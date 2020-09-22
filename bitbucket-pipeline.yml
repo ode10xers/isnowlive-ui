@@ -1,0 +1,58 @@
+definitions:
+  caches:
+    npm: .npmcache
+pipelines:
+  branches:
+    master:
+      - step:
+          name: Build
+          image: node:11
+          caches:
+            - node
+            - npm
+          script:
+            - npm install --cache .npmcache
+            - npm run build
+          artifacts:
+            - build/**
+      - step :
+          trigger: manual
+          name : deploy to prod
+          image: atlassian/pipelines-awscli:latest
+          deployment: production
+          script:
+            - aws s3 sync build/ s3://${S3_BUCKET} --region me-south-1 --delete
+            - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
+    develop:
+      - step:
+          name: Build
+          image: node:11
+          caches:
+            - node
+            - npm
+          script:
+            - npm install --cache .npmcache
+            - npm run build:stage
+          artifacts:
+            - build/**
+      - step:
+          name: deploy to stage
+          image: atlassian/pipelines-awscli:latest
+          deployment: staging
+          script:
+            - aws s3 sync build/ s3://${S3_BUCKET} --region me-south-1 --delete
+            - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
+
+
+  pull-requests:
+    '**':
+      - step:
+          name: Build
+          image: node:11
+          caches:
+            - node
+            - npm
+          script:
+            - npm install --cache .npmcache
+            - npm run build
+
