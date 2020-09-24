@@ -4,6 +4,7 @@ import { Router, Switch, Route } from 'react-router-dom';
 import Routes from './routes';
 
 import Home from './pages/Home';
+import Profile from './pages/Profile';
 
 function App() {
   const history = createBrowserHistory();
@@ -12,7 +13,8 @@ function App() {
   return (
     <Router history={history}>
       <Switch>
-        <Route path={Routes.root} component={Home} />
+        <Route exact path={Routes.root} component={Home} />
+        <Route exact path={Routes.profile} component={Profile} />
       </Switch>
     </Router>
   );
