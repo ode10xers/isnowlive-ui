@@ -5,6 +5,7 @@ import Routes from './routes';
 
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import ProfilePreview from './pages/ProfilePreview';
 
 function App() {
   const history = createBrowserHistory();
@@ -15,6 +16,7 @@ function App() {
       <Switch>
         <Route exact path={Routes.root} component={Home} />
         <Route exact path={Routes.profile} component={Profile} />
+        <Route exact path={Routes.profilePreview} component={ProfilePreview} />
       </Switch>
     </Router>
   );
