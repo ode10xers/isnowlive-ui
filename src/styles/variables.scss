@@ -12,6 +12,9 @@ $spacing: (
 .ml5 {
   margin-left: map-get($spacing, '5');
 }
+.m10 {
+  margin: map-get($spacing, '10');
+}
 .ml10 {
   margin-left: map-get($spacing, '10');
 }

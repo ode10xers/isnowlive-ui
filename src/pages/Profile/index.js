@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Image, Upload, message } from 'antd';
-import { LoadingOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form, Typography, Button, Space, Row, Col, Input, Card, Upload, message } from 'antd';
+import { LoadingOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import DefaultLayout from '../../layouts/DefaultLayout';
 import parse from 'html-react-parser';
 import { Section } from '../../components';
@@ -40,6 +40,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
+  const [testimonials, setTestimonials] = useState([]);
 
   const [form] = Form.useForm();
   const onFinish = (values) => {
@@ -73,6 +75,13 @@ const Profile = () => {
     setProfileImage(newFileList[0]);
   };
 
+  const handlePublicUrlChange = (e) => {
+    if (e.target.value === 'abc') {
+      setIsPublicUrlAvaiable(false);
+    } else {
+      setIsPublicUrlAvaiable(true);
+    }
+  };
   return (
     <DefaultLayout>
       <Space size="middle">
@@ -142,6 +151,7 @@ const Profile = () => {
             label="Public URL"
             name="publicUrl"
             rules={[{ required: true, message: 'Please input public URL' }]}
+            onChange={handlePublicUrlChange}
           >
             <Row align="middle">
               <Col>
@@ -151,9 +161,15 @@ const Profile = () => {
                 <Text>.is-now.live</Text>
               </Col>
               <Col className={styles.ml10}>
-                <Text type="success">
-                  <span className={styles.dot} style={{ backgroundColor: '#52C41A' }}></span> Available
-                </Text>
+                {isPublicUrlAvaiable ? (
+                  <Text type="success">
+                    <span className={styles.dot} style={{ backgroundColor: '#52C41A' }}></span> Available
+                  </Text>
+                ) : (
+                  <Text type="danger">
+                    <span className={styles.dot} style={{ backgroundColor: '#bb2124' }}></span> Unavailable
+                  </Text>
+                )}
               </Col>
             </Row>
           </Form.Item>
@@ -189,57 +205,46 @@ const Profile = () => {
           <Text className={styles.ml20} type="secondary">
             Embed social media posts to add social proof on your public page
           </Text>
-          <Form.List name="testimonials">
-            {(fields, { add, remove }) => {
-              return (
-                <div>
-                  {fields.map((field, index) => {
-                    return (
-                      <Form.Item {...formItemLayout} label={'Embed Code'} required={false} key={field.key}>
-                        <Form.Item
-                          {...field}
-                          validateTrigger={['onChange', 'onBlur']}
-                          rules={[
-                            {
-                              required: true,
-                              whitespace: true,
-                              message: 'Please input embeded code for the profile link',
-                            },
-                          ]}
-                          noStyle
-                        >
-                          <Input.TextArea rows={4} placeholder="Enter profile link" style={{ width: '80%' }} />
-                        </Form.Item>
-                        <MinusCircleOutlined
-                          className="dynamic-delete-button"
-                          style={{ margin: '0 8px' }}
-                          onClick={() => {
-                            remove(field.name);
-                          }}
-                        />
-                      </Form.Item>
-                    );
-                  })}
-                  <Form.Item {...tailLayout}>
-                    <Button
-                      onClick={() => {
-                        add();
-                      }}
+
+          <Form.Item label="Embed code" name="testimonials">
+            <Input.TextArea rows={4} placeholder="Please input your short bio" />
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Row>
+              <Col xs={24}>
+                <Button
+                  className={styles.mb10}
+                  onClick={() => {
+                    setTestimonials([...testimonials, form.getFieldValue().testimonials]);
+                    form.setFieldsValue({ testimonials: '' });
+                  }}
+                >
+                  <PlusOutlined /> Add
+                </Button>
+              </Col>
+            </Row>
+          </Form.Item>
+
+          <Form.Item {...tailLayout}>
+            <Row>
+              {testimonials?.map((item, index) => (
+                <Col xs={24} md={24} key={index}>
+                  {item && item.length ? (
+                    <Card
+                      title="Preview"
+                      bordered={false}
+                      extra={
+                        <DeleteOutlined onClick={() => setTestimonials(testimonials.filter((_, i) => i !== index))} />
+                      }
+                      className={styles.m10}
                     >
-                      <PlusOutlined /> Add
-                    </Button>
-                    <Row>
-                      {form.getFieldsValue()?.testimonials?.map((item) => (
-                        <Col xs={24} md={12}>
-                          {item && item.length ? <div>{parse(item)}</div> : null}
-                        </Col>
-                      ))}
-                    </Row>
-                  </Form.Item>
-                </div>
-              );
-            }}
-          </Form.List>
+                      {parse(item)}
+                    </Card>
+                  ) : null}
+                </Col>
+              ))}
+            </Row>
+          </Form.Item>
         </Section>
 
         {/* ====PREVIEW AND PUBLISH====== */}
