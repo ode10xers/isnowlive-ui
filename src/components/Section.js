@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Typography, Divider, Row, Col, Space } from 'antd';
+import { Row, Col } from 'antd';
 import styles from './SectionStyles.module.scss';
 
 export const Section = ({ children }) => {
