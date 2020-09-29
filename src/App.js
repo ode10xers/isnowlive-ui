@@ -2,9 +2,16 @@ import React from 'react';
 import { createBrowserHistory } from 'history';
 import { Router, Switch, Route } from 'react-router-dom';
 import Routes from './routes';
+import DefaultLayout from './layouts/DefaultLayout';
 
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+
+function RouteWithLayout({ layout, component, ...rest }) {
+  return (
+    <Route {...rest} render={(props) => React.createElement(layout, props, React.createElement(component, props))} />
+  );
+}
 
 function App() {
   const history = createBrowserHistory();
@@ -14,7 +21,7 @@ function App() {
     <Router history={history}>
       <Switch>
         <Route exact path={Routes.root} component={Home} />
-        <Route exact path={Routes.profile} component={Profile} />
+        <RouteWithLayout layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
       </Switch>
     </Router>
   );
