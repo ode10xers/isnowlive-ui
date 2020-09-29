@@ -21,7 +21,7 @@ pipelines:
           image: atlassian/pipelines-awscli:latest
           deployment: production
           script:
-            - aws s3 sync build/ s3://${S3_BUCKET} --region me-south-1 --delete
+            - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
     develop:
       - step:
@@ -40,7 +40,7 @@ pipelines:
           image: atlassian/pipelines-awscli:latest
           deployment: staging
           script:
-            - aws s3 sync build/ s3://${S3_BUCKET} --region me-south-1 --delete
+            - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
 
 
