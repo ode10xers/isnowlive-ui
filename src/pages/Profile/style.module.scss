@@ -5,15 +5,22 @@
 .dot {
   height: 10px;
   width: 10px;
-  background-color: #bbb;
+  background-color: map-get($colors, $key: 'offWhite');
   border-radius: 50%;
   display: inline-block;
+}
+.success {
+  background-color: map-get($colors, $key: 'success');
+}
+.danger {
+  background-color: map-get($colors, $key: 'danger');
 }
 .imageWrapper {
   position: relative;
   height: 290px;
 }
-.coverImage {
+.coverImage > div {
+  width: 100% !important;
   height: 200px !important;
 }
 .profileImage {

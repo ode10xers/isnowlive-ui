@@ -7,7 +7,6 @@ import {
   InstagramOutlined,
   TwitterOutlined,
 } from '@ant-design/icons';
-import DefaultLayout from '../../layouts/DefaultLayout';
 import MobileDetect from 'mobile-detect';
 import styles from './style.module.scss';
 
@@ -21,7 +20,7 @@ const ProfilePreview = () => {
     'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1339&q=80'
   );
   return (
-    <DefaultLayout>
+    <>
       {/* ======INTRO========= */}
       <div className={styles.imageWrapper}>
         <div
@@ -79,7 +78,7 @@ const ProfilePreview = () => {
       </Row>
 
       {/* =====SESSION======== */}
-    </DefaultLayout>
+    </>
   );
 };
 export default ProfilePreview;

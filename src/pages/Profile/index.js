@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card, Upload, message } from 'antd';
-import { LoadingOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import DefaultLayout from '../../layouts/DefaultLayout';
+import { Form, Typography, Button, Space, Row, Col, Input, Card } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
-import { Section } from '../../components';
-import ImgCrop from 'antd-img-crop';
+import Section from '../../components/Section';
+import ImageUpload from '../../components/ImageUpload';
 import styles from './style.module.scss';
+import validationRules from '../../utils/validation';
 
 const formItemLayout = {
   labelCol: {
@@ -23,27 +23,13 @@ const tailLayout = {
 };
 const { Title, Text } = Typography;
 
-// const initialValue = {
-//   coverImage: '',
-//   profileImage: '',
-//   name: '',
-//   shortBio: '',
-//   publicUrl: '',
-//   websitee: '',
-//   facebook: '',
-//   twitter: '',
-//   instagram: '',
-//   testimonials: '',
-// };
-
 const Profile = () => {
-  const [loading, setLoading] = useState(false);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
+  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(false);
   const [testimonials, setTestimonials] = useState([]);
-
   const [form] = Form.useForm();
+
   const onFinish = (values) => {
     console.log('Success:', values);
   };
@@ -51,38 +37,31 @@ const Profile = () => {
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
-  const beforeUpload = (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!');
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
-    }
-    return isJpgOrPng && isLt2M;
-  };
+
   const onCoverImageUpload = ({ fileList: newFileList }) => {
     setCoverImage(newFileList[0]);
   };
+
   const onProfileImageUpload = ({ fileList: newFileList }) => {
     setProfileImage(newFileList[0]);
   };
 
   const handlePublicUrlChange = (e) => {
-    if (e.target.value === 'abc') {
-      setIsPublicUrlAvaiable(false);
-    } else {
+    if (e.target.value) {
       setIsPublicUrlAvaiable(true);
+    } else {
+      setIsPublicUrlAvaiable(false);
     }
   };
+
   return (
-    <DefaultLayout>
+    <>
       <Space size="middle">
         <Typography>
           <Title>Setup your profile</Title>
         </Typography>
       </Space>
+
       <Form form={form} {...formItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========PRIMARY INFO======== */}
         <Section>
@@ -92,48 +71,27 @@ const Profile = () => {
           </Text>
 
           <div className={styles.imageWrapper}>
-            <ImgCrop shape="rect" aspect={2}>
-              <Upload.Dragger
-                className={styles.coverImage}
-                name="coverImage"
-                multiple={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                onChange={onCoverImageUpload}
-                showUploadList={false}
-              >
-                {coverImage ? (
-                  <img src={coverImage} alt="avatar" style={{ width: '100%' }} />
-                ) : (
-                  <div>
-                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                    <div style={{ marginTop: 8 }}>Cover Photo</div>
-                  </div>
-                )}
-              </Upload.Dragger>
-            </ImgCrop>
-            <ImgCrop rotate>
-              <Upload
-                name="profileImage"
-                listType="picture-card"
-                className={classNames('avatar-uploader', styles.profileImage)}
-                showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                beforeUpload={beforeUpload}
-                onChange={onProfileImageUpload}
-              >
-                {profileImage ? (
-                  <img src={profileImage} alt="avatar" style={{ width: '100%' }} />
-                ) : (
-                  <div>
-                    {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                    <div style={{ marginTop: 8 }}>Your Photo</div>
-                  </div>
-                )}
-              </Upload>
-            </ImgCrop>
+            <ImageUpload
+              aspect={2}
+              className={classNames('avatar-uploader', styles.coverImage)}
+              name="coverImage"
+              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              onChange={onCoverImageUpload}
+              value={coverImage}
+              label="Cover Photo"
+            />
+
+            <ImageUpload
+              name="profileImage"
+              className={classNames('avatar-uploader', styles.profileImage)}
+              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              onChange={onProfileImageUpload}
+              value={profileImage}
+              label="Profile Photo"
+            />
           </div>
 
-          <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please input your name' }]}>
+          <Form.Item label="Name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Your Display Name" />
           </Form.Item>
 
@@ -144,12 +102,12 @@ const Profile = () => {
           <Form.Item
             label="Public URL"
             name="publicUrl"
-            rules={[{ required: true, message: 'Please input public URL' }]}
+            rules={validationRules.publicUrlValidation}
             onChange={handlePublicUrlChange}
           >
             <Row align="middle">
               <Col>
-                <Input placeholder="avishayyoga" />
+                <Input placeholder="username" />
               </Col>
               <Col className={styles.ml10}>
                 <Text>.is-now.live</Text>
@@ -157,11 +115,11 @@ const Profile = () => {
               <Col className={styles.ml10}>
                 {isPublicUrlAvaiable ? (
                   <Text type="success">
-                    <span className={styles.dot} style={{ backgroundColor: '#52C41A' }}></span> Available
+                    <span className={classNames(styles.dot, styles.success)}></span> Available
                   </Text>
                 ) : (
                   <Text type="danger">
-                    <span className={styles.dot} style={{ backgroundColor: '#bb2124' }}></span> Unavailable
+                    <span className={classNames(styles.dot, styles.danger)}></span> Unavailable
                   </Text>
                 )}
               </Col>
@@ -259,7 +217,7 @@ const Profile = () => {
           </Row>
         </Section>
       </Form>
-    </DefaultLayout>
+    </>
   );
 };
 
