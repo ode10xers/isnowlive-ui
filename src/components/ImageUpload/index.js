@@ -14,7 +14,7 @@ const ImageUpload = ({
   aspect = 1,
   className,
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
