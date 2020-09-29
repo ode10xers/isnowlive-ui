@@ -40,8 +40,6 @@ const ImageUpload = ({
         onChange={onChange}
         beforeUpload={beforeUpload}
         showUploadList={showUploadList}
-        value={value}
-        label={label}
       >
         {value ? (
           <img src={value} alt="avatar" className={styles.w100} />
