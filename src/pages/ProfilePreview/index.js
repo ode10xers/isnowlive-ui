@@ -13,10 +13,10 @@ import styles from './style.module.scss';
 const ProfilePreview = () => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  const [coverImage, setCoverImage] = useState(
+  const [coverImage] = useState(
     'https://images.unsplash.com/photo-1516093491926-a4c43060540a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2109&q=80'
   );
-  const [profileImage, setProfileImage] = useState(
+  const [profileImage] = useState(
     'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1339&q=80'
   );
   return (
