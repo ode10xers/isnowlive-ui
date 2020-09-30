@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Typography, Button, Row, Col, Space } from 'antd';
+import { Image, Typography, Button, Row, Col, Space, Tabs } from 'antd';
 import {
   ShareAltOutlined,
   GlobalOutlined,
@@ -9,6 +9,8 @@ import {
 } from '@ant-design/icons';
 import MobileDetect from 'mobile-detect';
 import styles from './style.module.scss';
+import moment from 'moment';
+import Sessions from '../../components/Sessions';
 
 const ProfilePreview = () => {
   const md = new MobileDetect(window.navigator.userAgent);
@@ -19,6 +21,49 @@ const ProfilePreview = () => {
   const [profileImage] = useState(
     'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1339&q=80'
   );
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [upcomingSession] = useState([
+    {
+      id: 1,
+      sessionImage: profileImage,
+      sessionType: 'Group Session',
+      name: 'Introduction to Geometry and Trigonometry',
+      date: moment().format(),
+      starttime: moment().format(),
+      endtime: moment().add(2, 'hours'),
+    },
+    {
+      id: 2,
+      sessionImage: profileImage,
+      sessionType: 'Group Session',
+      name: 'Introduction to Geometry and Trigonometry',
+      date: moment().format(),
+      starttime: moment().format(),
+      endtime: moment().add(2, 'hours'),
+    },
+    {
+      id: 3,
+      sessionImage: profileImage,
+      sessionType: 'Group Session',
+      name: 'Introduction to Geometry and Trigonometry',
+      date: moment().format(),
+      starttime: moment().format(),
+      endtime: moment().add(2, 'hours'),
+    },
+    {
+      id: 4,
+      sessionImage: profileImage,
+      sessionType: 'Group Session',
+      name: 'Introduction to Geometry and Trigonometry',
+      date: moment().format(),
+      starttime: moment().format(),
+      endtime: moment().add(2, 'hours'),
+    },
+  ]);
+
+  const handleChangeTab = (key) => {
+    setSelectedTab(key);
+  };
   return (
     <>
       {/* ======INTRO========= */}
@@ -78,6 +123,29 @@ const ProfilePreview = () => {
       </Row>
 
       {/* =====SESSION======== */}
+      <Row className={styles.mt50}>
+        <Col span={24}>
+          <Typography.Title level={isMobileDevice ? 4 : 2}>Sessions</Typography.Title>
+        </Col>
+        <Col span={24}>
+          <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
+            <Tabs.TabPane tab="Upcoming Sessions" key="0">
+              <Sessions sessions={upcomingSession} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Past Sesions" key="1">
+              <Sessions sessions={upcomingSession} />
+            </Tabs.TabPane>
+          </Tabs>
+        </Col>
+      </Row>
+
+      {/* =====TESTIMONIALS======== */}
+      <Row className={styles.mt50}>
+        <Col span={24}>
+          <Typography.Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Typography.Title>
+        </Col>
+        <Col span={24}></Col>
+      </Row>
     </>
   );
 };

@@ -15,11 +15,14 @@ $spacing: (
 }
 
 // MARGIN
-.ml5 {
-  margin-left: map-get($spacing, '5');
-}
 .m10 {
   margin: map-get($spacing, '10');
+}
+.m20 {
+  margin: map-get($spacing, '20');
+}
+.ml5 {
+  margin-left: map-get($spacing, '5');
 }
 .ml10 {
   margin-left: map-get($spacing, '10');
