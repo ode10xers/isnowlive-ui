@@ -39,6 +39,12 @@ $spacing: (
 .mt10 {
   margin-top: map-get($spacing, '10');
 }
+.mt20 {
+  margin-top: map-get($spacing, '-20');
+}
+.nmt20 {
+  margin-top: -20px;
+}
 .mb10 {
   margin-bottom: map-get($spacing, '10');
 }

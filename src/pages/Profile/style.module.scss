@@ -28,3 +28,8 @@
   bottom: 30px;
   left: 20px;
 }
+.subtext {
+  color: map-get($colors, $key: 'sub-text');
+  margin-left: map-get($spacing, '20');
+  margin-bottom: map-get($spacing, '20');
+}

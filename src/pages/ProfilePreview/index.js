@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image, Typography, Button, Row, Col, Space, Tabs } from 'antd';
 import {
   ShareAltOutlined,
@@ -10,22 +10,22 @@ import {
 import MobileDetect from 'mobile-detect';
 import styles from './style.module.scss';
 import moment from 'moment';
+import apis from 'apis';
 import Sessions from '../../components/Sessions';
+import Loader from '../../components/Loader';
+const demoPic =
+  'https://images.unsplash.com/photo-1548182880-8b7b2af2caa2?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80';
 
 const ProfilePreview = () => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  const [coverImage] = useState(
-    'https://images.unsplash.com/photo-1516093491926-a4c43060540a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2109&q=80'
-  );
-  const [profileImage] = useState(
-    'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1339&q=80'
-  );
+  const [coverImage, setCoverImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const [upcomingSession] = useState([
     {
       id: 1,
-      sessionImage: profileImage,
+      sessionImage: demoPic,
       sessionType: 'Group Session',
       name: 'Introduction to Geometry and Trigonometry',
       date: moment().format(),
@@ -34,7 +34,7 @@ const ProfilePreview = () => {
     },
     {
       id: 2,
-      sessionImage: profileImage,
+      sessionImage: demoPic,
       sessionType: 'Group Session',
       name: 'Introduction to Geometry and Trigonometry',
       date: moment().format(),
@@ -43,7 +43,7 @@ const ProfilePreview = () => {
     },
     {
       id: 3,
-      sessionImage: profileImage,
+      sessionImage: demoPic,
       sessionType: 'Group Session',
       name: 'Introduction to Geometry and Trigonometry',
       date: moment().format(),
@@ -52,7 +52,7 @@ const ProfilePreview = () => {
     },
     {
       id: 4,
-      sessionImage: profileImage,
+      sessionImage: demoPic,
       sessionType: 'Group Session',
       name: 'Introduction to Geometry and Trigonometry',
       date: moment().format(),
@@ -60,12 +60,31 @@ const ProfilePreview = () => {
       endtime: moment().add(2, 'hours'),
     },
   ]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
 
+  const getProfileDetails = async () => {
+    try {
+      const { data } = await apis.user.getProfile();
+      if (data) {
+        setProfile(data);
+        setCoverImage(data.profile.cover_image_url);
+        setProfileImage(data.profile.profile_image_url);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    getProfileDetails();
+  }, []);
   const handleChangeTab = (key) => {
     setSelectedTab(key);
   };
   return (
-    <>
+    <Loader loading={isLoading} size="large" text="Loading profile">
       {/* ======INTRO========= */}
       <div className={styles.imageWrapper}>
         <div
@@ -96,7 +115,7 @@ const ProfilePreview = () => {
       <Row justify="space-between" align="middle">
         <Col xs={8} md={24}></Col>
         <Col xs={10} md={{ span: 6, offset: 6 }}>
-          <Typography.Title level={isMobileDevice ? 4 : 2}>Avishay M.</Typography.Title>
+          <Typography.Title level={isMobileDevice ? 4 : 2}>{profile?.full_name}</Typography.Title>
         </Col>
         <Col xs={6} md={{ span: 6, offset: 6 }}>
           <Button size={isMobileDevice ? 'small' : 'middle'} icon={<ShareAltOutlined />}>
@@ -104,20 +123,42 @@ const ProfilePreview = () => {
           </Button>
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
-          <Typography.Text type="secondary">
-            Elit, erat urna, sagittis aliquam egestas eu feugiat. Sit aenean nulla luctus imperdiet diam tristique non
-            massa vulputate. Enim pulvinar ultrices fusce justo, est phasellus est gravida ultrices. Mauris parturient
-            ut elementum gravida amet vitae. Nam quam ultrices suspendisse diam. In proin massa aliquam gravida amet dui
-            varius. Consectetur ac commodo tincidunt dolor risus velit scelerisque ullamcorper. Eget arcu porttitor ut
-            lorem morbi duis nunc amet, eget.
-          </Typography.Text>
+          <Typography.Text type="secondary">{profile?.profile?.description}</Typography.Text>
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
           <Space size={'middle'}>
-            <GlobalOutlined className={styles.socialIcon} />
-            <FacebookOutlined className={styles.socialIcon} />
-            <InstagramOutlined className={styles.socialIcon} />
-            <TwitterOutlined className={styles.socialIcon} />
+            <a
+              href="/#"
+              onClick={() => window.open(profile?.profile?.social_media_links?.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <GlobalOutlined className={styles.socialIcon} />
+            </a>
+            <a
+              href="/#"
+              onClick={() => window.open(profile?.profile?.social_media_links?.facebook_link)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FacebookOutlined className={styles.socialIcon} />
+            </a>
+            <a
+              href="/#"
+              onClick={() => window.open(profile?.profile?.social_media_links?.twitter_link)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <TwitterOutlined className={styles.socialIcon} />
+            </a>
+            <a
+              href="/#"
+              onClick={() => window.open(profile?.profile?.social_media_links?.instagram_link)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <InstagramOutlined className={styles.socialIcon} />
+            </a>
           </Space>
         </Col>
       </Row>
@@ -146,7 +187,7 @@ const ProfilePreview = () => {
         </Col>
         <Col span={24}></Col>
       </Row>
-    </>
+    </Loader>
   );
 };
 export default ProfilePreview;

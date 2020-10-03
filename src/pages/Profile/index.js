@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { Form, Typography, Button, Space, Row, Col, Input, Card } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import Section from '../../components/Section';
+import Loader from '../../components/Loader';
+import OnboardSteps from '../../components/OnboardSteps';
 import ImageUpload from '../../components/ImageUpload';
 import styles from './style.module.scss';
 import validationRules from '../../utils/validation';
+import apis from 'apis';
+import Routes from 'routes';
 
 const formItemLayout = {
   labelCol: {
@@ -18,20 +22,61 @@ const formItemLayout = {
     sm: { span: 12 },
   },
 };
+
 const tailLayout = {
   wrapperCol: { offset: 5, span: 19 },
 };
 const { Title, Text } = Typography;
 
 const Profile = () => {
+  const [isLoading, setIsLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(false);
   const [testimonials, setTestimonials] = useState([]);
   const [form] = Form.useForm();
 
+  const getProfileDetails = useCallback(async () => {
+    try {
+      const { data } = await apis.user.getProfile();
+      if (data) {
+        form.setFieldsValue(data);
+        setCoverImage(data.profile.cover_image_url);
+        setProfileImage(data.profile.profile_image_url);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  }, [form]);
+
+  const updateProfileDetails = async (values) => {
+    try {
+      const { data } = await apis.user.updateProfile(values);
+      if (data) {
+        form.setFieldsValue(data);
+        setCoverImage(data.profile.cover_image_url);
+        setProfileImage(data.profile.profile_image_url);
+        setIsLoading(false);
+        window.open(Routes.profilePreview);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getProfileDetails();
+  }, [getProfileDetails]);
+
   const onFinish = (values) => {
+    setIsLoading(true);
     console.log('Success:', values);
+    values.profile.cover_image_url = coverImage;
+    values.profile.profile_image_url = coverImage;
+    values.testimonials = testimonials;
+    updateProfileDetails(values);
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -55,7 +100,8 @@ const Profile = () => {
   };
 
   return (
-    <>
+    <Loader loading={isLoading} size="large" text="Loading profile">
+      <OnboardSteps current={0} />
       <Space size="middle">
         <Typography>
           <Title>Setup your profile</Title>
@@ -66,15 +112,13 @@ const Profile = () => {
         {/* ========PRIMARY INFO======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
-          <Text className={styles.ml20} type="secondary">
-            some text here - to be decieded later
-          </Text>
+          <p className={styles.subtext}>some text here - to be decieded later</p>
 
           <div className={styles.imageWrapper}>
             <ImageUpload
               aspect={2}
               className={classNames('avatar-uploader', styles.coverImage)}
-              name="coverImage"
+              name="profile.cover_image_url"
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
               onChange={onCoverImageUpload}
               value={coverImage}
@@ -82,7 +126,7 @@ const Profile = () => {
             />
 
             <ImageUpload
-              name="profileImage"
+              name="profile.profile_image_url"
               className={classNames('avatar-uploader', styles.profileImage)}
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
               onChange={onProfileImageUpload}
@@ -90,29 +134,25 @@ const Profile = () => {
               label="Profile Photo"
             />
           </div>
-
-          <Form.Item label="Name" name="name" rules={validationRules.nameValidation}>
+          <Form.Item label="Name" name="full_name" rules={validationRules.nameValidation}>
             <Input placeholder="Your Display Name" />
           </Form.Item>
 
-          <Form.Item label="Short bio" name="shortBio">
+          <Form.Item label="Short bio" name={['profile', 'description']}>
             <Input.TextArea rows={4} placeholder="Please input your short bio" />
           </Form.Item>
 
-          <Form.Item
-            label="Public URL"
-            name="publicUrl"
-            rules={validationRules.publicUrlValidation}
-            onChange={handlePublicUrlChange}
-          >
+          <Form.Item label="Public URL">
             <Row align="middle">
               <Col>
-                <Input placeholder="username" />
+                <Form.Item name="username" rules={validationRules.publicUrlValidation} onChange={handlePublicUrlChange}>
+                  <Input placeholder="username" />
+                </Form.Item>
               </Col>
-              <Col className={styles.ml10}>
+              <Col className={classNames(styles.ml10, styles.nmt20)}>
                 <Text>.is-now.live</Text>
               </Col>
-              <Col className={styles.ml10}>
+              <Col className={classNames(styles.ml10, styles.nmt20)}>
                 {isPublicUrlAvaiable ? (
                   <Text type="success">
                     <span className={classNames(styles.dot, styles.success)}></span> Available
@@ -130,23 +170,21 @@ const Profile = () => {
         {/* =========ONLINE PRESENCE==== */}
         <Section>
           <Title level={4}>2. Online Presence</Title>
-          <Text className={styles.ml20} type="secondary">
-            Let people know where else to follow you on social media
-          </Text>
+          <p className={styles.subtext}>Let people know where else to follow you on social media</p>
 
-          <Form.Item label="Website" name="websitee">
+          <Form.Item label="Website" name={['profile', 'social_media_links', 'website']}>
             <Input placeholder="Your website link" />
           </Form.Item>
 
-          <Form.Item label="Facebook" name="facebook">
+          <Form.Item label="Facebook" name={['profile', 'social_media_links', 'facebook_link']}>
             <Input placeholder="Facebook profile link" />
           </Form.Item>
 
-          <Form.Item label="Twitter" name="twitter">
+          <Form.Item label="Twitter" name={['profile', 'social_media_links', 'twitter_link']}>
             <Input placeholder="Twitter profile link" />
           </Form.Item>
 
-          <Form.Item label="Instagram" name="instagram">
+          <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
             <Input placeholder="Instagram profile link" />
           </Form.Item>
         </Section>
@@ -154,9 +192,7 @@ const Profile = () => {
         {/* ========TESTIMONIALS======== */}
         <Section>
           <Title level={4}>3. Testimonials</Title>
-          <Text className={styles.ml20} type="secondary">
-            Embed social media posts to add social proof on your public page
-          </Text>
+          <p className={styles.subtext}>Embed social media posts to add social proof on your public page</p>
 
           <Form.Item label="Embed code" name="testimonials">
             <Input.TextArea rows={4} placeholder="Please input your short bio" />
@@ -202,22 +238,17 @@ const Profile = () => {
         {/* ====PREVIEW AND PUBLISH====== */}
         <Section>
           <Row justify="center">
-            <Col xs={12} sm={{ span: 6 }}>
+            <Col>
               <Form.Item>
-                <Button htmlType="submit" className={styles.button}>
-                  Live Preview
+                <Button htmlType="submit" type="primary">
+                  Publish Page
                 </Button>
-              </Form.Item>
-            </Col>
-            <Col xs={12} sm={{ span: 6 }}>
-              <Form.Item>
-                <Button type="primary">Publish Page</Button>
               </Form.Item>
             </Col>
           </Row>
         </Section>
       </Form>
-    </>
+    </Loader>
   );
 };
 
