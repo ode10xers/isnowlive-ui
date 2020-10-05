@@ -12,6 +12,7 @@ import OnboardSteps from '../../components/OnboardSteps';
 import ImageUpload from '../../components/ImageUpload';
 import validationRules from '../../utils/validation';
 import { profileFormItemLayout, profileFormTailLayout } from '../../layouts/FormLayouts';
+import { parseEmbedCode } from '../../utils/helper';
 
 import styles from './style.module.scss';
 
@@ -32,6 +33,7 @@ const Profile = () => {
         form.setFieldsValue(data);
         setCoverImage(data.profile.cover_image_url);
         setProfileImage(data.profile.profile_image_url);
+        setTestimonials(data.profile.testimonials);
         setIsLoading(false);
       }
     } catch (error) {
@@ -212,7 +214,7 @@ const Profile = () => {
                       }
                       className={styles.m10}
                     >
-                      {parse(item)}
+                      {parseEmbedCode(parse(item))}
                     </Card>
                   ) : null}
                 </Col>

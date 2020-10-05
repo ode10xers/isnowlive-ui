@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image, Typography, Button, Row, Col, Space, Tabs, message } from 'antd';
+import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message } from 'antd';
 import {
   ShareAltOutlined,
   GlobalOutlined,
@@ -7,10 +7,14 @@ import {
   InstagramOutlined,
   TwitterOutlined,
 } from '@ant-design/icons';
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from '../../components/Sessions';
 import Loader from '../../components/Loader';
+import parse from 'html-react-parser';
+import { parseEmbedCode } from '../../utils/helper';
 import DefaultImage from '../../components/Icons/DefaultImage/index';
 import styles from './style.module.scss';
 
@@ -146,7 +150,23 @@ const ProfilePreview = () => {
         <Col span={24}>
           <Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Title>
         </Col>
-        <Col span={24}></Col>
+        <Col span={24}>
+          <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 2 }}>
+            <Masonry>
+              {profile && profile?.profile?.testimonials
+                ? profile.profile.testimonials.map((testimonial, index) => (
+                    <Card
+                      key={index}
+                      bordered={false}
+                      hoverable
+                      className={styles.card}
+                      cover={parseEmbedCode(parse(testimonial))}
+                    ></Card>
+                  ))
+                : null}
+            </Masonry>
+          </ResponsiveMasonry>
+        </Col>
       </Row>
     </Loader>
   );
