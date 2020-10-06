@@ -1,4 +1,5 @@
 @import '../../styles/variables.scss';
+
 .button {
   margin-right: 20px;
 }
@@ -28,7 +29,6 @@
 .profileImage img {
   border-radius: 4px;
 }
-
 .profileImageSmall {
   position: absolute;
   border: 2px solid #ffffff;
@@ -41,4 +41,10 @@
 .socialIcon {
   font-size: 24px;
   margin: 5px;
+}
+.coverImageWrapper {
+  background-color: #f5f5f5;
+  text-align: 'center';
+  border-radius: 8px;
+  margin: -20px;
 }

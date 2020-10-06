@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, Card, message } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import Section from '../../components/Section';
@@ -22,7 +22,6 @@ const formItemLayout = {
     sm: { span: 12 },
   },
 };
-
 const tailLayout = {
   wrapperCol: { offset: 5, span: 19 },
 };
@@ -60,9 +59,10 @@ const Profile = () => {
         setProfileImage(data.profile.profile_image_url);
         setIsLoading(false);
         window.open(Routes.profilePreview);
+        message.success('Profile successfully updated.');
       }
     } catch (error) {
-      console.log(error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
 

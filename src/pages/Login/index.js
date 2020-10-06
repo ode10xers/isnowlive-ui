@@ -1,39 +1,27 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Button, Checkbox, Row, Col } from 'antd';
-import styles from './style.module.scss';
+import { Form, Input, Button, Checkbox, Row, Col, message } from 'antd';
 import { useGlobalContext } from '../../services/globalContext';
 import Routes from '../../routes';
 import apis from '../../apis';
 import http from '../../services/http';
 import validationRules from '../../utils/validation';
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from '../../utils/constants';
+import styles from './style.module.scss';
 
 const Login = ({ history }) => {
   const { state, logIn } = useGlobalContext();
 
   const onFinish = async (values) => {
     try {
-      console.log('Success:', values);
       const { data } = await apis.user.login(values);
       if (data) {
         http.setAuthToken(data.token);
-        logIn(data, true);
+        logIn(data, values.remember);
         history.push(Routes.profile);
       }
     } catch (error) {
-      console.log(error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
   };
 
   useEffect(() => {
@@ -45,13 +33,7 @@ const Login = ({ history }) => {
   return (
     <Row align="middle" className={styles.mt50}>
       <Col span={12} offset={6}>
-        <Form
-          {...layout}
-          name="basic"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-        >
+        <Form {...layout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
           <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
             <Input />
           </Form.Item>

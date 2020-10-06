@@ -6,5 +6,6 @@ export default {
     signup: (payload) => http.post('/client', payload),
     getProfile: (payload) => http.get('secure/client', payload),
     updateProfile: (payload) => http.put('secure/client', payload),
+    upcomingSession: (payload) => http.get('session/upcoming', payload),
   },
 };

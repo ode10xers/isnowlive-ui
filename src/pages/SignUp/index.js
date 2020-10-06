@@ -1,30 +1,22 @@
 import React, { useEffect } from 'react';
 import { Form, Input, Button, Checkbox, Row, Col } from 'antd';
-import styles from './style.module.scss';
 import { useGlobalContext } from '../../services/globalContext';
 import Routes from '../../routes';
 import apis from '../../apis';
 import http from '../../services/http';
 import validationRules from '../../utils/validation';
-
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
+import { layout, tailLayout } from '../../utils/constants';
+import styles from './style.module.scss';
 
 const SignUp = ({ history }) => {
   const { state, logIn } = useGlobalContext();
 
   const onFinish = async (values) => {
     try {
-      console.log('Success:', values);
       const { data } = await apis.user.signup(values);
       if (data) {
         http.setAuthToken(data.token);
-        logIn(data, true);
+        logIn(data, values.remember);
         history.push(Routes.profile);
       }
     } catch (error) {

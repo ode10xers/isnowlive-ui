@@ -3,7 +3,7 @@ const Routes = {
   login: '/login',
   signup: '/signup',
   profile: '/profile',
-  profilePreview: '/profile-preview',
+  profilePreview: '/profile/preview',
 };
 
 export default Routes;
