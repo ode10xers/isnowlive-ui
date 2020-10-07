@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
-import { Form, Input, Button, Checkbox, Row, Col } from 'antd';
+import { Form, Input, Button, Checkbox, Row, Col, message } from 'antd';
 import { useGlobalContext } from '../../services/globalContext';
 import Routes from '../../routes';
 import apis from '../../apis';
 import http from '../../services/http';
 import validationRules from '../../utils/validation';
-import { layout, tailLayout } from '../../utils/constants';
+import { formLayout, formTailLayout } from '../../utils/layouts';
+import { getRememberUserEmail } from '../../utils/storage';
 import styles from './style.module.scss';
 
 const SignUp = ({ history }) => {
   const { state, logIn } = useGlobalContext();
+  const [form] = Form.useForm();
 
   const onFinish = async (values) => {
     try {
@@ -20,30 +22,23 @@ const SignUp = ({ history }) => {
         history.push(Routes.profile);
       }
     } catch (error) {
-      console.log(error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
   };
 
   useEffect(() => {
-    if (state.userDeatils) {
+    form.setFieldsValue({
+      email: getRememberUserEmail(),
+    });
+    if (state.userDetails) {
       history.push(Routes.profile);
     }
-  }, [history, state.userDeatils]);
+  }, [history, state.userDetails, form]);
 
   return (
     <Row align="middle" className={styles.mt50}>
       <Col span={12} offset={6}>
-        <Form
-          {...layout}
-          name="basic"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-        >
+        <Form form={form} {...formLayout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
           <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
             <Input />
           </Form.Item>
@@ -52,11 +47,11 @@ const SignUp = ({ history }) => {
             <Input.Password />
           </Form.Item>
 
-          <Form.Item {...tailLayout} name="remember" valuePropName="checked">
+          <Form.Item {...formTailLayout} name="remember" valuePropName="checked">
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
-          <Form.Item {...tailLayout}>
+          <Form.Item {...formTailLayout}>
             <Button type="primary" htmlType="submit">
               Submit
             </Button>

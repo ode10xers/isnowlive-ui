@@ -34,3 +34,6 @@
   margin-left: map-get($spacing, '20');
   margin-bottom: map-get($spacing, '20');
 }
+.alignUrl {
+  align-items: baseline !important;
+}

@@ -30,21 +30,24 @@ const reducer = (state, action) => {
 const GlobalDataProvider = ({ children }) => {
   //TODO : add shared data here
   const initialState = {
-    userDeatils: getLocalUserDetails(),
+    userDetails: getLocalUserDetails(),
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
   function logIn(userDetails, rememberUser) {
     if (rememberUser) {
-      localStorage.setItem('user-details', JSON.stringify(userDetails));
+      localStorage.setItem('remember-user', JSON.stringify(userDetails.email));
+    } else {
+      localStorage.removeItem('remember-user');
     }
+    setUserDetails(userDetails);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
   }
 
   function setUserDetails(userDetails) {
-    dispatch({ type: 'SET_USER_DETAILS', payload: { userDetails } });
     localStorage.setItem('user-details', JSON.stringify(userDetails));
+    dispatch({ type: 'SET_USER_DETAILS', payload: { userDetails } });
   }
 
   function logOut(history) {

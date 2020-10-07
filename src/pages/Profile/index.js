@@ -3,28 +3,16 @@ import classNames from 'classnames';
 import { Form, Typography, Button, Space, Row, Col, Input, Card, message } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
+import apis from 'apis';
+import Routes from 'routes';
 import Section from '../../components/Section';
 import Loader from '../../components/Loader';
 import OnboardSteps from '../../components/OnboardSteps';
 import ImageUpload from '../../components/ImageUpload';
-import styles from './style.module.scss';
 import validationRules from '../../utils/validation';
-import apis from 'apis';
-import Routes from 'routes';
+import { profileFormItemLayout, profileFormTailLayout } from '../../utils/layouts';
+import styles from './style.module.scss';
 
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 5 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 12 },
-  },
-};
-const tailLayout = {
-  wrapperCol: { offset: 5, span: 19 },
-};
 const { Title, Text } = Typography;
 
 const Profile = () => {
@@ -45,7 +33,7 @@ const Profile = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
   }, [form]);
@@ -79,10 +67,6 @@ const Profile = () => {
     updateProfileDetails(values);
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
-
   const onCoverImageUpload = ({ fileList: newFileList }) => {
     setCoverImage(newFileList[0]);
   };
@@ -108,7 +92,7 @@ const Profile = () => {
         </Typography>
       </Space>
 
-      <Form form={form} {...formItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form form={form} {...profileFormItemLayout} onFinish={onFinish}>
         {/* ========PRIMARY INFO======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
@@ -143,16 +127,16 @@ const Profile = () => {
           </Form.Item>
 
           <Form.Item label="Public URL">
-            <Row align="middle">
+            <Row align="middle" className={styles.alignUrl}>
               <Col>
                 <Form.Item name="username" rules={validationRules.publicUrlValidation} onChange={handlePublicUrlChange}>
                   <Input placeholder="username" />
                 </Form.Item>
               </Col>
-              <Col className={classNames(styles.ml10, styles.nmt20)}>
+              <Col className={classNames(styles.ml10)}>
                 <Text>.is-now.live</Text>
               </Col>
-              <Col className={classNames(styles.ml10, styles.nmt20)}>
+              <Col className={classNames(styles.ml10)}>
                 {isPublicUrlAvaiable ? (
                   <Text type="success">
                     <span className={classNames(styles.dot, styles.success)}></span> Available
@@ -197,7 +181,7 @@ const Profile = () => {
           <Form.Item label="Embed code" name="testimonials">
             <Input.TextArea rows={4} placeholder="Please input your short bio" />
           </Form.Item>
-          <Form.Item {...tailLayout}>
+          <Form.Item {...profileFormTailLayout}>
             <Row>
               <Col xs={24}>
                 <Button
@@ -213,7 +197,7 @@ const Profile = () => {
             </Row>
           </Form.Item>
 
-          <Form.Item {...tailLayout}>
+          <Form.Item {...profileFormTailLayout}>
             <Row>
               {testimonials?.map((item, index) => (
                 <Col xs={24} md={24} key={index}>

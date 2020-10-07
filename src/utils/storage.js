@@ -9,3 +9,11 @@ export const getLocalUserDetails = () => {
   }
   return null;
 };
+
+export const getRememberUserEmail = () => {
+  const rememberUserDetails = JSON.parse(localStorage.getItem('remember-user'));
+  if (rememberUserDetails) {
+    return rememberUserDetails;
+  }
+  return null;
+};
