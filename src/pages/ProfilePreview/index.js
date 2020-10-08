@@ -11,7 +11,7 @@ import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from '../../components/Sessions';
 import Loader from '../../components/Loader';
-import DefaultImage from '../../components/Icons/DefaultImage';
+import DefaultImage from '../../components/Icons/DefaultImage/index';
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
