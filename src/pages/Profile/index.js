@@ -5,12 +5,14 @@ import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 import apis from 'apis';
 import Routes from 'routes';
+
 import Section from '../../components/Section';
 import Loader from '../../components/Loader';
 import OnboardSteps from '../../components/OnboardSteps';
 import ImageUpload from '../../components/ImageUpload';
 import validationRules from '../../utils/validation';
-import { profileFormItemLayout, profileFormTailLayout } from '../../utils/layouts';
+import { profileFormItemLayout, profileFormTailLayout } from '../../layouts/FormLayouts';
+
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;

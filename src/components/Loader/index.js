@@ -2,12 +2,15 @@ import React from 'react';
 import { Spin } from 'antd';
 
 const Loader = ({ children, loading, size = null, text }) => {
-  return loading ? (
-    <Spin size={size} tip={text}>
-      {children}
-    </Spin>
-  ) : (
-    <>{children}</>
+  return (
+    <React.Fragment>
+      {loading && (
+        <Spin size={size} tip={text}>
+          {children}
+        </Spin>
+      )}
+      {!loading && <React.Fragment> {children} </React.Fragment>}
+    </React.Fragment>
   );
 };
 

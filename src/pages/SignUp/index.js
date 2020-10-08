@@ -5,7 +5,7 @@ import Routes from '../../routes';
 import apis from '../../apis';
 import http from '../../services/http';
 import validationRules from '../../utils/validation';
-import { formLayout, formTailLayout } from '../../utils/layouts';
+import { formLayout, formTailLayout } from '../../layouts/FormLayouts';
 import { getRememberUserEmail } from '../../utils/storage';
 import styles from './style.module.scss';
 

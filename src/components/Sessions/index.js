@@ -13,7 +13,7 @@ const Sessions = ({ sessions }) => {
 
   const description = (session) => {
     return (
-      <>
+      <React.Fragment>
         <Text className={styles.day} strong>
           {moment(session.date).format('D').padStart(2, 0)}
         </Text>
@@ -24,7 +24,7 @@ const Sessions = ({ sessions }) => {
           {' -'}
         </Text>
         <Text type="secondary"> {moment(session.endtime).format('LT')} </Text>
-      </>
+      </React.Fragment>
     );
   };
 
@@ -40,11 +40,11 @@ const Sessions = ({ sessions }) => {
                   <Card.Meta
                     title={session.name}
                     description={
-                      <>
+                      <React.Fragment>
                         <Text type="secondary">{session.sessionType}</Text>
                         <br />
                         {description(session)}
-                      </>
+                      </React.Fragment>
                     }
                   />
                 </Card>
