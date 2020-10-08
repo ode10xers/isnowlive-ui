@@ -1,6 +1,6 @@
 /* eslint-disable */
 export default {
   server: {
-    baseURL: 'https://stage-api.isnow.live',
+    baseURL: 'https://api.mocklets.com/mock68084',
   },
 };

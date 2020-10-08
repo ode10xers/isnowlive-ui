@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
@@ -42,7 +43,7 @@ const ImageUpload = ({
         showUploadList={showUploadList}
       >
         {value ? (
-          <img src={value} alt="avatar" className={styles.w100} />
+          <img src={value} alt="avatar" className={classNames(styles.w100, styles.image)} />
         ) : (
           <div>
             {loading ? <LoadingOutlined /> : <PlusOutlined />}
