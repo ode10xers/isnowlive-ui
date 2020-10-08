@@ -8,4 +8,7 @@ export default {
     updateProfile: (payload) => http.put('secure/client', payload),
     upcomingSession: (payload) => http.get('session/upcoming', payload),
   },
+  session: {
+    create: (payload) => http.post('/secure/staff/sessions/', payload),
+  },
 };

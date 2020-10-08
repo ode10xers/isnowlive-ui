@@ -24,3 +24,12 @@ export const parseEmbedCode = (parsedItem) => {
     return parsedItem;
   }
 };
+
+export const getCurrencyList = async () => {
+  try {
+    const currencyList = await fetch('https://openexchangerates.org/api/currencies.json').then((res) => res.json());
+    return currencyList;
+  } catch (error) {
+    console.log('Failed to load currency list', error?.response?.error);
+  }
+};

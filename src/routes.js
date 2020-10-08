@@ -3,6 +3,7 @@ const Routes = {
   login: '/login',
   signup: '/signup',
   profile: '/profile',
+  session: '/session',
   profilePreview: '/profile/preview',
 };
 
