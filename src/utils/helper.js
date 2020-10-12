@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const appendScript = (src, charset) => {
   const script = document.createElement('script');
   script.src = src;
@@ -32,4 +34,26 @@ export const getCurrencyList = async () => {
   } catch (error) {
     console.log('Failed to load currency list', error?.response?.error);
   }
+};
+
+export const convertSchedulesToLocal = (schedules) => {
+  if (schedules) {
+    for (let i = 0; i < schedules.length; i++) {
+      schedules[i].session_date = moment(schedules[i].session_date).format();
+      schedules[i].start_time = moment(schedules[i].start_time).format();
+      schedules[i].end_time = moment(schedules[i].end_time).format();
+    }
+  }
+  return schedules;
+};
+
+export const convertSchedulesToUTC = (schedules) => {
+  if (schedules) {
+    for (let i = 0; i < schedules.length; i++) {
+      schedules[i].session_date = moment(schedules[i].session_date).utc().format();
+      schedules[i].start_time = moment(schedules[i].start_time).utc().format();
+      schedules[i].end_time = moment(schedules[i].end_time).utc().format();
+    }
+  }
+  return schedules;
 };

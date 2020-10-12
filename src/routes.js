@@ -4,6 +4,7 @@ const Routes = {
   signup: '/signup',
   profile: '/profile',
   session: '/session',
+  sessionDetails: '/session/:id',
   profilePreview: '/profile/preview',
 };
 

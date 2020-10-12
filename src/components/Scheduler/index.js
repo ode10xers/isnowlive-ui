@@ -1,128 +1,172 @@
-import React from 'react';
-import { Calendar, Alert, Modal, Button, Badge } from 'antd';
+import React, { useState } from 'react';
+import { Calendar, Popover, Modal, Button, List, TimePicker, Form, Space } from 'antd';
 import moment from 'moment';
+import { MinusCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
-class Scheduler extends React.Component {
-  state = {
-    value: moment(),
-    selectedValue: moment(),
-    visible: false,
-    listData: [
-      {
-        datetime: moment().format(),
-        type: 'success',
-        content: 'This is usual event.',
-      },
-      {
-        datetime: moment().add(7, 'days').format(),
-        type: 'success',
-        content: 'This is usual event.',
-      },
-    ],
+import validationRules from '../../utils/validation';
+import { convertSchedulesToLocal } from '../../utils/helper';
+
+import styles from './style.module.scss';
+
+const { RangePicker } = TimePicker;
+
+const Scheduler = ({ sessionSlots, recurring, recurringDatesRange }) => {
+  const [value, setValue] = useState(moment());
+  const [selectedValue, setSelectedValue] = useState(moment());
+  const [visible, setVisible] = useState(false);
+  const [slots, setSlots] = useState(convertSchedulesToLocal(sessionSlots));
+  const [form] = Form.useForm();
+
+  const onSelect = (value) => {
+    // check if slots are presents for selected date
+    let slotsForSelectedDate = slots.filter(
+      (item) => moment(item.session_date).format('L') === moment(value).format('L')
+    );
+    form.setFieldsValue({ slots: slotsForSelectedDate.length ? slotsForSelectedDate : [[]] });
+    setValue(value);
+    setSelectedValue(value);
+    setVisible(true);
   };
 
-  onSelect = (value) => {
-    this.setState({
-      value,
-      selectedValue: value,
-      visible: true,
-    });
+  const onPanelChange = (value) => {
+    setValue(value);
   };
 
-  onPanelChange = (value) => {
-    this.setState({ value });
+  const handleCancel = () => {
+    setVisible(false);
   };
 
-  handleCancel = () => {
-    this.setState({ visible: false });
-  };
-
-  getListData = (value) => {
-    return this.state.listData.filter((event) => {
-      return moment(event.datetime).format() === moment(value).format() ? event : null;
-    });
-  };
-
-  dateCellRender = (value) => {
-    const listData = this.getListData(value);
-    return (
-      <ul className="events">
-        {listData.map((item) => (
-          <li key={item.content}>
-            <Badge status={item.type} text={item.content} />
-          </li>
-        ))}
-      </ul>
+  const getSlotsList = (value) => {
+    return slots.filter((event) =>
+      moment(event.session_date).format('L') === moment(value).format('L') ? event : null
     );
   };
 
-  getMonthData = (value) => {
-    if (value.month() === 8) {
-      return 1394;
+  const deleteSlot = (slot) => {
+    if (window.confirm('Are you sure you want to delete the schedule?')) {
+      setSlots(slots.filter((item) => item.id !== slot.id));
     }
   };
 
-  monthCellRender = (value) => {
-    const num = this.getMonthData(value);
-    return num ? (
-      <div className="notes-month">
-        <section>{num}</section>
-        <span>Backlog number</span>
-      </div>
-    ) : null;
-  };
-
-  createNewEvent = () => {
-    const { selectedValue } = this.state;
-    let tempDate = selectedValue.format();
-
-    let tempEvent = [
-      {
-        datetime: tempDate,
-        type: 'success',
-        content: 'This is usual event.',
-      },
-    ];
-
-    while (tempDate < moment().endOf('month').format()) {
-      tempDate = moment(tempDate).add(7, 'days').format();
-      tempEvent.push({
-        datetime: tempDate,
-        type: 'success',
-        content: 'This is usual event.',
-      });
-    }
-    console.log('=====', tempEvent);
-    this.setState({
-      listData: [...this.state.listData, ...tempEvent],
-      visible: false,
-    });
-  };
-
-  render() {
-    const { value, selectedValue } = this.state;
-    return (
-      <>
-        <Calendar
-          value={value}
-          onSelect={this.onSelect}
-          onPanelChange={this.onPanelChange}
-          dateCellRender={this.dateCellRender}
-          monthCellRender={this.monthCellRender}
-        />
-        <Modal
-          title={<Alert message={`You selected date: ${selectedValue && selectedValue.format('YYYY-MM-DD')}`} />}
-          visible={this.state.visible}
-          onOk={this.handleCancel}
-          onCancel={this.handleCancel}
+  const dateCellRender = (value) => {
+    const tempSlots = getSlotsList(value);
+    if (tempSlots.length) {
+      return (
+        <Popover
+          content={
+            <List
+              size="small"
+              bordered
+              dataSource={tempSlots}
+              renderItem={(item) => (
+                <List.Item
+                  className={styles.slot}
+                  actions={[<EditOutlined />, <DeleteOutlined onClick={() => deleteSlot(item)} />]}
+                >
+                  {moment(item['start_time']).format('LT')}
+                  {' - '} {moment(item['end_time']).format('LT')}
+                </List.Item>
+              )}
+            />
+          }
+          title="Slot"
         >
-          <Button type="primary" onClick={this.createNewEvent}>
-            {'Select all ' + selectedValue.format('dddd')}
-          </Button>
-        </Modal>
-      </>
-    );
-  }
-}
+          <List
+            size="small"
+            bordered
+            dataSource={tempSlots}
+            renderItem={(item) => (
+              <List.Item className={styles.slot}>
+                {moment(item['start_time']).format('LT')}
+                {' - '} {moment(item['end_time']).format('LT')}
+              </List.Item>
+            )}
+          />
+        </Popover>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const createOneTimeSession = (values) => {
+    console.log(values);
+  };
+
+  const handleDisableDate = (currentDate) => {
+    if (recurring) {
+      const startDate = recurringDatesRange ? moment(recurringDatesRange[0]).startOf('day') : moment().startOf('day');
+      const endDate = recurringDatesRange ? moment(recurringDatesRange[1]).endOf('day') : moment().endOf('day');
+      // check if current date is in between recuring dates range
+      if (moment(currentDate).isBetween(startDate, endDate)) {
+        return false;
+      } else {
+        // check if it's within defined schedules
+        if (slots.filter((item) => moment(item.session_date).format('L') === moment(currentDate).format('L')).length) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  return (
+    <>
+      <Calendar
+        value={value}
+        disabledDate={handleDisableDate}
+        onSelect={onSelect}
+        onPanelChange={onPanelChange}
+        dateCellRender={dateCellRender}
+      />
+      <Modal
+        title={`Select slot for ${selectedValue && selectedValue.format('Do MMM')}`}
+        visible={visible}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <Form form={form} name="slots" onFinish={createOneTimeSession} autoComplete="off">
+          <Form.List name="slots">
+            {(fields, { add, remove }) => {
+              return (
+                <div>
+                  {fields.map((field, index) => {
+                    return (
+                      <Space key={field.key} style={{ display: 'flex' }} align="start">
+                        <Form.Item {...field} rules={index === 0 ? validationRules.requiredValidation : null}>
+                          <RangePicker
+                            defaultValue={[field.start_time, field.end_time]}
+                            format="HH:mm"
+                            onChange={() => add()}
+                          />
+                        </Form.Item>
+
+                        {index > 0 && (
+                          <MinusCircleOutlined
+                            onClick={() => {
+                              remove(field.name);
+                            }}
+                          />
+                        )}
+                      </Space>
+                    );
+                  })}
+                </div>
+              );
+            }}
+          </Form.List>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Create Slots
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+};
 
 export default Scheduler;

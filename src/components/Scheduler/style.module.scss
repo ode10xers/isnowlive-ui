@@ -1,14 +1,10 @@
-.events {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.events .ant-badge-status {
+.slot {
+  vertical-align: baseline;
+  display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  width: 100%;
-  text-overflow: ellipsis;
-  font-size: 12px;
+  margin: 0px;
+  padding: 0px;
 }
 .notesMonth {
   text-align: center;
