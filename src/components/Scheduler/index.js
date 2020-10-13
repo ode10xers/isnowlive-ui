@@ -167,7 +167,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange }) => {
       }
       return false;
     }
-    return true;
   };
 
   return (
