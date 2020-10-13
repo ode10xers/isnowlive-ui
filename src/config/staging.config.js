@@ -4,6 +4,6 @@ export default {
   ...devConfig,
   /* Staging config here */
   server: {
-    baseURL: 'https://stage-api.isnow.live',
+    baseURL: 'https://api.mocklets.com/mock68084',
   },
 };
