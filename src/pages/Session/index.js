@@ -174,6 +174,13 @@ const Session = ({ match, history }) => {
     setRecurringDatesRanges(value);
   };
 
+  const handleSlotsChange = (schedules) => {
+    setSession({
+      ...session,
+      schedules,
+    });
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       <OnboardSteps current={2} />
@@ -331,13 +338,19 @@ const Session = ({ match, history }) => {
             sessionSlots={session.schedules}
             recurring={isSessionRecurring}
             recurringDatesRange={recurringDatesRanges}
+            handleSlotsChange={handleSlotsChange}
           />
         </Section>
 
         {/* ========= CREATE SESSION ============= */}
         <Section>
           <Row justify="center">
-            <Col>
+            <Col flex={4}>
+              <Title level={4} className={styles.scheduleCount}>
+                {session?.schedules.length} Schedules will be created
+              </Title>
+            </Col>
+            <Col flex={1}>
               <Form.Item>
                 <Button htmlType="submit" type="primary">
                   Publish
