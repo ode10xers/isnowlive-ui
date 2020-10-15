@@ -12,12 +12,17 @@
   text-align: center;
   font-size: 28px;
 }
-.notesMonth section {
-  font-size: 28px;
+.notesMonth {
+  section {
+    font-size: 28px;
+  }
 }
 .checkboxs {
   margin-bottom: 10px;
   label {
     width: 100%;
   }
+}
+.inline {
+  display: flex;
 }

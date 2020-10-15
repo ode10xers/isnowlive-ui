@@ -27,6 +27,7 @@ import Scheduler from '../../components/Scheduler';
 import validationRules from '../../utils/validation';
 import { getCurrencyList } from '../../utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from '../../layouts/FormLayouts';
+import { convertSchedulesToUTC } from '../../utils/helper';
 import Routes from '../../routes';
 
 import styles from './style.module.scss';
@@ -122,16 +123,11 @@ const Session = ({ match, history }) => {
       .catch(() => message.error('Failed to load currency list'));
   }, [form, getSessionDetails, match.params.id]);
 
-  const onFinish = (values) => {
-    console.log(values);
-  };
-
   const onSessionImageUpload = ({ fileList: newFileList }) => {
     setSessionImageUrl(newFileList[0]);
   };
 
   const normFile = (e) => {
-    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -179,6 +175,29 @@ const Session = ({ match, history }) => {
       ...session,
       schedules,
     });
+  };
+
+  const onFinish = async (values) => {
+    try {
+      setIsLoading(true);
+      const data = {
+        ...session,
+        ...values,
+      };
+      data.beginning = moment(values.recurring_dates_range[0]).utc().format();
+      data.expiry = moment(values.recurring_dates_range[1]).utc().format();
+      data.schedules = convertSchedulesToUTC(session.schedules);
+      if (data.id) {
+        await apis.session.update(data.id, data);
+        message.success('Session successfully updated.');
+      } else {
+        await apis.session.create(data);
+        message.success('Session successfully created.');
+      }
+      setIsLoading(false);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
   };
 
   return (

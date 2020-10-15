@@ -57,3 +57,27 @@ export const convertSchedulesToUTC = (schedules) => {
   }
   return schedules;
 };
+
+export const getLocalTimeFormat = (value) => {
+  return moment(value).format('LT');
+};
+
+export const getLocalTimeFormat2 = (value) => {
+  return moment(value).format('hh:mm');
+};
+
+export const getLocalDateFormat = (value) => {
+  return moment(value).format('L');
+};
+
+export const getLocalDateFormat2 = (value) => {
+  return moment(value).format('Do MMM YYYY');
+};
+
+export const getLocalDateFormat3 = (value) => {
+  return moment(value).format('YYYY-MM-DD');
+};
+
+export const getLocalDayFormat = (value) => {
+  return moment(value).format('dddd');
+};
