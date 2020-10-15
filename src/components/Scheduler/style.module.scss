@@ -1,0 +1,28 @@
+@import '../../styles/variables.scss';
+
+.slot {
+  vertical-align: baseline;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0px;
+  padding: 0px;
+}
+.notesMonth {
+  text-align: center;
+  font-size: 28px;
+}
+.notesMonth {
+  section {
+    font-size: 28px;
+  }
+}
+.checkboxs {
+  margin-bottom: 10px;
+  label {
+    width: 100%;
+  }
+}
+.inline {
+  display: flex;
+}

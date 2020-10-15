@@ -8,4 +8,10 @@ export default {
     updateProfile: (payload) => http.put('secure/client', payload),
     upcomingSession: (payload) => http.get('session/upcoming', payload),
   },
+  session: {
+    getDetails: (sessionId) => http.get(`/secure/sessions/${sessionId}`),
+    create: (payload) => http.post('/secure/sessions/', payload),
+    update: (sessionId, payload) => http.put(`/secure/sessions/${sessionId}`, payload),
+    delete: (sessionId) => http.delete(`/secure/sessions/${sessionId}`),
+  },
 };

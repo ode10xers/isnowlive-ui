@@ -1,0 +1,15 @@
+@import '../../styles/variables.scss';
+
+.imageWrapper {
+  position: relative;
+  height: 290px;
+}
+.coverImage {
+  & > div {
+    width: 100% !important;
+    height: 200px !important;
+  }
+}
+.scheduleCount {
+  color: map-get($colors, $key: 'blue') !important;
+}
