@@ -137,6 +137,7 @@ const Session = ({ match, history }) => {
   const handleSessionType = (e) => {
     if (e.target.value === '1-on-1') {
       form.setFieldsValue({ ...form.getFieldsValue(), max_participants: 1 });
+      setSession({ ...session, max_participants: 1 });
       setIsSessionTypeGroup(false);
     } else {
       form.setFieldsValue({ ...form.getFieldsValue(), max_participants: 2 });
@@ -147,6 +148,7 @@ const Session = ({ match, history }) => {
   const handleSessionPriceType = (e) => {
     if (e.target.value === 'Free') {
       form.setFieldsValue({ ...form.getFieldsValue(), price: 0 });
+      setSession({ ...session, price: 0 });
       setIsSessionFree(true);
     } else {
       setIsSessionFree(false);
@@ -269,15 +271,16 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item
-              hidden={!isSessionTypeGroup}
-              {...profileFormTailLayout}
-              name="max_participants"
-              help="Maximum 100 supported"
-              rules={validationRules.requiredValidation}
-            >
-              <InputNumber min={2} max={100} />
-            </Form.Item>
+            {isSessionTypeGroup && (
+              <Form.Item
+                {...profileFormTailLayout}
+                name="max_participants"
+                help="Maximum 100 supported"
+                rules={validationRules.requiredValidation}
+              >
+                <InputNumber min={2} max={100} />
+              </Form.Item>
+            )}
           </>
 
           {/* ---- Session Price ---- */}
@@ -294,31 +297,29 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item
-              hidden={isSessionFree}
-              name="currency"
-              label="Currency"
-              rules={validationRules.requiredValidation}
-            >
-              <Select value={form.getFieldsValue().currency}>
-                {currencyList &&
-                  Object.entries(currencyList).map(([key, value], i) => (
-                    <Option value={key} key={key}>
-                      ({key}) {value}
-                    </Option>
-                  ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              hidden={isSessionFree}
-              {...profileFormTailLayout}
-              name="price"
-              help="Set your price"
-              rules={validationRules.requiredValidation}
-            >
-              <InputNumber min={1} placeholder="Amount" />
-            </Form.Item>
+            {!isSessionFree && (
+              <>
+                {' '}
+                <Form.Item name="currency" label="Currency" rules={validationRules.requiredValidation}>
+                  <Select value={form.getFieldsValue().currency}>
+                    {currencyList &&
+                      Object.entries(currencyList).map(([key, value], i) => (
+                        <Option value={key} key={key}>
+                          ({key}) {value}
+                        </Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  {...profileFormTailLayout}
+                  name="price"
+                  help="Set your price"
+                  rules={validationRules.requiredValidation}
+                >
+                  <InputNumber min={1} placeholder="Amount" />
+                </Form.Item>{' '}
+              </>
+            )}
           </>
         </Section>
 
@@ -338,21 +339,22 @@ const Session = ({ match, history }) => {
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item
-            hidden={!isSessionRecurring}
-            rules={isSessionRecurring ? validationRules.requiredValidation : null}
-            name="recurring_dates_range"
-            {...profileFormTailLayout}
-            layout="vertical"
-          >
-            <Text>First Session Date: </Text>
-            <Text className={styles.ml30}> Last Session Date:</Text> <br />
-            <RangePicker
-              defaultValue={recurringDatesRanges}
-              disabledDate={disabledDate}
-              onChange={handleRecurringDatesRange}
-            />
-          </Form.Item>
+          {isSessionRecurring && (
+            <Form.Item
+              rules={isSessionRecurring ? validationRules.requiredValidation : null}
+              name="recurring_dates_range"
+              {...profileFormTailLayout}
+              layout="vertical"
+            >
+              <Text>First Session Date: </Text>
+              <Text className={styles.ml30}> Last Session Date:</Text> <br />
+              <RangePicker
+                defaultValue={recurringDatesRanges}
+                disabledDate={disabledDate}
+                onChange={handleRecurringDatesRange}
+              />
+            </Form.Item>
+          )}
           <Scheduler
             sessionSlots={session.schedules}
             recurring={isSessionRecurring}
