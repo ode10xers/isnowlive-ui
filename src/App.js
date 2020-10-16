@@ -10,6 +10,7 @@ import ProfilePreview from './pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';
+import SessionDetails from 'pages/SessionDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -33,7 +34,8 @@ function App() {
       <Switch>
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={Session} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />

@@ -5,6 +5,7 @@ const Routes = {
   profile: '/profile',
   session: '/session',
   sessionDetails: '/session/:id',
+  sessionUpdate: '/session/:id/edit',
   profilePreview: '/profile/preview',
 };
 

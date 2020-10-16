@@ -48,11 +48,17 @@ $spacing: (
 .mb10 {
   margin-bottom: map-get($spacing, '10');
 }
+.mb20 {
+  margin-bottom: map-get($spacing, '20');
+}
 .mt50 {
   margin-top: map-get($spacing, '50');
 }
 .mb50 {
   margin-bottom: map-get($spacing, '50');
+}
+.p50 {
+  padding: map-get($spacing, '50');
 }
 .pt50 {
   padding-top: map-get($spacing, '50');
