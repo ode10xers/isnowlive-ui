@@ -4,19 +4,15 @@ import moment from 'moment';
 import { DeleteFilled } from '@ant-design/icons';
 
 import validationRules from '../../utils/validation';
-import {
-  convertSchedulesToLocal,
-  getLocalTimeFormat,
-  getLocalDateFormat,
-  getLocalDayFormat,
-  getLocalDateFormat2,
-  getLocalTimeFormat2,
-  getLocalDateFormat3,
-} from '../../utils/helper';
+import { convertSchedulesToLocal } from '../../utils/helper';
+import dateUtil from '../../utils/date';
 
 import styles from './style.module.scss';
 
 const { RangePicker } = TimePicker;
+const {
+  formatDate: { toLocaleTime, toLocaleDate, toShortTime, toLongDate, toShortDate, toDayOfWeek },
+} = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange }) => {
   const typeOfSessionCreation = useRef(0);
@@ -34,30 +30,28 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // eslint-disable-next-line
   }, [slots]);
 
-  const onSelect = (value) => {
-    if (moment(value).endOf('day') >= moment().startOf('day')) {
-      // check if slots are presents for selected date
-      const slotsForSelectedDate = slots.filter(
-        (item) => getLocalDateFormat(item.session_date) === getLocalDateFormat(value)
-      );
-      const tempSlots = slotsForSelectedDate.map((obj) => ({
+  const onSelect = (selecetedCalendarDate) => {
+    if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
+      // check if slots are present for selected date
+      const slotsForSelectedDate = slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate));
+      const formattedSlots = slotsForSelectedDate.map((obj) => ({
         id: obj.id,
         session_date: moment(obj.session_date),
         slot: [moment(obj.start_time), moment(obj.end_time)],
       }));
-      let defaultSlot = { id: undefined, session_date: moment(value).format(), slot: [] };
+      const defaultSlot = { id: undefined, session_date: moment(selecetedCalendarDate).format(), slot: [] };
 
       form.setFieldsValue({
-        slots: slotsForSelectedDate.length ? [...tempSlots, defaultSlot] : [defaultSlot],
+        slots: slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot],
       });
-      setDate(value);
-      setSelectedDate(value);
+      setDate(selecetedCalendarDate);
+      setSelectedDate(selecetedCalendarDate);
       setOpenModal(true);
     }
   };
 
-  const onPanelChange = (value) => {
-    setDate(value);
+  const onPanelChange = (calendarDate) => {
+    setDate(calendarDate);
   };
 
   const handleCancel = () => {
@@ -65,25 +59,23 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   };
 
   const getSlotsList = (value) => {
-    return slots.filter((event) =>
-      getLocalDateFormat(event.session_date) === getLocalDateFormat(value) ? event : null
-    );
+    return slots.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
   };
 
-  const dateCellRender = (value) => {
-    const tempSlots = getSlotsList(value);
-    if (tempSlots.length) {
+  const renderDateCell = (calendarDate) => {
+    const slotsForDate = getSlotsList(calendarDate);
+    if (slotsForDate.length) {
       return (
         <Popover
           content={
             <List
               size="small"
               bordered
-              dataSource={tempSlots}
+              dataSource={slotsForDate}
               renderItem={(item) => (
                 <List.Item className={styles.slot}>
-                  {getLocalTimeFormat(item['start_time'])}
-                  {' - '} {getLocalTimeFormat(item['end_time'])}
+                  {toLocaleTime(item['start_time'])}
+                  {' - '} {toLocaleTime(item['end_time'])}
                 </List.Item>
               )}
             />
@@ -93,11 +85,11 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           <List
             size="small"
             bordered
-            dataSource={tempSlots}
+            dataSource={slotsForDate}
             renderItem={(item) => (
               <List.Item className={styles.slot}>
-                {getLocalTimeFormat(item['start_time'])}
-                {' - '} {getLocalTimeFormat(item['end_time'])}
+                {toLocaleTime(item['start_time'])}
+                {' - '} {toLocaleTime(item['end_time'])}
               </List.Item>
             )}
           />
@@ -110,9 +102,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const createOneTimeSchedule = (values, givenDate, givenSlots) => {
     // remove all the slots for selected date
-    let tempSlots = givenSlots.filter(
-      (item) => getLocalDateFormat(item.session_date) !== getLocalDateFormat(givenDate)
-    );
+    let tempSlots = givenSlots.filter((item) => toLocaleDate(item.session_date) !== toLocaleDate(givenDate));
     // adding slots values for that selected date
     const { slots: valuesSlots } = values;
 
@@ -120,13 +110,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       if (vs.slot?.length) {
         let value = vs;
         // work around get concat selected date and slot times as timepicker gives date as current date
-        let start_time = getLocalTimeFormat2(vs.slot[0]);
-        let end_time = getLocalTimeFormat2(vs.slot[1]);
+        let start_time = toShortTime(vs.slot[0]);
+        let end_time = toShortTime(vs.slot[1]);
         let selected_date = moment(givenDate);
 
         value.session_date = selected_date.format();
-        value.start_time = moment(getLocalDateFormat3(selected_date) + ' ' + start_time).format();
-        value.end_time = moment(getLocalDateFormat3(selected_date) + ' ' + end_time).format();
+        value.start_time = moment(toShortDate(selected_date) + ' ' + start_time).format();
+        value.end_time = moment(toShortDate(selected_date) + ' ' + end_time).format();
 
         // NOTE: deep clone the object else moment dates will be mutate
         tempSlots.push(JSON.parse(JSON.stringify(value)));
@@ -138,29 +128,29 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const createSchedulesAllSelectedDay = (values) => {
     let tempSlots = slots;
-    const startDate = recurringDatesRange && getLocalDateFormat(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && getLocalDateFormat(moment(recurringDatesRange[1]).add(1, 'days'));
-    let selected_date = getLocalDateFormat(selectedDate);
+    const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
+    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    let selected_date = toLocaleDate(selectedDate);
 
     while (moment(selected_date).isBetween(startDate, endDate)) {
       tempSlots = createOneTimeSchedule(values, selected_date, tempSlots);
-      selected_date = getLocalDateFormat(moment(selected_date).add(7, 'days'));
+      selected_date = toLocaleDate(moment(selected_date).add(7, 'days'));
     }
     return tempSlots;
   };
 
   const createSchedulesMultipleDays = (values) => {
     let tempSlots = slots;
-    const startDate = recurringDatesRange && getLocalDateFormat(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && getLocalDateFormat(moment(recurringDatesRange[1]).add(1, 'days'));
-    let selected_date = getLocalDateFormat(selectedDate);
+    const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
+    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    let selected_date = toLocaleDate(selectedDate);
 
     let slotdates = [];
     while (moment(selected_date).isBetween(startDate, endDate)) {
-      if (dayList.includes(getLocalDayFormat(selected_date))) {
+      if (dayList.includes(toDayOfWeek(selected_date))) {
         slotdates.push(selected_date);
       }
-      selected_date = getLocalDateFormat(moment(selected_date).add(1, 'days'));
+      selected_date = toLocaleDate(moment(selected_date).add(1, 'days'));
     }
 
     slotdates.forEach((date) => {
@@ -181,7 +171,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         handleCancel();
         break;
       case 2:
-        setDayList([getLocalDayFormat(selectedDate)]);
+        setDayList([toDayOfWeek(selectedDate)]);
         break;
       case 3:
         tempSlots = createSchedulesMultipleDays(values);
@@ -204,7 +194,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         return false;
       } else {
         // check if it's within defined schedules
-        if (slots.filter((item) => getLocalDateFormat(item.session_date) === getLocalDateFormat(currentDate)).length) {
+        if (slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
           return false;
         } else {
           return true;
@@ -213,7 +203,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     } else {
       if (moment(currentDate).endOf('day') < moment().startOf('day')) {
         // check if it's within defined schedules
-        if (slots.filter((item) => getLocalDateFormat(item.session_date) === getLocalDateFormat(currentDate)).length) {
+        if (slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
           return false;
         } else {
           return true;
@@ -230,16 +220,16 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         disabledDate={handleDisableDate}
         onSelect={onSelect}
         onPanelChange={onPanelChange}
-        dateCellRender={dateCellRender}
+        dateCellRender={renderDateCell}
       />
 
       <Modal
         title={
           recurring
-            ? `Add Session Slot: ${recurringDatesRange && getLocalDateFormat2(recurringDatesRange[0])} - ${
-                recurringDatesRange && getLocalDateFormat2(recurringDatesRange[1])
+            ? `Add Session Slot: ${recurringDatesRange && toLongDate(recurringDatesRange[0])} - ${
+                recurringDatesRange && toLongDate(recurringDatesRange[1])
               }`
-            : `Create Session Slot for ${selectedDate && getLocalDateFormat2(selectedDate)}`
+            : `Create Session Slot for ${selectedDate && toLongDate(selectedDate)}`
         }
         visible={openModal}
         onCancel={handleCancel}
@@ -291,7 +281,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                 <Col span={10} offset={1}>
                   <Form.Item>
                     <Button htmlType="submit" onClick={() => (typeOfSessionCreation.current = 1)} type="primary">
-                      Apply to all {getLocalDayFormat(selectedDate)}
+                      Apply to all {toDayOfWeek(selectedDate)}
                     </Button>
                   </Form.Item>
                 </Col>
@@ -307,7 +297,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                 <Col span={12} offset={3}>
                   <Form.Item>
                     <Button htmlType="submit" onClick={() => (typeOfSessionCreation.current = 0)} type="link">
-                      Apply to {getLocalDateFormat2(selectedDate)} only
+                      Apply to {toLongDate(selectedDate)} only
                     </Button>
                   </Form.Item>
                 </Col>
