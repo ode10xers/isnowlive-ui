@@ -1,0 +1,75 @@
+@import '../../styles/variables.scss';
+
+.box {
+  padding: 10px;
+  background: map-get($colors, 'light-blue3');
+  border: 1px solid map-get($colors, 'light-blue');
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 60px;
+}
+.date {
+  background: map-get($colors, 'blue');
+  border: 1px solid map-get($colors, 'blue');
+  box-sizing: border-box;
+  border-radius: 2px;
+  height: 40px;
+  text-align: center;
+  color: map-get($colors, 'white');
+  font-size: 24px;
+  font-weight: 900;
+  margin-right: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.month {
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+.divider {
+  height: 40px !important;
+  margin-right: 10px !important;
+}
+.day {
+  height: 40px;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  margin-top: 15px;
+  margin-right: 5px;
+}
+.time {
+  width: 100%;
+  height: 40px;
+  font-style: normal;
+  font-weight: bold;
+  padding-top: 8px;
+  margin-left: 10px;
+}
+@media (max-width: 768px) {
+  .box {
+    height: 50px;
+  }
+  .date {
+    height: 26px;
+    font-size: 16px;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-right: 5px;
+  }
+  .divider {
+    height: 30px !important;
+    margin: 5px !important;
+  }
+  .day {
+    margin-right: 0px;
+    margin-top: 25px;
+  }
+  .time {
+    padding-top: 12px !important;
+    font-size: 12px;
+  }
+}
