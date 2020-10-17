@@ -8,7 +8,7 @@ const formatDate = {
   toShortDate: (date) => moment(date).format('YYYY-MM-DD'),
   toDayOfWeek: (date) => moment(date).format('dddd'),
   toShortMonth: (date) => moment(date).format('MMM'),
-  toDate: (date) => moment(date).format('MMM'),
+  toDate: (date) => moment(date).format('DD'),
 };
 
 const dateUtil = {

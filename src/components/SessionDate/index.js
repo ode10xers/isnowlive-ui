@@ -1,7 +1,7 @@
 import React from 'react';
 import { Divider, Typography } from 'antd';
 
-import isMobileDevice from '../../utils/device';
+import { isMobileDevice } from '../../utils/device';
 import dateUtil from '../../utils/date';
 
 import styles from './styles.module.scss';
