@@ -33,7 +33,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const onSelect = (selecetedCalendarDate) => {
     if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
       // check if slots are present for selected date
-      const slotsForSelectedDate = slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate));
+      const slotsForSelectedDate = slots.filter(
+        (item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate)
+      );
       const formattedSlots = slotsForSelectedDate.map((obj) => ({
         id: obj.id,
         session_date: moment(obj.session_date),
