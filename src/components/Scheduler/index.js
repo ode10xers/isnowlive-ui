@@ -30,22 +30,22 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // eslint-disable-next-line
   }, [slots]);
 
-  const onSelect = (selectedDate) => {
-    if (moment(selectedDate).endOf('day') >= moment().startOf('day')) {
+  const onSelect = (selecetedCalendarDate) => {
+    if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
       // check if slots are present for selected date
-      const slotsForSelectedDate = slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(selectedDate));
+      const slotsForSelectedDate = slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate));
       const formattedSlots = slotsForSelectedDate.map((obj) => ({
         id: obj.id,
         session_date: moment(obj.session_date),
         slot: [moment(obj.start_time), moment(obj.end_time)],
       }));
-      const defaultSlot = { id: undefined, session_date: moment(selectedDate).format(), slot: [] };
+      const defaultSlot = { id: undefined, session_date: moment(selecetedCalendarDate).format(), slot: [] };
 
       form.setFieldsValue({
         slots: slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot],
       });
-      setDate(selectedDate);
-      setSelectedDate(selectedDate);
+      setDate(selecetedCalendarDate);
+      setSelectedDate(selecetedCalendarDate);
       setOpenModal(true);
     }
   };
