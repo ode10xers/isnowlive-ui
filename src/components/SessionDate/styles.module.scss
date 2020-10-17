@@ -1,20 +1,24 @@
+@import '../../styles/variables.scss';
+
 .box {
   padding: 10px;
-  background: #f0f5ff;
-  border: 1px solid #d6e4ff;
+  background: map-get($colors, 'light-blue3');
+  border: 1px solid map-get($colors, 'light-blue');
   border-radius: 4px;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   height: 60px;
 }
 .date {
-  background: #1890ff;
-  border: 1px solid #1890ff;
+  background: map-get($colors, 'blue');
+  border: 1px solid map-get($colors, 'blue');
   box-sizing: border-box;
   border-radius: 2px;
-  width: 40px;
   height: 40px;
   text-align: center;
-  color: #ffffff;
+  color: map-get($colors, 'white');
   font-size: 24px;
   font-weight: 900;
   margin-right: 10px;
@@ -23,18 +27,18 @@
 }
 .month {
   text-transform: uppercase;
+  margin-top: 10px;
 }
 .divider {
   height: 40px !important;
   margin-right: 10px !important;
 }
 .day {
-  width: 80px;
   height: 40px;
   font-style: normal;
   font-weight: bold;
   font-size: 24px;
-  color: #434343;
+  margin-top: 15px;
   margin-right: 5px;
 }
 .time {
@@ -58,12 +62,14 @@
   }
   .divider {
     height: 30px !important;
+    margin: 5px !important;
   }
   .day {
     margin-right: 0px;
+    margin-top: 25px;
   }
   .time {
-    padding-top: 3px;
+    padding-top: 12px !important;
     font-size: 12px;
   }
 }
