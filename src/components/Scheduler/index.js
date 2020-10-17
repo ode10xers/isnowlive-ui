@@ -50,8 +50,8 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
   };
 
-  const onPanelChange = (date) => {
-    setDate(date);
+  const onPanelChange = (calendarDate) => {
+    setDate(calendarDate);
   };
 
   const handleCancel = () => {
@@ -62,16 +62,16 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     return slots.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
   };
 
-  const renderDateCell = (date) => {
-    const slots = getSlotsList(date);
-    if (slots.length) {
+  const renderDateCell = (calendarDate) => {
+    const slotsForDate = getSlotsList(calendarDate);
+    if (slotsForDate.length) {
       return (
         <Popover
           content={
             <List
               size="small"
               bordered
-              dataSource={slots}
+              dataSource={slotsForDate}
               renderItem={(item) => (
                 <List.Item className={styles.slot}>
                   {toLocaleTime(item['start_time'])}
@@ -85,7 +85,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           <List
             size="small"
             bordered
-            dataSource={slots}
+            dataSource={slotsForDate}
             renderItem={(item) => (
               <List.Item className={styles.slot}>
                 {toLocaleTime(item['start_time'])}
