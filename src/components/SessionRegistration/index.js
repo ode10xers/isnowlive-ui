@@ -9,9 +9,7 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const SessionRegistration = (props) => {
-  const { onFinish } = props;
-
+const SessionRegistration = ({ onFinish }) => {
   return (
     <div className={classNames(styles.box, styles.p50)}>
       <Row>

@@ -9,8 +9,7 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const HostDetails = (props) => {
-  const { host } = props;
+const HostDetails = ({ host }) => {
   return (
     <div className={styles.box}>
       <Row>
