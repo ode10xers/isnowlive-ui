@@ -18,3 +18,10 @@ export const formLayout = {
 export const formTailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
+export const sessionRegistrationformLayout = {
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
+};
+export const sessionRegistrationTailLayout = {
+  wrapperCol: { offset: 4, span: 20 },
+};
