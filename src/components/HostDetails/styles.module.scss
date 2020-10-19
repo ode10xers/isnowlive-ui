@@ -1,0 +1,32 @@
+@import '../../styles/variables.scss';
+
+.box {
+  background: map-get($colors, 'offWhite');
+  border-radius: 6px;
+  padding: 15px;
+}
+.profileImage {
+  position: absolute;
+  border: 2px solid map-get($colors, 'white');
+  border-radius: 4px;
+}
+.profileImage {
+  img {
+    border-radius: 4px;
+  }
+}
+.profileImageSmall {
+  position: absolute;
+  border: 2px solid map-get($colors, 'white');
+  border-radius: 4px;
+}
+.profileImageSmall {
+  img {
+    border-radius: 4px;
+  }
+}
+
+.socialIcon {
+  font-size: 24px;
+  margin: 5px;
+}
