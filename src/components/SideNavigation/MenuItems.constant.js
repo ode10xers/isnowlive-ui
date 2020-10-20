@@ -46,7 +46,6 @@ const MenuItems = [
     key: 'attendees',
     value: 'Attendees',
     icon: <TeamOutlined />,
-    redirect: '/sessions/1',
   },
   {
     order: 3,
