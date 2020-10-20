@@ -7,6 +7,7 @@ const Routes = {
   sessionDetails: '/session/:id',
   sessionUpdate: '/session/:id/edit',
   profilePreview: '/profile/preview',
+  dashboard: '/dashboard',
 };
 
 export default Routes;

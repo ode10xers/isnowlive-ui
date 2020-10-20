@@ -11,6 +11,8 @@ import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
+import SideNavLayout from 'layouts/SideNavLayout';
+import Dashboard from 'pages/Dashboard';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -32,6 +34,7 @@ function App() {
   return (
     <Router>
       <Switch>
+        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
