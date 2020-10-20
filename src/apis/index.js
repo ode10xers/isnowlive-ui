@@ -13,5 +13,8 @@ export default {
     create: (payload) => http.post('/secure/sessions/', payload),
     update: (sessionId, payload) => http.put(`/secure/sessions/${sessionId}`, payload),
     delete: (sessionId) => http.delete(`/secure/sessions/${sessionId}`),
+    // Mock data for past and upcoming session is same. They have same response
+    getSessionForPast: () => http.get('/secure/order/past'),
+    getSessionForUpcoming: () => http.get('/secure/order/past'),
   },
 };
