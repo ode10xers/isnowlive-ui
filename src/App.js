@@ -1,16 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Routes from 'routes';
-import DefaultLayout from 'layouts/DefaultLayout';
-import { getLocalUserDetails } from 'utils/storage';
+import Routes from './routes';
+import { getLocalUserDetails } from './utils/storage';
 
-import Home from 'pages/Home';
-import Profile from 'pages/Profile';
-import ProfilePreview from 'pages/ProfilePreview';
+import DefaultLayout from './layouts/DefaultLayout';
+import SideNavLayout from 'layouts/SideNavLayout';
+
+import Home from './pages/Home';
+import Profile from './pages/Profile';
+import ProfilePreview from './pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
+import Dashboard from 'pages/Dashboard';
 import DashboardSessions from 'pages/DashboardSessions';
 import DashboardSessionsDetails from 'pages/DashboardSessionsDetails';
 
@@ -34,13 +37,14 @@ function App() {
   return (
     <Router>
       <Switch>
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.dashboardSessions} component={DashboardSessions} />
+        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboardSessions} component={DashboardSessions} />
         <PrivateRoute
-          layout={DefaultLayout}
+          layout={SideNavLayout}
           exact
           path={Routes.dashboardSessionsDetails}
           component={DashboardSessionsDetails}
         />
+        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
