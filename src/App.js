@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from './routes';
-import DefaultLayout from './layouts/DefaultLayout';
 import { getLocalUserDetails } from './utils/storage';
+
+import DefaultLayout from './layouts/DefaultLayout';
+import SideNavLayout from 'layouts/SideNavLayout';
 
 import Home from './pages/Home';
 import Profile from './pages/Profile';
@@ -11,7 +13,6 @@ import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
-import SideNavLayout from 'layouts/SideNavLayout';
 import Dashboard from 'pages/Dashboard';
 
 function RouteWithLayout({ layout, component, ...rest }) {
