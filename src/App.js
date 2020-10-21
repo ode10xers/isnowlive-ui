@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from './routes';
-import DefaultLayout from './layouts/DefaultLayout';
 import { getLocalUserDetails } from './utils/storage';
+
+import DefaultLayout from './layouts/DefaultLayout';
+import SideNavLayout from 'layouts/SideNavLayout';
 
 import Home from './pages/Home';
 import Profile from './pages/Profile';
@@ -11,6 +13,7 @@ import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
+import Dashboard from 'pages/Dashboard';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -32,6 +35,7 @@ function App() {
   return (
     <Router>
       <Switch>
+        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
