@@ -1,3 +1,8 @@
+@import '../../styles/variables.scss';
+
 .detailsButton {
   padding-left: 0px !important;
+}
+.danger {
+  color: map-get($colors, $key: 'danger');
 }

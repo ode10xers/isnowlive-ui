@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Tooltip, Typography, Popconfirm, Button, Card } from 'antd';
 import apis from 'apis';
-import moment from 'moment';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -14,7 +13,7 @@ import { isMobileDevice } from 'utils/device';
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLocaleTime },
+  formatDate: { toLocaleTime, toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
 
@@ -25,18 +24,17 @@ const DashboardSessions = ({ match }) => {
   const [isPast, setIsPast] = useState(false);
 
   const getStaffSession = useCallback(async () => {
-    const convert = (time) => moment(time).local();
     const { data } = isPast ? await apis.session.getSessionForPast() : await apis.session.getSessionForUpcoming();
     if (data) {
-      const d = data.sort((a, b) => new Date(a.inventory.start_time) - new Date(b.inventory.start_time));
+      const sortedData = data.sort((a, b) => new Date(a.inventory.start_time) - new Date(b.inventory.start_time));
       setSessions(
-        d.map((i, index) => ({
+        sortedData.map((i, index) => ({
           index,
           key: i.session.id,
           name: i.session.name,
           type: i.session.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
           duration: `${i.session.duration} mins`,
-          days: convert(i.inventory.start_time).format('ddd, DD MMM YYYY'),
+          days: toLongDateWithDay(i.inventory.start_time),
           session_date: i.inventory.session_date,
           time: `${toLocaleTime(i.inventory.start_time)} - ${toLocaleTime(i.inventory.end_time)}`,
           start_time: i.inventory.start_time,
@@ -67,11 +65,7 @@ const DashboardSessions = ({ match }) => {
       title: 'Session Name',
       key: 'name',
       width: '12%',
-      render: (record) => (
-        <div className="participants-wrapper">
-          <Text style={{ textAlign: 'left' }}>{record.name}</Text>
-        </div>
-      ),
+      render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
     },
     {
       title: 'Type',
@@ -102,17 +96,11 @@ const DashboardSessions = ({ match }) => {
       key: 'participants',
       dataIndex: 'participants',
       width: '2%',
-      render: (text, record) => {
-        return (
-          <div className="participants-wrapper">
-            <Tooltip placement="right">
-              <Text className="plus-text">
-                {record.participants || 0} / {record.max_participants}
-              </Text>
-            </Tooltip>
-          </div>
-        );
-      },
+      render: (text, record) => (
+        <Text>
+          {record.participants || 0} / {record.max_participants}
+        </Text>
+      ),
     },
     {
       title: 'Actions',
@@ -140,10 +128,10 @@ const DashboardSessions = ({ match }) => {
             </Col>
             <Col md={24} lg={24} xl={8}>
               <Popconfirm
-                title={'cancel_this_session'}
-                icon={<DeleteOutlined style={{ color: 'red' }} />}
-                okText={'cancel'}
-                cancelText={'back'}
+                title="Cancel Session"
+                icon={<DeleteOutlined className={styles.danger} />}
+                okText="Cancel"
+                cancelText="Back"
                 disabled={isDisabled}
               >
                 <Button type="text" disabled={isDisabled} danger>
@@ -192,8 +180,7 @@ const DashboardSessions = ({ match }) => {
           </Button>,
           <Popconfirm
             title="cancel_this_session"
-            //  onConfirm={() => removeInventory(item.inventory_id)}
-            icon={<DeleteOutlined style={{ color: 'red' }} />}
+            icon={<DeleteOutlined className={styles.danger} />}
             okText="cancel"
             cancelText={'back'}
             disabled={isCancelDisabled}
@@ -202,17 +189,7 @@ const DashboardSessions = ({ match }) => {
               Cancel
             </Button>
           </Popconfirm>,
-          <>
-            {item.index === 0 && !isPast && (
-              <Button
-                type="link"
-                // onClick={() => startSession(item)}
-                // disabled={buttonDisabled}
-              >
-                Start
-              </Button>
-            )}
-          </>,
+          <>{item.index === 0 && !isPast && <Button type="link">Start</Button>}</>,
         ]}
       >
         {layout('Type', <Text>{item.type}</Text>)}

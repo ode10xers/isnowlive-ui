@@ -1,14 +1,14 @@
 import React from 'react';
 import { Divider, Typography } from 'antd';
 
-import { isMobileDevice } from '../../utils/device';
-import dateUtil from '../../utils/date';
+import { isMobileDevice } from 'utils/device';
+import dateUtil from 'utils/date';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
-  formatDate: { toLocaleTime, toShortMonth, toDate, toDayOfWeek },
+  formatDate: { toLocaleTime, toShortMonth, toDate, toDayOfWeek, toShortDayOfWeek },
 } = dateUtil;
 
 const SessionDate = ({ schedule }) => {
@@ -20,7 +20,7 @@ const SessionDate = ({ schedule }) => {
       </Title>
       <Divider className={styles.divider} type="vertical" />
       <Title className={styles.day} level={isMobileDevice ? 5 : 3}>
-        {toDayOfWeek(schedule?.schedule_date)}
+        {isMobileDevice ? toShortDayOfWeek(schedule?.schedule_date) : toDayOfWeek(schedule?.schedule_date)}
       </Title>
       <Text className={styles.time}>
         {toLocaleTime(schedule?.start_time)} {' -'} {toLocaleTime(schedule?.end_time)}
