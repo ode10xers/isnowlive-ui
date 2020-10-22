@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Tooltip, Typography, Popconfirm, Button, Card } from 'antd';
+import { Row, Col, Typography, Popconfirm, Button, Card } from 'antd';
 import apis from 'apis';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
