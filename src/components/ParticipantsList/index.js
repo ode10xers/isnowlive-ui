@@ -2,7 +2,7 @@ import React from 'react';
 import { Typography, Card, Row, Col } from 'antd';
 
 import Table from 'components/Table';
-import { isMobileDevice } from '../../utils/device';
+import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
 
 import styles from './styles.module.scss';
@@ -13,7 +13,7 @@ const {
 } = dateUtil;
 
 const ParticipantsList = ({ participants, isPast, currency }) => {
-  const participantsColumns = [
+  const columns = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -70,7 +70,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       {isMobileDevice ? (
         participants?.map(renderParticipant)
       ) : (
-        <Table columns={participantsColumns} data={participants} loading={false} />
+        <Table columns={columns} data={participants} loading={false} />
       )}
     </div>
   );

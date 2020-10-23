@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Popconfirm, Button, Card } from 'antd';
-import apis from 'apis';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
+import apis from 'apis';
 import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
-import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
@@ -55,12 +55,14 @@ const DashboardSessions = ({ match }) => {
     if (match?.params?.session_type) {
       if (match?.params?.session_type === 'past') {
         setIsPast(true);
+      } else {
+        setIsPast(false);
       }
       getStaffSession();
     }
   }, [match.params.session_type, getStaffSession]);
 
-  let upcomingSessionColumns = [
+  let sessionColumns = [
     {
       title: 'Session Name',
       key: 'name',
@@ -151,7 +153,7 @@ const DashboardSessions = ({ match }) => {
     },
   ];
 
-  const renderUpcomingItem = (item) => {
+  const renderSessionItem = (item) => {
     const isCancelDisabled = item.participants > 0 || item.participants.length > 0;
 
     const layout = (label, value) => (
@@ -212,13 +214,13 @@ const DashboardSessions = ({ match }) => {
       {isMobileDevice ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
           {sessions.length > 0 ? (
-            sessions.map(renderUpcomingItem)
+            sessions.map(renderSessionItem)
           ) : (
             <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
           )}
         </Loader>
       ) : (
-        <Table columns={upcomingSessionColumns} data={sessions} loading={isLoading} />
+        <Table columns={sessionColumns} data={sessions} loading={isLoading} />
       )}
     </Section>
   );

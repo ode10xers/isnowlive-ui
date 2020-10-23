@@ -37,14 +37,16 @@ function App() {
   return (
     <Router>
       <Switch>
-        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboardSessions} component={DashboardSessions} />
-        <PrivateRoute
-          layout={SideNavLayout}
-          exact
-          path={Routes.dashboardSessionsDetails}
-          component={DashboardSessionsDetails}
-        />
-        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
+        <Route path={Routes.dashboard}>
+          <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
+          <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboardSessions} component={DashboardSessions} />
+          <PrivateRoute
+            layout={SideNavLayout}
+            exact
+            path={Routes.dashboardSessionsDetails}
+            component={DashboardSessionsDetails}
+          />
+        </Route>
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
