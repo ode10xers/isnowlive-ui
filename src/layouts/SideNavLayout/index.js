@@ -9,7 +9,7 @@ const { Content, Sider } = Layout;
 
 const SideNavLayout = ({ children }) => {
   return (
-    <Layout>
+    <Layout className={styles.container}>
       {/* Header should come at this place */}
       <Sider width={250} breakpoint="md" collapsedWidth="0">
         <SideNavigation />

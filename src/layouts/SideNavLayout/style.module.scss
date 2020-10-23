@@ -1,4 +1,9 @@
-.mainContent {
-  padding: 0 24px 24px;
-  min-height: 100vh !important;
+@import '../../styles/variables.scss';
+
+.container {
+  .mainContent {
+    padding: 0 24px 24px;
+    min-height: 100vh;
+    background-color: map-get($colors, 'white');
+  }
 }
