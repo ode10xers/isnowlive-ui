@@ -24,7 +24,7 @@ const DashboardSessions = ({ match }) => {
   const [isPast, setIsPast] = useState(false);
 
   const getStaffSession = useCallback(async () => {
-    const { data } = isPast ? await apis.session.getSessionForPast() : await apis.session.getSessionForUpcoming();
+    const { data } = isPast ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
     if (data) {
       const sortedData = data.sort((a, b) => new Date(a.inventory.start_time) - new Date(b.inventory.start_time));
       setSessions(

@@ -14,8 +14,6 @@ import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
 import Dashboard from 'pages/Dashboard';
-import DashboardSessions from 'pages/DashboardSessions';
-import DashboardSessionsDetails from 'pages/DashboardSessionsDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -33,20 +31,10 @@ const PrivateRoute = ({ ...rest }) => {
 };
 
 function App() {
-  //TODO: add private and public routes
   return (
     <Router>
       <Switch>
-        <Route path={Routes.dashboard}>
-          <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
-          <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboardSessions} component={DashboardSessions} />
-          <PrivateRoute
-            layout={SideNavLayout}
-            exact
-            path={Routes.dashboardSessionsDetails}
-            component={DashboardSessionsDetails}
-          />
-        </Route>
+        <PrivateRoute layout={SideNavLayout} path={Routes.dashboard.rootPath} component={Dashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />

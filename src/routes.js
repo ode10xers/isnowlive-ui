@@ -7,9 +7,12 @@ const Routes = {
   sessionDetails: '/session/:id',
   sessionUpdate: '/session/:id/edit',
   profilePreview: '/profile/preview',
-  dashboard: '/dashboard',
-  dashboardSessions: '/dashboard/sessions/:session_type',
-  dashboardSessionsDetails: '/dashboard/sessions/:session_id/:inventory_id/details',
+  dashboard: {
+    rootPath: '/dashboard',
+    defaultPath: '/sessions/upcoming',
+    sessions: '/sessions/:session_type',
+    sessionsDetails: '/sessions/:session_id/:inventory_id/details',
+  },
 };
 
 export default Routes;

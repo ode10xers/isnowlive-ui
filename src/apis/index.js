@@ -15,7 +15,7 @@ export default {
     delete: (sessionId) => http.delete(`/secure/sessions/${sessionId}`),
     // Mock data for past and upcoming session is same. They have same response
     getSession: () => http.get('/secure/order/past'),
-    getSessionForPast: () => http.get('/secure/order/past'),
-    getSessionForUpcoming: () => http.get('/secure/order/past'),
+    getPastSession: () => http.get('/secure/order/past'),
+    getUpcomingSession: () => http.get('/secure/order/past'),
   },
 };

@@ -1,8 +1,17 @@
 import React from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import Routes from 'routes';
 
-const Dashboard = () => {
+import DashboardSessions from 'pages/DashboardSessions';
+import DashboardSessionsDetails from 'pages/DashboardSessionsDetails';
+
+const Dashboard = ({ match }) => {
   return (
-    <p>This component can be renamed and used to show the nested routes in the manner - dashboard/sessions/upcoming</p>
+    <Switch>
+      <Route exact path={match.url + Routes.dashboard.sessions} component={DashboardSessions} />
+      <Route exact path={match.url + Routes.dashboard.sessionsDetails} component={DashboardSessionsDetails} />
+      <Redirect to={match.url + Routes.dashboard.defaultPath} />
+    </Switch>
   );
 };
 
