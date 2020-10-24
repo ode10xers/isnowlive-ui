@@ -21,13 +21,13 @@ const MenuItems = [
         order: 1,
         key: 'upcoming_sessions',
         title: 'Upcoming Sessions',
-        // For demo purpose
-        path: Routes.profile,
+        path: '/dashboard/sessions/upcoming',
       },
       {
         order: 2,
         key: 'past_sessions',
         title: 'Past Sessions',
+        path: '/dashboard/sessions/past',
       },
       {
         order: 3,
@@ -38,6 +38,7 @@ const MenuItems = [
         order: 4,
         key: 'create_session',
         title: 'Create Session',
+        path: Routes.session,
       },
     ],
   },

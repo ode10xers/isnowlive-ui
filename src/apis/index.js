@@ -13,5 +13,9 @@ export default {
     create: (payload) => http.mockService.post('/secure/sessions/', payload),
     update: (sessionId, payload) => http.mockService.put(`/secure/sessions/${sessionId}`, payload),
     delete: (sessionId) => http.mockService.delete(`/secure/sessions/${sessionId}`),
+    // Mock data for past and upcoming session is same. They have same response
+    getSession: () => http.mockService.get('/secure/order/past'),
+    getPastSession: () => http.mockService.get('/secure/order/past'),
+    getUpcomingSession: () => http.mockService.get('/secure/order/past'),
   },
 };
