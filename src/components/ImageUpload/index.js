@@ -3,6 +3,9 @@ import classNames from 'classnames';
 import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+
+import apis from 'apis';
+
 import styles from './styles.module.scss';
 
 const ImageUpload = ({
@@ -30,6 +33,17 @@ const ImageUpload = ({
     return isJpgOrPng && isValidFileSize;
   };
 
+  const handleImageUpload = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { data } = await apis.user.uploadImage(formData);
+      onChange(data);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
   return (
     <ImgCrop shape="rect" aspect={aspect}>
       <Upload
@@ -37,8 +51,7 @@ const ImageUpload = ({
         listType="picture-card"
         name={name}
         multiple={multiple}
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-        onChange={onChange}
+        action={handleImageUpload}
         beforeUpload={beforeUpload}
         showUploadList={showUploadList}
       >

@@ -35,8 +35,8 @@ const ProfilePreview = () => {
       const { data } = await apis.user.getProfile();
       if (data) {
         setProfile(data);
-        setCoverImage(data.profile.cover_image_url);
-        setProfileImage(data.profile.profile_image_url);
+        setCoverImage(data.cover_image_url);
+        setProfileImage(data.profile_image_url);
         setIsLoading(false);
       }
     } catch (error) {
@@ -98,7 +98,7 @@ const ProfilePreview = () => {
           </Button>
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
-          <Text type="secondary">{profile?.profile?.description}</Text>
+          <Text type="secondary">{profile?.profile?.bio}</Text>
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
           {profile?.profile?.social_media_links && (

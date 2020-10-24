@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card, message } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
-import apis from 'apis';
-import Routes from 'routes';
 
-import Section from '../../components/Section';
-import Loader from '../../components/Loader';
-import OnboardSteps from '../../components/OnboardSteps';
-import ImageUpload from '../../components/ImageUpload';
-import validationRules from '../../utils/validation';
-import { profileFormItemLayout, profileFormTailLayout } from '../../layouts/FormLayouts';
-import { parseEmbedCode } from '../../utils/helper';
+import Routes from 'routes';
+import apis from 'apis';
+import Section from 'components/Section';
+import Loader from 'components/Loader';
+import OnboardSteps from 'components/OnboardSteps';
+import ImageUpload from 'components/ImageUpload';
+import validationRules from 'utils/validation';
+import { parseEmbedCode } from 'utils/helper';
+import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
@@ -22,7 +22,8 @@ const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(false);
+  const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
+  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
   const [testimonials, setTestimonials] = useState([]);
   const [form] = Form.useForm();
 
@@ -31,8 +32,8 @@ const Profile = () => {
       const { data } = await apis.user.getProfile();
       if (data) {
         form.setFieldsValue(data);
-        setCoverImage(data.profile.cover_image_url);
-        setProfileImage(data.profile.profile_image_url);
+        setCoverImage(data.cover_image_url);
+        setProfileImage(data.profile_image_url);
         setTestimonials(data.profile.testimonials);
         setIsLoading(false);
       }
@@ -44,11 +45,8 @@ const Profile = () => {
 
   const updateProfileDetails = async (values) => {
     try {
-      const { data } = await apis.user.updateProfile(values);
-      if (data) {
-        form.setFieldsValue(data);
-        setCoverImage(data.profile.cover_image_url);
-        setProfileImage(data.profile.profile_image_url);
+      const { status } = await apis.user.updateProfile(values);
+      if (status) {
         setIsLoading(false);
         window.open(Routes.profilePreview);
         message.success('Profile successfully updated.');
@@ -64,29 +62,49 @@ const Profile = () => {
 
   const onFinish = (values) => {
     setIsLoading(true);
-    console.log('Success:', values);
-    values.profile.cover_image_url = coverImage;
-    values.profile.profile_image_url = coverImage;
-    values.testimonials = testimonials;
-    updateProfileDetails(values);
-  };
-
-  const onCoverImageUpload = ({ fileList: newFileList }) => {
-    setCoverImage(newFileList[0]);
-  };
-
-  const onProfileImageUpload = ({ fileList: newFileList }) => {
-    setProfileImage(newFileList[0]);
-  };
-
-  const handlePublicUrlChange = (e) => {
-    if (e.target.value) {
-      setIsPublicUrlAvaiable(true);
+    values.cover_image_url = coverImage;
+    values.profile_image_url = profileImage;
+    values.profile.testimonials = testimonials;
+    if (isPublicUrlAvaiable) {
+      updateProfileDetails(values);
     } else {
-      setIsPublicUrlAvaiable(false);
+      message.error('Please enter valid username.');
     }
   };
 
+  const onCoverImageUpload = (imageUrl) => {
+    setCoverImage(imageUrl);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      cover_image_url: imageUrl,
+    });
+  };
+
+  const onProfileImageUpload = (imageUrl) => {
+    setProfileImage(imageUrl);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      profile_image_url: imageUrl,
+    });
+  };
+
+  const handlePublicUrlChange = async (e) => {
+    try {
+      setIsLoadingUsernameCheck(true);
+      const { data } = await apis.user.validUsernameCheck({
+        username: e.target.value,
+      });
+      if (data) {
+        setIsPublicUrlAvaiable(true);
+      } else {
+        setIsPublicUrlAvaiable(false);
+      }
+      setIsLoadingUsernameCheck(false);
+    } catch (error) {
+      setIsLoadingUsernameCheck(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       <OnboardSteps current={0} />
@@ -106,51 +124,60 @@ const Profile = () => {
             <ImageUpload
               aspect={2}
               className={classNames('avatar-uploader', styles.coverImage)}
-              name="profile.cover_image_url"
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              name="cover_image_url"
               onChange={onCoverImageUpload}
               value={coverImage}
               label="Cover Photo"
             />
 
             <ImageUpload
-              name="profile.profile_image_url"
+              name="profile_image_url"
               className={classNames('avatar-uploader', styles.profileImage)}
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
               onChange={onProfileImageUpload}
               value={profileImage}
               label="Profile Photo"
             />
           </div>
-          <Form.Item label="Name" name="full_name" rules={validationRules.nameValidation}>
-            <Input placeholder="Your Display Name" />
+          <Form.Item label="Name" className={styles.nameInputWrapper}>
+            <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
+              <Input placeholder="First Name" />
+            </Form.Item>
+            <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
+              <Input placeholder="Last Name" />
+            </Form.Item>
           </Form.Item>
 
-          <Form.Item label="Short bio" name={['profile', 'description']}>
+          <Form.Item label="Short bio" name={['profile', 'bio']}>
             <Input.TextArea rows={4} placeholder="Please input your short bio" />
           </Form.Item>
 
           <Form.Item label="Public URL">
             <Row align="middle" className={styles.alignUrl}>
               <Col>
-                <Form.Item name="username" rules={validationRules.publicUrlValidation} onChange={handlePublicUrlChange}>
+                <Form.Item name="username" rules={validationRules.publicUrlValidation} onBlur={handlePublicUrlChange}>
                   <Input placeholder="username" />
                 </Form.Item>
               </Col>
               <Col className={classNames(styles.ml10)}>
                 <Text>.is-now.live</Text>
               </Col>
-              <Col className={classNames(styles.ml10)}>
-                {isPublicUrlAvaiable ? (
-                  <Text type="success">
-                    <span className={classNames(styles.dot, styles.success)}></span> Available
-                  </Text>
-                ) : (
-                  <Text type="danger">
-                    <span className={classNames(styles.dot, styles.danger)}></span> Unavailable
-                  </Text>
-                )}
-              </Col>
+              {isLoadingUsernameCheck ? (
+                <Col className={classNames(styles.ml10)}>
+                  <Spin />
+                </Col>
+              ) : (
+                <Col className={classNames(styles.ml10)}>
+                  {isPublicUrlAvaiable ? (
+                    <Text type="success">
+                      <span className={classNames(styles.dot, styles.success)}></span> Available
+                    </Text>
+                  ) : (
+                    <Text type="danger">
+                      <span className={classNames(styles.dot, styles.danger)}></span> Unavailable
+                    </Text>
+                  )}
+                </Col>
+              )}
             </Row>
           </Form.Item>
         </Section>
@@ -174,6 +201,10 @@ const Profile = () => {
 
           <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
             <Input placeholder="Instagram profile link" />
+          </Form.Item>
+
+          <Form.Item label="LinkedIn" name={['profile', 'social_media_links', 'linkedin_link']}>
+            <Input placeholder="LinkedIn profile link" />
           </Form.Item>
         </Section>
 

@@ -4,8 +4,10 @@ export default {
   user: {
     login: (payload) => http.service.post('/auth/login', payload),
     signup: (payload) => http.mockService.post('/client', payload),
-    getProfile: (payload) => http.mockService.get('secure/client', payload),
-    updateProfile: (payload) => http.mockService.put('secure/client', payload),
+    getProfile: (payload) => http.service.get('/secure/user', payload),
+    validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
+    uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
+    updateProfile: (payload) => http.service.patch('secure/user', payload),
     upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
   },
   session: {
