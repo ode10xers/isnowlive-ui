@@ -1,29 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Checkbox, Row, Col, message } from 'antd';
 
-import { useGlobalContext } from '../../services/globalContext';
-import Routes from '../../routes';
-import apis from '../../apis';
-import http from '../../services/http';
-import validationRules from '../../utils/validation';
-import { formLayout, formTailLayout } from '../../layouts/FormLayouts';
-import { getRememberUserEmail } from '../../utils/storage';
+import Routes from 'routes';
+import apis from 'apis';
+import { useGlobalContext } from 'services/globalContext';
+import http from 'services/http';
+import validationRules from 'utils/validation';
+import { getRememberUserEmail } from 'utils/storage';
+import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
+const { Item } = Form;
+const { Password } = Input;
+
 const Login = ({ history }) => {
-  const { state, logIn } = useGlobalContext();
   const [form] = Form.useForm();
+  const { state, logIn } = useGlobalContext();
+  const [isLoading, setIsLoading] = useState(false);
 
   const onFinish = async (values) => {
     try {
+      setIsLoading(true);
       const { data } = await apis.user.login(values);
       if (data) {
-        http.setAuthToken(data.token);
+        http.service.setAuthToken(data.auth_token);
         logIn(data, values.remember);
+        setIsLoading(false);
         history.push(Routes.profile);
       }
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -41,23 +48,23 @@ const Login = ({ history }) => {
     <Row align="middle" className={styles.mt50}>
       <Col span={12} offset={6}>
         <Form form={form} {...formLayout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
-          <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
+          <Item label="Email" name="email" rules={validationRules.emailValidation}>
             <Input />
-          </Form.Item>
+          </Item>
 
-          <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-            <Input.Password />
-          </Form.Item>
+          <Item label="Password" name="password" rules={validationRules.passwordValidation}>
+            <Password />
+          </Item>
 
-          <Form.Item {...formTailLayout} name="remember" valuePropName="checked">
+          <Item {...formTailLayout} name="remember" valuePropName="checked">
             <Checkbox>Remember me</Checkbox>
-          </Form.Item>
+          </Item>
 
-          <Form.Item {...formTailLayout}>
-            <Button type="primary" htmlType="submit">
+          <Item {...formTailLayout}>
+            <Button type="primary" htmlType="submit" loading={isLoading}>
               Submit
             </Button>
-          </Form.Item>
+          </Item>
         </Form>
       </Col>
     </Row>

@@ -1,6 +1,7 @@
 /* eslint-disable */
 export default {
   server: {
-    baseURL: 'https://api.mocklets.com/mock68084',
+    mockBaseURL: 'https://api.mocklets.com/mock68084',
+    baseURL: 'https://stage.api.app.is-now.live',
   },
 };
