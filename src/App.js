@@ -31,11 +31,10 @@ const PrivateRoute = ({ ...rest }) => {
 };
 
 function App() {
-  //TODO: add private and public routes
   return (
     <Router>
       <Switch>
-        <PrivateRoute layout={SideNavLayout} exact path={Routes.dashboard} component={Dashboard} />
+        <PrivateRoute layout={SideNavLayout} path={Routes.dashboard.rootPath} component={Dashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />

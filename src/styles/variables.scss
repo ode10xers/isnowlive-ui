@@ -43,7 +43,7 @@ $spacing: (
   margin-top: map-get($spacing, '10');
 }
 .mt20 {
-  margin-top: map-get($spacing, '-20');
+  margin-top: map-get($spacing, '20');
 }
 .mb10 {
   margin-bottom: map-get($spacing, '10');
@@ -65,4 +65,7 @@ $spacing: (
 }
 .pb50 {
   padding-bottom: map-get($spacing, '50');
+}
+.textAlignLeft {
+  text-align: left;
 }

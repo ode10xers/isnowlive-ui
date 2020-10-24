@@ -7,8 +7,10 @@ const formatDate = {
   toLongDate: (date) => moment(date).format('Do MMM YYYY'),
   toShortDate: (date) => moment(date).format('YYYY-MM-DD'),
   toDayOfWeek: (date) => moment(date).format('dddd'),
+  toShortDayOfWeek: (date) => moment(date).format('ddd'),
   toShortMonth: (date) => moment(date).format('MMM'),
   toDate: (date) => moment(date).format('DD'),
+  toLongDateWithDay: (date) => moment(date).format('ddd, DD MMM YYYY'),
 };
 
 const dateUtil = {
