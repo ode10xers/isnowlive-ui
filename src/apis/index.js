@@ -7,12 +7,14 @@ export default {
     getProfile: (payload) => http.service.get('/secure/user', payload),
     validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
+    uploadFile: (payload) => http.service.post('/secure/upload?type=document', payload),
     updateProfile: (payload) => http.service.patch('secure/user', payload),
     upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
   },
   session: {
-    getDetails: (sessionId) => http.mockService.get(`/secure/sessions/${sessionId}`),
-    create: (payload) => http.mockService.post('/secure/sessions/', payload),
+    getDetails: (sessionId, startDate, endDate) =>
+      http.service.get(`/secure/creator/sessions/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
+    create: (payload) => http.service.post('/secure/creator/sessions', payload),
     update: (sessionId, payload) => http.mockService.put(`/secure/sessions/${sessionId}`, payload),
     delete: (sessionId) => http.mockService.delete(`/secure/sessions/${sessionId}`),
     // Mock data for past and upcoming session is same. They have same response

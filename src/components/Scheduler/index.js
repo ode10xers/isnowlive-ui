@@ -33,7 +33,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const onSelect = (selecetedCalendarDate) => {
     if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
       // check if slots are present for selected date
-      const slotsForSelectedDate = slots.filter(
+      const slotsForSelectedDate = slots?.filter(
         (item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate)
       );
       const formattedSlots = slotsForSelectedDate.map((obj) => ({
@@ -61,12 +61,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   };
 
   const getSlotsList = (value) => {
-    return slots.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
+    return slots?.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
   };
 
   const renderDateCell = (calendarDate) => {
     const slotsForDate = getSlotsList(calendarDate);
-    if (slotsForDate.length) {
+    if (slotsForDate?.length) {
       return (
         <Popover
           content={
@@ -104,7 +104,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const createOneTimeSchedule = (values, givenDate, givenSlots) => {
     // remove all the slots for selected date
-    let tempSlots = givenSlots.filter((item) => toLocaleDate(item.session_date) !== toLocaleDate(givenDate));
+    let tempSlots = givenSlots?.filter((item) => toLocaleDate(item.session_date) !== toLocaleDate(givenDate));
     // adding slots values for that selected date
     const { slots: valuesSlots } = values;
 
@@ -120,10 +120,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         value.start_time = moment(toShortDate(selected_date) + ' ' + start_time).format();
         value.end_time = moment(toShortDate(selected_date) + ' ' + end_time).format();
 
+        // remove slot as BE does not need it(Strong params check)
+        delete value.slot;
+
         // NOTE: deep clone the object else moment dates will be mutate
         tempSlots.push(JSON.parse(JSON.stringify(value)));
       }
     });
+    console.log(tempSlots);
 
     return tempSlots;
   };
@@ -196,7 +200,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         return false;
       } else {
         // check if it's within defined schedules
-        if (slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
+        if (slots?.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
           return false;
         } else {
           return true;
@@ -205,7 +209,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     } else {
       if (moment(currentDate).endOf('day') < moment().startOf('day')) {
         // check if it's within defined schedules
-        if (slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
+        if (slots?.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
           return false;
         } else {
           return true;

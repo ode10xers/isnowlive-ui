@@ -9,32 +9,34 @@ import {
   Col,
   Input,
   Radio,
-  Upload,
   InputNumber,
   Select,
   message,
   DatePicker,
 } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
 import moment from 'moment';
-import apis from 'apis';
 
-import Section from '../../components/Section';
-import Loader from '../../components/Loader';
-import ImageUpload from '../../components/ImageUpload';
-import OnboardSteps from '../../components/OnboardSteps';
-import Scheduler from '../../components/Scheduler';
-import validationRules from '../../utils/validation';
-import { getCurrencyList } from '../../utils/helper';
-import { profileFormItemLayout, profileFormTailLayout } from '../../layouts/FormLayouts';
-import { convertSchedulesToUTC } from '../../utils/helper';
-import Routes from '../../routes';
+import apis from 'apis';
+import Routes from 'routes';
+import Section from 'components/Section';
+import Loader from 'components/Loader';
+import ImageUpload from 'components/ImageUpload';
+import FileUpload from 'components/FileUpload';
+import OnboardSteps from 'components/OnboardSteps';
+import Scheduler from 'components/Scheduler';
+import validationRules from 'utils/validation';
+import dateUtil from 'utils/date';
+import { getCurrencyList, convertSchedulesToUTC } from 'utils/helper';
+import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+const {
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay },
+} = dateUtil;
 
 const initialSession = {
   price: 0,
@@ -44,25 +46,19 @@ const initialSession = {
   name: '',
   description: '',
   session_image_url: '',
-  category: '',
-  sub_category: '',
-  duration: 0,
-  schedules: [],
+  // duration: 10,
+  inventory: [],
   document_url: '',
   beginning: '',
   expiry: '',
   recurring: false,
-  rating: 0,
-  total_ratings: 0,
   prerequisites: '',
-  total_bookings: 0,
-  package_available: true,
-  is_under_membership: false,
 };
 
 const Session = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
+  const [sessionDocumentUrl, setSessionDocumentUrl] = useState(null);
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
   const [isSessionFree, setIsSessionFree] = useState(true);
   const [currencyList, setCurrencyList] = useState(null);
@@ -72,26 +68,23 @@ const Session = ({ match, history }) => {
   const [form] = Form.useForm();
 
   const getSessionDetails = useCallback(
-    async (sessionId) => {
+    async (sessionId, startDate, endDate) => {
       try {
-        const { data } = await apis.session.getDetails(sessionId);
-        if (data?.session) {
-          setSession(data.session);
+        const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
+        if (data) {
+          setSession(data);
           form.setFieldsValue({
-            ...data.session,
-            type: data?.session?.max_participants >= 2 ? 'Group' : '1-on-1',
-            price_type: data?.session?.price === 0 ? 'Free' : 'Paid',
-            recurring_dates_range: data?.session?.recurring
-              ? [moment(data?.session?.beginning), moment(data?.session?.expiry)]
-              : [],
+            ...data,
+            type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
+            price_type: data?.price === 0 ? 'Free' : 'Paid',
+            recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
           });
-          setSessionImageUrl(data.session.session_image_url);
-          setIsSessionTypeGroup(data?.session?.max_participants >= 2 ? true : false);
-          setIsSessionFree(data?.session?.price === 0 ? true : false);
-          setIsSessionRecurring(data?.session?.recurring);
-          setRecurringDatesRanges(
-            data?.session?.recurring ? [moment(data?.session?.beginning), moment(data?.session?.expiry)] : []
-          );
+          setSessionImageUrl(data.session_image_url);
+          setSessionDocumentUrl(data.document_url);
+          setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
+          setIsSessionFree(data?.price === 0 ? true : false);
+          setIsSessionRecurring(data?.recurring);
+          setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setIsLoading(false);
         }
       } catch (error) {
@@ -105,7 +98,9 @@ const Session = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.id) {
-      getSessionDetails(match.params.id);
+      const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
+      const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+      getSessionDetails(match.params.id, startDate, endDate);
     } else {
       form.setFieldsValue({
         ...form.getFieldsValue(),
@@ -123,8 +118,13 @@ const Session = ({ match, history }) => {
       .catch(() => message.error('Failed to load currency list'));
   }, [form, getSessionDetails, match.params.id]);
 
-  const onSessionImageUpload = ({ fileList: newFileList }) => {
-    setSessionImageUrl(newFileList[0]);
+  const onSessionImageUpload = (imageUrl) => {
+    setSessionImageUrl(imageUrl);
+    setSession({ ...session, session_image_url: imageUrl });
+  };
+  const handleDocumentUrlUpload = (imageUrl) => {
+    setSessionDocumentUrl(imageUrl);
+    setSession({ ...session, document_url: imageUrl });
   };
 
   const normFile = (e) => {
@@ -172,10 +172,10 @@ const Session = ({ match, history }) => {
     setRecurringDatesRanges(value);
   };
 
-  const handleSlotsChange = (schedules) => {
+  const handleSlotsChange = (inventory) => {
     setSession({
       ...session,
-      schedules,
+      inventory,
     });
   };
 
@@ -183,12 +183,22 @@ const Session = ({ match, history }) => {
     try {
       setIsLoading(true);
       const data = {
-        ...session,
-        ...values,
+        price: values.price,
+        currency: values.currency,
+        max_participants: values.max_participants,
+        name: values.name,
+        description: values.description,
+        session_image_url: sessionImageUrl || '',
+        category: '',
+        document_url: sessionDocumentUrl || '',
+        expiry: '',
+        beginning: '',
       };
-      data.beginning = moment(values.recurring_dates_range[0]).utc().format();
-      data.expiry = moment(values.recurring_dates_range[1]).utc().format();
-      data.schedules = convertSchedulesToUTC(session.schedules);
+      if (isSessionRecurring) {
+        data.beginning = moment(values.recurring_dates_range[0]).utc().format();
+        data.expiry = moment(values.recurring_dates_range[1]).utc().format();
+      }
+      data.inventory = convertSchedulesToUTC(session.inventory);
       if (data.id) {
         await apis.session.update(data.id, data);
         message.success('Session successfully updated.');
@@ -248,9 +258,13 @@ const Session = ({ match, history }) => {
             <Text>or upload a session pre-requisite document</Text>
             <br />
             <br />
-            <Upload name="document_url" action="https://www.mocky.io/v2/5cc8019d300000980a055e76" listType="text">
-              <Button icon={<UploadOutlined />}>Upload a PDF file</Button>
-            </Upload>
+            <FileUpload
+              name="document_url"
+              value={sessionDocumentUrl}
+              onChange={handleDocumentUrlUpload}
+              listType="text"
+              label="Upload a PDF file"
+            />
           </Form.Item>
 
           <Form.Item label="Session Pre-requisite" name="prerequisites">
@@ -299,7 +313,6 @@ const Session = ({ match, history }) => {
 
             {!isSessionFree && (
               <>
-                {' '}
                 <Form.Item name="currency" label="Currency" rules={validationRules.requiredValidation}>
                   <Select value={form.getFieldsValue().currency}>
                     {currencyList &&
@@ -317,7 +330,7 @@ const Session = ({ match, history }) => {
                   rules={validationRules.requiredValidation}
                 >
                   <InputNumber min={1} placeholder="Amount" />
-                </Form.Item>{' '}
+                </Form.Item>
               </>
             )}
           </>
@@ -356,7 +369,7 @@ const Session = ({ match, history }) => {
             </Form.Item>
           )}
           <Scheduler
-            sessionSlots={session.schedules}
+            sessionSlots={session?.inventory || []}
             recurring={isSessionRecurring}
             recurringDatesRange={recurringDatesRanges}
             handleSlotsChange={handleSlotsChange}
@@ -368,7 +381,7 @@ const Session = ({ match, history }) => {
           <Row justify="center">
             <Col flex={4}>
               <Title level={4} className={styles.scheduleCount}>
-                {session?.schedules.length} Schedules will be created
+                {session?.inventory?.length || 0} Schedules will be created
               </Title>
             </Col>
             <Col flex={1}>

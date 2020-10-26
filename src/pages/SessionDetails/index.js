@@ -1,21 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
 import { Row, Col, Image, message, Typography, Button } from 'antd';
-import apis from 'apis';
 import { ShareAltOutlined } from '@ant-design/icons';
+import classNames from 'classnames';
+import moment from 'moment';
 
-import Routes from '../../routes';
-import SessionDate from '../../components/SessionDate';
-import SessionInfo from '../../components/SessionInfo';
-import SessionRegistration from '../../components/SessionRegistration';
-import Loader from '../../components/Loader';
-import DefaultImage from '../../components/Icons/DefaultImage/index';
-import HostDetails from '../../components/HostDetails';
-import { isMobileDevice } from '../../utils/device';
+import apis from 'apis';
+import Routes from 'routes';
+import SessionDate from 'components/SessionDate';
+import SessionInfo from 'components/SessionInfo';
+import SessionRegistration from 'components/SessionRegistration';
+import Loader from 'components/Loader';
+import DefaultImage from 'components/Icons/DefaultImage/index';
+import HostDetails from 'components/HostDetails';
+import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 
 const { Title } = Typography;
+const {
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay },
+} = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,9 +28,9 @@ const SessionDetails = ({ match, history }) => {
   const [staff, setStaff] = useState(null);
 
   const getSessionDetails = useCallback(
-    async (sessionId) => {
+    async (sessionId, startDate, endDate) => {
       try {
-        const { data } = await apis.session.getDetails(sessionId);
+        const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
         if (data?.session) {
           setSession(data.session);
           setStaff(data.staff);
@@ -42,7 +47,9 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.id) {
-      getSessionDetails(match.params.id);
+      const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
+      const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+      getSessionDetails(match.params.id, startDate, endDate);
     } else {
       setIsLoading(false);
       message.error('Session details not found.');
