@@ -46,7 +46,6 @@ const initialSession = {
   name: '',
   description: '',
   session_image_url: '',
-  // duration: 10,
   inventory: [],
   document_url: '',
   beginning: '',
