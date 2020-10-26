@@ -37,3 +37,16 @@
 .alignUrl {
   align-items: baseline !important;
 }
+.nameInputWrapper {
+  margin: 0px !important;
+}
+.nameInput {
+  max-width: 180px;
+  display: inline-block !important;
+  margin-right: 10px !important;
+}
+@media (max-width: 768px) {
+  .nameInput {
+    max-width: 230px;
+  }
+}

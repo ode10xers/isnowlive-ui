@@ -2,20 +2,22 @@ import http from 'services/http';
 
 export default {
   user: {
-    login: (payload) => http.post('/client/login', payload),
-    signup: (payload) => http.post('/client', payload),
-    getProfile: (payload) => http.get('secure/client', payload),
-    updateProfile: (payload) => http.put('secure/client', payload),
-    upcomingSession: (payload) => http.get('session/upcoming', payload),
+    login: (payload) => http.service.post('/auth/login', payload),
+    signup: (payload) => http.mockService.post('/client', payload),
+    getProfile: (payload) => http.service.get('/secure/user', payload),
+    validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
+    uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
+    updateProfile: (payload) => http.service.patch('secure/user', payload),
+    upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
   },
   session: {
-    getDetails: (sessionId) => http.get(`/secure/sessions/${sessionId}`),
-    create: (payload) => http.post('/secure/sessions/', payload),
-    update: (sessionId, payload) => http.put(`/secure/sessions/${sessionId}`, payload),
-    delete: (sessionId) => http.delete(`/secure/sessions/${sessionId}`),
+    getDetails: (sessionId) => http.mockService.get(`/secure/sessions/${sessionId}`),
+    create: (payload) => http.mockService.post('/secure/sessions/', payload),
+    update: (sessionId, payload) => http.mockService.put(`/secure/sessions/${sessionId}`, payload),
+    delete: (sessionId) => http.mockService.delete(`/secure/sessions/${sessionId}`),
     // Mock data for past and upcoming session is same. They have same response
-    getSession: () => http.get('/secure/order/past'),
-    getPastSession: () => http.get('/secure/order/past'),
-    getUpcomingSession: () => http.get('/secure/order/past'),
+    getSession: () => http.mockService.get('/secure/order/past'),
+    getPastSession: () => http.mockService.get('/secure/order/past'),
+    getUpcomingSession: () => http.mockService.get('/secure/order/past'),
   },
 };
