@@ -3,7 +3,7 @@ import http from 'services/http';
 export default {
   user: {
     login: (payload) => http.service.post('/auth/login', payload),
-    signup: (payload) => http.mockService.post('/client', payload),
+    signup: (payload) => http.service.post('/user', payload),
     getProfile: (payload) => http.service.get('/secure/user', payload),
     validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
