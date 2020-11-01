@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Checkbox, Row, Col, message } from 'antd';
+import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -15,9 +15,11 @@ const { Item } = Form;
 const { Password } = Input;
 
 const Login = ({ history }) => {
-  const [form] = Form.useForm();
+  const [loginForm] = Form.useForm();
+  const [emailPasswordForm] = Form.useForm();
   const { state, logIn } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoginView, setIsLoginView] = useState(true);
 
   const onFinish = async (values) => {
     try {
@@ -35,19 +37,35 @@ const Login = ({ history }) => {
     }
   };
 
+  const sendNewPasswordEmail = async (values) => {
+    try {
+      setIsLoading(true);
+      const { status } = await apis.user.sendNewPasswordEmail(values);
+      if (status === 200 || status === 201 || status === 204) {
+        setIsLoading(false);
+        message.success('Email sent successfully.');
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  }
+
   useEffect(() => {
-    form.setFieldsValue({
+    loginForm.setFieldsValue({
       email: getRememberUserEmail(),
     });
     if (state.userDetails) {
       history.push(Routes.profile);
     }
-  }, [history, state.userDetails, form]);
+  }, [history, state.userDetails, loginForm]);
 
-  return (
-    <Row align="middle" className={styles.mt50}>
-      <Col span={12} offset={6}>
-        <Form form={form} {...formLayout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
+  let view = null;
+
+  if (isLoginView) {
+    view = (
+      <>
+        <Form form={loginForm} {...formLayout} name="basic" onFinish={onFinish}>
           <Item label="Email" name="email" rules={validationRules.emailValidation}>
             <Input />
           </Item>
@@ -56,16 +74,53 @@ const Login = ({ history }) => {
             <Password />
           </Item>
 
-          <Item {...formTailLayout} name="remember" valuePropName="checked">
-            <Checkbox>Remember me</Checkbox>
-          </Item>
-
           <Item {...formTailLayout}>
             <Button type="primary" htmlType="submit" loading={isLoading}>
               Submit
             </Button>
           </Item>
         </Form>
+
+        <Row>
+          <Col span={16} offset={8}>
+            <a href onClick={() => setIsLoginView(false)}>Set a new password</a>
+          </Col>
+        </Row>
+      </>
+    )
+  } else {
+    view = (
+      <>
+        <Row>
+          <Col span={16} offset={8}>
+            <h1>Set a new password</h1>
+          </Col>
+        </Row>
+
+        <Form form={emailPasswordForm} {...formLayout} name="basic" onFinish={sendNewPasswordEmail}>
+          <Item label="Email" name="email" rules={validationRules.emailValidation}>
+            <Input />
+          </Item>
+          <Item {...formTailLayout}>
+            <Button type="primary" htmlType="submit" loading={isLoading}>
+              Send Email
+            </Button>
+          </Item>
+        </Form>
+
+        <Row>
+          <Col span={16} offset={8}>
+            <a href onClick={() => setIsLoginView(true)}>Login with password</a>
+          </Col>
+        </Row>
+      </>
+    )
+  }
+
+  return (
+    <Row align="middle" className={styles.mt50}>
+      <Col span={12} offset={6}>
+        {view}
       </Col>
     </Row>
   );
