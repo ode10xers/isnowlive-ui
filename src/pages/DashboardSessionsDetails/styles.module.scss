@@ -8,7 +8,7 @@
   color: map-get($colors, $key: 'white') !important;
 }
 .emailButton {
-  background-color: map-get($colors, $key: 'grey') !important;
+  background-color: map-get($colors, $key: 'gray') !important;
   color: map-get($colors, $key: 'white') !important;
 }
 @media (max-width: 768px) {

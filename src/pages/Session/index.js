@@ -28,6 +28,7 @@ import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
 import { getCurrencyList, convertSchedulesToUTC } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 
@@ -48,13 +49,14 @@ const initialSession = {
   session_image_url: '',
   inventory: [],
   document_url: '',
-  beginning: '',
-  expiry: '',
+  beginning: moment().startOf('day').utc().format(),
+  expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
   prerequisites: '',
 };
 
 const Session = ({ match, history }) => {
+  const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
   const [sessionDocumentUrl, setSessionDocumentUrl] = useState(null);
@@ -64,7 +66,7 @@ const Session = ({ match, history }) => {
   const [isSessionRecurring, setIsSessionRecurring] = useState(false);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
   const [session, setSession] = useState(initialSession);
-  const [form] = Form.useForm();
+  const [deleteSlot, setDeleteSlot] = useState([]);
 
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
@@ -121,6 +123,7 @@ const Session = ({ match, history }) => {
     setSessionImageUrl(imageUrl);
     setSession({ ...session, session_image_url: imageUrl });
   };
+
   const handleDocumentUrlUpload = (imageUrl) => {
     setSessionDocumentUrl(imageUrl);
     setSession({ ...session, document_url: imageUrl });
@@ -169,6 +172,7 @@ const Session = ({ match, history }) => {
 
   const handleRecurringDatesRange = (value) => {
     setRecurringDatesRanges(value);
+    form.setFieldsValue({ ...form.getFieldsValue(), recurring_dates_range: value });
   };
 
   const handleSlotsChange = (inventory) => {
@@ -176,6 +180,13 @@ const Session = ({ match, history }) => {
       ...session,
       inventory,
     });
+  };
+
+  const handleSlotDelete = (value) => {
+    let tempDeleteSlots = deleteSlot;
+    tempDeleteSlots.push(value);
+    tempDeleteSlots = tempDeleteSlots.filter((item, index) => tempDeleteSlots.indexOf(item) === index);
+    setDeleteSlot(tempDeleteSlots);
   };
 
   const onFinish = async (values) => {
@@ -190,20 +201,28 @@ const Session = ({ match, history }) => {
         session_image_url: sessionImageUrl || '',
         category: '',
         document_url: sessionDocumentUrl || '',
-        expiry: '',
-        beginning: '',
+        recurring: isSessionRecurring,
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
         data.expiry = moment(values.recurring_dates_range[1]).utc().format();
       }
       data.inventory = convertSchedulesToUTC(session.inventory);
-      if (data.id) {
-        await apis.session.update(data.id, data);
+      if (deleteSlot && deleteSlot.length) {
+        await apis.session.delete({ data: JSON.stringify(deleteSlot) });
+      }
+      if (session.id) {
+        await apis.session.update(session.id, data);
         message.success('Session successfully updated.');
+        const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
+        const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+        getSessionDetails(match.params.id, startDate, endDate);
       } else {
-        await apis.session.create(data);
+        const newSessionResponse = await apis.session.create(data);
         message.success('Session successfully created.');
+        if (newSessionResponse.data.id) {
+          history.push(`/session/${newSessionResponse.data.id}/edit`);
+        }
       }
       setIsLoading(false);
     } catch (error) {
@@ -216,7 +235,7 @@ const Session = ({ match, history }) => {
       <OnboardSteps current={2} />
       <Space size="middle">
         <Typography>
-          <Title>Create Session</Title>
+          <Title>{session.id ? 'Update' : 'Create'} Session</Title>
           <Paragraph>
             Ornare ipsum cras non egestas risus, tincidunt malesuada potenti suspendisse mauris id consectetur sit
             ultrices nunc, ut ac montes, proin diam elit, tristique vitae
@@ -250,7 +269,7 @@ const Session = ({ match, history }) => {
           </Form.Item>
           <Form.Item
             name="document_url"
-            {...profileFormTailLayout}
+            {...(!isMobileDevice && profileFormTailLayout)}
             valuePropName="fileList"
             getValueFromEvent={normFile}
           >
@@ -286,7 +305,7 @@ const Session = ({ match, history }) => {
 
             {isSessionTypeGroup && (
               <Form.Item
-                {...profileFormTailLayout}
+                {...(!isMobileDevice && profileFormTailLayout)}
                 name="max_participants"
                 help="Maximum 100 supported"
                 rules={validationRules.requiredValidation}
@@ -323,7 +342,7 @@ const Session = ({ match, history }) => {
                   </Select>
                 </Form.Item>
                 <Form.Item
-                  {...profileFormTailLayout}
+                  {...(!isMobileDevice && profileFormTailLayout)}
                   name="price"
                   help="Set your price"
                   rules={validationRules.requiredValidation}
@@ -355,7 +374,7 @@ const Session = ({ match, history }) => {
             <Form.Item
               rules={isSessionRecurring ? validationRules.requiredValidation : null}
               name="recurring_dates_range"
-              {...profileFormTailLayout}
+              {...(!isMobileDevice && profileFormTailLayout)}
               layout="vertical"
             >
               <Text>First Session Date: </Text>
@@ -372,6 +391,7 @@ const Session = ({ match, history }) => {
             recurring={isSessionRecurring}
             recurringDatesRange={recurringDatesRanges}
             handleSlotsChange={handleSlotsChange}
+            handleSlotDelete={handleSlotDelete}
           />
         </Section>
 

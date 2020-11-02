@@ -15,8 +15,8 @@ export default {
     getDetails: (sessionId, startDate, endDate) =>
       http.service.get(`/secure/creator/sessions/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
     create: (payload) => http.service.post('/secure/creator/sessions', payload),
-    update: (sessionId, payload) => http.mockService.put(`/secure/sessions/${sessionId}`, payload),
-    delete: (sessionId) => http.mockService.delete(`/secure/sessions/${sessionId}`),
+    update: (sessionId, payload) => http.service.patch(`/secure/creator/sessions/${sessionId}`, payload),
+    delete: (payload) => http.service.delete('secure/creator/sessions/inventories/bulk', payload),
     // Mock data for past and upcoming session is same. They have same response
     getSession: () => http.mockService.get('/secure/order/past'),
     getPastSession: () => http.mockService.get('/secure/order/past'),

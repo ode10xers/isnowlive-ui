@@ -84,8 +84,8 @@ class HttpService {
     return this.axios.patch(url, payload);
   }
 
-  delete(url) {
-    return this.axios.delete(url);
+  delete(url, payload) {
+    return this.axios.delete(url, payload);
   }
 }
 

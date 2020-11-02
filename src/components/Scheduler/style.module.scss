@@ -24,3 +24,12 @@
 .inline {
   display: flex;
 }
+.badge {
+  position: absolute !important;
+  top: -10px;
+  right: -5px;
+  z-index: 1;
+  > .ant-badge-count {
+    background: map-get($colors, $key: 'success') !important;
+  }
+}
