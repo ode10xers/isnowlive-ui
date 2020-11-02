@@ -207,7 +207,13 @@ const Session = ({ match, history }) => {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
         data.expiry = moment(values.recurring_dates_range[1]).utc().format();
       }
-      data.inventory = convertSchedulesToUTC(session.inventory);
+
+      let allInventoryList = convertSchedulesToUTC(session.inventory);
+      data.inventory = allInventoryList.filter((slot) => {
+        if (moment(slot.session_date).diff(moment(), 'days') > 0) {
+          return slot;
+        }
+      });
       if (deleteSlot && deleteSlot.length) {
         await apis.session.delete({ data: JSON.stringify(deleteSlot) });
       }
