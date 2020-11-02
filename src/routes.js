@@ -2,6 +2,7 @@ const Routes = {
   root: '/',
   login: '/login',
   signup: '/signup',
+  passwordVerification: '/password/verify/:token',
   profile: '/profile',
   session: '/session',
   sessionDetails: '/session/:id',

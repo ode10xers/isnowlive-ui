@@ -14,6 +14,7 @@ import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
 import Dashboard from 'pages/Dashboard';
+import ResetPassword from 'pages/ResetPassword';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -41,6 +42,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
+        <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
       </Switch>
