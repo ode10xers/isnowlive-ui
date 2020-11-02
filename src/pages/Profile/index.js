@@ -52,7 +52,7 @@ const Profile = () => {
         setIsLoading(false);
         window.open(Routes.profilePreview);
         message.success('Profile successfully updated.');
-        history.push(Routes.livestream); 
+        history.push(Routes.livestream);
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');

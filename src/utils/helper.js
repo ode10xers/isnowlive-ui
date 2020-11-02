@@ -61,4 +61,4 @@ export const convertSchedulesToUTC = (schedules) => {
 export const isAPISuccess = (statusCode) => {
   const successStatusCode = [200, 201, 204];
   return successStatusCode.includes(statusCode);
-}
+};

@@ -22,15 +22,18 @@ const Login = ({ history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
 
-  const redirectBasedOnProfileCriteria =  useCallback((user) => {
-    if (user.profile_complete === false) {
-      history.push(Routes.profile);
-    } else if (user.zoom_connected === false) {
-      history.push(Routes.livestream);
-    } else {
-      history.push(Routes.dashboard.rootPath);
-    }
-  }, [history]);
+  const redirectBasedOnProfileCriteria = useCallback(
+    (user) => {
+      if (user.profile_complete === false) {
+        history.push(Routes.profile);
+      } else if (user.zoom_connected === false) {
+        history.push(Routes.livestream);
+      } else {
+        history.push(Routes.dashboard.rootPath);
+      }
+    },
+    [history]
+  );
 
   const onFinish = async (values) => {
     try {
@@ -60,7 +63,7 @@ const Login = ({ history }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
-  }
+  };
 
   useEffect(() => {
     loginForm.setFieldsValue({
@@ -94,11 +97,13 @@ const Login = ({ history }) => {
 
         <Row>
           <Col span={16} offset={8}>
-            <a href onClick={() => setIsLoginView(false)}>Set a new password</a>
+            <a href onClick={() => setIsLoginView(false)}>
+              Set a new password
+            </a>
           </Col>
         </Row>
       </>
-    )
+    );
   } else {
     view = (
       <>
@@ -121,11 +126,13 @@ const Login = ({ history }) => {
 
         <Row>
           <Col span={16} offset={8}>
-            <a href onClick={() => setIsLoginView(true)}>Login with password</a>
+            <a href onClick={() => setIsLoginView(true)}>
+              Login with password
+            </a>
           </Col>
         </Row>
       </>
-    )
+    );
   }
 
   return (

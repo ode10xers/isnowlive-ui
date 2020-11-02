@@ -33,7 +33,7 @@ const ResetPassword = () => {
       });
       if (isAPISuccess(status)) {
         setSubmitting(false);
-        message.success('Password set successfully.')
+        message.success('Password set successfully.');
         history.push(Routes.login);
       }
     } catch (error) {
@@ -61,7 +61,6 @@ const ResetPassword = () => {
             </Button>
           </Item>
         </Form>
-
       </Col>
     </Row>
   );
