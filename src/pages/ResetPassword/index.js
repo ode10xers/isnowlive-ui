@@ -5,6 +5,7 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
@@ -30,7 +31,7 @@ const ResetPassword = () => {
         token,
         new_password: values.password,
       });
-      if (status === 200 || status === 201 || status === 204) {
+      if (isAPISuccess(status)) {
         setSubmitting(false);
         message.success('Password set successfully.')
         history.push(Routes.login);

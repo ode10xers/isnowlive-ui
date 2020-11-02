@@ -7,6 +7,7 @@ import { useGlobalContext } from 'services/globalContext';
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
+import { isAPISuccess } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
@@ -41,7 +42,7 @@ const Login = ({ history }) => {
     try {
       setIsLoading(true);
       const { status } = await apis.user.sendNewPasswordEmail(values);
-      if (status === 200 || status === 201 || status === 204) {
+      if (isAPISuccess(status)) {
         setIsLoading(false);
         message.success('Email sent successfully.');
       }
