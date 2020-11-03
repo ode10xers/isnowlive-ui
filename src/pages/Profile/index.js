@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -26,6 +27,7 @@ const Profile = () => {
   const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
   const [testimonials, setTestimonials] = useState([]);
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -50,6 +52,7 @@ const Profile = () => {
         setIsLoading(false);
         window.open(Routes.profilePreview);
         message.success('Profile successfully updated.');
+        history.push(Routes.livestream);
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');

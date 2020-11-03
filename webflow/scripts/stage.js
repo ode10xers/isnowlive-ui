@@ -6,17 +6,17 @@ function findSelectorAndAttachEvent(selector, eventName, eventCallBack) {
 }
 
 function setRedirectionToSignup() {
-  const signupRedirectUrl = "https://app.stage.passion.do/signup";
+  const signupRedirectUrl = 'https://app.stage.passion.do/signup';
   findSelectorAndAttachEvent("[data-signup-link='true']", 'click', function () {
     window.location.href = signupRedirectUrl;
-  })
+  });
 }
 
 function setRedirectionToLogin() {
-  const loginRedirectUrl = "https://app.stage.passion.do/login";
+  const loginRedirectUrl = 'https://app.stage.passion.do/login';
   findSelectorAndAttachEvent("[data-login-link='true']", 'click', function () {
     window.location.href = loginRedirectUrl;
-  })
+  });
 }
 
 setRedirectionToSignup();
