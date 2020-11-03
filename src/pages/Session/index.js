@@ -15,7 +15,7 @@ import {
   message,
   DatePicker,
 } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import apis from 'apis';
 
@@ -69,6 +69,7 @@ const Session = ({ match, history }) => {
   const [isSessionRecurring, setIsSessionRecurring] = useState(false);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
   const [session, setSession] = useState(initialSession);
+  const [isOnboarding, setIsOnboarding] = useState(true);
   const [form] = Form.useForm();
 
   const getSessionDetails = useCallback(
@@ -97,13 +98,20 @@ const Session = ({ match, history }) => {
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
-        history.push(Routes.session);
+        if (isOnboarding) {
+          history.push(Routes.session);
+        } else {
+          history.push(Routes.dashboard.createSessions);
+        }
       }
     },
-    [form, history]
+    [form, history, isOnboarding]
   );
 
   useEffect(() => {
+    if (match.path.includes('manage')) {
+      setIsOnboarding(false);
+    }
     if (match.params.id) {
       getSessionDetails(match.params.id);
     } else {
@@ -121,7 +129,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-  }, [form, getSessionDetails, match.params.id]);
+  }, [form, getSessionDetails, match.params.id, match.path]);
 
   const onSessionImageUpload = ({ fileList: newFileList }) => {
     setSessionImageUrl(newFileList[0]);
@@ -204,8 +212,22 @@ const Session = ({ match, history }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
-      <OnboardSteps current={2} />
-      <Space size="middle">
+      {isOnboarding ? (
+        <OnboardSteps current={2} />
+      ) : (
+        <Row>
+          <Col span={24}>
+            <Button
+              className={styles.headButton}
+              onClick={() => history.push('/dashboard/manage/sessions')}
+              icon={<ArrowLeftOutlined />}
+            >
+              Sessions
+            </Button>
+          </Col>
+        </Row>
+      )}
+      <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
           <Title>Create Session</Title>
           <Paragraph>
