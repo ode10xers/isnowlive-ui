@@ -6,10 +6,10 @@ export default {
     signup: (payload) => http.service.post('/user', payload),
     sendNewPasswordEmail: (payload) => http.service.post('/user/password/new', payload),
     setNewPassword: (payload) => http.service.post('/user/password/set', payload),
-    getProfile: (payload) => http.service.get('/secure/user', payload),
+    getProfile: (payload) => http.service.get('/secure/user/', payload),
     validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
-    updateProfile: (payload) => http.service.patch('secure/user', payload),
+    updateProfile: (payload) => http.service.patch('secure/user/', payload),
     upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
   },
   session: {
