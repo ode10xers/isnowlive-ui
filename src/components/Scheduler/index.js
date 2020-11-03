@@ -295,7 +295,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                 <Row className={styles.m10}>
                   <Col xs={11} md={11}>
                     <Select
-                      defaultValue={slot.start_time}
+                      value={slot.start_time}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
@@ -308,7 +308,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   <Col xs={11} md={11}>
                     <Select
                       disabled={slot.start_time ? false : true}
-                      defaultValue={slot.end_time}
+                      value={slot.end_time}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
                       placeholder="End time"
