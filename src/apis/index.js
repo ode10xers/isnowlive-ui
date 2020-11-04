@@ -11,6 +11,7 @@ export default {
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
     updateProfile: (payload) => http.service.patch('secure/user/', payload),
     upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
+    storeZoomCredentials: (payload) => http.service.post('secure/creator/profile/zoom', payload),
   },
   session: {
     getDetails: (sessionId) => http.mockService.get(`/secure/sessions/${sessionId}`),
