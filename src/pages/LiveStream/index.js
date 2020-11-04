@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { Form, Typography, Button, Space, Row, Col, Input, Radio } from 'antd';
-
+import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
 
 import { profileFormItemLayout } from 'layouts/FormLayouts';
+import validationRules from 'utils/validation';
+import Routes from 'routes';
+import apis from 'apis';
 
 import styles from './style.module.scss';
 
@@ -18,7 +21,22 @@ const ZoomAuthType = {
 
 const LiveStream = () => {
   const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
+  const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
+  const history = useHistory();
+
+  const storeZoomCrendetials = async (values) => {
+    try {
+      setIsLoading(true);
+      const { data } = await apis.user.storeZoomCredentials(values);
+      if (data) {
+        history.push(Routes.session);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
 
   return (
     <>
@@ -93,28 +111,30 @@ const LiveStream = () => {
               </p>
             </Col>
             <Col span={24}>
-              <Form form={form} {...profileFormItemLayout}>
-                <Form.Item label="API Key">
-                  <Input placeholder="API Key" />
-                </Form.Item>
-                <Form.Item label="API Secret">
-                  <Input placeholder="API Secret" />
-                </Form.Item>
-                <Form.Item label="Email">
-                  <Input placeholder="Email" />
-                </Form.Item>
-              </Form>
-            </Col>
-            <Col span={24}>
-              <Row justify="center">
-                <Col>
-                  <Form.Item>
-                    <Button htmlType="submit" type="primary">
-                      Submit
-                    </Button>
+              <Form form={form} {...profileFormItemLayout} onFinish={storeZoomCrendetials}>
+                <Col span={24}>
+                  <Form.Item label="API Key" name="api_key" rules={validationRules.requiredValidation}>
+                    <Input placeholder="API Key" />
+                  </Form.Item>
+                  <Form.Item label="API Secret" name="api_secret" rules={validationRules.requiredValidation}>
+                    <Input placeholder="API Secret" />
+                  </Form.Item>
+                  <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
+                    <Input placeholder="Email" />
                   </Form.Item>
                 </Col>
-              </Row>
+                <Col span={24}>
+                  <Row justify="center">
+                    <Col>
+                      <Form.Item>
+                        <Button htmlType="submit" type="primary" loading={isLoading}>
+                          Submit
+                        </Button>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                </Col>
+              </Form>
             </Col>
           </Row>
         )}
