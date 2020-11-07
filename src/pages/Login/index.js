@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import Routes from 'routes';
@@ -22,6 +22,19 @@ const Login = ({ history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
 
+  const redirectBasedOnProfileCriteria = useCallback(
+    (user) => {
+      if (user.profile_complete === false) {
+        history.push(Routes.profile);
+      } else if (user.zoom_connected === false) {
+        history.push(Routes.livestream);
+      } else {
+        history.push(Routes.dashboard.rootPath);
+      }
+    },
+    [history]
+  );
+
   const onFinish = async (values) => {
     try {
       setIsLoading(true);
@@ -30,7 +43,7 @@ const Login = ({ history }) => {
         http.service.setAuthToken(data.auth_token);
         logIn(data, values.remember);
         setIsLoading(false);
-        history.push(Routes.profile);
+        redirectBasedOnProfileCriteria(data);
       }
     } catch (error) {
       setIsLoading(false);
@@ -57,9 +70,9 @@ const Login = ({ history }) => {
       email: getRememberUserEmail(),
     });
     if (state.userDetails) {
-      history.push(Routes.profile);
+      redirectBasedOnProfileCriteria(state.userDetails);
     }
-  }, [history, state.userDetails, loginForm]);
+  }, [history, state.userDetails, loginForm, redirectBasedOnProfileCriteria]);
 
   let view = null;
 

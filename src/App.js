@@ -8,6 +8,7 @@ import SideNavLayout from 'layouts/SideNavLayout';
 
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import LiveStream from './pages/LiveStream';
 import ProfilePreview from './pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
@@ -37,6 +38,7 @@ function App() {
       <Switch>
         <PrivateRoute layout={SideNavLayout} path={Routes.dashboard.rootPath} component={Dashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />

@@ -6,12 +6,13 @@ export default {
     signup: (payload) => http.service.post('/user', payload),
     sendNewPasswordEmail: (payload) => http.service.post('/user/password/new', payload),
     setNewPassword: (payload) => http.service.post('/user/password/set', payload),
-    getProfile: (payload) => http.service.get('/secure/user', payload),
+    getProfile: (payload) => http.service.get('/secure/user/', payload),
     validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
     uploadFile: (payload) => http.service.post('/secure/upload?type=document', payload),
     updateProfile: (payload) => http.service.patch('secure/user', payload),
     upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
+    storeZoomCredentials: (payload) => http.service.post('secure/creator/profile/zoom', payload),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
@@ -20,8 +21,8 @@ export default {
     update: (sessionId, payload) => http.service.patch(`/secure/creator/sessions/${sessionId}`, payload),
     delete: (payload) => http.service.delete('secure/creator/sessions/inventories/bulk', payload),
     // Mock data for past and upcoming session is same. They have same response
-    getSession: () => http.mockService.get('/secure/order/past'),
-    getPastSession: () => http.mockService.get('/secure/order/past'),
-    getUpcomingSession: () => http.mockService.get('/secure/order/past'),
+    getSession: () => http.service.get('/secure/creator/sessions/'),
+    getPastSession: () => http.service.get('/secure/creator/inventories/past'),
+    getUpcomingSession: () => http.service.get('/secure/creator/inventories/upcoming'),
   },
 };

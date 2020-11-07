@@ -1,0 +1,11 @@
+@import '../../styles/variables.scss';
+
+.card {
+  margin-top: 10px !important;
+}
+.detailsButton {
+  padding-left: 0px !important;
+}
+.sucessButton {
+  color: map-get($colors, $key: 'success') !important;
+}

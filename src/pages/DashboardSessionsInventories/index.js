@@ -17,7 +17,7 @@ const {
 } = dateUtil;
 const { Text, Title } = Typography;
 
-const DashboardSessions = ({ match }) => {
+const DashboardSessionsInventories = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -26,25 +26,24 @@ const DashboardSessions = ({ match }) => {
   const getStaffSession = useCallback(async () => {
     const { data } = isPast ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
     if (data) {
-      const sortedData = data.sort((a, b) => new Date(a.inventory.start_time) - new Date(b.inventory.start_time));
       setSessions(
-        sortedData.map((i, index) => ({
+        data.map((i, index) => ({
           index,
-          key: i.session.id,
-          name: i.session.name,
-          type: i.session.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
-          duration: `${i.session.duration} mins`,
-          days: toLongDateWithDay(i.inventory.start_time),
-          session_date: i.inventory.session_date,
-          time: `${toLocaleTime(i.inventory.start_time)} - ${toLocaleTime(i.inventory.end_time)}`,
-          start_time: i.inventory.start_time,
-          end_time: i.inventory.end_time,
+          key: i.id,
+          name: i.name,
+          type: i.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
+          duration: `${i.duration} mins`,
+          days: i?.inventory?.start_time ? toLongDateWithDay(i.inventory.start_time) : null,
+          session_date: i?.inventory?.session_date,
+          time: i?.inventory ? `${toLocaleTime(i.inventory.start_time)} - ${toLocaleTime(i.inventory.end_time)}` : null,
+          start_time: i?.inventory?.start_time,
+          end_time: i?.inventory?.end_time,
           participants:
-            i.session.max_participants > 1 ? i.participants.length : i.participants.map((p) => p.name).join(' '),
+            i.max_participants > 1 ? i.participants?.length || 0 : i.participants?.map((p) => p.name).join(' '),
           start_url: i.start_url,
-          inventory_id: i.inventory.id,
-          session_id: i.session.id,
-          max_participants: i.session.max_participants,
+          inventory_id: i?.inventory?.id,
+          session_id: i.id,
+          max_participants: i.max_participants,
         }))
       );
     }
@@ -61,6 +60,12 @@ const DashboardSessions = ({ match }) => {
       getStaffSession();
     }
   }, [match.params.session_type, getStaffSession]);
+
+  const openSessionInventoryDetails = (item) => {
+    if (item.inventory_id) {
+      history.push(`/dashboard/sessions/${item.id}/${item.inventory_id}/details`);
+    }
+  };
 
   let sessionColumns = [
     {
@@ -108,7 +113,7 @@ const DashboardSessions = ({ match }) => {
       title: 'Actions',
       width: isPast ? '4%' : '16%',
       render: (text, record) => {
-        const isDisabled = record.participants > 0 || record.participants.length > 0;
+        const isDisabled = record.participants ? record.participants.length > 0 : false;
         return isPast ? (
           <Row justify="start">
             <Col>
@@ -120,11 +125,7 @@ const DashboardSessions = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button
-                className={styles.detailsButton}
-                onClick={() => history.push(`/dashboard/sessions/${record.session_id}/${record.inventory_id}/details`)}
-                type="link"
-              >
+              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
                 Details
               </Button>
             </Col>
@@ -154,7 +155,7 @@ const DashboardSessions = ({ match }) => {
   ];
 
   const renderSessionItem = (item) => {
-    const isCancelDisabled = item.participants > 0 || item.participants.length > 0;
+    const isCancelDisabled = item.participants ? item.participants.length > 0 : false;
 
     const layout = (label, value) => (
       <Row>
@@ -168,16 +169,12 @@ const DashboardSessions = ({ match }) => {
     return (
       <Card
         title={
-          <div onClick={() => history.push(`/dashboard/sessions/${item.session_id}/${item.inventory_id}/details`)}>
+          <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
-          <Button
-            className={styles.detailsButton}
-            onClick={() => history.push(`/dashboard/sessions/${item.session_id}/${item.inventory_id}/details`)}
-            type="link"
-          >
+          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
             Details
           </Button>,
           <Popconfirm
@@ -226,4 +223,4 @@ const DashboardSessions = ({ match }) => {
   );
 };
 
-export default DashboardSessions;
+export default DashboardSessionsInventories;
