@@ -62,3 +62,11 @@ export const isAPISuccess = (statusCode) => {
   const successStatusCode = [200, 201, 204];
   return successStatusCode.includes(statusCode);
 };
+
+export const isValidImage = (url) => {
+  const extenstion = url?.split('.')?.pop();
+  if (url?.startsWith('https://') && ['png, jpeg, jpg'].includes(extenstion)) {
+    return true;
+  }
+  return false;
+};
