@@ -37,60 +37,60 @@ const Sessions = ({ sessions }) => {
       <Row>
         {sessions && sessions.length ? (
           sessions.map((session) => {
-            if (session.name) {
-              return (
-                <Col key={session.id} xs={24} md={isMobileDevice ? 24 : 12}>
-                  {isMobileDevice && (
-                    <Card
-                      hoverable
-                      className={styles.cardSmall}
-                      cover={
-                        <img
-                          alt="session"
-                          src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
-                        />
-                      }
-                    >
-                      <Card.Meta
-                        title={session.name}
-                        description={
-                          <React.Fragment>
-                            <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
-                            <br />
-                            {session.session_date && description(session)}
-                          </React.Fragment>
-                        }
-                      />
-                    </Card>
-                  )}
-                  {!isMobileDevice && (
-                    <Card className={styles.card}>
-                      <Row>
-                        <Col>
-                          <Image
-                            height={100}
-                            width={100}
-                            className={styles.cardImage}
+            return (
+              <>
+                {session.name && (
+                  <Col key={session.id} xs={24} md={isMobileDevice ? 24 : 12}>
+                    {isMobileDevice && (
+                      <Card
+                        hoverable
+                        className={styles.cardSmall}
+                        cover={
+                          <img
+                            alt="session"
                             src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
-                        </Col>
-                        <Col>
-                          <div className={styles.wrapper}>
-                            <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
-                            <Title className={styles.title} level={5}>
-                              {session.name}
-                            </Title>
-                            {session.session_date && description(session)}
-                          </div>
-                        </Col>
-                      </Row>
-                    </Card>
-                  )}
-                </Col>
-              );
-            } else {
-              return null;
-            }
+                        }
+                      >
+                        <Card.Meta
+                          title={session.name}
+                          description={
+                            <React.Fragment>
+                              <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
+                              <br />
+                              {session.session_date && description(session)}
+                            </React.Fragment>
+                          }
+                        />
+                      </Card>
+                    )}
+                    {!isMobileDevice && (
+                      <Card className={styles.card}>
+                        <Row>
+                          <Col>
+                            <Image
+                              height={100}
+                              width={100}
+                              className={styles.cardImage}
+                              src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                            />
+                          </Col>
+                          <Col>
+                            <div className={styles.wrapper}>
+                              <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
+                              <Title className={styles.title} level={5}>
+                                {session.name}
+                              </Title>
+                              {session.session_date && description(session)}
+                            </div>
+                          </Col>
+                        </Row>
+                      </Card>
+                    )}
+                  </Col>
+                )}
+              </>
+            );
           })
         ) : (
           <Col span={24}>
