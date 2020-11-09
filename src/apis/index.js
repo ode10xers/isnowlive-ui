@@ -7,12 +7,14 @@ export default {
     sendNewPasswordEmail: (payload) => http.service.post('/user/password/new', payload),
     setNewPassword: (payload) => http.service.post('/user/password/set', payload),
     getProfile: (payload) => http.service.get('/secure/user/', payload),
+    getProfileByUsername: (username) => http.service.get(`/creator/${username}/profile`),
     validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
     uploadFile: (payload) => http.service.post('/secure/upload?type=document', payload),
-    updateProfile: (payload) => http.service.patch('secure/user', payload),
-    upcomingSession: (payload) => http.mockService.get('session/upcoming', payload),
-    storeZoomCredentials: (payload) => http.service.post('secure/creator/profile/zoom', payload),
+    updateProfile: (payload) => http.service.patch('/secure/user/', payload),
+    upcomingSession: (payload) => http.mockService.get('/session/upcoming', payload),
+    getSessionsByUsername: (username, type) => http.service.get(`/sessions/${username}/${type}/`),
+    storeZoomCredentials: (payload) => http.service.post('/secure/creator/profile/zoom', payload),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>

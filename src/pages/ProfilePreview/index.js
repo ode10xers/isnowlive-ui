@@ -1,38 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message } from 'antd';
 import {
-  ShareAltOutlined,
   GlobalOutlined,
   FacebookOutlined,
   InstagramOutlined,
   TwitterOutlined,
+  ArrowLeftOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
+import parse from 'html-react-parser';
 
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
-import Sessions from '../../components/Sessions';
-import Loader from '../../components/Loader';
-import parse from 'html-react-parser';
-import { parseEmbedCode } from '../../utils/helper';
-import DefaultImage from '../../components/Icons/DefaultImage/index';
+import Sessions from 'components/Sessions';
+import Loader from 'components/Loader';
+import { parseEmbedCode } from 'utils/helper';
+import DefaultImage from 'components/Icons/DefaultImage/index';
+import Share from 'components/Share';
+
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
-const ProfilePreview = () => {
+const ProfilePreview = ({ username = null }) => {
+  const history = useHistory();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [upcomingSession, setUpcomingSession] = useState([]);
+  const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
 
-  const getProfileDetails = async () => {
+  const getProfileDetails = useCallback(async () => {
     try {
-      const { data } = await apis.user.getProfile();
+      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
       if (data) {
         setProfile(data);
         setCoverImage(data.cover_image_url);
@@ -43,30 +49,71 @@ const ProfilePreview = () => {
       message.error('Failed to load profile details');
       setIsLoading(false);
     }
-  };
+  }, [username]);
 
-  const getSessionDetails = async () => {
-    try {
-      const { data } = await apis.user.upcomingSession();
-      if (data) {
-        setUpcomingSession(data);
+  const getSessionDetails = useCallback(
+    async (type) => {
+      try {
+        const { data } = username
+          ? await apis.user.getSessionsByUsername(username, type)
+          : await apis.user.upcomingSession();
+        if (data) {
+          setSessions(data);
+        }
+      } catch (error) {
+        message.error('Failed to load user session details');
       }
-    } catch (error) {
-      message.error('Failed to load user session details');
-    }
-  };
+    },
+    [username]
+  );
 
   useEffect(() => {
+    if (history.location.pathname.includes('dashboard')) {
+      setIsOnDashboard(true);
+    }
     getProfileDetails();
-    getSessionDetails();
-  }, []);
+    getSessionDetails('upcoming');
+  }, [history.location.pathname, getProfileDetails, getSessionDetails]);
 
   const handleChangeTab = (key) => {
     setSelectedTab(key);
+    if (parseInt(key) === 0) {
+      getSessionDetails('upcoming');
+    } else {
+      getSessionDetails('past');
+    }
   };
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
+      {isOnDashboard && (
+        <Row>
+          <Col span={24}>
+            <Button
+              className={styles.headButton}
+              onClick={() => history.push('/dashboard')}
+              icon={<ArrowLeftOutlined />}
+            >
+              Dashboard
+            </Button>
+            <Button
+              className={styles.headButton}
+              onClick={() => history.push('/dashboard/profile/edit')}
+              icon={<EditOutlined />}
+            >
+              Edit Profile
+            </Button>
+            <Button
+              className={styles.headButton}
+              onClick={() => history.push('/profile/preview')}
+              icon={<GlobalOutlined />}
+            >
+              Public Page
+            </Button>
+          </Col>
+        </Row>
+      )}
+
       {/* ======INTRO========= */}
       <div className={styles.imageWrapper}>
         <div className={styles.coverImageWrapper}>
@@ -90,12 +137,12 @@ const ProfilePreview = () => {
       <Row justify="space-between" align="middle">
         <Col xs={8} md={24}></Col>
         <Col xs={10} md={{ span: 6, offset: 6 }}>
-          <Title level={isMobileDevice ? 4 : 2}>{profile?.full_name}</Title>
+          <Title level={isMobileDevice ? 4 : 2}>
+            {profile?.first_name} {profile?.last_name}
+          </Title>
         </Col>
         <Col xs={6} md={{ span: 6, offset: 6 }}>
-          <Button size={isMobileDevice ? 'small' : 'middle'} icon={<ShareAltOutlined />}>
-            Share
-          </Button>
+          <Share label="Share" username={profile.username} title={`${profile.first_name} ${profile.last_name}`} />
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
           <Text type="secondary">{profile?.profile?.bio}</Text>
@@ -136,10 +183,10 @@ const ProfilePreview = () => {
         <Col span={24}>
           <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
             <Tabs.TabPane tab="Upcoming Sessions" key="0">
-              <Sessions sessions={upcomingSession} />
+              <Sessions sessions={sessions} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Past Sesions" key="1">
-              <Sessions sessions={upcomingSession} />
+              <Sessions sessions={sessions} />
             </Tabs.TabPane>
           </Tabs>
         </Col>
