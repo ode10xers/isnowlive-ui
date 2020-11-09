@@ -140,8 +140,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         tempSlots.push(JSON.parse(JSON.stringify(value)));
       }
     });
-    console.log(tempSlots);
-
     return tempSlots;
   };
 
@@ -156,7 +154,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       moment(selected_date).isSame(endDate)
     ) {
       tempSlots = createOneTimeSchedule(selected_date, tempSlots);
-      console.log(tempSlots);
       selected_date = toLocaleDate(moment(selected_date).add(7, 'days'));
     }
     return tempSlots;

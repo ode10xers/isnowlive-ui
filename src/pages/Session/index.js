@@ -96,7 +96,7 @@ const Session = ({ match, history }) => {
         if (isOnboarding) {
           history.push(Routes.session);
         } else {
-          history.push(Routes.dashboard.createSessions);
+          history.push('/dashboard' + Routes.dashboard.createSessions);
         }
       }
     },
@@ -218,11 +218,7 @@ const Session = ({ match, history }) => {
       }
 
       let allInventoryList = convertSchedulesToUTC(session.inventory);
-      data.inventory = allInventoryList.filter((slot) => {
-        if (moment(slot.session_date).diff(moment(), 'days') > 0) {
-          return slot;
-        }
-      });
+      data.inventory = allInventoryList.filter((slot) => moment(slot.session_date).diff(moment(), 'days') > 0);
       if (deleteSlot && deleteSlot.length) {
         await apis.session.delete({ data: JSON.stringify(deleteSlot) });
       }
