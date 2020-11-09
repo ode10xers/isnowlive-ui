@@ -66,6 +66,7 @@ const MenuItems = [
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
+    path: Routes.dashboard.rootPath + Routes.dashboard.profile,
   },
   {
     order: 6,

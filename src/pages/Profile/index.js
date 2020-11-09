@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin } from 'antd';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 
 import Routes from 'routes';
@@ -13,6 +13,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
 import validationRules from 'utils/validation';
 import { parseEmbedCode } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
@@ -26,6 +27,7 @@ const Profile = () => {
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
   const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
   const [testimonials, setTestimonials] = useState([]);
+  const [isOnboarding, setIsOnboarding] = useState(true);
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -33,6 +35,10 @@ const Profile = () => {
     try {
       const { data } = await apis.user.getProfile();
       if (data) {
+        const localUserDetails = getLocalUserDetails();
+        if (!localUserDetails.profile_complete) {
+          data.username = '';
+        }
         form.setFieldsValue(data);
         setCoverImage(data.cover_image_url);
         setProfileImage(data.profile_image_url);
@@ -50,9 +56,13 @@ const Profile = () => {
       const { status } = await apis.user.updateProfile(values);
       if (status) {
         setIsLoading(false);
-        window.open(Routes.profilePreview);
         message.success('Profile successfully updated.');
-        history.push(Routes.livestream);
+        if (isOnboarding) {
+          window.open(Routes.profilePreview);
+          history.push(Routes.livestream);
+        } else {
+          history.push('/dashboard/profile');
+        }
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
@@ -60,8 +70,11 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    if (history.location.pathname.includes('dashboard')) {
+      setIsOnboarding(false);
+    }
     getProfileDetails();
-  }, [getProfileDetails]);
+  }, [getProfileDetails, history.location.pathname]);
 
   const onFinish = (values) => {
     setIsLoading(true);
@@ -92,28 +105,46 @@ const Profile = () => {
   };
 
   const handlePublicUrlChange = async (e) => {
-    try {
-      setIsLoadingUsernameCheck(true);
-      const { data } = await apis.user.validUsernameCheck({
-        username: e.target.value,
-      });
-      if (data) {
-        setIsPublicUrlAvaiable(true);
-      } else {
-        setIsPublicUrlAvaiable(false);
+    let regex = new RegExp('^[a-zA-Z]*$');
+    if (regex.test(e.target.value)) {
+      try {
+        setIsLoadingUsernameCheck(true);
+        const { data } = await apis.user.validUsernameCheck({
+          username: e.target.value,
+        });
+        if (data) {
+          setIsPublicUrlAvaiable(true);
+        } else {
+          setIsPublicUrlAvaiable(false);
+        }
+        setIsLoadingUsernameCheck(false);
+      } catch (error) {
+        setIsLoadingUsernameCheck(false);
+        message.error(error.response?.data?.message || 'Something went wrong.');
       }
-      setIsLoadingUsernameCheck(false);
-    } catch (error) {
-      setIsLoadingUsernameCheck(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
-      <OnboardSteps current={0} />
-      <Space size="middle">
+      {isOnboarding ? (
+        <OnboardSteps current={0} />
+      ) : (
+        <Row>
+          <Col span={24}>
+            <Button
+              className={styles.headButton}
+              onClick={() => history.push('/dashboard/profile')}
+              icon={<ArrowLeftOutlined />}
+            >
+              Back
+            </Button>
+          </Col>
+        </Row>
+      )}
+      <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title>Setup your profile</Title>
+          <Title> {isOnboarding ? 'Setup' : 'Update'} Public Profile</Title>
         </Typography>
       </Space>
 
@@ -162,7 +193,7 @@ const Profile = () => {
                 </Form.Item>
               </Col>
               <Col className={classNames(styles.ml10)}>
-                <Text>.is-now.live</Text>
+                <Text>.passion.do</Text>
               </Col>
               {isLoadingUsernameCheck ? (
                 <Col className={classNames(styles.ml10)}>
