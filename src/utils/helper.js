@@ -50,7 +50,7 @@ export const convertSchedulesToLocal = (schedules) => {
 export const convertSchedulesToUTC = (schedules) => {
   if (schedules) {
     for (let i = 0; i < schedules.length; i++) {
-      schedules[i].session_date = moment(schedules[i].session_date).utc().startOf('day').format();
+      schedules[i].session_date = moment(schedules[i].session_date).utc().format();
       schedules[i].start_time = moment(schedules[i].start_time).utc().format();
       schedules[i].end_time = moment(schedules[i].end_time).utc().format();
     }

@@ -22,7 +22,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const [openModal, setOpenModal] = useState(false);
   const [slots, setSlots] = useState(convertSchedulesToLocal(sessionSlots));
   const [dayList, setDayList] = useState(null);
-  const [slotsList, setSlotsList] = useState([]);
+  const [slotsList] = useState(() => generateTimes());
 
   useEffect(() => {
     if (slots) {
@@ -30,10 +30,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
     // eslint-disable-next-line
   }, [slots]);
-
-  useEffect(() => {
-    setSlotsList(generateTimes());
-  }, []);
 
   const onSelect = (selecetedCalendarDate) => {
     if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {

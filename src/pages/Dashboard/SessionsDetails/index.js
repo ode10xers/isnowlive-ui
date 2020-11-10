@@ -28,7 +28,7 @@ const {
 } = dateUtil;
 const { Title, Text } = Typography;
 
-const DashboardSessionsDetails = ({ match }) => {
+const SessionsDetails = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
@@ -212,4 +212,4 @@ const DashboardSessionsDetails = ({ match }) => {
   );
 };
 
-export default DashboardSessionsDetails;
+export default SessionsDetails;

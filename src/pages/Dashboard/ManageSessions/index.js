@@ -16,7 +16,7 @@ const {
 } = dateUtil;
 const { Text, Title } = Typography;
 
-const DashboardManageSessions = () => {
+const ManageSessions = () => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -186,4 +186,4 @@ const DashboardManageSessions = () => {
   );
 };
 
-export default DashboardManageSessions;
+export default ManageSessions;
