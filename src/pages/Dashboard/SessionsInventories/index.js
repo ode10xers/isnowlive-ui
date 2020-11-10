@@ -17,7 +17,7 @@ const {
 } = dateUtil;
 const { Text, Title } = Typography;
 
-const DashboardSessionsInventories = ({ match }) => {
+const SessionsInventories = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -223,4 +223,4 @@ const DashboardSessionsInventories = ({ match }) => {
   );
 };
 
-export default DashboardSessionsInventories;
+export default SessionsInventories;

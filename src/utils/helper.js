@@ -58,6 +58,30 @@ export const convertSchedulesToUTC = (schedules) => {
   return schedules;
 };
 
+export const generateTimes = () => {
+  const times = [];
+
+  const intervalInMins = moment.duration(15, 'minutes');
+  const BEGINNING_OF_TODAY = moment().startOf('day');
+  const time = moment(BEGINNING_OF_TODAY);
+
+  const format = (m) => m.format('hh:mm a');
+  const getObject = (m) => ({
+    label: format(m),
+    value: m.format(),
+  });
+  const addIntervalAndPush = () => {
+    times.push(getObject(time));
+    time.add(intervalInMins, 'm');
+  };
+  addIntervalAndPush();
+
+  while (format(time) !== format(BEGINNING_OF_TODAY)) {
+    addIntervalAndPush();
+  }
+  return times;
+};
+
 export const isAPISuccess = (statusCode) => {
   const successStatusCode = [200, 201, 204];
   return successStatusCode.includes(statusCode);

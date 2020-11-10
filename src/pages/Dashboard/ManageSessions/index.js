@@ -16,7 +16,7 @@ const {
 } = dateUtil;
 const { Text, Title } = Typography;
 
-const DashboardManageSessions = () => {
+const ManageSessions = () => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -86,7 +86,7 @@ const DashboardManageSessions = () => {
             <Col md={24} lg={24} xl={8}>
               <Button
                 className={styles.detailsButton}
-                onClick={() => history.push(`/dashboard/manage/session/${record.id}/edit`)}
+                onClick={() => history.push(`/dashboard/manage/session/${record.session_id}/edit`)}
                 type="link"
               >
                 Details
@@ -123,14 +123,14 @@ const DashboardManageSessions = () => {
       <Card
         className={styles.card}
         title={
-          <div onClick={() => history.push(`/dashboard/manage/session/${item.id}/edit`)}>
+          <div onClick={() => history.push(`/dashboard/manage/session/${item.session_id}/edit`)}>
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
           <Button
             className={styles.detailsButton}
-            onClick={() => history.push(`/dashboard/manage/session/${item.id}/edit`)}
+            onClick={() => history.push(`/dashboard/manage/session/${item.session_id}/edit`)}
             type="link"
           >
             Details
@@ -186,4 +186,4 @@ const DashboardManageSessions = () => {
   );
 };
 
-export default DashboardManageSessions;
+export default ManageSessions;

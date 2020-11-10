@@ -56,7 +56,7 @@ const ImageUpload = ({
         showUploadList={showUploadList}
       >
         {value ? (
-          <img src={value} alt="avatar" className={classNames(styles.w100, styles.image)} />
+          <img src={value} alt={label} className={classNames(styles.w100, styles.image)} />
         ) : (
           <div>
             {loading ? <LoadingOutlined /> : <PlusOutlined />}

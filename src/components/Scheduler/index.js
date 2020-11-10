@@ -1,27 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Popover, Modal, Button, List, TimePicker, Form, Space, Input, Row, Col, Checkbox } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import { DeleteFilled } from '@ant-design/icons';
 
-import validationRules from '../../utils/validation';
 import { convertSchedulesToLocal } from '../../utils/helper';
 import dateUtil from '../../utils/date';
 
 import styles from './style.module.scss';
+import { isMobileDevice } from 'utils/device';
+import { generateTimes } from 'utils/helper';
 
-const { RangePicker } = TimePicker;
+const { Option } = Select;
 const {
   formatDate: { toLocaleTime, toLocaleDate, toShortTime, toLongDate, toShortDate, toDayOfWeek },
 } = dateUtil;
 
-const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange }) => {
-  const typeOfSessionCreation = useRef(0);
-  const [form] = Form.useForm();
+const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
+  const [form, setForm] = useState(null);
   const [date, setDate] = useState(moment());
   const [selectedDate, setSelectedDate] = useState(moment());
   const [openModal, setOpenModal] = useState(false);
   const [slots, setSlots] = useState(convertSchedulesToLocal(sessionSlots));
   const [dayList, setDayList] = useState(null);
+  const [slotsList] = useState(() => generateTimes());
 
   useEffect(() => {
     if (slots) {
@@ -33,19 +34,22 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const onSelect = (selecetedCalendarDate) => {
     if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
       // check if slots are present for selected date
-      const slotsForSelectedDate = slots.filter(
+      const slotsForSelectedDate = slots?.filter(
         (item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate)
       );
       const formattedSlots = slotsForSelectedDate.map((obj) => ({
         id: obj.id,
         session_date: moment(obj.session_date),
-        slot: [moment(obj.start_time), moment(obj.end_time)],
+        start_time: obj.start_time,
+        end_time: obj.end_time,
       }));
-      const defaultSlot = { id: undefined, session_date: moment(selecetedCalendarDate).format(), slot: [] };
+      const defaultSlot = {
+        session_date: moment(selecetedCalendarDate).format(),
+        start_time: null,
+        end_time: null,
+      };
 
-      form.setFieldsValue({
-        slots: slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot],
-      });
+      setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
       setDate(selecetedCalendarDate);
       setSelectedDate(selecetedCalendarDate);
       setOpenModal(true);
@@ -57,16 +61,17 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   };
 
   const handleCancel = () => {
+    setForm(null);
     setOpenModal(false);
   };
 
   const getSlotsList = (value) => {
-    return slots.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
+    return slots?.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
   };
 
   const renderDateCell = (calendarDate) => {
     const slotsForDate = getSlotsList(calendarDate);
-    if (slotsForDate.length) {
+    if (slotsForDate?.length && !isMobileDevice) {
       return (
         <Popover
           content={
@@ -97,58 +102,71 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           />
         </Popover>
       );
+    } else if (slotsForDate?.length && isMobileDevice) {
+      return <Badge className={styles.badge} size="small" count={slotsForDate?.length}></Badge>;
     } else {
       return null;
     }
   };
 
-  const createOneTimeSchedule = (values, givenDate, givenSlots) => {
+  const createOneTimeSchedule = (givenDate, givenSlots) => {
     // remove all the slots for selected date
-    let tempSlots = givenSlots.filter((item) => toLocaleDate(item.session_date) !== toLocaleDate(givenDate));
-    // adding slots values for that selected date
-    const { slots: valuesSlots } = values;
+    let tempSlots = givenSlots?.filter((item) => toLocaleDate(item.session_date) !== toLocaleDate(givenDate));
 
-    valuesSlots.forEach((vs) => {
-      if (vs.slot?.length) {
+    form.forEach((vs) => {
+      if (vs.start_time && vs.end_time) {
         let value = vs;
         // work around get concat selected date and slot times as timepicker gives date as current date
-        let start_time = toShortTime(vs.slot[0]);
-        let end_time = toShortTime(vs.slot[1]);
+        let end_time = toShortTime(vs.end_time);
+        let start_time = toShortTime(vs.start_time);
+        if (moment(vs.end_time).diff(vs.start_time, 'minute') < 0) {
+          start_time = toShortTime(vs.end_time);
+          end_time = toShortTime(vs.start_time);
+        }
         let selected_date = moment(givenDate);
 
         value.session_date = selected_date.format();
         value.start_time = moment(toShortDate(selected_date) + ' ' + start_time).format();
         value.end_time = moment(toShortDate(selected_date) + ' ' + end_time).format();
 
+        // remove slot as BE does not need it(Strong params check)
+        delete value.slot;
+
         // NOTE: deep clone the object else moment dates will be mutate
         tempSlots.push(JSON.parse(JSON.stringify(value)));
       }
     });
-
     return tempSlots;
   };
 
-  const createSchedulesAllSelectedDay = (values) => {
+  const createSchedulesAllSelectedDay = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
     const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
     let selected_date = toLocaleDate(selectedDate);
-
-    while (moment(selected_date).isBetween(startDate, endDate)) {
-      tempSlots = createOneTimeSchedule(values, selected_date, tempSlots);
+    while (
+      moment(selected_date).isBetween(startDate, endDate) ||
+      moment(selected_date).isSame(startDate) ||
+      moment(selected_date).isSame(endDate)
+    ) {
+      tempSlots = createOneTimeSchedule(selected_date, tempSlots);
       selected_date = toLocaleDate(moment(selected_date).add(7, 'days'));
     }
     return tempSlots;
   };
 
-  const createSchedulesMultipleDays = (values) => {
+  const createSchedulesMultipleDays = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
     const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
     let selected_date = toLocaleDate(selectedDate);
 
     let slotdates = [];
-    while (moment(selected_date).isBetween(startDate, endDate)) {
+    while (
+      moment(selected_date).isBetween(startDate, endDate) ||
+      moment(selected_date).isSame(startDate) ||
+      moment(selected_date).isSame(endDate)
+    ) {
       if (dayList.includes(toDayOfWeek(selected_date))) {
         slotdates.push(selected_date);
       }
@@ -156,32 +174,32 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
 
     slotdates.forEach((date) => {
-      tempSlots = createOneTimeSchedule(values, date, tempSlots);
+      tempSlots = createOneTimeSchedule(date, tempSlots);
     });
     return tempSlots;
   };
 
-  const createSession = (values) => {
+  const createSession = (typeOfSessionCreation) => {
     let tempSlots = slots;
-    switch (typeOfSessionCreation.current) {
+    switch (typeOfSessionCreation) {
       case 0:
-        tempSlots = createOneTimeSchedule(values, selectedDate, slots);
+        tempSlots = createOneTimeSchedule(selectedDate, slots);
         handleCancel();
         break;
       case 1:
-        tempSlots = createSchedulesAllSelectedDay(values);
+        tempSlots = createSchedulesAllSelectedDay();
         handleCancel();
         break;
       case 2:
         setDayList([toDayOfWeek(selectedDate)]);
         break;
       case 3:
-        tempSlots = createSchedulesMultipleDays(values);
+        tempSlots = createSchedulesMultipleDays();
         setDayList(null);
         handleCancel();
         break;
       default:
-        createOneTimeSchedule(values, selectedDate, slots);
+        createOneTimeSchedule(selectedDate, slots);
         break;
     }
     setSlots(tempSlots);
@@ -196,7 +214,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         return false;
       } else {
         // check if it's within defined schedules
-        if (slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
+        if (slots?.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
           return false;
         } else {
           return true;
@@ -205,7 +223,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     } else {
       if (moment(currentDate).endOf('day') < moment().startOf('day')) {
         // check if it's within defined schedules
-        if (slots.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
+        if (slots?.filter((item) => toLocaleDate(item.session_date) === toLocaleDate(currentDate)).length) {
           return false;
         } else {
           return true;
@@ -215,9 +233,35 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
   };
 
+  const handleSelectChange = (field, value, index) => {
+    // Need to deepclone as react does not rerender on change state
+    let tempForm = JSON.parse(JSON.stringify(form));
+    tempForm[index][field] = value;
+    if (field === 'end_time') {
+      tempForm.push({
+        session_date: moment(date).format(),
+        start_time: null,
+        end_time: null,
+      });
+      setForm(tempForm);
+    } else {
+      setForm(tempForm);
+    }
+  };
+
+  const handleDeleteSlot = (index) => {
+    let tempForm = [...form];
+    if (tempForm[index].id) {
+      handleSlotDelete(tempForm[index].id);
+    }
+    tempForm.splice(index, 1);
+    setForm(tempForm);
+  };
+
   return (
     <>
       <Calendar
+        fullscreen={isMobileDevice ? false : true}
         value={date}
         disabledDate={handleDisableDate}
         onSelect={onSelect}
@@ -237,71 +281,74 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         onCancel={handleCancel}
         footer={null}
       >
-        <Form form={form} name="slots" onFinish={createSession} autoComplete="off">
-          <Row>
+        <>
+          <Row className={styles.m10}>
             <Col span={18} offset={3}>
-              <Form.List name="slots">
-                {(fields, { add, remove }) => {
-                  return (
-                    <div>
-                      {fields.map((field) => {
-                        return (
-                          <Space key={field.key} className={styles.inline} align="start">
-                            <Form.Item {...field} name={[field.name, 'id']}>
-                              <Input type="hidden" />
-                            </Form.Item>
-                            <Form.Item {...field} name={[field.name, 'session_date']}>
-                              <Input type="hidden" />
-                            </Form.Item>
-                            <Form.Item
-                              {...field}
-                              name={[field.name, 'slot']}
-                              rules={fields.length === 1 ? validationRules.requiredValidation : null}
-                            >
-                              <RangePicker format="HH:mm" onChange={() => add()} />
-                            </Form.Item>
-
-                            {fields.length > 1 && (
-                              <DeleteFilled
-                                onClick={() => {
-                                  remove(field.name);
-                                }}
-                              />
-                            )}
-                          </Space>
-                        );
-                      })}
-                    </div>
-                  );
-                }}
-              </Form.List>
+              {form?.map((slot, index) => (
+                <Row className={styles.m10}>
+                  <Col xs={11} md={11}>
+                    <Select
+                      value={slot.start_time}
+                      style={{ width: 120 }}
+                      onChange={(value) => handleSelectChange('start_time', value, index)}
+                      placeholder="Start time"
+                    >
+                      {slotsList?.map((item) => (
+                        <Option value={item.value}>{item.label}</Option>
+                      ))}
+                    </Select>
+                  </Col>
+                  <Col xs={11} md={11}>
+                    <Select
+                      disabled={slot.start_time ? false : true}
+                      value={slot.end_time}
+                      style={{ width: 120 }}
+                      onChange={(value) => handleSelectChange('end_time', value, index)}
+                      placeholder="End time"
+                    >
+                      {slotsList?.map((item) => (
+                        <Option disabled={moment(item.value).diff(slot.start_time, 'minute') <= 0} value={item.value}>
+                          {item.label}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Col>
+                  {form.length > 1 && (
+                    <Col xs={2} md={2}>
+                      <Tooltip title="Delete">
+                        <Button
+                          disabled={slot?.num_participants && slot?.num_participants > 0}
+                          shape="circle"
+                          onClick={() => handleDeleteSlot(index)}
+                          icon={<DeleteFilled />}
+                        />
+                      </Tooltip>
+                    </Col>
+                  )}
+                </Row>
+              ))}
             </Col>
           </Row>
+
           {recurring ? (
             <>
               <Row justify="center">
                 <Col span={10} offset={1}>
-                  <Form.Item>
-                    <Button htmlType="submit" onClick={() => (typeOfSessionCreation.current = 1)} type="primary">
-                      Apply to all {toDayOfWeek(selectedDate)}
-                    </Button>
-                  </Form.Item>
+                  <Button onClick={() => createSession(1)} type="primary">
+                    Apply to all {toDayOfWeek(selectedDate)}
+                  </Button>
                 </Col>
                 <Col span={10} offset={1}>
-                  <Form.Item>
-                    <Button htmlType="submit" onClick={() => (typeOfSessionCreation.current = 2)} type="primary">
-                      Apply to multiple days
-                    </Button>
-                  </Form.Item>
+                  <Button onClick={() => createSession(2)} type="primary">
+                    Apply to multiple days
+                  </Button>
                 </Col>
               </Row>
               <Row justify="center">
                 <Col span={12} offset={3}>
-                  <Form.Item>
-                    <Button htmlType="submit" onClick={() => (typeOfSessionCreation.current = 0)} type="link">
-                      Apply to {toLongDate(selectedDate)} only
-                    </Button>
-                  </Form.Item>
+                  <Button onClick={() => createSession(0)} type="link">
+                    Apply to {toLongDate(selectedDate)} only
+                  </Button>
                 </Col>
               </Row>
               {dayList && (
@@ -315,21 +362,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                     />
                   </Col>
                   <Col span={4} offset={4}>
-                    <Form.Item>
-                      <Button
-                        htmlType="submit"
-                        onClick={() => (typeOfSessionCreation.current = 3)}
-                        type="primary"
-                        ghost
-                      >
-                        Apply
-                      </Button>
-                    </Form.Item>
+                    <Button onClick={() => createSession(3)} type="primary" ghost>
+                      Apply
+                    </Button>
                   </Col>
                   <Col span={4} offset={4}>
-                    <Form.Item className={styles.ml20}>
-                      <Button onClick={handleCancel}>Cancel</Button>
-                    </Form.Item>
+                    <Button className={styles.ml20} onClick={handleCancel}>
+                      Cancel
+                    </Button>
                   </Col>
                 </Row>
               )}
@@ -337,20 +377,18 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           ) : (
             <Row>
               <Col span={4} offset={4}>
-                <Form.Item>
-                  <Button htmlType="submit" onClick={() => (typeOfSessionCreation.current = 0)} type="primary" ghost>
-                    Apply
-                  </Button>
-                </Form.Item>
+                <Button onClick={() => createSession(0)} type="primary" ghost>
+                  Apply
+                </Button>
               </Col>
               <Col span={4} offset={4}>
-                <Form.Item className={styles.ml20}>
-                  <Button onClick={handleCancel}>Cancel</Button>
-                </Form.Item>
+                <Button className={styles.ml20} onClick={handleCancel}>
+                  Cancel
+                </Button>
               </Col>
             </Row>
           )}
-        </Form>
+        </>
       </Modal>
     </>
   );

@@ -10,16 +10,18 @@ export default {
     getProfileByUsername: (username) => http.service.get(`/creator/${username}/profile`),
     validUsernameCheck: (payload) => http.service.post('/secure/user/username', payload),
     uploadImage: (payload) => http.service.post('/secure/upload?type=image', payload),
+    uploadFile: (payload) => http.service.post('/secure/upload?type=document', payload),
     updateProfile: (payload) => http.service.patch('/secure/user/', payload),
     upcomingSession: (payload) => http.mockService.get('/session/upcoming', payload),
     getSessionsByUsername: (username, type) => http.service.get(`/sessions/${username}/${type}/`),
     storeZoomCredentials: (payload) => http.service.post('/secure/creator/profile/zoom', payload),
   },
   session: {
-    getDetails: (sessionId) => http.mockService.get(`/secure/sessions/${sessionId}`),
-    create: (payload) => http.mockService.post('/secure/sessions/', payload),
-    update: (sessionId, payload) => http.mockService.put(`/secure/sessions/${sessionId}`, payload),
-    delete: (sessionId) => http.mockService.delete(`/secure/sessions/${sessionId}`),
+    getDetails: (sessionId, startDate, endDate) =>
+      http.service.get(`/secure/creator/sessions/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
+    create: (payload) => http.service.post('/secure/creator/sessions', payload),
+    update: (sessionId, payload) => http.service.patch(`/secure/creator/sessions/${sessionId}`, payload),
+    delete: (payload) => http.service.delete('secure/creator/sessions/inventories/bulk', payload),
     // Mock data for past and upcoming session is same. They have same response
     getSession: () => http.service.get('/secure/creator/sessions/'),
     getPastSession: () => http.service.get('/secure/creator/inventories/past'),
