@@ -14,13 +14,13 @@ const {
 const SessionDate = ({ schedule }) => {
   return (
     <div className={styles.box}>
-      <div className={styles.date}>{toDate(schedule?.schedule_date)}</div>
+      <div className={styles.date}>{toDate(schedule?.session_date)}</div>
       <Title className={styles.month} level={isMobileDevice ? 5 : 3}>
-        {toShortMonth(schedule?.schedule_date)}
+        {toShortMonth(schedule?.session_date)}
       </Title>
       <Divider className={styles.divider} type="vertical" />
       <Title className={styles.day} level={isMobileDevice ? 5 : 3}>
-        {isMobileDevice ? toShortDayOfWeek(schedule?.schedule_date) : toDayOfWeek(schedule?.schedule_date)}
+        {isMobileDevice ? toShortDayOfWeek(schedule?.session_date) : toDayOfWeek(schedule?.session_date)}
       </Title>
       <Text className={styles.time}>
         {toLocaleTime(schedule?.start_time)} {' -'} {toLocaleTime(schedule?.end_time)}

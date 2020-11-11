@@ -29,7 +29,7 @@ const SessionsInventories = ({ match }) => {
       setSessions(
         data.map((i, index) => ({
           index,
-          key: i.id,
+          key: i.session_id,
           name: i.name,
           type: i.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
           duration: `${i.duration} mins`,
@@ -41,8 +41,8 @@ const SessionsInventories = ({ match }) => {
           participants:
             i.max_participants > 1 ? i.participants?.length || 0 : i.participants?.map((p) => p.name).join(' '),
           start_url: i.start_url,
-          inventory_id: i?.inventory?.id,
-          session_id: i.id,
+          inventory_id: i?.inventory_id,
+          session_id: i.session_id,
           max_participants: i.max_participants,
         }))
       );
@@ -63,7 +63,7 @@ const SessionsInventories = ({ match }) => {
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
-      history.push(`/dashboard/sessions/${item.id}/${item.inventory_id}/details`);
+      history.push(`/dashboard/sessions/${item.session_id}/${item.inventory_id}/details`);
     }
   };
 

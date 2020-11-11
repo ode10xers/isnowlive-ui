@@ -6,7 +6,7 @@ const Routes = {
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/session',
-  sessionDetails: '/session/:id',
+  sessionDetails: '/inventory/:inventory_id',
   sessionUpdate: '/session/:id/edit',
   profilePreview: '/profile/preview',
   dashboard: {
