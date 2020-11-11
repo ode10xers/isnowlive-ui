@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography, Button } from 'antd';
-import { ShareAltOutlined } from '@ant-design/icons';
+import { Row, Col, Image, message, Typography } from 'antd';
 import classNames from 'classnames';
 
+import Routes from 'routes';
 import apis from 'apis';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
@@ -36,7 +36,7 @@ const SessionDetails = ({ match, history }) => {
         console.log(error);
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
-        // history.push(Routes.session);
+        history.push(Routes.root);
       }
     },
     [history]
