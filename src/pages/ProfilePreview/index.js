@@ -19,6 +19,7 @@ import Loader from 'components/Loader';
 import { parseEmbedCode } from 'utils/helper';
 import DefaultImage from 'components/Icons/DefaultImage/index';
 import Share from 'components/Share';
+import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -142,7 +143,11 @@ const ProfilePreview = ({ username = null }) => {
           </Title>
         </Col>
         <Col xs={6} md={{ span: 6, offset: 6 }}>
-          <Share label="Share" username={profile.username} title={`${profile.first_name} ${profile.last_name}`} />
+          <Share
+            label="Share"
+            shareUrl={generateUrlFromUsername(profile.username)}
+            title={`${profile.first_name} ${profile.last_name}`}
+          />
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
           <Text type="secondary">{profile?.profile?.bio}</Text>

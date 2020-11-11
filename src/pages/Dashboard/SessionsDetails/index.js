@@ -37,7 +37,9 @@ const SessionsDetails = ({ match }) => {
   const getStaffSession = useCallback(async () => {
     const { data } = await apis.session.getSession();
     if (data) {
-      const selectedData = data.reduce((item) => item.session.id === parseInt(match?.params?.session_id));
+      const selectedData = data
+        .filter((item) => item?.session_id && item.session_id === parseInt(match.params.session_id))
+        ?.pop();
       setSession(selectedData);
       if (moment(selectedData?.inventory?.end_time).diff(moment(), 'days') < 0) {
         setIsPastSession(true);
@@ -92,7 +94,11 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={3}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push(`/sessions/${session?.session?.id}`)}
+                onClick={() =>
+                  history.push(
+                    `/profile/${session.username}/session/${session.session_id}/inventory/${session.inventory_id}`
+                  )
+                }
                 icon={<GlobalOutlined />}
               >
                 Public Page
@@ -111,25 +117,22 @@ const SessionsDetails = ({ match }) => {
           {isPastSession ? (
             <>
               <Col span={24}>
-                <Title level={5}>{session?.session?.name}</Title>
+                <Title level={5}>{session?.name}</Title>
               </Col>
               <Col span={24}>
                 <Title level={5}>Session Details</Title>
               </Col>
               <Col xs={24} md={12}>
                 {layout('Session Date and Time', toLongDateWithDay(session?.inventory?.start_time))}
-                {layout('Session Type', session?.session?.group ? 'Group Session' : '1-on-1 Session')}
-                {layout('Session Duration', `${session?.session?.duration || 0} Minutes`)}
+                {layout('Session Type', session?.group ? 'Group Session' : '1-on-1 Session')}
+                {layout('Session Duration', `${session?.duration || 0} Minutes`)}
               </Col>
               <Col xs={24} md={12}>
-                {layout(
-                  'Session Attendees',
-                  `${session?.participants?.length} / ${session?.session?.max_participants}`
-                )}
-                {layout('Session Price', `${session?.session?.currency} ${session?.session?.price}`)}
+                {layout('Session Attendees', `${session?.participants?.length} / ${session?.max_participants}`)}
+                {layout('Session Price', `${session?.currency} ${session?.price}`)}
                 {layout(
                   'Session Earning',
-                  `${session?.session?.currency} ${session?.participants.reduce(
+                  `${session?.currency} ${session?.participants.reduce(
                     (item, participant) => item + (participant.fee_paid || 0),
                     0
                   )}`
@@ -139,12 +142,12 @@ const SessionsDetails = ({ match }) => {
           ) : (
             <>
               <Col span={24}>
-                <Title>{session?.session?.name}</Title>
+                <Title>{session?.name}</Title>
               </Col>
               <Col xs={24} md={18}>
-                <SessionDate schedule={session?.session?.schedules[0]} />
+                <SessionDate schedule={session?.inventory ? session?.inventory[0] : null} />
                 <div className={styles.mt20}>
-                  <SessionInfo session={session?.session} />
+                  <SessionInfo session={session} />
                 </div>
               </Col>
               <Col xs={24} md={4}>
@@ -186,23 +189,31 @@ const SessionsDetails = ({ match }) => {
               </Col>
 
               <Col xs={24} md={18} className={styles.mt20}>
-                <Title level={5}>Session Information</Title>
-                <Text type="secondary" level={5}>
-                  {session?.session?.description}
-                </Text>
-                <Title level={5} className={styles.mt50}>
-                  Session Prerequisite
-                </Title>
-                <Text type="secondary" level={5}>
-                  {session?.session?.prerequisites}
-                </Text>
+                {session?.description && (
+                  <>
+                    <Title level={5}>Session Information</Title>
+                    <Text type="secondary" level={5}>
+                      {session?.description}
+                    </Text>
+                  </>
+                )}
+                {session?.prerequisites && (
+                  <>
+                    <Title level={5} className={styles.mt50}>
+                      Session Prerequisite
+                    </Title>
+                    <Text type="secondary" level={5}>
+                      {session?.prerequisites}
+                    </Text>
+                  </>
+                )}
               </Col>
             </>
           )}
           <Col span={24} className={styles.mt20}>
             <ParticipantsList
               participants={session?.participants}
-              currency={session?.session?.currency}
+              currency={session?.currency}
               isPast={isPastSession}
             />
           </Col>

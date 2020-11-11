@@ -94,3 +94,15 @@ export const isValidImage = (url) => {
   }
   return false;
 };
+
+export const generateUrlFromUsername = (username) => {
+  let newUrl = '';
+  if (process.env.NODE_ENV === 'development') {
+    newUrl = 'http://' + username + '.localhost:' + window.location.port;
+  } else if (process.env.NODE_ENV === 'stage') {
+    newUrl = 'https://' + username + '.stage.passion.do';
+  } else {
+    newUrl = 'https://' + username + '.passion.do';
+  }
+  return newUrl;
+};

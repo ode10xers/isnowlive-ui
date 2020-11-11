@@ -2,6 +2,8 @@ import React from 'react';
 import { Row, Col, Button, Typography } from 'antd';
 import { FilePdfOutlined } from '@ant-design/icons';
 
+import { isValidImage } from 'utils/helper';
+
 import styles from './style.module.scss';
 
 const { Text } = Typography;
@@ -23,16 +25,24 @@ const SessionInfo = ({ session }) => {
           {session?.price || 0} {session?.currency}
         </Text>
       </Col>
-      <Col xs={8} md={8}>
-        <Text className={styles.text} type="secondary">
-          Session Prerequisite
-        </Text>
-        <Text className={styles.subText}>
-          <Button className={styles.downloadButton} type="link" icon={<FilePdfOutlined />} size="middle">
-            Download
-          </Button>
-        </Text>
-      </Col>
+      {session?.document_url && isValidImage(session?.document_url) && (
+        <Col xs={8} md={8}>
+          <Text className={styles.text} type="secondary">
+            Session Prerequisite
+          </Text>
+          <Text className={styles.subText}>
+            <Button
+              className={styles.downloadButton}
+              type="link"
+              icon={<FilePdfOutlined />}
+              size="middle"
+              onClick={() => window.open(session?.document_url)}
+            >
+              Download
+            </Button>
+          </Text>
+        </Col>
+      )}
     </Row>
   );
 };

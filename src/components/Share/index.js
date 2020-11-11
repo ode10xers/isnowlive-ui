@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Menu, Dropdown, Button } from 'antd';
 import {
   ShareAltOutlined,
@@ -22,21 +22,7 @@ import { isMobileDevice } from 'utils/device';
 
 const { Item } = Menu;
 
-const Share = ({ label, title, username }) => {
-  const [shareUrl, setShareUrl] = useState(null);
-
-  useEffect(() => {
-    let newUrl = '';
-    if (process.env.NODE_ENV === 'development') {
-      newUrl = 'http://' + username + '.localhost:' + window.location.port;
-    } else if (process.env.NODE_ENV === 'stage') {
-      newUrl = 'https://' + username + '.stage.passion.do';
-    } else {
-      newUrl = 'https://' + username + '.passion.do';
-    }
-    setShareUrl(newUrl);
-  }, [username]);
-
+const Share = ({ label, title, shareUrl }) => {
   const menu = (
     <Menu>
       <Item icon={<FacebookOutlined />}>

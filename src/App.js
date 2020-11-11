@@ -40,9 +40,9 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+        <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />

@@ -22,9 +22,9 @@ export default {
     create: (payload) => http.service.post('/secure/creator/sessions', payload),
     update: (sessionId, payload) => http.service.patch(`/secure/creator/sessions/${sessionId}`, payload),
     delete: (payload) => http.service.delete('secure/creator/sessions/inventories/bulk', payload),
-    // Mock data for past and upcoming session is same. They have same response
     getSession: () => http.service.get('/secure/creator/sessions/'),
     getPastSession: () => http.service.get('/secure/creator/inventories/past'),
     getUpcomingSession: () => http.service.get('/secure/creator/inventories/upcoming'),
+    getPublicInventoryById: (inventoryId) => http.service.get(`/inventories/${inventoryId}`),
   },
 };
