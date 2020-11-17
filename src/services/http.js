@@ -85,7 +85,13 @@ class HttpService {
   }
 
   delete(url, payload) {
-    return this.axios.delete(url, payload);
+    return this.axios.delete(url, {
+      baseURL: this.baseURL,
+      headers: {
+        'auth-token': this.authToken,
+      },
+      data: payload
+    });
   }
 }
 
