@@ -4,7 +4,6 @@ import { Row, Col, Typography, Button, Card } from 'antd';
 import {
   ArrowLeftOutlined,
   GlobalOutlined,
-  ShareAltOutlined,
   VideoCameraOutlined,
   EditOutlined,
   MailOutlined,
@@ -15,11 +14,14 @@ import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 
 import dateUtil from 'utils/date';
+import { generateUrlFromUsername } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import ParticipantsList from 'components/ParticipantsList';
+import Share from 'components/Share';
 
 import styles from './styles.module.scss';
 
@@ -33,26 +35,27 @@ const SessionsDetails = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [isPastSession, setIsPastSession] = useState(false);
+  const [publicUrl, setPublicUrl] = useState(null);
 
-  const getStaffSession = useCallback(async () => {
-    const { data } = await apis.session.getSession();
+  const getInventoryDetails = useCallback(async (inventory_id) => {
+    const { data } = await apis.session.getPrivateInventoryById(inventory_id);
     if (data) {
-      const selectedData = data
-        .filter((item) => item?.session_id && item.session_id === parseInt(match.params.session_id))
-        ?.pop();
-      setSession(selectedData);
-      if (moment(selectedData?.inventory?.end_time).diff(moment(), 'days') < 0) {
+      setSession(data);
+      if (moment(data.end_time).diff(moment(), 'days') < 0) {
         setIsPastSession(true);
       }
     }
     setIsLoading(false);
-  }, [match.params.session_id]);
+  }, []);
 
   useEffect(() => {
-    if (match?.params?.session_id && match?.params?.inventory_id) {
-      getStaffSession();
+    if (match?.params?.inventory_id) {
+      getInventoryDetails(match?.params?.inventory_id);
+      const username = getLocalUserDetails().username;
+      const userProfilePath = generateUrlFromUsername(username);
+      setPublicUrl(`${userProfilePath}/inventory/${match?.params?.inventory_id}`);
     }
-  }, [match.params.session_id, match.params.inventory_id, getStaffSession]);
+  }, [match.params.inventory_id, getInventoryDetails]);
 
   const layout = (label, value) => (
     <Card>
@@ -92,22 +95,14 @@ const SessionsDetails = ({ match }) => {
               </Button>
             </Col>
             <Col xs={24} md={3}>
-              <Button
-                className={styles.headButton}
-                onClick={() =>
-                  history.push(
-                    `/profile/${session.username}/session/${session.session_id}/inventory/${session.inventory_id}`
-                  )
-                }
-                icon={<GlobalOutlined />}
-              >
+              <Button className={styles.headButton} onClick={() => window.open(publicUrl)} icon={<GlobalOutlined />}>
                 Public Page
               </Button>
             </Col>
             <Col xs={24} md={4}>
-              <Button className={styles.headButton} icon={<ShareAltOutlined />}>
-                Share Session
-              </Button>
+              <div className={styles.headButton}>
+                <Share label="Share Session" title={session?.name} shareUrl={publicUrl} />
+              </div>
             </Col>
           </>
         )}
@@ -128,14 +123,15 @@ const SessionsDetails = ({ match }) => {
                 {layout('Session Duration', `${session?.duration || 0} Minutes`)}
               </Col>
               <Col xs={24} md={12}>
-                {layout('Session Attendees', `${session?.participants?.length} / ${session?.max_participants}`)}
-                {layout('Session Price', `${session?.currency} ${session?.price}`)}
+                {layout('Session Attendees', `${session?.num_participants} / ${session?.max_participants}`)}
+                {layout('Session Price', `${session?.price} ${session?.currency} `)}
                 {layout(
                   'Session Earning',
-                  `${session?.currency} ${session?.participants.reduce(
-                    (item, participant) => item + (participant.fee_paid || 0),
-                    0
-                  )}`
+                  `${
+                    session.participants
+                      ? session.participants.reduce((item, participant) => item + (participant.fee_paid || 0), 0)
+                      : 0
+                  } ${session?.currency}`
                 )}
               </Col>
             </>
@@ -145,7 +141,7 @@ const SessionsDetails = ({ match }) => {
                 <Title>{session?.name}</Title>
               </Col>
               <Col xs={24} md={18}>
-                <SessionDate schedule={session?.inventory ? session?.inventory[0] : null} />
+                <SessionDate schedule={session} />
                 <div className={styles.mt20}>
                   <SessionInfo session={session} />
                 </div>
