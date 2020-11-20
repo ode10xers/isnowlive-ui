@@ -90,7 +90,7 @@ class HttpService {
       headers: {
         'auth-token': this.authToken,
       },
-      data: payload
+      data: payload,
     });
   }
 }

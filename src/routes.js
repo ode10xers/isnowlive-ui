@@ -5,9 +5,9 @@ const Routes = {
   passwordVerification: '/password/verify/:token',
   profile: '/creator/profile',
   livestream: '/creator/livestream',
-  session: '/session',
+  session: '/creator/session',
   sessionDetails: '/inventory/:inventory_id',
-  sessionUpdate: '/session/:id/edit',
+  sessionUpdate: '/creator/session/:id/edit',
   profilePreview: '/profile/preview',
   dashboard: {
     rootPath: '/dashboard',
