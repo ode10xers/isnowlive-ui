@@ -11,6 +11,9 @@ const appendScript = (src, charset) => {
     document.querySelectorAll(`script[src="${src}"]`)[0].remove();
   }
   document.body.appendChild(script);
+  if (window.instgrm) {
+    window.instgrm.Embeds.process();
+  }
 };
 
 export const parseEmbedCode = (parsedItem) => {
