@@ -26,5 +26,6 @@ export default {
     getPastSession: () => http.service.get('/secure/creator/inventories/past'),
     getUpcomingSession: () => http.service.get('/secure/creator/inventories/upcoming'),
     getPublicInventoryById: (inventoryId) => http.service.get(`/inventories/${inventoryId}`),
+    getPrivateInventoryById: (inventoryId) => http.service.get(`/secure/creator/inventories/id/${inventoryId}`),
   },
 };

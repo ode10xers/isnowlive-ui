@@ -16,7 +16,7 @@ const Routes = {
     createSessions: '/manage/session',
     updateSessions: '/manage/session/:id/edit',
     sessions: '/sessions/:session_type',
-    sessionsDetails: '/sessions/:session_id/:inventory_id/details',
+    sessionsDetails: '/sessions/inventory/:inventory_id/details',
     profile: '/profile',
     editProfile: '/profile/edit',
   },

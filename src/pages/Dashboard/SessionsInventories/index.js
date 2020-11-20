@@ -63,7 +63,7 @@ const SessionsInventories = ({ match }) => {
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
-      history.push(`/dashboard/sessions/${item.session_id}/${item.inventory_id}/details`);
+      history.push(`/dashboard/sessions/inventory/${item.inventory_id}/details`);
     }
   };
 
@@ -117,7 +117,7 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button className={styles.detailsButton} type="link">
+              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
                 Details
               </Button>
             </Col>
