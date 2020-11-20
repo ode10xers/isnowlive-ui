@@ -15,6 +15,7 @@ import parse from 'html-react-parser';
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
+import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import { parseEmbedCode } from 'utils/helper';
 import DefaultImage from 'components/Icons/DefaultImage/index';
@@ -210,9 +211,8 @@ const ProfilePreview = ({ username = null }) => {
                     <Card
                       key={index}
                       bordered={false}
-                      hoverable
                       className={styles.card}
-                      cover={parseEmbedCode(parse(testimonial))}
+                      cover={<EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>}
                     ></Card>
                   ))
                 : null}

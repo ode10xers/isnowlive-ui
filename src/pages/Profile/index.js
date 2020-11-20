@@ -11,10 +11,12 @@ import Section from 'components/Section';
 import Loader from 'components/Loader';
 import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
+import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
 import { parseEmbedCode } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 
@@ -266,7 +268,7 @@ const Profile = () => {
             </Row>
           </Form.Item>
 
-          <Form.Item {...profileFormTailLayout}>
+          <Form.Item {...(!isMobileDevice && profileFormTailLayout)}>
             <Row>
               {testimonials?.map((item, index) => (
                 <Col xs={24} md={24} key={index}>
@@ -277,9 +279,10 @@ const Profile = () => {
                       extra={
                         <DeleteOutlined onClick={() => setTestimonials(testimonials.filter((_, i) => i !== index))} />
                       }
-                      className={styles.m10}
+                      className={styles.card}
+                      bodyStyle={{ padding: '0px' }} // styles.cardbody is not working here
                     >
-                      {parseEmbedCode(parse(item))}
+                      <EMCode>{parseEmbedCode(parse(item))}</EMCode>
                     </Card>
                   ) : null}
                 </Col>
