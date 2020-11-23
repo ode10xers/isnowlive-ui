@@ -222,8 +222,8 @@ const Session = ({ match, history }) => {
       if (deleteSlot && deleteSlot.length) {
         await apis.session.delete({ data: JSON.stringify(deleteSlot) });
       }
-      if (session.id) {
-        await apis.session.update(session.id, data);
+      if (session.session_id) {
+        await apis.session.update(session.session_id, data);
         message.success('Session successfully updated.');
         const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
         const endDate = toUtcEndOfDay(moment().add(1, 'month'));
@@ -231,8 +231,9 @@ const Session = ({ match, history }) => {
       } else {
         const newSessionResponse = await apis.session.create(data);
         message.success('Session successfully created.');
-        if (newSessionResponse.data.id) {
-          history.push(`/session/${newSessionResponse.data.id}/edit`);
+        console.log(newSessionResponse);
+        if (newSessionResponse.data.session_id) {
+          history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`);
         }
       }
       setIsLoading(false);
@@ -260,7 +261,7 @@ const Session = ({ match, history }) => {
       )}
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title>{session.id ? 'Update' : 'Create'} Session</Title>
+          <Title>{session.session_id ? 'Update' : 'Create'} Session</Title>
           <Paragraph>
             Ornare ipsum cras non egestas risus, tincidunt malesuada potenti suspendisse mauris id consectetur sit
             ultrices nunc, ut ac montes, proin diam elit, tristique vitae

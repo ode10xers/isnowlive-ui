@@ -4,6 +4,7 @@ const formatDate = {
   toLocaleTime: (date) => moment(date).format('LT'),
   toLocaleDate: (date) => moment(date).format('L'),
   toShortTime: (date) => moment(date).format('hh:mm'),
+  toShortTimeForSlot: (date) => moment(date).format('hh:mm a'),
   toLongDate: (date) => moment(date).format('Do MMM YYYY'),
   toShortDate: (date) => moment(date).format('YYYY-MM-DD'),
   toDayOfWeek: (date) => moment(date).format('dddd'),

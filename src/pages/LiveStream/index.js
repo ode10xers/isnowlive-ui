@@ -7,6 +7,7 @@ import Section from 'components/Section';
 
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
 import Routes from 'routes';
 import apis from 'apis';
 
@@ -28,8 +29,8 @@ const LiveStream = () => {
   const storeZoomCrendetials = async (values) => {
     try {
       setIsLoading(true);
-      const { data } = await apis.user.storeZoomCredentials(values);
-      if (data) {
+      const { status } = await apis.user.storeZoomCredentials(values);
+      if (isAPISuccess(status)) {
         history.push(Routes.session);
       }
     } catch (error) {
