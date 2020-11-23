@@ -109,3 +109,14 @@ export const generateUrlFromUsername = (username) => {
   }
   return newUrl;
 };
+
+export const getDuration = (start_time, end_time) => {
+  let duration = start_time && end_time ? moment(end_time).diff(start_time, 'minute') : 0;
+  if (duration >= 60) {
+    return `${duration / 60} Hr`;
+  }
+  if (duration < 0) {
+    return null;
+  }
+  return `${duration} Min`;
+};

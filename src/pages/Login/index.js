@@ -40,7 +40,7 @@ const Login = ({ history }) => {
       setIsLoading(true);
       const { data } = await apis.user.login(values);
       if (data) {
-        http.service.setAuthToken(data.auth_token);
+        http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);

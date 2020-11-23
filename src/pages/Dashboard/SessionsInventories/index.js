@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card } from 'antd';
+import { Row, Col, Typography, Popconfirm, Button, Card, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
+import { isAPISuccess, getDuration } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -23,47 +24,65 @@ const SessionsInventories = ({ match }) => {
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
 
-  const getStaffSession = useCallback(async () => {
-    const { data } = isPast ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
-    if (data) {
-      setSessions(
-        data.map((i, index) => ({
-          index,
-          key: i.session_id,
-          name: i.name,
-          type: i.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
-          duration: `${i.duration} mins`,
-          days: i?.inventory?.start_time ? toLongDateWithDay(i.inventory.start_time) : null,
-          session_date: i?.inventory?.session_date,
-          time: i?.inventory ? `${toLocaleTime(i.inventory.start_time)} - ${toLocaleTime(i.inventory.end_time)}` : null,
-          start_time: i?.inventory?.start_time,
-          end_time: i?.inventory?.end_time,
-          participants:
-            i.max_participants > 1 ? i.participants?.length || 0 : i.participants?.map((p) => p.name).join(' '),
-          start_url: i.start_url,
-          inventory_id: i?.inventory_id,
-          session_id: i.session_id,
-          max_participants: i.max_participants,
-        }))
-      );
+  const getStaffSession = useCallback(async (sessionType) => {
+    try {
+      const { data } =
+        sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
+      if (data) {
+        setSessions(
+          data.map((i, index) => ({
+            index,
+            key: i.session_id,
+            name: i.name,
+            type: i.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
+            duration: getDuration(i.start_time, i.end_time),
+            days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
+            session_date: i?.session_date,
+            time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
+            start_time: i?.start_time,
+            end_time: i?.end_time,
+            participants: i.num_participants,
+            start_url: i.start_url,
+            inventory_id: i?.inventory_id,
+            session_id: i.session_id,
+            max_participants: i.max_participants,
+          }))
+        );
+      }
+      setIsLoading(false);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [isPast]);
+  }, []);
 
   useEffect(() => {
     if (match?.params?.session_type) {
+      setSessions([]);
+      setIsLoading(true);
       if (match?.params?.session_type === 'past') {
         setIsPast(true);
       } else {
         setIsPast(false);
       }
-      getStaffSession();
+      getStaffSession(match?.params?.session_type);
     }
   }, [match.params.session_type, getStaffSession]);
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
       history.push(`/dashboard/sessions/inventory/${item.inventory_id}/details`);
+    }
+  };
+
+  const deleteInventory = async (inventory_id) => {
+    try {
+      const { status } = await apis.session.delete({ data: JSON.stringify([inventory_id]) });
+      if (isAPISuccess(status)) {
+        getStaffSession(match?.params?.session_type);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
 
@@ -131,11 +150,12 @@ const SessionsInventories = ({ match }) => {
             </Col>
             <Col md={24} lg={24} xl={8}>
               <Popconfirm
-                title="Cancel Session"
+                title="Do you want to cancel session?"
                 icon={<DeleteOutlined className={styles.danger} />}
-                okText="Cancel"
-                cancelText="Back"
+                okText="Yes"
+                cancelText="No"
                 disabled={isDisabled}
+                onConfirm={() => deleteInventory(record.inventory_id)}
               >
                 <Button type="text" disabled={isDisabled} danger>
                   Cancel
@@ -143,9 +163,11 @@ const SessionsInventories = ({ match }) => {
               </Popconfirm>
             </Col>
 
-            {record.index === 0 && !isPast && (
+            {!isPast && (
               <Col md={24} lg={24} xl={8}>
-                <Button type="link">Start</Button>
+                <Button type="link" disabled={!record.start_url} onClick={() => window.open(record.start_url)}>
+                  Start
+                </Button>
               </Col>
             )}
           </Row>
@@ -178,17 +200,24 @@ const SessionsInventories = ({ match }) => {
             Details
           </Button>,
           <Popconfirm
-            title="cancel_this_session"
+            title="Do you want to cancel session?"
             icon={<DeleteOutlined className={styles.danger} />}
-            okText="cancel"
-            cancelText={'back'}
+            okText="Yes"
+            cancelText={'No'}
             disabled={isCancelDisabled}
+            onConfirm={() => deleteInventory(item.inventory_id)}
           >
             <Button type="text" disabled={isCancelDisabled}>
               Cancel
             </Button>
           </Popconfirm>,
-          <>{item.index === 0 && !isPast && <Button type="link">Start</Button>}</>,
+          <>
+            {item.index === 0 && !isPast && (
+              <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
+                Start
+              </Button>
+            )}
+          </>,
         ]}
       >
         {layout('Type', <Text>{item.type}</Text>)}
