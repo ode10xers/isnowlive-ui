@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Button, Card } from 'antd';
+import { Row, Col, Typography, Button, Card, message, Popconfirm } from 'antd';
 import {
   ArrowLeftOutlined,
   GlobalOutlined,
@@ -8,13 +8,14 @@ import {
   EditOutlined,
   MailOutlined,
   CloseCircleOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import apis from 'apis';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 
 import dateUtil from 'utils/date';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, getDuration } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
@@ -22,6 +23,7 @@ import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import ParticipantsList from 'components/ParticipantsList';
 import Share from 'components/Share';
+import Routes from 'routes';
 
 import styles from './styles.module.scss';
 
@@ -67,6 +69,19 @@ const SessionsDetails = ({ match }) => {
       </Row>
     </Card>
   );
+
+  const deleteInventory = async (inventory_id) => {
+    try {
+      const { status } = await apis.session.delete({ data: JSON.stringify([inventory_id]) });
+      if (isAPISuccess(status)) {
+        history.push(Routes.dashboard);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const isDisabled = session?.participants ? session?.participants.length > 0 : false;
 
   return (
     <Loader loading={isLoading} size="large" text="Loading session details">
@@ -120,7 +135,7 @@ const SessionsDetails = ({ match }) => {
               <Col xs={24} md={12}>
                 {layout('Session Date and Time', toLongDateWithDay(session?.inventory?.start_time))}
                 {layout('Session Type', session?.group ? 'Group Session' : '1-on-1 Session')}
-                {layout('Session Duration', `${session?.duration || 0} Minutes`)}
+                {layout('Session Duration', getDuration(session?.start_time, session?.end_time))}
               </Col>
               <Col xs={24} md={12}>
                 {layout('Session Attendees', `${session?.num_participants} / ${session?.max_participants}`)}
@@ -153,6 +168,8 @@ const SessionsDetails = ({ match }) => {
                   type="primary"
                   className={styles.actionButton}
                   icon={<VideoCameraOutlined />}
+                  disabled={!session?.start_url}
+                  onClick={() => window.open(session?.start_url)}
                 >
                   Start Session
                 </Button>
@@ -161,6 +178,7 @@ const SessionsDetails = ({ match }) => {
                   block
                   className={classNames(styles.actionButton, styles.editButton)}
                   icon={<EditOutlined />}
+                  onClick={() => history.push(`/dashboard/manage/session/${session?.session_id}/edit`)}
                 >
                   Edit Session
                 </Button>
@@ -172,16 +190,25 @@ const SessionsDetails = ({ match }) => {
                 >
                   Send Email
                 </Button>
-                <Button
-                  size="large"
-                  block
-                  type="primary"
-                  danger
-                  className={styles.actionButton}
-                  icon={<CloseCircleOutlined />}
+                <Popconfirm
+                  title="Do you want to cancel session?"
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  disabled={isDisabled}
+                  onConfirm={() => deleteInventory(session?.inventory_id)}
                 >
-                  Cancel Session
-                </Button>
+                  <Button
+                    size="large"
+                    block
+                    type="primary"
+                    danger
+                    className={styles.actionButton}
+                    icon={<CloseCircleOutlined />}
+                  >
+                    Cancel Session
+                  </Button>
+                </Popconfirm>
               </Col>
 
               <Col xs={24} md={18} className={styles.mt20}>
