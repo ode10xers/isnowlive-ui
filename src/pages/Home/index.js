@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
-import DefaultLayout from 'layouts/DefaultLayout';
+import Routes from 'routes';
 import ProfilePreview from 'pages/ProfilePreview';
 
 const reservedDomainName = ['app', 'localhost'];
 
 const Home = () => {
+  const history = useHistory();
   const [loadProfile, setLoadProfile] = useState(false);
   const [username, setUsername] = useState(null);
   useEffect(() => {
@@ -13,16 +15,14 @@ const Home = () => {
     if (domainName && !reservedDomainName.includes(domainName)) {
       setLoadProfile(true);
       setUsername(domainName);
+    } else {
+      history.push(Routes.login);
     }
-  }, []);
+  }, [history]);
   if (loadProfile) {
     return <ProfilePreview username={username} />;
   }
-  return (
-    <DefaultLayout>
-      <h1>Hello</h1>
-    </DefaultLayout>
-  );
+  return null;
 };
 
 export default Home;
