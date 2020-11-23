@@ -112,7 +112,7 @@ const ProfilePreview = ({ username = null }) => {
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/profile/preview')}
+              onClick={() => window.open(generateUrlFromUsername(profile.username))}
               icon={<GlobalOutlined />}
             >
               Public Page
