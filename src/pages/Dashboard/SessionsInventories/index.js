@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Popconfirm, Button, Card, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
-import moment from 'moment';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
