@@ -21,6 +21,7 @@ import { parseEmbedCode } from 'utils/helper';
 import DefaultImage from 'components/Icons/DefaultImage/index';
 import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './style.module.scss';
 
@@ -56,9 +57,13 @@ const ProfilePreview = ({ username = null }) => {
   const getSessionDetails = useCallback(
     async (type) => {
       try {
-        const { data } = username
-          ? await apis.user.getSessionsByUsername(username, type)
-          : await apis.user.upcomingSession();
+        let profileUsername = '';
+        if (username) {
+          profileUsername = username;
+        } else {
+          profileUsername = getLocalUserDetails().username;
+        }
+        const { data } = await apis.user.getSessionsByUsername(profileUsername, type);
         if (data) {
           setSessions(data);
         }

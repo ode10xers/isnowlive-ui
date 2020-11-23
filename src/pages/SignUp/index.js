@@ -25,7 +25,7 @@ const SignUp = ({ history }) => {
         is_creator: true,
       });
       if (data) {
-        http.service.setAuthToken(data.auth_token);
+        http.setAuthToken(data.auth_token);
         logIn(data, true);
         setIsLoading(false);
         history.push(Routes.profile);
