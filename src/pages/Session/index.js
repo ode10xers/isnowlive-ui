@@ -231,7 +231,6 @@ const Session = ({ match, history }) => {
       } else {
         const newSessionResponse = await apis.session.create(data);
         message.success('Session successfully created.');
-        console.log(newSessionResponse);
         if (newSessionResponse.data.session_id) {
           history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`);
         }

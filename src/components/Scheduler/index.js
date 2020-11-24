@@ -12,7 +12,15 @@ import { generateTimes } from 'utils/helper';
 
 const { Option } = Select;
 const {
-  formatDate: { toLocaleTime, toLocaleDate, toShortTime, toShortTimeForSlot, toLongDate, toShortDate, toDayOfWeek },
+  formatDate: {
+    toLocaleTime,
+    toLocaleDate,
+    toShortTime,
+    betoShartTimeWithPeriod,
+    toLongDate,
+    toShortDate,
+    toDayOfWeek,
+  },
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
@@ -288,7 +296,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                 <Row className={styles.m10}>
                   <Col xs={11} md={11}>
                     <Select
-                      value={slot.start_time && toShortTimeForSlot(slot.start_time)}
+                      value={slot.start_time && betoShartTimeWithPeriod(slot.start_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
@@ -301,7 +309,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   <Col xs={11} md={11}>
                     <Select
                       disabled={slot.start_time ? false : true}
-                      value={slot.end_time && toShortTimeForSlot(slot.end_time)}
+                      value={slot.end_time && betoShartTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
                       placeholder="End time"
