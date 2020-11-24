@@ -2,6 +2,7 @@
 
 .card {
   margin: 10px !important;
+  cursor: pointer;
 }
 .card > div {
   padding: 0px !important;
@@ -26,4 +27,9 @@
   border-radius: 4px;
   margin-right: 5px;
   text-align: center;
+}
+.box {
+  background: map-get($colors, $key: 'offWhite');
+  border-radius: 6px;
+  padding: 20px;
 }
