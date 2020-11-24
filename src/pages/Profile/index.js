@@ -15,7 +15,7 @@ import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
 import { parseEmbedCode } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
+import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
@@ -124,6 +124,16 @@ const Profile = () => {
         setIsLoadingUsernameCheck(false);
         message.error(error.response?.data?.message || 'Something went wrong.');
       }
+    }
+  };
+
+  const addTestimonial = () => {
+    if (testimonials) {
+      setTestimonials([...testimonials, form.getFieldValue().testimonials]);
+      form.setFieldsValue({ testimonials: '' });
+    } else {
+      setTestimonials([form.getFieldValue().testimonials]);
+      form.setFieldsValue({ testimonials: '' });
     }
   };
 
@@ -255,23 +265,17 @@ const Profile = () => {
           <Form.Item {...profileFormTailLayout}>
             <Row>
               <Col xs={24}>
-                <Button
-                  className={styles.mb10}
-                  onClick={() => {
-                    setTestimonials([...testimonials, form.getFieldValue().testimonials]);
-                    form.setFieldsValue({ testimonials: '' });
-                  }}
-                >
+                <Button className={styles.mb10} onClick={() => addTestimonial()}>
                   <PlusOutlined /> Add
                 </Button>
               </Col>
             </Row>
           </Form.Item>
 
-          <Form.Item {...(!isMobileDevice && profileFormTailLayout)}>
+          <Form.Item {...(!isMobileDevice && profileTestimonialTailLayout)}>
             <Row>
               {testimonials?.map((item, index) => (
-                <Col xs={24} md={24} key={index}>
+                <Col xs={24} md={24} lg={12} key={index}>
                   {item && item.length ? (
                     <Card
                       title="Preview"
@@ -280,7 +284,7 @@ const Profile = () => {
                         <DeleteOutlined onClick={() => setTestimonials(testimonials.filter((_, i) => i !== index))} />
                       }
                       className={styles.card}
-                      bodyStyle={{ padding: '0px' }} // styles.cardbody is not working here
+                      bodyStyle={{ padding: '0px', height: '600px', overflowY: 'scroll' }} // styles.cardbody is not working here
                     >
                       <EMCode>{parseEmbedCode(parse(item))}</EMCode>
                     </Card>
