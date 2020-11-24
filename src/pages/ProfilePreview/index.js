@@ -209,7 +209,7 @@ const ProfilePreview = ({ username = null }) => {
           <Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Title>
         </Col>
         <Col span={24}>
-          <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 2 }}>
+          <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>
             <Masonry>
               {profile && profile?.profile?.testimonials
                 ? profile.profile.testimonials.map((testimonial, index) => (
