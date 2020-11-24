@@ -39,6 +39,8 @@ const ImageUpload = ({
       formData.append('file', file);
       const { data } = await apis.user.uploadImage(formData);
       onChange(data);
+      // Fix for scroll issue after image upload
+      document.getElementsByClassName('ant-scrolling-effect')[0].style.overflow = 'auto';
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
     }

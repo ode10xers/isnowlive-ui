@@ -275,7 +275,7 @@ const Session = ({ match, history }) => {
 
           <div className={styles.imageWrapper}>
             <ImageUpload
-              aspect={2}
+              aspect={4}
               className={classNames('avatar-uploader', styles.coverImage)}
               name="session_image_url"
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
