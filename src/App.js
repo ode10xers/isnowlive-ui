@@ -16,6 +16,7 @@ import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
 import Dashboard from 'pages/Dashboard';
 import ResetPassword from 'pages/ResetPassword';
+import EmailVerification from 'pages/EmailVerification';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -45,6 +46,8 @@ function App() {
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
+        <RouteWithLayout layout={DefaultLayout} path={Routes.createPassword} component={ResetPassword} />
+        <RouteWithLayout layout={DefaultLayout} path={Routes.emailVerification} component={EmailVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
       </Switch>

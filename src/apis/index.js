@@ -6,6 +6,7 @@ export default {
     signup: (payload) => http.post('/user', payload),
     sendNewPasswordEmail: (payload) => http.post('/user/password/new', payload),
     setNewPassword: (payload) => http.post('/user/password/set', payload),
+    verifyEmail: (payload) => http.post('/user/email/verify', payload),
     getProfile: (payload) => http.get('/secure/user', payload),
     getProfileByUsername: (username) => http.get(`/creator/${username}/profile`),
     validUsernameCheck: (payload) => http.post('/secure/user/username', payload),
