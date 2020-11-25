@@ -31,6 +31,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // eslint-disable-next-line
   }, [slots]);
 
+  useEffect(() => {
+    if (openModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [openModal]);
+
   const onSelect = (selecetedCalendarDate) => {
     if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
       // check if slots are present for selected date
@@ -293,7 +301,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       placeholder="Start time"
                     >
                       {slotsList?.map((item) => (
-                        <Option value={item.value}>{item.label}</Option>
+                        <Option value={item.value} disabled={moment(item.value).diff(moment(), 'minute') <= 0}>
+                          {item.label}
+                        </Option>
                       ))}
                     </Select>
                   </Col>

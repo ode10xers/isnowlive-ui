@@ -13,6 +13,7 @@ import {
   Select,
   message,
   DatePicker,
+  Modal,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import moment from 'moment';
@@ -27,7 +28,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
-import { getCurrencyList, convertSchedulesToUTC } from 'utils/helper';
+import { getCurrencyList, convertSchedulesToUTC, isAPISuccess } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
@@ -41,8 +42,8 @@ const {
 } = dateUtil;
 
 const initialSession = {
-  price: 0,
-  currency: 'USD',
+  price: 10,
+  currency: 'SGD',
   max_participants: 0,
   group: true,
   name: '',
@@ -62,7 +63,7 @@ const Session = ({ match, history }) => {
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
   const [sessionDocumentUrl, setSessionDocumentUrl] = useState(null);
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
-  const [isSessionFree, setIsSessionFree] = useState(true);
+  const [isSessionFree, setIsSessionFree] = useState(false);
   const [currencyList, setCurrencyList] = useState(null);
   const [isSessionRecurring, setIsSessionRecurring] = useState(false);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
@@ -116,10 +117,10 @@ const Session = ({ match, history }) => {
         ...form.getFieldsValue(),
         type: 'Group',
         max_participants: 2,
-        price_type: 'Free',
+        price_type: 'Paid',
         recurring: false,
-        price: 0,
-        currency: 'USD',
+        price: 10,
+        currency: 'SGD',
       });
       setIsLoading(false);
     }
@@ -207,6 +208,7 @@ const Session = ({ match, history }) => {
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
+        prerequisites: values.prerequisites,
         session_image_url: sessionImageUrl || '',
         category: '',
         document_url: sessionDocumentUrl || '',
@@ -217,28 +219,50 @@ const Session = ({ match, history }) => {
         data.expiry = moment(values.recurring_dates_range[1]).utc().format();
       }
 
-      let allInventoryList = convertSchedulesToUTC(session.inventory);
-      data.inventory = allInventoryList.filter((slot) => moment(slot.session_date).diff(moment(), 'minutes') > 0);
-      if (deleteSlot && deleteSlot.length) {
-        await apis.session.delete(JSON.stringify(deleteSlot));
-      }
-      if (session.session_id) {
-        await apis.session.update(session.session_id, data);
-        message.success('Session successfully updated.');
-        const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
-        const endDate = toUtcEndOfDay(moment().add(1, 'month'));
-        getSessionDetails(match.params.id, startDate, endDate);
-      } else {
-        const newSessionResponse = await apis.session.create(data);
-        message.success('Session successfully created.');
-        if (newSessionResponse.data.session_id) {
-          history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`);
+      if (session?.inventory?.length) {
+        let allInventoryList = convertSchedulesToUTC(session.inventory);
+        data.inventory = allInventoryList.filter((slot) => moment(slot.session_date).diff(moment(), 'minutes') > 0);
+        if (deleteSlot && deleteSlot.length) {
+          await apis.session.delete(JSON.stringify(deleteSlot));
         }
+        if (session.session_id) {
+          await apis.session.update(session.session_id, data);
+          message.success('Session successfully updated.');
+          const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
+          const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+          getSessionDetails(match.params.id, startDate, endDate);
+        } else {
+          const newSessionResponse = await apis.session.create(data);
+
+          if (isAPISuccess(newSessionResponse.status)) {
+            const modal = Modal.confirm({
+              title: `${newSessionResponse.data.name} session successfully created`,
+              className: styles.confirmModal,
+              okText: 'Add New',
+              cancelText: 'Done',
+              onOk: () => {
+                window.location.reload();
+                document.body.scrollTop = 0; // For Safari
+                document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+              },
+              onCancel: () => history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`),
+            });
+          }
+        }
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        message.error('Need least 1 sesssion to publish');
       }
-      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
+  };
+
+  const onFinishFailed = ({ errorFields }) => {
+    document.getElementById(errorFields[0].name).focus();
+    document.getElementById(errorFields[0].name).scrollIntoView();
   };
 
   return (
@@ -268,7 +292,7 @@ const Session = ({ match, history }) => {
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish}>
+      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>

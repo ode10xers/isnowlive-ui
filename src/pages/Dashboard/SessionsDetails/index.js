@@ -40,14 +40,19 @@ const SessionsDetails = ({ match }) => {
   const [publicUrl, setPublicUrl] = useState(null);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
-    const { data } = await apis.session.getPrivateInventoryById(inventory_id);
-    if (data) {
-      setSession(data);
-      if (moment(data.end_time).diff(moment(), 'days') < 0) {
-        setIsPastSession(true);
+    try {
+      const { data } = await apis.session.getPrivateInventoryById(inventory_id);
+      if (data) {
+        setSession(data);
+        if (moment(data.end_time).diff(moment(), 'days') < 0) {
+          setIsPastSession(true);
+        }
       }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {

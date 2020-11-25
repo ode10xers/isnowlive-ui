@@ -33,7 +33,6 @@ const SessionDetails = ({ match, history }) => {
         setCreator(userDetails.data);
         setIsLoading(false);
       } catch (error) {
-        console.log(error);
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         history.push(Routes.root);

@@ -30,8 +30,12 @@ const LiveStream = () => {
     try {
       setIsLoading(true);
       const { status } = await apis.user.storeZoomCredentials(values);
+      setIsLoading(false);
       if (isAPISuccess(status)) {
-        history.push(Routes.session);
+        message.success('Zoom successfully setup!');
+        setTimeout(() => {
+          history.push(Routes.session);
+        }, 2000);
       }
     } catch (error) {
       setIsLoading(false);

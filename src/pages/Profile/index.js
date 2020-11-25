@@ -137,6 +137,11 @@ const Profile = () => {
     }
   };
 
+  const onFinishFailed = ({ errorFields }) => {
+    document.getElementById(errorFields[0].name).focus();
+    document.getElementById(errorFields[0].name).scrollIntoView();
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -160,7 +165,7 @@ const Profile = () => {
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish}>
+      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========PRIMARY INFO======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
