@@ -12,7 +12,10 @@ const Home = () => {
   const [username, setUsername] = useState(null);
   useEffect(() => {
     const domainName = window.location.hostname.split('.')[0];
-    if (domainName && !reservedDomainName.includes(domainName)) {
+    console.log(domainName && !reservedDomainName.includes(domainName));
+    if (window.location.hostname.includes('ngrok')) {
+      history.push(Routes.login);
+    } else if (domainName && !reservedDomainName.includes(domainName)) {
       setLoadProfile(true);
       setUsername(domainName);
     } else {
