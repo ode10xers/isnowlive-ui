@@ -220,7 +220,7 @@ const Session = ({ match, history }) => {
       let allInventoryList = convertSchedulesToUTC(session.inventory);
       data.inventory = allInventoryList.filter((slot) => moment(slot.session_date).diff(moment(), 'minutes') > 0);
       if (deleteSlot && deleteSlot.length) {
-        await apis.session.delete({ data: JSON.stringify(deleteSlot) });
+        await apis.session.delete(JSON.stringify(deleteSlot));
       }
       if (session.session_id) {
         await apis.session.update(session.session_id, data);

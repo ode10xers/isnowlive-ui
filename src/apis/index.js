@@ -20,7 +20,7 @@ export default {
       http.get(`/secure/creator/sessions/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
     create: (payload) => http.post('/secure/creator/sessions', payload),
     update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
-    delete: (payload) => http.delete('secure/creator/sessions/inventories/bulk', payload),
+    delete: (payload) => http.delete('secure/creator/inventories/bulk', payload),
     getSession: () => http.get('/secure/creator/sessions'),
     getPastSession: () => http.get('/secure/creator/inventories/past'),
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
