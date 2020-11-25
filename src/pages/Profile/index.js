@@ -67,6 +67,8 @@ const Profile = () => {
         }
       }
     } catch (error) {
+      console.log(error);
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
