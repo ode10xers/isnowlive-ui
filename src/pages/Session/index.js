@@ -235,7 +235,7 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
-            const modal = Modal.confirm({
+            Modal.confirm({
               title: `${newSessionResponse.data.name} session successfully created`,
               className: styles.confirmModal,
               okText: 'Add New',
