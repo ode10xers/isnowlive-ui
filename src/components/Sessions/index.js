@@ -3,8 +3,8 @@ import MobileDetect from 'mobile-detect';
 import moment from 'moment';
 import { Card, Image, Row, Col, Typography, Divider, Empty } from 'antd';
 
-import Section from '../Section';
-import { isValidImage } from 'utils/helper';
+import { isValidImage, generateUrlFromUsername } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/fallbackimage.png');
@@ -32,15 +32,20 @@ const Sessions = ({ sessions }) => {
     );
   };
 
+  const showInventoryDetails = (inventory_id) => {
+    const baseurl = generateUrlFromUsername(getLocalUserDetails().username);
+    window.open(`${baseurl}/inventory/${inventory_id}`);
+  };
+
   return (
-    <Section>
+    <div className={styles.box}>
       <Row>
         {sessions && sessions.length ? (
           sessions.map((session) => {
             return (
               <>
                 {session.name && (
-                  <Col key={session.id} xs={24} md={isMobileDevice ? 24 : 12}>
+                  <Col key={session.id} xs={24} md={isMobileDevice ? 24 : 12} lg={8}>
                     {isMobileDevice && (
                       <Card
                         hoverable
@@ -51,6 +56,7 @@ const Sessions = ({ sessions }) => {
                             src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         }
+                        onClick={() => showInventoryDetails(session.inventory_id)}
                       >
                         <Card.Meta
                           title={session.name}
@@ -65,9 +71,9 @@ const Sessions = ({ sessions }) => {
                       </Card>
                     )}
                     {!isMobileDevice && (
-                      <Card className={styles.card}>
+                      <Card className={styles.card} onClick={() => showInventoryDetails(session.inventory_id)}>
                         <Row>
-                          <Col>
+                          <Col flex="100px">
                             <Image
                               height={100}
                               width={100}
@@ -75,7 +81,7 @@ const Sessions = ({ sessions }) => {
                               src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
                             />
                           </Col>
-                          <Col>
+                          <Col flex="auto">
                             <div className={styles.wrapper}>
                               <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
                               <Title className={styles.title} level={5}>
@@ -98,7 +104,7 @@ const Sessions = ({ sessions }) => {
           </Col>
         )}
       </Row>
-    </Section>
+    </div>
   );
 };
 export default Sessions;
