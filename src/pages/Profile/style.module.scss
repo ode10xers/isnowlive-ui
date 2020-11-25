@@ -18,15 +18,15 @@
 }
 .imageWrapper {
   position: relative;
-  height: 290px;
+  height: 315px;
 }
 .coverImage > div {
   width: 100% !important;
-  height: 200px !important;
+  height: 300px !important;
 }
 .profileImage {
   position: absolute;
-  bottom: 30px;
+  bottom: -30px;
   left: 20px;
 }
 .subtext {
@@ -39,6 +39,7 @@
 }
 .nameInputWrapper {
   margin: 0px !important;
+  margin-top: 30px !important;
 }
 .nameInput {
   max-width: 180px;

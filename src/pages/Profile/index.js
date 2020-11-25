@@ -168,7 +168,7 @@ const Profile = () => {
 
           <div className={styles.imageWrapper}>
             <ImageUpload
-              aspect={2}
+              aspect={4}
               className={classNames('avatar-uploader', styles.coverImage)}
               name="cover_image_url"
               onChange={onCoverImageUpload}
