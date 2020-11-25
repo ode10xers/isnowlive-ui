@@ -118,8 +118,8 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         let value = vs;
         let selected_date = moment(givenDate);
         value.session_date = selected_date.format();
-        value.start_time = vs.start_time;
-        value.end_time = vs.end_time;
+        value.start_time = value.session_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
+        value.end_time = value.session_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
 
         // remove slot as BE does not need it(Strong params check)
         delete value.slot;
