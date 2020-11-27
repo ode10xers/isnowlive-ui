@@ -107,7 +107,7 @@ export const generateUrlFromUsername = (username) => {
   let newUrl = '';
   if (process.env.NODE_ENV === 'development') {
     newUrl = 'http://' + username + '.localhost:' + window.location.port;
-  } else if (window.location.origin.includes('stage') || window.location.origin.includes('ngrok')) {
+  } else if (window.location.origin.includes('stage')) {
     newUrl = 'https://' + username + '.stage.passion.do';
   } else {
     newUrl = 'https://' + username + '.passion.do';
@@ -126,7 +126,7 @@ export const getDuration = (start_time, end_time) => {
   return `${duration} Min`;
 };
 
-export const onFinishFailed = ({ errorFields }) => {
+export const scrollToErrorField = (errorFields) => {
   document.getElementById(errorFields[0].name).focus();
   document.getElementById(errorFields[0].name).scrollIntoView();
 };

@@ -13,7 +13,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
 import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
-import { parseEmbedCode, onFinishFailed } from 'utils/helper';
+import { parseEmbedCode, scrollToErrorField } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -136,6 +136,10 @@ const Profile = () => {
       setTestimonials([form.getFieldValue().testimonials]);
       form.setFieldsValue({ testimonials: '' });
     }
+  };
+
+  const onFinishFailed = ({ errorFields }) => {
+    scrollToErrorField(errorFields);
   };
 
   return (

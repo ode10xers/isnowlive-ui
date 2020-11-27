@@ -28,7 +28,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
-import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, onFinishFailed } from 'utils/helper';
+import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorField } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
@@ -257,6 +257,10 @@ const Session = ({ match, history }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
+  };
+
+  const onFinishFailed = ({ errorFields }) => {
+    scrollToErrorField(errorFields);
   };
 
   return (
