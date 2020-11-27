@@ -28,7 +28,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
-import { getCurrencyList, convertSchedulesToUTC, isAPISuccess } from 'utils/helper';
+import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, onFinishFailed } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
@@ -242,8 +242,7 @@ const Session = ({ match, history }) => {
               cancelText: 'Done',
               onOk: () => {
                 window.location.reload();
-                document.body.scrollTop = 0; // For Safari
-                document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+                window.scrollTo(0, 0);
               },
               onCancel: () => history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`),
             });
@@ -252,17 +251,12 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        message.error('Need least 1 sesssion to publish');
+        message.error('Need at least 1 sesssion to publish');
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
-  };
-
-  const onFinishFailed = ({ errorFields }) => {
-    document.getElementById(errorFields[0].name).focus();
-    document.getElementById(errorFields[0].name).scrollIntoView();
   };
 
   return (

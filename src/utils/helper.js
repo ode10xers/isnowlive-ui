@@ -120,3 +120,8 @@ export const getDuration = (start_time, end_time) => {
   }
   return `${duration} Min`;
 };
+
+export const onFinishFailed = ({ errorFields }) => {
+  document.getElementById(errorFields[0].name).focus();
+  document.getElementById(errorFields[0].name).scrollIntoView();
+};

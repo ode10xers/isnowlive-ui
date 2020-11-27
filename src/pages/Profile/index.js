@@ -13,7 +13,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
 import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
-import { parseEmbedCode } from 'utils/helper';
+import { parseEmbedCode, onFinishFailed } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -67,7 +67,6 @@ const Profile = () => {
         }
       }
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
@@ -137,11 +136,6 @@ const Profile = () => {
       setTestimonials([form.getFieldValue().testimonials]);
       form.setFieldsValue({ testimonials: '' });
     }
-  };
-
-  const onFinishFailed = ({ errorFields }) => {
-    document.getElementById(errorFields[0].name).focus();
-    document.getElementById(errorFields[0].name).scrollIntoView();
   };
 
   return (

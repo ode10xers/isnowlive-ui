@@ -33,6 +33,7 @@ const LiveStream = () => {
       setIsLoading(false);
       if (isAPISuccess(status)) {
         message.success('Zoom successfully setup!');
+        // setTimeout is used for better user experince suggest by Rahul
         setTimeout(() => {
           history.push(Routes.session);
         }, 2000);

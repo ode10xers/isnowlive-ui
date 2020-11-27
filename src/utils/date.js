@@ -14,6 +14,7 @@ const formatDate = {
   toLongDateWithDay: (date) => moment(date).format('ddd, DD MMM YYYY'),
   toUtcStartOfDay: (date) => moment(date).utc().startOf('day').format(),
   toUtcEndOfDay: (date) => moment(date).utc().endOf('day').format(),
+  getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
 };
 
 const dateUtil = {

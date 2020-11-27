@@ -12,7 +12,7 @@ import { generateTimes } from 'utils/helper';
 
 const { Option } = Select;
 const {
-  formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek },
+  formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek, getTimeDiff },
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
@@ -240,7 +240,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     if (
       field === 'start_time' &&
       tempForm[index].end_time &&
-      moment(tempForm[index].end_time).diff(tempForm[index].start_time, 'minute') <= 0
+      getTimeDiff(tempForm[index].end_time, tempForm[index].start_time, 'minute') <= 0
     ) {
       tempForm[index].end_time = null;
     }
@@ -301,7 +301,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       placeholder="Start time"
                     >
                       {slotsList?.map((item) => (
-                        <Option value={item.value} disabled={moment(item.value).diff(moment(), 'minute') <= 0}>
+                        <Option value={item.value} disabled={getTimeDiff(item.value, moment(), 'minute') <= 0}>
                           {item.label}
                         </Option>
                       ))}
@@ -316,7 +316,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       placeholder="End time"
                     >
                       {slotsList?.map((item) => (
-                        <Option disabled={moment(item.value).diff(slot.start_time, 'minute') <= 0} value={item.value}>
+                        <Option disabled={getTimeDiff(item.value, slot.start_time, 'minute') <= 0} value={item.value}>
                           {item.label}
                         </Option>
                       ))}
