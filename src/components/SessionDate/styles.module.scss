@@ -34,7 +34,8 @@
   height: 40px !important;
   margin-right: 10px !important;
 }
-.day {
+.longday {
+  display: block;
   height: 40px;
   font-style: normal;
   font-weight: bold;
@@ -42,13 +43,16 @@
   margin-top: 15px;
   margin-right: 5px;
 }
+.shortday {
+  display: none;
+}
 .time {
   width: 100%;
-  height: 40px;
   font-style: normal;
   font-weight: bold;
   padding-top: 8px;
   margin-left: 10px;
+  margin-top: -10px;
 }
 @media (max-width: 768px) {
   .box {
@@ -65,12 +69,18 @@
     height: 30px !important;
     margin: 5px !important;
   }
-  .day {
-    margin-right: 0px;
-    margin-top: 25px;
-  }
   .time {
     padding-top: 12px !important;
     font-size: 12px;
+  }
+}
+@media (max-width: 1230px) {
+  .longday {
+    display: none;
+  }
+  .shortday {
+    display: block;
+    margin-right: 0px;
+    margin-top: 10px;
   }
 }
