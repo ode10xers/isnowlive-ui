@@ -213,12 +213,9 @@ const ProfilePreview = ({ username = null }) => {
             <Masonry>
               {profile && profile?.profile?.testimonials
                 ? profile.profile.testimonials.map((testimonial, index) => (
-                    <Card
-                      key={index}
-                      bordered={false}
-                      className={styles.card}
-                      cover={<EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>}
-                    ></Card>
+                    <Card key={index} bordered={false} className={styles.card} bodyStyle={{ padding: '0px' }}>
+                      <EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>
+                    </Card>
                   ))
                 : null}
             </Masonry>

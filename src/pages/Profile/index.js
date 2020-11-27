@@ -13,7 +13,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
 import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
-import { parseEmbedCode } from 'utils/helper';
+import { parseEmbedCode, scrollToErrorField } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -67,6 +67,7 @@ const Profile = () => {
         }
       }
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -137,6 +138,10 @@ const Profile = () => {
     }
   };
 
+  const onFinishFailed = ({ errorFields }) => {
+    scrollToErrorField(errorFields);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -160,7 +165,7 @@ const Profile = () => {
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish}>
+      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========PRIMARY INFO======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
@@ -168,7 +173,7 @@ const Profile = () => {
 
           <div className={styles.imageWrapper}>
             <ImageUpload
-              aspect={2}
+              aspect={4}
               className={classNames('avatar-uploader', styles.coverImage)}
               name="cover_image_url"
               onChange={onCoverImageUpload}

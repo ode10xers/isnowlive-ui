@@ -28,7 +28,7 @@ import Routes from 'routes';
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLongDateWithDay },
+  formatDate: { toLongDateWithDay, getTimeDiff },
 } = dateUtil;
 const { Title, Text } = Typography;
 
@@ -40,14 +40,19 @@ const SessionsDetails = ({ match }) => {
   const [publicUrl, setPublicUrl] = useState(null);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
-    const { data } = await apis.session.getPrivateInventoryById(inventory_id);
-    if (data) {
-      setSession(data);
-      if (moment(data.end_time).diff(moment(), 'days') < 0) {
-        setIsPastSession(true);
+    try {
+      const { data } = await apis.session.getPrivateInventoryById(inventory_id);
+      if (data) {
+        setSession(data);
+        if (getTimeDiff(data.end_time, moment(), 'days') < 0) {
+          setIsPastSession(true);
+        }
       }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -72,7 +77,7 @@ const SessionsDetails = ({ match }) => {
 
   const deleteInventory = async (inventory_id) => {
     try {
-      const { status } = await apis.session.delete({ data: JSON.stringify([inventory_id]) });
+      const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
         history.push(Routes.dashboard);
       }

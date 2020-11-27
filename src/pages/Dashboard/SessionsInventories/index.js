@@ -77,7 +77,7 @@ const SessionsInventories = ({ match }) => {
 
   const deleteInventory = async (inventory_id) => {
     try {
-      const { status } = await apis.session.delete({ data: JSON.stringify([inventory_id]) });
+      const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
         getStaffSession(match?.params?.session_type);
       }
