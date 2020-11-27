@@ -3,12 +3,11 @@ import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Sele
 import moment from 'moment';
 import { DeleteFilled } from '@ant-design/icons';
 
-import { convertSchedulesToLocal } from '../../utils/helper';
-import dateUtil from '../../utils/date';
+import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
+import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
-import { isMobileDevice } from 'utils/device';
-import { generateTimes } from 'utils/helper';
 
 const { Option } = Select;
 const {

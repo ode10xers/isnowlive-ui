@@ -28,7 +28,7 @@ import Routes from 'routes';
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLongDateWithDay },
+  formatDate: { toLongDateWithDay, getTimeDiff },
 } = dateUtil;
 const { Title, Text } = Typography;
 
@@ -44,7 +44,7 @@ const SessionsDetails = ({ match }) => {
       const { data } = await apis.session.getPrivateInventoryById(inventory_id);
       if (data) {
         setSession(data);
-        if (moment(data.end_time).diff(moment(), 'days') < 0) {
+        if (getTimeDiff(data.end_time, moment(), 'days') < 0) {
           setIsPastSession(true);
         }
       }

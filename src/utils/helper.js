@@ -1,4 +1,9 @@
 import moment from 'moment';
+import dateUtil from 'utils/date';
+
+const {
+  formatDate: { getTimeDiff },
+} = dateUtil;
 
 const appendScript = (src, charset) => {
   const script = document.createElement('script');
@@ -102,7 +107,7 @@ export const generateUrlFromUsername = (username) => {
   let newUrl = '';
   if (process.env.NODE_ENV === 'development') {
     newUrl = 'http://' + username + '.localhost:' + window.location.port;
-  } else if (window.location.origin.includes('stage')) {
+  } else if (window.location.origin.includes('stage') || window.location.origin.includes('ngrok')) {
     newUrl = 'https://' + username + '.stage.passion.do';
   } else {
     newUrl = 'https://' + username + '.passion.do';
@@ -111,7 +116,7 @@ export const generateUrlFromUsername = (username) => {
 };
 
 export const getDuration = (start_time, end_time) => {
-  let duration = start_time && end_time ? moment(end_time).diff(start_time, 'minute') : 0;
+  let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration >= 60) {
     return `${duration / 60} Hr`;
   }

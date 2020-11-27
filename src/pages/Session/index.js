@@ -38,7 +38,7 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
 } = dateUtil;
 
 const initialSession = {
@@ -221,7 +221,7 @@ const Session = ({ match, history }) => {
 
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
-        data.inventory = allInventoryList.filter((slot) => moment(slot.session_date).diff(moment(), 'minutes') > 0);
+        data.inventory = allInventoryList.filter((slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0);
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
