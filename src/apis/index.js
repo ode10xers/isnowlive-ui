@@ -26,5 +26,6 @@ export default {
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
+    createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
   },
 };

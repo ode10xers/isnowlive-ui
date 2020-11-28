@@ -60,7 +60,7 @@ const SessionsDetails = ({ match }) => {
       getInventoryDetails(match?.params?.inventory_id);
       const username = getLocalUserDetails().username;
       const userProfilePath = generateUrlFromUsername(username);
-      setPublicUrl(`${userProfilePath}/inventory/${match?.params?.inventory_id}`);
+      setPublicUrl(`${userProfilePath}/e/${match?.params?.inventory_id}`);
     }
   }, [match.params.inventory_id, getInventoryDetails]);
 

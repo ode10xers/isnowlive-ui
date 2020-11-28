@@ -71,7 +71,7 @@ const SessionsInventories = ({ match }) => {
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/sessions/inventory/${item.inventory_id}/details`);
+      history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
     }
   };
 
