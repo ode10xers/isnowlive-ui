@@ -10,10 +10,10 @@ import {
   CloseCircleOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import apis from 'apis';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 
+import apis from 'apis';
 import dateUtil from 'utils/date';
 import { generateUrlFromUsername, isAPISuccess, getDuration } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
@@ -79,7 +79,7 @@ const SessionsDetails = ({ match }) => {
     try {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
-        history.push(Routes.dashboard);
+        history.push(Routes.creatorDashboard);
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
@@ -96,7 +96,7 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push('/dashboard/sessions/past')}
+                onClick={() => history.push('/creator/dashboard/sessions/past')}
                 icon={<ArrowLeftOutlined />}
               >
                 Past Sessions
@@ -108,7 +108,7 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push('/dashboard/sessions/upcoming')}
+                onClick={() => history.push('/creator/dashboard/sessions/upcoming')}
                 icon={<ArrowLeftOutlined />}
               >
                 Upcoming Sessions
@@ -183,7 +183,9 @@ const SessionsDetails = ({ match }) => {
                   block
                   className={classNames(styles.actionButton, styles.editButton)}
                   icon={<EditOutlined />}
-                  onClick={() => history.push(`/dashboard/manage/session/${session?.session_id}/edit`)}
+                  onClick={() =>
+                    history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`)
+                  }
                 >
                   Edit Session
                 </Button>

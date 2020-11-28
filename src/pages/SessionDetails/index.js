@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography, Modal } from 'antd';
 import classNames from 'classnames';
+import moment from 'moment';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -16,11 +17,15 @@ import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess, generateUrl } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
+import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
 
 const reservedDomainName = ['app', 'localhost'];
 const { Title } = Typography;
+const {
+  formatDate: { getTimeDiff },
+} = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -95,12 +100,20 @@ const SessionDetails = ({ match, history }) => {
       if (isAPISuccess(status)) {
         Modal.success({
           content: 'Session is been booked successfully',
-          onOk: () => generateUrl(),
+          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
         });
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        Modal.warning({
+          content: 'It seems you have already booked this session, please check your dashboard',
+          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+        });
+      }
     }
   };
 
@@ -192,7 +205,9 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
         <Col xs={24} md={15} className={styles.mt50}>
-          <SessionRegistration user={currentUser} showPasswordField={showPasswordField} onFinish={onFinish} />
+          {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
+            <SessionRegistration user={currentUser} showPasswordField={showPasswordField} onFinish={onFinish} />
+          )}
         </Col>
       </Row>
     </Loader>

@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import Routes from 'routes';
 
-const MenuItems = [
+export const creatorMenuItems = [
   {
     order: 1,
     key: 'sessions',
@@ -21,25 +21,25 @@ const MenuItems = [
         order: 1,
         key: 'upcoming_sessions',
         title: 'Upcoming Sessions',
-        path: Routes.dashboard.rootPath + '/sessions/upcoming',
+        path: Routes.creatorDashboard.rootPath + '/sessions/upcoming',
       },
       {
         order: 2,
         key: 'past_sessions',
         title: 'Past Sessions',
-        path: Routes.dashboard.rootPath + '/sessions/past',
+        path: Routes.creatorDashboard.rootPath + '/sessions/past',
       },
       {
         order: 3,
         key: 'manage_sessions',
         title: 'Manage Sessions',
-        path: Routes.dashboard.rootPath + Routes.dashboard.manageSessions,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageSessions,
       },
       {
         order: 4,
         key: 'create_session',
         title: 'Create Session',
-        path: Routes.dashboard.rootPath + Routes.dashboard.createSessions,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
       },
     ],
   },
@@ -66,7 +66,7 @@ const MenuItems = [
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
-    path: Routes.dashboard.rootPath + Routes.dashboard.profile,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
     order: 6,
@@ -82,6 +82,37 @@ const MenuItems = [
   },
 ];
 
-MenuItems.sort((a, b) => a.order - b.order);
-
-export default MenuItems;
+export const attendeeMenuItems = [
+  {
+    order: 1,
+    key: 'sessions',
+    title: 'Sessions',
+    icon: <VideoCameraOutlined />,
+    children: [
+      {
+        order: 1,
+        key: 'upcoming_sessions',
+        title: 'Upcoming Sessions',
+        path: Routes.attendeeDashboard.rootPath + '/sessions/upcoming',
+      },
+      {
+        order: 2,
+        key: 'past_sessions',
+        title: 'Past Sessions',
+        path: Routes.attendeeDashboard.rootPath + '/sessions/past',
+      },
+    ],
+  },
+  {
+    order: 3,
+    key: 'packages',
+    title: 'Packages',
+    icon: <ControlOutlined />,
+  },
+  {
+    order: 7,
+    key: 'account',
+    title: 'Account',
+    icon: <UserOutlined />,
+  },
+];

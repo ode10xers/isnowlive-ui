@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Menu } from 'antd';
 
-import menuItems from './MenuItems.constant';
+import Routes from 'routes';
+import { creatorMenuItems, attendeeMenuItems } from './MenuItems.constant';
 
 import styles from './style.module.scss';
 
 const { SubMenu, Item } = Menu;
 
 const SideNavigation = () => {
+  const [showMenu, setShowMenu] = useState(() => creatorMenuItems.sort((a, b) => a.order - b.order));
   const history = useHistory();
+
+  useEffect(() => {
+    if (history.location.pathname.includes(Routes.creatorDashboard.rootPath)) {
+      setShowMenu(creatorMenuItems.sort((a, b) => a.order - b.order));
+    } else {
+      setShowMenu(attendeeMenuItems.sort((a, b) => a.order - b.order));
+    }
+  }, [history.location.pathname]);
 
   return (
     <Menu mode="inline" className={styles.sideNavMenu}>
-      {menuItems.map((navItem) =>
+      {showMenu.map((navItem) =>
         navItem.children ? (
           <SubMenu key={navItem.key} title={navItem.title} icon={navItem.icon}>
             {navItem.children.map((item) => (

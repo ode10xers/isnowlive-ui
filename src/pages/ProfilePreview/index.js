@@ -98,14 +98,14 @@ const ProfilePreview = ({ username = null }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard')}
+              onClick={() => history.push('/creator/dashboard')}
               icon={<ArrowLeftOutlined />}
             >
               Dashboard
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard/profile/edit')}
+              onClick={() => history.push('/creator/dashboard/profile/edit')}
               icon={<EditOutlined />}
             >
               Edit Profile
