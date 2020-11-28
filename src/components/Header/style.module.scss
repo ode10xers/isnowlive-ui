@@ -13,3 +13,13 @@
 .navItemIcon {
   margin-right: 5px;
 }
+.logo {
+  height: 40px;
+  margin-left: 5px;
+}
+@media (max-width: 768px) {
+  .headerContainer {
+    height: 90px;
+    padding: 5px;
+  }
+}

@@ -9,6 +9,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
+const logo = require('assets/images/Logo-passion-transparent.png');
 
 const Header = () => {
   const { logOut } = useGlobalContext();
@@ -16,7 +17,9 @@ const Header = () => {
 
   return (
     <Row className={styles.headerContainer}>
-      <Col flex="auto"></Col>
+      <Col flex="auto">
+        <img src={logo} alt="Passion.do" className={styles.logo} />
+      </Col>
       <Col flex={isMobileDevice ? 'auto' : '300px'} className={isMobileDevice && styles.navItemWrapper}>
         <span
           className={classNames(styles.ml10, styles.navItem)}

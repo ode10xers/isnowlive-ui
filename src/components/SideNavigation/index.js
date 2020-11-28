@@ -10,20 +10,20 @@ import styles from './style.module.scss';
 const { SubMenu, Item } = Menu;
 
 const SideNavigation = () => {
-  const [showCreatorMenu, setShowCreatorMenu] = useState(() => creatorMenuItems.sort((a, b) => a.order - b.order));
+  const [showMenu, setShowMenu] = useState(() => creatorMenuItems.sort((a, b) => a.order - b.order));
   const history = useHistory();
 
   useEffect(() => {
     if (history.location.pathname.includes(Routes.creatorDashboard.rootPath)) {
-      setShowCreatorMenu(creatorMenuItems.sort((a, b) => a.order - b.order));
+      setShowMenu(creatorMenuItems.sort((a, b) => a.order - b.order));
     } else {
-      setShowCreatorMenu(attendeeMenuItems.sort((a, b) => a.order - b.order));
+      setShowMenu(attendeeMenuItems.sort((a, b) => a.order - b.order));
     }
   }, [history.location.pathname]);
 
   return (
     <Menu mode="inline" className={styles.sideNavMenu}>
-      {showCreatorMenu.map((navItem) =>
+      {showMenu.map((navItem) =>
         navItem.children ? (
           <SubMenu key={navItem.key} title={navItem.title} icon={navItem.icon}>
             {navItem.children.map((item) => (
