@@ -63,7 +63,7 @@ const Profile = () => {
           window.open(Routes.profilePreview);
           history.push(Routes.livestream);
         } else {
-          history.push('/dashboard/profile');
+          history.push('/creator/dashboard/profile');
         }
       }
     } catch (error) {
@@ -151,7 +151,7 @@ const Profile = () => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard/profile')}
+              onClick={() => history.push('/creator/dashboard/profile')}
               icon={<ArrowLeftOutlined />}
             >
               Back

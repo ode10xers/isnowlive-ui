@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card } from 'antd';
 import { useHistory } from 'react-router-dom';
 
+import Routes from 'routes';
 import apis from 'apis';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -86,7 +87,9 @@ const ManageSessions = () => {
             <Col md={24} lg={24} xl={8}>
               <Button
                 className={styles.detailsButton}
-                onClick={() => history.push(`/dashboard/manage/session/${record.session_id}/edit`)}
+                onClick={() =>
+                  history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
+                }
                 type="link"
               >
                 Details
@@ -123,14 +126,16 @@ const ManageSessions = () => {
       <Card
         className={styles.card}
         title={
-          <div onClick={() => history.push(`/dashboard/manage/session/${item.session_id}/edit`)}>
+          <div
+            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
+          >
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
           <Button
             className={styles.detailsButton}
-            onClick={() => history.push(`/dashboard/manage/session/${item.session_id}/edit`)}
+            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
             type="link"
           >
             Details

@@ -97,7 +97,7 @@ const Session = ({ match, history }) => {
         if (isOnboarding) {
           history.push(Routes.session);
         } else {
-          history.push('/dashboard' + Routes.dashboard.createSessions);
+          history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
         }
       }
     },
@@ -244,7 +244,10 @@ const Session = ({ match, history }) => {
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
-              onCancel: () => history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`),
+              onCancel: () =>
+                history.push(
+                  `${Routes.creatorDashboard.rootPath}/manage/session/${newSessionResponse.data.session_id}/edit`
+                ),
             });
           }
         }
@@ -272,7 +275,7 @@ const Session = ({ match, history }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard/manage/sessions')}
+              onClick={() => history.push('/creator/dashboard/manage/sessions')}
               icon={<ArrowLeftOutlined />}
             >
               Sessions

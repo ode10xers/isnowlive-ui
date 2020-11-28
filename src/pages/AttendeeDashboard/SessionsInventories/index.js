@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button, Card, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
+import Routes from 'routes';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
-import { isAPISuccess, getDuration } from 'utils/helper';
+import { getDuration } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -71,18 +71,7 @@ const SessionsInventories = ({ match }) => {
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
-      history.push(`/dashboard/sessions/inventory/${item.inventory_id}/details`);
-    }
-  };
-
-  const deleteInventory = async (inventory_id) => {
-    try {
-      const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
-      if (isAPISuccess(status)) {
-        getStaffSession(match?.params?.session_type);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      history.push(`${Routes.creatorDashboard.rootPath}/sessions/inventory/${item.inventory_id}/details`);
     }
   };
 
@@ -118,21 +107,9 @@ const SessionsInventories = ({ match }) => {
       width: '15%',
     },
     {
-      title: isPast ? 'Registrations' : 'Attendees',
-      key: 'participants',
-      dataIndex: 'participants',
-      width: '2%',
-      render: (text, record) => (
-        <Text>
-          {record.participants || 0} / {record.max_participants}
-        </Text>
-      ),
-    },
-    {
       title: 'Actions',
       width: isPast ? '4%' : '16%',
       render: (text, record) => {
-        const isDisabled = record.participants ? record.participants.length > 0 : false;
         return isPast ? (
           <Row justify="start">
             <Col>
@@ -148,25 +125,11 @@ const SessionsInventories = ({ match }) => {
                 Details
               </Button>
             </Col>
-            <Col md={24} lg={24} xl={8}>
-              <Popconfirm
-                title="Do you want to cancel session?"
-                icon={<DeleteOutlined className={styles.danger} />}
-                okText="Yes"
-                cancelText="No"
-                disabled={isDisabled}
-                onConfirm={() => deleteInventory(record.inventory_id)}
-              >
-                <Button type="text" disabled={isDisabled} danger>
-                  Cancel
-                </Button>
-              </Popconfirm>
-            </Col>
 
             {!isPast && (
               <Col md={24} lg={24} xl={8}>
                 <Button type="link" disabled={!record.start_url} onClick={() => window.open(record.start_url)}>
-                  Start
+                  Join
                 </Button>
               </Col>
             )}
@@ -177,8 +140,6 @@ const SessionsInventories = ({ match }) => {
   ];
 
   const renderSessionItem = (item) => {
-    const isCancelDisabled = item.participants ? item.participants.length > 0 : false;
-
     const layout = (label, value) => (
       <Row>
         <Col span={9}>
@@ -199,22 +160,10 @@ const SessionsInventories = ({ match }) => {
           <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
             Details
           </Button>,
-          <Popconfirm
-            title="Do you want to cancel session?"
-            icon={<DeleteOutlined className={styles.danger} />}
-            okText="Yes"
-            cancelText={'No'}
-            disabled={isCancelDisabled}
-            onConfirm={() => deleteInventory(item.inventory_id)}
-          >
-            <Button type="text" disabled={isCancelDisabled}>
-              Cancel
-            </Button>
-          </Popconfirm>,
           <>
             {item.index === 0 && !isPast && (
               <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
-                Start
+                Join
               </Button>
             )}
           </>,
@@ -224,12 +173,6 @@ const SessionsInventories = ({ match }) => {
         {layout('Duration', <Text>{item.duration}</Text>)}
         {layout('Day', <Text>{item.days}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
-        {layout(
-          isPast ? 'Registrations' : 'Attendees',
-          <Text>
-            {item.participants || 0} {'/'} {item.max_participants}
-          </Text>
-        )}
       </Card>
     );
   };

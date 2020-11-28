@@ -29,7 +29,7 @@ const Login = ({ history }) => {
       } else if (user.zoom_connected === false) {
         history.push(Routes.livestream);
       } else {
-        history.push(Routes.dashboard.rootPath);
+        history.push(Routes.creatorDashboard.rootPath);
       }
     },
     [history]

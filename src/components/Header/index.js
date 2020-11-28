@@ -1,8 +1,12 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Row, Col, Button } from 'antd';
 import { useHistory } from 'react-router-dom';
+import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
+import Routes from 'routes';
 import { useGlobalContext } from 'services/globalContext';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 
@@ -13,7 +17,21 @@ const Header = () => {
   return (
     <Row className={styles.headerContainer}>
       <Col flex="auto"></Col>
-      <Col flex="100px">
+      <Col flex={isMobileDevice ? 'auto' : '300px'} className={isMobileDevice && styles.navItemWrapper}>
+        <span
+          className={classNames(styles.ml10, styles.navItem)}
+          onClick={() => history.push(Routes.creatorDashboard.rootPath)}
+        >
+          <VideoCameraAddOutlined className={styles.navItemIcon} />
+          Hosting
+        </span>
+        <span
+          className={classNames(styles.ml10, styles.navItem)}
+          onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
+        >
+          <TeamOutlined className={styles.navItemIcon} />
+          Attending
+        </span>
         <Button type="text" onClick={() => logOut(history)}>
           Logout
         </Button>

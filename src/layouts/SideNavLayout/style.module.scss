@@ -10,3 +10,13 @@
 .divider {
   margin: 2px !important;
 }
+.sideIcon {
+  :global {
+    .ant-layout-sider-zero-width-trigger {
+      top: -50px;
+      right: -36px;
+      color: black;
+      background: white;
+    }
+  }
+}

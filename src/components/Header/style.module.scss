@@ -1,4 +1,15 @@
+@import '../../styles/variables.scss';
+
 .headerContainer {
   height: 50px;
   padding: 5px;
+}
+.navItemWrapper {
+  text-align: end;
+}
+.navItem {
+  cursor: pointer;
+}
+.navItemIcon {
+  margin-right: 5px;
 }

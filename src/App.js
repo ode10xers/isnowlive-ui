@@ -14,7 +14,8 @@ import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
-import Dashboard from 'pages/Dashboard';
+import CreatorDashboard from 'pages/CreatorDashboard';
+import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 
 function RouteWithLayout({ layout, component, ...rest }) {
@@ -36,7 +37,8 @@ function App() {
   return (
     <Router>
       <Switch>
-        <PrivateRoute layout={SideNavLayout} path={Routes.dashboard.rootPath} component={Dashboard} />
+        <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
+        <PrivateRoute layout={SideNavLayout} path={Routes.attendeeDashboard.rootPath} component={AttendeeDashboard} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
