@@ -17,9 +17,15 @@
   height: 40px;
   margin-left: 5px;
 }
+.isActiveNavItem {
+  color: map-get($colors, 'blue');
+}
 @media (max-width: 768px) {
   .headerContainer {
     height: 90px;
     padding: 5px;
+  }
+  .logoWrapper {
+    text-align: center;
   }
 }

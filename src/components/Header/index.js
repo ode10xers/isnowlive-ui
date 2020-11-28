@@ -15,21 +15,27 @@ const Header = () => {
   const { logOut } = useGlobalContext();
   const history = useHistory();
 
+  const isActive = (path) => {
+    if (history.location.pathname.includes(path)) {
+      return styles.isActiveNavItem;
+    }
+  };
+
   return (
     <Row className={styles.headerContainer}>
-      <Col flex="auto">
+      <Col flex="auto" className={isMobileDevice && styles.logoWrapper}>
         <img src={logo} alt="Passion.do" className={styles.logo} />
       </Col>
       <Col flex={isMobileDevice ? 'auto' : '300px'} className={isMobileDevice && styles.navItemWrapper}>
         <span
-          className={classNames(styles.ml10, styles.navItem)}
+          className={classNames(styles.ml10, styles.navItem, isActive(Routes.creatorDashboard.rootPath))}
           onClick={() => history.push(Routes.creatorDashboard.rootPath)}
         >
           <VideoCameraAddOutlined className={styles.navItemIcon} />
           Hosting
         </span>
         <span
-          className={classNames(styles.ml10, styles.navItem)}
+          className={classNames(styles.ml10, styles.navItem, isActive(Routes.attendeeDashboard.rootPath))}
           onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
         >
           <TeamOutlined className={styles.navItemIcon} />

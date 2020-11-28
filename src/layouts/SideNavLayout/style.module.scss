@@ -15,8 +15,8 @@
     .ant-layout-sider-zero-width-trigger {
       top: -50px;
       right: -36px;
-      color: black;
-      background: white;
+      color: map-get($colors, 'black');
+      background: map-get($colors, 'white');
     }
   }
 }
