@@ -19,8 +19,11 @@ const SessionDate = ({ schedule }) => {
         {toShortMonth(schedule?.session_date)}
       </Title>
       <Divider className={styles.divider} type="vertical" />
-      <Title className={styles.day} level={isMobileDevice ? 5 : 3}>
-        {isMobileDevice ? toShortDayOfWeek(schedule?.session_date) : toDayOfWeek(schedule?.session_date)}
+      <Title className={styles.shortday} level={5}>
+        {toShortDayOfWeek(schedule?.session_date)}
+      </Title>
+      <Title className={styles.longday} level={3}>
+        {toDayOfWeek(schedule?.session_date)}
       </Title>
       <Text className={styles.time}>
         {toLocaleTime(schedule?.start_time)} {' -'} {toLocaleTime(schedule?.end_time)}

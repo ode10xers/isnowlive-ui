@@ -71,7 +71,7 @@ const SessionsInventories = ({ match }) => {
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
-      history.push(`/dashboard/sessions/inventory/${item.inventory_id}/details`);
+      history.push(`/dashboard/sessions/e/${item.inventory_id}/details`);
     }
   };
 

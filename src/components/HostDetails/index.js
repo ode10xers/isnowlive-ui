@@ -1,15 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Row, Col, Image, Space, Typography } from 'antd';
 import { GlobalOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined } from '@ant-design/icons';
 
 import DefaultImage from '../Icons/DefaultImage/index';
-import { isMobileDevice } from '../../utils/device';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 const HostDetails = ({ host }) => {
+  useEffect(() => {
+    // Timeout need as it take some time to paint the dom
+    setTimeout(() => {
+      if (document.getElementsByClassName('ant-typography-expand')[0]) {
+        document.getElementsByClassName('ant-typography-expand')[0].innerText = 'Read more';
+      }
+    }, 200);
+  }, [host]);
+
   return (
     <div className={styles.box}>
       <Row>
@@ -25,14 +34,22 @@ const HostDetails = ({ host }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={12} md={12}>
+        <Col xs={12} md={12} className={styles.pl10}>
           <Title className={styles.mt10} level={4}>
             {host?.first_name} {host?.last_name}
           </Title>
           <Title level={5}>Full Profile</Title>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
-          <Text>{host?.profile?.bio}</Text>
+          <Paragraph
+            ellipsis={{
+              rows: 5,
+              expandable: true,
+            }}
+            title={host?.profile?.bio}
+          >
+            {host?.profile?.bio}
+          </Paragraph>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           <Space size={'middle'}>

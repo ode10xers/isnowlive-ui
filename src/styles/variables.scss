@@ -60,6 +60,9 @@ $spacing: (
 .mb50 {
   margin-bottom: map-get($spacing, '50');
 }
+.pl10 {
+  padding-left: map-get($spacing, '10');
+}
 .p50 {
   padding: map-get($spacing, '50');
 }
