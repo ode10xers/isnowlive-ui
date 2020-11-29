@@ -3,6 +3,7 @@
 .card {
   margin: 10px !important;
   cursor: pointer;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 .card > div {
   padding: 0px !important;
@@ -11,6 +12,7 @@
   margin-top: 20px !important;
   margin-left: -20px !important;
   margin-right: -20px !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
 .title {
   max-width: 200px;

@@ -38,6 +38,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -66,8 +67,10 @@ const ProfilePreview = ({ username = null }) => {
         const { data } = await apis.user.getSessionsByUsername(profileUsername, type);
         if (data) {
           setSessions(data);
+          setIsSessionLoading(false);
         }
       } catch (error) {
+        setIsSessionLoading(false);
         message.error('Failed to load user session details');
       }
     },
@@ -83,6 +86,7 @@ const ProfilePreview = ({ username = null }) => {
   }, [history.location.pathname, getProfileDetails, getSessionDetails]);
 
   const handleChangeTab = (key) => {
+    setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
       getSessionDetails('upcoming');
@@ -194,10 +198,14 @@ const ProfilePreview = ({ username = null }) => {
         <Col span={24}>
           <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
             <Tabs.TabPane tab="Upcoming Sessions" key="0">
-              <Sessions sessions={sessions} />
+              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                <Sessions username={username} sessions={sessions} />
+              </Loader>
             </Tabs.TabPane>
             <Tabs.TabPane tab="Past Sesions" key="1">
-              <Sessions sessions={sessions} />
+              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                <Sessions username={username} sessions={sessions} />
+              </Loader>
             </Tabs.TabPane>
           </Tabs>
         </Col>

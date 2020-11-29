@@ -300,7 +300,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       placeholder="Start time"
                     >
                       {slotsList?.map((item) => (
-                        <Option value={item.value} disabled={getTimeDiff(item.value, moment(), 'minute') <= 0}>
+                        <Option
+                          value={item.value}
+                          disabled={
+                            getTimeDiff(slot.start_time, moment(), 'days') === 0 &&
+                            getTimeDiff(item.value, moment(), 'minute') <= 0
+                          }
+                        >
                           {item.label}
                         </Option>
                       ))}
