@@ -25,7 +25,7 @@ const HostDetails = ({ host }) => {
         <Col xs={24} md={24}>
           <Title level={5}>Host</Title>
         </Col>
-        <Col xs={12} md={12}>
+        <Col flex={isMobileDevice ? '80px' : '120px'}>
           <Image
             className={isMobileDevice ? styles.profileImageSmall : styles.profileImage}
             width={isMobileDevice ? 80 : 120}
@@ -34,7 +34,13 @@ const HostDetails = ({ host }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={12} md={12} className={styles.pl10}>
+        <Col
+          flex="auto"
+          className={styles.pl10}
+          style={{
+            height: isMobileDevice ? 80 : 120,
+          }}
+        >
           <Title className={styles.mt10} level={4}>
             {host?.first_name} {host?.last_name}
           </Title>

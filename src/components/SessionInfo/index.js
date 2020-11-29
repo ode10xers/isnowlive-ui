@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Button, Typography } from 'antd';
 import { FilePdfOutlined } from '@ant-design/icons';
 
-import { isValidImage } from 'utils/helper';
+import { isValidFile } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -25,7 +25,7 @@ const SessionInfo = ({ session }) => {
           {session?.price || 0} {session?.currency}
         </Text>
       </Col>
-      {session?.document_url && isValidImage(session?.document_url) && (
+      {session?.document_url && isValidFile(session?.document_url) && (
         <Col xs={8} md={8}>
           <Text className={styles.text} type="secondary">
             Session Prerequisite

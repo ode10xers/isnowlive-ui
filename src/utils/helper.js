@@ -95,9 +95,9 @@ export const isAPISuccess = (statusCode) => {
   return successStatusCode.includes(statusCode);
 };
 
-export const isValidImage = (url) => {
+export const isValidFile = (url) => {
   const extenstion = url?.split('.')?.pop();
-  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg'].includes(extenstion)) {
+  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf'].includes(extenstion)) {
     return true;
   }
   return false;

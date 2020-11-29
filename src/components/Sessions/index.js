@@ -3,7 +3,7 @@ import MobileDetect from 'mobile-detect';
 import moment from 'moment';
 import { Card, Image, Row, Col, Typography, Divider, Empty } from 'antd';
 
-import { isValidImage, generateUrlFromUsername } from 'utils/helper';
+import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './style.module.scss';
@@ -53,7 +53,7 @@ const Sessions = ({ sessions, username }) => {
                         cover={
                           <img
                             alt="session"
-                            src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                            src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         }
                         onClick={() => showInventoryDetails(session.inventory_id)}
@@ -78,7 +78,7 @@ const Sessions = ({ sessions, username }) => {
                               height={100}
                               width={100}
                               className={styles.cardImage}
-                              src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                              src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                             />
                           </Col>
                           <Col flex={4}>

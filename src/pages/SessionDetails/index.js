@@ -165,20 +165,20 @@ const SessionDetails = ({ match, history }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={24} md={15}>
+        <Col xs={24} lg={15}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
-        <Col xs={24} md={9}>
+        <Col xs={24} lg={9}>
           <SessionDate schedule={session} />
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} md={12}>
+        <Col xs={24} lg={12}>
           <SessionInfo session={session} />
         </Col>
-        <Col xs={24} md={9}></Col>
+        <Col xs={24} lg={9}></Col>
         {creator && (
-          <Col xs={24} md={3}>
+          <Col xs={24} lg={3}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
@@ -188,7 +188,7 @@ const SessionDetails = ({ match, history }) => {
         )}
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} md={14}>
+        <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
           <Title type="secondary" level={5}>
             {session?.description}
@@ -200,11 +200,11 @@ const SessionDetails = ({ match, history }) => {
             {session?.prerequisites}
           </Title>
         </Col>
-        <Col xs={24} md={1}></Col>
-        <Col xs={24} md={9}>
+        <Col xs={24} lg={1}></Col>
+        <Col xs={24} lg={9}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} md={15} className={styles.mt50}>
+        <Col xs={24} lg={15} className={styles.mt50}>
           {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
             <SessionRegistration user={currentUser} showPasswordField={showPasswordField} onFinish={onFinish} />
           )}
