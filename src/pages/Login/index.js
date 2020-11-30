@@ -96,7 +96,7 @@ const Login = ({ history }) => {
         </Form>
 
         <Row>
-          <Col span={16} offset={8}>
+          <Col xs={24} md={{ span: 16, offset: 8 }}>
             <a href onClick={() => setIsLoginView(false)}>
               Set a new password
             </a>
@@ -108,7 +108,7 @@ const Login = ({ history }) => {
     view = (
       <>
         <Row>
-          <Col span={16} offset={8}>
+          <Col xs={24} md={{ span: 16, offset: 8 }}>
             <h1>Set a new password</h1>
           </Col>
         </Row>
@@ -125,7 +125,7 @@ const Login = ({ history }) => {
         </Form>
 
         <Row>
-          <Col span={16} offset={8}>
+          <Col xs={24} md={{ span: 16, offset: 8 }}>
             <a href onClick={() => setIsLoginView(true)}>
               Login with password
             </a>
@@ -137,7 +137,7 @@ const Login = ({ history }) => {
 
   return (
     <Row align="middle" className={styles.mt50}>
-      <Col span={12} offset={6}>
+      <Col xs={24} md={{ span: 12, offset: 6 }}>
         {view}
       </Col>
     </Row>

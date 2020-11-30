@@ -38,7 +38,7 @@ const SignUp = ({ history }) => {
 
   return (
     <Row align="middle" className={styles.mt50}>
-      <Col span={12} offset={6}>
+      <Col xs={24} md={{ span: 12, offset: 6 }}>
         <Form form={form} {...formLayout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
           <Item label="Email" name="email" rules={validationRules.emailValidation}>
             <Input />
