@@ -1,0 +1,20 @@
+@import '../../../styles/variables.scss';
+
+.stripeContainer {
+  @extend .mt50;
+  background-color: map-get($colors, 'white');
+  padding: 50px;
+  .connectBtn {
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .stripeContainer {
+    padding: 20px;
+    .connectBtn {
+      margin-top: 20px;
+      text-align: left;
+    }
+  }
+}

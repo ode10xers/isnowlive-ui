@@ -49,8 +49,17 @@ function App() {
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
+        <Route path={Route.stripeAccountValidate}>
+          <Redirect
+            to={{
+              pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
+              state: { validateAccount: true }
+            }}
+
+          />
+        </Route>
       </Switch>
-    </Router>
+    </Router >
   );
 }
 

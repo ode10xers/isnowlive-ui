@@ -9,6 +9,7 @@ const Routes = {
   sessionDetails: '/e/:inventory_id',
   sessionUpdate: '/creator/session/:id/edit',
   profilePreview: '/profile/preview',
+  stripeAccountValidate: '/stripe/account/validate',
   creatorDashboard: {
     rootPath: '/creator/dashboard',
     defaultPath: '/sessions/upcoming',
