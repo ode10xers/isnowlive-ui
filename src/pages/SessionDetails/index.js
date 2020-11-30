@@ -100,7 +100,7 @@ const SessionDetails = ({ match, history }) => {
       if (isAPISuccess(status)) {
         Modal.success({
           content: 'Session is been booked successfully',
-          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
         });
       }
     } catch (error) {
@@ -111,7 +111,7 @@ const SessionDetails = ({ match, history }) => {
       ) {
         Modal.warning({
           content: 'It seems you have already booked this session, please check your dashboard',
-          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
         });
       }
     }
@@ -165,10 +165,10 @@ const SessionDetails = ({ match, history }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={24} lg={15}>
+        <Col xs={24} lg={13}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
-        <Col xs={24} lg={9}>
+        <Col xs={24} lg={11}>
           <SessionDate schedule={session} />
         </Col>
       </Row>

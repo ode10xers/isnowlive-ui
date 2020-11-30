@@ -49,7 +49,7 @@ const HostDetails = ({ host }) => {
         <Col xs={24} md={24} className={styles.mt10}>
           <Paragraph
             ellipsis={{
-              rows: 5,
+              rows: 6,
               expandable: true,
             }}
             title={host?.profile?.bio}

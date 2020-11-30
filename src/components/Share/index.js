@@ -50,7 +50,7 @@ const Share = ({ label, title, shareUrl }) => {
       </Item>
       <Item icon={<WhatsAppOutlined />}>
         <WhatsappShareButton url={shareUrl} title={title} separator=":: ">
-          What's App
+          Whatsapp
         </WhatsappShareButton>
       </Item>
     </Menu>

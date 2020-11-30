@@ -147,7 +147,7 @@ const ProfilePreview = ({ username = null }) => {
       </div>
       <Row justify="space-between" align="middle">
         <Col xs={6} md={24}></Col>
-        <Col xs={12} md={{ span: 7, offset: 5 }}>
+        <Col xs={12} md={{ span: 7, offset: 4 }}>
           <Title level={isMobileDevice ? 4 : 2}>
             {profile?.first_name} {profile?.last_name}
           </Title>
