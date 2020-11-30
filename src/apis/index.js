@@ -20,7 +20,7 @@ export default {
       onboardUser: (payload) => http.post('/secure/creator/profile/stripe', payload),
       relinkAccount: () => http.post('/secure/creator/profile/stripe/relink'),
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
-    }
+    },
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>

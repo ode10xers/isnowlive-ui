@@ -53,13 +53,12 @@ function App() {
           <Redirect
             to={{
               pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
-              state: { validateAccount: true }
+              state: { validateAccount: true },
             }}
-
           />
         </Route>
       </Switch>
-    </Router >
+    </Router>
   );
 }
 
