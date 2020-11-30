@@ -98,14 +98,14 @@ const ProfilePreview = ({ username = null }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard')}
+              onClick={() => history.push('/creator/dashboard')}
               icon={<ArrowLeftOutlined />}
             >
               Dashboard
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard/profile/edit')}
+              onClick={() => history.push('/creator/dashboard/profile/edit')}
               icon={<EditOutlined />}
             >
               Edit Profile
@@ -213,12 +213,9 @@ const ProfilePreview = ({ username = null }) => {
             <Masonry>
               {profile && profile?.profile?.testimonials
                 ? profile.profile.testimonials.map((testimonial, index) => (
-                    <Card
-                      key={index}
-                      bordered={false}
-                      className={styles.card}
-                      cover={<EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>}
-                    ></Card>
+                    <Card key={index} bordered={false} className={styles.card} bodyStyle={{ padding: '0px' }}>
+                      <EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>
+                    </Card>
                   ))
                 : null}
             </Masonry>

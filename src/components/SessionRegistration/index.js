@@ -1,15 +1,37 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Button, Form, Input, Typography } from 'antd';
 
-import validationRules from '../../utils/validation';
-import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from '../../layouts/FormLayouts';
+import validationRules from 'utils/validation';
+import { scrollToErrorField } from 'utils/helper';
+import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { Item } = Form;
+const { Password } = Input;
 
-const SessionRegistration = ({ onFinish }) => {
+const SessionRegistration = ({ onFinish, showPasswordField, user }) => {
+  const [form] = Form.useForm();
+  const passwordInput = useRef(null);
+
+  useEffect(() => {
+    if (user) {
+      form.setFieldsValue(user);
+    }
+  }, [user, form]);
+
+  useEffect(() => {
+    if (showPasswordField && passwordInput.current) {
+      passwordInput.current.focus();
+    }
+  }, [showPasswordField]);
+
+  const onFinishFailed = ({ errorFields }) => {
+    scrollToErrorField(errorFields);
+  };
+
   return (
     <div className={classNames(styles.box, styles.p50)}>
       <Row>
@@ -20,25 +42,37 @@ const SessionRegistration = ({ onFinish }) => {
           <Text>After you register, we will send you an email with the event login information.</Text>
         </Col>
         <Col xs={24} md={18} className={styles.mt10}>
-          <Form labelAlign="left" {...sessionRegistrationformLayout} onFinish={onFinish}>
-            <Form.Item label="Name" className={styles.nameInputWrapper}>
-              <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
+          <Form
+            form={form}
+            labelAlign="left"
+            {...sessionRegistrationformLayout}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+          >
+            <Item label="Name" className={styles.nameInputWrapper}>
+              <Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
                 <Input placeholder="First Name" />
-              </Form.Item>
-              <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
+              </Item>
+              <Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
                 <Input placeholder="Last Name" />
-              </Form.Item>
-            </Form.Item>
+              </Item>
+            </Item>
 
-            <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
+            <Item label="Email" name="email" rules={validationRules.emailValidation}>
               <Input placeholder="Enter your email" />
-            </Form.Item>
+            </Item>
 
-            <Form.Item {...sessionRegistrationTailLayout}>
+            {showPasswordField && (
+              <Item label="Password" name="password" rules={validationRules.passwordValidation} ref={passwordInput}>
+                <Password />
+              </Item>
+            )}
+
+            <Item {...sessionRegistrationTailLayout}>
               <Button type="primary" htmlType="submit">
                 Register
               </Button>
-            </Form.Item>
+            </Item>
           </Form>
         </Col>
       </Row>

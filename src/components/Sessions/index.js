@@ -34,7 +34,7 @@ const Sessions = ({ sessions }) => {
 
   const showInventoryDetails = (inventory_id) => {
     const baseurl = generateUrlFromUsername(getLocalUserDetails().username);
-    window.open(`${baseurl}/inventory/${inventory_id}`);
+    window.open(`${baseurl}/e/${inventory_id}`);
   };
 
   return (

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography } from 'antd';
+import { Row, Col, Image, message, Typography, Modal } from 'antd';
 import classNames from 'classnames';
+import moment from 'moment';
 
 import Routes from 'routes';
 import apis from 'apis';
+import http from 'services/http';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import SessionRegistration from 'components/SessionRegistration';
@@ -12,17 +14,26 @@ import DefaultImage from 'components/Icons/DefaultImage/index';
 import HostDetails from 'components/HostDetails';
 import Share from 'components/Share';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, generateUrl } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
+import { useGlobalContext } from 'services/globalContext';
+import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
 
 const reservedDomainName = ['app', 'localhost'];
 const { Title } = Typography;
+const {
+  formatDate: { getTimeDiff },
+} = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
+  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const { logIn } = useGlobalContext();
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -33,7 +44,6 @@ const SessionDetails = ({ match, history }) => {
         setCreator(userDetails.data);
         setIsLoading(false);
       } catch (error) {
-        console.log(error);
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         history.push(Routes.root);
@@ -52,10 +62,95 @@ const SessionDetails = ({ match, history }) => {
       setIsLoading(false);
       message.error('Session details not found.');
     }
+    if (getLocalUserDetails()) {
+      setCurrentUser(getLocalUserDetails());
+    }
   }, [match.params.inventory_id, getDetails]);
 
-  const onFinish = (values) => {
-    console.log(values);
+  const signupUser = async (values) => {
+    try {
+      const { data } = await apis.user.signup({
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        is_creator: false,
+      });
+      if (data) {
+        http.setAuthToken(data.auth_token);
+        logIn(data, true);
+      }
+    } catch (error) {
+      if (error.response?.data?.message && error.response.data.message === 'user already exists') {
+        setIsLoading(false);
+        setShowPasswordField(true);
+        setCurrentUser(values);
+        message.info('Enter password to register session');
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
+    }
+  };
+
+  const createOrder = async () => {
+    try {
+      const { status } = await apis.session.createOrderForUser({
+        inventory_id: parseInt(match.params.inventory_id),
+      });
+
+      if (isAPISuccess(status)) {
+        Modal.success({
+          content: 'Session is been booked successfully',
+          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+        });
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        Modal.warning({
+          content: 'It seems you have already booked this session, please check your dashboard',
+          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+        });
+      }
+    }
+  };
+
+  const onFinish = async (values) => {
+    try {
+      setIsLoading(true);
+      // check if user is login
+
+      // NOTE: Reason the check have getLocalUserDetails() and not currentUser
+      // is beause if user aleady existing and have to login then value will be
+      // set to currentUser where as getLocalUserDetails is only set if user has
+      // actually login
+
+      if (!getLocalUserDetails() && values.password) {
+        try {
+          const { data } = await apis.user.login({
+            email: values.email,
+            password: values.password,
+          });
+          if (data) {
+            http.setAuthToken(data.auth_token);
+            logIn(data, true);
+            createOrder();
+          }
+        } catch (error) {
+          setIsLoading(false);
+          message.error(error.response?.data?.message || 'Something went wrong');
+        }
+      } else if (!getLocalUserDetails()) {
+        signupUser(values);
+      } else {
+        createOrder();
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
   };
 
   return (
@@ -86,7 +181,7 @@ const SessionDetails = ({ match, history }) => {
           <Col xs={24} md={3}>
             <Share
               label="Share"
-              shareUrl={`${generateUrlFromUsername(creator?.username)}/inventory/${session.inventory_id}`}
+              shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
               title={`${session?.name} - ${creator?.first_name} ${creator?.last_name}`}
             />
           </Col>
@@ -110,7 +205,9 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
         <Col xs={24} md={15} className={styles.mt50}>
-          <SessionRegistration onFinish={onFinish} />
+          {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
+            <SessionRegistration user={currentUser} showPasswordField={showPasswordField} onFinish={onFinish} />
+          )}
         </Col>
       </Row>
     </Loader>

@@ -13,6 +13,7 @@ import {
   Select,
   message,
   DatePicker,
+  Modal,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import moment from 'moment';
@@ -27,7 +28,7 @@ import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
-import { getCurrencyList, convertSchedulesToUTC } from 'utils/helper';
+import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorField } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
@@ -37,12 +38,12 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
 } = dateUtil;
 
 const initialSession = {
-  price: 0,
-  currency: 'USD',
+  price: 10,
+  currency: 'SGD',
   max_participants: 0,
   group: true,
   name: '',
@@ -62,7 +63,7 @@ const Session = ({ match, history }) => {
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
   const [sessionDocumentUrl, setSessionDocumentUrl] = useState(null);
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
-  const [isSessionFree, setIsSessionFree] = useState(true);
+  const [isSessionFree, setIsSessionFree] = useState(false);
   const [currencyList, setCurrencyList] = useState(null);
   const [isSessionRecurring, setIsSessionRecurring] = useState(false);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
@@ -96,7 +97,7 @@ const Session = ({ match, history }) => {
         if (isOnboarding) {
           history.push(Routes.session);
         } else {
-          history.push('/dashboard' + Routes.dashboard.createSessions);
+          history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
         }
       }
     },
@@ -116,10 +117,10 @@ const Session = ({ match, history }) => {
         ...form.getFieldsValue(),
         type: 'Group',
         max_participants: 2,
-        price_type: 'Free',
+        price_type: 'Paid',
         recurring: false,
-        price: 0,
-        currency: 'USD',
+        price: 10,
+        currency: 'SGD',
       });
       setIsLoading(false);
     }
@@ -207,6 +208,7 @@ const Session = ({ match, history }) => {
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
+        prerequisites: values.prerequisites,
         session_image_url: sessionImageUrl || '',
         category: '',
         document_url: sessionDocumentUrl || '',
@@ -217,29 +219,51 @@ const Session = ({ match, history }) => {
         data.expiry = moment(values.recurring_dates_range[1]).utc().format();
       }
 
-      let allInventoryList = convertSchedulesToUTC(session.inventory);
-      data.inventory = allInventoryList.filter((slot) => moment(slot.session_date).diff(moment(), 'minutes') > 0);
-      if (deleteSlot && deleteSlot.length) {
-        await apis.session.delete({ data: JSON.stringify(deleteSlot) });
-      }
-      if (session.session_id) {
-        await apis.session.update(session.session_id, data);
-        message.success('Session successfully updated.');
-        const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
-        const endDate = toUtcEndOfDay(moment().add(1, 'month'));
-        getSessionDetails(match.params.id, startDate, endDate);
-      } else {
-        const newSessionResponse = await apis.session.create(data);
-        message.success('Session successfully created.');
-        console.log(newSessionResponse);
-        if (newSessionResponse.data.session_id) {
-          history.push(`/dashboard/manage/session/${newSessionResponse.data.session_id}/edit`);
+      if (session?.inventory?.length) {
+        let allInventoryList = convertSchedulesToUTC(session.inventory);
+        data.inventory = allInventoryList.filter((slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0);
+        if (deleteSlot && deleteSlot.length) {
+          await apis.session.delete(JSON.stringify(deleteSlot));
         }
+        if (session.session_id) {
+          await apis.session.update(session.session_id, data);
+          message.success('Session successfully updated.');
+          const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
+          const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+          getSessionDetails(match.params.id, startDate, endDate);
+        } else {
+          const newSessionResponse = await apis.session.create(data);
+
+          if (isAPISuccess(newSessionResponse.status)) {
+            Modal.confirm({
+              title: `${newSessionResponse.data.name} session successfully created`,
+              className: styles.confirmModal,
+              okText: 'Add New',
+              cancelText: 'Done',
+              onOk: () => {
+                window.location.reload();
+                window.scrollTo(0, 0);
+              },
+              onCancel: () =>
+                history.push(
+                  `${Routes.creatorDashboard.rootPath}/manage/session/${newSessionResponse.data.session_id}/edit`
+                ),
+            });
+          }
+        }
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        message.error('Need at least 1 sesssion to publish');
       }
-      setIsLoading(false);
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
+  };
+
+  const onFinishFailed = ({ errorFields }) => {
+    scrollToErrorField(errorFields);
   };
 
   return (
@@ -251,7 +275,7 @@ const Session = ({ match, history }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/dashboard/manage/sessions')}
+              onClick={() => history.push('/creator/dashboard/manage/sessions')}
               icon={<ArrowLeftOutlined />}
             >
               Sessions
@@ -269,14 +293,14 @@ const Session = ({ match, history }) => {
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish}>
+      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
 
           <div className={styles.imageWrapper}>
             <ImageUpload
-              aspect={2}
+              aspect={4}
               className={classNames('avatar-uploader', styles.coverImage)}
               name="session_image_url"
               action="https://www.mocky.io/v2/5cc8019d300000980a055e76"

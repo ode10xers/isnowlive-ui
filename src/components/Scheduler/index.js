@@ -3,16 +3,15 @@ import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Sele
 import moment from 'moment';
 import { DeleteFilled } from '@ant-design/icons';
 
-import { convertSchedulesToLocal } from '../../utils/helper';
-import dateUtil from '../../utils/date';
+import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
+import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
-import { isMobileDevice } from 'utils/device';
-import { generateTimes } from 'utils/helper';
 
 const { Option } = Select;
 const {
-  formatDate: { toLocaleTime, toLocaleDate, toShortTime, toShortTimeForSlot, toLongDate, toShortDate, toDayOfWeek },
+  formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek, getTimeDiff },
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
@@ -30,6 +29,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
     // eslint-disable-next-line
   }, [slots]);
+
+  useEffect(() => {
+    if (openModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [openModal]);
 
   const onSelect = (selecetedCalendarDate) => {
     if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
@@ -116,18 +123,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     form.forEach((vs) => {
       if (vs.start_time && vs.end_time) {
         let value = vs;
-        // work around get concat selected date and slot times as timepicker gives date as current date
-        let end_time = toShortTime(vs.end_time);
-        let start_time = toShortTime(vs.start_time);
-        if (moment(vs.end_time).diff(vs.start_time, 'minute') < 0) {
-          start_time = toShortTime(vs.end_time);
-          end_time = toShortTime(vs.start_time);
-        }
         let selected_date = moment(givenDate);
-
         value.session_date = selected_date.format();
-        value.start_time = moment(toShortDate(selected_date) + ' ' + start_time).format();
-        value.end_time = moment(toShortDate(selected_date) + ' ' + end_time).format();
+        value.start_time = value.session_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
+        value.end_time = value.session_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
 
         // remove slot as BE does not need it(Strong params check)
         delete value.slot;
@@ -237,7 +236,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // Need to deepclone as react does not rerender on change state
     let tempForm = JSON.parse(JSON.stringify(form));
     tempForm[index][field] = value;
-    if (field === 'end_time') {
+    if (
+      field === 'start_time' &&
+      tempForm[index].end_time &&
+      getTimeDiff(tempForm[index].end_time, tempForm[index].start_time, 'minute') <= 0
+    ) {
+      tempForm[index].end_time = null;
+    }
+    if (field === 'end_time' && !form[index + 1]) {
       tempForm.push({
         session_date: moment(date).format(),
         start_time: null,
@@ -288,26 +294,28 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                 <Row className={styles.m10}>
                   <Col xs={11} md={11}>
                     <Select
-                      value={slot.start_time && toShortTimeForSlot(slot.start_time)}
+                      value={slot.start_time && toShortTimeWithPeriod(slot.start_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
                     >
                       {slotsList?.map((item) => (
-                        <Option value={item.value}>{item.label}</Option>
+                        <Option value={item.value} disabled={getTimeDiff(item.value, moment(), 'minute') <= 0}>
+                          {item.label}
+                        </Option>
                       ))}
                     </Select>
                   </Col>
                   <Col xs={11} md={11}>
                     <Select
                       disabled={slot.start_time ? false : true}
-                      value={slot.end_time && toShortTimeForSlot(slot.end_time)}
+                      value={slot.end_time && toShortTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
                       placeholder="End time"
                     >
                       {slotsList?.map((item) => (
-                        <Option disabled={moment(item.value).diff(slot.start_time, 'minute') <= 0} value={item.value}>
+                        <Option disabled={getTimeDiff(item.value, slot.start_time, 'minute') <= 0} value={item.value}>
                           {item.label}
                         </Option>
                       ))}

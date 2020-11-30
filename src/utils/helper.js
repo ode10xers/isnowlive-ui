@@ -1,4 +1,9 @@
 import moment from 'moment';
+import dateUtil from 'utils/date';
+
+const {
+  formatDate: { getTimeDiff },
+} = dateUtil;
 
 const appendScript = (src, charset) => {
   const script = document.createElement('script');
@@ -110,8 +115,20 @@ export const generateUrlFromUsername = (username) => {
   return newUrl;
 };
 
+export const generateUrl = () => {
+  let newUrl = '';
+  if (process.env.NODE_ENV === 'development') {
+    newUrl = 'http://localhost:' + window.location.port;
+  } else if (window.location.origin.includes('stage')) {
+    newUrl = 'https://app.stage.passion.do';
+  } else {
+    newUrl = 'https://app.passion.do';
+  }
+  return newUrl;
+};
+
 export const getDuration = (start_time, end_time) => {
-  let duration = start_time && end_time ? moment(end_time).diff(start_time, 'minute') : 0;
+  let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration >= 60) {
     return `${duration / 60} Hr`;
   }
@@ -119,4 +136,9 @@ export const getDuration = (start_time, end_time) => {
     return null;
   }
   return `${duration} Min`;
+};
+
+export const scrollToErrorField = (errorFields) => {
+  document.getElementById(errorFields[0].name).focus();
+  document.getElementById(errorFields[0].name).scrollIntoView();
 };
