@@ -20,6 +20,9 @@
 .isActiveNavItem {
   color: map-get($colors, 'blue');
 }
+.logout {
+  margin-left: 100px;
+}
 @media (max-width: 768px) {
   .headerContainer {
     height: 90px;
@@ -27,5 +30,8 @@
   }
   .logoWrapper {
     text-align: center;
+  }
+  .logout {
+    margin-left: 10px;
   }
 }

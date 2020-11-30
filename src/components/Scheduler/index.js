@@ -277,11 +277,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
       <Modal
         title={
-          recurring
-            ? `Add Session Slot: ${recurringDatesRange && toLongDate(recurringDatesRange[0])} - ${
-                recurringDatesRange && toLongDate(recurringDatesRange[1])
-              }`
-            : `Create Session Slot for ${selectedDate && toLongDate(selectedDate)}`
+          recurring ? (
+            <>
+              Add Session Slot: {isMobileDevice && <br />} {recurringDatesRange && toLongDate(recurringDatesRange[0])} -{' '}
+              {recurringDatesRange && toLongDate(recurringDatesRange[1])}
+            </>
+          ) : (
+            `Create Session Slot for ${selectedDate && toLongDate(selectedDate)}`
+          )
         }
         visible={openModal}
         onCancel={handleCancel}
@@ -289,7 +292,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       >
         <>
           <Row className={styles.m10}>
-            <Col span={18} offset={3}>
+            <Col xs={24} md={{ span: 18, offset: 3 }}>
               {form?.map((slot, index) => (
                 <Row className={styles.m10}>
                   <Col xs={11} md={11}>
@@ -303,7 +306,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                         <Option
                           value={item.value}
                           disabled={
-                            getTimeDiff(slot.start_time, moment(), 'days') === 0 &&
+                            getTimeDiff(toLocaleDate(slot.session_date), toLocaleDate(moment()), 'days') === 0 &&
                             getTimeDiff(item.value, moment(), 'minute') <= 0
                           }
                         >
@@ -347,20 +350,20 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           {recurring ? (
             <>
               <Row justify="center">
-                <Col span={10} offset={1}>
-                  <Button onClick={() => createSession(1)} type="primary">
+                <Col className={styles.textAlignCenter} xs={24} md={{ span: 10, offset: 1 }}>
+                  <Button className={styles.mt10} onClick={() => createSession(1)} type="primary">
                     Apply to all {toDayOfWeek(selectedDate)}
                   </Button>
                 </Col>
-                <Col span={10} offset={1}>
-                  <Button onClick={() => createSession(2)} type="primary">
+                <Col className={styles.textAlignCenter} xs={24} md={{ span: 10, offset: 1 }}>
+                  <Button className={styles.mt10} onClick={() => createSession(2)} type="primary">
                     Apply to multiple days
                   </Button>
                 </Col>
               </Row>
               <Row justify="center">
-                <Col span={12} offset={3}>
-                  <Button onClick={() => createSession(0)} type="link">
+                <Col className={styles.textAlignCenter} xs={24} md={{ span: 12, offset: 3 }}>
+                  <Button className={styles.mt10} onClick={() => createSession(0)} type="link">
                     Apply to {toLongDate(selectedDate)} only
                   </Button>
                 </Col>

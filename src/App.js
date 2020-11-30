@@ -1,15 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Routes from './routes';
-import { getLocalUserDetails } from './utils/storage';
+import Routes from 'routes';
+import { getLocalUserDetails } from 'utils/storage';
 
-import DefaultLayout from './layouts/DefaultLayout';
+import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
 
-import Home from './pages/Home';
-import Profile from './pages/Profile';
-import LiveStream from './pages/LiveStream';
-import ProfilePreview from './pages/ProfilePreview';
+import Home from 'pages/Home';
+import Profile from 'pages/Profile';
+import LiveStream from 'pages/LiveStream';
+import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import Session from 'pages/Session';

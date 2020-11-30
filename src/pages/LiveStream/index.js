@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
@@ -21,10 +21,17 @@ const ZoomAuthType = {
 };
 
 const LiveStream = () => {
-  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
-  const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
   const history = useHistory();
+  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOnboarding, setIsOnboarding] = useState(true);
+
+  useEffect(() => {
+    if (history.location.pathname.includes('dashboard')) {
+      setIsOnboarding(false);
+    }
+  }, [history.location.pathname]);
 
   const storeZoomCrendetials = async (values) => {
     try {
@@ -46,7 +53,7 @@ const LiveStream = () => {
 
   return (
     <>
-      <OnboardSteps current={1} />
+      {isOnboarding && <OnboardSteps current={1} />}
       <Space size="middle">
         <Typography>
           <Title>Setup Livestream</Title>

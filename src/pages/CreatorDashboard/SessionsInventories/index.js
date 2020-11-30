@@ -35,7 +35,7 @@ const SessionsInventories = ({ match }) => {
             index,
             key: i.session_id,
             name: i.name,
-            type: i.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
+            type: i.max_participants > 1 ? 'Group' : '1-on-1',
             duration: getDuration(i.start_time, i.end_time),
             days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
             session_date: i?.session_date,
@@ -98,7 +98,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '5%',
+      width: '4%',
     },
     {
       title: 'Day',
@@ -131,7 +131,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Actions',
-      width: isPast ? '4%' : '16%',
+      width: isPast ? '4%' : '20%',
       render: (text, record) => {
         const isDisabled = record.participants ? record.participants.length > 0 : false;
         return isPast ? (
@@ -164,13 +164,13 @@ const SessionsInventories = ({ match }) => {
               </Popconfirm>
             </Col>
 
-            {!isPast && (
-              <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={8}>
+              {!isPast && (
                 <Button type="link" disabled={!record.start_url} onClick={() => window.open(record.start_url)}>
                   Start
                 </Button>
-              </Col>
-            )}
+              )}
+            </Col>
           </Row>
         );
       },
@@ -213,7 +213,7 @@ const SessionsInventories = ({ match }) => {
             </Button>
           </Popconfirm>,
           <>
-            {item.index === 0 && !isPast && (
+            {!isPast && (
               <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
                 Start
               </Button>

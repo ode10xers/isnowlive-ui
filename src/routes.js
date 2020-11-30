@@ -19,6 +19,7 @@ const Routes = {
     sessionsDetails: '/sessions/e/:inventory_id/details',
     profile: '/profile',
     editProfile: '/profile/edit',
+    livestream: '/livestream',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
@@ -27,6 +28,7 @@ const Routes = {
     sessionsDetails: '/sessions/e/:inventory_id/details',
     profile: '/profile',
     editProfile: '/profile/edit',
+    livestream: '/livestream',
   },
 };
 
