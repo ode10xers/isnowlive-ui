@@ -3,6 +3,7 @@ import { Row, Col, Button, Typography } from 'antd';
 import { FilePdfOutlined } from '@ant-design/icons';
 
 import { isValidFile } from 'utils/helper';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 
@@ -13,9 +14,9 @@ const SessionInfo = ({ session }) => {
     <Row justify="space-between">
       <Col xs={8} md={8}>
         <Text className={styles.text} type="secondary">
-          Session Type
+          {!isMobileDevice && 'Session '}Type
         </Text>
-        <Text className={styles.subText}>{session?.group ? 'Group session' : '1-on-1 Session'}</Text>
+        <Text className={styles.subText}>{session?.group ? 'Group' : '1-on-1'}</Text>
       </Col>
       <Col xs={8} md={8}>
         <Text className={styles.text} type="secondary">
@@ -28,7 +29,7 @@ const SessionInfo = ({ session }) => {
       {session?.document_url && isValidFile(session?.document_url) && (
         <Col xs={8} md={8}>
           <Text className={styles.text} type="secondary">
-            Session Prerequisite
+            {!isMobileDevice && 'Session '}Prerequisite
           </Text>
           <Text className={styles.subText}>
             <Button
