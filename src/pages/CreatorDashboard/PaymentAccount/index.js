@@ -18,7 +18,7 @@ const PaymentAccount = () => {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const countries = countryList().getData();
-  let {
+  const {
     state: {
       userDetails: { payment_connected = false },
     },
