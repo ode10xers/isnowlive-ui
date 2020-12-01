@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-
 import { Row, message } from 'antd';
-import Loader from 'components/Loader';
-import apis from 'apis';
+
 import Routes from 'routes';
+import apis from 'apis';
+import Loader from 'components/Loader';
 import { isAPISuccess } from 'utils/helper';
 
 export default function EmailVerification() {
@@ -18,9 +18,10 @@ export default function EmailVerification() {
       setIsLoading(true);
       const { status } = await apis.user.verifyEmail({ token });
       if (isAPISuccess(status)) {
-        history.push(Routes.createPassword, { token: token });
+        history.push(Routes.createPassword, { token });
       }
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   }, [token, history]);
