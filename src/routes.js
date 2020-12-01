@@ -3,6 +3,8 @@ const Routes = {
   login: '/login',
   signup: '/signup',
   passwordVerification: '/password/verify/:token',
+  emailVerification: '/email/verify/:token',
+  createPassword: '/password/create',
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/creator/session',
