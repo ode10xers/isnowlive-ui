@@ -15,6 +15,13 @@ export default {
     getSessionsByUsername: (username, type) => http.get(`/sessions/${username}/${type}`),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
   },
+  payment: {
+    stripe: {
+      onboardUser: (payload) => http.post('/secure/creator/profile/stripe', payload),
+      relinkAccount: () => http.post('/secure/creator/profile/stripe/relink'),
+      validate: () => http.post('/secure/creator/profile/stripe/validate'),
+    },
+  },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
       http.get(`/secure/creator/sessions/${sessionId}?start_date=${startDate}&end_date=${endDate}`),
