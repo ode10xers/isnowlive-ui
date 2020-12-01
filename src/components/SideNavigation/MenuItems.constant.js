@@ -73,6 +73,7 @@ export const creatorMenuItems = [
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
     order: 7,

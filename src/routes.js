@@ -11,6 +11,7 @@ const Routes = {
   sessionDetails: '/e/:inventory_id',
   sessionUpdate: '/creator/session/:id/edit',
   profilePreview: '/profile/preview',
+  stripeAccountValidate: '/stripe/account/validate',
   creatorDashboard: {
     rootPath: '/creator/dashboard',
     defaultPath: '/sessions/upcoming',
@@ -21,6 +22,7 @@ const Routes = {
     sessionsDetails: '/sessions/e/:inventory_id/details',
     profile: '/profile',
     editProfile: '/profile/edit',
+    paymentAccount: '/payment',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
