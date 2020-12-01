@@ -23,7 +23,7 @@ const PaymentAccount = () => {
       userDetails: { payment_connected = false },
     },
   } = useGlobalContext();
-  const validateAccount = location.state && location.state.validateAccount;
+  const validateAccount = location?.state?.validateAccount;
   const [paymentConnected, setPaymentConnected] = useState(payment_connected);
 
   useEffect(() => {
