@@ -18,7 +18,7 @@ const ResetPassword = () => {
   const location = useLocation();
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
-  const token = location.pathname.replace('/password/verify/', '');
+  const token = location.state ? location.state.token : location.pathname.replace('/password/verify/', '');
 
   if (!token) {
     history.push(Routes.root);

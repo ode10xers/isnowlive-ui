@@ -3,12 +3,15 @@ const Routes = {
   login: '/login',
   signup: '/signup',
   passwordVerification: '/password/verify/:token',
+  emailVerification: '/email/verify/:token',
+  createPassword: '/password/create',
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/creator/session',
   sessionDetails: '/e/:inventory_id',
   sessionUpdate: '/creator/session/:id/edit',
   profilePreview: '/profile/preview',
+  stripeAccountValidate: '/stripe/account/validate',
   creatorDashboard: {
     rootPath: '/creator/dashboard',
     defaultPath: '/sessions/upcoming',
@@ -20,6 +23,7 @@ const Routes = {
     profile: '/profile',
     editProfile: '/profile/edit',
     livestream: '/livestream',
+    paymentAccount: '/payment',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
