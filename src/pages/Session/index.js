@@ -266,6 +266,13 @@ const Session = ({ match, history }) => {
     scrollToErrorField(errorFields);
   };
 
+  const handleCalenderPop = () => {
+    if (isMobileDevice && document.getElementsByClassName('ant-picker-panels')[0]) {
+      document.getElementsByClassName('ant-picker-panels')[0].style.display = 'block';
+      document.getElementsByClassName('ant-picker-panels')[0].style['text-align'] = 'center';
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -428,11 +435,13 @@ const Session = ({ match, history }) => {
               layout="vertical"
             >
               <Text>First Session Date: </Text>
-              <Text className={styles.ml30}> Last Session Date:</Text> <br />
+              <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> Last Session Date:</Text> <br />
               <RangePicker
+                className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
                 disabledDate={disabledDate}
                 onChange={handleRecurringDatesRange}
+                onFocus={handleCalenderPop}
               />
             </Form.Item>
           )}
@@ -453,7 +462,7 @@ const Session = ({ match, history }) => {
                 {session?.inventory?.length || 0} Schedules will be created
               </Title>
             </Col>
-            <Col flex={1}>
+            <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
               <Form.Item>
                 <Button htmlType="submit" type="primary">
                   Publish

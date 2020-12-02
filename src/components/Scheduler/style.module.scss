@@ -33,3 +33,22 @@
     background: map-get($colors, $key: 'success') !important;
   }
 }
+.badgeLg {
+  margin-top: 10px !important;
+  padding-right: 5px !important;
+  :global {
+    .ant-badge-count {
+      background: map-get($colors, $key: 'success') !important;
+    }
+  }
+}
+@media (max-width: 768px) {
+  .modal {
+    :global {
+      .ant-modal-body {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    }
+  }
+}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
-import { DeleteFilled } from '@ant-design/icons';
+import classNames from 'classnames';
+import { DeleteFilled, CarryOutOutlined } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -94,19 +95,11 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
               )}
             />
           }
-          title="Slot"
+          title="Schedules"
         >
-          <List
-            size="small"
-            bordered
-            dataSource={slotsForDate}
-            renderItem={(item) => (
-              <List.Item className={styles.slot}>
-                {toLocaleTime(item['start_time'])}
-                {' - '} {toLocaleTime(item['end_time'])}
-              </List.Item>
-            )}
-          />
+          <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
+            <CarryOutOutlined />
+          </Badge>
         </Popover>
       );
     } else if (slotsForDate?.length && isMobileDevice) {
@@ -276,6 +269,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       />
 
       <Modal
+        className={styles.modal}
         title={
           recurring ? (
             <>
@@ -283,7 +277,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
               {recurringDatesRange && toLongDate(recurringDatesRange[1])}
             </>
           ) : (
-            `Create Session Slot for ${selectedDate && toLongDate(selectedDate)}`
+            <>
+              Create Session Slot for {isMobileDevice && <br />} ${selectedDate && toLongDate(selectedDate)}
+            </>
           )
         }
         visible={openModal}
@@ -291,7 +287,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         footer={null}
       >
         <>
-          <Row className={styles.m10}>
+          <Row className={classNames(styles.mt10, styles.mb10)}>
             <Col xs={24} md={{ span: 18, offset: 3 }}>
               {form?.map((slot, index) => (
                 <Row className={styles.m10}>
