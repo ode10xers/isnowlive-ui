@@ -278,7 +278,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
             </>
           ) : (
             <>
-              Create Session Slot for {isMobileDevice && <br />} ${selectedDate && toLongDate(selectedDate)}
+              Create Session Slot for {isMobileDevice && <br />} {selectedDate && toLongDate(selectedDate)}
             </>
           )
         }

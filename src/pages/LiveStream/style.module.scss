@@ -6,16 +6,19 @@
     margin-right: 10px;
   }
 }
-
 .zoomConnectAccount {
   @extend .mt50;
   background-color: map-get($colors, $key: 'white');
   padding: 80px 120px;
 }
-
 .zoomConnectAccountForm {
   @extend .mt50;
   color: map-get($colors, $key: 'sub-text');
   margin-left: map-get($spacing, '20');
   margin-bottom: map-get($spacing, '20');
+}
+@media (max-width: 768px) {
+  .zoomConnectAccount {
+    padding: 10px;
+  }
 }
