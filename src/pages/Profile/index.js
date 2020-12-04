@@ -11,9 +11,10 @@ import Section from 'components/Section';
 import Loader from 'components/Loader';
 import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
+import TextEditor from 'components/TextEditor';
 import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
-import { parseEmbedCode, scrollToErrorField } from 'utils/helper';
+import { parseEmbedCode, scrollToErrorField, isAPISuccess } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -56,9 +57,12 @@ const Profile = () => {
   const updateProfileDetails = async (values) => {
     try {
       const { status } = await apis.user.updateProfile(values);
-      if (status) {
+      if (isAPISuccess(status)) {
         setIsLoading(false);
         message.success('Profile successfully updated.');
+        const localUserDetails = getLocalUserDetails();
+        localUserDetails.profile_complete = true;
+        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         if (isOnboarding) {
           window.open(Routes.profilePreview);
           history.push(Routes.livestream);
@@ -198,8 +202,8 @@ const Profile = () => {
             </Form.Item>
           </Form.Item>
 
-          <Form.Item label="Short bio" name={['profile', 'bio']}>
-            <Input.TextArea rows={4} placeholder="Please input your short bio" />
+          <Form.Item className={styles.bgWhite} label="Short bio" name={['profile', 'bio']}>
+            <TextEditor name={['profile', 'bio']} form={form} placeholder="Please input your short bio" />
           </Form.Item>
 
           <Form.Item label="Public URL">

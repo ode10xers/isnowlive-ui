@@ -82,3 +82,10 @@ $spacing: (
   margin-top: 10px;
   margin-left: 15px;
 }
+.bgWhite {
+  :global {
+    .ant-form-item-control-input {
+      background: map-get($colors, $key: 'white');
+    }
+  }
+}

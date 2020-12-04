@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
+import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
@@ -160,7 +161,7 @@ const ProfilePreview = ({ username = null }) => {
           />
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
-          <Text type="secondary">{profile?.profile?.bio}</Text>
+          <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
           {profile?.profile?.social_media_links && (

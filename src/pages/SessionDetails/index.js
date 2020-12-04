@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography, Modal } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
+import ReactHtmlParser from 'react-html-parser';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -191,13 +192,13 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
           <Title type="secondary" level={5}>
-            {session?.description}
+            {ReactHtmlParser(session?.description)}
           </Title>
           <Title level={5} className={styles.mt50}>
             Session Prerequisite
           </Title>
           <Title type="secondary" level={5}>
-            {session?.prerequisites}
+            {ReactHtmlParser(session?.prerequisites)}
           </Title>
         </Col>
         <Col xs={24} lg={1}></Col>

@@ -26,6 +26,7 @@ import ImageUpload from 'components/ImageUpload';
 import FileUpload from 'components/FileUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
+import TextEditor from 'components/TextEditor';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
 import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorField } from 'utils/helper';
@@ -321,8 +322,13 @@ const Session = ({ match, history }) => {
             <Input placeholder="Enter Session Name" />
           </Form.Item>
 
-          <Form.Item label="Session Description" name="description" rules={validationRules.requiredValidation}>
-            <Input.TextArea rows={4} placeholder="Please input description" />
+          <Form.Item
+            className={styles.bgWhite}
+            label="Session Description"
+            name="description"
+            rules={validationRules.requiredValidation}
+          >
+            <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -342,8 +348,8 @@ const Session = ({ match, history }) => {
             />
           </Form.Item>
 
-          <Form.Item label="Session Pre-requisite" name="prerequisites">
-            <Input.TextArea rows={4} placeholder="Please input session pre-requisite" />
+          <Form.Item className={styles.bgWhite} label="Session Pre-requisite" name="prerequisites">
+            <TextEditor name="prerequisites" form={form} placeholder="Please input session pre-requisite" />
           </Form.Item>
 
           {/* ---- Session Type ---- */}

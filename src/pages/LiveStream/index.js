@@ -8,6 +8,7 @@ import Section from 'components/Section';
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 import Routes from 'routes';
 import apis from 'apis';
 
@@ -40,6 +41,9 @@ const LiveStream = () => {
       setIsLoading(false);
       if (isAPISuccess(status)) {
         message.success('Zoom successfully setup!');
+        const localUserDetails = getLocalUserDetails();
+        localUserDetails.zoom_connected = true;
+        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         // setTimeout is used for better user experince suggest by Rahul
         setTimeout(() => {
           history.push(Routes.session);

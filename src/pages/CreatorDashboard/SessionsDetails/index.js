@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
+import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
@@ -223,7 +224,7 @@ const SessionsDetails = ({ match }) => {
                   <>
                     <Title level={5}>Session Information</Title>
                     <Text type="secondary" level={5}>
-                      {session?.description}
+                      {ReactHtmlParser(session?.description)}
                     </Text>
                   </>
                 )}
@@ -233,7 +234,7 @@ const SessionsDetails = ({ match }) => {
                       Session Prerequisite
                     </Title>
                     <Text type="secondary" level={5}>
-                      {session?.prerequisites}
+                      {ReactHtmlParser(session?.prerequisites)}
                     </Text>
                   </>
                 )}

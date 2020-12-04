@@ -12,16 +12,19 @@
   margin-left: 0px !important;
   margin-right: 0px !important;
 }
-.sideIcon {
-  position: absolute !important;
-  z-index: 999;
-  height: 100vh;
-  :global {
-    .ant-layout-sider-zero-width-trigger {
-      top: -50px;
-      right: -36px;
-      color: map-get($colors, 'black');
-      background: transparent;
+@media (max-width: 768px) {
+  .sideIcon {
+    position: absolute !important;
+    z-index: 999;
+    height: 100vh;
+    box-shadow: 2px 0 4px -3px #333;
+    :global {
+      .ant-layout-sider-zero-width-trigger {
+        top: -50px;
+        right: -36px;
+        color: map-get($colors, 'black');
+        background: transparent;
+      }
     }
   }
 }
