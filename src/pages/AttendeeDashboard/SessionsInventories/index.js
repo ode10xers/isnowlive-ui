@@ -7,7 +7,6 @@ import Routes from 'routes';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
-import Section from 'components/Section';
 import Loader from 'components/Loader';
 import { getDuration } from 'utils/helper';
 
@@ -27,7 +26,9 @@ const SessionsInventories = ({ match }) => {
   const getStaffSession = useCallback(async (sessionType) => {
     try {
       const { data } =
-        sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
+        sessionType === 'past'
+          ? await apis.session.getAttendeePastSession()
+          : await apis.session.getAttendeeUpcomingSession();
       if (data) {
         setSessions(
           data.map((i, index) => ({
@@ -42,7 +43,7 @@ const SessionsInventories = ({ match }) => {
             start_time: i?.start_time,
             end_time: i?.end_time,
             participants: i.num_participants,
-            start_url: i.start_url,
+            join_url: i.join_url,
             inventory_id: i?.inventory_id,
             session_id: i.session_id,
             max_participants: i.max_participants,
@@ -128,7 +129,7 @@ const SessionsInventories = ({ match }) => {
 
             {!isPast && (
               <Col md={24} lg={24} xl={8}>
-                <Button type="link" disabled={!record.start_url} onClick={() => window.open(record.start_url)}>
+                <Button type="link" disabled={!record.join_url} onClick={() => window.open(record.join_url)}>
                   Join
                 </Button>
               </Col>
@@ -162,7 +163,7 @@ const SessionsInventories = ({ match }) => {
           </Button>,
           <>
             {item.index === 0 && !isPast && (
-              <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
+              <Button type="link" disabled={!item.join_url} onClick={() => window.open(item.join_url)}>
                 Join
               </Button>
             )}
@@ -178,7 +179,7 @@ const SessionsInventories = ({ match }) => {
   };
 
   return (
-    <Section>
+    <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
       {isMobileDevice ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
@@ -191,7 +192,7 @@ const SessionsInventories = ({ match }) => {
       ) : (
         <Table columns={sessionColumns} data={sessions} loading={isLoading} />
       )}
-    </Section>
+    </div>
   );
 };
 

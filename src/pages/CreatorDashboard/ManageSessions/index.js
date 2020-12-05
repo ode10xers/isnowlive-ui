@@ -7,7 +7,6 @@ import apis from 'apis';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
-import Section from 'components/Section';
 import Loader from 'components/Loader';
 
 import styles from './styles.module.scss';
@@ -178,7 +177,7 @@ const ManageSessions = () => {
   };
 
   return (
-    <Section>
+    <div className={styles.box}>
       <Title level={4}>Manage Sessions</Title>
       {isMobileDevice ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
@@ -187,7 +186,7 @@ const ManageSessions = () => {
       ) : (
         <Table columns={sessionColumns} data={sessions} loading={isLoading} />
       )}
-    </Section>
+    </div>
   );
 };
 
