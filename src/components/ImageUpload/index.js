@@ -33,10 +33,10 @@ const ImageUpload = ({
     return isJpgOrPng && isValidFileSize;
   };
 
-  const handleImageUpload = async (file) => {
+  const handleImageUpload = async (fileData) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', fileData.file);
       const { data } = await apis.user.uploadImage(formData);
       onChange(data);
       // Fix for scroll issue after image upload
@@ -53,7 +53,7 @@ const ImageUpload = ({
         listType="picture-card"
         name={name}
         multiple={multiple}
-        action={handleImageUpload}
+        customRequest={handleImageUpload}
         beforeUpload={beforeUpload}
         showUploadList={showUploadList}
       >
