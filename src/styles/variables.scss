@@ -88,6 +88,7 @@ $spacing: (
       background: map-get($colors, $key: 'white');
     }
   }
+}
 .box {
   background: map-get($colors, $key: 'offWhite');
   border-radius: 6px;
