@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
+import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
@@ -38,6 +39,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -66,8 +68,10 @@ const ProfilePreview = ({ username = null }) => {
         const { data } = await apis.user.getSessionsByUsername(profileUsername, type);
         if (data) {
           setSessions(data);
+          setIsSessionLoading(false);
         }
       } catch (error) {
+        setIsSessionLoading(false);
         message.error('Failed to load user session details');
       }
     },
@@ -83,6 +87,7 @@ const ProfilePreview = ({ username = null }) => {
   }, [history.location.pathname, getProfileDetails, getSessionDetails]);
 
   const handleChangeTab = (key) => {
+    setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
       getSessionDetails('upcoming');
@@ -142,8 +147,8 @@ const ProfilePreview = ({ username = null }) => {
         />
       </div>
       <Row justify="space-between" align="middle">
-        <Col xs={8} md={24}></Col>
-        <Col xs={10} md={{ span: 6, offset: 6 }}>
+        <Col xs={6} md={24}></Col>
+        <Col xs={12} md={{ span: 7, offset: 4 }}>
           <Title level={isMobileDevice ? 4 : 2}>
             {profile?.first_name} {profile?.last_name}
           </Title>
@@ -156,7 +161,7 @@ const ProfilePreview = ({ username = null }) => {
           />
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
-          <Text type="secondary">{profile?.profile?.bio}</Text>
+          <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
         </Col>
         <Col xs={24} md={{ span: 18, offset: 3 }}>
           {profile?.profile?.social_media_links && (
@@ -193,12 +198,13 @@ const ProfilePreview = ({ username = null }) => {
         </Col>
         <Col span={24}>
           <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
-            <Tabs.TabPane tab="Upcoming Sessions" key="0">
-              <Sessions sessions={sessions} />
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Past Sesions" key="1">
-              <Sessions sessions={sessions} />
-            </Tabs.TabPane>
+            {['Upcoming Sessions', 'Past Sesions'].map((item, index) => (
+              <Tabs.TabPane tab={item} key={index}>
+                <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                  <Sessions username={username} sessions={sessions} />
+                </Loader>
+              </Tabs.TabPane>
+            ))}
           </Tabs>
         </Col>
       </Row>

@@ -82,6 +82,13 @@ $spacing: (
   margin-top: 10px;
   margin-left: 15px;
 }
+.bgWhite {
+  :global {
+    .ant-form-item-control-input {
+      background: map-get($colors, $key: 'white');
+    }
+  }
+}
 .box {
   background: map-get($colors, $key: 'offWhite');
   border-radius: 6px;

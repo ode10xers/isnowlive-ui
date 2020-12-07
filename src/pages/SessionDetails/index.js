@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography, Modal } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
+import ReactHtmlParser from 'react-html-parser';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -100,7 +101,7 @@ const SessionDetails = ({ match, history }) => {
       if (isAPISuccess(status)) {
         Modal.success({
           content: 'Session is been booked successfully',
-          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
         });
       }
     } catch (error) {
@@ -111,7 +112,7 @@ const SessionDetails = ({ match, history }) => {
       ) {
         Modal.warning({
           content: 'It seems you have already booked this session, please check your dashboard',
-          onOk: () => (window.location.href = `${generateUrl()}/${Routes.attendeeDashboard.rootPath}`),
+          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
         });
       }
     }
@@ -165,20 +166,20 @@ const SessionDetails = ({ match, history }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={24} md={15}>
+        <Col xs={24} lg={13}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
-        <Col xs={24} md={9}>
+        <Col xs={24} lg={11}>
           <SessionDate schedule={session} />
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} md={12}>
+        <Col xs={24} lg={12}>
           <SessionInfo session={session} />
         </Col>
-        <Col xs={24} md={9}></Col>
+        <Col xs={24} lg={9}></Col>
         {creator && (
-          <Col xs={24} md={3}>
+          <Col xs={24} lg={3}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
@@ -188,23 +189,23 @@ const SessionDetails = ({ match, history }) => {
         )}
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} md={14}>
+        <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
           <Title type="secondary" level={5}>
-            {session?.description}
+            {ReactHtmlParser(session?.description)}
           </Title>
           <Title level={5} className={styles.mt50}>
             Session Prerequisite
           </Title>
           <Title type="secondary" level={5}>
-            {session?.prerequisites}
+            {ReactHtmlParser(session?.prerequisites)}
           </Title>
         </Col>
-        <Col xs={24} md={1}></Col>
-        <Col xs={24} md={9}>
+        <Col xs={24} lg={1}></Col>
+        <Col xs={24} lg={9}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} md={15} className={styles.mt50}>
+        <Col xs={24} lg={15} className={styles.mt50}>
           {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
             <SessionRegistration user={currentUser} showPasswordField={showPasswordField} onFinish={onFinish} />
           )}

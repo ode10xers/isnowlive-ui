@@ -26,7 +26,7 @@ const Header = () => {
       <Col flex="auto" className={isMobileDevice && styles.logoWrapper}>
         <img src={logo} alt="Passion.do" className={styles.logo} />
       </Col>
-      <Col flex={isMobileDevice ? 'auto' : '300px'} className={isMobileDevice && styles.navItemWrapper}>
+      <Col flex={isMobileDevice ? 'auto' : '400px'} className={isMobileDevice && styles.navItemWrapper}>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.creatorDashboard.rootPath))}
           onClick={() => history.push(Routes.creatorDashboard.rootPath)}
@@ -41,7 +41,7 @@ const Header = () => {
           <TeamOutlined className={styles.navItemIcon} />
           Attending
         </span>
-        <Button type="text" onClick={() => logOut(history)}>
+        <Button className={styles.logout} type="text" onClick={() => logOut(history)}>
           Logout
         </Button>
       </Col>

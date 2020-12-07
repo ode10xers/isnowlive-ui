@@ -60,6 +60,7 @@ export const creatorMenuItems = [
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
     order: 5,

@@ -26,6 +26,7 @@ import ImageUpload from 'components/ImageUpload';
 import FileUpload from 'components/FileUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
+import TextEditor from 'components/TextEditor';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
 import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorField } from 'utils/helper';
@@ -263,6 +264,13 @@ const Session = ({ match, history }) => {
     scrollToErrorField(errorFields);
   };
 
+  const handleCalenderPop = () => {
+    if (isMobileDevice && document.getElementsByClassName('ant-picker-panels')[0]) {
+      document.getElementsByClassName('ant-picker-panels')[0].style.display = 'block';
+      document.getElementsByClassName('ant-picker-panels')[0].style['text-align'] = 'center';
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -311,8 +319,13 @@ const Session = ({ match, history }) => {
             <Input placeholder="Enter Session Name" />
           </Form.Item>
 
-          <Form.Item label="Session Description" name="description" rules={validationRules.requiredValidation}>
-            <Input.TextArea rows={4} placeholder="Please input description" />
+          <Form.Item
+            className={styles.bgWhite}
+            label="Session Description"
+            name="description"
+            rules={validationRules.requiredValidation}
+          >
+            <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -332,8 +345,8 @@ const Session = ({ match, history }) => {
             />
           </Form.Item>
 
-          <Form.Item label="Session Pre-requisite" name="prerequisites">
-            <Input.TextArea rows={4} placeholder="Please input session pre-requisite" />
+          <Form.Item className={styles.bgWhite} label="Session Pre-requisite" name="prerequisites">
+            <TextEditor name="prerequisites" form={form} placeholder="Please input session pre-requisite" />
           </Form.Item>
 
           {/* ---- Session Type ---- */}
@@ -425,11 +438,13 @@ const Session = ({ match, history }) => {
               layout="vertical"
             >
               <Text>First Session Date: </Text>
-              <Text className={styles.ml30}> Last Session Date:</Text> <br />
+              <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> Last Session Date:</Text> <br />
               <RangePicker
+                className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
                 disabledDate={disabledDate}
                 onChange={handleRecurringDatesRange}
+                onFocus={handleCalenderPop}
               />
             </Form.Item>
           )}
@@ -450,7 +465,7 @@ const Session = ({ match, history }) => {
                 {session?.inventory?.length || 0} Schedules will be created
               </Title>
             </Col>
-            <Col flex={1}>
+            <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
               <Form.Item>
                 <Button htmlType="submit" type="primary">
                   Publish

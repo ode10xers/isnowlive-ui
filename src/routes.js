@@ -22,6 +22,7 @@ const Routes = {
     sessionsDetails: '/sessions/e/:inventory_id/details',
     profile: '/profile',
     editProfile: '/profile/edit',
+    livestream: '/livestream',
     paymentAccount: '/payment',
   },
   attendeeDashboard: {
@@ -31,6 +32,7 @@ const Routes = {
     sessionsDetails: '/sessions/e/:inventory_id/details',
     profile: '/profile',
     editProfile: '/profile/edit',
+    livestream: '/livestream',
   },
 };
 

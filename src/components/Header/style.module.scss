@@ -20,12 +20,21 @@
 .isActiveNavItem {
   color: map-get($colors, 'blue');
 }
+.logout {
+  margin-left: 100px;
+}
 @media (max-width: 768px) {
+  .navItemWrapper {
+    text-align: center;
+  }
   .headerContainer {
     height: 90px;
     padding: 5px;
   }
   .logoWrapper {
     text-align: center;
+  }
+  .logout {
+    margin-left: 10px;
   }
 }

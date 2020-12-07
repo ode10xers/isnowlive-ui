@@ -13,3 +13,8 @@
 .scheduleCount {
   color: map-get($colors, $key: 'blue') !important;
 }
+@media (max-width: 768px) {
+  .publishBtnWrapper {
+    text-align: center;
+  }
+}

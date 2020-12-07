@@ -45,7 +45,7 @@ const ManageSessions = () => {
       dataIndex: 'type',
       key: 'type',
       width: '5%',
-      render: (text, record) => <Text>{record.group ? 'Group Session' : '1-to-1 Session'}</Text>,
+      render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
     },
     {
       title: 'Session Date',

@@ -35,7 +35,7 @@ const SessionsInventories = ({ match }) => {
             index,
             key: i.session_id,
             name: i.name,
-            type: i.max_participants > 1 ? 'Group Session' : '1-on-1 Session',
+            type: i.max_participants > 1 ? 'Group' : '1-on-1',
             duration: getDuration(i.start_time, i.end_time),
             days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
             session_date: i?.session_date,
@@ -87,7 +87,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '5%',
+      width: '4%',
     },
     {
       title: 'Day',
@@ -109,7 +109,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Actions',
-      width: isPast ? '4%' : '16%',
+      width: isPast ? '4%' : '20%',
       render: (text, record) => {
         return isPast ? (
           <Row justify="start">
@@ -162,7 +162,7 @@ const SessionsInventories = ({ match }) => {
             Details
           </Button>,
           <>
-            {item.index === 0 && !isPast && (
+            {!isPast && (
               <Button type="link" disabled={!item.join_url} onClick={() => window.open(item.join_url)}>
                 Join
               </Button>

@@ -8,6 +8,7 @@ import ManageSessions from 'pages/CreatorDashboard/ManageSessions';
 import Session from 'pages/Session';
 import Profile from 'pages/Profile';
 import ProfilePreview from 'pages/ProfilePreview';
+import LiveStream from 'pages/LiveStream';
 import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
 
 const CreatorDashboard = ({ match }) => {
@@ -20,6 +21,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.updateSessions} component={Session} />
       <Route exact path={match.url + Routes.creatorDashboard.profile} component={ProfilePreview} />
       <Route exact path={match.url + Routes.creatorDashboard.editProfile} component={Profile} />
+      <Route exact path={match.url + Routes.creatorDashboard.livestream} component={LiveStream} />
       <Route exact path={match.url + Routes.creatorDashboard.paymentAccount} component={PaymentAccount} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>

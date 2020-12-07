@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
@@ -8,6 +8,7 @@ import Section from 'components/Section';
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 import Routes from 'routes';
 import apis from 'apis';
 
@@ -21,10 +22,17 @@ const ZoomAuthType = {
 };
 
 const LiveStream = () => {
-  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
-  const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
   const history = useHistory();
+  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOnboarding, setIsOnboarding] = useState(true);
+
+  useEffect(() => {
+    if (history.location.pathname.includes('dashboard')) {
+      setIsOnboarding(false);
+    }
+  }, [history.location.pathname]);
 
   const storeZoomCrendetials = async (values) => {
     try {
@@ -33,6 +41,9 @@ const LiveStream = () => {
       setIsLoading(false);
       if (isAPISuccess(status)) {
         message.success('Zoom successfully setup!');
+        const localUserDetails = getLocalUserDetails();
+        localUserDetails.zoom_connected = true;
+        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         // setTimeout is used for better user experince suggest by Rahul
         setTimeout(() => {
           history.push(Routes.session);
@@ -46,7 +57,7 @@ const LiveStream = () => {
 
   return (
     <>
-      <OnboardSteps current={1} />
+      {isOnboarding && <OnboardSteps current={1} />}
       <Space size="middle">
         <Typography>
           <Title>Setup Livestream</Title>

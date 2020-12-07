@@ -13,8 +13,15 @@
   display: inline-block !important;
   margin-right: 10px !important;
 }
+.emailInput {
+  input {
+    max-width: 370px;
+  }
+}
 @media (max-width: 768px) {
   .nameInput {
-    max-width: 230px;
+    max-width: 100%;
+    display: block !important;
+    margin-right: 10px !important;
   }
 }

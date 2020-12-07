@@ -3,7 +3,7 @@ import MobileDetect from 'mobile-detect';
 import moment from 'moment';
 import { Card, Image, Row, Col, Typography, Divider, Empty } from 'antd';
 
-import { isValidImage, generateUrlFromUsername } from 'utils/helper';
+import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './style.module.scss';
@@ -11,7 +11,7 @@ const DefaultImage = require('assets/images/fallbackimage.png');
 
 const { Text, Title } = Typography;
 
-const Sessions = ({ sessions }) => {
+const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -33,7 +33,7 @@ const Sessions = ({ sessions }) => {
   };
 
   const showInventoryDetails = (inventory_id) => {
-    const baseurl = generateUrlFromUsername(getLocalUserDetails().username);
+    const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
     window.open(`${baseurl}/e/${inventory_id}`);
   };
 
@@ -45,7 +45,7 @@ const Sessions = ({ sessions }) => {
             return (
               <>
                 {session.name && (
-                  <Col key={session.id} xs={24} md={isMobileDevice ? 24 : 12} lg={8}>
+                  <Col key={session.id} xs={24} lg={12} xxl={8}>
                     {isMobileDevice && (
                       <Card
                         hoverable
@@ -53,7 +53,7 @@ const Sessions = ({ sessions }) => {
                         cover={
                           <img
                             alt="session"
-                            src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                            src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         }
                         onClick={() => showInventoryDetails(session.inventory_id)}
@@ -73,15 +73,15 @@ const Sessions = ({ sessions }) => {
                     {!isMobileDevice && (
                       <Card className={styles.card} onClick={() => showInventoryDetails(session.inventory_id)}>
                         <Row>
-                          <Col flex="100px">
+                          <Col flex={1}>
                             <Image
                               height={100}
                               width={100}
                               className={styles.cardImage}
-                              src={isValidImage(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                              src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                             />
                           </Col>
-                          <Col flex="auto">
+                          <Col flex={4}>
                             <div className={styles.wrapper}>
                               <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
                               <Title className={styles.title} level={5}>

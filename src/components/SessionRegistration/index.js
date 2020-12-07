@@ -41,7 +41,7 @@ const SessionRegistration = ({ onFinish, showPasswordField, user }) => {
         <Col xs={24} md={24}>
           <Text>After you register, we will send you an email with the event login information.</Text>
         </Col>
-        <Col xs={24} md={18} className={styles.mt10}>
+        <Col xs={24} md={24} className={styles.mt10}>
           <Form
             form={form}
             labelAlign="left"
@@ -58,7 +58,7 @@ const SessionRegistration = ({ onFinish, showPasswordField, user }) => {
               </Item>
             </Item>
 
-            <Item label="Email" name="email" rules={validationRules.emailValidation}>
+            <Item className={styles.emailInput} label="Email" name="email" rules={validationRules.emailValidation}>
               <Input placeholder="Enter your email" />
             </Item>
 
