@@ -32,6 +32,8 @@ export default {
     getSession: () => http.get('/secure/creator/sessions'),
     getPastSession: () => http.get('/secure/creator/inventories/past'),
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
+    getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
+    getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),

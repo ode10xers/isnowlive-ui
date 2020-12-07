@@ -245,10 +245,7 @@ const Session = ({ match, history }) => {
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
-              onCancel: () =>
-                history.push(
-                  `${Routes.creatorDashboard.rootPath}/manage/session/${newSessionResponse.data.session_id}/edit`
-                ),
+              onCancel: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
             });
           }
         }

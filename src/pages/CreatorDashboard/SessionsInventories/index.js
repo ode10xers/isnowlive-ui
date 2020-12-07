@@ -8,7 +8,6 @@ import Routes from 'routes';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
-import Section from 'components/Section';
 import Loader from 'components/Loader';
 import { isAPISuccess, getDuration } from 'utils/helper';
 
@@ -236,7 +235,7 @@ const SessionsInventories = ({ match }) => {
   };
 
   return (
-    <Section>
+    <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
       {isMobileDevice ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
@@ -249,7 +248,7 @@ const SessionsInventories = ({ match }) => {
       ) : (
         <Table columns={sessionColumns} data={sessions} loading={isLoading} />
       )}
-    </Section>
+    </div>
   );
 };
 
