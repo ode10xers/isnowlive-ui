@@ -42,6 +42,12 @@
     }
   }
 }
+.titlePrefix {
+  display: inline;
+}
+.slotTitle {
+  display: inline;
+}
 @media (max-width: 768px) {
   .modal {
     :global {
@@ -50,5 +56,11 @@
         padding-right: 10px;
       }
     }
+  }
+  .titlePrefix {
+    display: block;
+  }
+  .slotTitle {
+    display: block;
   }
 }

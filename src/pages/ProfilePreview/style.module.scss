@@ -6,7 +6,7 @@
 .dot {
   height: 10px;
   width: 10px;
-  background-color: #bbb;
+  background-color: map-get($colors, $key: 'light-gray3');
   border-radius: 50%;
   display: inline-block;
 }
@@ -20,7 +20,7 @@
   border-radius: 8px;
 }
 .profileImage {
-  border: 2px solid #ffffff;
+  border: 2px solid map-get($colors, $key: 'white');
   border-radius: 4px;
   bottom: 50px;
   left: 50px;
@@ -29,7 +29,7 @@
   border-radius: 4px;
 }
 .profileImageSmall {
-  border: 2px solid #ffffff;
+  border: 2px solid map-get($colors, $key: 'white');
   border-radius: 4px;
   bottom: 20px;
 }
@@ -41,7 +41,7 @@
   margin: 5px;
 }
 .coverImageWrapper {
-  background-color: #f5f5f5;
+  background-color: map-get($colors, $key: 'white5');
   text-align: center;
   border-radius: 8px;
   margin: -20px;
@@ -64,10 +64,10 @@
   width: 12px;
 }
 ::-webkit-scrollbar-track {
-  background: #fafafa;
+  background: map-get($colors, $key: 'offWhite');
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #f0f0f0;
+  background-color: map-get($colors, $key: 'white6');
   border-radius: 20px;
-  border: 3px solid #ffffff;
+  border: 3px solid map-get($colors, $key: 'white');
 }

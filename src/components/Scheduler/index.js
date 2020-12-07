@@ -273,12 +273,16 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         title={
           recurring ? (
             <>
-              Add Session Slot: {isMobileDevice && <br />} {recurringDatesRange && toLongDate(recurringDatesRange[0])} -{' '}
-              {recurringDatesRange && toLongDate(recurringDatesRange[1])}
+              <p className={styles.titlePrefix}>Add Session Slot: </p>
+              <p className={styles.slotTitle}>
+                {recurringDatesRange && toLongDate(recurringDatesRange[0])} -{' '}
+                {recurringDatesRange && toLongDate(recurringDatesRange[1])}
+              </p>
             </>
           ) : (
             <>
-              Create Session Slot for {isMobileDevice && <br />} {selectedDate && toLongDate(selectedDate)}
+              <p className={styles.titlePrefix}>Create Session Slot for </p>
+              <p className={styles.slotTitle}>{selectedDate && toLongDate(selectedDate)}</p>
             </>
           )
         }

@@ -198,16 +198,13 @@ const ProfilePreview = ({ username = null }) => {
         </Col>
         <Col span={24}>
           <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
-            <Tabs.TabPane tab="Upcoming Sessions" key="0">
-              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                <Sessions username={username} sessions={sessions} />
-              </Loader>
-            </Tabs.TabPane>
-            <Tabs.TabPane tab="Past Sesions" key="1">
-              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                <Sessions username={username} sessions={sessions} />
-              </Loader>
-            </Tabs.TabPane>
+            {['Upcoming Sessions', 'Past Sesions'].map((item, index) => (
+              <Tabs.TabPane tab={item} key={index}>
+                <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                  <Sessions username={username} sessions={sessions} />
+                </Loader>
+              </Tabs.TabPane>
+            ))}
           </Tabs>
         </Col>
       </Row>
