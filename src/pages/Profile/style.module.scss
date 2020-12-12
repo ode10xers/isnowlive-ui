@@ -6,15 +6,15 @@
 .dot {
   height: 10px;
   width: 10px;
-  background-color: map-get($colors, $key: 'offWhite');
+  background-color: map-get($colors, $key: 'White1');
   border-radius: 50%;
   display: inline-block;
 }
 .success {
-  background-color: map-get($colors, $key: 'success');
+  background-color: map-get($colors, $key: 'KellyGreen');
 }
 .danger {
-  background-color: map-get($colors, $key: 'danger');
+  background-color: map-get($colors, $key: 'FireBrick');
 }
 .imageWrapper {
   position: relative;
@@ -30,7 +30,7 @@
   left: 20px;
 }
 .subtext {
-  color: map-get($colors, $key: 'sub-text');
+  color: map-get($colors, $key: 'SuvaGrey');
   margin-left: map-get($spacing, '20');
   margin-bottom: map-get($spacing, '20');
 }

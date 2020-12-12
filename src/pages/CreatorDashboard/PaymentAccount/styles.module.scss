@@ -2,7 +2,7 @@
 
 .stripeContainer {
   @extend .mt50;
-  background-color: map-get($colors, 'white');
+  background-color: map-get($colors, 'White');
   padding: 50px;
   .connectBtn {
     text-align: center;

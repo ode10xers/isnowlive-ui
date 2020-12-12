@@ -49,7 +49,7 @@ const ImageUpload = ({
   return (
     <ImgCrop shape="rect" aspect={aspect}>
       <Upload
-        className={className}
+        className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType="picture-card"
         name={name}
         multiple={multiple}

@@ -1,13 +1,13 @@
 @import '../../styles/variables.scss';
 
 .box {
-  background: map-get($colors, 'offWhite');
+  background: map-get($colors, 'White1');
   border-radius: 6px;
   padding: 15px;
 }
 .profileImage {
   position: absolute;
-  border: 2px solid map-get($colors, 'white');
+  border: 2px solid map-get($colors, 'White');
   border-radius: 4px;
 }
 .profileImage {
@@ -17,7 +17,7 @@
 }
 .profileImageSmall {
   position: absolute;
-  border: 2px solid map-get($colors, 'white');
+  border: 2px solid map-get($colors, 'White');
   border-radius: 4px;
 }
 .profileImageSmall {
