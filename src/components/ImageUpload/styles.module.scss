@@ -3,3 +3,17 @@
 .image {
   max-height: 300px;
 }
+.showBorder {
+  :global {
+    .ant-upload-select-picture-card {
+      border: 1px dashed map-get($colors, $key: 'Gainsboro') !important;
+    }
+  }
+}
+.hideBorder {
+  :global {
+    .ant-upload-select-picture-card {
+      border: none !important;
+    }
+  }
+}

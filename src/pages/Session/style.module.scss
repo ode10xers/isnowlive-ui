@@ -11,7 +11,7 @@
   }
 }
 .scheduleCount {
-  color: map-get($colors, $key: 'blue') !important;
+  color: map-get($colors, $key: 'DodgerBlue') !important;
 }
 @media (max-width: 768px) {
   .publishBtnWrapper {

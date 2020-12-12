@@ -30,7 +30,7 @@
   right: -5px;
   z-index: 1;
   > .ant-badge-count {
-    background: map-get($colors, $key: 'success') !important;
+    background: map-get($colors, $key: 'KellyGreen') !important;
   }
 }
 .badgeLg {
@@ -38,7 +38,7 @@
   padding-right: 5px !important;
   :global {
     .ant-badge-count {
-      background: map-get($colors, $key: 'success') !important;
+      background: map-get($colors, $key: 'KellyGreen') !important;
     }
   }
 }

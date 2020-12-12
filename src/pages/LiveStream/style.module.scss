@@ -8,12 +8,12 @@
 }
 .zoomConnectAccount {
   @extend .mt50;
-  background-color: map-get($colors, $key: 'white');
+  background-color: map-get($colors, $key: 'White');
   padding: 80px 120px;
 }
 .zoomConnectAccountForm {
   @extend .mt50;
-  color: map-get($colors, $key: 'sub-text');
+  color: map-get($colors, $key: 'SuvaGrey');
   margin-left: map-get($spacing, '20');
   margin-bottom: map-get($spacing, '20');
 }

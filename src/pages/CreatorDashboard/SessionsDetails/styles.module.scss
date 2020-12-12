@@ -4,12 +4,12 @@
   margin-top: 10px;
 }
 .editButton {
-  background-color: map-get($colors, $key: 'orange') !important;
-  color: map-get($colors, $key: 'white') !important;
+  background-color: map-get($colors, $key: 'Pumpkin') !important;
+  color: map-get($colors, $key: 'White') !important;
 }
 .emailButton {
-  background-color: map-get($colors, $key: 'gray') !important;
-  color: map-get($colors, $key: 'white') !important;
+  background-color: map-get($colors, $key: 'DarkGray1') !important;
+  color: map-get($colors, $key: 'White') !important;
 }
 @media (max-width: 768px) {
   .headButton {

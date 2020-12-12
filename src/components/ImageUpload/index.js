@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
@@ -19,14 +19,6 @@ const ImageUpload = ({
   className,
 }) => {
   const [loading] = useState(false);
-
-  useEffect(() => {
-    if (value) {
-      document.getElementsByClassName('ant-upload-select-picture-card')[0].style.border = 'none';
-    } else {
-      document.getElementsByClassName('ant-upload-select-picture-card')[0].style.border = '1px dashed #d9d9d9';
-    }
-  }, [value]);
 
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -57,7 +49,7 @@ const ImageUpload = ({
   return (
     <ImgCrop shape="rect" aspect={aspect}>
       <Upload
-        className={className}
+        className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType="picture-card"
         name={name}
         multiple={multiple}

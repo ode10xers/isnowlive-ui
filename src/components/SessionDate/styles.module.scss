@@ -2,8 +2,8 @@
 
 .box {
   padding: 10px;
-  background: map-get($colors, 'light-blue3');
-  border: 1px solid map-get($colors, 'light-blue');
+  background: map-get($colors, 'AliceBlue');
+  border: 1px solid map-get($colors, 'PaleCornflowerBlue');
   border-radius: 4px;
   display: flex;
   justify-content: center;
@@ -13,13 +13,13 @@
   max-width: 450px;
 }
 .date {
-  background: map-get($colors, 'blue');
-  border: 1px solid map-get($colors, 'blue');
+  background: map-get($colors, 'DodgerBlue');
+  border: 1px solid map-get($colors, 'DodgerBlue');
   box-sizing: border-box;
   border-radius: 2px;
   height: 40px;
   text-align: center;
-  color: map-get($colors, 'white');
+  color: map-get($colors, 'White');
   font-size: 24px;
   font-weight: 900;
   margin-right: 10px;
