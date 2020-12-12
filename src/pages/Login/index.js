@@ -24,12 +24,16 @@ const Login = ({ history }) => {
 
   const redirectBasedOnProfileCriteria = useCallback(
     (user) => {
-      if (user.profile_complete === false) {
-        history.push(Routes.profile);
-      } else if (user.zoom_connected === false) {
-        history.push(Routes.livestream);
+      if (user.is_creator) {
+        if (user.profile_complete === false) {
+          history.push(Routes.profile);
+        } else if (user.zoom_connected === false) {
+          history.push(Routes.livestream);
+        } else {
+          history.push(Routes.creatorDashboard.rootPath);
+        }
       } else {
-        history.push(Routes.creatorDashboard.rootPath);
+        history.push(Routes.attendeeDashboard.rootPath);
       }
     },
     [history]
