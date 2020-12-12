@@ -1,34 +1,47 @@
 import React from 'react';
 import MobileDetect from 'mobile-detect';
-import moment from 'moment';
-import { Card, Image, Row, Col, Typography, Divider, Empty } from 'antd';
+import { Card, Image, Row, Col, Typography, Empty } from 'antd';
 
 import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/fallbackimage.png');
 
-const { Text, Title } = Typography;
+const { Text, Title, Paragraph } = Typography;
+const {
+  formatDate: { toDate, toShortMonth, toDayOfWeek, toLocaleTime },
+} = dateUtil;
 
 const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
-  const description = (session) => {
+  const eventSchedule = (session) => {
     return (
-      <React.Fragment>
-        <Text className={styles.day} strong>
-          {moment(session.session_date).format('D').padStart(2, 0)}
-        </Text>
-        <Text strong> {moment(session.session_date).format('MMM')?.toUpperCase()} </Text>
-        <Text type="secondary">
-          {' '}
-          <Divider type="vertical" /> {moment(session.start_time).format('LT')}
-          {' -'}
-        </Text>
-        <Text type="secondary"> {moment(session.end_time).format('LT')} </Text>
-      </React.Fragment>
+      <div className={styles.eventBoxWrap}>
+        <Row>
+          <Col xs={8} className={styles.eventBox}>
+            <Text className={styles.text} strong>
+              {toDate(session.session_date)}
+            </Text>
+            <Text className={styles.subtext} strong>
+              {toShortMonth(session.session_date)?.toUpperCase()}
+            </Text>
+          </Col>
+          <Col xs={16} className={styles.eventBox2}>
+            <Text className={styles.text} strong>
+              {toDayOfWeek(session.session_date)}
+            </Text>
+            <Text className={styles.subtext} strong>
+              {toLocaleTime(session.start_time)}
+              {' - '}
+              {toLocaleTime(session.end_time)}
+            </Text>
+          </Col>
+        </Row>
+      </div>
     );
   };
 
@@ -45,54 +58,39 @@ const Sessions = ({ sessions, username }) => {
             return (
               <>
                 {session.name && (
-                  <Col key={session.id} xs={24} lg={12} xxl={8}>
-                    {isMobileDevice && (
-                      <Card
-                        hoverable
-                        className={styles.cardSmall}
-                        cover={
-                          <img
-                            alt="session"
+                  <Col key={session.id} xs={24}>
+                    <Card
+                      hoverable
+                      className={styles.card}
+                      onClick={() => showInventoryDetails(session.inventory_id)}
+                      bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
+                    >
+                      <Row>
+                        <Col>
+                          <Image
+                            height={100}
+                            className={styles.cardImage}
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
-                        }
-                        onClick={() => showInventoryDetails(session.inventory_id)}
-                      >
-                        <Card.Meta
-                          title={session.name}
-                          description={
-                            <React.Fragment>
-                              <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
-                              <br />
-                              {session.session_date && description(session)}
-                            </React.Fragment>
-                          }
-                        />
-                      </Card>
-                    )}
-                    {!isMobileDevice && (
-                      <Card className={styles.card} onClick={() => showInventoryDetails(session.inventory_id)}>
-                        <Row>
-                          <Col flex={1}>
-                            <Image
-                              height={100}
-                              width={100}
-                              className={styles.cardImage}
-                              src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
-                            />
-                          </Col>
-                          <Col flex={4}>
-                            <div className={styles.wrapper}>
-                              <Text type="secondary">{session.group ? 'Group Session' : '1-to-1 Session'}</Text>
-                              <Title className={styles.title} level={5}>
-                                {session.name}
-                              </Title>
-                              {session.session_date && description(session)}
-                            </div>
-                          </Col>
-                        </Row>
-                      </Card>
-                    )}
+                        </Col>
+                        <Col xs={24} md={10} lg={12}>
+                          <div className={styles.wrapper}>
+                            <Title className={styles.title} level={5}>
+                              {session.name}
+                            </Title>
+                            <Paragraph ellipsis={{ rows: 3 }}>{session?.description}</Paragraph>
+                          </div>
+                        </Col>
+                        <Col xs={24} md={4}>
+                          <div className={styles.wrapper}>
+                            {session.session_date && eventSchedule(session)}
+                            <Text className={styles.sessionType} type="secondary">
+                              {session.group ? 'Group Session' : '1-to-1 Session'}
+                            </Text>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Card>
                   </Col>
                 )}
               </>
