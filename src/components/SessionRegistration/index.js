@@ -89,6 +89,10 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
   );
 };
 
+SessionRegistration.defaultProps = {
+  user: {}
+};
+
 SessionRegistration.propTypes = {
   onFinish: PropTypes.func.isRequired,
   showPasswordField: PropTypes.bool.isRequired,
