@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Row, Col, Button, Form, Input, Typography } from 'antd';
 
@@ -12,7 +13,7 @@ const { Title, Text } = Typography;
 const { Item } = Form;
 const { Password } = Input;
 
-const SessionRegistration = ({ onFinish, showPasswordField, user }) => {
+const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPassword }) => {
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
@@ -51,15 +52,15 @@ const SessionRegistration = ({ onFinish, showPasswordField, user }) => {
           >
             <Item label="Name" className={styles.nameInputWrapper}>
               <Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-                <Input placeholder="First Name" />
+                <Input placeholder="First Name" disabled={showPasswordField} />
               </Item>
               <Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-                <Input placeholder="Last Name" />
+                <Input placeholder="Last Name" disabled={showPasswordField} />
               </Item>
             </Item>
 
             <Item className={styles.emailInput} label="Email" name="email" rules={validationRules.emailValidation}>
-              <Input placeholder="Enter your email" />
+              <Input placeholder="Enter your email" disabled={showPasswordField} />
             </Item>
 
             {showPasswordField && (
@@ -73,11 +74,30 @@ const SessionRegistration = ({ onFinish, showPasswordField, user }) => {
                 Register
               </Button>
             </Item>
+
+            {showPasswordField && (
+              <Item {...sessionRegistrationTailLayout}>
+                <a href onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                  Set a new password
+                </a>
+              </Item>
+            )}
           </Form>
         </Col>
       </Row>
     </div>
   );
+};
+
+SessionRegistration.defaultProps = {
+  user: {}
+};
+
+SessionRegistration.propTypes = {
+  onFinish: PropTypes.func.isRequired,
+  showPasswordField: PropTypes.bool.isRequired,
+  user: PropTypes.object,
+  onSetNewPassword: PropTypes.func.isRequired,
 };
 
 export default SessionRegistration;
