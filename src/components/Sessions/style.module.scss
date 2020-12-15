@@ -45,13 +45,6 @@
     width: 100%;
   }
 }
-.defaultImage {
-  img {
-    border-radius: 5px;
-    width: 100px;
-    max-width: 350px;
-  }
-}
 .eventBoxWrap {
   background: map-get($colors, $key: 'AliceBlue');
   border: 2px solid map-get($colors, $key: 'WhiteSmoke2');
