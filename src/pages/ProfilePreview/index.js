@@ -130,6 +130,7 @@ const ProfilePreview = ({ username = null }) => {
       <div className={styles.imageWrapper}>
         <div className={styles.coverImageWrapper}>
           <Image
+            preview={false}
             width={coverImage ? '100%' : 200}
             height={300}
             className={styles.coverImage}
@@ -139,6 +140,7 @@ const ProfilePreview = ({ username = null }) => {
         </div>
 
         <Image
+          preview={false}
           className={isMobileDevice ? styles.profileImageSmall : styles.profileImage}
           width={isMobileDevice ? 80 : 120}
           height={isMobileDevice ? 80 : 120}
