@@ -1,7 +1,9 @@
+import config from 'config';
+
 function initFreshChatWidget(userData = null) {
   let freshChatConfig = {
-    token: 'a30f40c7-e40a-4a1f-ade9-c66ee65c372d',
-    host: 'https://wchat.in.freshchat.com',
+    token: config.freshChat.appToken,
+    host: config.freshChat.hostUrl,
   };
 
   if (userData) {
@@ -26,7 +28,7 @@ export const initializeFreshChat = (userData = null) => {
     let element = document.createElement('script');
     element.id = 'freshchat-js-sdk';
     element.async = !0;
-    element.src = 'https://wchat.in.freshchat.com/js/widget.js';
+    element.src = `${config.freshChat.hostUrl}/js/widget.js`;
     element.onload = () => {
       initFreshChatWidget(userData);
     };
