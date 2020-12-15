@@ -22,7 +22,7 @@ import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
 
-const reservedDomainName = ['app', 'localhost'];
+const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 const { Title } = Typography;
 const {
   formatDate: { getTimeDiff },
@@ -79,6 +79,7 @@ const SessionDetails = ({ match, history }) => {
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
+        createOrder();
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
@@ -154,6 +155,20 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
+  const sendNewPasswordEmail = async (email) => {
+    try {
+      setIsLoading(true);
+      const { status } = await apis.user.sendNewPasswordEmail({ email });
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        message.success('Email sent successfully.');
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       <Row justify="space-between" className={styles.mt50}>
@@ -207,7 +222,12 @@ const SessionDetails = ({ match, history }) => {
         </Col>
         <Col xs={24} lg={15} className={styles.mt50}>
           {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
-            <SessionRegistration user={currentUser} showPasswordField={showPasswordField} onFinish={onFinish} />
+            <SessionRegistration
+              user={currentUser}
+              showPasswordField={showPasswordField}
+              onFinish={onFinish}
+              onSetNewPassword={sendNewPasswordEmail}
+            />
           )}
         </Col>
       </Row>
