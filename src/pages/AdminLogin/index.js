@@ -40,7 +40,6 @@ const AdminLogin = ({ history }) => {
   const onFinish = async (values) => {
     try {
       setIsLoading(true);
-      console.log(values);
 
       const { data } = await apis.admin.login(values);
 
