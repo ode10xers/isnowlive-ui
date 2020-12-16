@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
-import { Card, Image, Row, Col, Typography, Empty } from 'antd';
+import ReactHtmlParser from 'react-html-parser';
+import { Card, Image, Row, Col, Typography, Empty, Button } from 'antd';
 
 import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
-const DefaultImage = require('assets/images/fallbackimage.png');
+const DefaultImage = require('assets/images/greybg.jpg');
 
 const { Text, Title, Paragraph } = Typography;
 const {
@@ -17,6 +18,13 @@ const {
 const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
+  const [sessionCount, setSessionCount] = useState(4);
+
+  const showMore = () => {
+    if (sessionCount <= sessions.length) {
+      setSessionCount(sessionCount + 4);
+    }
+  };
 
   const eventSchedule = (session) => {
     return (
@@ -52,13 +60,13 @@ const Sessions = ({ sessions, username }) => {
 
   return (
     <div className={styles.box}>
-      <Row>
+      <Row justify="space-around">
         {sessions && sessions.length ? (
-          sessions.map((session) => {
-            return (
-              <>
+          <>
+            {sessions.slice(0, sessionCount).map((session) => (
+              <div key={session.id}>
                 {session.name && (
-                  <Col key={session.id} xs={24}>
+                  <Col xs={24}>
                     <Card
                       hoverable
                       className={styles.card}
@@ -66,22 +74,23 @@ const Sessions = ({ sessions, username }) => {
                       bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
                     >
                       <Row>
-                        <Col>
+                        <Col xs={24} md={8} lg={8}>
                           <Image
+                            preview={false}
                             height={100}
                             className={styles.cardImage}
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         </Col>
-                        <Col xs={24} md={10} lg={12}>
+                        <Col xs={24} md={8} lg={10}>
                           <div className={styles.wrapper}>
                             <Title className={styles.title} level={5}>
                               {session.name}
                             </Title>
-                            <Paragraph ellipsis={{ rows: 3 }}>{session?.description}</Paragraph>
+                            <Paragraph ellipsis={{ rows: 3 }}>{ReactHtmlParser(session?.description)}</Paragraph>
                           </div>
                         </Col>
-                        <Col xs={24} md={4}>
+                        <Col xs={24} md={8} lg={6}>
                           <div className={styles.wrapper}>
                             {session.session_date && eventSchedule(session)}
                             <Text className={styles.sessionType} type="secondary">
@@ -93,9 +102,16 @@ const Sessions = ({ sessions, username }) => {
                     </Card>
                   </Col>
                 )}
-              </>
-            );
-          })
+              </div>
+            ))}
+            {sessionCount < sessions.length && (
+              <Col span={24} className={styles.textAlignCenter}>
+                <Button onClick={() => showMore()} type="primary">
+                  Show more
+                </Button>
+              </Col>
+            )}
+          </>
         ) : (
           <Col span={24}>
             <Empty description={false} />
