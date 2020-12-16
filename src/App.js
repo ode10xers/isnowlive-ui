@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
 import { getLocalUserDetails } from 'utils/storage';
+import { useGlobalContext } from 'services/globalContext';
+import { initializeFreshChat } from 'services/integrations/fresh-chat';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -36,6 +38,14 @@ const PrivateRoute = ({ ...rest }) => {
 };
 
 function App() {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
+  useEffect(() => {
+    initializeFreshChat(userDetails);
+  }, [userDetails]);
+
   return (
     <Router>
       <Switch>
