@@ -14,6 +14,7 @@ import LiveStream from 'pages/LiveStream';
 import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
+import AdminLogin from 'pages/AdminLogin';
 import Session from 'pages/Session';
 import SessionDetails from 'pages/SessionDetails';
 import CreatorDashboard from 'pages/CreatorDashboard';
@@ -57,6 +58,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
+        <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.createPassword} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.emailVerification} component={EmailVerification} />

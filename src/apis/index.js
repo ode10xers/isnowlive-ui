@@ -1,6 +1,9 @@
 import http from 'services/http';
 
 export default {
+  admin: {
+    login: (payload) => http.post('/auth/login/admin', payload),
+  },
   user: {
     login: (payload) => http.post('/auth/login', payload),
     signup: (payload) => http.post('/user', payload),

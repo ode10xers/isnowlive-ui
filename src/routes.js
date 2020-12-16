@@ -2,6 +2,7 @@ const Routes = {
   root: '/',
   login: '/login',
   signup: '/signup',
+  adminLogin: '/admin',
   passwordVerification: '/password/verify/:token',
   emailVerification: '/email/verify/:token',
   createPassword: '/password/create',

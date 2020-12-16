@@ -50,8 +50,11 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'SET_USER_DETAILS', payload: { userDetails } });
   }
 
-  function logOut(history) {
-    history.push(Routes.login);
+  function logOut(history, fromAdmin = false) {
+    if (!fromAdmin) {
+      history.push(Routes.login);
+    }
+
     dispatch({ type: 'LOG_OUT' });
     localStorage.removeItem('user-details');
     localStorage.removeItem('session-token');
