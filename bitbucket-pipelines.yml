@@ -12,17 +12,17 @@ pipelines:
             - npm
           script:
             - npm install --cache .npmcache
-            - npm run build
+            - npm run build:prod
           artifacts:
             - build/**
-      - step :
+      - step:
           trigger: manual
-          name : deploy to prod
+          name: deploy to prod
           image: atlassian/pipelines-awscli:latest
           deployment: production
           script:
-            - aws s3 sync build/ s3://${S3_BUCKET} --region me-south-1 --delete
-            - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
+            - aws s3 sync build/ s3://${PD_PROD_S3_BUCKET} --region ${PD_PROD_AWS_S3_REGION} --delete
+            - aws cloudfront create-invalidation --distribution-id ${PD_PROD_CLOUDFRONT_ID} --paths "/*"
     develop:
       - step:
           name: Build
@@ -40,10 +40,8 @@ pipelines:
           image: atlassian/pipelines-awscli:latest
           deployment: staging
           script:
-            - aws s3 sync build/ s3://${S3_BUCKET} --region me-south-1 --delete
+            - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
-
-
   pull-requests:
     '**':
       - step:
@@ -55,4 +53,3 @@ pipelines:
           script:
             - npm install --cache .npmcache
             - npm run build
-

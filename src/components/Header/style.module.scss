@@ -1,0 +1,40 @@
+@import '../../styles/variables.scss';
+
+.headerContainer {
+  height: 50px;
+  padding: 5px;
+}
+.navItemWrapper {
+  text-align: end;
+}
+.navItem {
+  cursor: pointer;
+}
+.navItemIcon {
+  margin-right: 5px;
+}
+.logo {
+  height: 40px;
+  margin-left: 5px;
+}
+.isActiveNavItem {
+  color: map-get($colors, 'DodgerBlue');
+}
+.logout {
+  margin-left: 100px;
+}
+@media (max-width: 768px) {
+  .navItemWrapper {
+    text-align: center;
+  }
+  .headerContainer {
+    height: 90px;
+    padding: 5px;
+  }
+  .logoWrapper {
+    text-align: center;
+  }
+  .logout {
+    margin-left: 10px;
+  }
+}

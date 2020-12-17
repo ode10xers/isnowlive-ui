@@ -1,0 +1,66 @@
+@import '../../styles/variables.scss';
+
+.slot {
+  vertical-align: baseline;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0px;
+  padding: 0px;
+}
+.notesMonth {
+  text-align: center;
+  font-size: 28px;
+  section {
+    font-size: 28px;
+  }
+}
+.checkboxs {
+  margin-bottom: 10px;
+  label {
+    width: 100%;
+  }
+}
+.inline {
+  display: flex;
+}
+.badge {
+  position: absolute !important;
+  top: -10px;
+  right: -5px;
+  z-index: 1;
+  > .ant-badge-count {
+    background: map-get($colors, $key: 'KellyGreen') !important;
+  }
+}
+.badgeLg {
+  margin-top: 10px !important;
+  padding-right: 5px !important;
+  :global {
+    .ant-badge-count {
+      background: map-get($colors, $key: 'KellyGreen') !important;
+    }
+  }
+}
+.titlePrefix {
+  display: inline;
+}
+.slotTitle {
+  display: inline;
+}
+@media (max-width: 768px) {
+  .modal {
+    :global {
+      .ant-modal-body {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    }
+  }
+  .titlePrefix {
+    display: block;
+  }
+  .slotTitle {
+    display: block;
+  }
+}

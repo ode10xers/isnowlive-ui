@@ -1,0 +1,19 @@
+@import '../../../styles/variables.scss';
+
+.actionButton {
+  margin-top: 10px;
+}
+.editButton {
+  background-color: map-get($colors, $key: 'Pumpkin') !important;
+  color: map-get($colors, $key: 'White') !important;
+}
+.emailButton {
+  background-color: map-get($colors, $key: 'DarkGray1') !important;
+  color: map-get($colors, $key: 'White') !important;
+}
+@media (max-width: 768px) {
+  .headButton {
+    margin-top: 10px;
+    margin-left: 15px;
+  }
+}

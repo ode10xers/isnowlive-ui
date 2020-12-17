@@ -1,0 +1,59 @@
+@import '../../styles/variables.scss';
+
+.card {
+  margin: 10px !important;
+  cursor: pointer;
+  box-shadow: 0 7px 30px -10px rgba(150, 170, 180, 0.5);
+  border-radius: 6px !important;
+}
+.title {
+  max-width: 200px;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+}
+.wrapper {
+  padding-left: 10px;
+}
+.eventBox {
+  padding: 10px;
+  text-align: center;
+  width: 50px;
+}
+.eventBox2 {
+  padding: 10px;
+  text-align: start;
+  background: map-get($colors, $key: 'White');
+}
+.text {
+  display: block;
+  color: map-get($colors, $key: 'NavyBlue') !important;
+  font-size: 20px;
+}
+.subtext {
+  display: block;
+  color: map-get($colors, $key: 'NavyBlue') !important;
+  font-size: 10px;
+}
+.box {
+  background: map-get($colors, $key: 'White1');
+  border-radius: 6px;
+  padding: 20px;
+}
+.cardImage {
+  img {
+    border-radius: 5px;
+    width: 100%;
+  }
+}
+.eventBoxWrap {
+  background: map-get($colors, $key: 'AliceBlue');
+  border: 2px solid map-get($colors, $key: 'WhiteSmoke2');
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+.sessionType {
+  color: map-get($colors, $key: 'EasternBlue') !important;
+  background: map-get($colors, $key: 'PaleCornflowerBlue');
+  border-radius: 8px;
+  padding: 10px;
+}

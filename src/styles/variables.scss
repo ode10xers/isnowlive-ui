@@ -1,0 +1,96 @@
+@import './colors.scss';
+
+$spacing: (
+  '5': 5px,
+  '10': 10px,
+  '15': 15px,
+  '20': 20px,
+  '30': 30px,
+  '40': 40px,
+  '50': 50px,
+);
+
+.w100 {
+  width: 100%;
+}
+
+// MARGIN
+.m10 {
+  margin: map-get($spacing, '10');
+}
+.m20 {
+  margin: map-get($spacing, '20');
+}
+.ml5 {
+  margin-left: map-get($spacing, '5');
+}
+.ml10 {
+  margin-left: map-get($spacing, '10');
+}
+.ml20 {
+  margin-left: map-get($spacing, '20');
+}
+.ml30 {
+  margin-left: map-get($spacing, '30');
+}
+.mt5 {
+  margin-top: map-get($spacing, '5');
+}
+.mb5 {
+  margin-bottom: map-get($spacing, '5');
+}
+.mt10 {
+  margin-top: map-get($spacing, '10');
+}
+.mt20 {
+  margin-top: map-get($spacing, '20');
+}
+.mt30 {
+  margin-top: map-get($spacing, '30');
+}
+.mb10 {
+  margin-bottom: map-get($spacing, '10');
+}
+.mb20 {
+  margin-bottom: map-get($spacing, '20');
+}
+.mt50 {
+  margin-top: map-get($spacing, '50');
+}
+.mb50 {
+  margin-bottom: map-get($spacing, '50');
+}
+.pl10 {
+  padding-left: map-get($spacing, '10');
+}
+.p50 {
+  padding: map-get($spacing, '50');
+}
+.pt50 {
+  padding-top: map-get($spacing, '50');
+}
+.pb50 {
+  padding-bottom: map-get($spacing, '50');
+}
+.textAlignLeft {
+  text-align: left;
+}
+.textAlignCenter {
+  text-align: center;
+}
+.headButton {
+  margin-top: 10px;
+  margin-left: 15px;
+}
+.bgWhite {
+  :global {
+    .ant-form-item-control-input {
+      background: map-get($colors, $key: 'White');
+    }
+  }
+}
+.box {
+  background: map-get($colors, $key: 'White1');
+  border-radius: 6px;
+  padding: 15px;
+}

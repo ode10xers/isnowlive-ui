@@ -1,0 +1,20 @@
+@import '../../styles/variables.scss';
+
+.imageWrapper {
+  position: relative;
+  height: 315px;
+}
+.coverImage {
+  & > div {
+    width: 100% !important;
+    height: 300px !important;
+  }
+}
+.scheduleCount {
+  color: map-get($colors, $key: 'DodgerBlue') !important;
+}
+@media (max-width: 768px) {
+  .publishBtnWrapper {
+    text-align: center;
+  }
+}
