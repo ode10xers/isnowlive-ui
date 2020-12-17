@@ -1,0 +1,10 @@
+@import '../../../styles/variables.scss';
+.box2 {
+  border: 1px solid map-get($colors, $key: 'Gainsboro');
+  background: map-get($colors, $key: 'White') !important;
+  box-sizing: border-box;
+  border-radius: 6px;
+  padding: 15px;
+  max-width: 300px;
+  margin-top: 10px;
+}

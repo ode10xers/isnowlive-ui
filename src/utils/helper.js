@@ -142,3 +142,12 @@ export const scrollToErrorField = (errorFields) => {
   document.getElementById(errorFields[0].name).focus();
   document.getElementById(errorFields[0].name).scrollIntoView();
 };
+
+export const paymentStatus = (status) => {
+  switch (status) {
+    case 'PAYMENT_COMPLETED':
+      return 'Paid';
+    default:
+      return 'Unpaid';
+  }
+};

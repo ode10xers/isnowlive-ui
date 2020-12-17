@@ -90,7 +90,7 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
 };
 
 SessionRegistration.defaultProps = {
-  user: {}
+  user: {},
 };
 
 SessionRegistration.propTypes = {
