@@ -12,7 +12,7 @@ pipelines:
             - npm
           script:
             - npm install --cache .npmcache
-            - npm run build
+            - npm run build:prod
           artifacts:
             - build/**
       - step:
