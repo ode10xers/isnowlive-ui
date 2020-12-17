@@ -16,7 +16,6 @@ pipelines:
           artifacts:
             - build/**
       - step:
-          trigger: manual
           name: deploy to prod
           image: atlassian/pipelines-awscli:latest
           deployment: production
