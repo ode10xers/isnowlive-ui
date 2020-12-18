@@ -26,6 +26,7 @@ export default {
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
     },
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
+    verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>

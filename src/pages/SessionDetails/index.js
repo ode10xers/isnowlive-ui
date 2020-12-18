@@ -133,7 +133,6 @@ const SessionDetails = ({ match, history }) => {
         })
 
         if (isAPISuccess(status)) {
-
           const stripe = await stripePromise;
     
           const result = await stripe.redirectToCheckout({
