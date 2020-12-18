@@ -97,66 +97,27 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  // Order Flow
-  /* 
-  1. {{host}}/secure/customer/orders -
-  
-
-  2. {{host}}/secure/customer/payment/session
-  Order_id
-
-  Response - {
-    "payment_gateway_session_id": "cs_test_a18JsOBX9cbEdugIearrPWEe4h4jNkWENLAt3wfnz8TqETjgFoqeWRKxYZ",
-    "transaction_id": "7eacd479-c946-4523-b7b2-2f71fc75de43",
-    "order_id": "UAnMXHRii0LDItyM",
-    "status": "unpaid"
-  }
-
-
-  3. Open the Stripe with charge_id
-
-  4. On success - stripe will redirect to --> https://app.stage.passion.do/stripe/payment/success?orderId={order}&chargeId={chargeId}
-
-  5. Make API call - /secure/creator/payment/verify
-    {
-      "order_id": "DrX1aJUYgrLfNTrB",
-      "payment_gateway_session_id": "cs_test_a18pE9Olcg7Xa89zQbsrazO887wE6bA7L6ls3t6EmlLONIIiuTE1sKBEKb"
-    }
-
-  */
-
   const initiatePaymentForOrder = async (orderDetails) => {
-    if (orderDetails.payment_required) {
-      try {
-        const { data, status } = await apis.payment.createPaymentSessionForOrder({
-          order_id: orderDetails.order_id,
-        })
+    try {
+      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+        order_id: orderDetails.order_id,
+      })
 
-        if (isAPISuccess(status)) {
-          const stripe = await stripePromise;
-    
-          const result = await stripe.redirectToCheckout({
-            sessionId: data.payment_gateway_session_id,
-          });
-    
-          if (result.error) {
-            // If `redirectToCheckout` fails due to a browser or network
-            // error, display the localized error message to your customer
-            // using `result.error.message`.
-            // TODO: Payment Failure popup
-          }
+      if (isAPISuccess(status)) {
+        const stripe = await stripePromise;
+
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.payment_gateway_session_id,
+        });
+
+        if (result.error) {
+          message.error('Cannot initiate payment at this time, please try again...')
         }
-  
-      } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong');
       }
-
-    } else {
-      Modal.success({
-        content: 'Session is been booked successfully',
-        onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-      });
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong');
     }
+
   }
 
 
@@ -167,10 +128,15 @@ const SessionDetails = ({ match, history }) => {
         inventory_id: parseInt(match.params.inventory_id),
       });
 
-      // 
-
       if (isAPISuccess(status)) {
-        initiatePaymentForOrder(data);
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          Modal.success({
+            content: 'Session is been booked successfully',
+            onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);

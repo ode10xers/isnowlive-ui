@@ -8,7 +8,6 @@ import Routes from 'routes';
 import { isAPISuccess } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
 
-
 const PaymentVerification = () => {
   const location = useLocation();
   const history = useHistory();
@@ -21,13 +20,11 @@ const PaymentVerification = () => {
       const verifyPayment = async () => {
         setIsLoading(true);
         try {
-          const { data, status } = await apis.payment.verifyPaymentForOrder({
+          const { status } = await apis.payment.verifyPaymentForOrder({
             order_id,
             transaction_id,
           });
 
-          console.log('data', data);
-          
           if (isAPISuccess(status)) {
             message.success('Order booked successfully.')
             history.push(Routes.attendeeDashboard.rootPath);
@@ -46,13 +43,11 @@ const PaymentVerification = () => {
     }
   }, [order_id, transaction_id, history]);
 
-
   return (
     <Row justify="center">
       <Loader loading={isLoading} size="large" text="Verifying order payment"></Loader>
     </Row>
   )
-
 }
 
 export default PaymentVerification;
