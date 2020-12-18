@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -47,6 +47,8 @@ const SessionsInventories = ({ match }) => {
             inventory_id: i?.inventory_id,
             session_id: i.session_id,
             max_participants: i.max_participants,
+            currency: i.currency || 'SGD',
+            refund_amount: i.refund_amount || 0,
           }))
         );
       }
@@ -134,6 +136,33 @@ const SessionsInventories = ({ match }) => {
                 </Button>
               </Col>
             )}
+
+            {!isPast && (
+              <Col md={24} lg={24} xl={8}>
+                <Popconfirm
+                  arrowPointAtCenter
+                  placement="topRight"
+                  title={
+                    <Text>
+                      Do you want to refund this session? <br />
+                      You will get{' '}
+                      <b>
+                        {' '}
+                        {record.currency} {record.refund_amount}{' '}
+                      </b>{' '}
+                      back.
+                    </Text>
+                  }
+                  onConfirm={() => {
+                    console.log('Refunded');
+                  }}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button type="link">Cancel</Button>
+                </Popconfirm>
+              </Col>
+            )}
           </Row>
         );
       },
@@ -166,6 +195,32 @@ const SessionsInventories = ({ match }) => {
               <Button type="link" disabled={!item.join_url} onClick={() => window.open(item.join_url)}>
                 Join
               </Button>
+            )}
+          </>,
+          <>
+            {!isPast && (
+              <Popconfirm
+                arrowPointAtCenter
+                placement="topRight"
+                title={
+                  <Text>
+                    Do you want to refund this session? <br />
+                    You will get{' '}
+                    <b>
+                      {' '}
+                      {item.currency} {item.refund_amount}{' '}
+                    </b>{' '}
+                    back.
+                  </Text>
+                }
+                onConfirm={() => {
+                  console.log('Refunded');
+                }}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button type="link">Cancel</Button>
+              </Popconfirm>
             )}
           </>,
         ]}
