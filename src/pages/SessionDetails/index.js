@@ -3,7 +3,9 @@ import { Row, Col, Image, message, Typography, Modal } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
+import { loadStripe } from '@stripe/stripe-js';
 
+import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -21,6 +23,8 @@ import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
+
+const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 const { Title } = Typography;
@@ -40,7 +44,7 @@ const SessionDetails = ({ match, history }) => {
     async (username, inventory_id) => {
       try {
         const inventoryDetails = await apis.session.getPublicInventoryById(inventory_id);
-        const userDetails = await apis.user.getProfileByUsername(username);
+        const userDetails = await apis.user.getProfileByUsername('rahula');
         setSession(inventoryDetails.data);
         setCreator(userDetails.data);
         setIsLoading(false);
@@ -93,17 +97,81 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
+  // Order Flow
+  /* 
+  1. {{host}}/secure/customer/orders -
+  
+
+  2. {{host}}/secure/customer/payment/session
+  Order_id
+
+  Response - {
+    "payment_gateway_session_id": "cs_test_a18JsOBX9cbEdugIearrPWEe4h4jNkWENLAt3wfnz8TqETjgFoqeWRKxYZ",
+    "transaction_id": "7eacd479-c946-4523-b7b2-2f71fc75de43",
+    "order_id": "UAnMXHRii0LDItyM",
+    "status": "unpaid"
+  }
+
+
+  3. Open the Stripe with charge_id
+
+  4. On success - stripe will redirect to --> https://app.stage.passion.do/stripe/payment/success?orderId={order}&chargeId={chargeId}
+
+  5. Make API call - /secure/creator/payment/verify
+    {
+      "order_id": "DrX1aJUYgrLfNTrB",
+      "payment_gateway_session_id": "cs_test_a18pE9Olcg7Xa89zQbsrazO887wE6bA7L6ls3t6EmlLONIIiuTE1sKBEKb"
+    }
+
+  */
+
+  const initiatePaymentForOrder = async (orderDetails) => {
+    if (orderDetails.payment_required) {
+      try {
+        const { data, status } = await apis.payment.createPaymentSessionForOrder({
+          order_id: orderDetails.order_id,
+        })
+
+        if (isAPISuccess(status)) {
+
+          const stripe = await stripePromise;
+    
+          const result = await stripe.redirectToCheckout({
+            sessionId: data.payment_gateway_session_id,
+          });
+    
+          if (result.error) {
+            // If `redirectToCheckout` fails due to a browser or network
+            // error, display the localized error message to your customer
+            // using `result.error.message`.
+            // TODO: Payment Failure popup
+          }
+        }
+  
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
+
+    } else {
+      Modal.success({
+        content: 'Session is been booked successfully',
+        onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
+      });
+    }
+  }
+
+
   const createOrder = async () => {
     try {
-      const { status } = await apis.session.createOrderForUser({
+
+      const { status, data } = await apis.session.createOrderForUser({
         inventory_id: parseInt(match.params.inventory_id),
       });
 
+      // 
+
       if (isAPISuccess(status)) {
-        Modal.success({
-          content: 'Session is been booked successfully',
-          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-        });
+        initiatePaymentForOrder(data);
       }
     } catch (error) {
       setIsLoading(false);
