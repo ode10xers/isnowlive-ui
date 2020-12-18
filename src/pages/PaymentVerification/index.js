@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
-import { message } from 'antd';
+import { message, Row } from 'antd';
 import Loader from 'components/Loader';
 import apis from 'apis';
 import Routes from 'routes';
@@ -48,7 +48,9 @@ const PaymentVerification = () => {
 
 
   return (
-    <Loader loading={isLoading} size="large" text="Verifying order payment"></Loader>
+    <Row justify="center">
+      <Loader loading={isLoading} size="large" text="Verifying order payment"></Loader>
+    </Row>
   )
 
 }
