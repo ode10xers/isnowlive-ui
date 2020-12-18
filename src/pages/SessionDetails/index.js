@@ -44,7 +44,7 @@ const SessionDetails = ({ match, history }) => {
     async (username, inventory_id) => {
       try {
         const inventoryDetails = await apis.session.getPublicInventoryById(inventory_id);
-        const userDetails = await apis.user.getProfileByUsername('rahula');
+        const userDetails = await apis.user.getProfileByUsername(username);
         setSession(inventoryDetails.data);
         setCreator(userDetails.data);
         setIsLoading(false);
