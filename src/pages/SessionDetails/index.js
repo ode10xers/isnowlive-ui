@@ -103,7 +103,7 @@ const SessionDetails = ({ match, history }) => {
         order_id: orderDetails.order_id,
       })
 
-      if (isAPISuccess(status)) {
+      if (isAPISuccess(status) && data) {
         const stripe = await stripePromise;
 
         const result = await stripe.redirectToCheckout({
@@ -128,7 +128,7 @@ const SessionDetails = ({ match, history }) => {
         inventory_id: parseInt(match.params.inventory_id),
       });
 
-      if (isAPISuccess(status)) {
+      if (isAPISuccess(status) && data) {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
