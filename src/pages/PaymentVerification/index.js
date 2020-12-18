@@ -21,7 +21,7 @@ const PaymentVerification = () => {
       const verifyPayment = async () => {
         setIsLoading(true);
         try {
-          const { data, status } = await apis.verifyPaymentForOrder({
+          const { data, status } = await apis.payment.verifyPaymentForOrder({
             order_id,
             transaction_id,
           });
