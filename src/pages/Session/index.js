@@ -55,6 +55,8 @@ const initialSession = {
   beginning: moment().startOf('day').utc().format(),
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
+  is_refundable: true,
+  hours_refund_limit: 24,
   prerequisites: '',
 };
 
@@ -66,6 +68,8 @@ const Session = ({ match, history }) => {
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
   const [isSessionFree, setIsSessionFree] = useState(false);
   const [currencyList, setCurrencyList] = useState(null);
+  const [sessionRefundable, setSessionRefundable] = useState(true);
+  const [hoursRefundLimit, setHoursRefundLimit] = useState(24);
   const [isSessionRecurring, setIsSessionRecurring] = useState(false);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
   const [session, setSession] = useState(initialSession);
@@ -82,6 +86,8 @@ const Session = ({ match, history }) => {
             ...data,
             type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
             price_type: data?.price === 0 ? 'Free' : 'Paid',
+            is_refundable: data?.is_refundable ? 'Yes' : 'No',
+            hours_refund_limit: data?.hours_refund_limit ? data?.hours_refund_limit : 24,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
           });
           setSessionImageUrl(data.session_image_url);
@@ -89,6 +95,8 @@ const Session = ({ match, history }) => {
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
+          setSessionRefundable(data?.is_refundable ? true : false);
+          setHoursRefundLimit(data?.hours_refund_limit ? data?.hours_refund_limit : 24);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setIsLoading(false);
         }
@@ -122,6 +130,8 @@ const Session = ({ match, history }) => {
         recurring: false,
         price: 10,
         currency: 'SGD',
+        is_refundable: 'Yes',
+        hours_refund_limit: 24,
       });
       setIsLoading(false);
     }
@@ -168,6 +178,15 @@ const Session = ({ match, history }) => {
     }
   };
 
+  const handleSessionRefundable = (e) => {
+    if (e.target.value === 'Yes') {
+      setSessionRefundable(true);
+    } else {
+      setSessionRefundable(false);
+      setHoursRefundLimit(24);
+    }
+  };
+
   const handleSessionRecurrance = (e) => {
     if (e.target.value === 'true') {
       setIsSessionRecurring(true);
@@ -200,6 +219,7 @@ const Session = ({ match, history }) => {
     setDeleteSlot(tempDeleteSlots);
   };
 
+  //TODO: Will have to change here to match new API payload
   const onFinish = async (values) => {
     try {
       setIsLoading(true);
@@ -408,6 +428,35 @@ const Session = ({ match, history }) => {
                   rules={validationRules.requiredValidation}
                 >
                   <InputNumber min={1} placeholder="Amount" />
+                </Form.Item>
+              </>
+            )}
+
+            {!isSessionFree && (
+              <Form.Item
+                name="is_refundable"
+                label="Refundable"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionRefundable}
+              >
+                <Radio.Group>
+                  <Radio value="Yes">Yes</Radio>
+                  <Radio value="No">no</Radio>
+                </Radio.Group>
+              </Form.Item>
+            )}
+
+            {!isSessionFree && sessionRefundable && (
+              <>
+                <Form.Item
+                  {...(!isMobileDevice && profileFormItemLayout)}
+                  label="Cancellable Before"
+                  name="hours_refund_limit"
+                  help="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
+                  rules={validationRules.requiredValidation}
+                >
+                  <InputNumber defaultValue={24} min={0} placeholder="Hours limit" />
+                  <span className="ant-form-text"> hour(s) before the session starts </span>
                 </Form.Item>
               </>
             )}
