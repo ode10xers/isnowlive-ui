@@ -320,12 +320,12 @@ const Session = ({ match, history }) => {
           </Form.Item>
 
           <Form.Item
-            className={styles.bgWhite}
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
             label="Session Description"
             name="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="Please input description" />
+            <TextEditor name="description" form={form} placeholder="  Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -345,8 +345,12 @@ const Session = ({ match, history }) => {
             />
           </Form.Item>
 
-          <Form.Item className={styles.bgWhite} label="Session Pre-requisite" name="prerequisites">
-            <TextEditor name="prerequisites" form={form} placeholder="Please input session pre-requisite" />
+          <Form.Item
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
+            label="Session Pre-requisite"
+            name="prerequisites"
+          >
+            <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
           </Form.Item>
 
           {/* ---- Session Type ---- */}
