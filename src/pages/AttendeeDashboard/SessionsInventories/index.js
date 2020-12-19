@@ -3,12 +3,11 @@ import { Row, Col, Typography, Button, Card, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
-import Routes from 'routes';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import { getDuration } from 'utils/helper';
+import { getDuration, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -47,6 +46,7 @@ const SessionsInventories = ({ match }) => {
             inventory_id: i?.inventory_id,
             session_id: i.session_id,
             max_participants: i.max_participants,
+            username: i.username,
           }))
         );
       }
@@ -71,8 +71,8 @@ const SessionsInventories = ({ match }) => {
   }, [match.params.session_type, getStaffSession]);
 
   const openSessionInventoryDetails = (item) => {
-    if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
+    if (item.username && item.inventory_id) {
+      history.push(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
     }
   };
 

@@ -153,3 +153,9 @@ export const getPaymentStatus = (status) => {
       return 'Unpaid';
   }
 };
+
+export const ZoomAuthType = {
+  OAUTH: 'OAUTH',
+  JWT: 'JWT',
+  NOT_CONNECTED: 'NOT_CONNECTED',
+};

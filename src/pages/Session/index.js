@@ -15,7 +15,7 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -237,15 +237,16 @@ const Session = ({ match, history }) => {
 
           if (isAPISuccess(newSessionResponse.status)) {
             Modal.confirm({
+              icon: <CheckCircleOutlined />,
               title: `${newSessionResponse.data.name} session successfully created`,
               className: styles.confirmModal,
-              okText: 'Add New',
-              cancelText: 'Done',
-              onOk: () => {
+              okText: 'Done',
+              cancelText: 'Add New',
+              onCancel: () => {
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
-              onCancel: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
+              onOk: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
             });
           }
         }
@@ -320,12 +321,12 @@ const Session = ({ match, history }) => {
           </Form.Item>
 
           <Form.Item
-            className={styles.bgWhite}
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
             label="Session Description"
             name="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="Please input description" />
+            <TextEditor name="description" form={form} placeholder="  Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -345,8 +346,12 @@ const Session = ({ match, history }) => {
             />
           </Form.Item>
 
-          <Form.Item className={styles.bgWhite} label="Session Pre-requisite" name="prerequisites">
-            <TextEditor name="prerequisites" form={form} placeholder="Please input session pre-requisite" />
+          <Form.Item
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
+            label="Session Pre-requisite"
+            name="prerequisites"
+          >
+            <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
           </Form.Item>
 
           {/* ---- Session Type ---- */}
