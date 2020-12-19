@@ -8,6 +8,7 @@ export default {
     hostUrl: 'https://wchat.in.freshchat.com',
   },
   stripe: {
-    secretKey: 'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
-  }
+    secretKey:
+      'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
+  },
 };

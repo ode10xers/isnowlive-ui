@@ -26,7 +26,7 @@ const PaymentVerification = () => {
           });
 
           if (isAPISuccess(status)) {
-            message.success('Order booked successfully.')
+            message.success('Order booked successfully.');
             history.push(Routes.attendeeDashboard.rootPath);
           }
           setIsLoading(false);
@@ -34,7 +34,7 @@ const PaymentVerification = () => {
           setIsLoading(false);
           message.error(error.response?.data?.message || 'Something went wrong.');
         }
-      }
+      };
       verifyPayment();
     } else {
       setIsLoading(false);
@@ -47,7 +47,7 @@ const PaymentVerification = () => {
     <Row justify="center">
       <Loader loading={isLoading} size="large" text="Verifying order payment"></Loader>
     </Row>
-  )
-}
+  );
+};
 
 export default PaymentVerification;
