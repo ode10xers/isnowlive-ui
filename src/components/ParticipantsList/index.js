@@ -15,10 +15,16 @@ const {
 const ParticipantsList = ({ participants, isPast, currency }) => {
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      width: '12%',
+      title: 'First name',
+      dataIndex: 'first_name',
+      key: 'first_name',
+      width: '6%',
+    },
+    {
+      title: 'Last name',
+      dataIndex: 'last_name',
+      key: 'last_name',
+      width: '6%',
     },
     {
       title: 'Registered on',
@@ -26,9 +32,9 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       key: 'date_registered',
       width: '12%',
       render: (record) => (
-        <div>
-          <Text className={styles.textAlignLeft}>{toLongDateWithDay(record.date_registered)}</Text>
-        </div>
+        <Text className={styles.textAlignLeft}>
+          {record?.date_registered && toLongDateWithDay(record?.date_registered)}
+        </Text>
       ),
     },
     {
@@ -36,13 +42,14 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       dataIndex: 'fee_paid',
       key: 'fee_paid',
       width: '12%',
-      render: (record) => (
-        <div>
-          <Text className={styles.textAlignLeft}>
-            {currency} {record.fee_paid}
-          </Text>
-        </div>
-      ),
+      render: (record) =>
+        record?.fee_paid && (
+          <div>
+            <Text className={styles.textAlignLeft}>
+              {currency} {record?.fee_paid}
+            </Text>
+          </div>
+        ),
     },
   ];
 
@@ -56,10 +63,10 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       </Row>
     );
     return (
-      <Card key={item.id}>
-        {layout('Name', item.name)}
-        {layout('Registered on', toLongDate(item.date_registered))}
-        {layout('Fee Paid', `${currency} ${item.fee_paid}`)}
+      <Card key={item?.id}>
+        {layout('Name', `${item?.first_name} ${item?.last_name}`)}
+        {layout('Registered on', item?.date_registered && toLongDate(item?.date_registered))}
+        {layout('Fee Paid', `${currency} ${item?.fee_paid}`)}
       </Card>
     );
   };
