@@ -15,7 +15,7 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -237,15 +237,16 @@ const Session = ({ match, history }) => {
 
           if (isAPISuccess(newSessionResponse.status)) {
             Modal.confirm({
+              icon: <CheckCircleOutlined />,
               title: `${newSessionResponse.data.name} session successfully created`,
               className: styles.confirmModal,
-              okText: 'Add New',
-              cancelText: 'Done',
-              onOk: () => {
+              okText: 'Done',
+              cancelText: 'Add New',
+              onCancel: () => {
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
-              onCancel: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
+              onOk: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
             });
           }
         }
