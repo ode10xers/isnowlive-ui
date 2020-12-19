@@ -302,17 +302,27 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
                     >
-                      {slotsList?.map((item) => (
-                        <Option
-                          value={item.value}
-                          disabled={
+                      {slotsList?.map((item) => {
+                        if (
+                          !(
                             getTimeDiff(toLocaleDate(slot.session_date), toLocaleDate(moment()), 'days') === 0 &&
                             getTimeDiff(item.value, moment(), 'minute') <= 0
-                          }
-                        >
-                          {item.label}
-                        </Option>
-                      ))}
+                          )
+                        ) {
+                          return (
+                            <Option
+                              value={item.value}
+                              disabled={
+                                getTimeDiff(toLocaleDate(slot.session_date), toLocaleDate(moment()), 'days') === 0 &&
+                                getTimeDiff(item.value, moment(), 'minute') <= 0
+                              }
+                            >
+                              {item.label}
+                            </Option>
+                          );
+                        }
+                        return null;
+                      })}
                     </Select>
                   </Col>
                   <Col xs={11} md={11}>
@@ -323,11 +333,25 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       onChange={(value) => handleSelectChange('end_time', value, index)}
                       placeholder="End time"
                     >
-                      {slotsList?.map((item) => (
-                        <Option disabled={getTimeDiff(item.value, slot.start_time, 'minute') <= 0} value={item.value}>
-                          {item.label}
-                        </Option>
-                      ))}
+                      {slotsList?.map((item) => {
+                        if (
+                          !(
+                            getTimeDiff(toLocaleDate(slot.session_date), toLocaleDate(moment()), 'days') === 0 &&
+                            getTimeDiff(item.value, moment(), 'minute') <= 0
+                          ) &&
+                          getTimeDiff(item.value, slot.start_time, 'minute') > 0
+                        ) {
+                          return (
+                            <Option
+                              disabled={getTimeDiff(item.value, slot.start_time, 'minute') <= 0}
+                              value={item.value}
+                            >
+                              {item.label}
+                            </Option>
+                          );
+                        }
+                        return null;
+                      })}
                     </Select>
                   </Col>
                   {form.length > 1 && (
