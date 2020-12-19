@@ -91,6 +91,7 @@ const Profile = () => {
     if (isPublicUrlAvaiable) {
       updateProfileDetails(values);
     } else {
+      setIsLoading(false);
       message.error('Please enter valid username.');
     }
   };
