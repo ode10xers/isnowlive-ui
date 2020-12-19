@@ -4,6 +4,7 @@ import { Typography, Card, Row, Col } from 'antd';
 import Table from 'components/Table';
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
+import { getPaymentStatus } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -15,41 +16,63 @@ const {
 const ParticipantsList = ({ participants, isPast, currency }) => {
   const columns = [
     {
-      title: 'First name',
-      dataIndex: 'first_name',
-      key: 'first_name',
-      width: '6%',
-    },
-    {
-      title: 'Last name',
-      dataIndex: 'last_name',
-      key: 'last_name',
-      width: '6%',
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: '12%',
     },
     {
       title: 'Registered on',
-      dataIndex: 'date_registered',
-      key: 'date_registered',
+      dataIndex: 'booking_time',
+      key: 'booking_time',
       width: '12%',
-      render: (record) => (
-        <Text className={styles.textAlignLeft}>
-          {record?.date_registered && toLongDateWithDay(record?.date_registered)}
-        </Text>
+      render: (text, record, index) => (
+        <Text className={styles.textAlignLeft}>{record?.booking_time && toLongDateWithDay(record?.booking_time)}</Text>
       ),
     },
     {
-      title: 'Fee Paid',
-      dataIndex: 'fee_paid',
-      key: 'fee_paid',
+      title: 'Total Fee Paid',
+      dataIndex: 'total_price',
+      key: 'total_price',
       width: '12%',
-      render: (record) =>
-        record?.fee_paid && (
-          <div>
-            <Text className={styles.textAlignLeft}>
-              {currency} {record?.fee_paid}
-            </Text>
-          </div>
+      render: (text, record, index) =>
+        record?.total_price && (
+          <Text className={styles.textAlignLeft}>
+            {currency} {record?.total_price}
+          </Text>
         ),
+    },
+    {
+      title: 'Net Price',
+      dataIndex: 'net_price',
+      key: 'net_price',
+      width: '12%',
+      render: (text, record, index) =>
+        record?.net_price && (
+          <Text className={styles.textAlignLeft}>
+            {currency} {record?.net_price}
+          </Text>
+        ),
+    },
+    {
+      title: 'Platform Fees',
+      dataIndex: 'platform_fees',
+      key: 'platform_fees',
+      width: '12%',
+      render: (text, record, index) =>
+        record?.platform_fees && (
+          <Text className={styles.textAlignLeft}>
+            {currency} {record?.platform_fees}
+          </Text>
+        ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: '12%',
+      render: (text, record, index) =>
+        record?.status && <Text className={styles.textAlignLeft}>{getPaymentStatus(record?.status)}</Text>,
     },
   ];
 
@@ -63,10 +86,13 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       </Row>
     );
     return (
-      <Card key={item?.id}>
-        {layout('Name', `${item?.first_name} ${item?.last_name}`)}
-        {layout('Registered on', item?.date_registered && toLongDate(item?.date_registered))}
-        {layout('Fee Paid', `${currency} ${item?.fee_paid}`)}
+      <Card className={styles.card} key={item?.id}>
+        {layout('Name', item?.name)}
+        {layout('Registered on', item?.booking_time && toLongDate(item?.booking_time))}
+        {layout('Total Fee Paid', `${currency} ${item?.total_price}`)}
+        {layout('Net Price', `${currency} ${item?.net_price}`)}
+        {layout('Platform Fees', `${currency} ${item?.platform_fees}`)}
+        {layout('Status', getPaymentStatus(item?.status))}
       </Card>
     );
   };
