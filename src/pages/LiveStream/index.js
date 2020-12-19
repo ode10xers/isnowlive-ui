@@ -64,7 +64,11 @@ const LiveStream = () => {
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         // setTimeout is used for better user experince suggest by Rahul
         setTimeout(() => {
-          history.push(Routes.session);
+          if (isOnboarding) {
+            history.push(Routes.session);
+          } else {
+            history.push(Routes.creatorDashboard.rootPath);
+          }
         }, 2000);
       }
     } catch (error) {
