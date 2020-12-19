@@ -25,7 +25,8 @@ const Routes = {
     profile: '/profile',
     editProfile: '/profile/edit',
     livestream: '/livestream',
-    paymentAccount: '/payment',
+    paymentAccount: '/payments',
+    sessionEarnings: '/payments/:inventory_id',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',

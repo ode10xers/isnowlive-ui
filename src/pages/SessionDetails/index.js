@@ -101,7 +101,7 @@ const SessionDetails = ({ match, history }) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.order_id,
-      })
+      });
 
       if (isAPISuccess(status) && data) {
         const stripe = await stripePromise;
@@ -111,19 +111,16 @@ const SessionDetails = ({ match, history }) => {
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...')
+          message.error('Cannot initiate payment at this time, please try again...');
         }
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
-
-  }
-
+  };
 
   const createOrder = async () => {
     try {
-
       const { status, data } = await apis.session.createOrderForUser({
         inventory_id: parseInt(match.params.inventory_id),
       });
