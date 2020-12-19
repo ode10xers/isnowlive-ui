@@ -11,7 +11,7 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ShowAmount from 'components/ShowAmount';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, paymentStatus } from 'utils/helper';
+import { isAPISuccess, getPaymentStatus } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -54,43 +54,27 @@ const SessionEarnings = ({ match }) => {
     }
   }, [getEarningData, history, match.params.inventory_id]);
 
-  const showSessionName = () => (
+  const showSessionLayout = (title, details) => (
     <div className={styles.box2}>
       <Row>
         <Col xs={24}>
-          <Text type="secondary">Session Name</Text>
+          <Text type="secondary">{title}</Text>
         </Col>
-        <Col xs={24}>
-          <Title level={3}>{earnings?.name}</Title>
-        </Col>
+        <Col xs={24}>{details}</Col>
       </Row>
     </div>
   );
 
-  const showSessionDate = () => (
-    <div className={styles.box2}>
-      <Row>
-        <Col xs={24}>
-          <Text type="secondary">Session Day and Date</Text>
-        </Col>
-        <Col xs={24}>
-          <Title level={3}>{toLongDateWithDay(earnings?.session_date)}</Title>
-        </Col>
-      </Row>
-    </div>
+  const showSessionName = showSessionLayout('Session Name', <Title level={3}>{earnings?.name}</Title>);
+
+  const showSessionDate = showSessionLayout(
+    'Session Day and Date',
+    <Title level={3}>{toLongDateWithDay(earnings?.session_date)}</Title>
   );
 
-  const showSessionEarning = () => (
-    <div className={styles.box2}>
-      <Row>
-        <Col xs={24}>
-          <Text type="secondary">Total Earning</Text>
-        </Col>
-        <Col xs={24}>
-          <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency} />
-        </Col>
-      </Row>
-    </div>
+  const showSessionEarning = showSessionLayout(
+    'Total Earning',
+    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency} />
   );
 
   let sessionColumns = [
@@ -145,7 +129,7 @@ const SessionEarnings = ({ match }) => {
       dataIndex: 'status',
       key: 'status',
       width: '5%',
-      render: (text, record) => <Text>{paymentStatus(record.status)}</Text>,
+      render: (text, record) => <Text>{getPaymentStatus(record.status)}</Text>,
     },
   ];
 
@@ -180,7 +164,7 @@ const SessionEarnings = ({ match }) => {
             {item.currency} {item.net_price}
           </Text>
         )}
-        {layout('Status', <Text>{paymentStatus(item.status)}</Text>)}
+        {layout('Status', <Text>{getPaymentStatus(item.status)}</Text>)}
       </Card>
     );
   };
@@ -204,13 +188,13 @@ const SessionEarnings = ({ match }) => {
             <Title level={5}>Session Earning Details</Title>
           </Col>
           <Col xs={24} md={8}>
-            {showSessionName()}
+            {showSessionName}
           </Col>
           <Col xs={24} md={8}>
-            {showSessionDate()}
+            {showSessionDate}
           </Col>
           <Col xs={24} md={8}>
-            {showSessionEarning()}
+            {showSessionEarning}
           </Col>
         </Row>
         <Row className={styles.mt50}>

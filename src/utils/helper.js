@@ -143,10 +143,12 @@ export const scrollToErrorField = (errorFields) => {
   document.getElementById(errorFields[0].name).scrollIntoView();
 };
 
-export const paymentStatus = (status) => {
+export const getPaymentStatus = (status) => {
   switch (status) {
     case 'PAYMENT_COMPLETED':
       return 'Paid';
+    case 'CANCELLED':
+      return 'Cancel';
     default:
       return 'Unpaid';
   }

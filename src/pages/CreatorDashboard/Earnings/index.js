@@ -32,8 +32,11 @@ const Earnings = () => {
 
   const getEarningData = async () => {
     try {
-      const creatorEarningResponse = await apis.session.getCreatorEarnings(1, 50);
-      const creatorBalanceResponse = await apis.session.getCreatorBalance();
+      setIsLoading(true);
+      let [creatorEarningResponse, creatorBalanceResponse] = await Promise.all([
+        apis.session.getCreatorEarnings(1, 50),
+        apis.session.getCreatorBalance(),
+      ]);
       if (isAPISuccess(creatorEarningResponse.status) && isAPISuccess(creatorBalanceResponse.status)) {
         setIsLoading(false);
         setSessions(creatorEarningResponse.data);
@@ -62,92 +65,66 @@ const Earnings = () => {
     }
   };
 
-  const availabeForPayout = () => {
-    return (
-      <div className={styles.box1}>
-        <Row>
-          <Col xs={24}>
-            <Text className={styles.box1Text}>Availabe for Payout</Text>
-          </Col>
-          <Col xs={24} sm={12}>
-            <ShowAmount amount={balance?.available} currency={balance?.currency} />
-          </Col>
-          <Col xs={24} xl={12}>
-            {balance === null || balance?.available === 0 ? (
-              <Button disabled type="primary">
-                Request Payout
+  const availabeForPayout = (
+    <div className={styles.box1}>
+      <Row>
+        <Col xs={24}>
+          <Text className={styles.box1Text}>Availabe for Payout</Text>
+        </Col>
+        <Col xs={24} sm={12}>
+          <ShowAmount amount={balance?.available} currency={balance?.currency} />
+        </Col>
+        <Col xs={24} xl={12}>
+          {balance === null || balance?.available === 0 ? (
+            <Button disabled type="primary">
+              Request Payout
+            </Button>
+          ) : (
+            <Popconfirm
+              title="Are you sure to request payout?"
+              onConfirm={confirmPayout}
+              okText="Yes, Request Payout"
+              cancelText="No"
+            >
+              <Button className={styles.box1Button} loading={isLoadingPayout}>
+                {isLoadingPayout ? '...Requesting' : 'Request Payout'}
               </Button>
-            ) : (
-              <Popconfirm
-                title="Are you sure to request payout?"
-                onConfirm={confirmPayout}
-                okText="Yes, Request Payout"
-                cancelText="No"
-              >
-                <Button className={styles.box1Button} loading={isLoadingPayout}>
-                  {isLoadingPayout ? '...Requesting' : 'Request Payout'}
-                </Button>
-              </Popconfirm>
-            )}
-          </Col>
-        </Row>
-      </div>
-    );
-  };
+            </Popconfirm>
+          )}
+        </Col>
+      </Row>
+    </div>
+  );
 
-  const totalAmountEarned = () => {
-    return (
-      <div className={styles.box2}>
-        <Row>
-          <Col xs={24}>
-            <Text className={styles.box2Text}>Total Amount Earned </Text>
-          </Col>
-          <Col xs={18}>
-            <ShowAmount amount={balance?.total_earned} currency={balance?.currency} />
-          </Col>
-          <Col xs={6}>
-            <img src={cashIcon} height={40} alt="" />
-          </Col>
-        </Row>
-      </div>
-    );
-  };
+  const paymentBoxLayout = (title, titleClassName = null, titleType = 'default', amount, image) => (
+    <div className={styles.box2}>
+      <Row>
+        <Col xs={24}>
+          <Text className={titleClassName} type={titleType}>
+            {title}
+          </Text>
+        </Col>
+        <Col xs={18}>
+          <ShowAmount amount={amount} currency={balance?.currency} />
+        </Col>
+        <Col xs={6}>
+          <img src={image} height={40} alt="" />
+        </Col>
+      </Row>
+    </div>
+  );
 
-  const paidOut = () => {
-    return (
-      <div className={styles.box2}>
-        <Row>
-          <Col xs={24}>
-            <Text type="success">Paid Out</Text>
-          </Col>
-          <Col xs={18}>
-            <ShowAmount amount={balance?.paid_out} currency={balance?.currency} />
-          </Col>
-          <Col xs={6}>
-            <img src={checkIcon} height={40} alt="" />
-          </Col>
-        </Row>
-      </div>
-    );
-  };
+  const totalAmountEarned = paymentBoxLayout(
+    'Total Amount Earned ',
+    styles.box2Text,
+    'default',
+    balance?.total_earned,
+    cashIcon
+  );
 
-  const inProcess = () => {
-    return (
-      <div className={styles.box2}>
-        <Row>
-          <Col xs={24}>
-            <Text>In Process</Text>
-          </Col>
-          <Col xs={18}>
-            <ShowAmount amount={balance?.in_process} currency={balance?.currency} />
-          </Col>
-          <Col xs={6}>
-            <img src={timerIcon} height={40} alt="" />
-          </Col>
-        </Row>
-      </div>
-    );
-  };
+  const paidOut = paymentBoxLayout('Paid Out', null, 'success', balance?.paid_out, checkIcon);
+
+  const inProcess = paymentBoxLayout('In Process', null, 'default', balance?.in_process, timerIcon);
 
   const openSessionDetails = (item) => {
     if (item.inventory_id) {
@@ -240,18 +217,18 @@ const Earnings = () => {
           </Col>
           <Col xs={24} md={8}></Col>
           <Col xs={24} md={8}>
-            {availabeForPayout()}
+            {availabeForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>
           <Col xs={24} md={8}>
-            {totalAmountEarned()}
+            {totalAmountEarned}
           </Col>
           <Col xs={24} md={8}>
-            {paidOut()}
+            {paidOut}
           </Col>
           <Col xs={24} md={8}>
-            {inProcess()}
+            {inProcess}
           </Col>
         </Row>
         <Row className={styles.mt20}>
