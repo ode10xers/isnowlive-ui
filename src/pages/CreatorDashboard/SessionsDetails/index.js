@@ -139,7 +139,7 @@ const SessionsDetails = ({ match }) => {
                 <Title level={5}>Session Details</Title>
               </Col>
               <Col xs={24} md={12}>
-                {layout('Session Date and Time', toLongDateWithDay(session?.inventory?.start_time))}
+                {layout('Session Day and Date', toLongDateWithDay(session?.session_date))}
                 {layout('Session Type', session?.group ? 'Group Session' : '1-on-1 Session')}
                 {layout('Session Duration', getDuration(session?.start_time, session?.end_time))}
               </Col>

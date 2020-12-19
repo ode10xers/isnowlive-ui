@@ -27,7 +27,7 @@ import styles from './style.module.scss';
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const {
   formatDate: { getTimeDiff },
 } = dateUtil;
@@ -237,15 +237,15 @@ const SessionDetails = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
-          <Title type="secondary" level={5}>
+          <Paragraph type="secondary" ellipsis={{ rows: 5, expandable: true }}>
             {ReactHtmlParser(session?.description)}
-          </Title>
+          </Paragraph>
           <Title level={5} className={styles.mt50}>
             Session Prerequisite
           </Title>
-          <Title type="secondary" level={5}>
+          <Paragraph type="secondary" ellipsis={{ rows: 5, expandable: true }}>
             {ReactHtmlParser(session?.prerequisites)}
-          </Title>
+          </Paragraph>
         </Col>
         <Col xs={24} lg={1}></Col>
         <Col xs={24} lg={9}>
