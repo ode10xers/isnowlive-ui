@@ -2,13 +2,20 @@ import mixpanel from 'mixpanel-browser';
 import config from 'config';
 
 export const mixPanelEventTags = {
-  click: {
-    creatorLogin: 'Creator Login Clicked',
-    dashboard: {
-      upcomingSessions: 'Upcoming Sessions Clicked',
-      pastSessions: 'Past Sessions Clicked',
-      manageSessions: 'Manage Sessions Clicked',
-      createSession: 'Create Session Clicked',
+  creator: {
+    click: {
+      creatorLogin: 'Creator Login Clicked',
+      dashboard: {
+        upcomingSessions: 'Upcoming Sessions Clicked',
+        pastSessions: 'Past Sessions Clicked',
+        manageSessions: 'Manage Sessions Clicked',
+        createSession: 'Create Session Clicked',
+        attendeeNav: 'Attendee Nav (Creator Side) Clicked',
+        packagesNav: 'Packages Nav (Creator Side) Clicked',
+        livestreamNav: 'LiveStream Nav (Creator Side) Clicked',
+        profileNav: 'Creator Profile Nav Clicked',
+        paymentNav: 'Get Paid Nav Clicked',
+      },
     },
   },
 };
