@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm } from 'antd';
 import { useHistory } from 'react-router-dom';
@@ -30,19 +30,42 @@ const Earnings = () => {
   const [balance, setBalance] = useState(null);
   const [isLoadingPayout, setIsLoadingPayout] = useState(false);
 
-  const getEarningData = async () => {
+  const [showMore, setShowMore] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const sessionPerPage = 10;
+
+  const getEarningData = useCallback(async () => {
     try {
       setIsLoading(true);
       let [creatorEarningResponse, creatorBalanceResponse] = await Promise.all([
-        apis.session.getCreatorEarnings(1, 50),
+        apis.session.getCreatorEarnings(1, sessionPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
         apis.session.getCreatorBalance(),
       ]);
       if (isAPISuccess(creatorEarningResponse.status) && isAPISuccess(creatorBalanceResponse.status)) {
         setIsLoading(false);
-        setSessions(creatorEarningResponse.data);
+        setSessions(creatorEarningResponse.data.earnings);
+        setShowMore(creatorEarningResponse.data.next_page || false);
         setBalance(creatorBalanceResponse.data);
       }
     } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  }, []);
+
+  const handleShowMoreSession = async () => {
+    try {
+      setIsLoading(true);
+      let pageNo = currentPage + 1;
+      const { status, data } = await apis.session.getCreatorEarnings(pageNo, sessionPerPage);
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        setSessions([...sessions, ...data.earnings]);
+        setCurrentPage(pageNo);
+        setShowMore(data.next_page || false);
+      }
+    } catch (error) {
+      console.log(error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -50,7 +73,7 @@ const Earnings = () => {
 
   useEffect(() => {
     getEarningData();
-  }, []);
+  }, [getEarningData]);
 
   const confirmPayout = async () => {
     try {
@@ -128,7 +151,7 @@ const Earnings = () => {
 
   const openSessionDetails = (item) => {
     if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/earnings/${item.inventory_id}`);
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/${item.inventory_id}`);
     }
   };
 
@@ -247,6 +270,15 @@ const Earnings = () => {
             ) : (
               <Table columns={sessionColumns} data={sessions} loading={isLoading} />
             )}
+          </Col>
+          <Col span={24}>
+            <Row justify="center" className={styles.mt50}>
+              <Col>
+                <Button onClick={() => handleShowMoreSession()} disabled={!showMore} className={styles.ml20}>
+                  Show More
+                </Button>
+              </Col>
+            </Row>
           </Col>
         </Row>
       </div>
