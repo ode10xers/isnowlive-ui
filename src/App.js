@@ -21,6 +21,7 @@ import CreatorDashboard from 'pages/CreatorDashboard';
 import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
+import PaymentVerification from 'pages/PaymentVerification';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -56,6 +57,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
