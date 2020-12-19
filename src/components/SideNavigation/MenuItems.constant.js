@@ -9,6 +9,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
+import { mixPanelEventTags } from 'services/integrations/mixpanel';
 
 export const creatorMenuItems = [
   {
@@ -21,24 +22,28 @@ export const creatorMenuItems = [
         order: 1,
         key: 'upcoming_sessions',
         title: 'Upcoming Sessions',
+        mixPanelTag: mixPanelEventTags.click.dashboard.upcomingSessions,
         path: Routes.creatorDashboard.rootPath + '/sessions/upcoming',
       },
       {
         order: 2,
         key: 'past_sessions',
         title: 'Past Sessions',
+        mixPanelTag: mixPanelEventTags.click.dashboard.pastSessions,
         path: Routes.creatorDashboard.rootPath + '/sessions/past',
       },
       {
         order: 3,
         key: 'manage_sessions',
         title: 'Manage Sessions',
+        mixPanelTag: mixPanelEventTags.click.dashboard.manageSessions,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageSessions,
       },
       {
         order: 4,
         key: 'create_session',
         title: 'Create Session',
+        mixPanelTag: mixPanelEventTags.click.dashboard.createSession,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
       },
     ],

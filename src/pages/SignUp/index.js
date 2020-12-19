@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import { useGlobalContext } from 'services/globalContext';
+import { mapUserToMixPanel } from 'services/integrations/mixpanel';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -28,6 +29,7 @@ const SignUp = ({ history }) => {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
         setIsLoading(false);
+        mapUserToMixPanel(data);
         history.push(Routes.profile);
       }
     } catch (error) {

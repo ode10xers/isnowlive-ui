@@ -4,6 +4,7 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
+import { mixPanelEventTags, identifyUserInMixPanel, trackEventInMixPanel } from 'services/integrations/mixpanel';
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
@@ -46,11 +47,23 @@ const Login = ({ history }) => {
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
+        identifyUserInMixPanel(data);
+        trackEventInMixPanel(mixPanelEventTags.click.creatorLogin, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);
       }
     } catch (error) {
       setIsLoading(false);
+      trackEventInMixPanel(mixPanelEventTags.click.creatorLogin, {
+        result: 'FAILED',
+        email: values.email || '',
+        error_code: error.code || error.name,
+        error_message: error.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
