@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-
 import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
+
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
-
+import { useGlobalContext } from 'services/globalContext';
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, ZoomAuthType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import Routes from 'routes';
 import apis from 'apis';
@@ -16,23 +16,41 @@ import styles from './style.module.scss';
 
 const { Title } = Typography;
 
-const ZoomAuthType = {
-  OAUTH: 'OAUTH',
-  JWT: 'JWT',
-};
-
 const LiveStream = () => {
   const [form] = Form.useForm();
   const history = useHistory();
   const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(true);
+  const {
+    state: {
+      userDetails: { zoom_connected = 'NOT_CONNECTED' },
+    },
+  } = useGlobalContext();
 
+  const getZoomJWTDetails = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const { status, data } = await apis.user.getZoomCredentials();
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        form.setFieldsValue(data);
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  }, [form]);
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnboarding(false);
     }
-  }, [history.location.pathname]);
+    setSelectedZoomOption(zoom_connected);
+    if (zoom_connected === ZoomAuthType.JWT) {
+      getZoomJWTDetails();
+    }
+  }, [history.location.pathname, zoom_connected, getZoomJWTDetails]);
 
   const storeZoomCrendetials = async (values) => {
     try {
@@ -134,7 +152,7 @@ const LiveStream = () => {
                     <Input placeholder="API Key" />
                   </Form.Item>
                   <Form.Item label="API Secret" name="api_secret" rules={validationRules.requiredValidation}>
-                    <Input placeholder="API Secret" />
+                    <Input.Password placeholder="API Secret" />
                   </Form.Item>
                   <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
                     <Input placeholder="Email" />
