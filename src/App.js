@@ -4,6 +4,7 @@ import Routes from 'routes';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import { initializeFreshChat } from 'services/integrations/fresh-chat';
+import { initMixPanel, identifyUserInMixPanel } from 'services/integrations/mixpanel';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -43,7 +44,15 @@ function App() {
   } = useGlobalContext();
 
   useEffect(() => {
+    initMixPanel();
+  }, []);
+
+  useEffect(() => {
     initializeFreshChat(userDetails);
+
+    if (userDetails) {
+      identifyUserInMixPanel(userDetails);
+    }
   }, [userDetails]);
 
   return (
