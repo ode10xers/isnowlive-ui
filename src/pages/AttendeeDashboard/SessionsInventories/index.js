@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, Popconfirm, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message, Popover } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -14,6 +14,7 @@ import styles from './styles.module.scss';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
+  timeCalculation: { isBeforeLimitHours },
 } = dateUtil;
 const { Text, Title } = Typography;
 
@@ -46,9 +47,12 @@ const SessionsInventories = ({ match }) => {
             join_url: i.join_url,
             inventory_id: i?.inventory_id,
             session_id: i.session_id,
+            order_id: i.order_id,
             max_participants: i.max_participants,
             currency: i.currency || 'SGD',
             refund_amount: i.refund_amount || 0,
+            is_refundable: i.is_refundable || false,
+            refund_before_hours: i.refund_before_hours || 24,
           }))
         );
       }
@@ -63,18 +67,113 @@ const SessionsInventories = ({ match }) => {
     if (match?.params?.session_type) {
       setSessions([]);
       setIsLoading(true);
+
+      let monitorRefundPolling = null;
+
       if (match?.params?.session_type === 'past') {
         setIsPast(true);
       } else {
         setIsPast(false);
+
+        //Set polling to dynamically adjust Refund/Cancel Popup
+        monitorRefundPolling = setInterval(() => {
+          getStaffSession(match?.params?.session_type);
+        }, 5000);
       }
       getStaffSession(match?.params?.session_type);
+
+      if (monitorRefundPolling) {
+        return () => {
+          clearInterval(monitorRefundPolling);
+        };
+      }
     }
   }, [match.params.session_type, getStaffSession]);
 
   const openSessionInventoryDetails = (item) => {
     if (item.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
+    }
+  };
+
+  const cancelOrderForSession = async (orderId) => {
+    try {
+      await apis.session.cancel(orderId, { reason: 'requested_by_customer' });
+      message.success('Refund Successful');
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const renderRefundPopup = (data) => {
+    if (data.is_refundable) {
+      if (isBeforeLimitHours(data.start_time, data.refund_before_hours)) {
+        return (
+          <Popconfirm
+            arrowPointAtCenter
+            placement="topRight"
+            title={
+              <Text>
+                Do you want to refund this session? <br />
+                You will get{' '}
+                <b>
+                  {' '}
+                  {data.currency} {data.refund_amount}{' '}
+                </b>{' '}
+                back.
+              </Text>
+            }
+            onConfirm={() => cancelOrderForSession(data.order_id)}
+            okText="Cancel"
+            cancelText="Don't Cancel"
+          >
+            <Button type="link"> Cancel </Button>
+          </Popconfirm>
+        );
+      } else {
+        return (
+          <Popover
+            arrowPointAtCenter
+            placement="topRight"
+            trigger="click"
+            title="Refund Time Limit Reached"
+            content={
+              <Text>
+                Sorry, as per the cancellation policy of <br />
+                this session,{' '}
+                <b>
+                  {' '}
+                  it can only be cancelled <br />
+                  {data.refund_before_hours} hours{' '}
+                </b>{' '}
+                before the session starts.
+              </Text>
+            }
+          >
+            <Button type="link"> Cancel </Button>
+          </Popover>
+        );
+      }
+    } else {
+      return (
+        <Popover
+          arrowPointAtCenter
+          placement="topRight"
+          trigger="click"
+          title="Session Cannot be Refunded"
+          content={
+            <Text>
+              Sorry, this session is not refundable based <br />
+              on the creator's settings
+            </Text>
+          }
+        >
+          <Button type="link"> Cancel </Button>
+        </Popover>
+      );
     }
   };
 
@@ -130,38 +229,16 @@ const SessionsInventories = ({ match }) => {
             </Col>
 
             {!isPast && (
-              <Col md={24} lg={24} xl={8}>
-                <Button type="link" disabled={!record.join_url} onClick={() => window.open(record.join_url)}>
-                  Join
-                </Button>
-              </Col>
-            )}
-
-            {!isPast && (
-              <Col md={24} lg={24} xl={8}>
-                <Popconfirm
-                  arrowPointAtCenter
-                  placement="topRight"
-                  title={
-                    <Text>
-                      Do you want to refund this session? <br />
-                      You will get{' '}
-                      <b>
-                        {' '}
-                        {record.currency} {record.refund_amount}{' '}
-                      </b>{' '}
-                      back.
-                    </Text>
-                  }
-                  onConfirm={() => {
-                    console.log('Refunded');
-                  }}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button type="link">Cancel</Button>
-                </Popconfirm>
-              </Col>
+              <>
+                <Col md={24} lg={24} xl={8}>
+                  <Button type="link" disabled={!record.join_url} onClick={() => window.open(record.join_url)}>
+                    Join
+                  </Button>
+                </Col>
+                <Col md={24} lg={24} xl={8}>
+                  {renderRefundPopup(record)}
+                </Col>
+              </>
             )}
           </Row>
         );
@@ -197,32 +274,7 @@ const SessionsInventories = ({ match }) => {
               </Button>
             )}
           </>,
-          <>
-            {!isPast && (
-              <Popconfirm
-                arrowPointAtCenter
-                placement="topRight"
-                title={
-                  <Text>
-                    Do you want to refund this session? <br />
-                    You will get{' '}
-                    <b>
-                      {' '}
-                      {item.currency} {item.refund_amount}{' '}
-                    </b>{' '}
-                    back.
-                  </Text>
-                }
-                onConfirm={() => {
-                  console.log('Refunded');
-                }}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button type="link">Cancel</Button>
-              </Popconfirm>
-            )}
-          </>,
+          <>{!isPast && renderRefundPopup(item)}</>,
         ]}
       >
         {layout('Type', <Text>{item.type}</Text>)}

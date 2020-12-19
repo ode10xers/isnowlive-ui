@@ -18,8 +18,13 @@ const formatDate = {
   getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
 };
 
+const timeCalculation = {
+  isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
+};
+
 const dateUtil = {
   formatDate,
+  timeCalculation,
 };
 
 export default dateUtil;

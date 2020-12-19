@@ -221,8 +221,8 @@ const Session = ({ match, history }) => {
   };
 
   const handleRefundBeforeHoursChange = (e) => {
-    setRefundBeforeHours(e.target.value);
-    form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: e.target.value });
+    setRefundBeforeHours(parseInt(e.target.value));
+    form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: parseInt(e.target.value) });
   };
 
   //TODO: Will have to change here to match new API payload
@@ -243,7 +243,6 @@ const Session = ({ match, history }) => {
         is_refundable: sessionRefundable,
         refund_before_hours: refundBeforeHours,
       };
-      console.log(data);
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
         data.expiry = moment(values.recurring_dates_range[1]).utc().format();
