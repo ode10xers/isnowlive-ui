@@ -309,17 +309,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                             getTimeDiff(item.value, moment(), 'minute') <= 0
                           )
                         ) {
-                          return (
-                            <Option
-                              value={item.value}
-                              disabled={
-                                getTimeDiff(toLocaleDate(slot.session_date), toLocaleDate(moment()), 'days') === 0 &&
-                                getTimeDiff(item.value, moment(), 'minute') <= 0
-                              }
-                            >
-                              {item.label}
-                            </Option>
-                          );
+                          return <Option value={item.value}>{item.label}</Option>;
                         }
                         return null;
                       })}
@@ -341,14 +331,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                           ) &&
                           getTimeDiff(item.value, slot.start_time, 'minute') > 0
                         ) {
-                          return (
-                            <Option
-                              disabled={getTimeDiff(item.value, slot.start_time, 'minute') <= 0}
-                              value={item.value}
-                            >
-                              {item.label}
-                            </Option>
-                          );
+                          return <Option value={item.value}>{item.label}</Option>;
                         }
                         return null;
                       })}
