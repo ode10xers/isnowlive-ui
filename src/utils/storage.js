@@ -18,7 +18,7 @@ export const getLocalUserDetails = async () => {
   const authToken = getAuthCookie();
 
   let userDetails = JSON.parse(localStorage.getItem('user-details'));
-  if (userDetails && authToken) {
+  if (userDetails && authToken && authToken !== '') {
     if (authToken === userDetails.auth_token) {
       const expiry = new Date(userDetails.expiry);
       if (expiry.getTime() > new Date().getTime()) {
@@ -30,7 +30,6 @@ export const getLocalUserDetails = async () => {
       userDetails = await getUserDetails();
       return userDetails;
     }
-
   }
   return null;
 };
