@@ -43,18 +43,18 @@ export const creatorMenuItems = [
       },
     ],
   },
-  {
-    order: 2,
-    key: 'attendees',
-    title: 'Attendees',
-    icon: <TeamOutlined />,
-  },
-  {
-    order: 3,
-    key: 'packages',
-    title: 'Packages',
-    icon: <ControlOutlined />,
-  },
+  // {
+  //   order: 2,
+  //   key: 'attendees',
+  //   title: 'Attendees',
+  //   icon: <TeamOutlined />,
+  // },
+  // {
+  //   order: 3,
+  //   key: 'packages',
+  //   title: 'Packages',
+  //   icon: <ControlOutlined />,
+  // },
   {
     order: 4,
     key: 'livestream',
@@ -76,12 +76,12 @@ export const creatorMenuItems = [
     icon: <DollarOutlined />,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
-  {
-    order: 7,
-    key: 'account',
-    title: 'Account',
-    icon: <UserOutlined />,
-  },
+  // {
+  //   order: 7,
+  //   key: 'account',
+  //   title: 'Account',
+  //   icon: <UserOutlined />,
+  // },
 ];
 
 export const attendeeMenuItems = [
@@ -105,16 +105,16 @@ export const attendeeMenuItems = [
       },
     ],
   },
-  {
-    order: 3,
-    key: 'packages',
-    title: 'Packages',
-    icon: <ControlOutlined />,
-  },
-  {
-    order: 7,
-    key: 'account',
-    title: 'Account',
-    icon: <UserOutlined />,
-  },
+  // {
+  //   order: 3,
+  //   key: 'packages',
+  //   title: 'Packages',
+  //   icon: <ControlOutlined />,
+  // },
+  // {
+  //   order: 7,
+  //   key: 'account',
+  //   title: 'Account',
+  //   icon: <UserOutlined />,
+  // },
 ];

@@ -99,6 +99,11 @@
     right: -15px;
   }
 }
+@media (min-width: 768px) and (max-width: 1400px) {
+  .imageWrapper {
+    margin-bottom: 0px;
+  }
+}
 ::-webkit-scrollbar {
   width: 12px;
 }
