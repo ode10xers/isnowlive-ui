@@ -39,6 +39,8 @@ const SessionDetails = ({ match, history }) => {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { logIn } = useGlobalContext();
+  const [showDescription, setShowDescription] = useState(false);
+  const [showPrerequisite, setShowPrerequisite] = useState(false);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -206,7 +208,6 @@ const SessionDetails = ({ match, history }) => {
           <Image
             preview={false}
             width={'100%'}
-            height={300}
             className={classNames(styles.coverImage, styles.mb20)}
             src={session?.session_image_url || 'error'}
             fallback={DefaultImage()}
@@ -237,15 +238,33 @@ const SessionDetails = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
-          <Paragraph type="secondary" ellipsis={{ rows: 5, expandable: true }}>
-            {ReactHtmlParser(session?.description)}
-          </Paragraph>
+          {showDescription ? (
+            <Paragraph type="secondary"> {ReactHtmlParser(session?.description)}</Paragraph>
+          ) : (
+            <>
+              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                {ReactHtmlParser(session?.description)}
+              </Paragraph>
+              <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
+                Read More
+              </div>
+            </>
+          )}
           <Title level={5} className={styles.mt50}>
             Session Prerequisite
           </Title>
-          <Paragraph type="secondary" ellipsis={{ rows: 5, expandable: true }}>
-            {ReactHtmlParser(session?.prerequisites)}
-          </Paragraph>
+          {showPrerequisite ? (
+            <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
+          ) : (
+            <>
+              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                {ReactHtmlParser(session?.prerequisites)}
+              </Paragraph>
+              <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
+                Read More
+              </div>
+            </>
+          )}
         </Col>
         <Col xs={24} lg={1}></Col>
         <Col xs={24} lg={9}>
