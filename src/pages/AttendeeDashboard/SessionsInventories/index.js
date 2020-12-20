@@ -71,7 +71,6 @@ const SessionsInventories = ({ match }) => {
   }, [match.params.session_type, getStaffSession]);
 
   const openSessionInventoryDetails = (item) => {
-    console.log(item);
     if (item.username && item.inventory_id) {
       window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
     }
