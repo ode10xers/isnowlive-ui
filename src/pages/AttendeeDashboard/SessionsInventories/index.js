@@ -98,7 +98,7 @@ const SessionsInventories = ({ match }) => {
 
   const cancelOrderForSession = async (orderId) => {
     try {
-      await apis.session.cancel(orderId, { reason: 'requested_by_customer' });
+      await apis.session.cancelCustomerOrder(orderId, { reason: 'requested_by_customer' });
       message.success('Refund Successful');
       setTimeout(() => {
         window.location.reload();
@@ -118,16 +118,13 @@ const SessionsInventories = ({ match }) => {
             title={
               <Text>
                 Do you want to refund this session? <br />
-                You will get
-                <b>
-                  {data.currency} {data.refund_amount}
-                </b>
+                You will get <strong>{` ${data.currency} ${data.refund_amount} `}</strong>
                 back.
               </Text>
             }
             onConfirm={() => cancelOrderForSession(data.order_id)}
-            okText="Cancel"
-            cancelText="Don't Cancel"
+            okText="Yes, Refund Session"
+            cancelText="No"
           >
             <Button type="link"> Cancel </Button>
           </Popconfirm>
@@ -143,10 +140,11 @@ const SessionsInventories = ({ match }) => {
               <Text>
                 Sorry, as per the cancellation policy of <br />
                 this session,
-                <b>
+                <strong>
+                  {' '}
                   it can only be cancelled <br />
-                  {data.refund_before_hours} hours
-                </b>
+                  {data.refund_before_hours} hours{' '}
+                </strong>
                 before the session starts.
               </Text>
             }
