@@ -43,6 +43,8 @@ function App() {
     state: { userDetails },
   } = useGlobalContext();
 
+  console.log('App.js 46 Cookies = ', document.cookie);
+
   useEffect(() => {
     initializeFreshChat(userDetails);
   }, [userDetails]);
