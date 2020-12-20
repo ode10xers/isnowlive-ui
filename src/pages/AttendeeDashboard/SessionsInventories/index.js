@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card, message } from 'antd';
-import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
@@ -17,7 +16,6 @@ const {
 const { Text, Title } = Typography;
 
 const SessionsInventories = ({ match }) => {
-  const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
