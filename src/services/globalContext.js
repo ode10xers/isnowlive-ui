@@ -1,6 +1,7 @@
 import React, { useReducer, useContext, createContext } from 'react';
 import Routes from 'routes';
 import { getLocalUserDetails } from 'utils/storage';
+import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 
 const Context = createContext(null);
 
@@ -41,6 +42,7 @@ const GlobalDataProvider = ({ children }) => {
     } else {
       localStorage.removeItem('remember-user');
     }
+    setAuthCookie(userDetails.auth_token);
     setUserDetails(userDetails);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
   }
@@ -57,7 +59,7 @@ const GlobalDataProvider = ({ children }) => {
 
     dispatch({ type: 'LOG_OUT' });
     localStorage.removeItem('user-details');
-    localStorage.removeItem('session-token');
+    deleteAuthCookie();
   }
 
   const value = {
