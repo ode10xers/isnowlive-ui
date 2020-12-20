@@ -167,6 +167,9 @@ const SessionDetails = ({ match, history }) => {
           });
           if (data) {
             http.setAuthToken(data.auth_token);
+            console.log(document.cookie);
+            document.cookie = `__passion_auth_code__=${data.auth_token};path=/;domain=.stage.passion.do`;
+            console.log(document.cookie);
             logIn(data, true);
             createOrder();
           }
