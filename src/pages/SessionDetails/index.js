@@ -158,8 +158,10 @@ const SessionDetails = ({ match, history }) => {
       // is beause if user aleady existing and have to login then value will be
       // set to currentUser where as getLocalUserDetails is only set if user has
       // actually login
+      const localDetailsValue = await getLocalUserDetails();
+      console.log('getLocalUserDetails', getLocalUserDetails())
 
-      if (!getLocalUserDetails() && values.password) {
+      if (!localDetailsValue && values.password) {
         try {
           const { data } = await apis.user.login({
             email: values.email,
@@ -174,7 +176,7 @@ const SessionDetails = ({ match, history }) => {
           setIsLoading(false);
           message.error(error.response?.data?.message || 'Something went wrong');
         }
-      } else if (!getLocalUserDetails()) {
+      } else if (!localDetailsValue) {
         signupUser(values);
       } else {
         createOrder();
