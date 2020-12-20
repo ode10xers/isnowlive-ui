@@ -17,6 +17,7 @@ export default {
     uploadFile: (payload) => http.post('/secure/upload?type=document', payload),
     updateProfile: (payload) => http.patch('/secure/user', payload),
     getSessionsByUsername: (username, type) => http.get(`/sessions/${username}/${type}`),
+    getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
   },
   payment: {

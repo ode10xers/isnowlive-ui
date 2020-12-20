@@ -91,6 +91,7 @@ const Profile = () => {
     if (isPublicUrlAvaiable) {
       updateProfileDetails(values);
     } else {
+      setIsLoading(false);
       message.error('Please enter valid username.');
     }
   };
@@ -202,8 +203,12 @@ const Profile = () => {
             </Form.Item>
           </Form.Item>
 
-          <Form.Item className={styles.bgWhite} label="Short bio" name={['profile', 'bio']}>
-            <TextEditor name={['profile', 'bio']} form={form} placeholder="Please input your short bio" />
+          <Form.Item
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
+            label="Short bio"
+            name={['profile', 'bio']}
+          >
+            <TextEditor name={['profile', 'bio']} form={form} placeholder="  Please input your short bio" />
           </Form.Item>
 
           <Form.Item label="Public URL">

@@ -3,12 +3,11 @@ import { Row, Col, Typography, Button, Card, Popconfirm, message, Popover } from
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
-import Routes from 'routes';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import { getDuration } from 'utils/helper';
+import { getDuration, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -53,6 +52,7 @@ const SessionsInventories = ({ match }) => {
             refund_amount: i.refund_amount || 0,
             is_refundable: i.is_refundable || false,
             refund_before_hours: i.refund_before_hours || 24,
+            username: i.username,
           }))
         );
       }
@@ -91,8 +91,8 @@ const SessionsInventories = ({ match }) => {
   }, [match.params.session_type, getStaffSession]);
 
   const openSessionInventoryDetails = (item) => {
-    if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
+    if (item.username && item.inventory_id) {
+      history.push(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
     }
   };
 
