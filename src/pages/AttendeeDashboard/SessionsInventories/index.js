@@ -46,7 +46,7 @@ const SessionsInventories = ({ match }) => {
             inventory_id: i?.inventory_id,
             session_id: i.session_id,
             max_participants: i.max_participants,
-            username: i.username,
+            username: i.creator_username,
           }))
         );
       }
@@ -71,8 +71,9 @@ const SessionsInventories = ({ match }) => {
   }, [match.params.session_type, getStaffSession]);
 
   const openSessionInventoryDetails = (item) => {
+    console.log(item);
     if (item.username && item.inventory_id) {
-      history.push(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
+      window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
     }
   };
 
