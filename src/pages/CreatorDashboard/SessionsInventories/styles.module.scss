@@ -6,3 +6,6 @@
 .danger {
   color: map-get($colors, $key: 'FireBrick');
 }
+.card {
+  margin-top: 10px !important;
+}
