@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card, Popconfirm, message, Popover } from 'antd';
-import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
@@ -18,7 +17,6 @@ const {
 const { Text, Title } = Typography;
 
 const SessionsInventories = ({ match }) => {
-  const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
@@ -48,11 +46,11 @@ const SessionsInventories = ({ match }) => {
             session_id: i.session_id,
             order_id: i.order_id,
             max_participants: i.max_participants,
+            username: i.creator_username,
             currency: i.currency || 'SGD',
             refund_amount: i.refund_amount || 0,
             is_refundable: i.is_refundable || false,
             refund_before_hours: i.refund_before_hours || 24,
-            username: i.username,
           }))
         );
       }
@@ -92,7 +90,7 @@ const SessionsInventories = ({ match }) => {
 
   const openSessionInventoryDetails = (item) => {
     if (item.username && item.inventory_id) {
-      history.push(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
+      window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
     }
   };
 
