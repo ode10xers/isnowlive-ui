@@ -7,7 +7,7 @@ import { useGlobalContext } from 'services/globalContext';
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, ZoomAuthType } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
@@ -27,7 +27,7 @@ const Login = ({ history }) => {
       if (user.is_creator) {
         if (user.profile_complete === false) {
           history.push(Routes.profile);
-        } else if (user.zoom_connected === false) {
+        } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
           history.push(Routes.livestream);
         } else {
           history.push(Routes.creatorDashboard.rootPath);
