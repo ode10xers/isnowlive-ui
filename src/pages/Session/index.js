@@ -225,7 +225,6 @@ const Session = ({ match, history }) => {
     form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: parseInt(e.target.value) });
   };
 
-  //TODO: Will have to change here to match new API payload
   const onFinish = async (values) => {
     try {
       setIsLoading(true);

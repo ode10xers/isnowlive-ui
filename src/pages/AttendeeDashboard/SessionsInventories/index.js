@@ -118,11 +118,10 @@ const SessionsInventories = ({ match }) => {
             title={
               <Text>
                 Do you want to refund this session? <br />
-                You will get{' '}
+                You will get
                 <b>
-                  {' '}
-                  {data.currency} {data.refund_amount}{' '}
-                </b>{' '}
+                  {data.currency} {data.refund_amount}
+                </b>
                 back.
               </Text>
             }
@@ -143,12 +142,11 @@ const SessionsInventories = ({ match }) => {
             content={
               <Text>
                 Sorry, as per the cancellation policy of <br />
-                this session,{' '}
+                this session,
                 <b>
-                  {' '}
                   it can only be cancelled <br />
-                  {data.refund_before_hours} hours{' '}
-                </b>{' '}
+                  {data.refund_before_hours} hours
+                </b>
                 before the session starts.
               </Text>
             }
