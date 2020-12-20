@@ -12,28 +12,24 @@
 }
 .imageWrapper {
   position: relative;
-  height: 300px;
-  margin-bottom: 10px;
+  max-height: 300px;
+  margin-bottom: 70px;
   margin-top: 50px;
 }
 .coverImage img {
   border-radius: 8px;
+  max-height: 300px;
 }
 .profileImage {
-  border: 2px solid map-get($colors, $key: 'White');
+  position: relative;
   border-radius: 4px;
   bottom: 50px;
   left: 50px;
+  width: 100%;
 }
 .profileImage img {
-  border-radius: 4px;
-}
-.profileImageSmall {
   border: 2px solid map-get($colors, $key: 'White');
-  border-radius: 4px;
-  bottom: 20px;
-}
-.profileImageSmall img {
+  max-width: 120px;
   border-radius: 4px;
 }
 .socialIcon {
@@ -52,12 +48,55 @@
   height: 100%;
   overflow: auto;
 }
+.userName {
+  position: absolute;
+  bottom: -15px;
+  left: 140px;
+}
+.shareButton {
+  position: absolute;
+  bottom: 0px;
+  right: 45px;
+}
+.profilePreviewContainer {
+  margin: 80px;
+}
 @media (max-width: 768px) {
+  .profilePreviewContainer {
+    margin: 5px;
+  }
   .card {
     max-height: 100%;
     margin: 10px !important;
     margin-left: -20px !important;
     margin-right: -20px !important;
+  }
+  .imageWrapper {
+    position: relative;
+    max-height: 300px;
+    margin-bottom: 20px;
+    margin-top: 50px;
+  }
+  .profileImage {
+    border-radius: 4px;
+    bottom: 20px;
+    width: 100%;
+    left: 0px;
+  }
+  .profileImage img {
+    max-width: 70px;
+    border: 2px solid map-get($colors, $key: 'White');
+    border-radius: 4px;
+  }
+  .userName {
+    position: absolute;
+    bottom: -15px;
+    left: 75px;
+  }
+  .shareButton {
+    position: absolute;
+    bottom: 0px;
+    right: -15px;
   }
 }
 ::-webkit-scrollbar {
