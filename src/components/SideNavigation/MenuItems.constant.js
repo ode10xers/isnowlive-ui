@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  ControlOutlined,
-  TeamOutlined,
+  // ControlOutlined,
+  // TeamOutlined,
+  // UserOutlined,
   VideoCameraOutlined,
   ToolOutlined,
   DollarOutlined,
   GlobalOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 
