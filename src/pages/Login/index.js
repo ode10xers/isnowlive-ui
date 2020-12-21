@@ -48,7 +48,7 @@ const Login = ({ history }) => {
         http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
         identifyUserInMixPanel(data);
-        trackEventInMixPanel(mixPanelEventTags.click.creatorLogin, {
+        trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
           result: 'SUCCESS',
           error_code: 'NA',
           error_message: 'NA',
@@ -58,9 +58,8 @@ const Login = ({ history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.click.creatorLogin, {
+      trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
         result: 'FAILED',
-        email: values.email || '',
         error_code: error.code || error.name,
         error_message: error.message,
       });
@@ -114,7 +113,13 @@ const Login = ({ history }) => {
 
         <Row>
           <Col xs={24} md={{ span: 16, offset: 8 }}>
-            <a href onClick={() => setIsLoginView(false)}>
+            <a
+              href
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.public.click.newPassword);
+                setIsLoginView(false);
+              }}
+            >
               Set a new password
             </a>
           </Col>
@@ -135,7 +140,14 @@ const Login = ({ history }) => {
             <Input />
           </Item>
           <Item {...formTailLayout}>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isLoading}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.public.click.sendEmail);
+              }}
+            >
               Send Email
             </Button>
           </Item>
@@ -143,7 +155,13 @@ const Login = ({ history }) => {
 
         <Row>
           <Col xs={24} md={{ span: 16, offset: 8 }}>
-            <a href onClick={() => setIsLoginView(true)}>
+            <a
+              href
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.public.click.loginWithNewPassword);
+                setIsLoginView(true);
+              }}
+            >
               Login with password
             </a>
           </Col>

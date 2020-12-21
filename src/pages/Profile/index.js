@@ -20,6 +20,7 @@ import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLay
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 const { Title, Text } = Typography;
 
@@ -156,8 +157,11 @@ const Profile = () => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/profile')}
               icon={<ArrowLeftOutlined />}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.backToProfile);
+                history.push('/creator/dashboard/profile');
+              }}
             >
               Back
             </Button>
@@ -279,7 +283,13 @@ const Profile = () => {
           <Form.Item {...profileFormTailLayout}>
             <Row>
               <Col xs={24}>
-                <Button className={styles.mb10} onClick={() => addTestimonial()}>
+                <Button
+                  className={styles.mb10}
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.addEmbedCode);
+                    addTestimonial();
+                  }}
+                >
                   <PlusOutlined /> Add
                 </Button>
               </Col>
@@ -295,7 +305,12 @@ const Profile = () => {
                       title="Preview"
                       bordered={false}
                       extra={
-                        <DeleteOutlined onClick={() => setTestimonials(testimonials.filter((_, i) => i !== index))} />
+                        <DeleteOutlined
+                          onClick={() => {
+                            trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
+                            setTestimonials(testimonials.filter((_, i) => i !== index));
+                          }}
+                        />
                       }
                       className={styles.card}
                       bodyStyle={{ padding: '0px', height: '600px', overflowY: 'scroll' }} // styles.cardbody is not working here
@@ -314,7 +329,13 @@ const Profile = () => {
           <Row justify="center">
             <Col>
               <Form.Item>
-                <Button htmlType="submit" type="primary">
+                <Button
+                  htmlType="submit"
+                  type="primary"
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.submitProfile);
+                  }}
+                >
                   Publish Page
                 </Button>
               </Form.Item>

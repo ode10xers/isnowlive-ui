@@ -25,6 +25,8 @@ import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
@@ -91,8 +93,10 @@ const ProfilePreview = ({ username = null }) => {
     setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.profile.upcomingSessionsTab);
       getSessionDetails('upcoming');
     } else {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.profile.pastSessionsTab);
       getSessionDetails('past');
     }
   };
@@ -104,22 +108,31 @@ const ProfilePreview = ({ username = null }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard')}
               icon={<ArrowLeftOutlined />}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.backToDashboard);
+                history.push('/creator/dashboard');
+              }}
             >
               Dashboard
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/profile/edit')}
               icon={<EditOutlined />}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editProfile);
+                history.push('/creator/dashboard/profile/edit');
+              }}
             >
               Edit Profile
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => window.open(generateUrlFromUsername(profile.username))}
               icon={<GlobalOutlined />}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.publicPage);
+                window.open(generateUrlFromUsername(profile.username));
+              }}
             >
               Public Page
             </Button>
@@ -156,6 +169,9 @@ const ProfilePreview = ({ username = null }) => {
                 label="Share"
                 shareUrl={generateUrlFromUsername(profile.username)}
                 title={`${profile.first_name} ${profile.last_name}`}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.profile.shareButton);
+                }}
               />
             </div>
           </div>

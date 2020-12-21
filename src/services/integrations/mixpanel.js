@@ -4,7 +4,6 @@ import config from 'config';
 export const mixPanelEventTags = {
   creator: {
     click: {
-      creatorLogin: '(Creator) Login Clicked',
       dashboard: {
         upcomingSessions: '(Creator) Upcoming Sessions Clicked',
         pastSessions: '(Creator) Past Sessions Clicked',
@@ -62,6 +61,20 @@ export const mixPanelEventTags = {
         submitZoomDetails: '(Creator) Submit Zoom Details Clicked',
         connectZoomAccount: '(Creator) Connect Zoom Acc Clicked',
       },
+      profile: {
+        backToDashboard: '(Creator) Back to Dashboard Clicked',
+        editProfile: '(Creator) Edit Profile Clicked',
+        publicPage: '(Creator) Public Page Clicked',
+        shareButton: '(Creator) Share Button Clicked',
+        upcomingSessionsTab: '(Creator) Upcoming Session Tab Clicked',
+        pastSessionsTab: '(Creator) Past Session Tab Clicked',
+        editForm: {
+          backToProfile: '(Creator) Back to Profile Clicked',
+          addEmbedCode: '(Creator) Add Embed Code Clicked',
+          deleteEmbedCode: '(Creator) Delete Embed Code Clicked',
+          submitProfile: '(Creator) Submit Profile Clicked',
+        },
+      },
       payment: {
         connectStripe: '(Creator) Connect Stripe Clicked',
         requestPayout: '(Creator) Request Payout Clicked',
@@ -79,6 +92,22 @@ export const mixPanelEventTags = {
         pastSessions: '(Attendee) Past Sessions Clicked',
         packagesNav: '(Attendee) Packages Nav Clicked',
         accountNav: '(Attendee) Account Nav Clicked',
+      },
+    },
+  },
+
+  public: {
+    click: {
+      logIn: 'Log In Clicked',
+      logOut: 'Log Out Clicked',
+      newPassword: 'Set New Password Clicked',
+      sendEmail: 'Send Reset Password Email Clicked',
+      loginWithNewPassword: 'Login with New Password Clicked',
+      switchToAttendee: 'Switch to Attendee ,Clicked',
+      switchToCreator: 'Switch to Hosting Clicked',
+      sessions: {
+        sessionCard: 'Session Card in List Clicked',
+        showMore: 'Show More Session Card Clicked',
       },
     },
   },

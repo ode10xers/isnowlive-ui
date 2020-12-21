@@ -6,6 +6,7 @@ import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 import { useGlobalContext } from 'services/globalContext';
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
@@ -29,19 +30,32 @@ const Header = () => {
       <Col flex={isMobileDevice ? 'auto' : '400px'} className={isMobileDevice && styles.navItemWrapper}>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.creatorDashboard.rootPath))}
-          onClick={() => history.push(Routes.creatorDashboard.rootPath)}
+          onClick={() => {
+            trackEventInMixPanel(mixPanelEventTags.public.click.switchToCreator);
+            history.push(Routes.creatorDashboard.rootPath);
+          }}
         >
           <VideoCameraAddOutlined className={styles.navItemIcon} />
           Hosting
         </span>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.attendeeDashboard.rootPath))}
-          onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
+          onClick={() => {
+            trackEventInMixPanel(mixPanelEventTags.public.click.switchToAttendee);
+            history.push(Routes.attendeeDashboard.rootPath);
+          }}
         >
           <TeamOutlined className={styles.navItemIcon} />
           Attending
         </span>
-        <Button className={styles.logout} type="text" onClick={() => logOut(history)}>
+        <Button
+          type="text"
+          className={styles.logout}
+          onClick={() => {
+            trackEventInMixPanel(mixPanelEventTags.public.click.logOut);
+            logOut(history);
+          }}
+        >
           Logout
         </Button>
       </Col>

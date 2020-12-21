@@ -7,6 +7,8 @@ import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
@@ -70,8 +72,14 @@ const Sessions = ({ sessions, username }) => {
                     <Card
                       hoverable
                       className={styles.card}
-                      onClick={() => showInventoryDetails(session.inventory_id)}
                       bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
+                      onClick={() => {
+                        trackEventInMixPanel(mixPanelEventTags.public.click.sessions.sessionCard, {
+                          session_id: session.id,
+                          inventory_id: session.inventory_id,
+                        });
+                        showInventoryDetails(session.inventory_id);
+                      }}
                     >
                       <Row>
                         <Col xs={24} md={8} lg={8}>
@@ -106,7 +114,13 @@ const Sessions = ({ sessions, username }) => {
             ))}
             {sessionCount < sessions.length && (
               <Col span={24} className={styles.textAlignCenter}>
-                <Button onClick={() => showMore()} type="primary">
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.public.click.sessions.showMore);
+                    showMore();
+                  }}
+                >
                   Show more
                 </Button>
               </Col>
