@@ -132,7 +132,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Actions',
       width: isPast ? '4%' : '20%',
       render: (text, record) => {
-        const isDisabled = record.participants ? record.participants.length > 0 : false;
+        const isDisabled = record.participants > 0;
         return isPast ? (
           <Row justify="start">
             <Col>
@@ -149,18 +149,23 @@ const SessionsInventories = ({ match }) => {
               </Button>
             </Col>
             <Col md={24} lg={24} xl={8}>
-              <Popconfirm
-                title="Do you want to cancel session?"
-                icon={<DeleteOutlined className={styles.danger} />}
-                okText="Yes"
-                cancelText="No"
-                disabled={isDisabled}
-                onConfirm={() => deleteInventory(record.inventory_id)}
-              >
-                <Button type="text" disabled={isDisabled} danger>
+              {isDisabled ? (
+                <Button type="text" disabled={isDisabled}>
                   Cancel
                 </Button>
-              </Popconfirm>
+              ) : (
+                <Popconfirm
+                  title="Do you want to cancel session?"
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => deleteInventory(record.inventory_id)}
+                >
+                  <Button type="text" danger>
+                    Cancel
+                  </Button>
+                </Popconfirm>
+              )}
             </Col>
 
             <Col md={24} lg={24} xl={8}>
@@ -177,7 +182,7 @@ const SessionsInventories = ({ match }) => {
   ];
 
   const renderSessionItem = (item) => {
-    const isCancelDisabled = item.participants ? item.participants.length > 0 : false;
+    const isCancelDisabled = item.participants > 0;
 
     const layout = (label, value) => (
       <Row>
@@ -200,18 +205,23 @@ const SessionsInventories = ({ match }) => {
           <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
             Details
           </Button>,
-          <Popconfirm
-            title="Do you want to cancel session?"
-            icon={<DeleteOutlined className={styles.danger} />}
-            okText="Yes"
-            cancelText={'No'}
-            disabled={isCancelDisabled}
-            onConfirm={() => deleteInventory(item.inventory_id)}
-          >
-            <Button type="text" disabled={isCancelDisabled}>
+          isCancelDisabled ? (
+            <Button type="text" disabled={true}>
               Cancel
             </Button>
-          </Popconfirm>,
+          ) : (
+            <Popconfirm
+              title="Do you want to cancel session?"
+              icon={<DeleteOutlined className={styles.danger} />}
+              okText="Yes"
+              cancelText={'No'}
+              onConfirm={() => deleteInventory(item.inventory_id)}
+            >
+              <Button type="text" danger>
+                Cancel
+              </Button>
+            </Popconfirm>
+          ),
           <>
             {!isPast && (
               <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
