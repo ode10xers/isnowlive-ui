@@ -5,6 +5,7 @@ import { Select, Typography, Button, message, Row, Col } from 'antd';
 
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
 import { isAPISuccess } from 'utils/helper';
 import apis from 'apis';
 import Earnings from 'pages/CreatorDashboard/Earnings';
@@ -67,6 +68,7 @@ const PaymentAccount = () => {
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);
+    trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe);
     try {
       const { data, status } = await apis.payment.stripe.onboardUser({ country: selectedCountry });
       if (isAPISuccess(status)) {

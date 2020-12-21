@@ -21,6 +21,13 @@ export const mixPanelEventTags = {
         submitZoomDetails: '(Creator) Submit Zoom Details Clicked',
         connectZoomAccount: '(Creator) Connect Zoom Acc Clicked',
       },
+      payment: {
+        connectStripe: '(Creator) Connect Stripe Clicked',
+        requestPayout: '(Creator) Request Payout Clicked',
+        sessionEarnings: '(Creator) Session Earning Details Clicked',
+        backToEarningDashboard: '(Creator) Back to All Earnings Clicked',
+        showMoreEarnings: '(Creator) Show More Earnings Clicked',
+      },
     },
   },
 

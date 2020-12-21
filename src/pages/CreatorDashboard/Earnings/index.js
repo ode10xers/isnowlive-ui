@@ -12,6 +12,8 @@ import ShowAmount from 'components/ShowAmount';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const cashIcon = require('assets/images/cash.png');
@@ -109,7 +111,13 @@ const Earnings = () => {
               okText="Yes, Request Payout"
               cancelText="No"
             >
-              <Button className={styles.box1Button} loading={isLoadingPayout}>
+              <Button
+                className={styles.box1Button}
+                loading={isLoadingPayout}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.payment.requestPayout);
+                }}
+              >
                 {isLoadingPayout ? '...Requesting' : 'Request Payout'}
               </Button>
             </Popconfirm>
@@ -186,7 +194,16 @@ const Earnings = () => {
       render: (text, record) => (
         <Row justify="start">
           <Col>
-            <Button className={styles.detailsButton} onClick={() => openSessionDetails(record)} type="link">
+            <Button
+              type="link"
+              className={styles.detailsButton}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.payment.sessionEarnings, {
+                  inventory_id: record.inventory_id,
+                });
+                openSessionDetails(record);
+              }}
+            >
               Details
             </Button>
           </Col>
@@ -214,7 +231,16 @@ const Earnings = () => {
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionDetails(item)} type="link">
+          <Button
+            type="link"
+            className={styles.detailsButton}
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.creator.click.payment.sessionEarnings, {
+                inventory_id: item.inventory_id,
+              });
+              openSessionDetails(item);
+            }}
+          >
             Details
           </Button>,
         ]}
@@ -274,7 +300,14 @@ const Earnings = () => {
           <Col span={24}>
             <Row justify="center" className={styles.mt50}>
               <Col>
-                <Button onClick={() => handleShowMoreSession()} disabled={!showMore} className={styles.ml20}>
+                <Button
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.payment.showMoreEarnings);
+                    handleShowMoreSession();
+                  }}
+                  disabled={!showMore}
+                  className={styles.ml20}
+                >
                   Show More
                 </Button>
               </Col>

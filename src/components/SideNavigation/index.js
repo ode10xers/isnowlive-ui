@@ -41,7 +41,14 @@ const SideNavigation = () => {
             ))}
           </SubMenu>
         ) : (
-          <Item key={navItem.key} icon={navItem?.icon || null} onClick={() => history.push(navItem.path)}>
+          <Item
+            key={navItem.key}
+            icon={navItem?.icon || null}
+            onClick={() => {
+              trackEventInMixPanel(navItem.mixPanelTag);
+              history.push(navItem.path);
+            }}
+          >
             {navItem.title}
           </Item>
         )

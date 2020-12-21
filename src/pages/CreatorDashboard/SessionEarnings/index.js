@@ -13,6 +13,8 @@ import ShowAmount from 'components/ShowAmount';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, getPaymentStatus } from 'utils/helper';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
@@ -176,7 +178,10 @@ const SessionEarnings = ({ match }) => {
           <Col xs={24} md={4}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount)}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.payment.backToEarningDashboard);
+                history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
+              }}
               icon={<ArrowLeftOutlined />}
             >
               All Earnings
