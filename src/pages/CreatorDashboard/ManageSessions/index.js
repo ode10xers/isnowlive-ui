@@ -9,6 +9,8 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
@@ -120,9 +122,12 @@ const ManageSessions = () => {
             <Col md={24} lg={24} xl={8}>
               <Button
                 className={styles.detailsButton}
-                onClick={() =>
-                  history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
-                }
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.edit, {
+                    session_id: record.session_id,
+                  });
+                  history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`);
+                }}
                 type="link"
               >
                 Edit
@@ -130,11 +135,29 @@ const ManageSessions = () => {
             </Col>
             <Col md={24} lg={24} xl={8}>
               {!record.is_active ? (
-                <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
+                <Button
+                  type="text"
+                  className={styles.sucessButton}
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publish, {
+                      session_id: record.session_id,
+                    });
+                    publishSession(record.session_id);
+                  }}
+                >
                   Publish
                 </Button>
               ) : (
-                <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
+                <Button
+                  type="text"
+                  danger
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublish, {
+                      session_id: record.session_id,
+                    });
+                    unpublishSession(record.session_id);
+                  }}
+                >
                   Unpublish
                 </Button>
               )}
@@ -167,19 +190,42 @@ const ManageSessions = () => {
         }
         actions={[
           <Button
-            className={styles.detailsButton}
-            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
             type="link"
+            className={styles.detailsButton}
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.edit, {
+                session_id: item.session_id,
+              });
+              history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`);
+            }}
           >
             Edit
           </Button>,
           <>
             {!item.is_active ? (
-              <Button type="text" className={styles.sucessButton} onClick={() => publishSession(item.session_id)}>
+              <Button
+                type="text"
+                className={styles.sucessButton}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publish, {
+                    session_id: item.session_id,
+                  });
+                  publishSession(item.session_id);
+                }}
+              >
                 Publish
               </Button>
             ) : (
-              <Button type="text" danger onClick={() => unpublishSession(item.session_id)}>
+              <Button
+                type="text"
+                danger
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublish, {
+                    session_id: item.session_id,
+                  });
+                  unpublishSession(item.session_id);
+                }}
+              >
                 Unpublish
               </Button>
             )}

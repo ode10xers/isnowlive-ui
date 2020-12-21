@@ -17,6 +17,13 @@ export const mixPanelEventTags = {
         paymentNav: '(Creator) Get Paid Nav Clicked',
         accountNav: '(Creator) Account Nav Clicked',
       },
+      sessions: {
+        manage: {
+          publish: '(Creator) Publish Session Clicked',
+          unpublish: '(Creator) Unpublish Session Clicked',
+          edit: '(Creator) Edit Session Clicked',
+        },
+      },
       livestream: {
         submitZoomDetails: '(Creator) Submit Zoom Details Clicked',
         connectZoomAccount: '(Creator) Connect Zoom Acc Clicked',
