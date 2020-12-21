@@ -5,6 +5,7 @@ import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isAPISuccess, ZoomAuthType } from 'utils/helper';
@@ -103,7 +104,13 @@ const LiveStream = () => {
               We will connect your Zoom Account. You will be taken to Zoom authorization page. You'll be taken back to
               this page.
             </p>
-            <Button type="primary" className={styles.mt30}>
+            <Button
+              type="primary"
+              className={styles.mt30}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.connectZoomAccount);
+              }}
+            >
               Connect my Zoom Account
             </Button>
           </Row>
@@ -166,7 +173,14 @@ const LiveStream = () => {
                   <Row justify="center">
                     <Col>
                       <Form.Item>
-                        <Button htmlType="submit" type="primary" loading={isLoading}>
+                        <Button
+                          htmlType="submit"
+                          type="primary"
+                          loading={isLoading}
+                          onClick={() => {
+                            trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails);
+                          }}
+                        >
                           Submit
                         </Button>
                       </Form.Item>

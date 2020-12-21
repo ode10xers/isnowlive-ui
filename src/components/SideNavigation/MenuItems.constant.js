@@ -90,6 +90,7 @@ export const creatorMenuItems = [
   //   order: 7,
   //   key: 'account',
   //   title: 'Account',
+  //   mixPanelTag: mixPanelEventTags.creator.click.dashboard.accountNav,
   //   icon: <UserOutlined />,
   // },
 ];
@@ -105,12 +106,14 @@ export const attendeeMenuItems = [
         order: 1,
         key: 'upcoming_sessions',
         title: 'Upcoming Sessions',
+        mixPanelTag: mixPanelEventTags.attendee.click.dashboard.upcomingSession,
         path: Routes.attendeeDashboard.rootPath + '/sessions/upcoming',
       },
       {
         order: 2,
         key: 'past_sessions',
         title: 'Past Sessions',
+        mixPanelTag: mixPanelEventTags.attendee.click.dashboard.pastSessions,
         path: Routes.attendeeDashboard.rootPath + '/sessions/past',
       },
     ],
@@ -119,12 +122,14 @@ export const attendeeMenuItems = [
   //   order: 3,
   //   key: 'packages',
   //   title: 'Packages',
+  //   mixPanelTag: mixPanelEventTags.attendee.click.dsahboard.packagesNav,
   //   icon: <ControlOutlined />,
   // },
   // {
   //   order: 7,
   //   key: 'account',
   //   title: 'Account',
+  //   mixPanelTag: mixPanelEventTags.attendee.click.dsahboard.accountNav,
   //   icon: <UserOutlined />,
   // },
 ];
