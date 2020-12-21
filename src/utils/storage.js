@@ -1,19 +1,19 @@
 import { getAuthCookie } from "services/authCookie";
-import apis from "apis";
-import { isAPISuccess } from "./helper";
+// import apis from "apis";
+// import { isAPISuccess } from "./helper";
 
-const getUserDetails = async () => {
-  try {
-    const {data, status} = await apis.user.getProfile();
-    if (isAPISuccess(status) && data) {
-      return data;
-    }
-  } catch (error) {
-    return null;
-  }
-}
+// const getUserDetails = async () => {
+//   try {
+//     const {data, status} = await apis.user.getProfile();
+//     if (isAPISuccess(status) && data) {
+//       return data;
+//     }
+//   } catch (error) {
+//     return null;
+//   }
+// }
 
-export const getLocalUserDetails = async () => {
+export const getLocalUserDetails = () => {
   // compare auth tokens
   const authToken = getAuthCookie();
 
@@ -30,8 +30,9 @@ export const getLocalUserDetails = async () => {
       }
       return null;
     } else {
-      userDetails = await getUserDetails();
-      return userDetails;
+      // //
+      // userDetails = await getUserDetails();
+      return null;
     }
   }
   return null;
