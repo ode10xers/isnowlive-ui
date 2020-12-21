@@ -125,6 +125,7 @@ const SessionDetails = ({ match, history }) => {
     try {
       const { status, data } = await apis.session.createOrderForUser({
         inventory_id: parseInt(match.params.inventory_id),
+        user_timezone_offset: new Date().getTimezoneOffset(),
       });
 
       if (isAPISuccess(status) && data) {
