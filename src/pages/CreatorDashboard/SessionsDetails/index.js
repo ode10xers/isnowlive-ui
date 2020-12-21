@@ -26,6 +26,8 @@ import ParticipantsList from 'components/ParticipantsList';
 import Share from 'components/Share';
 import Routes from 'routes';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
@@ -97,7 +99,10 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push('/creator/dashboard/sessions/past')}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.backToPastSessionsList);
+                  history.push('/creator/dashboard/sessions/past');
+                }}
                 icon={<ArrowLeftOutlined />}
               >
                 Past Sessions
@@ -109,20 +114,40 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push('/creator/dashboard/sessions/upcoming')}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.backToUpcomingSessionsList);
+                  history.push('/creator/dashboard/sessions/upcoming');
+                }}
                 icon={<ArrowLeftOutlined />}
               >
                 Upcoming Sessions
               </Button>
             </Col>
             <Col xs={24} md={3}>
-              <Button className={styles.headButton} onClick={() => window.open(publicUrl)} icon={<GlobalOutlined />}>
+              <Button
+                className={styles.headButton}
+                icon={<GlobalOutlined />}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.publicPage);
+                  window.open(publicUrl);
+                }}
+              >
                 Public Page
               </Button>
             </Col>
             <Col xs={24} md={4}>
               <div className={styles.headButton}>
-                <Share label="Share Session" title={session?.name} shareUrl={publicUrl} />
+                <Share
+                  label="Share Session"
+                  title={session?.name}
+                  shareUrl={publicUrl}
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.shareSession, {
+                      session_id: session?.session_id,
+                      inventory_id: session?.inventory_id,
+                    });
+                  }}
+                />
               </div>
             </Col>
           </>
@@ -175,7 +200,13 @@ const SessionsDetails = ({ match }) => {
                   className={styles.actionButton}
                   icon={<VideoCameraOutlined />}
                   disabled={!session?.start_url}
-                  onClick={() => window.open(session?.start_url)}
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.startSession, {
+                      session_id: session?.session_id,
+                      inventory_id: session?.inventory_id,
+                    });
+                    window.open(session?.start_url);
+                  }}
                 >
                   Start Session
                 </Button>
@@ -184,9 +215,13 @@ const SessionsDetails = ({ match }) => {
                   block
                   className={classNames(styles.actionButton, styles.editButton)}
                   icon={<EditOutlined />}
-                  onClick={() =>
-                    history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`)
-                  }
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.editSession, {
+                      session_id: session?.session_id,
+                      inventory_id: session?.inventory_id,
+                    });
+                    history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`);
+                  }}
                 >
                   Edit Session
                 </Button>
@@ -195,6 +230,12 @@ const SessionsDetails = ({ match }) => {
                   block
                   className={classNames(styles.actionButton, styles.emailButton)}
                   icon={<MailOutlined />}
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.sendEmail, {
+                      session_id: session?.session_id,
+                      inventory_id: session?.inventory_id,
+                    });
+                  }}
                 >
                   Send Email
                 </Button>
@@ -213,6 +254,12 @@ const SessionsDetails = ({ match }) => {
                     danger
                     className={styles.actionButton}
                     icon={<CloseCircleOutlined />}
+                    onClick={() => {
+                      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.cancelSession, {
+                        session_id: session?.session_id,
+                        inventory_id: session?.inventory_id,
+                      });
+                    }}
                   >
                     Cancel Session
                   </Button>

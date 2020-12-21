@@ -123,7 +123,7 @@ const ManageSessions = () => {
               <Button
                 className={styles.detailsButton}
                 onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.edit, {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.editSession, {
                     session_id: record.session_id,
                   });
                   history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`);
@@ -139,7 +139,7 @@ const ManageSessions = () => {
                   type="text"
                   className={styles.sucessButton}
                   onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publish, {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
                       session_id: record.session_id,
                     });
                     publishSession(record.session_id);
@@ -152,7 +152,7 @@ const ManageSessions = () => {
                   type="text"
                   danger
                   onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublish, {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublishSession, {
                       session_id: record.session_id,
                     });
                     unpublishSession(record.session_id);
@@ -183,7 +183,12 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
-            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.sessionCard, {
+                session_id: item.session_id,
+              });
+              history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`);
+            }}
           >
             <Text>{item.name}</Text>
           </div>
@@ -193,7 +198,7 @@ const ManageSessions = () => {
             type="link"
             className={styles.detailsButton}
             onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.edit, {
+              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.editSession, {
                 session_id: item.session_id,
               });
               history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`);
@@ -207,7 +212,7 @@ const ManageSessions = () => {
                 type="text"
                 className={styles.sucessButton}
                 onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publish, {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.publishSession, {
                     session_id: item.session_id,
                   });
                   publishSession(item.session_id);
@@ -220,7 +225,7 @@ const ManageSessions = () => {
                 type="text"
                 danger
                 onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublish, {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.unpublishSession, {
                     session_id: item.session_id,
                   });
                   unpublishSession(item.session_id);

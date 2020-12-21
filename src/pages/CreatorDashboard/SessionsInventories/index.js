@@ -11,6 +11,8 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { isAPISuccess, getDuration } from 'utils/helper';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
@@ -136,7 +138,17 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button
+                type="link"
+                className={styles.detailsButton}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.pastSessionsDetails, {
+                    session_id: record.session_id,
+                    inventory_id: record.inventory_id,
+                  });
+                  openSessionInventoryDetails(record);
+                }}
+              >
                 Details
               </Button>
             </Col>
@@ -144,7 +156,17 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button
+                type="link"
+                className={styles.detailsButton}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.upcomingSessionsDetails, {
+                    session_id: record.session_id,
+                    inventory_id: record.inventory_id,
+                  });
+                  openSessionInventoryDetails(record);
+                }}
+              >
                 Details
               </Button>
             </Col>
@@ -157,7 +179,17 @@ const SessionsInventories = ({ match }) => {
                 disabled={isDisabled}
                 onConfirm={() => deleteInventory(record.inventory_id)}
               >
-                <Button type="text" disabled={isDisabled} danger>
+                <Button
+                  type="text"
+                  disabled={isDisabled}
+                  danger
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
+                      session_id: record.session_id,
+                      inventory_id: record.inventory_id,
+                    });
+                  }}
+                >
                   Cancel
                 </Button>
               </Popconfirm>
@@ -165,7 +197,17 @@ const SessionsInventories = ({ match }) => {
 
             <Col md={24} lg={24} xl={8}>
               {!isPast && (
-                <Button type="link" disabled={!record.start_url} onClick={() => window.open(record.start_url)}>
+                <Button
+                  type="link"
+                  disabled={!record.start_url}
+                  onClick={() => {
+                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.startSession, {
+                      session_id: record.session_id,
+                      inventory_id: record.inventory_id,
+                    });
+                    window.open(record.start_url);
+                  }}
+                >
                   Start
                 </Button>
               )}
@@ -192,12 +234,30 @@ const SessionsInventories = ({ match }) => {
       <Card
         className={styles.card}
         title={
-          <div onClick={() => openSessionInventoryDetails(item)}>
+          <div
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.sessionCard, {
+                session_id: item.session_id,
+                inventory_id: item.inventory_id,
+              });
+              openSessionInventoryDetails(item);
+            }}
+          >
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
+          <Button
+            className={styles.detailsButton}
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.sessionDetails, {
+                session_id: item.session_id,
+                inventory_id: item.inventory_id,
+              });
+              openSessionInventoryDetails(item);
+            }}
+            type="link"
+          >
             Details
           </Button>,
           <Popconfirm
@@ -208,13 +268,32 @@ const SessionsInventories = ({ match }) => {
             disabled={isCancelDisabled}
             onConfirm={() => deleteInventory(item.inventory_id)}
           >
-            <Button type="text" disabled={isCancelDisabled}>
+            <Button
+              type="text"
+              disabled={isCancelDisabled}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.cancelSession, {
+                  session_id: item.session_id,
+                  inventory_id: item.inventory_id,
+                });
+              }}
+            >
               Cancel
             </Button>
           </Popconfirm>,
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
+              <Button
+                type="link"
+                disabled={!item.start_url}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.startSession, {
+                    session_id: item.session_id,
+                    inventory_id: item.inventory_id,
+                  });
+                  window.open(item.start_url);
+                }}
+              >
                 Start
               </Button>
             )}
