@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card } from 'antd';
+import { Row, Col, Typography, Button, Card, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
@@ -28,6 +28,40 @@ const ManageSessions = () => {
     }
     setIsLoading(false);
   }, []);
+
+  const publishSession = async (sessionId) => {
+    setIsLoading(true);
+
+    try {
+      const { data } = await apis.session.publishSession(sessionId);
+
+      if (data) {
+        message.success('Session published successfully!');
+        getSessionsList();
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const unpublishSession = async (sessionId) => {
+    setIsLoading(true);
+
+    try {
+      const { data } = await apis.session.unpublishSession(sessionId);
+
+      if (data) {
+        message.success('Session is now unpublished!');
+        getSessionsList();
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     getSessionsList();
@@ -91,16 +125,16 @@ const ManageSessions = () => {
                 }
                 type="link"
               >
-                Details
+                Edit
               </Button>
             </Col>
             <Col md={24} lg={24} xl={8}>
-              {record.is_active ? (
-                <Button type="text" className={styles.sucessButton}>
+              {!record.is_active ? (
+                <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
                   Publish
                 </Button>
               ) : (
-                <Button type="text" danger>
+                <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
                   Unpublish
                 </Button>
               )}
@@ -137,15 +171,15 @@ const ManageSessions = () => {
             onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
             type="link"
           >
-            Details
+            Edit
           </Button>,
           <>
-            {item.is_active ? (
-              <Button type="text" className={styles.sucessButton}>
+            {!item.is_active ? (
+              <Button type="text" className={styles.sucessButton} onClick={() => publishSession(item.session_id)}>
                 Publish
               </Button>
             ) : (
-              <Button type="text" danger>
+              <Button type="text" danger onClick={() => unpublishSession(item.session_id)}>
                 Unpublish
               </Button>
             )}
