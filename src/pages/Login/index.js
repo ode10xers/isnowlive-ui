@@ -60,8 +60,8 @@ const Login = ({ history }) => {
       setIsLoading(false);
       trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
         result: 'FAILED',
-        error_code: error.code || error.name,
-        error_message: error.message,
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }

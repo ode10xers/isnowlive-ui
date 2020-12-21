@@ -68,11 +68,15 @@ const PaymentAccount = () => {
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);
-    trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe);
     try {
       const { data, status } = await apis.payment.stripe.onboardUser({ country: selectedCountry });
       if (isAPISuccess(status)) {
         setIsLoading(false);
+        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
@@ -82,6 +86,11 @@ const PaymentAccount = () => {
       ) {
         relinkStripe();
       } else {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
+          result: 'FAILED',
+          error_code: error.response?.data?.code,
+          error_message: error.response?.data?.message,
+        });
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
       }

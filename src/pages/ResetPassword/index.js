@@ -7,6 +7,7 @@ import apis from 'apis';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+import { mixPanelEventTags, trackEventInMixPanel } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 
@@ -33,11 +34,21 @@ const ResetPassword = () => {
       });
       if (isAPISuccess(status)) {
         setSubmitting(false);
+        trackEventInMixPanel(mixPanelEventTags.public.setNewPassword, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
         message.success('Password set successfully.');
         history.push(Routes.login);
       }
     } catch (error) {
       setSubmitting(false);
+      trackEventInMixPanel(mixPanelEventTags.public.setNewPassword, {
+        result: 'SUCCESS',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };

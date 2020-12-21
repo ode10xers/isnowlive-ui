@@ -60,6 +60,12 @@ const Profile = () => {
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
         setIsLoading(false);
+        trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.submitProfile, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
+
         message.success('Profile successfully updated.');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
@@ -73,6 +79,11 @@ const Profile = () => {
       }
     } catch (error) {
       setIsLoading(false);
+      trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.submitProfile, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -329,13 +340,7 @@ const Profile = () => {
           <Row justify="center">
             <Col>
               <Form.Item>
-                <Button
-                  htmlType="submit"
-                  type="primary"
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.submitProfile);
-                  }}
-                >
+                <Button htmlType="submit" type="primary">
                   Publish Page
                 </Button>
               </Form.Item>

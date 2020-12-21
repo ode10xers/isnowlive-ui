@@ -52,7 +52,8 @@ export const mixPanelEventTags = {
           },
         },
         form: {
-          submitUpdate: '(Creator) Publish Button in Form Clicked',
+          submitNewSession: '(Creator) Publish Button in Create Form Clicked',
+          submitUpdate: '(Creator) Publish Button in Update Form Clicked',
           addNewInModal: '(Creator) Add New in Confirmation Modal Clicked',
           doneInModal: '(Creator) Done in Confirmation Modal Clicked',
         },
@@ -93,6 +94,17 @@ export const mixPanelEventTags = {
         packagesNav: '(Attendee) Packages Nav Clicked',
         accountNav: '(Attendee) Account Nav Clicked',
       },
+      sessions: {
+        pastSessionDetails: '(Attendee) Past Session Details Clicked',
+        upcomingSessionDetails: '(Attendee) Upcoming Session Details Clicked',
+        joinSession: '(Attendee) Join Session Clicked',
+        cancelOrder: '(Attendee) Cancel Session Order Clicked',
+        mobile: {
+          sessionCard: '(Attendee) Session Card for Mobile devices Clicked',
+          pastSessionDetails: '(Attendee) Past Session Details for Mobile devices Clicked',
+          upcomingSessionDetails: '(Attendee) Upcoming Session Details for Mobile devices Clicked',
+        },
+      },
     },
   },
 
@@ -100,6 +112,7 @@ export const mixPanelEventTags = {
     click: {
       logIn: 'Log In Clicked',
       logOut: 'Log Out Clicked',
+      adminLogIn: 'Super Admin Login Clicked',
       newPassword: 'Set New Password Clicked',
       sendEmail: 'Send Reset Password Email Clicked',
       loginWithNewPassword: 'Login with New Password Clicked',

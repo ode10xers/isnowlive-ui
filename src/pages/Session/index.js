@@ -228,10 +228,6 @@ const Session = ({ match, history }) => {
   };
 
   const onFinish = async (values) => {
-    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitUpdate, {
-      formValues: values,
-    });
-
     try {
       setIsLoading(true);
       const data = {
@@ -261,6 +257,12 @@ const Session = ({ match, history }) => {
         }
         if (session.session_id) {
           await apis.session.update(session.session_id, data);
+          trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitUpdate, {
+            result: 'SUCCESS',
+            error_code: 'NA',
+            error_message: 'NA',
+            formValues: values,
+          });
           message.success('Session successfully updated.');
           const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
           const endDate = toUtcEndOfDay(moment().add(1, 'month'));
@@ -269,6 +271,13 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
+            trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitNewSession, {
+              result: 'SUCCESS',
+              error_code: 'NA',
+              error_message: 'NA',
+              formValues: values,
+            });
+
             Modal.confirm({
               icon: <CheckCircleOutlined />,
               title: `${newSessionResponse.data.name} session successfully created`,

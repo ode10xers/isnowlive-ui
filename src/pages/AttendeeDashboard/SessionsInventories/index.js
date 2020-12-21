@@ -7,6 +7,7 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import { mixPanelEventTags, trackEventInMixPanel } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -97,11 +98,23 @@ const SessionsInventories = ({ match }) => {
   const cancelOrderForSession = async (orderId) => {
     try {
       await apis.session.cancelCustomerOrder(orderId, { reason: 'requested_by_customer' });
+      trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.cancelOrder, {
+        result: 'SUCCESS',
+        error_code: 'NA',
+        error_message: 'NA',
+        order_id: orderId,
+      });
       message.success('Refund Successful');
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (error) {
+      trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.cancelOrder, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        order_id: orderId,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -209,7 +222,16 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button
+                type="link"
+                className={styles.detailsButton}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.pastSessionDetails, {
+                    orderId: record.order_id,
+                  });
+                  openSessionInventoryDetails(record);
+                }}
+              >
                 Details
               </Button>
             </Col>
@@ -217,7 +239,16 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button
+                type="link"
+                className={styles.detailsButton}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.upcomingSessionDetails, {
+                    orderId: record.order_id,
+                  });
+                  openSessionInventoryDetails(record);
+                }}
+              >
                 Details
               </Button>
             </Col>
@@ -225,7 +256,16 @@ const SessionsInventories = ({ match }) => {
             {!isPast && (
               <>
                 <Col md={24} lg={24} xl={8}>
-                  <Button type="link" disabled={!record.join_url} onClick={() => window.open(record.join_url)}>
+                  <Button
+                    type="link"
+                    disabled={!record.join_url}
+                    onClick={() => {
+                      trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.pastSessionDetails, {
+                        orderId: record.order_id,
+                      });
+                      window.open(record.join_url);
+                    }}
+                  >
                     Join
                   </Button>
                 </Col>
@@ -253,17 +293,42 @@ const SessionsInventories = ({ match }) => {
     return (
       <Card
         title={
-          <div onClick={() => openSessionInventoryDetails(item)}>
+          <div
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.sessionCard, {
+                orderId: item.order_id,
+              });
+              openSessionInventoryDetails(item);
+            }}
+          >
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
+          <Button
+            type="link"
+            className={styles.detailsButton}
+            onClick={() => {
+              trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.upcomingSessionDetails, {
+                orderId: item.order_id,
+              });
+              openSessionInventoryDetails(item);
+            }}
+          >
             Details
           </Button>,
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.join_url} onClick={() => window.open(item.join_url)}>
+              <Button
+                type="link"
+                disabled={!item.join_url}
+                onClick={() => {
+                  trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.pastSessionDetails, {
+                    orderId: item.order_id,
+                  });
+                  window.open(item.join_url);
+                }}
+              >
                 Join
               </Button>
             )}

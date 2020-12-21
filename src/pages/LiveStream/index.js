@@ -59,6 +59,12 @@ const LiveStream = () => {
       const { status } = await apis.user.storeZoomCredentials(values);
       setIsLoading(false);
       if (isAPISuccess(status)) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
+
         message.success('Zoom successfully setup!');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.zoom_connected = true;
@@ -74,6 +80,11 @@ const LiveStream = () => {
       }
     } catch (error) {
       setIsLoading(false);
+      trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails, {
+        result: 'SUCCESS',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -173,14 +184,7 @@ const LiveStream = () => {
                   <Row justify="center">
                     <Col>
                       <Form.Item>
-                        <Button
-                          htmlType="submit"
-                          type="primary"
-                          loading={isLoading}
-                          onClick={() => {
-                            trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails);
-                          }}
-                        >
+                        <Button htmlType="submit" type="primary" loading={isLoading}>
                           Submit
                         </Button>
                       </Form.Item>

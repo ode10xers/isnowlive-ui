@@ -7,6 +7,7 @@ import validationRules from 'utils/validation';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
+import { mixPanelEventTags, trackEventInMixPanel } from 'services/integrations/mixpanel';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
@@ -44,6 +45,13 @@ const AdminLogin = ({ history }) => {
       const { data } = await apis.admin.login(values);
 
       if (data) {
+        trackEventInMixPanel(mixPanelEventTags.public.click.adminLogIn, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+          user_email: values.user_email,
+          admin_email: values.email,
+        });
         http.setAuthToken(data.auth_token);
         logIn(data, false);
         setIsLoading(false);
@@ -51,6 +59,11 @@ const AdminLogin = ({ history }) => {
       }
     } catch (error) {
       setIsLoading(false);
+      trackEventInMixPanel(mixPanelEventTags.public.click.adminLogIn, {
+        result: 'SUCCESS',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };

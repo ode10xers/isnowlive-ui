@@ -81,10 +81,22 @@ const SessionsInventories = ({ match }) => {
     try {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+          inventory_id: inventory_id,
+        });
         getStaffSession(match?.params?.session_type);
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
+      trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        inventory_id: inventory_id,
+      });
     }
   };
 
@@ -179,17 +191,7 @@ const SessionsInventories = ({ match }) => {
                 disabled={isDisabled}
                 onConfirm={() => deleteInventory(record.inventory_id)}
               >
-                <Button
-                  type="text"
-                  disabled={isDisabled}
-                  danger
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
-                      session_id: record.session_id,
-                      inventory_id: record.inventory_id,
-                    });
-                  }}
-                >
+                <Button type="text" disabled={isDisabled} danger>
                   Cancel
                 </Button>
               </Popconfirm>
@@ -268,16 +270,7 @@ const SessionsInventories = ({ match }) => {
             disabled={isCancelDisabled}
             onConfirm={() => deleteInventory(item.inventory_id)}
           >
-            <Button
-              type="text"
-              disabled={isCancelDisabled}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.cancelSession, {
-                  session_id: item.session_id,
-                  inventory_id: item.inventory_id,
-                });
-              }}
-            >
+            <Button type="text" disabled={isCancelDisabled}>
               Cancel
             </Button>
           </Popconfirm>,

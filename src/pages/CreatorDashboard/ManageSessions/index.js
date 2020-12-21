@@ -38,10 +38,22 @@ const ManageSessions = () => {
       const { data } = await apis.session.publishSession(sessionId);
 
       if (data) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+          session_id: sessionId,
+        });
         message.success('Session published successfully!');
         getSessionsList();
       }
     } catch (error) {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        session_id: sessionId,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
 
@@ -55,10 +67,22 @@ const ManageSessions = () => {
       const { data } = await apis.session.unpublishSession(sessionId);
 
       if (data) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublishSession, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+          session_id: sessionId,
+        });
         message.success('Session is now unpublished!');
         getSessionsList();
       }
     } catch (error) {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        session_id: sessionId,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
 
@@ -135,29 +159,11 @@ const ManageSessions = () => {
             </Col>
             <Col md={24} lg={24} xl={8}>
               {!record.is_active ? (
-                <Button
-                  type="text"
-                  className={styles.sucessButton}
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
-                      session_id: record.session_id,
-                    });
-                    publishSession(record.session_id);
-                  }}
-                >
+                <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
                   Publish
                 </Button>
               ) : (
-                <Button
-                  type="text"
-                  danger
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublishSession, {
-                      session_id: record.session_id,
-                    });
-                    unpublishSession(record.session_id);
-                  }}
-                >
+                <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
                   Unpublish
                 </Button>
               )}
@@ -208,29 +214,11 @@ const ManageSessions = () => {
           </Button>,
           <>
             {!item.is_active ? (
-              <Button
-                type="text"
-                className={styles.sucessButton}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.publishSession, {
-                    session_id: item.session_id,
-                  });
-                  publishSession(item.session_id);
-                }}
-              >
+              <Button type="text" className={styles.sucessButton} onClick={() => publishSession(item.session_id)}>
                 Publish
               </Button>
             ) : (
-              <Button
-                type="text"
-                danger
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.unpublishSession, {
-                    session_id: item.session_id,
-                  });
-                  unpublishSession(item.session_id);
-                }}
-              >
+              <Button type="text" danger onClick={() => unpublishSession(item.session_id)}>
                 Unpublish
               </Button>
             )}
