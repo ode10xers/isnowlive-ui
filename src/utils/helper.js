@@ -142,3 +142,20 @@ export const scrollToErrorField = (errorFields) => {
   document.getElementById(errorFields[0].name).focus();
   document.getElementById(errorFields[0].name).scrollIntoView();
 };
+
+export const getPaymentStatus = (status) => {
+  switch (status) {
+    case 'PAYMENT_COMPLETED':
+      return 'Paid';
+    case 'CANCELLED':
+      return 'Cancel';
+    default:
+      return 'Unpaid';
+  }
+};
+
+export const ZoomAuthType = {
+  OAUTH: 'OAUTH',
+  JWT: 'JWT',
+  NOT_CONNECTED: 'NOT_CONNECTED',
+};

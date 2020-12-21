@@ -190,6 +190,7 @@ const SessionsInventories = ({ match }) => {
 
     return (
       <Card
+        className={styles.card}
         title={
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>

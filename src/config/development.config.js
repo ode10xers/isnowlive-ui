@@ -10,4 +10,8 @@ export default {
   mixPanel: {
     projectToken: '66d14eef944c59af0a94e7a20f7e0b2f',
   },
+  stripe: {
+    secretKey:
+      'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
+  },
 };

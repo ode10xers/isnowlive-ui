@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  ControlOutlined,
-  TeamOutlined,
+  // ControlOutlined,
+  // TeamOutlined,
+  // UserOutlined,
   VideoCameraOutlined,
   ToolOutlined,
   DollarOutlined,
   GlobalOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -48,20 +48,20 @@ export const creatorMenuItems = [
       },
     ],
   },
-  {
-    order: 2,
-    key: 'attendees',
-    title: 'Attendees',
-    mixPanelTag: mixPanelEventTags.creator.click.dashboard.attendeeNav,
-    icon: <TeamOutlined />,
-  },
-  {
-    order: 3,
-    key: 'packages',
-    title: 'Packages',
-    mixPanelTag: mixPanelEventTags.creator.click.dashboard.packagesNav,
-    icon: <ControlOutlined />,
-  },
+  // {
+  //   order: 2,
+  //   key: 'attendees',
+  //   title: 'Attendees',
+  //   mixPanelTag: mixPanelEventTags.creator.click.dashboard.attendeeNav,
+  //   icon: <TeamOutlined />,
+  // },
+  // {
+  //   order: 3,
+  //   key: 'packages',
+  //   title: 'Packages',
+  //   mixPanelTag: mixPanelEventTags.creator.click.dashboard.packagesNav,
+  //   icon: <ControlOutlined />,
+  // },
   {
     order: 4,
     key: 'livestream',
@@ -86,12 +86,12 @@ export const creatorMenuItems = [
     mixPanelTag: mixPanelEventTags.creator.click.dashboard.paymentNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
-  {
-    order: 7,
-    key: 'account',
-    title: 'Account',
-    icon: <UserOutlined />,
-  },
+  // {
+  //   order: 7,
+  //   key: 'account',
+  //   title: 'Account',
+  //   icon: <UserOutlined />,
+  // },
 ];
 
 export const attendeeMenuItems = [
@@ -115,16 +115,16 @@ export const attendeeMenuItems = [
       },
     ],
   },
-  {
-    order: 3,
-    key: 'packages',
-    title: 'Packages',
-    icon: <ControlOutlined />,
-  },
-  {
-    order: 7,
-    key: 'account',
-    title: 'Account',
-    icon: <UserOutlined />,
-  },
+  // {
+  //   order: 3,
+  //   key: 'packages',
+  //   title: 'Packages',
+  //   icon: <ControlOutlined />,
+  // },
+  // {
+  //   order: 7,
+  //   key: 'account',
+  //   title: 'Account',
+  //   icon: <UserOutlined />,
+  // },
 ];

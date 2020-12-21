@@ -7,6 +7,7 @@ import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
 import { isAPISuccess } from 'utils/helper';
 import apis from 'apis';
+import Earnings from 'pages/CreatorDashboard/Earnings';
 
 import styles from './styles.module.scss';
 
@@ -20,11 +21,11 @@ const PaymentAccount = () => {
   const countries = countryList().getData();
   const {
     state: {
-      userDetails: { payment_connected = false },
+      userDetails: { payment_account_status = false },
     },
   } = useGlobalContext();
   const validateAccount = location?.state?.validateAccount;
-  const [paymentConnected, setPaymentConnected] = useState(payment_connected);
+  const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
   useEffect(() => {
     if (validateAccount) {
@@ -87,8 +88,8 @@ const PaymentAccount = () => {
 
   let view = null;
 
-  if (paymentConnected === true) {
-    view = <p>Payment Dashboard</p>;
+  if (paymentConnected === 'CONNECTED') {
+    view = <Earnings />;
   } else {
     view = (
       <>

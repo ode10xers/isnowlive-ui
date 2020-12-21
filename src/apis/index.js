@@ -17,6 +17,7 @@ export default {
     uploadFile: (payload) => http.post('/secure/upload?type=document', payload),
     updateProfile: (payload) => http.patch('/secure/user', payload),
     getSessionsByUsername: (username, type) => http.get(`/sessions/${username}/${type}`),
+    getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
   },
   payment: {
@@ -25,6 +26,8 @@ export default {
       relinkAccount: () => http.post('/secure/creator/profile/stripe/relink'),
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
     },
+    createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
+    verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
@@ -40,5 +43,11 @@ export default {
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
+    getCreatorEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings?page_no=${pageNo}&per_page=${perPage}`),
+    getEarningsByInventoryId: (inventoryId) => http.get(`/secure/creator/payments/earnings/id/${inventoryId}`),
+    getCreatorBalance: () => http.get('/secure/creator/payments/earnings/balance'),
+    createCreatorBalancePayout: () => http.post('/secure/creator/payments/payouts'),
+    cancelCustomerOrder: (orderId, payload) => http.post(`/secure/customer/orders/${orderId}/cancel`, payload),
   },
 };

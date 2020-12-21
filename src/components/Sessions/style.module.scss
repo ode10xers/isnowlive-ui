@@ -34,6 +34,14 @@
   color: map-get($colors, $key: 'NavyBlue') !important;
   font-size: 10px;
 }
+@media (min-width: 768px) and (max-width: 1200px) {
+  .text {
+    font-size: 1.3vw;
+  }
+  .subtext {
+    font-size: 1vw;
+  }
+}
 .box {
   background: map-get($colors, $key: 'White1');
   border-radius: 6px;
@@ -55,5 +63,5 @@
   color: map-get($colors, $key: 'EasternBlue') !important;
   background: map-get($colors, $key: 'PaleCornflowerBlue');
   border-radius: 8px;
-  padding: 10px;
+  padding: 5px 10px 5px 10px;
 }
