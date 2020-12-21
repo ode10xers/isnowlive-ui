@@ -33,6 +33,8 @@ import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorFiel
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
+import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
@@ -226,6 +228,10 @@ const Session = ({ match, history }) => {
   };
 
   const onFinish = async (values) => {
+    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitUpdate, {
+      formValues: values,
+    });
+
     try {
       setIsLoading(true);
       const data = {
@@ -270,10 +276,14 @@ const Session = ({ match, history }) => {
               okText: 'Done',
               cancelText: 'Add New',
               onCancel: () => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.addNewInModal);
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
-              onOk: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
+              onOk: () => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.doneInModal);
+                history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`);
+              },
             });
           }
         }
@@ -308,7 +318,10 @@ const Session = ({ match, history }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/manage/sessions')}
+              onClick={() => {
+                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.backToManageSessionsList);
+                history.push('/creator/dashboard/manage/sessions');
+              }}
               icon={<ArrowLeftOutlined />}
             >
               Sessions

@@ -22,6 +22,12 @@ export const mixPanelEventTags = {
           publish: '(Creator) Publish Session Clicked',
           unpublish: '(Creator) Unpublish Session Clicked',
           edit: '(Creator) Edit Session Clicked',
+          backToManageSessionsList: '(Creator) Back to Manage Sessions Clicked',
+        },
+        form: {
+          submitUpdate: '(Creator) Publish Button in Form Clicked',
+          addNewInModal: '(Creator) Add New in Confirmation Modal Clicked',
+          doneInModal: '(Creator) Done in Confirmation Modal Clicked',
         },
       },
       livestream: {
