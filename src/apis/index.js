@@ -49,5 +49,7 @@ export default {
     getCreatorBalance: () => http.get('/secure/creator/payments/earnings/balance'),
     createCreatorBalancePayout: () => http.post('/secure/creator/payments/payouts'),
     cancelCustomerOrder: (orderId, payload) => http.post(`/secure/customer/orders/${orderId}/cancel`, payload),
+    publishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
+    unpublishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
   },
 };
