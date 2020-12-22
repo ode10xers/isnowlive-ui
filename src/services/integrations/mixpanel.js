@@ -74,6 +74,7 @@ export const mixPanelEventTags = {
         sessionEarnings: '(Creator) Session Earning Details Clicked',
         backToEarningDashboard: '(Creator) Back to All Earnings Clicked',
         showMoreEarnings: '(Creator) Show More Earnings Clicked',
+        verifyBankAccount: '(Creator) Verify Bank Account Clicked',
       },
     },
   },
