@@ -42,4 +42,3 @@ const deleteAuthCookie = () => {
 }
 
 export { setAuthCookie, getAuthCookie, deleteAuthCookie };
-

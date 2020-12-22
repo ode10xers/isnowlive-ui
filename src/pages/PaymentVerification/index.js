@@ -7,6 +7,7 @@ import apis from 'apis';
 import Routes from 'routes';
 import { isAPISuccess } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
+import { Modal } from 'antd';
 
 const PaymentVerification = () => {
   const location = useLocation();
@@ -26,8 +27,13 @@ const PaymentVerification = () => {
           });
 
           if (isAPISuccess(status)) {
-            message.success('Order booked successfully.');
-            history.push(Routes.attendeeDashboard.rootPath);
+            Modal.success({
+              content: 'Session booked successfully.',
+              okText: 'Go to Dashboard',
+              onOk: () => {
+                history.push(Routes.attendeeDashboard.rootPath);
+              }
+            });
           }
           setIsLoading(false);
         } catch (error) {
