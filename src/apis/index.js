@@ -25,6 +25,7 @@ export default {
       onboardUser: (payload) => http.post('/secure/creator/profile/stripe', payload),
       relinkAccount: () => http.post('/secure/creator/profile/stripe/relink'),
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
+      getDashboard: () => http.get('/secure/creator/profile/stripe/dashboard'),
     },
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),

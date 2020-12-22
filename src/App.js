@@ -74,6 +74,7 @@ function App() {
         }
       } catch (error) {
         setUserAuthentication(false);
+        setUserDetails(null);
         setIsReadyToLoad(true);
       }
     };
@@ -81,8 +82,9 @@ function App() {
     if (authToken && authToken !== '') {
       getUserDetails();
     } else {
-      setIsReadyToLoad(true);
       setUserAuthentication(false);
+      setUserDetails(null);
+      setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
   }, []);

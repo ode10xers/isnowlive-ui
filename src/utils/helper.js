@@ -159,3 +159,9 @@ export const ZoomAuthType = {
   JWT: 'JWT',
   NOT_CONNECTED: 'NOT_CONNECTED',
 };
+
+export const StripeAccountStatus = {
+  NOT_CONNECTED: 'NOT_CONNECTED',
+  VERIFICATION_PENDING: 'VERIFICATION_PENDING',
+  CONNECTED: 'CONNECTED',
+};

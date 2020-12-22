@@ -9,8 +9,9 @@ import dateUtil from 'utils/date';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ShowAmount from 'components/ShowAmount';
+import { useGlobalContext } from 'services/globalContext';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -37,6 +38,11 @@ const Earnings = () => {
   const [sessions, setSessions] = useState([]);
   const [balance, setBalance] = useState(null);
   const [isLoadingPayout, setIsLoadingPayout] = useState(false);
+  const {
+    state: {
+      userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
+    },
+  } = useGlobalContext();
 
   const [showMore, setShowMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,6 +79,24 @@ const Earnings = () => {
         setSessions([...sessions, ...data.earnings]);
         setCurrentPage(pageNo);
         setShowMore(data.next_page || false);
+      }
+    } catch (error) {
+      trackFailedEvent(eventTag, error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  };
+
+  const openStripeDashboard = async () => {
+    const eventTag = creator.click.payment.verifyBankAccount;
+
+    try {
+      setIsLoading(true);
+      const { status, data } = await apis.payment.stripe.getDashboard();
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        trackSuccessEvent(eventTag);
+        window.open(data.url, '_self');
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
@@ -161,6 +185,28 @@ const Earnings = () => {
   const paidOut = paymentBoxLayout('Paid Out', null, 'success', balance?.paid_out, checkIcon);
 
   const inProcess = paymentBoxLayout('In Process', null, 'default', balance?.in_process, timerIcon);
+
+  const stripePaymentDashboard = (
+    <div className={styles.box2}>
+      <Row>
+        <Col xs={24}>
+          <Text>Edit Bank Account</Text>
+        </Col>
+        <Col xs={24}>
+          <Button
+            className={styles.mt10}
+            danger={payment_account_status === StripeAccountStatus.VERIFICATION_PENDING ? true : false}
+            type="primary"
+            onClick={() => openStripeDashboard()}
+          >
+            {payment_account_status === StripeAccountStatus.VERIFICATION_PENDING
+              ? 'Verify Bank Account'
+              : 'Edit Bank Account'}
+          </Button>
+        </Col>
+      </Row>
+    </div>
+  );
 
   const openSessionDetails = (item) => {
     trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
@@ -252,7 +298,9 @@ const Earnings = () => {
           <Col xs={24} md={8}>
             <Title level={2}>Your Earnings</Title>
           </Col>
-          <Col xs={24} md={8}></Col>
+          <Col xs={24} md={8}>
+            {stripePaymentDashboard}
+          </Col>
           <Col xs={24} md={8}>
             {availabeForPayout}
           </Col>
