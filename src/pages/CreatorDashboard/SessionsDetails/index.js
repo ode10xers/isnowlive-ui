@@ -59,6 +59,7 @@ const SessionsDetails = ({ match }) => {
   useEffect(() => {
     if (match?.params?.inventory_id) {
       getInventoryDetails(match?.params?.inventory_id);
+      // Promise can be implemented here
       const username = getLocalUserDetails().username;
       const userProfilePath = generateUrlFromUsername(username);
       setPublicUrl(`${userProfilePath}/e/${match?.params?.inventory_id}`);

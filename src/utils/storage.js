@@ -1,39 +1,11 @@
-import { getAuthCookie } from "services/authCookie";
-// import apis from "apis";
-// import { isAPISuccess } from "./helper";
-
-// const getUserDetails = async () => {
-//   try {
-//     const {data, status} = await apis.user.getProfile();
-//     if (isAPISuccess(status) && data) {
-//       return data;
-//     }
-//   } catch (error) {
-//     return null;
-//   }
-// }
-
 export const getLocalUserDetails = () => {
-  // compare auth tokens
-  const authToken = getAuthCookie();
-
-  if (!authToken || authToken === '') {
-    return null;
-  }
-
-  let userDetails = JSON.parse(localStorage.getItem('user-details'));
+  const userDetails = JSON.parse(localStorage.getItem('user-details'));
   if (userDetails) {
-    if (authToken === userDetails.auth_token) {
-      const expiry = new Date(userDetails.expiry);
-      if (expiry.getTime() > new Date().getTime()) {
-        return userDetails;
-      }
-      return null;
-    } else {
-      // //
-      // userDetails = await getUserDetails();
-      return null;
+    const expiry = new Date(userDetails.expiry);
+    if (expiry.getTime() > new Date().getTime()) {
+      return userDetails;
     }
+    return null;
   }
   return null;
 };
