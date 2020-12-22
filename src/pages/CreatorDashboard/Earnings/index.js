@@ -21,7 +21,7 @@ const timerIcon = require('assets/images/timer.png');
 
 const { Title, Text } = Typography;
 const {
-  formatDate: { toLongDateWithDay },
+  formatDate: { toLongDateWithDayTime },
 } = dateUtil;
 
 const Earnings = () => {
@@ -204,11 +204,11 @@ const Earnings = () => {
       render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
     },
     {
-      title: 'Session Date',
+      title: 'Session Date and Time',
       dataIndex: 'session_date',
       key: 'session_date',
       width: '12%',
-      render: (text, record) => <Text>{toLongDateWithDay(record.session_date)}</Text>,
+      render: (text, record) => <Text>{toLongDateWithDayTime(record.session_date)}</Text>,
     },
     {
       title: 'Earnings',
@@ -260,7 +260,7 @@ const Earnings = () => {
           </Button>,
         ]}
       >
-        {layout('Date', <Text>{toLongDateWithDay(item.session_date)}</Text>)}
+        {layout('Date', <Text>{toLongDateWithDayTime(item.session_date)}</Text>)}
 
         {layout(
           'Earnings',
