@@ -8,6 +8,7 @@ import Routes from 'routes';
 import { isAPISuccess } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
 import { Modal } from 'antd';
+import config from 'config';
 
 const PaymentVerification = () => {
   const location = useLocation();
@@ -31,7 +32,7 @@ const PaymentVerification = () => {
               content: 'Session booked successfully.',
               okText: 'Go to Dashboard',
               onOk: () => {
-                history.push(Routes.attendeeDashboard.rootPath);
+                window.open(config.client.platformBaseURL, '_self');
               }
             });
           }
