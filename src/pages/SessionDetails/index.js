@@ -161,7 +161,6 @@ const SessionDetails = ({ match, history }) => {
       // is beause if user aleady existing and have to login then value will be
       // set to currentUser where as getLocalUserDetails is only set if user has
       // actually login
-
       if (!getLocalUserDetails() && values.password) {
         try {
           const { data } = await apis.user.login({

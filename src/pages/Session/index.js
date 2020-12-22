@@ -41,7 +41,7 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay },
 } = dateUtil;
 
 const initialSession = {
@@ -243,6 +243,7 @@ const Session = ({ match, history }) => {
         recurring: isSessionRecurring,
         is_refundable: sessionRefundable,
         refund_before_hours: refundBeforeHours,
+        user_timezone_offset: new Date().getTimezoneOffset(),
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
@@ -250,8 +251,7 @@ const Session = ({ match, history }) => {
       }
 
       if (session?.inventory?.length) {
-        let allInventoryList = convertSchedulesToUTC(session.inventory);
-        data.inventory = allInventoryList.filter((slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0);
+        data.inventory = convertSchedulesToUTC(session.inventory);
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
