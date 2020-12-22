@@ -22,7 +22,7 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${PD_PROD_S3_BUCKET} --region ${PD_PROD_AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${PD_PROD_CLOUDFRONT_ID} --paths "/*"
-    bugfix/LIVE-114-high-priority-production-ui-bugs:
+    develop:
       - step:
           name: Build
           image: node:11
