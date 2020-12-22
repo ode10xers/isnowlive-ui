@@ -51,7 +51,9 @@ const PaymentAccount = () => {
             setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
           }
         } catch (error) {
-          openStripeDashboard();
+          if (error.response?.data?.message !== 'unable to find payment credentials') {
+            openStripeDashboard();
+          }
         }
       };
       validateStripeAccount();
@@ -101,7 +103,6 @@ const PaymentAccount = () => {
   };
 
   let view = null;
-
   if (paymentConnected === StripeAccountStatus.NOT_CONNECTED) {
     view = (
       <>
