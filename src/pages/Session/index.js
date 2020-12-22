@@ -272,7 +272,7 @@ const Session = ({ match, history }) => {
 
           if (isAPISuccess(newSessionResponse.status)) {
             trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitNewSession, {
-              result: 'SUCCESS',
+              result: 'FAILED',
               error_code: 'NA',
               error_message: 'NA',
               formValues: values,

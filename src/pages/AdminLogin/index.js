@@ -60,7 +60,7 @@ const AdminLogin = ({ history }) => {
     } catch (error) {
       setIsLoading(false);
       trackEventInMixPanel(mixPanelEventTags.public.click.adminLogIn, {
-        result: 'SUCCESS',
+        result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
       });

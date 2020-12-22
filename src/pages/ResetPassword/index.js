@@ -45,7 +45,7 @@ const ResetPassword = () => {
     } catch (error) {
       setSubmitting(false);
       trackEventInMixPanel(mixPanelEventTags.public.setNewPassword, {
-        result: 'SUCCESS',
+        result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
       });

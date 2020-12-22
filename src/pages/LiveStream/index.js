@@ -81,7 +81,7 @@ const LiveStream = () => {
     } catch (error) {
       setIsLoading(false);
       trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails, {
-        result: 'SUCCESS',
+        result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
       });
