@@ -24,16 +24,18 @@ const Login = ({ history }) => {
 
   const redirectBasedOnProfileCriteria = useCallback(
     (user) => {
-      if (user.is_creator) {
-        if (user.profile_complete === false) {
-          history.push(Routes.profile);
-        } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
-          history.push(Routes.livestream);
+      if (user) {
+        if (user.is_creator) {
+          if (user.profile_complete === false) {
+            history.push(Routes.profile);
+          } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
+            history.push(Routes.livestream);
+          } else {
+            history.push(Routes.creatorDashboard.rootPath);
+          }
         } else {
-          history.push(Routes.creatorDashboard.rootPath);
+          history.push(Routes.attendeeDashboard.rootPath);
         }
-      } else {
-        history.push(Routes.attendeeDashboard.rootPath);
       }
     },
     [history]
@@ -76,7 +78,7 @@ const Login = ({ history }) => {
     if (state.userDetails) {
       redirectBasedOnProfileCriteria(state.userDetails);
     }
-  }, [history, state.userDetails, loginForm, redirectBasedOnProfileCriteria]);
+  }, [loginForm, redirectBasedOnProfileCriteria, state.userDetails]);
 
   let view = null;
 

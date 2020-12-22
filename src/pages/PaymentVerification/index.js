@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
-import { message, Row } from 'antd';
+import { message, Row, Modal } from 'antd';
 import Loader from 'components/Loader';
 import apis from 'apis';
 import Routes from 'routes';
+import config from 'config';
 import { isAPISuccess } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
 
@@ -26,8 +27,13 @@ const PaymentVerification = () => {
           });
 
           if (isAPISuccess(status)) {
-            message.success('Order booked successfully.');
-            history.push(Routes.attendeeDashboard.rootPath);
+            Modal.success({
+              content: 'Session booked successfully.',
+              okText: 'Go to Dashboard',
+              onOk: () => {
+                window.open(config.client.platformBaseURL, '_self');
+              },
+            });
           }
           setIsLoading(false);
         } catch (error) {

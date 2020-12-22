@@ -1,10 +1,11 @@
 import axios from 'axios';
 import config from 'config';
+import { setAuthCookie, getAuthCookie } from './authCookie';
 
 class HttpService {
   constructor() {
     this.baseURL = config.server.baseURL;
-    this.authToken = localStorage.getItem('session-token') || '';
+    this.authToken = getAuthCookie() || '';
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
@@ -14,7 +15,7 @@ class HttpService {
   }
 
   setAuthToken(authToken) {
-    localStorage.setItem('session-token', authToken);
+    setAuthCookie(authToken);
     this.authToken = authToken;
     this.axios = axios.create({
       baseURL: this.baseURL,
