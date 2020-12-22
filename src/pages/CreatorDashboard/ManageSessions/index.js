@@ -9,7 +9,12 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -17,6 +22,7 @@ const {
   formatDate: { toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const ManageSessions = () => {
   const history = useHistory();
@@ -33,27 +39,18 @@ const ManageSessions = () => {
 
   const publishSession = async (sessionId) => {
     setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.publishSession;
 
     try {
       const { data } = await apis.session.publishSession(sessionId);
 
       if (data) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          session_id: sessionId,
-        });
+        trackSuccessEvent(eventTag, { session_id: sessionId });
         message.success('Session published successfully!');
         getSessionsList();
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        session_id: sessionId,
-      });
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
 
@@ -62,31 +59,27 @@ const ManageSessions = () => {
 
   const unpublishSession = async (sessionId) => {
     setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.unpublishSession;
 
     try {
       const { data } = await apis.session.unpublishSession(sessionId);
 
       if (data) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublishSession, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          session_id: sessionId,
-        });
+        trackSuccessEvent(eventTag, { session_id: sessionId });
         message.success('Session is now unpublished!');
         getSessionsList();
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublishSession, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        session_id: sessionId,
-      });
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
 
     setIsLoading(false);
+  };
+
+  const trackAndNavigate = (destination) => {
+    trackSimpleEvent(creator.click.sessions.manage.editSession);
+    history.push(destination);
   };
 
   useEffect(() => {
@@ -146,12 +139,9 @@ const ManageSessions = () => {
             <Col md={24} lg={24} xl={8}>
               <Button
                 className={styles.detailsButton}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.editSession, {
-                    session_id: record.session_id,
-                  });
-                  history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`);
-                }}
+                onClick={() =>
+                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
+                }
                 type="link"
               >
                 Edit
@@ -189,12 +179,9 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
-            onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.sessionCard, {
-                session_id: item.session_id,
-              });
-              history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`);
-            }}
+            onClick={() =>
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+            }
           >
             <Text>{item.name}</Text>
           </div>
@@ -203,12 +190,9 @@ const ManageSessions = () => {
           <Button
             type="link"
             className={styles.detailsButton}
-            onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.mobile.editSession, {
-                session_id: item.session_id,
-              });
-              history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`);
-            }}
+            onClick={() =>
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+            }
           >
             Edit
           </Button>,

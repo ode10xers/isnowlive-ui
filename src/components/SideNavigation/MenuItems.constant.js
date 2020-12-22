@@ -11,6 +11,8 @@ import {
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
 
+const { creator, attendee } = mixPanelEventTags;
+
 export const creatorMenuItems = [
   {
     order: 1,
@@ -22,28 +24,28 @@ export const creatorMenuItems = [
         order: 1,
         key: 'upcoming_sessions',
         title: 'Upcoming Sessions',
-        mixPanelTag: mixPanelEventTags.creator.click.dashboard.upcomingSessions,
+        mixPanelTag: creator.click.dashboard.upcomingSessions,
         path: Routes.creatorDashboard.rootPath + '/sessions/upcoming',
       },
       {
         order: 2,
         key: 'past_sessions',
         title: 'Past Sessions',
-        mixPanelTag: mixPanelEventTags.creator.click.dashboard.pastSessions,
+        mixPanelTag: creator.click.dashboard.pastSessions,
         path: Routes.creatorDashboard.rootPath + '/sessions/past',
       },
       {
         order: 3,
         key: 'manage_sessions',
         title: 'Manage Sessions',
-        mixPanelTag: mixPanelEventTags.creator.click.dashboard.manageSessions,
+        mixPanelTag: creator.click.dashboard.manageSessions,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageSessions,
       },
       {
         order: 4,
         key: 'create_session',
         title: 'Create Session',
-        mixPanelTag: mixPanelEventTags.creator.click.dashboard.createSession,
+        mixPanelTag: creator.click.dashboard.createSession,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
       },
     ],
@@ -52,14 +54,14 @@ export const creatorMenuItems = [
   //   order: 2,
   //   key: 'attendees',
   //   title: 'Attendees',
-  //   mixPanelTag: mixPanelEventTags.creator.click.dashboard.attendeeNav,
+  //   mixPanelTag: creator.click.dashboard.attendeeNav,
   //   icon: <TeamOutlined />,
   // },
   // {
   //   order: 3,
   //   key: 'packages',
   //   title: 'Packages',
-  //   mixPanelTag: mixPanelEventTags.creator.click.dashboard.packagesNav,
+  //   mixPanelTag: creator.click.dashboard.packagesNav,
   //   icon: <ControlOutlined />,
   // },
   {
@@ -67,7 +69,7 @@ export const creatorMenuItems = [
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
-    mixPanelTag: mixPanelEventTags.creator.click.dashboard.livestreamNav,
+    mixPanelTag: creator.click.dashboard.livestreamNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
@@ -75,7 +77,7 @@ export const creatorMenuItems = [
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
-    mixPanelTag: mixPanelEventTags.creator.click.dashboard.profileNav,
+    mixPanelTag: creator.click.dashboard.profileNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
@@ -83,14 +85,14 @@ export const creatorMenuItems = [
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
-    mixPanelTag: mixPanelEventTags.creator.click.dashboard.paymentNav,
+    mixPanelTag: creator.click.dashboard.paymentNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   // {
   //   order: 7,
   //   key: 'account',
   //   title: 'Account',
-  //   mixPanelTag: mixPanelEventTags.creator.click.dashboard.accountNav,
+  //   mixPanelTag: creator.click.dashboard.accountNav,
   //   icon: <UserOutlined />,
   // },
 ];
@@ -106,14 +108,14 @@ export const attendeeMenuItems = [
         order: 1,
         key: 'upcoming_sessions',
         title: 'Upcoming Sessions',
-        mixPanelTag: mixPanelEventTags.attendee.click.dashboard.upcomingSession,
+        mixPanelTag: attendee.click.dashboard.upcomingSession,
         path: Routes.attendeeDashboard.rootPath + '/sessions/upcoming',
       },
       {
         order: 2,
         key: 'past_sessions',
         title: 'Past Sessions',
-        mixPanelTag: mixPanelEventTags.attendee.click.dashboard.pastSessions,
+        mixPanelTag: attendee.click.dashboard.pastSessions,
         path: Routes.attendeeDashboard.rootPath + '/sessions/past',
       },
     ],
@@ -122,14 +124,14 @@ export const attendeeMenuItems = [
   //   order: 3,
   //   key: 'packages',
   //   title: 'Packages',
-  //   mixPanelTag: mixPanelEventTags.attendee.click.dsahboard.packagesNav,
+  //   mixPanelTag: attendee.click.dashboard.packagesNav,
   //   icon: <ControlOutlined />,
   // },
   // {
   //   order: 7,
   //   key: 'account',
   //   title: 'Account',
-  //   mixPanelTag: mixPanelEventTags.attendee.click.dsahboard.accountNav,
+  //   mixPanelTag: attendee.click.dashboard.accountNav,
   //   icon: <UserOutlined />,
   // },
 ];

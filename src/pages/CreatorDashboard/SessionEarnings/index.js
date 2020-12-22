@@ -13,7 +13,7 @@ import ShowAmount from 'components/ShowAmount';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, getPaymentStatus } from 'utils/helper';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { mixPanelEventTags, trackSimpleEvent } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -21,6 +21,7 @@ const { Title, Text } = Typography;
 const {
   formatDate: { toLongDateWithDay, toLongDateWithTime },
 } = dateUtil;
+const { creator } = mixPanelEventTags;
 
 const SessionEarnings = ({ match }) => {
   const history = useHistory();
@@ -55,6 +56,11 @@ const SessionEarnings = ({ match }) => {
       }, 1500);
     }
   }, [getEarningData, history, match.params.inventory_id]);
+
+  const trackAndNavigate = (destination, eventTag) => {
+    trackSimpleEvent(eventTag);
+    history.push(destination);
+  };
 
   const showSessionLayout = (title, details) => (
     <div className={styles.box2}>
@@ -178,10 +184,12 @@ const SessionEarnings = ({ match }) => {
           <Col xs={24} md={4}>
             <Button
               className={styles.headButton}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.payment.backToEarningDashboard);
-                history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
-              }}
+              onClick={() =>
+                trackAndNavigate(
+                  Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
+                  creator.click.payment.backToEarningDashboard
+                )
+              }
               icon={<ArrowLeftOutlined />}
             >
               All Earnings

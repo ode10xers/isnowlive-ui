@@ -7,13 +7,14 @@ import validationRules from 'utils/validation';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
-import { mixPanelEventTags, trackEventInMixPanel } from 'services/integrations/mixpanel';
+import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
 const { Item } = Form;
 const { Password } = Input;
+const { user } = mixPanelEventTags;
 
 const AdminLogin = ({ history }) => {
   const [loginForm] = Form.useForm();
@@ -39,16 +40,15 @@ const AdminLogin = ({ history }) => {
   );
 
   const onFinish = async (values) => {
+    const eventTag = user.click.adminLogIn;
+
     try {
       setIsLoading(true);
 
       const { data } = await apis.admin.login(values);
 
       if (data) {
-        trackEventInMixPanel(mixPanelEventTags.public.click.adminLogIn, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
+        trackSuccessEvent(eventTag, {
           user_email: values.user_email,
           admin_email: values.email,
         });
@@ -59,10 +59,7 @@ const AdminLogin = ({ history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.public.click.adminLogIn, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
+      trackFailedEvent(eventTag, error, {
         user_email: values.user_email,
         admin_email: values.email,
       });

@@ -20,9 +20,15 @@ import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLay
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 const { Title, Text } = Typography;
+const { creator } = mixPanelEventTags;
 
 const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -56,17 +62,13 @@ const Profile = () => {
   }, [form]);
 
   const updateProfileDetails = async (values) => {
+    const eventTag = creator.click.profile.editForm.submitProfile;
+
     try {
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.submitProfile, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          formValues: values,
-        });
-
+        trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
@@ -80,12 +82,7 @@ const Profile = () => {
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.submitProfile, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        formValues: values,
-      });
+      trackFailedEvent(eventTag, error, { form_values: values });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -148,6 +145,7 @@ const Profile = () => {
   };
 
   const addTestimonial = () => {
+    trackSimpleEvent(creator.click.profile.editForm.addEmbedCode);
     if (testimonials) {
       setTestimonials([...testimonials, form.getFieldValue().testimonials]);
       form.setFieldsValue({ testimonials: '' });
@@ -161,6 +159,11 @@ const Profile = () => {
     scrollToErrorField(errorFields);
   };
 
+  const trackAndNavigate = (destination, eventTag) => {
+    trackSimpleEvent(eventTag);
+    history.push(destination);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -171,10 +174,9 @@ const Profile = () => {
             <Button
               className={styles.headButton}
               icon={<ArrowLeftOutlined />}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.backToProfile);
-                history.push('/creator/dashboard/profile');
-              }}
+              onClick={() =>
+                trackAndNavigate('/creator/dashboard/profile', creator.click.profile.editForm.backToProfile)
+              }
             >
               Back
             </Button>
@@ -296,13 +298,7 @@ const Profile = () => {
           <Form.Item {...profileFormTailLayout}>
             <Row>
               <Col xs={24}>
-                <Button
-                  className={styles.mb10}
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.addEmbedCode);
-                    addTestimonial();
-                  }}
-                >
+                <Button className={styles.mb10} onClick={() => addTestimonial()}>
                   <PlusOutlined /> Add
                 </Button>
               </Col>
@@ -320,7 +316,7 @@ const Profile = () => {
                       extra={
                         <DeleteOutlined
                           onClick={() => {
-                            trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
+                            trackSimpleEvent(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
                             setTestimonials(testimonials.filter((_, i) => i !== index));
                           }}
                         />

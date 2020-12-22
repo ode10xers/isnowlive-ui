@@ -5,7 +5,12 @@ import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isAPISuccess, ZoomAuthType } from 'utils/helper';
@@ -16,6 +21,7 @@ import apis from 'apis';
 import styles from './style.module.scss';
 
 const { Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const LiveStream = () => {
   const [form] = Form.useForm();
@@ -54,17 +60,13 @@ const LiveStream = () => {
   }, [history.location.pathname, zoom_connected, getZoomJWTDetails]);
 
   const storeZoomCredentials = async (values) => {
+    const eventTag = creator.click.livestream.submitZoomDetails;
     try {
       setIsLoading(true);
       const { status } = await apis.user.storeZoomCredentials(values);
       setIsLoading(false);
       if (isAPISuccess(status)) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-        });
-
+        trackSuccessEvent(eventTag);
         message.success('Zoom successfully setup!');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.zoom_connected = true;
@@ -80,11 +82,7 @@ const LiveStream = () => {
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.submitZoomDetails, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-      });
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -119,7 +117,7 @@ const LiveStream = () => {
               type="primary"
               className={styles.mt30}
               onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.livestream.connectZoomAccount);
+                trackSimpleEvent(creator.click.livestream.connectZoomAccount);
               }}
             >
               Connect my Zoom Account

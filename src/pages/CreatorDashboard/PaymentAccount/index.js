@@ -5,7 +5,7 @@ import { Select, Typography, Button, message, Row, Col } from 'antd';
 
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { isAPISuccess } from 'utils/helper';
 import apis from 'apis';
 import Earnings from 'pages/CreatorDashboard/Earnings';
@@ -14,6 +14,7 @@ import styles from './styles.module.scss';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
+const { creator } = mixPanelEventTags;
 
 const PaymentAccount = () => {
   const location = useLocation();
@@ -58,19 +59,9 @@ const PaymentAccount = () => {
       const { data, status } = await apis.payment.stripe.relinkAccount();
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
-          result: 'RELINK_SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-        });
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
-        result: 'RELINK_FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-      });
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -78,15 +69,13 @@ const PaymentAccount = () => {
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);
+    const eventTag = creator.click.payment.connectStripe;
+
     try {
       const { data, status } = await apis.payment.stripe.onboardUser({ country: selectedCountry });
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-        });
+        trackSuccessEvent(eventTag, { country: selectedCountry });
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
@@ -94,16 +83,9 @@ const PaymentAccount = () => {
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'user already registered for account, trigger relink'
       ) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
-          result: 'RELINK_TRIGGER',
-        });
         relinkStripe();
       } else {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
-          result: 'FAILED',
-          error_code: error.response?.data?.code,
-          error_message: error.response?.data?.message,
-        });
+        trackFailedEvent(eventTag, error, { country: selectedCountry });
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
       }

@@ -7,7 +7,7 @@ import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -16,6 +16,7 @@ const { Text, Title, Paragraph } = Typography;
 const {
   formatDate: { toDate, toShortMonth, toDayOfWeek, toLocaleTime },
 } = dateUtil;
+const { user } = mixPanelEventTags;
 
 const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
@@ -23,7 +24,7 @@ const Sessions = ({ sessions, username }) => {
   const [sessionCount, setSessionCount] = useState(4);
 
   const showMore = () => {
-    trackEventInMixPanel(mixPanelEventTags.public.click.profile.showMore);
+    trackSimpleEvent(user.click.profile.showMore);
     if (sessionCount <= sessions.length) {
       setSessionCount(sessionCount + 4);
     }
@@ -57,9 +58,7 @@ const Sessions = ({ sessions, username }) => {
   };
 
   const showInventoryDetails = (inventory_id) => {
-    trackEventInMixPanel(mixPanelEventTags.public.click.profile.sessionCard, {
-      inventory_id: inventory_id,
-    });
+    trackSimpleEvent(user.click.profile.sessionCard, { inventory_id: inventory_id });
     const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
     window.open(`${baseurl}/e/${inventory_id}`);
   };

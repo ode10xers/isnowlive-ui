@@ -4,7 +4,13 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
-import { mixPanelEventTags, identifyUserInMixPanel, trackEventInMixPanel } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  identifyUserInMixPanel,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
@@ -15,6 +21,7 @@ import styles from './style.module.scss';
 
 const { Item } = Form;
 const { Password } = Input;
+const { user } = mixPanelEventTags;
 
 const Login = ({ history }) => {
   const [loginForm] = Form.useForm();
@@ -43,6 +50,8 @@ const Login = ({ history }) => {
   );
 
   const onFinish = async (values) => {
+    const eventTag = user.click.logIn;
+
     try {
       setIsLoading(true);
       const { data } = await apis.user.login(values);
@@ -50,50 +59,32 @@ const Login = ({ history }) => {
         http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
         identifyUserInMixPanel(data);
-        trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          email: values.email,
-        });
+        trackSuccessEvent(eventTag, { email: values.email });
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        email: values.email,
-      });
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
 
   const sendNewPasswordEmail = async (values) => {
+    const eventTag = user.click.sendNewPasswordEmail;
+
     try {
       setIsLoading(true);
       const { status } = await apis.user.sendNewPasswordEmail(values);
       if (isAPISuccess(status)) {
-        trackEventInMixPanel(mixPanelEventTags.public.click.sendNewPasswordEmail, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          email: values.email,
-        });
+        trackSuccessEvent(eventTag, { email: values.email });
 
         setIsLoading(false);
         message.success('Email sent successfully.');
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.public.click.sendNewPasswordEmail, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        email: values.email,
-      });
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -106,6 +97,11 @@ const Login = ({ history }) => {
       redirectBasedOnProfileCriteria(state.userDetails);
     }
   }, [loginForm, redirectBasedOnProfileCriteria, state.userDetails]);
+
+  const trackAndSetLoginView = (eventTag, loginViewValue) => {
+    trackSimpleEvent(eventTag);
+    setIsLoginView(loginViewValue);
+  };
 
   let view = null;
 
@@ -130,13 +126,7 @@ const Login = ({ history }) => {
 
         <Row>
           <Col xs={24} md={{ span: 16, offset: 8 }}>
-            <a
-              href
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.public.click.newPassword);
-                setIsLoginView(false);
-              }}
-            >
+            <a href onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
               Set a new password
             </a>
           </Col>
@@ -165,13 +155,7 @@ const Login = ({ history }) => {
 
         <Row>
           <Col xs={24} md={{ span: 16, offset: 8 }}>
-            <a
-              href
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.public.click.loginWithNewPassword);
-                setIsLoginView(true);
-              }}
-            >
+            <a href onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
               Login with password
             </a>
           </Col>

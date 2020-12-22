@@ -11,7 +11,12 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { isAPISuccess, getDuration } from 'utils/helper';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -19,6 +24,7 @@ const {
   formatDate: { toLocaleTime, toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const SessionsInventories = ({ match }) => {
   const history = useHistory();
@@ -71,32 +77,41 @@ const SessionsInventories = ({ match }) => {
     }
   }, [match.params.session_type, getStaffSession]);
 
+  const trackAndStartSession = (data) => {
+    const eventTag = isMobileDevice
+      ? creator.click.sessions.list.mobile.startSession
+      : creator.click.sessions.list.startSession;
+
+    trackSimpleEvent(eventTag, { session_data: data });
+    window.open(data.start_url);
+  };
+
   const openSessionInventoryDetails = (item) => {
+    const eventTag = isMobileDevice
+      ? creator.click.sessions.list.mobile.sessionDetails
+      : isPast
+      ? creator.click.sessions.list.pastSessionsDetails
+      : creator.click.sessions.list.upcomingSessionsDetails;
+
+    trackSimpleEvent(eventTag, { session_data: item });
+
     if (item.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
     }
   };
 
   const deleteInventory = async (inventory_id) => {
+    const eventTag = creator.click.sessions.list.cancelSession;
+
     try {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          inventory_id: inventory_id,
-        });
+        trackSuccessEvent(eventTag, { inventory_id: inventory_id });
         getStaffSession(match?.params?.session_type);
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
       message.error(error.response?.data?.message || 'Something went wrong.');
-      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        inventory_id: inventory_id,
-      });
     }
   };
 
@@ -150,17 +165,7 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button
-                type="link"
-                className={styles.detailsButton}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.pastSessionsDetails, {
-                    session_id: record.session_id,
-                    inventory_id: record.inventory_id,
-                  });
-                  openSessionInventoryDetails(record);
-                }}
-              >
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
@@ -168,17 +173,7 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button
-                type="link"
-                className={styles.detailsButton}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.upcomingSessionsDetails, {
-                    session_id: record.session_id,
-                    inventory_id: record.inventory_id,
-                  });
-                  openSessionInventoryDetails(record);
-                }}
-              >
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
@@ -204,17 +199,7 @@ const SessionsInventories = ({ match }) => {
 
             <Col md={24} lg={24} xl={8}>
               {!isPast && (
-                <Button
-                  type="link"
-                  disabled={!record.start_url}
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.startSession, {
-                      session_id: record.session_id,
-                      inventory_id: record.inventory_id,
-                    });
-                    window.open(record.start_url);
-                  }}
-                >
+                <Button type="link" disabled={!record.start_url} onClick={() => trackAndStartSession(record)}>
                   Start
                 </Button>
               )}
@@ -241,30 +226,12 @@ const SessionsInventories = ({ match }) => {
       <Card
         className={styles.card}
         title={
-          <div
-            onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.sessionCard, {
-                session_id: item.session_id,
-                inventory_id: item.inventory_id,
-              });
-              openSessionInventoryDetails(item);
-            }}
-          >
+          <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
-          <Button
-            className={styles.detailsButton}
-            onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.sessionDetails, {
-                session_id: item.session_id,
-                inventory_id: item.inventory_id,
-              });
-              openSessionInventoryDetails(item);
-            }}
-            type="link"
-          >
+          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
             Details
           </Button>,
           isCancelDisabled ? (
@@ -286,17 +253,7 @@ const SessionsInventories = ({ match }) => {
           ),
           <>
             {!isPast && (
-              <Button
-                type="link"
-                disabled={!item.start_url}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.mobile.startSession, {
-                    session_id: item.session_id,
-                    inventory_id: item.inventory_id,
-                  });
-                  window.open(item.start_url);
-                }}
-              >
+              <Button type="link" disabled={!item.start_url} onClick={() => trackAndStartSession(item)}>
                 Start
               </Button>
             )}

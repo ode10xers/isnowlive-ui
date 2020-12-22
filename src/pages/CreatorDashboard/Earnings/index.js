@@ -12,7 +12,12 @@ import ShowAmount from 'components/ShowAmount';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -24,6 +29,7 @@ const { Title, Text } = Typography;
 const {
   formatDate: { toLongDateWithDay },
 } = dateUtil;
+const { creator } = mixPanelEventTags;
 
 const Earnings = () => {
   const history = useHistory();
@@ -56,27 +62,20 @@ const Earnings = () => {
   }, []);
 
   const handleShowMoreSession = async () => {
+    const eventTag = creator.click.payment.showMoreEarnings;
     try {
       setIsLoading(true);
       let pageNo = currentPage + 1;
       const { status, data } = await apis.session.getCreatorEarnings(pageNo, sessionPerPage);
       if (isAPISuccess(status)) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.showMoreEarnings, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-        });
+        trackSuccessEvent(eventTag);
         setIsLoading(false);
         setSessions([...sessions, ...data.earnings]);
         setCurrentPage(pageNo);
         setShowMore(data.next_page || false);
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.payment.showMoreEarnings, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-      });
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -87,23 +86,16 @@ const Earnings = () => {
   }, [getEarningData]);
 
   const confirmPayout = async () => {
+    const eventTag = creator.click.payment.requestPayout;
     try {
       setIsLoadingPayout(true);
       const { status } = await apis.session.createCreatorBalancePayout();
       if (isAPISuccess(status)) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.requestPayout, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-        });
+        trackSuccessEvent(eventTag);
         setIsLoadingPayout(false);
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.payment.requestPayout, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-      });
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoadingPayout(false);
     }
@@ -171,6 +163,7 @@ const Earnings = () => {
   const inProcess = paymentBoxLayout('In Process', null, 'default', balance?.in_process, timerIcon);
 
   const openSessionDetails = (item) => {
+    trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
     if (item.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/${item.inventory_id}`);
     }
@@ -207,16 +200,7 @@ const Earnings = () => {
       render: (text, record) => (
         <Row justify="start">
           <Col>
-            <Button
-              type="link"
-              className={styles.detailsButton}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.payment.sessionEarnings, {
-                  inventory_id: record.inventory_id,
-                });
-                openSessionDetails(record);
-              }}
-            >
+            <Button type="link" className={styles.detailsButton} onClick={() => openSessionDetails(record)}>
               Details
             </Button>
           </Col>
@@ -244,16 +228,7 @@ const Earnings = () => {
           </div>
         }
         actions={[
-          <Button
-            type="link"
-            className={styles.detailsButton}
-            onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.creator.click.payment.sessionEarnings, {
-                inventory_id: item.inventory_id,
-              });
-              openSessionDetails(item);
-            }}
-          >
+          <Button type="link" className={styles.detailsButton} onClick={() => openSessionDetails(item)}>
             Details
           </Button>,
         ]}

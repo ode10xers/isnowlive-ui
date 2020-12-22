@@ -26,7 +26,12 @@ import ParticipantsList from 'components/ParticipantsList';
 import Share from 'components/Share';
 import Routes from 'routes';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -34,6 +39,7 @@ const {
   formatDate: { toLongDateWithDay, getTimeDiff },
 } = dateUtil;
 const { Title, Text } = Typography;
+const { creator } = mixPanelEventTags;
 
 const SessionsDetails = ({ match }) => {
   const history = useHistory();
@@ -78,25 +84,27 @@ const SessionsDetails = ({ match }) => {
     </Card>
   );
 
+  const trackAndNavigate = (destination, eventTag, newWindow = false) => {
+    trackSimpleEvent(eventTag);
+
+    if (newWindow) {
+      window.open(destination);
+    } else {
+      history.push(destination);
+    }
+  };
+
   const deleteInventory = async (inventory_id) => {
+    const eventTag = creator.click.sessions.details.cancelSession;
+
     try {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
-        trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.cancelSession, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          inventory_id: inventory_id,
-        });
+        trackSuccessEvent(eventTag, { inventory_id: inventory_id });
         history.push(Routes.creatorDashboard);
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.cancelSession, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        inventory_id: inventory_id,
-      });
+      trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -111,10 +119,12 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.backToPastSessionsList);
-                  history.push('/creator/dashboard/sessions/past');
-                }}
+                onClick={() =>
+                  trackAndNavigate(
+                    '/creator/dashboard/sessions/past',
+                    creator.click.sessions.details.backToPastSessionsList
+                  )
+                }
                 icon={<ArrowLeftOutlined />}
               >
                 Past Sessions
@@ -126,10 +136,12 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.backToUpcomingSessionsList);
-                  history.push('/creator/dashboard/sessions/upcoming');
-                }}
+                onClick={() =>
+                  trackAndNavigate(
+                    '/creator/dashboard/sessions/upcoming',
+                    creator.click.sessions.details.backToUpcomingSessionsList
+                  )
+                }
                 icon={<ArrowLeftOutlined />}
               >
                 Upcoming Sessions
@@ -139,10 +151,7 @@ const SessionsDetails = ({ match }) => {
               <Button
                 className={styles.headButton}
                 icon={<GlobalOutlined />}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.publicPage);
-                  window.open(publicUrl);
-                }}
+                onClick={() => trackAndNavigate(publicUrl, creator.click.sessions.details.publicPage, true)}
               >
                 Public Page
               </Button>
@@ -202,13 +211,9 @@ const SessionsDetails = ({ match }) => {
                   className={styles.actionButton}
                   icon={<VideoCameraOutlined />}
                   disabled={!session?.start_url}
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.startSession, {
-                      session_id: session?.session_id,
-                      inventory_id: session?.inventory_id,
-                    });
-                    window.open(session?.start_url);
-                  }}
+                  onClick={() =>
+                    trackAndNavigate(session?.start_url, creator.click.sessions.details.startSession, true)
+                  }
                 >
                   Start Session
                 </Button>
@@ -217,13 +222,12 @@ const SessionsDetails = ({ match }) => {
                   block
                   className={classNames(styles.actionButton, styles.editButton)}
                   icon={<EditOutlined />}
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.editSession, {
-                      session_id: session?.session_id,
-                      inventory_id: session?.inventory_id,
-                    });
-                    history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`);
-                  }}
+                  onClick={() =>
+                    trackAndNavigate(
+                      `${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`,
+                      creator.click.sessions.details.editSession
+                    )
+                  }
                 >
                   Edit Session
                 </Button>
@@ -233,10 +237,7 @@ const SessionsDetails = ({ match }) => {
                   className={classNames(styles.actionButton, styles.emailButton)}
                   icon={<MailOutlined />}
                   onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.sendEmail, {
-                      session_id: session?.session_id,
-                      inventory_id: session?.inventory_id,
-                    });
+                    trackSimpleEvent(creator.click.sessions.details.sendEmail);
                   }}
                 >
                   Send Email

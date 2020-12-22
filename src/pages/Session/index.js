@@ -33,7 +33,12 @@ import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorFiel
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 
@@ -43,6 +48,7 @@ const { RangePicker } = DatePicker;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay },
 } = dateUtil;
+const { creator } = mixPanelEventTags;
 
 const initialSession = {
   price: 10,
@@ -228,6 +234,8 @@ const Session = ({ match, history }) => {
   };
 
   const onFinish = async (values) => {
+    const eventTagObject = creator.click.sessions.form;
+
     try {
       setIsLoading(true);
       const data = {
@@ -257,12 +265,7 @@ const Session = ({ match, history }) => {
         }
         if (session.session_id) {
           await apis.session.update(session.session_id, data);
-          trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitUpdate, {
-            result: 'SUCCESS',
-            error_code: 'NA',
-            error_message: 'NA',
-            formValues: values,
-          });
+          trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
           message.success('Session successfully updated.');
           const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
           const endDate = toUtcEndOfDay(moment().add(1, 'month'));
@@ -271,12 +274,7 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
-            trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitNewSession, {
-              result: 'SUCCESS',
-              error_code: 'NA',
-              error_message: 'NA',
-              formValues: values,
-            });
+            trackSuccessEvent(eventTagObject.submitNewSession, { form_values: values });
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
@@ -285,12 +283,12 @@ const Session = ({ match, history }) => {
               okText: 'Done',
               cancelText: 'Add New',
               onCancel: () => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.addNewInModal);
+                trackSimpleEvent(eventTagObject.addNewInModal);
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
               onOk: () => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.doneInModal);
+                trackSimpleEvent(eventTagObject.doneInModal);
                 history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`);
               },
             });
@@ -304,13 +302,8 @@ const Session = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
 
-      const eventTag = mixPanelEventTags.creator.click.sessions.form;
-
-      trackEventInMixPanel(session.session_id ? eventTag.submitUpdate : eventTag.submitNewSession, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        formValues: values,
+      trackFailedEvent(session.session_id ? eventTagObject.submitUpdate : eventTagObject.submitNewSession, error, {
+        form_values: values,
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
@@ -327,6 +320,11 @@ const Session = ({ match, history }) => {
     }
   };
 
+  const trackAndNavigate = (destination, eventTag) => {
+    trackSimpleEvent(eventTag);
+    history.push(destination);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -336,10 +334,12 @@ const Session = ({ match, history }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.backToManageSessionsList);
-                history.push('/creator/dashboard/manage/sessions');
-              }}
+              onClick={() =>
+                trackAndNavigate(
+                  '/creator/dashboard/manage/sessions',
+                  creator.click.sessions.manage.backToManageSessionsList
+                )
+              }
               icon={<ArrowLeftOutlined />}
             >
               Sessions

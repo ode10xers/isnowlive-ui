@@ -25,11 +25,12 @@ import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
-import { trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { user, creator } = mixPanelEventTags;
 
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
@@ -93,11 +94,21 @@ const ProfilePreview = ({ username = null }) => {
     setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
-      trackEventInMixPanel(mixPanelEventTags.public.click.profile.upcomingSessionsTab);
+      trackSimpleEvent(user.click.profile.upcomingSessionsTab);
       getSessionDetails('upcoming');
     } else {
-      trackEventInMixPanel(mixPanelEventTags.public.click.profile.pastSessionsTab);
+      trackSimpleEvent(user.click.profile.pastSessionsTab);
       getSessionDetails('past');
+    }
+  };
+
+  const trackAndNavigate = (destination, eventTag, newWindow = false) => {
+    trackSimpleEvent(eventTag);
+
+    if (newWindow) {
+      window.open(destination);
+    } else {
+      history.push(destination);
     }
   };
 
@@ -109,30 +120,23 @@ const ProfilePreview = ({ username = null }) => {
             <Button
               className={styles.headButton}
               icon={<ArrowLeftOutlined />}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.backToDashboard);
-                history.push('/creator/dashboard');
-              }}
+              onClick={() => trackAndNavigate('/creator/dashboard', creator.click.profile.backToDashboard)}
             >
               Dashboard
             </Button>
             <Button
               className={styles.headButton}
               icon={<EditOutlined />}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.editProfile);
-                history.push('/creator/dashboard/profile/edit');
-              }}
+              onClick={() => trackAndNavigate('/creator/dashboard/profile/edit', creator.click.profile.editProfile)}
             >
               Edit Profile
             </Button>
             <Button
               className={styles.headButton}
               icon={<GlobalOutlined />}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.creator.click.profile.publicPage);
-                window.open(generateUrlFromUsername(profile.username));
-              }}
+              onClick={() =>
+                trackAndNavigate(generateUrlFromUsername(profile.username), creator.click.profile.publicPage, true)
+              }
             >
               Public Page
             </Button>

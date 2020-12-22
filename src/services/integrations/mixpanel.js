@@ -22,10 +22,6 @@ export const mixPanelEventTags = {
           unpublishSession: '(Creator) Unpublish Session Clicked',
           editSession: '(Creator) Edit Session Clicked',
           backToManageSessionsList: '(Creator) Back to Manage Sessions Clicked',
-          mobile: {
-            sessionCard: '(Creator) Manage Session Card for Mobile device Clicked',
-            editSession: '(Creator) Edit Session for Mobile device Clicked',
-          },
         },
         details: {
           backToPastSessionsList: '(Creator) Back to Past Sessions Clicked',
@@ -42,7 +38,6 @@ export const mixPanelEventTags = {
           startSession: '(Creator) Start Session in List Clicked',
           cancelSession: '(Creator) Cancel Session in List Clicked',
           mobile: {
-            sessionCard: '(Creator) Session Card for Mobile device Clicked',
             sessionDetails: '(Creator) Session Details for Mobile device Clicked',
             startSession: '(Creator) Start Session for Mobile device Clicked',
           },
@@ -97,7 +92,6 @@ export const mixPanelEventTags = {
         joinSession: '(Attendee) Join Session Clicked',
         cancelOrder: '(Attendee) Cancel Session Order Clicked',
         mobile: {
-          sessionCard: '(Attendee) Session Card for Mobile devices Clicked',
           sessionDetails: '(Attendee) Session Details for Mobile device Clicked',
           joinSession: '(Attendee) Join Session for Mobile device Clicked',
         },
@@ -105,7 +99,7 @@ export const mixPanelEventTags = {
     },
   },
 
-  public: {
+  user: {
     click: {
       signUp: 'Sign Up Clicked',
       logIn: 'Log In Clicked',
@@ -150,7 +144,22 @@ export const identifyUserInMixPanel = (userData) => {
   mixpanel.identify(userData.external_id);
 };
 
-export const trackEventInMixPanel = (eventTag, eventData) =>
+export const trackSimpleEvent = (eventTag, eventData = {}) => mixpanel.track(eventTag, eventData);
+
+export const trackSuccessEvent = (eventTag, eventData = {}) => {
   mixpanel.track(eventTag, {
+    result: 'SUCCESS',
+    error_code: 'N/A',
+    error_message: 'N/A',
     ...eventData,
   });
+};
+
+export const trackFailedEvent = (eventTag, error, eventData = {}) => {
+  mixpanel.track(eventTag, {
+    result: 'FAILED',
+    error_code: error.response?.data?.code,
+    error_message: error.response?.data?.message,
+    ...eventData,
+  });
+};

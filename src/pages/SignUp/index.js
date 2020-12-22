@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import { useGlobalContext } from 'services/globalContext';
-import { mapUserToMixPanel, trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
+import {
+  mixPanelEventTags,
+  mapUserToMixPanel,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -12,6 +18,7 @@ import validationRules from 'utils/validation';
 import styles from './style.module.scss';
 
 const { Item } = Form;
+const { user } = mixPanelEventTags;
 
 const SignUp = ({ history }) => {
   const [form] = Form.useForm();
@@ -19,6 +26,8 @@ const SignUp = ({ history }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onFinish = async (values) => {
+    const eventTag = user.click.signUp;
+
     try {
       setIsLoading(true);
       const { data } = await apis.user.signup({
@@ -30,22 +39,12 @@ const SignUp = ({ history }) => {
         logIn(data, true);
         setIsLoading(false);
         mapUserToMixPanel(data);
-        trackEventInMixPanel(mixPanelEventTags.public.click.signUp, {
-          result: 'SUCCESS',
-          error_code: 'NA',
-          error_message: 'NA',
-          email: values.email,
-        });
+        trackSuccessEvent(eventTag, { email: values.email });
         history.push(Routes.profile);
       }
     } catch (error) {
       setIsLoading(false);
-      trackEventInMixPanel(mixPanelEventTags.public.click.signUp, {
-        result: 'FAILED',
-        error_code: error.response?.data?.code,
-        error_message: error.response?.data?.message,
-        email: values.email,
-      });
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
