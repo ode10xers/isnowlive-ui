@@ -61,13 +61,22 @@ const Earnings = () => {
       let pageNo = currentPage + 1;
       const { status, data } = await apis.session.getCreatorEarnings(pageNo, sessionPerPage);
       if (isAPISuccess(status)) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.showMoreEarnings, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
         setIsLoading(false);
         setSessions([...sessions, ...data.earnings]);
         setCurrentPage(pageNo);
         setShowMore(data.next_page || false);
       }
     } catch (error) {
-      console.log(error);
+      trackEventInMixPanel(mixPanelEventTags.creator.click.payment.showMoreEarnings, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -82,9 +91,19 @@ const Earnings = () => {
       setIsLoadingPayout(true);
       const { status } = await apis.session.createCreatorBalancePayout();
       if (isAPISuccess(status)) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.requestPayout, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
         setIsLoadingPayout(false);
       }
     } catch (error) {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.payment.requestPayout, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoadingPayout(false);
     }
@@ -111,13 +130,7 @@ const Earnings = () => {
               okText="Yes, Request Payout"
               cancelText="No"
             >
-              <Button
-                className={styles.box1Button}
-                loading={isLoadingPayout}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.payment.requestPayout);
-                }}
-              >
+              <Button className={styles.box1Button} loading={isLoadingPayout}>
                 {isLoadingPayout ? '...Requesting' : 'Request Payout'}
               </Button>
             </Popconfirm>
@@ -300,14 +313,7 @@ const Earnings = () => {
           <Col span={24}>
             <Row justify="center" className={styles.mt50}>
               <Col>
-                <Button
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.payment.showMoreEarnings);
-                    handleShowMoreSession();
-                  }}
-                  disabled={!showMore}
-                  className={styles.ml20}
-                >
+                <Button onClick={() => handleShowMoreSession()} disabled={!showMore} className={styles.ml20}>
                   Show More
                 </Button>
               </Col>

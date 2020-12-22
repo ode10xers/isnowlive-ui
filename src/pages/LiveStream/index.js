@@ -53,7 +53,7 @@ const LiveStream = () => {
     }
   }, [history.location.pathname, zoom_connected, getZoomJWTDetails]);
 
-  const storeZoomCrendetials = async (values) => {
+  const storeZoomCredentials = async (values) => {
     try {
       setIsLoading(true);
       const { status } = await apis.user.storeZoomCredentials(values);
@@ -168,7 +168,7 @@ const LiveStream = () => {
               </p>
             </Col>
             <Col span={24}>
-              <Form form={form} {...profileFormItemLayout} onFinish={storeZoomCrendetials}>
+              <Form form={form} {...profileFormItemLayout} onFinish={storeZoomCredentials}>
                 <Col span={24}>
                   <Form.Item label="API Key" name="api_key" rules={validationRules.requiredValidation}>
                     <Input placeholder="API Key" />

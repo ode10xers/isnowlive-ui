@@ -25,15 +25,12 @@ export const mixPanelEventTags = {
           mobile: {
             sessionCard: '(Creator) Manage Session Card for Mobile device Clicked',
             editSession: '(Creator) Edit Session for Mobile device Clicked',
-            publishSession: '(Creator) Publish Session for Mobile device Clicked',
-            unpublishSession: '(Creator) Unpublish Session for Mobile device Clicked',
           },
         },
         details: {
           backToPastSessionsList: '(Creator) Back to Past Sessions Clicked',
           backToUpcomingSessionsList: '(Creator) Back to Upcoming Sessions Clicked',
-          toPublicPage: '(Creator) Public Page Clicked',
-          shareSession: '(Creator) Share Session Clicked',
+          publicPage: '(Creator) Public Page Clicked',
           startSession: '(Creator) Start Session Clicked',
           editSession: '(Creator) Edit Session Clicked',
           cancelSession: '(Creator) Cancel Session Clicked',
@@ -47,7 +44,6 @@ export const mixPanelEventTags = {
           mobile: {
             sessionCard: '(Creator) Session Card for Mobile device Clicked',
             sessionDetails: '(Creator) Session Details for Mobile device Clicked',
-            cancelSession: '(Creator) Cancel Session for Mobile device Clicked',
             startSession: '(Creator) Start Session for Mobile device Clicked',
           },
         },
@@ -58,6 +54,10 @@ export const mixPanelEventTags = {
           doneInModal: '(Creator) Done in Confirmation Modal Clicked',
         },
       },
+      // Attendee Dashboard seem to have links to Profile and Livestream
+      // as found in AttendeeDashboard/index.js, but no Nav Links to access them
+      // If attendee can access livestream and profile page, will move this to
+      // public or add new tags in attendee section accordingly
       livestream: {
         submitZoomDetails: '(Creator) Submit Zoom Details Clicked',
         connectZoomAccount: '(Creator) Connect Zoom Acc Clicked',
@@ -66,9 +66,6 @@ export const mixPanelEventTags = {
         backToDashboard: '(Creator) Back to Dashboard Clicked',
         editProfile: '(Creator) Edit Profile Clicked',
         publicPage: '(Creator) Public Page Clicked',
-        shareButton: '(Creator) Share Button Clicked',
-        upcomingSessionsTab: '(Creator) Upcoming Session Tab Clicked',
-        pastSessionsTab: '(Creator) Past Session Tab Clicked',
         editForm: {
           backToProfile: '(Creator) Back to Profile Clicked',
           addEmbedCode: '(Creator) Add Embed Code Clicked',
@@ -101,8 +98,8 @@ export const mixPanelEventTags = {
         cancelOrder: '(Attendee) Cancel Session Order Clicked',
         mobile: {
           sessionCard: '(Attendee) Session Card for Mobile devices Clicked',
-          pastSessionDetails: '(Attendee) Past Session Details for Mobile devices Clicked',
-          upcomingSessionDetails: '(Attendee) Upcoming Session Details for Mobile devices Clicked',
+          sessionDetails: '(Attendee) Session Details for Mobile device Clicked',
+          joinSession: '(Attendee) Join Session for Mobile device Clicked',
         },
       },
     },
@@ -110,17 +107,20 @@ export const mixPanelEventTags = {
 
   public: {
     click: {
+      signUp: 'Sign Up Clicked',
       logIn: 'Log In Clicked',
       logOut: 'Log Out Clicked',
       adminLogIn: 'Super Admin Login Clicked',
       newPassword: 'Set New Password Clicked',
-      sendEmail: 'Send Reset Password Email Clicked',
+      sendNewPasswordEmail: 'Send New Password Email Clicked',
       loginWithNewPassword: 'Login with New Password Clicked',
       switchToAttendee: 'Switch to Attendee ,Clicked',
       switchToCreator: 'Switch to Hosting Clicked',
-      sessions: {
-        sessionCard: 'Session Card in List Clicked',
-        showMore: 'Show More Session Card Clicked',
+      profile: {
+        upcomingSessionsTab: 'Profile Upcoming Session Tab Clicked',
+        pastSessionsTab: 'Profile Past Session Tab Clicked',
+        sessionCard: 'Session Card in Profile List Clicked',
+        showMore: 'Show More Session Card in Profile Clicked',
       },
     },
   },

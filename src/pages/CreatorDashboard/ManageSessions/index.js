@@ -77,7 +77,7 @@ const ManageSessions = () => {
         getSessionsList();
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.publishSession, {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.manage.unpublishSession, {
         result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,

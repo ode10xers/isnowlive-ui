@@ -58,9 +58,19 @@ const PaymentAccount = () => {
       const { data, status } = await apis.payment.stripe.relinkAccount();
       if (isAPISuccess(status)) {
         setIsLoading(false);
+        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
+          result: 'RELINK_SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+        });
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
+        result: 'RELINK_FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -84,6 +94,9 @@ const PaymentAccount = () => {
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'user already registered for account, trigger relink'
       ) {
+        trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {
+          result: 'RELINK_TRIGGER',
+        });
         relinkStripe();
       } else {
         trackEventInMixPanel(mixPanelEventTags.creator.click.payment.connectStripe, {

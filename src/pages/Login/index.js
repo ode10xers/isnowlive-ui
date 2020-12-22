@@ -52,6 +52,7 @@ const Login = ({ history }) => {
           result: 'SUCCESS',
           error_code: 'NA',
           error_message: 'NA',
+          email: values.email,
         });
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);
@@ -62,6 +63,7 @@ const Login = ({ history }) => {
         result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
+        email: values.email,
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
@@ -72,11 +74,24 @@ const Login = ({ history }) => {
       setIsLoading(true);
       const { status } = await apis.user.sendNewPasswordEmail(values);
       if (isAPISuccess(status)) {
+        trackEventInMixPanel(mixPanelEventTags.public.click.sendNewPasswordEmail, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+          email: values.email,
+        });
+
         setIsLoading(false);
         message.success('Email sent successfully.');
       }
     } catch (error) {
       setIsLoading(false);
+      trackEventInMixPanel(mixPanelEventTags.public.click.sendNewPasswordEmail, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        email: values.email,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -140,14 +155,7 @@ const Login = ({ history }) => {
             <Input />
           </Item>
           <Item {...formTailLayout}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={isLoading}
-              onClick={() => {
-                trackEventInMixPanel(mixPanelEventTags.public.click.sendEmail);
-              }}
-            >
+            <Button type="primary" htmlType="submit" loading={isLoading}>
               Send Email
             </Button>
           </Item>

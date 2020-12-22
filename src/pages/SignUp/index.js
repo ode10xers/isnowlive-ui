@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import { useGlobalContext } from 'services/globalContext';
-import { mapUserToMixPanel } from 'services/integrations/mixpanel';
+import { mapUserToMixPanel, trackEventInMixPanel, mixPanelEventTags } from 'services/integrations/mixpanel';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -30,10 +30,22 @@ const SignUp = ({ history }) => {
         logIn(data, true);
         setIsLoading(false);
         mapUserToMixPanel(data);
+        trackEventInMixPanel(mixPanelEventTags.public.click.signUp, {
+          result: 'SUCCESS',
+          error_code: 'NA',
+          error_message: 'NA',
+          email: values.email,
+        });
         history.push(Routes.profile);
       }
     } catch (error) {
       setIsLoading(false);
+      trackEventInMixPanel(mixPanelEventTags.public.click.signUp, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        email: values.email,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };

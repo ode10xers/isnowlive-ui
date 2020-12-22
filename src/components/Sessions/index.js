@@ -23,6 +23,7 @@ const Sessions = ({ sessions, username }) => {
   const [sessionCount, setSessionCount] = useState(4);
 
   const showMore = () => {
+    trackEventInMixPanel(mixPanelEventTags.public.click.profile.showMore);
     if (sessionCount <= sessions.length) {
       setSessionCount(sessionCount + 4);
     }
@@ -56,6 +57,9 @@ const Sessions = ({ sessions, username }) => {
   };
 
   const showInventoryDetails = (inventory_id) => {
+    trackEventInMixPanel(mixPanelEventTags.public.click.profile.sessionCard, {
+      inventory_id: inventory_id,
+    });
     const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
     window.open(`${baseurl}/e/${inventory_id}`);
   };
@@ -73,13 +77,7 @@ const Sessions = ({ sessions, username }) => {
                       hoverable
                       className={styles.card}
                       bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
-                      onClick={() => {
-                        trackEventInMixPanel(mixPanelEventTags.public.click.sessions.sessionCard, {
-                          session_id: session.id,
-                          inventory_id: session.inventory_id,
-                        });
-                        showInventoryDetails(session.inventory_id);
-                      }}
+                      onClick={() => showInventoryDetails(session.inventory_id)}
                     >
                       <Row>
                         <Col xs={24} md={8} lg={8}>
@@ -114,13 +112,7 @@ const Sessions = ({ sessions, username }) => {
             ))}
             {sessionCount < sessions.length && (
               <Col span={24} className={styles.textAlignCenter}>
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.public.click.sessions.showMore);
-                    showMore();
-                  }}
-                >
+                <Button type="primary" onClick={() => showMore()}>
                   Show more
                 </Button>
               </Col>

@@ -91,7 +91,7 @@ const SessionsInventories = ({ match }) => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
-      trackEventInMixPanel(mixPanelEventTags.public.click.logIn, {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
         result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,

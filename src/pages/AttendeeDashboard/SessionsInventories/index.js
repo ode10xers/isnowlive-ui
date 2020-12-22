@@ -260,7 +260,7 @@ const SessionsInventories = ({ match }) => {
                     type="link"
                     disabled={!record.join_url}
                     onClick={() => {
-                      trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.pastSessionDetails, {
+                      trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.joinSession, {
                         orderId: record.order_id,
                       });
                       window.open(record.join_url);
@@ -309,7 +309,7 @@ const SessionsInventories = ({ match }) => {
             type="link"
             className={styles.detailsButton}
             onClick={() => {
-              trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.upcomingSessionDetails, {
+              trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.sessionDetails, {
                 orderId: item.order_id,
               });
               openSessionInventoryDetails(item);
@@ -323,7 +323,7 @@ const SessionsInventories = ({ match }) => {
                 type="link"
                 disabled={!item.join_url}
                 onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.pastSessionDetails, {
+                  trackEventInMixPanel(mixPanelEventTags.attendee.click.sessions.mobile.joinSession, {
                     orderId: item.order_id,
                   });
                   window.open(item.join_url);

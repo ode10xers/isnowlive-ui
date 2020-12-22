@@ -91,7 +91,7 @@ const SessionsDetails = ({ match }) => {
         history.push(Routes.creatorDashboard);
       }
     } catch (error) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.list.cancelSession, {
+      trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.cancelSession, {
         result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
@@ -149,17 +149,7 @@ const SessionsDetails = ({ match }) => {
             </Col>
             <Col xs={24} md={4}>
               <div className={styles.headButton}>
-                <Share
-                  label="Share Session"
-                  title={session?.name}
-                  shareUrl={publicUrl}
-                  onClick={() => {
-                    trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.details.shareSession, {
-                      session_id: session?.session_id,
-                      inventory_id: session?.inventory_id,
-                    });
-                  }}
-                />
+                <Share label="Share Session" title={session?.name} shareUrl={publicUrl} />
               </div>
             </Col>
           </>

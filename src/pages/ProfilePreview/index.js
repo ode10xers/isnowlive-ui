@@ -93,10 +93,10 @@ const ProfilePreview = ({ username = null }) => {
     setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.profile.upcomingSessionsTab);
+      trackEventInMixPanel(mixPanelEventTags.public.click.profile.upcomingSessionsTab);
       getSessionDetails('upcoming');
     } else {
-      trackEventInMixPanel(mixPanelEventTags.creator.click.profile.pastSessionsTab);
+      trackEventInMixPanel(mixPanelEventTags.public.click.profile.pastSessionsTab);
       getSessionDetails('past');
     }
   };
@@ -169,9 +169,6 @@ const ProfilePreview = ({ username = null }) => {
                 label="Share"
                 shareUrl={generateUrlFromUsername(profile.username)}
                 title={`${profile.first_name} ${profile.last_name}`}
-                onClick={() => {
-                  trackEventInMixPanel(mixPanelEventTags.creator.click.profile.shareButton);
-                }}
               />
             </div>
           </div>

@@ -272,7 +272,7 @@ const Session = ({ match, history }) => {
 
           if (isAPISuccess(newSessionResponse.status)) {
             trackEventInMixPanel(mixPanelEventTags.creator.click.sessions.form.submitNewSession, {
-              result: 'FAILED',
+              result: 'SUCCESS',
               error_code: 'NA',
               error_message: 'NA',
               formValues: values,
@@ -303,6 +303,15 @@ const Session = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
+
+      const eventTag = mixPanelEventTags.creator.click.sessions.form;
+
+      trackEventInMixPanel(session.session_id ? eventTag.submitUpdate : eventTag.submitNewSession, {
+        result: 'FAILED',
+        error_code: error.response?.data?.code,
+        error_message: error.response?.data?.message,
+        formValues: values,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };

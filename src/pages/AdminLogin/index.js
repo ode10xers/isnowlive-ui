@@ -63,6 +63,8 @@ const AdminLogin = ({ history }) => {
         result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
+        user_email: values.user_email,
+        admin_email: values.email,
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }

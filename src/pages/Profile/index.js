@@ -64,6 +64,7 @@ const Profile = () => {
           result: 'SUCCESS',
           error_code: 'NA',
           error_message: 'NA',
+          formValues: values,
         });
 
         message.success('Profile successfully updated.');
@@ -83,6 +84,7 @@ const Profile = () => {
         result: 'FAILED',
         error_code: error.response?.data?.code,
         error_message: error.response?.data?.message,
+        formValues: values,
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
