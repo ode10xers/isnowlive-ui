@@ -22,21 +22,24 @@ const Login = ({ history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoginView, setIsLoginView] = useState(true);
 
-  const redirectBasedOnProfileCriteria = useCallback((user) => {
-    if (user) {
-      if (user.is_creator) {
-        if (user.profile_complete === false) {
-          history.push(Routes.profile);
-        } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
-          history.push(Routes.livestream);
+  const redirectBasedOnProfileCriteria = useCallback(
+    (user) => {
+      if (user) {
+        if (user.is_creator) {
+          if (user.profile_complete === false) {
+            history.push(Routes.profile);
+          } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
+            history.push(Routes.livestream);
+          } else {
+            history.push(Routes.creatorDashboard.rootPath);
+          }
         } else {
-          history.push(Routes.creatorDashboard.rootPath);
+          history.push(Routes.attendeeDashboard.rootPath);
         }
-      } else {
-        history.push(Routes.attendeeDashboard.rootPath);
       }
-    }
-  }, [history]);
+    },
+    [history]
+  );
 
   const onFinish = async (values) => {
     try {
@@ -73,7 +76,7 @@ const Login = ({ history }) => {
       email: getRememberUserEmail(),
     });
     if (state.userDetails) {
-      redirectBasedOnProfileCriteria(state.userDetails)
+      redirectBasedOnProfileCriteria(state.userDetails);
     }
   }, [loginForm, redirectBasedOnProfileCriteria, state.userDetails]);
 

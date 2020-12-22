@@ -54,7 +54,6 @@ const Sessions = ({ sessions, username }) => {
   };
 
   const showInventoryDetails = (inventory_id) => {
-    // Promise can be implemented here
     const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
     window.open(`${baseurl}/e/${inventory_id}`);
   };

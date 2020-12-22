@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
+import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initializeFreshChat } from 'services/integrations/fresh-chat';
+import { getAuthCookie } from 'services/authCookie';
+import { isAPISuccess } from 'utils/helper';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -21,9 +24,6 @@ import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
 import PaymentVerification from 'pages/PaymentVerification';
-import { getAuthCookie } from 'services/authCookie';
-import apis from 'apis';
-import { isAPISuccess } from 'utils/helper';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -62,16 +62,16 @@ function App() {
         const { data, status } = await apis.user.getProfile();
         if (isAPISuccess(status) && data) {
           setUserAuthentication(true);
-          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() })
+          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
           setTimeout(() => {
             setIsReadyToLoad(true);
-          }, 100)
+          }, 100);
         }
       } catch (error) {
         setUserAuthentication(false);
         setIsReadyToLoad(true);
       }
-    }
+    };
     const authToken = getAuthCookie();
     if (authToken && authToken !== '') {
       getUserDetails();
@@ -83,7 +83,7 @@ function App() {
   }, []);
 
   if (!isReadyToLoad) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (

@@ -13,7 +13,6 @@ import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
 import SessionEarnings from 'pages/CreatorDashboard/SessionEarnings';
 
 const CreatorDashboard = ({ match }) => {
-  console.log('coming here');
   return (
     <Switch>
       <Route exact path={match.url + Routes.creatorDashboard.sessions} component={SessionsInventories} />

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
-import { message, Row } from 'antd';
+import { message, Row, Modal } from 'antd';
 import Loader from 'components/Loader';
 import apis from 'apis';
 import Routes from 'routes';
+import config from 'config';
 import { isAPISuccess } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
-import { Modal } from 'antd';
-import config from 'config';
 
 const PaymentVerification = () => {
   const location = useLocation();
@@ -33,7 +32,7 @@ const PaymentVerification = () => {
               okText: 'Go to Dashboard',
               onOk: () => {
                 window.open(config.client.platformBaseURL, '_self');
-              }
+              },
             });
           }
           setIsLoading(false);

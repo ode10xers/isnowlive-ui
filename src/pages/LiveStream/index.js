@@ -59,7 +59,6 @@ const LiveStream = () => {
       setIsLoading(false);
       if (isAPISuccess(status)) {
         message.success('Zoom successfully setup!');
-        // Promise can be implemented here
         const localUserDetails = getLocalUserDetails();
         localUserDetails.zoom_connected = true;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));

@@ -1,7 +1,7 @@
 import React, { useReducer, useContext, createContext } from 'react';
 import Routes from 'routes';
-import { getLocalUserDetails } from 'utils/storage';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
+import { getLocalUserDetails } from 'utils/storage';
 
 const Context = createContext(null);
 
