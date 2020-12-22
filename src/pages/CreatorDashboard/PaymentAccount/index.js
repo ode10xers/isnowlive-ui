@@ -5,7 +5,7 @@ import { Select, Typography, Button, message, Row, Col } from 'antd';
 
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import apis from 'apis';
 import Earnings from 'pages/CreatorDashboard/Earnings';
 
@@ -21,11 +21,25 @@ const PaymentAccount = () => {
   const countries = countryList().getData();
   const {
     state: {
-      userDetails: { payment_account_status = false },
+      userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
     },
   } = useGlobalContext();
   const validateAccount = location?.state?.validateAccount;
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
+
+  const openStripeDashboard = async () => {
+    try {
+      setIsLoading(true);
+      const { status, data } = await apis.payment.stripe.getDashboard();
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        window.open(data.url, '_self');
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (validateAccount) {
@@ -34,10 +48,10 @@ const PaymentAccount = () => {
           const { status } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
             message.success('Stripe Account Connected Succesfully!!');
-            setPaymentConnected(true);
+            setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
           }
         } catch (error) {
-          message.error(error.response?.data?.message || 'Something went wrong.');
+          openStripeDashboard();
         }
       };
       validateStripeAccount();
@@ -88,9 +102,7 @@ const PaymentAccount = () => {
 
   let view = null;
 
-  if (paymentConnected === 'CONNECTED') {
-    view = <Earnings />;
-  } else {
+  if (paymentConnected === StripeAccountStatus.NOT_CONNECTED) {
     view = (
       <>
         <Title level={2}>Get Paid</Title>
@@ -137,6 +149,8 @@ const PaymentAccount = () => {
         </Row>
       </>
     );
+  } else {
+    view = <Earnings />;
   }
 
   return <Section>{view}</Section>;
