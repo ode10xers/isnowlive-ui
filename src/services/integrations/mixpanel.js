@@ -121,13 +121,27 @@ export const mixPanelEventTags = {
   },
 };
 
-export const initMixPanel = () => mixpanel.init(config.mixPanel.projectToken);
+const env = process.env.REACT_APP_ENV || 'development';
+const isDevelopment = () => env === 'development';
 
-export const resetMixPanel = () => mixpanel.reset();
+export const initMixPanel = () => {
+  if (isDevelopment()) return;
+  mixpanel.init(config.mixPanel.projectToken);
+};
 
-export const mapUserToMixPanel = (userData) => mixpanel.alias(userData.external_id);
+export const resetMixPanel = () => {
+  if (isDevelopment()) return;
+  mixpanel.reset();
+};
+
+export const mapUserToMixPanel = (userData) => {
+  if (isDevelopment()) return;
+  mixpanel.alias(userData.external_id);
+};
 
 export const identifyUserInMixPanel = (userData) => {
+  if (isDevelopment()) return;
+
   mixpanel.register({
     email: userData.email,
     external_id: userData.external_id,
@@ -145,9 +159,15 @@ export const identifyUserInMixPanel = (userData) => {
   mixpanel.identify(userData.external_id);
 };
 
-export const trackSimpleEvent = (eventTag, eventData = {}) => mixpanel.track(eventTag, eventData);
+export const trackSimpleEvent = (eventTag, eventData = {}) => {
+  if (isDevelopment()) return;
+
+  mixpanel.track(eventTag, eventData);
+};
 
 export const trackSuccessEvent = (eventTag, eventData = {}) => {
+  if (isDevelopment()) return;
+
   mixpanel.track(eventTag, {
     result: 'SUCCESS',
     error_code: 'N/A',
@@ -157,6 +177,8 @@ export const trackSuccessEvent = (eventTag, eventData = {}) => {
 };
 
 export const trackFailedEvent = (eventTag, error, eventData = {}) => {
+  if (isDevelopment()) return;
+
   mixpanel.track(eventTag, {
     result: 'FAILED',
     error_code: error.response?.data?.code,
