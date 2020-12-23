@@ -26,12 +26,20 @@ import ParticipantsList from 'components/ParticipantsList';
 import Share from 'components/Share';
 import Routes from 'routes';
 
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },
 } = dateUtil;
 const { Title, Text } = Typography;
+const { creator } = mixPanelEventTags;
 
 const SessionsDetails = ({ match }) => {
   const history = useHistory();
@@ -76,13 +84,27 @@ const SessionsDetails = ({ match }) => {
     </Card>
   );
 
+  const trackAndNavigate = (destination, eventTag, newWindow = false) => {
+    trackSimpleEvent(eventTag);
+
+    if (newWindow) {
+      window.open(destination);
+    } else {
+      history.push(destination);
+    }
+  };
+
   const deleteInventory = async (inventory_id) => {
+    const eventTag = creator.click.sessions.details.cancelSession;
+
     try {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag, { inventory_id: inventory_id });
         history.push(Routes.creatorDashboard);
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -97,7 +119,12 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push('/creator/dashboard/sessions/past')}
+                onClick={() =>
+                  trackAndNavigate(
+                    '/creator/dashboard/sessions/past',
+                    creator.click.sessions.details.backToPastSessionsList
+                  )
+                }
                 icon={<ArrowLeftOutlined />}
               >
                 Past Sessions
@@ -109,14 +136,23 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={4}>
               <Button
                 className={styles.headButton}
-                onClick={() => history.push('/creator/dashboard/sessions/upcoming')}
+                onClick={() =>
+                  trackAndNavigate(
+                    '/creator/dashboard/sessions/upcoming',
+                    creator.click.sessions.details.backToUpcomingSessionsList
+                  )
+                }
                 icon={<ArrowLeftOutlined />}
               >
                 Upcoming Sessions
               </Button>
             </Col>
             <Col xs={24} md={3}>
-              <Button className={styles.headButton} onClick={() => window.open(publicUrl)} icon={<GlobalOutlined />}>
+              <Button
+                className={styles.headButton}
+                icon={<GlobalOutlined />}
+                onClick={() => trackAndNavigate(publicUrl, creator.click.sessions.details.publicPage, true)}
+              >
                 Public Page
               </Button>
             </Col>
@@ -175,7 +211,9 @@ const SessionsDetails = ({ match }) => {
                   className={styles.actionButton}
                   icon={<VideoCameraOutlined />}
                   disabled={!session?.start_url}
-                  onClick={() => window.open(session?.start_url)}
+                  onClick={() =>
+                    trackAndNavigate(session?.start_url, creator.click.sessions.details.startSession, true)
+                  }
                 >
                   Start Session
                 </Button>
@@ -185,7 +223,10 @@ const SessionsDetails = ({ match }) => {
                   className={classNames(styles.actionButton, styles.editButton)}
                   icon={<EditOutlined />}
                   onClick={() =>
-                    history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`)
+                    trackAndNavigate(
+                      `${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`,
+                      creator.click.sessions.details.editSession
+                    )
                   }
                 >
                   Edit Session
@@ -195,6 +236,9 @@ const SessionsDetails = ({ match }) => {
                   block
                   className={classNames(styles.actionButton, styles.emailButton)}
                   icon={<MailOutlined />}
+                  onClick={() => {
+                    trackSimpleEvent(creator.click.sessions.details.sendEmail);
+                  }}
                 >
                   Send Email
                 </Button>

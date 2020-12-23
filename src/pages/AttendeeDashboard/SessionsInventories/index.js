@@ -7,6 +7,12 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
@@ -15,6 +21,7 @@ const {
   timeCalculation: { isBeforeLimitHours },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { attendee } = mixPanelEventTags;
 
 const SessionsInventories = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -88,7 +95,25 @@ const SessionsInventories = ({ match }) => {
     }
   }, [match.params.session_type, getStaffSession]);
 
+  const trackAndJoinSession = (data) => {
+    const eventTag = isMobileDevice ? attendee.click.sessions.mobile.joinSession : attendee.click.sessions.joinSession;
+
+    trackSimpleEvent(eventTag, { session_data: data });
+    window.open(data.join_url);
+  };
+
   const openSessionInventoryDetails = (item) => {
+    const eventTag = isMobileDevice
+      ? attendee.click.sessions.mobile.sessionDetails
+      : isPast
+      ? attendee.click.sessions.pastSessionDetails
+      : attendee.click.sessions.upcomingSessionDetails;
+
+    trackSimpleEvent(eventTag, {
+      creator: item.username,
+      session_data: item,
+    });
+
     if (item.username && item.inventory_id) {
       window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
     }
@@ -97,11 +122,13 @@ const SessionsInventories = ({ match }) => {
   const cancelOrderForSession = async (orderId) => {
     try {
       await apis.session.cancelCustomerOrder(orderId, { reason: 'requested_by_customer' });
+      trackSuccessEvent(attendee.click.sessions.cancelOrder, { order_id: orderId });
       message.success('Refund Successful');
       setTimeout(() => {
         window.location.reload();
       }, 2000);
     } catch (error) {
+      trackFailedEvent(attendee.click.sessions.cancelOrder, error, { order_id: orderId });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -209,7 +236,7 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
@@ -217,7 +244,7 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
@@ -225,7 +252,7 @@ const SessionsInventories = ({ match }) => {
             {!isPast && (
               <>
                 <Col md={24} lg={24} xl={8}>
-                  <Button type="link" disabled={!record.join_url} onClick={() => window.open(record.join_url)}>
+                  <Button type="link" disabled={!record.join_url} onClick={() => trackAndJoinSession(record)}>
                     Join
                   </Button>
                 </Col>
@@ -258,12 +285,12 @@ const SessionsInventories = ({ match }) => {
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
+          <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
             Details
           </Button>,
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.join_url} onClick={() => window.open(item.join_url)}>
+              <Button type="link" disabled={!item.join_url} onClick={() => trackAndJoinSession(item)}>
                 Join
               </Button>
             )}

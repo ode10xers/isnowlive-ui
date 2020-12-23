@@ -20,8 +20,15 @@ import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLay
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 const { Title, Text } = Typography;
+const { creator } = mixPanelEventTags;
 
 const Profile = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -55,10 +62,13 @@ const Profile = () => {
   }, [form]);
 
   const updateProfileDetails = async (values) => {
+    const eventTag = creator.click.profile.editForm.submitProfile;
+
     try {
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
         setIsLoading(false);
+        trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
@@ -72,6 +82,7 @@ const Profile = () => {
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error, { form_values: values });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -134,6 +145,7 @@ const Profile = () => {
   };
 
   const addTestimonial = () => {
+    trackSimpleEvent(creator.click.profile.editForm.addEmbedCode);
     if (testimonials) {
       setTestimonials([...testimonials, form.getFieldValue().testimonials]);
       form.setFieldsValue({ testimonials: '' });
@@ -147,6 +159,11 @@ const Profile = () => {
     scrollToErrorField(errorFields);
   };
 
+  const trackAndNavigate = (destination, eventTag) => {
+    trackSimpleEvent(eventTag);
+    history.push(destination);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -156,8 +173,10 @@ const Profile = () => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/profile')}
               icon={<ArrowLeftOutlined />}
+              onClick={() =>
+                trackAndNavigate('/creator/dashboard/profile', creator.click.profile.editForm.backToProfile)
+              }
             >
               Back
             </Button>
@@ -295,7 +314,12 @@ const Profile = () => {
                       title="Preview"
                       bordered={false}
                       extra={
-                        <DeleteOutlined onClick={() => setTestimonials(testimonials.filter((_, i) => i !== index))} />
+                        <DeleteOutlined
+                          onClick={() => {
+                            trackSimpleEvent(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
+                            setTestimonials(testimonials.filter((_, i) => i !== index));
+                          }}
+                        />
                       }
                       className={styles.card}
                       bodyStyle={{ padding: '0px', height: '600px', overflowY: 'scroll' }} // styles.cardbody is not working here

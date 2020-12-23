@@ -5,6 +5,7 @@ import { Select, Typography, Button, message, Row, Col } from 'antd';
 
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
+import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import apis from 'apis';
 import Earnings from 'pages/CreatorDashboard/Earnings';
@@ -13,6 +14,7 @@ import styles from './styles.module.scss';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
+const { creator } = mixPanelEventTags;
 
 const PaymentAccount = () => {
   const location = useLocation();
@@ -83,10 +85,13 @@ const PaymentAccount = () => {
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);
+    const eventTag = creator.click.payment.connectStripe;
+
     try {
       const { data, status } = await apis.payment.stripe.onboardUser({ country: selectedCountry });
       if (isAPISuccess(status)) {
         setIsLoading(false);
+        trackSuccessEvent(eventTag, { country: selectedCountry });
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
@@ -96,6 +101,7 @@ const PaymentAccount = () => {
       ) {
         relinkStripe();
       } else {
+        trackFailedEvent(eventTag, error, { country: selectedCountry });
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
       }

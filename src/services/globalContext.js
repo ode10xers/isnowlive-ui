@@ -2,6 +2,7 @@ import React, { useReducer, useContext, createContext } from 'react';
 import Routes from 'routes';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
+import { resetMixPanel } from 'services/integrations/mixpanel';
 
 const Context = createContext(null);
 
@@ -73,6 +74,7 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'LOG_OUT' });
     localStorage.removeItem('user-details');
     deleteAuthCookie();
+    resetMixPanel();
   }
 
   const value = {

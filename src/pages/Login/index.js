@@ -4,6 +4,13 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
+import {
+  mixPanelEventTags,
+  identifyUserInMixPanel,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
@@ -14,6 +21,7 @@ import styles from './style.module.scss';
 
 const { Item } = Form;
 const { Password } = Input;
+const { user } = mixPanelEventTags;
 
 const Login = ({ history }) => {
   const [loginForm] = Form.useForm();
@@ -42,31 +50,41 @@ const Login = ({ history }) => {
   );
 
   const onFinish = async (values) => {
+    const eventTag = user.click.logIn;
+
     try {
       setIsLoading(true);
       const { data } = await apis.user.login(values);
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
+        identifyUserInMixPanel(data);
+        trackSuccessEvent(eventTag, { email: values.email });
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
 
   const sendNewPasswordEmail = async (values) => {
+    const eventTag = user.click.sendNewPasswordEmail;
+
     try {
       setIsLoading(true);
       const { status } = await apis.user.sendNewPasswordEmail(values);
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag, { email: values.email });
+
         setIsLoading(false);
         message.success('Email sent successfully.');
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -79,6 +97,11 @@ const Login = ({ history }) => {
       redirectBasedOnProfileCriteria(state.userDetails);
     }
   }, [loginForm, redirectBasedOnProfileCriteria, state.userDetails]);
+
+  const trackAndSetLoginView = (eventTag, loginViewValue) => {
+    trackSimpleEvent(eventTag);
+    setIsLoginView(loginViewValue);
+  };
 
   let view = null;
 
@@ -103,7 +126,7 @@ const Login = ({ history }) => {
 
         <Row>
           <Col xs={24} md={{ span: 18, offset: 6 }}>
-            <a href onClick={() => setIsLoginView(false)}>
+            <a href onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
               Set a new password
             </a>
           </Col>
@@ -132,7 +155,7 @@ const Login = ({ history }) => {
 
         <Row>
           <Col xs={24} md={{ span: 18, offset: 6 }}>
-            <a href onClick={() => setIsLoginView(true)}>
+            <a href onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
               Login with password
             </a>
           </Col>

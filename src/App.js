@@ -4,6 +4,7 @@ import Routes from 'routes';
 import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initializeFreshChat } from 'services/integrations/fresh-chat';
+import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
 
@@ -51,6 +52,10 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
+
+  useEffect(() => {
+    initMixPanel();
+  }, []);
 
   useEffect(() => {
     initializeFreshChat(userDetails);

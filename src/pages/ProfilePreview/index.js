@@ -25,9 +25,12 @@ import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { user, creator } = mixPanelEventTags;
 
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
@@ -91,9 +94,21 @@ const ProfilePreview = ({ username = null }) => {
     setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
+      trackSimpleEvent(user.click.profile.upcomingSessionsTab);
       getSessionDetails('upcoming');
     } else {
+      trackSimpleEvent(user.click.profile.pastSessionsTab);
       getSessionDetails('past');
+    }
+  };
+
+  const trackAndNavigate = (destination, eventTag, newWindow = false) => {
+    trackSimpleEvent(eventTag);
+
+    if (newWindow) {
+      window.open(destination);
+    } else {
+      history.push(destination);
     }
   };
 
@@ -104,22 +119,24 @@ const ProfilePreview = ({ username = null }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard')}
               icon={<ArrowLeftOutlined />}
+              onClick={() => trackAndNavigate('/creator/dashboard', creator.click.profile.backToDashboard)}
             >
               Dashboard
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/profile/edit')}
               icon={<EditOutlined />}
+              onClick={() => trackAndNavigate('/creator/dashboard/profile/edit', creator.click.profile.editProfile)}
             >
               Edit Profile
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => window.open(generateUrlFromUsername(profile.username))}
               icon={<GlobalOutlined />}
+              onClick={() =>
+                trackAndNavigate(generateUrlFromUsername(profile.username), creator.click.profile.publicPage, true)
+              }
             >
               Public Page
             </Button>

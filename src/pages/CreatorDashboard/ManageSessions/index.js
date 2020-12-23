@@ -9,12 +9,20 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
   formatDate: { toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const ManageSessions = () => {
   const history = useHistory();
@@ -31,15 +39,18 @@ const ManageSessions = () => {
 
   const publishSession = async (sessionId) => {
     setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.publishSession;
 
     try {
       const { data } = await apis.session.publishSession(sessionId);
 
       if (data) {
+        trackSuccessEvent(eventTag, { session_id: sessionId });
         message.success('Session published successfully!');
         getSessionsList();
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
 
@@ -48,19 +59,27 @@ const ManageSessions = () => {
 
   const unpublishSession = async (sessionId) => {
     setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.unpublishSession;
 
     try {
       const { data } = await apis.session.unpublishSession(sessionId);
 
       if (data) {
+        trackSuccessEvent(eventTag, { session_id: sessionId });
         message.success('Session is now unpublished!');
         getSessionsList();
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
 
     setIsLoading(false);
+  };
+
+  const trackAndNavigate = (destination) => {
+    trackSimpleEvent(creator.click.sessions.manage.editSession);
+    history.push(destination);
   };
 
   useEffect(() => {
@@ -121,7 +140,7 @@ const ManageSessions = () => {
               <Button
                 className={styles.detailsButton}
                 onClick={() =>
-                  history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
+                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
                 }
                 type="link"
               >
@@ -160,16 +179,20 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
-            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
+            onClick={() =>
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+            }
           >
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
           <Button
-            className={styles.detailsButton}
-            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
             type="link"
+            className={styles.detailsButton}
+            onClick={() =>
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+            }
           >
             Edit
           </Button>,

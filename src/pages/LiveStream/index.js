@@ -5,6 +5,12 @@ import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isAPISuccess, ZoomAuthType } from 'utils/helper';
@@ -15,6 +21,7 @@ import apis from 'apis';
 import styles from './style.module.scss';
 
 const { Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const LiveStream = () => {
   const [form] = Form.useForm();
@@ -52,12 +59,14 @@ const LiveStream = () => {
     }
   }, [history.location.pathname, zoom_connected, getZoomJWTDetails]);
 
-  const storeZoomCrendetials = async (values) => {
+  const storeZoomCredentials = async (values) => {
+    const eventTag = creator.click.livestream.submitZoomDetails;
     try {
       setIsLoading(true);
       const { status } = await apis.user.storeZoomCredentials(values);
       setIsLoading(false);
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag);
         message.success('Zoom successfully setup!');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.zoom_connected = true;
@@ -73,6 +82,7 @@ const LiveStream = () => {
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -103,7 +113,13 @@ const LiveStream = () => {
               We will connect your Zoom Account. You will be taken to Zoom authorization page. You'll be taken back to
               this page.
             </p>
-            <Button type="primary" className={styles.mt30}>
+            <Button
+              type="primary"
+              className={styles.mt30}
+              onClick={() => {
+                trackSimpleEvent(creator.click.livestream.connectZoomAccount);
+              }}
+            >
               Connect my Zoom Account
             </Button>
           </Row>
@@ -150,7 +166,7 @@ const LiveStream = () => {
               </p>
             </Col>
             <Col span={24}>
-              <Form form={form} {...profileFormItemLayout} onFinish={storeZoomCrendetials}>
+              <Form form={form} {...profileFormItemLayout} onFinish={storeZoomCredentials}>
                 <Col span={24}>
                   <Form.Item label="API Key" name="api_key" rules={validationRules.requiredValidation}>
                     <Input placeholder="API Key" />

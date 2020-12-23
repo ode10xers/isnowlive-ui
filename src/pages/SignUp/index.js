@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import { useGlobalContext } from 'services/globalContext';
+import {
+  mixPanelEventTags,
+  mapUserToMixPanel,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -11,6 +18,7 @@ import validationRules from 'utils/validation';
 import styles from './style.module.scss';
 
 const { Item } = Form;
+const { user } = mixPanelEventTags;
 
 const SignUp = ({ history }) => {
   const [form] = Form.useForm();
@@ -18,6 +26,8 @@ const SignUp = ({ history }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onFinish = async (values) => {
+    const eventTag = user.click.signUp;
+
     try {
       setIsLoading(true);
       const { data } = await apis.user.signup({
@@ -28,10 +38,13 @@ const SignUp = ({ history }) => {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
         setIsLoading(false);
+        mapUserToMixPanel(data);
+        trackSuccessEvent(eventTag, { email: values.email });
         history.push(Routes.profile);
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };

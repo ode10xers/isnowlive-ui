@@ -13,6 +13,13 @@ import { useGlobalContext } from 'services/globalContext';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const cashIcon = require('assets/images/cash.png');
@@ -23,6 +30,7 @@ const { Title, Text } = Typography;
 const {
   formatDate: { toLongDateWithDayTime },
 } = dateUtil;
+const { creator } = mixPanelEventTags;
 
 const Earnings = () => {
   const history = useHistory();
@@ -60,31 +68,38 @@ const Earnings = () => {
   }, []);
 
   const handleShowMoreSession = async () => {
+    const eventTag = creator.click.payment.showMoreEarnings;
     try {
       setIsLoading(true);
       let pageNo = currentPage + 1;
       const { status, data } = await apis.session.getCreatorEarnings(pageNo, sessionPerPage);
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag);
         setIsLoading(false);
         setSessions([...sessions, ...data.earnings]);
         setCurrentPage(pageNo);
         setShowMore(data.next_page || false);
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
   };
 
   const openStripeDashboard = async () => {
+    const eventTag = creator.click.payment.verifyBankAccount;
+
     try {
       setIsLoading(true);
       const { status, data } = await apis.payment.stripe.getDashboard();
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
+        trackSuccessEvent(eventTag);
         window.open(data.url, '_self');
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -95,13 +110,16 @@ const Earnings = () => {
   }, [getEarningData]);
 
   const confirmPayout = async () => {
+    const eventTag = creator.click.payment.requestPayout;
     try {
       setIsLoadingPayout(true);
       const { status } = await apis.session.createCreatorBalancePayout();
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag);
         setIsLoadingPayout(false);
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoadingPayout(false);
     }
@@ -191,6 +209,7 @@ const Earnings = () => {
   );
 
   const openSessionDetails = (item) => {
+    trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
     if (item.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/${item.inventory_id}`);
     }
@@ -227,7 +246,7 @@ const Earnings = () => {
       render: (text, record) => (
         <Row justify="start">
           <Col>
-            <Button className={styles.detailsButton} onClick={() => openSessionDetails(record)} type="link">
+            <Button type="link" className={styles.detailsButton} onClick={() => openSessionDetails(record)}>
               Details
             </Button>
           </Col>
@@ -255,7 +274,7 @@ const Earnings = () => {
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionDetails(item)} type="link">
+          <Button type="link" className={styles.detailsButton} onClick={() => openSessionDetails(item)}>
             Details
           </Button>,
         ]}
