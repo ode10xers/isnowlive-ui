@@ -46,7 +46,7 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 
@@ -259,7 +259,10 @@ const Session = ({ match, history }) => {
       }
 
       if (session?.inventory?.length) {
-        data.inventory = convertSchedulesToUTC(session.inventory);
+        let allInventoryList = convertSchedulesToUTC(session.inventory);
+        data.inventory = allInventoryList.filter(
+          (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
+        );
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
-import { DeleteFilled, CarryOutOutlined } from '@ant-design/icons';
+import { DeleteFilled, CarryOutOutlined, TeamOutlined } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -50,11 +50,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         session_date: moment(obj.session_date),
         start_time: obj.start_time,
         end_time: obj.end_time,
+        num_participants: obj.num_participants,
       }));
       const defaultSlot = {
         session_date: moment(selecetedCalendarDate).format(),
         start_time: null,
         end_time: null,
+        num_participants: 0,
       };
 
       setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
@@ -301,6 +303,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
+                      disabled={slot.num_participants === 0 ? false : true}
                     >
                       {slotsList?.map((item) => {
                         if (
@@ -317,7 +320,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   <Col xs={11} md={11}>
                     <Select
-                      disabled={slot.start_time ? false : true}
+                      disabled={slot.start_time && slot.num_participants === 0 ? false : true}
                       value={slot.end_time && toShortTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
@@ -339,14 +342,24 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   {form.length > 1 && (
                     <Col xs={2} md={2}>
-                      <Tooltip title="Delete">
-                        <Button
-                          disabled={slot?.num_participants && slot?.num_participants > 0}
-                          shape="circle"
-                          onClick={() => handleDeleteSlot(index)}
-                          icon={<DeleteFilled />}
-                        />
-                      </Tooltip>
+                      {slot?.num_participants > 0 ? (
+                        <Tooltip
+                          title={`Unable to update this session as ${slot?.num_participants} participants have already registered`}
+                        >
+                          <Badge count={slot?.num_participants} size="small">
+                            <TeamOutlined />
+                          </Badge>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title="Delete">
+                          <Button
+                            disabled={slot?.num_participants && slot?.num_participants > 0}
+                            shape="circle"
+                            onClick={() => handleDeleteSlot(index)}
+                            icon={<DeleteFilled />}
+                          />
+                        </Tooltip>
+                      )}
                     </Col>
                   )}
                 </Row>
