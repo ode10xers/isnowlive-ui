@@ -229,8 +229,10 @@ const Session = ({ match, history }) => {
   };
 
   const handleRefundBeforeHoursChange = (e) => {
-    setRefundBeforeHours(parseInt(e.target.value));
-    form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: parseInt(e.target.value) });
+    const value = Math.max(1, parseInt(e.target.value));
+
+    setRefundBeforeHours(value);
+    form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: value });
   };
 
   const onFinish = async (values) => {
