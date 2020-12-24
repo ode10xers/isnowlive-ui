@@ -1,6 +1,8 @@
 import axios from 'axios';
 import config from 'config';
-import { setAuthCookie, getAuthCookie } from './authCookie';
+import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
+
+const UNAUTHORIZED = 401;
 
 class HttpService {
   constructor() {
@@ -12,6 +14,19 @@ class HttpService {
         'auth-token': this.authToken,
       },
     });
+
+    this.axios.interceptors.response.use(
+      response => response,
+      error => {
+        const { status } = error.response;
+        if (status === UNAUTHORIZED) {
+          localStorage.removeItem('user-details');
+          deleteAuthCookie();
+          window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 
   setAuthToken(authToken) {
@@ -50,6 +65,7 @@ class HttpService {
       data: payload,
     });
   }
+
 }
 
 const http = new HttpService();
