@@ -10,6 +10,7 @@ const Home = () => {
   const history = useHistory();
   const [loadProfile, setLoadProfile] = useState(false);
   const [username, setUsername] = useState(null);
+
   useEffect(() => {
     const domainName = window.location.hostname.split('.')[0];
     if (domainName && !reservedDomainName.includes(domainName)) {
@@ -19,6 +20,7 @@ const Home = () => {
       history.push(Routes.login);
     }
   }, [history]);
+
   if (loadProfile) {
     return <ProfilePreview username={username} />;
   }

@@ -4,16 +4,24 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
+import {
+  mixPanelEventTags,
+  identifyUserInMixPanel,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, ZoomAuthType } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
 const { Item } = Form;
 const { Password } = Input;
+const { user } = mixPanelEventTags;
 
 const Login = ({ history }) => {
   const [loginForm] = Form.useForm();
@@ -24,47 +32,59 @@ const Login = ({ history }) => {
 
   const redirectBasedOnProfileCriteria = useCallback(
     (user) => {
-      if (user.is_creator) {
-        if (user.profile_complete === false) {
-          history.push(Routes.profile);
-        } else if (user.zoom_connected === false) {
-          history.push(Routes.livestream);
+      if (user) {
+        if (user.is_creator) {
+          if (user.profile_complete === false) {
+            history.push(Routes.profile);
+          } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
+            history.push(Routes.livestream);
+          } else {
+            history.push(Routes.creatorDashboard.rootPath);
+          }
         } else {
-          history.push(Routes.creatorDashboard.rootPath);
+          history.push(Routes.attendeeDashboard.rootPath);
         }
-      } else {
-        history.push(Routes.attendeeDashboard.rootPath);
       }
     },
     [history]
   );
 
   const onFinish = async (values) => {
+    const eventTag = user.click.logIn;
+
     try {
       setIsLoading(true);
       const { data } = await apis.user.login(values);
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
+        identifyUserInMixPanel(data);
+        trackSuccessEvent(eventTag, { email: values.email });
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
 
   const sendNewPasswordEmail = async (values) => {
+    const eventTag = user.click.sendNewPasswordEmail;
+
     try {
       setIsLoading(true);
       const { status } = await apis.user.sendNewPasswordEmail(values);
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag, { email: values.email });
+
         setIsLoading(false);
         message.success('Email sent successfully.');
       }
     } catch (error) {
       setIsLoading(false);
+      trackFailedEvent(eventTag, error, { email: values.email });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -76,7 +96,12 @@ const Login = ({ history }) => {
     if (state.userDetails) {
       redirectBasedOnProfileCriteria(state.userDetails);
     }
-  }, [history, state.userDetails, loginForm, redirectBasedOnProfileCriteria]);
+  }, [loginForm, redirectBasedOnProfileCriteria, state.userDetails]);
+
+  const trackAndSetLoginView = (eventTag, loginViewValue) => {
+    trackSimpleEvent(eventTag);
+    setIsLoginView(loginViewValue);
+  };
 
   let view = null;
 
@@ -100,8 +125,8 @@ const Login = ({ history }) => {
         </Form>
 
         <Row>
-          <Col xs={24} md={{ span: 16, offset: 8 }}>
-            <a href onClick={() => setIsLoginView(false)}>
+          <Col xs={24} md={{ span: 18, offset: 6 }}>
+            <a href onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
               Set a new password
             </a>
           </Col>
@@ -112,7 +137,7 @@ const Login = ({ history }) => {
     view = (
       <>
         <Row>
-          <Col xs={24} md={{ span: 16, offset: 8 }}>
+          <Col xs={24} md={{ span: 18, offset: 6 }}>
             <h1>Set a new password</h1>
           </Col>
         </Row>
@@ -129,8 +154,8 @@ const Login = ({ history }) => {
         </Form>
 
         <Row>
-          <Col xs={24} md={{ span: 16, offset: 8 }}>
-            <a href onClick={() => setIsLoginView(true)}>
+          <Col xs={24} md={{ span: 18, offset: 6 }}>
+            <a href onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
               Login with password
             </a>
           </Col>

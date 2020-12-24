@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Image, Space, Typography } from 'antd';
 import { GlobalOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined } from '@ant-design/icons';
+import ReactHtmlParser from 'react-html-parser';
 
 import DefaultImage from '../Icons/DefaultImage/index';
 import { isMobileDevice } from 'utils/device';
@@ -10,11 +11,15 @@ import styles from './styles.module.scss';
 const { Title, Paragraph } = Typography;
 
 const HostDetails = ({ host }) => {
+  const [showMore, setShowMore] = useState(false);
+
   useEffect(() => {
     // Timeout need as it take some time to paint the dom
     setTimeout(() => {
-      if (document.getElementsByClassName('ant-typography-expand')[0]) {
-        document.getElementsByClassName('ant-typography-expand')[0].innerText = 'Read more';
+      if (document.getElementsByClassName('ant-typography-expand').length) {
+        for (let i = 0; i < document.getElementsByClassName('ant-typography-expand').length; i++) {
+          document.getElementsByClassName('ant-typography-expand')[i].innerText = 'Read more';
+        }
       }
     }, 200);
   }, [host]);
@@ -48,15 +53,18 @@ const HostDetails = ({ host }) => {
           <Title level={5}>Full Profile</Title>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
-          <Paragraph
-            ellipsis={{
-              rows: 6,
-              expandable: true,
-            }}
-            title={host?.profile?.bio}
-          >
-            {host?.profile?.bio}
-          </Paragraph>
+          {showMore ? (
+            <Paragraph type="secondary">{ReactHtmlParser(host?.profile?.bio)}</Paragraph>
+          ) : (
+            <>
+              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                {ReactHtmlParser(host?.profile?.bio)}
+              </Paragraph>
+              <div className={styles.readMoreText} onClick={() => setShowMore(true)}>
+                Read More
+              </div>
+            </>
+          )}
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           <Space size={'middle'}>

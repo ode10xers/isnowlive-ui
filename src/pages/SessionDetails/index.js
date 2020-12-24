@@ -3,7 +3,9 @@ import { Row, Col, Image, message, Typography, Modal } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
+import { loadStripe } from '@stripe/stripe-js';
 
+import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -22,8 +24,10 @@ import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
 
+const stripePromise = loadStripe(config.stripe.secretKey);
+
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 const {
   formatDate: { getTimeDiff },
 } = dateUtil;
@@ -35,6 +39,8 @@ const SessionDetails = ({ match, history }) => {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { logIn } = useGlobalContext();
+  const [showDescription, setShowDescription] = useState(false);
+  const [showPrerequisite, setShowPrerequisite] = useState(false);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -93,17 +99,44 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const createOrder = async () => {
+  const initiatePaymentForOrder = async (orderDetails) => {
     try {
-      const { status } = await apis.session.createOrderForUser({
-        inventory_id: parseInt(match.params.inventory_id),
+      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+        order_id: orderDetails.order_id,
       });
 
-      if (isAPISuccess(status)) {
-        Modal.success({
-          content: 'Session is been booked successfully',
-          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
+      if (isAPISuccess(status) && data) {
+        const stripe = await stripePromise;
+
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.payment_gateway_session_id,
         });
+
+        if (result.error) {
+          message.error('Cannot initiate payment at this time, please try again...');
+        }
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
+  };
+
+  const createOrder = async () => {
+    try {
+      const { status, data } = await apis.session.createOrderForUser({
+        inventory_id: parseInt(match.params.inventory_id),
+        user_timezone_offset: new Date().getTimezoneOffset(),
+      });
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          Modal.success({
+            content: 'Session is been booked successfully',
+            onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
+          });
+        }
       }
     } catch (error) {
       setIsLoading(false);
@@ -128,7 +161,6 @@ const SessionDetails = ({ match, history }) => {
       // is beause if user aleady existing and have to login then value will be
       // set to currentUser where as getLocalUserDetails is only set if user has
       // actually login
-
       if (!getLocalUserDetails() && values.password) {
         try {
           const { data } = await apis.user.login({
@@ -176,7 +208,6 @@ const SessionDetails = ({ match, history }) => {
           <Image
             preview={false}
             width={'100%'}
-            height={300}
             className={classNames(styles.coverImage, styles.mb20)}
             src={session?.session_image_url || 'error'}
             fallback={DefaultImage()}
@@ -207,15 +238,33 @@ const SessionDetails = ({ match, history }) => {
       <Row justify="space-between" className={styles.mt50}>
         <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
-          <Title type="secondary" level={5}>
-            {ReactHtmlParser(session?.description)}
-          </Title>
+          {showDescription ? (
+            <Paragraph type="secondary"> {ReactHtmlParser(session?.description)}</Paragraph>
+          ) : (
+            <>
+              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                {ReactHtmlParser(session?.description)}
+              </Paragraph>
+              <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
+                Read More
+              </div>
+            </>
+          )}
           <Title level={5} className={styles.mt50}>
             Session Prerequisite
           </Title>
-          <Title type="secondary" level={5}>
-            {ReactHtmlParser(session?.prerequisites)}
-          </Title>
+          {showPrerequisite ? (
+            <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
+          ) : (
+            <>
+              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                {ReactHtmlParser(session?.prerequisites)}
+              </Paragraph>
+              <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
+                Read More
+              </div>
+            </>
+          )}
         </Col>
         <Col xs={24} lg={1}></Col>
         <Col xs={24} lg={9}>

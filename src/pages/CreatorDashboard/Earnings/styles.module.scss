@@ -1,0 +1,40 @@
+@import '../../../styles/variables.scss';
+.box1 {
+  background: map-get($colors, $key: 'Ivory');
+  border: 1px solid map-get($colors, $key: 'SnowFlurry');
+  box-sizing: border-box;
+  border-radius: 6px;
+  padding: 15px;
+  max-width: 300px;
+  margin-top: 10px;
+}
+.box1Text {
+  color: map-get($colors, $key: 'Green') !important;
+}
+.box1Button {
+  color: map-get($colors, $key: 'White') !important;
+  background: map-get($colors, $key: 'KellyGreen') !important;
+  border-radius: 2px !important;
+  border: transparent !important;
+}
+.box2 {
+  border: 1px solid map-get($colors, $key: 'Gainsboro');
+  background: map-get($colors, $key: 'White') !important;
+  box-sizing: border-box;
+  border-radius: 6px;
+  padding: 15px;
+  max-width: 300px;
+  margin-top: 10px;
+}
+.box2Text {
+  color: map-get($colors, $key: 'DodgerBlue') !important;
+}
+.detailsButton {
+  padding-left: 0px !important;
+}
+.sucessButton {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+}
+.card {
+  margin-top: 10px !important;
+}

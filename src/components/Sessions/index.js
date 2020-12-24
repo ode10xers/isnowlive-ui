@@ -7,6 +7,8 @@ import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
@@ -14,6 +16,7 @@ const { Text, Title, Paragraph } = Typography;
 const {
   formatDate: { toDate, toShortMonth, toDayOfWeek, toLocaleTime },
 } = dateUtil;
+const { user } = mixPanelEventTags;
 
 const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
@@ -21,6 +24,7 @@ const Sessions = ({ sessions, username }) => {
   const [sessionCount, setSessionCount] = useState(4);
 
   const showMore = () => {
+    trackSimpleEvent(user.click.profile.showMore);
     if (sessionCount <= sessions.length) {
       setSessionCount(sessionCount + 4);
     }
@@ -54,6 +58,7 @@ const Sessions = ({ sessions, username }) => {
   };
 
   const showInventoryDetails = (inventory_id) => {
+    trackSimpleEvent(user.click.profile.sessionCard, { inventory_id: inventory_id });
     const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
     window.open(`${baseurl}/e/${inventory_id}`);
   };
@@ -70,8 +75,8 @@ const Sessions = ({ sessions, username }) => {
                     <Card
                       hoverable
                       className={styles.card}
-                      onClick={() => showInventoryDetails(session.inventory_id)}
                       bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
+                      onClick={() => showInventoryDetails(session.inventory_id)}
                     >
                       <Row>
                         <Col xs={24} md={8} lg={8}>
@@ -106,7 +111,7 @@ const Sessions = ({ sessions, username }) => {
             ))}
             {sessionCount < sessions.length && (
               <Col span={24} className={styles.textAlignCenter}>
-                <Button onClick={() => showMore()} type="primary">
+                <Button type="primary" onClick={() => showMore()}>
                   Show more
                 </Button>
               </Col>

@@ -8,6 +8,7 @@ import {
   TwitterOutlined,
   ArrowLeftOutlined,
   EditOutlined,
+  LinkedinOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
@@ -24,9 +25,12 @@ import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
+const { user, creator } = mixPanelEventTags;
 
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
@@ -90,9 +94,21 @@ const ProfilePreview = ({ username = null }) => {
     setIsSessionLoading(true);
     setSelectedTab(key);
     if (parseInt(key) === 0) {
+      trackSimpleEvent(user.click.profile.upcomingSessionsTab);
       getSessionDetails('upcoming');
     } else {
+      trackSimpleEvent(user.click.profile.pastSessionsTab);
       getSessionDetails('past');
+    }
+  };
+
+  const trackAndNavigate = (destination, eventTag, newWindow = false) => {
+    trackSimpleEvent(eventTag);
+
+    if (newWindow) {
+      window.open(destination);
+    } else {
+      history.push(destination);
     }
   };
 
@@ -103,22 +119,24 @@ const ProfilePreview = ({ username = null }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard')}
               icon={<ArrowLeftOutlined />}
+              onClick={() => trackAndNavigate('/creator/dashboard', creator.click.profile.backToDashboard)}
             >
               Dashboard
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/profile/edit')}
               icon={<EditOutlined />}
+              onClick={() => trackAndNavigate('/creator/dashboard/profile/edit', creator.click.profile.editProfile)}
             >
               Edit Profile
             </Button>
             <Button
               className={styles.headButton}
-              onClick={() => window.open(generateUrlFromUsername(profile.username))}
               icon={<GlobalOutlined />}
+              onClick={() =>
+                trackAndNavigate(generateUrlFromUsername(profile.username), creator.click.profile.publicPage, true)
+              }
             >
               Public Page
             </Button>
@@ -126,110 +144,115 @@ const ProfilePreview = ({ username = null }) => {
         </Row>
       )}
 
-      {/* ======INTRO========= */}
-      <div className={styles.imageWrapper}>
-        <div className={styles.coverImageWrapper}>
-          <Image
-            preview={false}
-            width={coverImage ? '100%' : 200}
-            height={300}
-            className={styles.coverImage}
-            src={coverImage ? coverImage : 'error'}
-            fallback={DefaultImage()}
-          />
+      <div className={isOnDashboard && styles.profilePreviewContainer}>
+        {/* ======INTRO========= */}
+        <div className={styles.imageWrapper}>
+          <div className={styles.coverImageWrapper}>
+            <Image
+              preview={false}
+              width={coverImage ? '100%' : 200}
+              className={styles.coverImage}
+              src={coverImage ? coverImage : 'error'}
+              fallback={DefaultImage()}
+            />
+          </div>
+          <div className={styles.profileImage}>
+            <Image
+              preview={false}
+              width={'100%'}
+              src={profileImage ? profileImage : 'error'}
+              fallback={DefaultImage()}
+            />
+            <div className={styles.userName}>
+              <Title level={isMobileDevice ? 4 : 2}>
+                {profile?.first_name} {profile?.last_name}
+              </Title>
+            </div>
+            <div className={styles.shareButton}>
+              <Share
+                label="Share"
+                shareUrl={generateUrlFromUsername(profile.username)}
+                title={`${profile.first_name} ${profile.last_name}`}
+              />
+            </div>
+          </div>
         </div>
+        <Row justify="space-between" align="middle">
+          <Col xs={24} md={{ span: 22, offset: 1 }}>
+            <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
+          </Col>
+          <Col xs={24} md={{ span: 22, offset: 1 }}>
+            {profile?.profile?.social_media_links && (
+              <Space size={'middle'}>
+                {profile.profile.social_media_links.website && (
+                  <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
+                    <GlobalOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.facebook_link && (
+                  <a href={profile.profile.social_media_links.facebook_link} target="_blank" rel="noopener noreferrer">
+                    <FacebookOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.twitter_link && (
+                  <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
+                    <TwitterOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.instagram_link && (
+                  <a href={profile.profile.social_media_links.instagram_link} target="_blank" rel="noopener noreferrer">
+                    <InstagramOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.linkedin_link && (
+                  <a href={profile.profile.social_media_links.linkedin_link} target="_blank" rel="noopener noreferrer">
+                    <LinkedinOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+              </Space>
+            )}
+          </Col>
+        </Row>
 
-        <Image
-          preview={false}
-          className={isMobileDevice ? styles.profileImageSmall : styles.profileImage}
-          width={isMobileDevice ? 80 : 120}
-          height={isMobileDevice ? 80 : 120}
-          src={profileImage ? profileImage : 'error'}
-          fallback={DefaultImage()}
-        />
-      </div>
-      <Row justify="space-between" align="middle">
-        <Col xs={6} md={24}></Col>
-        <Col xs={12} md={{ span: 7, offset: 4 }}>
-          <Title level={isMobileDevice ? 4 : 2}>
-            {profile?.first_name} {profile?.last_name}
-          </Title>
-        </Col>
-        <Col xs={6} md={{ span: 6, offset: 6 }}>
-          <Share
-            label="Share"
-            shareUrl={generateUrlFromUsername(profile.username)}
-            title={`${profile.first_name} ${profile.last_name}`}
-          />
-        </Col>
-        <Col xs={24} md={{ span: 18, offset: 3 }}>
-          <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
-        </Col>
-        <Col xs={24} md={{ span: 18, offset: 3 }}>
-          {profile?.profile?.social_media_links && (
-            <Space size={'middle'}>
-              {profile.profile.social_media_links.website && (
-                <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
-                  <GlobalOutlined className={styles.socialIcon} />
-                </a>
-              )}
-              {profile.profile.social_media_links.facebook_link && (
-                <a href={profile.profile.social_media_links.facebook_link} target="_blank" rel="noopener noreferrer">
-                  <FacebookOutlined className={styles.socialIcon} />
-                </a>
-              )}
-              {profile.profile.social_media_links.twitter_link && (
-                <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
-                  <TwitterOutlined className={styles.socialIcon} />
-                </a>
-              )}
-              {profile.profile.social_media_links.instagram_link && (
-                <a href={profile.profile.social_media_links.instagram_link} target="_blank" rel="noopener noreferrer">
-                  <InstagramOutlined className={styles.socialIcon} />
-                </a>
-              )}
-            </Space>
-          )}
-        </Col>
-      </Row>
+        {/* =====SESSION======== */}
+        <Row className={styles.mt50}>
+          <Col span={24}>
+            <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
+          </Col>
+          <Col span={24}>
+            <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
+              {['Upcoming Sessions', 'Past Sesions'].map((item, index) => (
+                <Tabs.TabPane tab={item} key={index}>
+                  <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                    <Sessions username={username} sessions={sessions} />
+                  </Loader>
+                </Tabs.TabPane>
+              ))}
+            </Tabs>
+          </Col>
+        </Row>
 
-      {/* =====SESSION======== */}
-      <Row className={styles.mt50}>
-        <Col span={24}>
-          <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
-        </Col>
-        <Col span={24}>
-          <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
-            {['Upcoming Sessions', 'Past Sesions'].map((item, index) => (
-              <Tabs.TabPane tab={item} key={index}>
-                <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                  <Sessions username={username} sessions={sessions} />
-                </Loader>
-              </Tabs.TabPane>
-            ))}
-          </Tabs>
-        </Col>
-      </Row>
+        {/* =====TESTIMONIALS======== */}
 
-      {/* =====TESTIMONIALS======== */}
-      <Row className={styles.mt50}>
-        <Col span={24}>
-          <Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Title>
-        </Col>
-        <Col span={24}>
-          <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>
-            <Masonry>
-              {profile && profile?.profile?.testimonials
-                ? profile.profile.testimonials.map((testimonial, index) => (
+        {profile && profile?.profile?.testimonials ? (
+          <Row className={styles.mt50}>
+            <Col span={24}>
+              <Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Title>
+            </Col>
+            <Col span={24}>
+              <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>
+                <Masonry>
+                  {profile.profile.testimonials.map((testimonial, index) => (
                     <Card key={index} bordered={false} className={styles.card} bodyStyle={{ padding: '0px' }}>
                       <EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>
                     </Card>
-                  ))
-                : null}
-            </Masonry>
-          </ResponsiveMasonry>
-        </Col>
-      </Row>
+                  ))}
+                </Masonry>
+              </ResponsiveMasonry>
+            </Col>
+          </Row>
+        ) : null}
+      </div>
     </Loader>
   );
 };

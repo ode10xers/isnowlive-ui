@@ -7,11 +7,13 @@ import apis from 'apis';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 
 const { Item } = Form;
 const { Password } = Input;
+const { user } = mixPanelEventTags;
 
 const ResetPassword = () => {
   const history = useHistory();
@@ -25,6 +27,8 @@ const ResetPassword = () => {
   }
 
   const setNewPassword = async (values) => {
+    const eventTag = user.click.newPassword;
+
     try {
       setSubmitting(true);
       const { status } = await apis.user.setNewPassword({
@@ -33,11 +37,13 @@ const ResetPassword = () => {
       });
       if (isAPISuccess(status)) {
         setSubmitting(false);
+        trackSuccessEvent(eventTag);
         message.success('Password set successfully.');
         history.push(Routes.login);
       }
     } catch (error) {
       setSubmitting(false);
+      trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };

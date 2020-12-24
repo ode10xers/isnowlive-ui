@@ -15,7 +15,7 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -33,6 +33,13 @@ import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorFiel
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
@@ -41,6 +48,7 @@ const { RangePicker } = DatePicker;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
 } = dateUtil;
+const { creator } = mixPanelEventTags;
 
 const initialSession = {
   price: 10,
@@ -55,6 +63,8 @@ const initialSession = {
   beginning: moment().startOf('day').utc().format(),
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
+  is_refundable: true,
+  refund_before_hours: 24,
   prerequisites: '',
 };
 
@@ -66,6 +76,8 @@ const Session = ({ match, history }) => {
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
   const [isSessionFree, setIsSessionFree] = useState(false);
   const [currencyList, setCurrencyList] = useState(null);
+  const [sessionRefundable, setSessionRefundable] = useState(true);
+  const [refundBeforeHours, setRefundBeforeHours] = useState(24);
   const [isSessionRecurring, setIsSessionRecurring] = useState(false);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
   const [session, setSession] = useState(initialSession);
@@ -82,6 +94,8 @@ const Session = ({ match, history }) => {
             ...data,
             type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
             price_type: data?.price === 0 ? 'Free' : 'Paid',
+            is_refundable: data?.is_refundable ? 'Yes' : 'No',
+            refund_before_hours: data?.refund_before_hours || 24,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
           });
           setSessionImageUrl(data.session_image_url);
@@ -89,6 +103,8 @@ const Session = ({ match, history }) => {
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
+          setSessionRefundable(data?.is_refundable);
+          setRefundBeforeHours(data?.refund_before_hours || 24);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setIsLoading(false);
         }
@@ -122,6 +138,8 @@ const Session = ({ match, history }) => {
         recurring: false,
         price: 10,
         currency: 'SGD',
+        is_refundable: 'Yes',
+        refund_before_hours: 24,
       });
       setIsLoading(false);
     }
@@ -168,6 +186,16 @@ const Session = ({ match, history }) => {
     }
   };
 
+  const handleSessionRefundable = (e) => {
+    if (e.target.value === 'Yes') {
+      setSessionRefundable(true);
+    } else {
+      setSessionRefundable(false);
+      setRefundBeforeHours(24);
+      form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: 24 });
+    }
+  };
+
   const handleSessionRecurrance = (e) => {
     if (e.target.value === 'true') {
       setIsSessionRecurring(true);
@@ -200,7 +228,16 @@ const Session = ({ match, history }) => {
     setDeleteSlot(tempDeleteSlots);
   };
 
+  const handleRefundBeforeHoursChange = (e) => {
+    const value = Math.max(1, parseInt(e.target.value));
+
+    setRefundBeforeHours(value);
+    form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: value });
+  };
+
   const onFinish = async (values) => {
+    const eventTagObject = creator.click.sessions.form;
+
     try {
       setIsLoading(true);
       const data = {
@@ -214,6 +251,9 @@ const Session = ({ match, history }) => {
         category: '',
         document_url: sessionDocumentUrl || '',
         recurring: isSessionRecurring,
+        is_refundable: sessionRefundable,
+        refund_before_hours: refundBeforeHours,
+        user_timezone_offset: new Date().getTimezoneOffset(),
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
@@ -222,12 +262,15 @@ const Session = ({ match, history }) => {
 
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
-        data.inventory = allInventoryList.filter((slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0);
+        data.inventory = allInventoryList.filter(
+          (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
+        );
         if (deleteSlot && deleteSlot.length) {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
         if (session.session_id) {
           await apis.session.update(session.session_id, data);
+          trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
           message.success('Session successfully updated.');
           const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
           const endDate = toUtcEndOfDay(moment().add(1, 'month'));
@@ -236,16 +279,23 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
+            trackSuccessEvent(eventTagObject.submitNewSession, { form_values: values });
+
             Modal.confirm({
+              icon: <CheckCircleOutlined />,
               title: `${newSessionResponse.data.name} session successfully created`,
               className: styles.confirmModal,
-              okText: 'Add New',
-              cancelText: 'Done',
-              onOk: () => {
+              okText: 'Done',
+              cancelText: 'Add New',
+              onCancel: () => {
+                trackSimpleEvent(eventTagObject.addNewInModal);
                 window.location.reload();
                 window.scrollTo(0, 0);
               },
-              onCancel: () => history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`),
+              onOk: () => {
+                trackSimpleEvent(eventTagObject.doneInModal);
+                history.push(`${Routes.creatorDashboard.rootPath}/${newSessionResponse.defaultPath}`);
+              },
             });
           }
         }
@@ -256,6 +306,10 @@ const Session = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
+
+      trackFailedEvent(session.session_id ? eventTagObject.submitUpdate : eventTagObject.submitNewSession, error, {
+        form_values: values,
+      });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -271,6 +325,11 @@ const Session = ({ match, history }) => {
     }
   };
 
+  const trackAndNavigate = (destination, eventTag) => {
+    trackSimpleEvent(eventTag);
+    history.push(destination);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
@@ -280,7 +339,12 @@ const Session = ({ match, history }) => {
           <Col span={24}>
             <Button
               className={styles.headButton}
-              onClick={() => history.push('/creator/dashboard/manage/sessions')}
+              onClick={() =>
+                trackAndNavigate(
+                  '/creator/dashboard/manage/sessions',
+                  creator.click.sessions.manage.backToManageSessionsList
+                )
+              }
               icon={<ArrowLeftOutlined />}
             >
               Sessions
@@ -320,12 +384,12 @@ const Session = ({ match, history }) => {
           </Form.Item>
 
           <Form.Item
-            className={styles.bgWhite}
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
             label="Session Description"
             name="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="Please input description" />
+            <TextEditor name="description" form={form} placeholder="  Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -345,8 +409,12 @@ const Session = ({ match, history }) => {
             />
           </Form.Item>
 
-          <Form.Item className={styles.bgWhite} label="Session Pre-requisite" name="prerequisites">
-            <TextEditor name="prerequisites" form={form} placeholder="Please input session pre-requisite" />
+          <Form.Item
+            className={classNames(styles.bgWhite, styles.textEditorLayout)}
+            label="Session Pre-requisite"
+            name="prerequisites"
+          >
+            <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
           </Form.Item>
 
           {/* ---- Session Type ---- */}
@@ -408,6 +476,36 @@ const Session = ({ match, history }) => {
                   rules={validationRules.requiredValidation}
                 >
                   <InputNumber min={1} placeholder="Amount" />
+                </Form.Item>
+              </>
+            )}
+
+            {!isSessionFree && (
+              <Form.Item
+                name="is_refundable"
+                label="Refundable"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionRefundable}
+              >
+                <Radio.Group>
+                  <Radio value="Yes">Yes</Radio>
+                  <Radio value="No">No</Radio>
+                </Radio.Group>
+              </Form.Item>
+            )}
+
+            {!isSessionFree && sessionRefundable && (
+              <>
+                <Form.Item
+                  {...(!isMobileDevice && profileFormItemLayout)}
+                  label="Cancellable Before"
+                  name="refund_before_hours"
+                  help="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleRefundBeforeHoursChange}
+                >
+                  <InputNumber value={refundBeforeHours} min={0} placeholder="Hours limit" />
+                  <span className="ant-form-text"> hour(s) before the session starts </span>
                 </Form.Item>
               </>
             )}

@@ -94,3 +94,15 @@ $spacing: (
   border-radius: 6px;
   padding: 15px;
 }
+.textEditorLayout {
+  :global {
+    .ant-form-item-control {
+      max-width: 100% !important;
+    }
+  }
+}
+.readMoreText {
+  font-size: 12px;
+  color: map-get($colors, 'DodgerBlue');
+  margin-top: -15px;
+}

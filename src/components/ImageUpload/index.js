@@ -42,7 +42,9 @@ const ImageUpload = ({
       // Fix for scroll issue after image upload
       document.getElementsByClassName('ant-scrolling-effect')[0].style.overflow = 'auto';
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      if (error.response?.data?.message) {
+        message.error(error.response?.data?.message);
+      }
     }
   };
 

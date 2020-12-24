@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
-import { getLocalUserDetails } from 'utils/storage';
+import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initializeFreshChat } from 'services/integrations/fresh-chat';
+import { initMixPanel } from 'services/integrations/mixpanel';
+import { getAuthCookie } from 'services/authCookie';
+import { isAPISuccess } from 'utils/helper';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -21,6 +24,7 @@ import CreatorDashboard from 'pages/CreatorDashboard';
 import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
+import PaymentVerification from 'pages/PaymentVerification';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -34,17 +38,60 @@ function RouteWithLayout({ layout, component, ...rest }) {
 }
 
 const PrivateRoute = ({ ...rest }) => {
-  return getLocalUserDetails() ? <RouteWithLayout {...rest} /> : <Redirect to={Routes.login} />;
+  const {
+    state: { userAuthenticated },
+  } = useGlobalContext();
+
+  return userAuthenticated ? <RouteWithLayout {...rest} /> : <Redirect to={Routes.login} />;
 };
 
 function App() {
   const {
     state: { userDetails },
+    setUserAuthentication,
+    setUserDetails,
   } = useGlobalContext();
+  const [isReadyToLoad, setIsReadyToLoad] = useState(false);
+
+  useEffect(() => {
+    initMixPanel();
+  }, []);
 
   useEffect(() => {
     initializeFreshChat(userDetails);
   }, [userDetails]);
+
+  useEffect(() => {
+    const getUserDetails = async () => {
+      try {
+        const { data, status } = await apis.user.getProfile();
+        if (isAPISuccess(status) && data) {
+          setUserAuthentication(true);
+          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+          setTimeout(() => {
+            setIsReadyToLoad(true);
+          }, 100);
+        }
+      } catch (error) {
+        setUserAuthentication(false);
+        setUserDetails(null);
+        setIsReadyToLoad(true);
+      }
+    };
+    const authToken = getAuthCookie();
+    if (authToken && authToken !== '') {
+      getUserDetails();
+    } else {
+      setUserAuthentication(false);
+      setUserDetails(null);
+      setIsReadyToLoad(true);
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  if (!isReadyToLoad) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>
@@ -56,6 +103,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />

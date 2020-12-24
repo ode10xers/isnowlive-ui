@@ -5,13 +5,16 @@ import { Select, Typography, Button, message, Row, Col } from 'antd';
 
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
-import { isAPISuccess } from 'utils/helper';
+import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
+import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import apis from 'apis';
+import Earnings from 'pages/CreatorDashboard/Earnings';
 
 import styles from './styles.module.scss';
 
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
+const { creator } = mixPanelEventTags;
 
 const PaymentAccount = () => {
   const location = useLocation();
@@ -20,11 +23,25 @@ const PaymentAccount = () => {
   const countries = countryList().getData();
   const {
     state: {
-      userDetails: { payment_connected = false },
+      userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
     },
   } = useGlobalContext();
   const validateAccount = location?.state?.validateAccount;
-  const [paymentConnected, setPaymentConnected] = useState(payment_connected);
+  const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
+
+  const openStripeDashboard = async () => {
+    try {
+      setIsLoading(true);
+      const { status, data } = await apis.payment.stripe.getDashboard();
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        window.open(data.url, '_self');
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (validateAccount) {
@@ -33,10 +50,12 @@ const PaymentAccount = () => {
           const { status } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
             message.success('Stripe Account Connected Succesfully!!');
-            setPaymentConnected(true);
+            setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
           }
         } catch (error) {
-          message.error(error.response?.data?.message || 'Something went wrong.');
+          if (error.response?.data?.message !== 'unable to find payment credentials') {
+            openStripeDashboard();
+          }
         }
       };
       validateStripeAccount();
@@ -66,10 +85,13 @@ const PaymentAccount = () => {
 
   const onboardUserToStripe = async () => {
     setIsLoading(true);
+    const eventTag = creator.click.payment.connectStripe;
+
     try {
       const { data, status } = await apis.payment.stripe.onboardUser({ country: selectedCountry });
       if (isAPISuccess(status)) {
         setIsLoading(false);
+        trackSuccessEvent(eventTag, { country: selectedCountry });
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
@@ -79,6 +101,7 @@ const PaymentAccount = () => {
       ) {
         relinkStripe();
       } else {
+        trackFailedEvent(eventTag, error, { country: selectedCountry });
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
       }
@@ -86,10 +109,7 @@ const PaymentAccount = () => {
   };
 
   let view = null;
-
-  if (paymentConnected === true) {
-    view = <p>Payment Dashboard</p>;
-  } else {
+  if (paymentConnected === StripeAccountStatus.NOT_CONNECTED) {
     view = (
       <>
         <Title level={2}>Get Paid</Title>
@@ -136,6 +156,8 @@ const PaymentAccount = () => {
         </Row>
       </>
     );
+  } else {
+    view = <Earnings />;
   }
 
   return <Section>{view}</Section>;

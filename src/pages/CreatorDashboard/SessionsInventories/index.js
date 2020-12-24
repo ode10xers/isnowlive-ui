@@ -11,12 +11,20 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { isAPISuccess, getDuration } from 'utils/helper';
 
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const SessionsInventories = ({ match }) => {
   const history = useHistory();
@@ -69,19 +77,40 @@ const SessionsInventories = ({ match }) => {
     }
   }, [match.params.session_type, getStaffSession]);
 
+  const trackAndStartSession = (data) => {
+    const eventTag = isMobileDevice
+      ? creator.click.sessions.list.mobile.startSession
+      : creator.click.sessions.list.startSession;
+
+    trackSimpleEvent(eventTag, { session_data: data });
+    window.open(data.start_url);
+  };
+
   const openSessionInventoryDetails = (item) => {
+    const eventTag = isMobileDevice
+      ? creator.click.sessions.list.mobile.sessionDetails
+      : isPast
+      ? creator.click.sessions.list.pastSessionsDetails
+      : creator.click.sessions.list.upcomingSessionsDetails;
+
+    trackSimpleEvent(eventTag, { session_data: item });
+
     if (item.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
     }
   };
 
   const deleteInventory = async (inventory_id) => {
+    const eventTag = creator.click.sessions.list.cancelSession;
+
     try {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag, { inventory_id: inventory_id });
         getStaffSession(match?.params?.session_type);
       }
     } catch (error) {
+      trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
@@ -132,11 +161,11 @@ const SessionsInventories = ({ match }) => {
       title: 'Actions',
       width: isPast ? '4%' : '20%',
       render: (text, record) => {
-        const isDisabled = record.participants ? record.participants.length > 0 : false;
+        const isDisabled = record.participants > 0;
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
@@ -144,28 +173,33 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
             <Col md={24} lg={24} xl={8}>
-              <Popconfirm
-                title="Do you want to cancel session?"
-                icon={<DeleteOutlined className={styles.danger} />}
-                okText="Yes"
-                cancelText="No"
-                disabled={isDisabled}
-                onConfirm={() => deleteInventory(record.inventory_id)}
-              >
-                <Button type="text" disabled={isDisabled} danger>
+              {isDisabled ? (
+                <Button type="text" disabled={isDisabled}>
                   Cancel
                 </Button>
-              </Popconfirm>
+              ) : (
+                <Popconfirm
+                  title="Do you want to cancel session?"
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => deleteInventory(record.inventory_id)}
+                >
+                  <Button type="text" danger>
+                    Cancel
+                  </Button>
+                </Popconfirm>
+              )}
             </Col>
 
             <Col md={24} lg={24} xl={8}>
               {!isPast && (
-                <Button type="link" disabled={!record.start_url} onClick={() => window.open(record.start_url)}>
+                <Button type="link" disabled={!record.start_url} onClick={() => trackAndStartSession(record)}>
                   Start
                 </Button>
               )}
@@ -177,7 +211,7 @@ const SessionsInventories = ({ match }) => {
   ];
 
   const renderSessionItem = (item) => {
-    const isCancelDisabled = item.participants ? item.participants.length > 0 : false;
+    const isCancelDisabled = item.participants > 0;
 
     const layout = (label, value) => (
       <Row>
@@ -190,6 +224,7 @@ const SessionsInventories = ({ match }) => {
 
     return (
       <Card
+        className={styles.card}
         title={
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
@@ -199,21 +234,26 @@ const SessionsInventories = ({ match }) => {
           <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
             Details
           </Button>,
-          <Popconfirm
-            title="Do you want to cancel session?"
-            icon={<DeleteOutlined className={styles.danger} />}
-            okText="Yes"
-            cancelText={'No'}
-            disabled={isCancelDisabled}
-            onConfirm={() => deleteInventory(item.inventory_id)}
-          >
-            <Button type="text" disabled={isCancelDisabled}>
+          isCancelDisabled ? (
+            <Button type="text" disabled={true}>
               Cancel
             </Button>
-          </Popconfirm>,
+          ) : (
+            <Popconfirm
+              title="Do you want to cancel session?"
+              icon={<DeleteOutlined className={styles.danger} />}
+              okText="Yes"
+              cancelText={'No'}
+              onConfirm={() => deleteInventory(item.inventory_id)}
+            >
+              <Button type="text" danger>
+                Cancel
+              </Button>
+            </Popconfirm>
+          ),
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.start_url} onClick={() => window.open(item.start_url)}>
+              <Button type="link" disabled={!item.start_url} onClick={() => trackAndStartSession(item)}>
                 Start
               </Button>
             )}

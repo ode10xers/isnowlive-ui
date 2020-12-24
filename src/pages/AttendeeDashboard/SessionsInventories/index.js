@@ -1,24 +1,29 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, message } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { Row, Col, Typography, Button, Card, Popconfirm, message, Popover } from 'antd';
 
 import apis from 'apis';
-import Routes from 'routes';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import { getDuration } from 'utils/helper';
+import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
+  timeCalculation: { isBeforeLimitHours },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { attendee } = mixPanelEventTags;
 
 const SessionsInventories = ({ match }) => {
-  const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
@@ -46,7 +51,13 @@ const SessionsInventories = ({ match }) => {
             join_url: i.join_url,
             inventory_id: i?.inventory_id,
             session_id: i.session_id,
+            order_id: i.order_id,
             max_participants: i.max_participants,
+            username: i.creator_username,
+            currency: i.currency || 'SGD',
+            refund_amount: i.refund_amount || 0,
+            is_refundable: i.is_refundable || false,
+            refund_before_hours: i.refund_before_hours || 24,
           }))
         );
       }
@@ -61,18 +72,129 @@ const SessionsInventories = ({ match }) => {
     if (match?.params?.session_type) {
       setSessions([]);
       setIsLoading(true);
+
+      let monitorRefundPolling = null;
+
       if (match?.params?.session_type === 'past') {
         setIsPast(true);
       } else {
         setIsPast(false);
+
+        //Set polling to dynamically adjust Refund/Cancel Popup
+        monitorRefundPolling = setInterval(() => {
+          getStaffSession(match?.params?.session_type);
+        }, 5000);
       }
       getStaffSession(match?.params?.session_type);
+
+      if (monitorRefundPolling) {
+        return () => {
+          clearInterval(monitorRefundPolling);
+        };
+      }
     }
   }, [match.params.session_type, getStaffSession]);
 
+  const trackAndJoinSession = (data) => {
+    const eventTag = isMobileDevice ? attendee.click.sessions.mobile.joinSession : attendee.click.sessions.joinSession;
+
+    trackSimpleEvent(eventTag, { session_data: data });
+    window.open(data.join_url);
+  };
+
   const openSessionInventoryDetails = (item) => {
-    if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
+    const eventTag = isMobileDevice
+      ? attendee.click.sessions.mobile.sessionDetails
+      : isPast
+      ? attendee.click.sessions.pastSessionDetails
+      : attendee.click.sessions.upcomingSessionDetails;
+
+    trackSimpleEvent(eventTag, {
+      creator: item.username,
+      session_data: item,
+    });
+
+    if (item.username && item.inventory_id) {
+      window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
+    }
+  };
+
+  const cancelOrderForSession = async (orderId) => {
+    try {
+      await apis.session.cancelCustomerOrder(orderId, { reason: 'requested_by_customer' });
+      trackSuccessEvent(attendee.click.sessions.cancelOrder, { order_id: orderId });
+      message.success('Refund Successful');
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } catch (error) {
+      trackFailedEvent(attendee.click.sessions.cancelOrder, error, { order_id: orderId });
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const renderRefundPopup = (data) => {
+    if (data.is_refundable) {
+      if (isBeforeLimitHours(data.start_time, data.refund_before_hours)) {
+        return (
+          <Popconfirm
+            arrowPointAtCenter
+            placement="topRight"
+            title={
+              <Text>
+                Do you want to refund this session? <br />
+                You will get <strong>{` ${data.currency} ${data.refund_amount} `}</strong>
+                back.
+              </Text>
+            }
+            onConfirm={() => cancelOrderForSession(data.order_id)}
+            okText="Yes, Refund Session"
+            cancelText="No"
+          >
+            <Button type="link"> Cancel </Button>
+          </Popconfirm>
+        );
+      } else {
+        return (
+          <Popover
+            arrowPointAtCenter
+            placement="topRight"
+            trigger="click"
+            title="Refund Time Limit Reached"
+            content={
+              <Text>
+                Sorry, as per the cancellation policy of <br />
+                this session,
+                <strong>
+                  {' '}
+                  it can only be cancelled <br />
+                  {data.refund_before_hours} hours{' '}
+                </strong>
+                before the session starts.
+              </Text>
+            }
+          >
+            <Button type="link"> Cancel </Button>
+          </Popover>
+        );
+      }
+    } else {
+      return (
+        <Popover
+          arrowPointAtCenter
+          placement="topRight"
+          trigger="click"
+          title="Session Cannot be Refunded"
+          content={
+            <Text>
+              Sorry, this session is not refundable based <br />
+              on the creator's settings
+            </Text>
+          }
+        >
+          <Button type="link"> Cancel </Button>
+        </Popover>
+      );
     }
   };
 
@@ -114,7 +236,7 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
@@ -122,17 +244,22 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
-              <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)} type="link">
+              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
 
             {!isPast && (
-              <Col md={24} lg={24} xl={8}>
-                <Button type="link" disabled={!record.join_url} onClick={() => window.open(record.join_url)}>
-                  Join
-                </Button>
-              </Col>
+              <>
+                <Col md={24} lg={24} xl={8}>
+                  <Button type="link" disabled={!record.join_url} onClick={() => trackAndJoinSession(record)}>
+                    Join
+                  </Button>
+                </Col>
+                <Col md={24} lg={24} xl={8}>
+                  {renderRefundPopup(record)}
+                </Col>
+              </>
             )}
           </Row>
         );
@@ -158,16 +285,17 @@ const SessionsInventories = ({ match }) => {
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
+          <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
             Details
           </Button>,
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.join_url} onClick={() => window.open(item.join_url)}>
+              <Button type="link" disabled={!item.join_url} onClick={() => trackAndJoinSession(item)}>
                 Join
               </Button>
             )}
           </>,
+          <>{!isPast && renderRefundPopup(item)}</>,
         ]}
       >
         {layout('Type', <Text>{item.type}</Text>)}

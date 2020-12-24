@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card } from 'antd';
+import { Row, Col, Typography, Button, Card, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
@@ -9,12 +9,20 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 
+import {
+  mixPanelEventTags,
+  trackSimpleEvent,
+  trackSuccessEvent,
+  trackFailedEvent,
+} from 'services/integrations/mixpanel';
+
 import styles from './styles.module.scss';
 
 const {
   formatDate: { toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { creator } = mixPanelEventTags;
 
 const ManageSessions = () => {
   const history = useHistory();
@@ -28,6 +36,51 @@ const ManageSessions = () => {
     }
     setIsLoading(false);
   }, []);
+
+  const publishSession = async (sessionId) => {
+    setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.publishSession;
+
+    try {
+      const { data } = await apis.session.publishSession(sessionId);
+
+      if (data) {
+        trackSuccessEvent(eventTag, { session_id: sessionId });
+        message.success('Session published successfully!');
+        getSessionsList();
+      }
+    } catch (error) {
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const unpublishSession = async (sessionId) => {
+    setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.unpublishSession;
+
+    try {
+      const { data } = await apis.session.unpublishSession(sessionId);
+
+      if (data) {
+        trackSuccessEvent(eventTag, { session_id: sessionId });
+        message.success('Session is now unpublished!');
+        getSessionsList();
+      }
+    } catch (error) {
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const trackAndNavigate = (destination) => {
+    trackSimpleEvent(creator.click.sessions.manage.editSession);
+    history.push(destination);
+  };
 
   useEffect(() => {
     getSessionsList();
@@ -87,20 +140,20 @@ const ManageSessions = () => {
               <Button
                 className={styles.detailsButton}
                 onClick={() =>
-                  history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
+                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
                 }
                 type="link"
               >
-                Details
+                Edit
               </Button>
             </Col>
             <Col md={24} lg={24} xl={8}>
-              {record.is_active ? (
-                <Button type="text" className={styles.sucessButton}>
+              {!record.is_active ? (
+                <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
                   Publish
                 </Button>
               ) : (
-                <Button type="text" danger>
+                <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
                   Unpublish
                 </Button>
               )}
@@ -126,26 +179,30 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
-            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
+            onClick={() =>
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+            }
           >
             <Text>{item.name}</Text>
           </div>
         }
         actions={[
           <Button
-            className={styles.detailsButton}
-            onClick={() => history.push(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)}
             type="link"
+            className={styles.detailsButton}
+            onClick={() =>
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+            }
           >
-            Details
+            Edit
           </Button>,
           <>
-            {item.is_active ? (
-              <Button type="text" className={styles.sucessButton}>
+            {!item.is_active ? (
+              <Button type="text" className={styles.sucessButton} onClick={() => publishSession(item.session_id)}>
                 Publish
               </Button>
             ) : (
-              <Button type="text" danger>
+              <Button type="text" danger onClick={() => unpublishSession(item.session_id)}>
                 Unpublish
               </Button>
             )}

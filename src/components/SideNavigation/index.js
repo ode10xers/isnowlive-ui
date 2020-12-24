@@ -5,6 +5,8 @@ import { Menu } from 'antd';
 import Routes from 'routes';
 import { creatorMenuItems, attendeeMenuItems } from './MenuItems.constant';
 
+import { trackSimpleEvent } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
 
 const { SubMenu, Item } = Menu;
@@ -21,19 +23,24 @@ const SideNavigation = () => {
     }
   }, [history.location.pathname]);
 
+  const trackAndNavigate = (item) => {
+    trackSimpleEvent(item.mixPanelTag);
+    history.push(item.path);
+  };
+
   return (
     <Menu mode="inline" className={styles.sideNavMenu}>
       {showMenu.map((navItem) =>
         navItem.children ? (
           <SubMenu key={navItem.key} title={navItem.title} icon={navItem.icon}>
             {navItem.children.map((item) => (
-              <Item key={item.key} onClick={() => history.push(item.path)}>
+              <Item key={item.key} onClick={() => trackAndNavigate(item)}>
                 {item.title}
               </Item>
             ))}
           </SubMenu>
         ) : (
-          <Item key={navItem.key} icon={navItem?.icon || null} onClick={() => history.push(navItem.path)}>
+          <Item key={navItem.key} icon={navItem?.icon || null} onClick={() => trackAndNavigate(navItem)}>
             {navItem.title}
           </Item>
         )

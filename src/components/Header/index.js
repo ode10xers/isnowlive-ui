@@ -6,10 +6,13 @@ import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 import { useGlobalContext } from 'services/globalContext';
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
 const logo = require('assets/images/Logo-passion-transparent.png');
+
+const { user } = mixPanelEventTags;
 
 const Header = () => {
   const { logOut } = useGlobalContext();
@@ -21,6 +24,16 @@ const Header = () => {
     }
   };
 
+  const trackAndNavigate = (destination, eventTag) => {
+    trackSimpleEvent(eventTag);
+    history.push(destination);
+  };
+
+  const trackAndLogOut = (eventTag) => {
+    trackSimpleEvent(eventTag);
+    logOut(history);
+  };
+
   return (
     <Row className={styles.headerContainer}>
       <Col flex="auto" className={isMobileDevice && styles.logoWrapper}>
@@ -29,19 +42,19 @@ const Header = () => {
       <Col flex={isMobileDevice ? 'auto' : '400px'} className={isMobileDevice && styles.navItemWrapper}>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.creatorDashboard.rootPath))}
-          onClick={() => history.push(Routes.creatorDashboard.rootPath)}
+          onClick={() => trackAndNavigate(user.click.switchToCreator, Routes.creatorDashboard.rootPath)}
         >
           <VideoCameraAddOutlined className={styles.navItemIcon} />
           Hosting
         </span>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.attendeeDashboard.rootPath))}
-          onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
+          onClick={() => trackAndNavigate(user.click.switchToAttendee, Routes.attendeeDashboard.rootPath)}
         >
           <TeamOutlined className={styles.navItemIcon} />
           Attending
         </span>
-        <Button className={styles.logout} type="text" onClick={() => logOut(history)}>
+        <Button type="text" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
           Logout
         </Button>
       </Col>
