@@ -19,6 +19,7 @@ export default {
     getSessionsByUsername: (username, type) => http.get(`/sessions/${username}/${type}`),
     getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
+    convertUserToCreator: () => http.post('/secure/user/convert'),
   },
   payment: {
     stripe: {
