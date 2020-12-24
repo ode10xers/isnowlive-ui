@@ -1,18 +1,21 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Button, Modal, Typography } from 'antd';
 import { useHistory } from 'react-router-dom';
-import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
+import { VideoCameraAddOutlined, TeamOutlined, CloseOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 import { useGlobalContext } from 'services/globalContext';
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './style.module.scss';
 const logo = require('assets/images/Logo-passion-transparent.png');
 
-const { user } = mixPanelEventTags;
+const { user, attendee } = mixPanelEventTags;
+const { Paragraph } = Typography;
 
 const Header = () => {
   const { logOut } = useGlobalContext();
@@ -21,6 +24,40 @@ const Header = () => {
   const isActive = (path) => {
     if (history.location.pathname.includes(path)) {
       return styles.isActiveNavItem;
+    }
+  };
+
+  const isCreatorCheck = () => {
+    const userDetails = getLocalUserDetails();
+
+    if (userDetails.is_creator) {
+      trackAndNavigate(Routes.creatorDashboard.rootPath, user.click.switchToCreator);
+    } else {
+      Modal.confirm({
+        className: styles.confirmModal,
+        autoFocusButton: 'cancel',
+        centered: true,
+        closable: true,
+        closeIcon: <CloseOutlined />,
+        maskClosable: true,
+        content: (
+          <Paragraph>
+            Ready to become a host and start making money by hosting live events?
+            <br /> <br />
+            By clicking on "<strong>Become Host</strong>" your account will be upgraded to a host account and you will
+            get access to your dashboard and features empowering you to host live events on topics you are passionate
+            about and make money from it.
+          </Paragraph>
+        ),
+        title: 'Become a Host',
+        okText: 'Become Host',
+        cancelText: 'Talk to Us',
+        onOk: () => {
+          console.log('OK Clicked');
+          trackAndNavigate(Routes.profile, attendee.click.dashboard.becomeHost);
+        },
+        onCancel: () => openFreshChatWidget(),
+      });
     }
   };
 
@@ -42,14 +79,14 @@ const Header = () => {
       <Col flex={isMobileDevice ? 'auto' : '400px'} className={isMobileDevice && styles.navItemWrapper}>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.creatorDashboard.rootPath))}
-          onClick={() => trackAndNavigate(user.click.switchToCreator, Routes.creatorDashboard.rootPath)}
+          onClick={() => isCreatorCheck()}
         >
           <VideoCameraAddOutlined className={styles.navItemIcon} />
           Hosting
         </span>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.attendeeDashboard.rootPath))}
-          onClick={() => trackAndNavigate(user.click.switchToAttendee, Routes.attendeeDashboard.rootPath)}
+          onClick={() => trackAndNavigate(Routes.attendeeDashboard.rootPath, user.click.switchToAttendee)}
         >
           <TeamOutlined className={styles.navItemIcon} />
           Attending

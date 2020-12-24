@@ -67,6 +67,7 @@ const Profile = () => {
     try {
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
+        await apis.user.convertUserToCreator();
         setIsLoading(false);
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
