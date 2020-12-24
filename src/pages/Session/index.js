@@ -41,7 +41,6 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
-import { getLocalUserDetails } from 'utils/storage';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
