@@ -23,9 +23,18 @@ const timeCalculation = {
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
 };
 
+const timezoneUtils = {
+  getCurrentLongTimezone: () => {
+    const timeString = new Date().toTimeString();
+    const longTimezone = timeString.substr(timeString.indexOf('('));
+    return longTimezone.substring(1, longTimezone.length - 1);
+  },
+};
+
 const dateUtil = {
   formatDate,
   timeCalculation,
+  timezoneUtils,
 };
 
 export default dateUtil;

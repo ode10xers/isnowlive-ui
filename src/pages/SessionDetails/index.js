@@ -30,6 +30,7 @@ const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? 
 const { Title, Paragraph } = Typography;
 const {
   formatDate: { getTimeDiff },
+  timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
@@ -126,6 +127,7 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await apis.session.createOrderForUser({
         inventory_id: parseInt(match.params.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone: getCurrentLongTimezone(),
       });
 
       if (isAPISuccess(status) && data) {

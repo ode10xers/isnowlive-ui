@@ -35,3 +35,9 @@ export const initializeFreshChat = (userData = null) => {
     document.head.appendChild(element);
   }
 };
+
+export const openFreshChatWidget = () => {
+  if (!window.fcWidget.isOpen()) {
+    window.fcWidget.open();
+  }
+};

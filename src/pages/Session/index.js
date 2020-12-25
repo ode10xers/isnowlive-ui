@@ -47,6 +47,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
+  timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 
@@ -254,6 +255,7 @@ const Session = ({ match, history }) => {
         is_refundable: sessionRefundable,
         refund_before_hours: refundBeforeHours,
         user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone: getCurrentLongTimezone(),
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
