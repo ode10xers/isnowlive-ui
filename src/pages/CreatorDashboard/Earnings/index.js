@@ -87,6 +87,24 @@ const Earnings = () => {
     }
   };
 
+  const openStripeConnect = (url) => {
+    window.open(url, '_self');
+  };
+
+  const relinkStripe = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const { data, status } = await apis.payment.stripe.relinkAccount();
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        openStripeConnect(data.onboarding_url);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  }, []);
+
   const openStripeDashboard = async () => {
     const eventTag = creator.click.payment.verifyBankAccount;
 
@@ -100,7 +118,14 @@ const Earnings = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      if (
+        error.response?.data?.code === 500 &&
+        error.response?.data?.message === 'error while generating dashboard URL from stripe'
+      ) {
+        relinkStripe();
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
       setIsLoading(false);
     }
   };
