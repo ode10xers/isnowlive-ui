@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import countryList from 'react-select-country-list';
 import { Select, Typography, Button, message, Row, Col } from 'antd';
@@ -29,7 +29,24 @@ const PaymentAccount = () => {
   const validateAccount = location?.state?.validateAccount;
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
-  const openStripeDashboard = async () => {
+  const openStripeConnect = (url) => {
+    window.open(url, '_self');
+  };
+
+  const relinkStripe = useCallback(async () => {
+    try {
+      const { data, status } = await apis.payment.stripe.relinkAccount();
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        openStripeConnect(data.onboarding_url);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  }, []);
+
+  const openStripeDashboard = useCallback(async () => {
     try {
       setIsLoading(true);
       const { status, data } = await apis.payment.stripe.getDashboard();
@@ -38,10 +55,17 @@ const PaymentAccount = () => {
         window.open(data.url, '_self');
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      if (
+        error.response?.data?.code === 500 &&
+        error.response?.data?.message === 'error while generating dashboard URL from stripe'
+      ) {
+        relinkStripe();
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
       setIsLoading(false);
     }
-  };
+  }, [relinkStripe]);
 
   useEffect(() => {
     if (validateAccount) {
@@ -60,27 +84,10 @@ const PaymentAccount = () => {
       };
       validateStripeAccount();
     }
-  }, [validateAccount]);
+  }, [validateAccount, openStripeDashboard]);
 
   const handleChange = (value) => {
     setSelectedCountry(value);
-  };
-
-  const openStripeConnect = (url) => {
-    window.open(url, '_self');
-  };
-
-  const relinkStripe = async () => {
-    try {
-      const { data, status } = await apis.payment.stripe.relinkAccount();
-      if (isAPISuccess(status)) {
-        setIsLoading(false);
-        openStripeConnect(data.onboarding_url);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
-    }
   };
 
   const onboardUserToStripe = async () => {
