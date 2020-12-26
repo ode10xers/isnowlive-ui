@@ -65,9 +65,10 @@ const Profile = () => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
     try {
+      await apis.user.convertUserToCreator();
+
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
-        await apis.user.convertUserToCreator();
         setIsLoading(false);
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');

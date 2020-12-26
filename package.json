@@ -5,7 +5,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
     "@stripe/stripe-js": "^1.11.0",
-    "antd": "^4.8.6",
+    "antd": "^4.9.4",
     "antd-img-crop": "^3.12.0",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",
