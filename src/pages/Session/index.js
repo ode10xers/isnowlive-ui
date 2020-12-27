@@ -406,7 +406,7 @@ const Session = ({ match, history }) => {
             {session.session_id ? 'Update' : 'Create'} Session
           </Title>
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
-          <Paragraph>
+          <Paragraph className={styles.mt10} type="secondary">
             Setup the event you plan to host. Adding a name, session image and description for the attendees is
             mandatory and you can also add pre-requisit or a document to make it more descriptive. Then select the days
             and time you want to host this session.
@@ -417,11 +417,7 @@ const Session = ({ match, history }) => {
       <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
-          <Title level={4}>1. About Yourself</Title>
-          <Paragraph>
-            This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
-            page and an a breif description to showcase yourself to your attendees.
-          </Paragraph>
+          <Title level={4}>1. Primary Information</Title>
           <div className={styles.imageWrapper}>
             <ImageUpload
               aspect={4}
