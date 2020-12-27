@@ -402,10 +402,14 @@ const Session = ({ match, history }) => {
       )}
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title>{session.session_id ? 'Update' : 'Create'} Session</Title>
+          <Title level={isMobileDevice ? 3 : 1} className={styles.titleText}>
+            {session.session_id ? 'Update' : 'Create'} Session
+          </Title>
+          {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph>
-            Ornare ipsum cras non egestas risus, tincidunt malesuada potenti suspendisse mauris id consectetur sit
-            ultrices nunc, ut ac montes, proin diam elit, tristique vitae
+            Setup the event you plan to host. Adding a name, session image and description for the attendees is
+            mandatory and you can also add pre-requisit or a document to make it more descriptive. Then select the days
+            and time you want to host this session.
           </Paragraph>
         </Typography>
       </Space>
