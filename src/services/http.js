@@ -16,8 +16,8 @@ class HttpService {
     });
 
     this.axios.interceptors.response.use(
-      response => response,
-      error => {
+      (response) => response,
+      (error) => {
         const { status } = error.response;
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
@@ -65,7 +65,6 @@ class HttpService {
       data: payload,
     });
   }
-
 }
 
 const http = new HttpService();

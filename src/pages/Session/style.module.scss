@@ -13,7 +13,14 @@
 .scheduleCount {
   color: map-get($colors, $key: 'DodgerBlue') !important;
 }
+.titleText {
+  display: inline;
+  margin-right: 20px;
+}
 @media (max-width: 768px) {
+  .titleText {
+    display: block;
+  }
   .publishBtnWrapper {
     text-align: center;
   }

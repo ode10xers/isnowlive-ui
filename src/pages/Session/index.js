@@ -52,7 +52,7 @@ const {
 const { creator } = mixPanelEventTags;
 
 const initialSession = {
-  price: 10,
+  price: 0,
   currency: 'SGD',
   max_participants: 0,
   group: true,
@@ -84,6 +84,7 @@ const Session = ({ match, history }) => {
   const [session, setSession] = useState(initialSession);
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
+  const [stripeCurrency, setStripeCurrency] = useState(null);
 
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
@@ -121,11 +122,43 @@ const Session = ({ match, history }) => {
     },
     [form, history, isOnboarding]
   );
+  const getCreatorStripeDetails = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const { status, data } = await apis.session.getCreatorBalance();
+      if (isAPISuccess(status) && data) {
+        setStripeCurrency(data.currency);
+        form.setFieldsValue({
+          ...form.getFieldsValue(),
+          price_type: 'Paid',
+          currency: data?.currency?.toUpperCase() || 'SGD',
+          price: 10,
+        });
+        setIsSessionFree(false);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      if (error.response?.data?.message === 'unable to fetch user payment details') {
+        setStripeCurrency(null);
+        form.setFieldsValue({
+          ...form.getFieldsValue(),
+          price_type: 'Free',
+          price: 0,
+          currency: 'SGD',
+        });
+        setIsSessionFree(true);
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
+      setIsLoading(false);
+    }
+  }, [form]);
 
   useEffect(() => {
     if (match.path.includes('manage')) {
       setIsOnboarding(false);
     }
+    getCreatorStripeDetails();
     if (match.params.id) {
       const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
       const endDate = toUtcEndOfDay(moment().add(1, 'month'));
@@ -135,10 +168,7 @@ const Session = ({ match, history }) => {
         ...form.getFieldsValue(),
         type: 'Group',
         max_participants: 2,
-        price_type: 'Paid',
         recurring: false,
-        price: 10,
-        currency: 'SGD',
         is_refundable: 'Yes',
         refund_before_hours: 24,
       });
@@ -147,7 +177,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-  }, [form, getSessionDetails, match.params.id, match.path]);
+  }, [form, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -178,12 +208,28 @@ const Session = ({ match, history }) => {
   };
 
   const handleSessionPriceType = (e) => {
-    if (e.target.value === 'Free') {
-      form.setFieldsValue({ ...form.getFieldsValue(), price: 0 });
+    const setFreeSession = () => {
+      form.setFieldsValue({ ...form.getFieldsValue(), price_type: 'Free', price: 0 });
       setSession({ ...session, price: 0 });
       setIsSessionFree(true);
+    };
+
+    if (e.target.value === 'Free') {
+      setFreeSession();
     } else {
-      setIsSessionFree(false);
+      if (stripeCurrency) {
+        setIsSessionFree(false);
+      } else {
+        Modal.confirm({
+          title: `The session cannot be paided untill you setup stripe account. Would you like to setup stripe account now?`,
+          okText: 'Yes, Setup stripe account now',
+          cancelText: 'No',
+          onCancel: () => setFreeSession(),
+          onOk: () => {
+            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+          },
+        });
+      }
     }
   };
 
@@ -356,10 +402,14 @@ const Session = ({ match, history }) => {
       )}
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title>{session.session_id ? 'Update' : 'Create'} Session</Title>
+          <Title level={isMobileDevice ? 3 : 1} className={styles.titleText}>
+            {session.session_id ? 'Update' : 'Create'} Session
+          </Title>
+          {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph>
-            Ornare ipsum cras non egestas risus, tincidunt malesuada potenti suspendisse mauris id consectetur sit
-            ultrices nunc, ut ac montes, proin diam elit, tristique vitae
+            Setup the event you plan to host. Adding a name, session image and description for the attendees is
+            mandatory and you can also add pre-requisit or a document to make it more descriptive. Then select the days
+            and time you want to host this session.
           </Paragraph>
         </Typography>
       </Space>
@@ -367,8 +417,11 @@ const Session = ({ match, history }) => {
       <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
-          <Title level={4}>1. Primary Information</Title>
-
+          <Title level={4}>1. About Yourself</Title>
+          <Paragraph>
+            This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
+            page and an a breif description to showcase yourself to your attendees.
+          </Paragraph>
           <div className={styles.imageWrapper}>
             <ImageUpload
               aspect={4}
@@ -462,7 +515,7 @@ const Session = ({ match, history }) => {
             {!isSessionFree && (
               <>
                 <Form.Item name="currency" label="Currency" rules={validationRules.requiredValidation}>
-                  <Select value={form.getFieldsValue().currency}>
+                  <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
                     {currencyList &&
                       Object.entries(currencyList).map(([key, value], i) => (
                         <Option value={key} key={key}>
