@@ -27,7 +27,7 @@ import {
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
@@ -195,8 +195,10 @@ const Profile = () => {
         {/* ========PRIMARY INFO======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
-          <p className={styles.subtext}>some text here - to be decieded later</p>
-
+          <Paragraph className={styles.mt10} type="secondary">
+            This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
+            page and an a breif description to showcase yourself to your attendees.
+          </Paragraph>
           <div className={styles.imageWrapper}>
             <ImageUpload
               aspect={4}
