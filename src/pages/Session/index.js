@@ -417,8 +417,11 @@ const Session = ({ match, history }) => {
       <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
-          <Title level={4}>1. Primary Information</Title>
-
+          <Title level={4}>1. About Yourself</Title>
+          <Paragraph>
+            This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
+            page and an a breif description to showcase yourself to your attendees.
+          </Paragraph>
           <div className={styles.imageWrapper}>
             <ImageUpload
               aspect={4}
