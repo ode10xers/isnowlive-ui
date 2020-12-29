@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
@@ -23,6 +23,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const [slots, setSlots] = useState(convertSchedulesToLocal(sessionSlots));
   const [dayList, setDayList] = useState(null);
   const [slotsList] = useState(() => generateTimes());
+  const isPannelChanged = useRef(false);
 
   useEffect(() => {
     if (slots) {
@@ -32,6 +33,29 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   }, [slots]);
 
   useEffect(() => {
+    if (recurring && recurringDatesRange && recurringDatesRange.length) {
+      setDate(moment(recurringDatesRange[0]));
+    } else {
+      setDate(moment());
+    }
+    if (recurringDatesRange && recurringDatesRange.length) {
+      const filteredSessionSlots = sessionSlots?.filter((slot) => {
+        if (slot.id) {
+          return slot;
+        } else {
+          if (
+            getTimeDiff(slot.session_date, recurringDatesRange[0], 'days') >= 0 &&
+            getTimeDiff(slot.session_date, recurringDatesRange[1], 'days') <= 0
+          ) {
+            return slot;
+          }
+        }
+      });
+      setSlots(convertSchedulesToLocal(filteredSessionSlots));
+    }
+  }, [recurring, recurringDatesRange]);
+
+  useEffect(() => {
     if (openModal) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -39,34 +63,43 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
   }, [openModal]);
 
-  const onSelect = (selecetedCalendarDate) => {
-    if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
-      // check if slots are present for selected date
-      const slotsForSelectedDate = slots?.filter(
-        (item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate)
-      );
-      const formattedSlots = slotsForSelectedDate.map((obj) => ({
-        id: obj.inventory_id,
-        session_date: moment(obj.session_date),
-        start_time: obj.start_time,
-        end_time: obj.end_time,
-        num_participants: obj.num_participants,
-      }));
-      const defaultSlot = {
-        session_date: moment(selecetedCalendarDate).format(),
-        start_time: null,
-        end_time: null,
-        num_participants: 0,
-      };
+  useEffect(() => {
+    setTimeout(() => {
+      isPannelChanged.current = false;
+    }, 500);
+  }, [isPannelChanged.current, date]);
 
-      setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
-      setDate(selecetedCalendarDate);
-      setSelectedDate(selecetedCalendarDate);
-      setOpenModal(true);
+  const onSelect = (selecetedCalendarDate) => {
+    if (!isPannelChanged.current) {
+      if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
+        // check if slots are present for selected date
+        const slotsForSelectedDate = slots?.filter(
+          (item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate)
+        );
+        const formattedSlots = slotsForSelectedDate.map((obj) => ({
+          id: obj.inventory_id,
+          session_date: moment(obj.session_date),
+          start_time: obj.start_time,
+          end_time: obj.end_time,
+          num_participants: obj.num_participants,
+        }));
+        const defaultSlot = {
+          session_date: moment(selecetedCalendarDate).format(),
+          start_time: null,
+          end_time: null,
+          num_participants: 0,
+        };
+
+        setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
+        setDate(selecetedCalendarDate);
+        setSelectedDate(selecetedCalendarDate);
+        setOpenModal(true);
+      }
     }
   };
 
   const onPanelChange = (calendarDate) => {
+    isPannelChanged.current = true;
     setDate(calendarDate);
   };
 
@@ -243,6 +276,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         session_date: moment(date).format(),
         start_time: null,
         end_time: null,
+        num_participants: 0,
       });
       setForm(tempForm);
     } else {
