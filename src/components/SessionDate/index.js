@@ -26,10 +26,13 @@ const SessionDate = ({ schedule }) => {
       <Title className={styles.longday} level={3}>
         {toDayOfWeek(schedule?.start_time)}
       </Title>
-      <Text className={styles.time}>
-        {toLocaleTime(schedule?.start_time)} {' -'} {toLocaleTime(schedule?.end_time)} <br />
-        {getCurrentLongTimezone()}
-      </Text>
+      <div className={styles.container}>
+        <Text className={styles.time}>
+          {toLocaleTime(schedule?.start_time)} {' -'} {toLocaleTime(schedule?.end_time)}
+        </Text>
+        <br />
+        <Text className={styles.timezone}>{getCurrentLongTimezone()}</Text>
+      </div>
     </div>
   );
 };
