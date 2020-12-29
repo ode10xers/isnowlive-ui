@@ -39,6 +39,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       setDate(moment());
     }
     if (recurringDatesRange && recurringDatesRange.length) {
+      // eslint-disable-next-line
       const filteredSessionSlots = sessionSlots?.filter((slot) => {
         if (slot.id) {
           return slot;
@@ -53,7 +54,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       });
       setSlots(convertSchedulesToLocal(filteredSessionSlots));
     }
-  }, [recurring, recurringDatesRange]);
+  }, [recurring, recurringDatesRange, sessionSlots]);
 
   useEffect(() => {
     if (openModal) {
@@ -67,7 +68,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     setTimeout(() => {
       isPannelChanged.current = false;
     }, 500);
-  }, [isPannelChanged.current, date]);
+  }, [date]);
 
   const onSelect = (selecetedCalendarDate) => {
     if (!isPannelChanged.current) {
@@ -101,6 +102,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const onPanelChange = (calendarDate) => {
     isPannelChanged.current = true;
     setDate(calendarDate);
+    setTimeout(() => {
+      isPannelChanged.current = false;
+    }, 500);
   };
 
   const handleCancel = () => {
