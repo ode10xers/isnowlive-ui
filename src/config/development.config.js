@@ -17,4 +17,7 @@ export default {
     secretKey:
       'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
   },
+  zoom: {
+    oAuthURL: `https://zoom.us/oauth/authorize?client_id=yJimvftXRna7XfBUlw8Geg&response_type=code&redirect_uri=https://app.stage.passion.do/creator/livestream/`
+  }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
 
 import OnboardSteps from 'components/OnboardSteps';
@@ -17,8 +17,10 @@ import { isAPISuccess, ZoomAuthType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import Routes from 'routes';
 import apis from 'apis';
+import config from 'config';
 
 import styles from './style.module.scss';
+import parseQueryString from 'utils/parseQueryString';
 
 const { Title } = Typography;
 const { creator } = mixPanelEventTags;
@@ -26,6 +28,7 @@ const { creator } = mixPanelEventTags;
 const LiveStream = () => {
   const [form] = Form.useForm();
   const history = useHistory();
+  const location = useLocation();
   const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(true);
@@ -34,6 +37,7 @@ const LiveStream = () => {
       userDetails: { zoom_connected = 'NOT_CONNECTED' },
     },
   } = useGlobalContext();
+  const { code } = parseQueryString(location.search);
 
   const getZoomJWTDetails = useCallback(async () => {
     try {
@@ -49,6 +53,13 @@ const LiveStream = () => {
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   }, [form]);
+
+  useEffect(() => {
+    if (code) {
+      verifyZoomProfile(code);
+    }
+  }, [code]);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnboarding(false);
@@ -87,6 +98,16 @@ const LiveStream = () => {
     }
   };
 
+  const connectZoomAccount = () => {
+    window.open(config.zoom.oAuthURL, '_self');
+  }
+
+  const verifyZoomProfile = async (code) => {
+    await apis.user.authZoom(code);
+    // setUserDetails({ ...userDetails, zoom_connected: true });
+    // setZoomAuthorized(true);
+  };
+
   return (
     <>
       {isOnboarding && <OnboardSteps current={1} />}
@@ -117,6 +138,7 @@ const LiveStream = () => {
               type="primary"
               className={styles.mt30}
               onClick={() => {
+                connectZoomAccount();
                 trackSimpleEvent(creator.click.livestream.connectZoomAccount);
               }}
             >
