@@ -15,6 +15,7 @@ const DefaultImage = require('assets/images/greybg.jpg');
 const { Text, Title, Paragraph } = Typography;
 const {
   formatDate: { toDate, toShortMonth, toDayOfWeek, toLocaleTime },
+  timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { user } = mixPanelEventTags;
 
@@ -36,21 +37,22 @@ const Sessions = ({ sessions, username }) => {
         <Row>
           <Col xs={8} className={styles.eventBox}>
             <Text className={styles.text} strong>
-              {toDate(session.session_date)}
+              {toDate(session.start_time)}
             </Text>
             <Text className={styles.subtext} strong>
-              {toShortMonth(session.session_date)?.toUpperCase()}
+              {toShortMonth(session.start_time)?.toUpperCase()}
             </Text>
           </Col>
           <Col xs={16} className={styles.eventBox2}>
             <Text className={styles.text} strong>
-              {toDayOfWeek(session.session_date)}
+              {toDayOfWeek(session.start_time)}
             </Text>
             <Text className={styles.subtext} strong>
               {toLocaleTime(session.start_time)}
               {' - '}
               {toLocaleTime(session.end_time)}
             </Text>
+            <Text className={styles.subtext}>{getCurrentLongTimezone()}</Text>
           </Col>
         </Row>
       </div>

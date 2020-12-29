@@ -24,6 +24,7 @@ import DefaultImage from 'components/Icons/DefaultImage/index';
 import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import dateUtil from 'utils/date';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
@@ -31,6 +32,9 @@ import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 const { user, creator } = mixPanelEventTags;
+const {
+  timezoneUtils: { getCurrentLongTimezone },
+} = dateUtil;
 
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
@@ -218,10 +222,13 @@ const ProfilePreview = ({ username = null }) => {
         <Row className={styles.mt50}>
           <Col span={24}>
             <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
+            <Text type="primary" strong>
+              All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+            </Text>
           </Col>
           <Col span={24}>
             <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
-              {['Upcoming Sessions', 'Past Sesions'].map((item, index) => (
+              {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
                 <Tabs.TabPane tab={item} key={index}>
                   <Loader loading={isSessionLoading} size="large" text="Loading sessions">
                     <Sessions username={username} sessions={sessions} />
