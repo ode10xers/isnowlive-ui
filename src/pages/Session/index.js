@@ -86,44 +86,6 @@ const Session = ({ match, history }) => {
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
 
-  const getSessionDetails = useCallback(
-    async (sessionId, startDate, endDate) => {
-      try {
-        const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
-        if (data) {
-          setSession(data);
-          form.setFieldsValue({
-            ...data,
-            type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
-            price_type: data?.price === 0 ? 'Free' : 'Paid',
-            is_refundable: data?.is_refundable ? 'Yes' : 'No',
-            refund_before_hours: data?.refund_before_hours || 24,
-            recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
-          });
-          setSessionImageUrl(data.session_image_url);
-          setSessionDocumentUrl(data.document_url);
-          setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
-          setIsSessionFree(data?.price === 0 ? true : false);
-          setIsSessionRecurring(data?.recurring);
-          setSessionRefundable(data?.is_refundable);
-          setRefundBeforeHours(data?.refund_before_hours || 24);
-          setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
-          setIsLoading(false);
-          await getCreatorStripeDetails(data);
-        }
-      } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
-        setIsLoading(false);
-        if (isOnboarding) {
-          history.push(Routes.session);
-        } else {
-          history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
-        }
-      }
-    },
-    [form, history, isOnboarding]
-  );
-
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
       try {
@@ -159,6 +121,44 @@ const Session = ({ match, history }) => {
       }
     },
     [form]
+  );
+
+  const getSessionDetails = useCallback(
+    async (sessionId, startDate, endDate) => {
+      try {
+        const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
+        if (data) {
+          setSession(data);
+          form.setFieldsValue({
+            ...data,
+            type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
+            price_type: data?.price === 0 ? 'Free' : 'Paid',
+            is_refundable: data?.is_refundable ? 'Yes' : 'No',
+            refund_before_hours: data?.refund_before_hours || 24,
+            recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
+          });
+          setSessionImageUrl(data.session_image_url);
+          setSessionDocumentUrl(data.document_url);
+          setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
+          setIsSessionFree(data?.price === 0 ? true : false);
+          setIsSessionRecurring(data?.recurring);
+          setSessionRefundable(data?.is_refundable);
+          setRefundBeforeHours(data?.refund_before_hours || 24);
+          setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
+          setIsLoading(false);
+          await getCreatorStripeDetails(data);
+        }
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+        setIsLoading(false);
+        if (isOnboarding) {
+          history.push(Routes.session);
+        } else {
+          history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
+        }
+      }
+    },
+    [form, history, isOnboarding, getCreatorStripeDetails]
   );
 
   useEffect(() => {
