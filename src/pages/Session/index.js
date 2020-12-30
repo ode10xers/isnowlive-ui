@@ -109,6 +109,7 @@ const Session = ({ match, history }) => {
           setRefundBeforeHours(data?.refund_before_hours || 24);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setIsLoading(false);
+          await getCreatorStripeDetails(data);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -122,48 +123,54 @@ const Session = ({ match, history }) => {
     },
     [form, history, isOnboarding]
   );
-  const getCreatorStripeDetails = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const { status, data } = await apis.session.getCreatorBalance();
-      if (isAPISuccess(status) && data) {
-        setStripeCurrency(data.currency);
-        form.setFieldsValue({
-          ...form.getFieldsValue(),
-          price_type: 'Paid',
-          currency: data?.currency?.toUpperCase() || 'SGD',
-          price: 10,
-        });
-        setIsSessionFree(false);
+
+  const getCreatorStripeDetails = useCallback(
+    async (sessionData = null) => {
+      try {
+        setIsLoading(true);
+        const { status, data } = await apis.session.getCreatorBalance();
+        if (isAPISuccess(status) && data) {
+          setStripeCurrency(data.currency);
+          if (!sessionData) {
+            form.setFieldsValue({
+              ...form.getFieldsValue(),
+              price_type: 'Paid',
+              currency: data?.currency?.toUpperCase() || 'SGD',
+              price: 10,
+            });
+            setIsSessionFree(false);
+          }
+        }
+        setIsLoading(false);
+      } catch (error) {
+        if (error.response?.data?.message === 'unable to fetch user payment details') {
+          setStripeCurrency(null);
+          form.setFieldsValue({
+            ...form.getFieldsValue(),
+            price_type: 'Free',
+            price: 0,
+            currency: 'SGD',
+          });
+          setIsSessionFree(true);
+        } else {
+          message.error(error.response?.data?.message || 'Something went wrong.');
+        }
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    } catch (error) {
-      if (error.response?.data?.message === 'unable to fetch user payment details') {
-        setStripeCurrency(null);
-        form.setFieldsValue({
-          ...form.getFieldsValue(),
-          price_type: 'Free',
-          price: 0,
-          currency: 'SGD',
-        });
-        setIsSessionFree(true);
-      } else {
-        message.error(error.response?.data?.message || 'Something went wrong.');
-      }
-      setIsLoading(false);
-    }
-  }, [form]);
+    },
+    [form]
+  );
 
   useEffect(() => {
     if (match.path.includes('manage')) {
       setIsOnboarding(false);
     }
-    getCreatorStripeDetails();
     if (match.params.id) {
       const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
       const endDate = toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
+      getCreatorStripeDetails();
       form.setFieldsValue({
         ...form.getFieldsValue(),
         type: 'Group',
@@ -288,8 +295,8 @@ const Session = ({ match, history }) => {
     try {
       setIsLoading(true);
       const data = {
-        price: values.price,
-        currency: values.currency,
+        price: values.price || 0,
+        currency: values.currency || stripeCurrency || 'SGD',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
