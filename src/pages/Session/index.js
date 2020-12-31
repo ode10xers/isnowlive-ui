@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import {
   Form,
@@ -70,6 +71,7 @@ const initialSession = {
 };
 
 const Session = ({ match, history }) => {
+  const location = useLocation();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
@@ -166,8 +168,12 @@ const Session = ({ match, history }) => {
       setIsOnboarding(false);
     }
     if (match.params.id) {
-      const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
-      const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+      const startDate = location.state.beginning
+        ? toUtcStartOfDay(moment(location.state.beginning))
+        : toUtcStartOfDay(moment().subtract(1, 'month'));
+      const endDate = location.state.expiry
+        ? toUtcEndOfDay(moment(location.state.expiry))
+        : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
       getCreatorStripeDetails();
@@ -184,7 +190,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-  }, [form, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -327,8 +333,8 @@ const Session = ({ match, history }) => {
           await apis.session.update(session.session_id, data);
           trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
           message.success('Session successfully updated.');
-          const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
-          const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+          const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
+          const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
           getSessionDetails(match.params.id, startDate, endDate);
         } else {
           const newSessionResponse = await apis.session.create(data);

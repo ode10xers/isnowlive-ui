@@ -77,9 +77,13 @@ const ManageSessions = () => {
     setIsLoading(false);
   };
 
-  const trackAndNavigate = (destination) => {
+  const trackAndNavigate = (destination, data = null) => {
     trackSimpleEvent(creator.click.sessions.manage.editSession);
-    history.push(destination);
+    if (data) {
+      history.push(destination, { ...data });
+    } else {
+      history.push(destination);
+    }
   };
 
   useEffect(() => {
@@ -140,7 +144,10 @@ const ManageSessions = () => {
               <Button
                 className={styles.detailsButton}
                 onClick={() =>
-                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
+                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
+                    beginning: record.beginning,
+                    expiry: record.expiry,
+                  })
                 }
                 type="link"
               >
@@ -180,7 +187,10 @@ const ManageSessions = () => {
         title={
           <div
             onClick={() =>
-              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
+                beginning: item.beginning,
+                expiry: item.expiry,
+              })
             }
           >
             <Text>{item.name}</Text>
@@ -191,7 +201,10 @@ const ManageSessions = () => {
             type="link"
             className={styles.detailsButton}
             onClick={() =>
-              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
+                beginning: item.beginning,
+                expiry: item.expiry,
+              })
             }
           >
             Edit
