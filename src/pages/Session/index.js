@@ -335,7 +335,7 @@ const Session = ({ match, history }) => {
           message.success('Session successfully updated.');
           const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
           const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
-          getSessionDetails(match.params.id, data.beginning, data.expiry);
+          getSessionDetails(match.params.id, startDate, endDate);
         } else {
           const newSessionResponse = await apis.session.create(data);
 
