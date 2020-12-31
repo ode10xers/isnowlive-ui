@@ -333,6 +333,8 @@ const Session = ({ match, history }) => {
           await apis.session.update(session.session_id, data);
           trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
           message.success('Session successfully updated.');
+          const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
+          const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
           getSessionDetails(match.params.id, data.beginning, data.expiry);
         } else {
           const newSessionResponse = await apis.session.create(data);
