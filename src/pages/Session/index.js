@@ -66,7 +66,7 @@ const initialSession = {
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
   is_refundable: true,
-  refund_before_hours: 24,
+  refund_before_hours: 0,
   prerequisites: '',
 };
 
@@ -136,7 +136,7 @@ const Session = ({ match, history }) => {
             type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
             price_type: data?.price === 0 ? 'Free' : 'Paid',
             is_refundable: data?.is_refundable ? 'Yes' : 'No',
-            refund_before_hours: data?.refund_before_hours || 24,
+            refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
           });
           setSessionImageUrl(data.session_image_url);
@@ -145,7 +145,7 @@ const Session = ({ match, history }) => {
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
           setSessionRefundable(data?.is_refundable);
-          setRefundBeforeHours(data?.refund_before_hours || 24);
+          setRefundBeforeHours(data?.refund_before_hours || 0);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setIsLoading(false);
           await getCreatorStripeDetails(data);
@@ -183,7 +183,7 @@ const Session = ({ match, history }) => {
         max_participants: 2,
         recurring: false,
         is_refundable: 'Yes',
-        refund_before_hours: 24,
+        refund_before_hours: 0,
       });
       setIsLoading(false);
     }
@@ -251,8 +251,8 @@ const Session = ({ match, history }) => {
       setSessionRefundable(true);
     } else {
       setSessionRefundable(false);
-      setRefundBeforeHours(24);
-      form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: 24 });
+      setRefundBeforeHours(0);
+      form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: 0 });
     }
   };
 
@@ -289,7 +289,7 @@ const Session = ({ match, history }) => {
   };
 
   const handleRefundBeforeHoursChange = (e) => {
-    const value = Math.max(1, parseInt(e.target.value));
+    const value = Math.max(0, parseInt(e.target.value));
 
     setRefundBeforeHours(value);
     form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: value });
