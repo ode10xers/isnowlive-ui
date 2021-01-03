@@ -1,8 +1,10 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 
 import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import styles from './styles.module.scss';
@@ -13,9 +15,12 @@ const {
 } = dateUtil;
 
 const CalendarView = ({ inventories = [], onSelectInventory, calendarView, onViewChange }) => {
+  let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
   return (
-    <div className={styles.mt20}>
+    <div className={classNames(styles.calendarWrapper, styles.mt20)}>
       <Calendar
+        views={views}
+        className={styles.calendar}
         localizer={localizer}
         events={inventories}
         step={60}
