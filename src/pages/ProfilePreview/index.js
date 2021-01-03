@@ -127,7 +127,6 @@ const ProfilePreview = ({ username = null }) => {
   };
 
   const handleViewChange = async (e) => {
-    console.log(e);
     setView(e.target.value);
     if (e.target.value === 'calendar') {
       try {
@@ -265,7 +264,7 @@ const ProfilePreview = ({ username = null }) => {
               All event times shown below are in your local time zone ({getCurrentLongTimezone()})
             </Text>
           </Col>
-          <Col span={24}>
+          <Col span={24} className={styles.mt10}>
             <Radio.Group value={view} onChange={handleViewChange}>
               <Radio.Button value="list">List View</Radio.Button>
               <Radio.Button value="calendar">Calendar View</Radio.Button>

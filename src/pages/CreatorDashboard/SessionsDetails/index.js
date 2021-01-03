@@ -101,7 +101,7 @@ const SessionsDetails = ({ match }) => {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag, { inventory_id: inventory_id });
-        history.push(Routes.creatorDashboard);
+        history.push(Routes.creatorDashboard.rootPath);
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
