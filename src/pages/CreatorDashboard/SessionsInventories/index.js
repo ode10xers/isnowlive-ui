@@ -33,7 +33,7 @@ const SessionsInventories = ({ match }) => {
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
   const [view, setView] = useState('calendar');
-  const [calendarView, setCalendarView] = useState('month');
+  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
@@ -294,7 +294,6 @@ const SessionsInventories = ({ match }) => {
       </Radio.Group>
       {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
-          {' '}
           {sessions.length > 0 ? (
             <CalendarView
               inventories={sessions}

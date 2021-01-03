@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message } from 'antd';
+import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -19,7 +19,8 @@ import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
-import { parseEmbedCode } from 'utils/helper';
+import CalendarView from 'components/CalendarView';
+import { isAPISuccess, parseEmbedCode } from 'utils/helper';
 import DefaultImage from 'components/Icons/DefaultImage/index';
 import Share from 'components/Share';
 import { generateUrlFromUsername } from 'utils/helper';
@@ -48,6 +49,9 @@ const ProfilePreview = ({ username = null }) => {
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
   const [isSessionLoading, setIsSessionLoading] = useState(true);
+  const [view, setView] = useState('list');
+  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
+  const [calendarSession, setCalendarSession] = useState([]);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -114,6 +118,41 @@ const ProfilePreview = ({ username = null }) => {
     } else {
       history.push(destination);
     }
+  };
+
+  const showInventoryDetails = (session) => {
+    trackSimpleEvent(user.click.profile.sessionCard, { inventory_id: session.inventory_id });
+    const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
+    window.open(`${baseurl}/e/${session.inventory_id}`);
+  };
+
+  const handleViewChange = async (e) => {
+    console.log(e);
+    setView(e.target.value);
+    if (e.target.value === 'calendar') {
+      try {
+        setIsSessionLoading(true);
+        let profileUsername = '';
+        if (username) {
+          profileUsername = username;
+        } else {
+          profileUsername = getLocalUserDetails().username;
+        }
+        const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
+        const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
+        if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
+          setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
+          setIsSessionLoading(false);
+        }
+      } catch (error) {
+        setIsSessionLoading(false);
+        message.error('Failed to load user session details');
+      }
+    }
+  };
+
+  const onViewChange = (e) => {
+    setCalendarView(e);
   };
 
   return (
@@ -227,15 +266,36 @@ const ProfilePreview = ({ username = null }) => {
             </Text>
           </Col>
           <Col span={24}>
-            <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
-              {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
-                <Tabs.TabPane tab={item} key={index}>
-                  <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                    <Sessions username={username} sessions={sessions} />
-                  </Loader>
-                </Tabs.TabPane>
-              ))}
-            </Tabs>
+            <Radio.Group value={view} onChange={handleViewChange}>
+              <Radio.Button value="list">List View</Radio.Button>
+              <Radio.Button value="calendar">Calendar View</Radio.Button>
+            </Radio.Group>
+          </Col>
+          <Col span={24}>
+            {view === 'calendar' ? (
+              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                {calendarSession.length > 0 ? (
+                  <CalendarView
+                    inventories={calendarSession}
+                    onSelectInventory={showInventoryDetails}
+                    onViewChange={onViewChange}
+                    calendarView={calendarView}
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Loader>
+            ) : (
+              <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
+                {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
+                  <Tabs.TabPane tab={item} key={index}>
+                    <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                      <Sessions username={username} sessions={sessions} />
+                    </Loader>
+                  </Tabs.TabPane>
+                ))}
+              </Tabs>
+            )}
           </Col>
         </Row>
 
