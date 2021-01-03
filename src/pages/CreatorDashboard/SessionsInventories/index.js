@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, message } from 'antd';
+import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -9,6 +9,7 @@ import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
+import CalendarView from 'components/CalendarView';
 import { isAPISuccess, getDuration } from 'utils/helper';
 
 import {
@@ -31,6 +32,8 @@ const SessionsInventories = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
+  const [view, setView] = useState('calendar');
+  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
@@ -274,19 +277,48 @@ const SessionsInventories = ({ match }) => {
     );
   };
 
+  const handleViewChange = (e) => {
+    setView(e.target.value);
+  };
+
+  const onViewChange = (e) => {
+    setCalendarView(e);
+  };
+
   return (
     <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
-      {isMobileDevice ? (
+      <Radio.Group value={view} onChange={handleViewChange}>
+        <Radio.Button value="calendar">Calendar View</Radio.Button>
+        <Radio.Button value="list">List View</Radio.Button>
+      </Radio.Group>
+      {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
           {sessions.length > 0 ? (
-            sessions.map(renderSessionItem)
+            <CalendarView
+              inventories={sessions}
+              onSelectInventory={openSessionInventoryDetails}
+              onViewChange={onViewChange}
+              calendarView={calendarView}
+            />
           ) : (
-            <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+            <Empty />
           )}
         </Loader>
       ) : (
-        <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+        <>
+          {isMobileDevice ? (
+            <Loader loading={isLoading} size="large" text="Loading sessions">
+              {sessions.length > 0 ? (
+                sessions.map(renderSessionItem)
+              ) : (
+                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+              )}
+            </Loader>
+          ) : (
+            <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+          )}
+        </>
       )}
     </div>
   );
