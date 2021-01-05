@@ -123,7 +123,16 @@ const SessionsInventories = ({ match }) => {
       title: 'Session Name',
       key: 'name',
       width: '12%',
-      render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
+      render: (record) => {
+        return {
+          props: {
+            style: {
+              borderLeft: `6px solid ${record.color_code || '#fff'}`,
+            },
+          },
+          children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+        };
+      },
     },
     {
       title: 'Type',
@@ -229,7 +238,10 @@ const SessionsInventories = ({ match }) => {
       <Card
         className={styles.card}
         title={
-          <div onClick={() => openSessionInventoryDetails(item)}>
+          <div
+            style={{ borderTop: `4px solid ${item.color_code || '#FFF'}` }}
+            onClick={() => openSessionInventoryDetails(item)}
+          >
             <Text>{item.name}</Text>
           </div>
         }
