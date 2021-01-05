@@ -256,7 +256,11 @@ const SessionsInventories = ({ match }) => {
 
   const renderDetailedTable = (record) => {
     const inventoryData = record.sessionsList;
-    return <Table columns={sessionColumns} data={inventoryData} rowKeys={(record) => record.inventory_id} />;
+    return (
+      <div className="inner-table">
+        <Table columns={sessionColumns} data={inventoryData} rowKeys={(record) => record.inventory_id} />
+      </div>
+    );
   };
 
   const renderSessionItem = (item) => {
