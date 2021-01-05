@@ -195,7 +195,7 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
-            style={{ borderTop: `4px solid ${item.color_code || '#FFF'}` }}
+            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
             onClick={() =>
               trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
                 beginning: item.beginning,

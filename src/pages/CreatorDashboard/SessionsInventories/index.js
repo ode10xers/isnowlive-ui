@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, DownCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
+import moment from 'moment';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -40,25 +41,43 @@ const SessionsInventories = ({ match }) => {
       const { data } =
         sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
       if (data) {
-        setSessions(
-          data.map((i, index) => ({
-            index,
-            key: i.session_id,
-            name: i.name,
-            type: i.max_participants > 1 ? 'Group' : '1-on-1',
-            duration: getDuration(i.start_time, i.end_time),
-            days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
-            session_date: i?.session_date,
-            time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
-            start_time: i?.start_time,
-            end_time: i?.end_time,
-            participants: i.num_participants,
-            start_url: i.start_url,
-            inventory_id: i?.inventory_id,
-            session_id: i.session_id,
-            max_participants: i.max_participants,
-          }))
-        );
+        const unfilteredSessions = data.map((i, index) => ({
+          index,
+          key: i?.inventory_id,
+          name: i.name,
+          type: i.max_participants > 1 ? 'Group' : '1-on-1',
+          duration: getDuration(i.start_time, i.end_time),
+          days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
+          session_date: i?.session_date,
+          time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
+          start_time: i?.start_time,
+          end_time: i?.end_time,
+          participants: i.num_participants,
+          start_url: i.start_url,
+          inventory_id: i?.inventory_id,
+          session_id: i.session_id,
+          max_participants: i.max_participants,
+          color_code: i.color_code,
+        }));
+
+        let filterByDateSessions = [];
+
+        unfilteredSessions.forEach((session) => {
+          const foundIndex = filterByDateSessions.findIndex(
+            (val) => val.start_time === moment(session.start_time).format('L')
+          );
+
+          if (foundIndex >= 0) {
+            filterByDateSessions[foundIndex].sessionsList.push(session);
+          } else {
+            filterByDateSessions.push({
+              start_time: moment(session.start_time).format('L'),
+              dateVal: session.start_time,
+              sessionsList: [session],
+            });
+          }
+        });
+        setSessions(filterByDateSessions);
       }
       setIsLoading(false);
     } catch (error) {
@@ -117,6 +136,16 @@ const SessionsInventories = ({ match }) => {
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
   };
+
+  let dateColumns = [
+    {
+      title: '',
+      dataIndex: 'dateVal',
+      key: 'dateVal',
+      width: '95%',
+      render: (record) => <Text className={styles.textAlignLeft}>{moment(record).format('dddd[,] D MMMM YYYY')}</Text>,
+    },
+  ];
 
   let sessionColumns = [
     {
@@ -222,6 +251,11 @@ const SessionsInventories = ({ match }) => {
     },
   ];
 
+  const renderDetailedTable = (record) => {
+    const inventoryData = record.sessionsList;
+    return <Table columns={sessionColumns} data={inventoryData} rowKeys={(record) => record.inventory_id} />;
+  };
+
   const renderSessionItem = (item) => {
     const isCancelDisabled = item.participants > 0;
 
@@ -239,7 +273,7 @@ const SessionsInventories = ({ match }) => {
         className={styles.card}
         title={
           <div
-            style={{ borderTop: `4px solid ${item.color_code || '#FFF'}` }}
+            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
             <Text>{item.name}</Text>
@@ -322,13 +356,43 @@ const SessionsInventories = ({ match }) => {
           {isMobileDevice ? (
             <Loader loading={isLoading} size="large" text="Loading sessions">
               {sessions.length > 0 ? (
-                sessions.map(renderSessionItem)
+                <Table
+                  columns={dateColumns}
+                  data={sessions}
+                  loading={isLoading}
+                  rowKey={(record) => record.start_time}
+                  expandable={{
+                    expandedRowRender: (record) => <> {record.sessionsList.map(renderSessionItem)} </>,
+                    expandRowByClick: true,
+                    expandIcon: ({ expanded, onExpand, record }) =>
+                      expanded ? (
+                        <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                      ) : (
+                        <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                      ),
+                  }}
+                />
               ) : (
                 <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
               )}
             </Loader>
           ) : (
-            <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+            <Table
+              columns={dateColumns}
+              data={sessions}
+              loading={isLoading}
+              rowKey={(record) => record.start_time}
+              expandable={{
+                expandedRowRender: renderDetailedTable,
+                expandRowByClick: true,
+                expandIcon: ({ expanded, onExpand, record }) =>
+                  expanded ? (
+                    <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                  ) : (
+                    <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                  ),
+              }}
+            />
           )}
         </>
       )}
