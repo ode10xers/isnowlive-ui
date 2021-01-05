@@ -32,6 +32,7 @@ const SessionsInventories = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
+  const [filteredByDateSession, setFilteredByDateSession] = useState([]);
   const [isPast, setIsPast] = useState(false);
   const [view, setView] = useState('calendar');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
@@ -77,7 +78,8 @@ const SessionsInventories = ({ match }) => {
             });
           }
         });
-        setSessions(filterByDateSessions);
+        setSessions(unfilteredSessions);
+        setFilteredByDateSession(filterByDateSessions);
       }
       setIsLoading(false);
     } catch (error) {
@@ -365,7 +367,7 @@ const SessionsInventories = ({ match }) => {
               {sessions.length > 0 ? (
                 <Table
                   columns={dateColumns}
-                  data={sessions}
+                  data={filteredByDateSession}
                   loading={isLoading}
                   rowKey={(record) => record.start_time}
                   expandable={{
@@ -386,7 +388,7 @@ const SessionsInventories = ({ match }) => {
           ) : (
             <Table
               columns={dateColumns}
-              data={sessions}
+              data={filteredByDateSession}
               loading={isLoading}
               rowKey={(record) => record.start_time}
               expandable={{
