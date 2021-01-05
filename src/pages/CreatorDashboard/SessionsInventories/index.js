@@ -142,8 +142,11 @@ const SessionsInventories = ({ match }) => {
       title: '',
       dataIndex: 'dateVal',
       key: 'dateVal',
-      width: '95%',
-      render: (record) => <Text className={styles.textAlignLeft}>{moment(record).format('dddd[,] D MMMM YYYY')}</Text>,
+      render: (record) => (
+        <Text strong className={styles.textAlignLeft}>
+          {moment(record).format('dddd[,] D MMMM YYYY')}
+        </Text>
+      ),
     },
   ];
 
