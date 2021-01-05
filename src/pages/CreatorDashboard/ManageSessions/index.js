@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
@@ -77,6 +78,24 @@ const ManageSessions = () => {
     setIsLoading(false);
   };
 
+  const deleteSession = async (sessionId) => {
+    setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.deleteSession;
+
+    try {
+      await apis.session.deleteSession(sessionId);
+
+      trackSuccessEvent(eventTag, { session_id: sessionId });
+      message.success('Session deleted successfully!');
+      getSessionsList();
+    } catch (error) {
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
   const trackAndNavigate = (destination, data = null) => {
     trackSimpleEvent(creator.click.sessions.manage.editSession);
     if (data) {
@@ -94,7 +113,7 @@ const ManageSessions = () => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '12%',
+      width: '15%',
       render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
     },
     {
@@ -124,23 +143,12 @@ const ManageSessions = () => {
       ),
     },
     {
-      title: 'Registrations',
-      key: 'participants',
-      dataIndex: 'participants',
-      width: '2%',
-      render: (text, record) => (
-        <Text>
-          {record.total_bookings || 0} / {record.max_participants}
-        </Text>
-      ),
-    },
-    {
       title: 'Actions',
-      width: '4%',
+      width: '15%',
       render: (text, record) => {
         return (
           <Row justify="start">
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={6}>
               <Button
                 className={styles.detailsButton}
                 onClick={() =>
@@ -154,7 +162,7 @@ const ManageSessions = () => {
                 Edit
               </Button>
             </Col>
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={10}>
               {!record.is_active ? (
                 <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
                   Publish
@@ -164,6 +172,17 @@ const ManageSessions = () => {
                   Unpublish
                 </Button>
               )}
+            </Col>
+            <Col md={24} lg={24} xl={8}>
+              <Popconfirm
+                title="Do you want to delete session?"
+                icon={<DeleteOutlined className={styles.danger} />}
+                okText="Yes"
+                cancelText="No"
+                onConfirm={() => deleteSession(record.session_id)}
+              >
+                <Button danger type="text" icon={<DeleteOutlined />} />
+              </Popconfirm>
             </Col>
           </Row>
         );
@@ -220,6 +239,17 @@ const ManageSessions = () => {
               </Button>
             )}
           </>,
+          <Popconfirm
+            title="Do you want to delete session?"
+            icon={<DeleteOutlined className={styles.danger} />}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => deleteSession(item.session_id)}
+          >
+            <Button danger type="text">
+              Delete
+            </Button>
+          </Popconfirm>,
         ]}
       >
         {layout('Type', <Text>{item.group ? 'Group Session' : '1-to-1 Session'}</Text>)}
