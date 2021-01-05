@@ -34,7 +34,7 @@ const SessionsInventories = ({ match }) => {
   const [sessions, setSessions] = useState([]);
   const [filteredByDateSession, setFilteredByDateSession] = useState([]);
   const [isPast, setIsPast] = useState(false);
-  const [view, setView] = useState('calendar');
+  const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
 
   const getStaffSession = useCallback(async (sessionType) => {
@@ -141,22 +141,55 @@ const SessionsInventories = ({ match }) => {
 
   let dateColumns = [
     {
-      title: '',
+      title: 'Session Name',
       dataIndex: 'dateVal',
       key: 'dateVal',
-      render: (record) => (
-        <Text strong className={styles.textAlignLeft}>
-          {moment(record).format('dddd[,] D MMMM YYYY')}
-        </Text>
-      ),
+      width: '20%',
+      render: (record) => {
+        return {
+          props: {
+            colSpan: 6,
+          },
+          children: (
+            <Text strong className={styles.textAlignLeft}>
+              {moment(record).format('dddd[,] D MMMM YYYY')}
+            </Text>
+          ),
+        };
+      },
+    },
+    {
+      title: 'Type',
+      width: '10%',
+      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+    },
+    {
+      title: 'Duration',
+      width: '10%',
+      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+    },
+    {
+      title: 'Time',
+      width: '15%',
+      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+    },
+    {
+      title: 'Participant',
+      width: '15%',
+      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+    },
+    {
+      title: 'Actions',
+      width: isPast ? '10%' : '25%',
+      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
     },
   ];
 
   let sessionColumns = [
     {
-      title: 'Session Name',
+      title: '',
       key: 'name',
-      width: '12%',
+      width: '20%',
       render: (record) => {
         return {
           props: {
@@ -169,34 +202,28 @@ const SessionsInventories = ({ match }) => {
       },
     },
     {
-      title: 'Type',
+      title: '',
       dataIndex: 'type',
       key: 'type',
-      width: '4%',
+      width: '10%',
     },
     {
-      title: 'Day',
-      key: 'days',
-      dataIndex: 'days',
-      width: '12%',
-    },
-    {
-      title: 'Duration',
+      title: '',
       dataIndex: 'duration',
       key: 'duration',
-      width: '4%',
+      width: '10%',
     },
     {
-      title: 'Time',
+      title: '',
       dataIndex: 'time',
       key: 'time',
       width: '15%',
     },
     {
-      title: isPast ? 'Registrations' : 'Attendees',
+      title: '',
       key: 'participants',
       dataIndex: 'participants',
-      width: '2%',
+      width: '10%',
       render: (text, record) => (
         <Text>
           {record.participants || 0} / {record.max_participants}
@@ -204,8 +231,8 @@ const SessionsInventories = ({ match }) => {
       ),
     },
     {
-      title: 'Actions',
-      width: isPast ? '4%' : '20%',
+      title: '',
+      width: isPast ? '10%' : '25%',
       render: (text, record) => {
         const isDisabled = record.participants > 0;
         return isPast ? (
@@ -260,7 +287,12 @@ const SessionsInventories = ({ match }) => {
     const inventoryData = record.sessionsList;
     return (
       <div className="inner-table">
-        <Table columns={sessionColumns} data={inventoryData} rowKeys={(record) => record.inventory_id} />
+        <Table
+          showHeader={false}
+          columns={sessionColumns}
+          data={inventoryData}
+          rowKeys={(record) => record.inventory_id}
+        />
       </div>
     );
   };
@@ -344,8 +376,8 @@ const SessionsInventories = ({ match }) => {
     <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
       <Radio.Group value={view} onChange={handleViewChange}>
-        <Radio.Button value="calendar">Calendar View</Radio.Button>
-        <Radio.Button value="list">List View</Radio.Button>
+        <Radio.Button value="list">List</Radio.Button>
+        <Radio.Button value="calendar">Calendar</Radio.Button>
       </Radio.Group>
       {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
@@ -366,7 +398,6 @@ const SessionsInventories = ({ match }) => {
             <Loader loading={isLoading} size="large" text="Loading sessions">
               {sessions.length > 0 ? (
                 <Table
-                  columns={dateColumns}
                   data={filteredByDateSession}
                   loading={isLoading}
                   rowKey={(record) => record.start_time}
@@ -387,6 +418,7 @@ const SessionsInventories = ({ match }) => {
             </Loader>
           ) : (
             <Table
+              sticky={true}
               columns={dateColumns}
               data={filteredByDateSession}
               loading={isLoading}
