@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -174,7 +174,15 @@ const ManageSessions = () => {
               )}
             </Col>
             <Col md={24} lg={24} xl={8}>
-              <Button danger type="text" icon={<DeleteOutlined />} onClick={() => deleteSession(record.session_id)} />
+              <Popconfirm
+                title="Do you want to delete session?"
+                icon={<DeleteOutlined className={styles.danger} />}
+                okText="Yes"
+                cancelText="No"
+                onConfirm={() => deleteSession(record.session_id)}
+              >
+                <Button danger type="text" icon={<DeleteOutlined />} />
+              </Popconfirm>
             </Col>
           </Row>
         );
@@ -231,9 +239,17 @@ const ManageSessions = () => {
               </Button>
             )}
           </>,
-          <Button danger type="text" onClick={() => deleteSession(item.session_id)}>
-            Delete
-          </Button>,
+          <Popconfirm
+            title="Do you want to delete session?"
+            icon={<DeleteOutlined className={styles.danger} />}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => deleteSession(item.session_id)}
+          >
+            <Button danger type="text">
+              Delete
+            </Button>
+          </Popconfirm>,
         ]}
       >
         {layout('Type', <Text>{item.group ? 'Group Session' : '1-to-1 Session'}</Text>)}
