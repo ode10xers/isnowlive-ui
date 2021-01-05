@@ -53,5 +53,6 @@ export default {
     cancelCustomerOrder: (orderId, payload) => http.post(`/secure/customer/orders/${orderId}/cancel`, payload),
     publishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
     unpublishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
+    deleteSession: (sessionId) => http.delete(`/secure/creator/sessions/${sessionId}`),
   },
 };
