@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import { BlockPicker } from 'react-color';
 import classNames from 'classnames';
 import {
   Form,
@@ -70,6 +71,8 @@ const initialSession = {
   prerequisites: '',
 };
 
+const whiteColor = '#ffffff';
+
 const Session = ({ match, history }) => {
   const location = useLocation();
   const [form] = Form.useForm();
@@ -87,6 +90,7 @@ const Session = ({ match, history }) => {
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
+  const [colorCode, setColorCode] = useState(whiteColor);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -138,6 +142,7 @@ const Session = ({ match, history }) => {
             is_refundable: data?.is_refundable ? 'Yes' : 'No',
             refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
+            color_code: data?.color_code || whiteColor,
           });
           setSessionImageUrl(data.session_image_url);
           setSessionDocumentUrl(data.document_url);
@@ -147,6 +152,7 @@ const Session = ({ match, history }) => {
           setSessionRefundable(data?.is_refundable);
           setRefundBeforeHours(data?.refund_before_hours || 0);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
+          setColorCode(data?.color_code || whiteColor);
           setIsLoading(false);
           await getCreatorStripeDetails(data);
         }
@@ -184,6 +190,7 @@ const Session = ({ match, history }) => {
         recurring: false,
         is_refundable: 'Yes',
         refund_before_hours: 0,
+        color_code: whiteColor,
       });
       setIsLoading(false);
     }
@@ -296,6 +303,11 @@ const Session = ({ match, history }) => {
     form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: value });
   };
 
+  const handleColorChange = (color) => {
+    setColorCode(color.hex || whiteColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
+  };
+
   const onFinish = async (values) => {
     const eventTagObject = creator.click.sessions.form;
 
@@ -316,6 +328,7 @@ const Session = ({ match, history }) => {
         refund_before_hours: refundBeforeHours,
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
+        color_code: colorCode,
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).utc().format();
@@ -595,6 +608,33 @@ const Session = ({ match, history }) => {
               </>
             )}
           </>
+          <Form.Item
+            name="color_code"
+            label="Color Tag"
+            rules={validationRules.requiredValidation}
+            style={{ marginTop: 32 }}
+          >
+            <BlockPicker
+              color={colorCode}
+              onChangeComplete={handleColorChange}
+              triangle="hide"
+              width={144}
+              colors={[
+                '#f44336',
+                '#e91e63',
+                '#9c27b0',
+                '#673ab7',
+                '#1890ff',
+                '#009688',
+                '#4caf50',
+                '#ffc107',
+                '#ff9800',
+                '#ff5722',
+                '#795548',
+                '#607d8b',
+              ]}
+            />
+          </Form.Item>
         </Section>
 
         {/* ========= SESSION SCHEDULE =========== */}

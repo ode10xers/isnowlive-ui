@@ -273,7 +273,7 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
         <Col xs={24} lg={15} className={styles.mt50}>
-          {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
+          {session?.end_time && getTimeDiff(session?.end_time, moment(), 'minutes') > 0 && (
             <SessionRegistration
               user={currentUser}
               showPasswordField={showPasswordField}
