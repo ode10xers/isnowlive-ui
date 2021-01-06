@@ -284,7 +284,8 @@ const Session = ({ match, history }) => {
   const handleSlotDelete = (value) => {
     let tempDeleteSlots = deleteSlot;
     tempDeleteSlots.push(value);
-    tempDeleteSlots = tempDeleteSlots.filter((item, index) => tempDeleteSlots.indexOf(item) === index);
+    tempDeleteSlots = [...new Set(tempDeleteSlots)];
+    console.log(tempDeleteSlots);
     setDeleteSlot(tempDeleteSlots);
   };
 
