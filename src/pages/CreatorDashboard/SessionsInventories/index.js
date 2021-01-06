@@ -69,12 +69,13 @@ const SessionsInventories = ({ match }) => {
           );
 
           if (foundIndex >= 0) {
-            filterByDateSessions[foundIndex].sessionsList.push(session);
+            filterByDateSessions[foundIndex].children.push(session);
           } else {
             filterByDateSessions.push({
               start_time: moment(session.start_time).format('L'),
-              dateVal: session.start_time,
-              sessionsList: [session],
+              name: session.start_time,
+              is_date: true,
+              children: [session],
             });
           }
         });
@@ -142,98 +143,122 @@ const SessionsInventories = ({ match }) => {
   let dateColumns = [
     {
       title: 'Session Name',
-      dataIndex: 'dateVal',
-      key: 'dateVal',
-      width: '20%',
-      render: (record) => {
-        return {
-          props: {
-            colSpan: 6,
-          },
-          children: (
-            <Text strong className={styles.textAlignLeft}>
-              {moment(record).format('dddd[,] D MMMM YYYY')}
-            </Text>
-          ),
-        };
+      dataIndex: 'name',
+      key: 'name',
+      width: '25%',
+      render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 6,
+            },
+            children: (
+              <Text strong className={styles.textAlignLeft}>
+                {moment(text).format('dddd[,] D MMMM YYYY')}
+              </Text>
+            ),
+          };
+        } else {
+          return {
+            props: {
+              style: {
+                borderLeft: `6px solid ${record.color_code || '#fff'}`,
+              },
+            },
+            children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+          };
+        }
       },
     },
     {
       title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
       width: '10%',
-      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+      render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 0,
+              rowSpan: 0,
+            },
+          };
+        } else {
+          return <Text>{text}</Text>;
+        }
+      },
     },
     {
       title: 'Duration',
-      width: '10%',
-      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+      dataIndex: 'duration',
+      key: 'duration',
+      width: '15%',
+      render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 0,
+              rowSpan: 0,
+            },
+          };
+        } else {
+          return <Text>{text}</Text>;
+        }
+      },
     },
     {
       title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
       width: '15%',
-      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+      render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 0,
+              rowSpan: 0,
+            },
+          };
+        } else {
+          return <Text>{text}</Text>;
+        }
+      },
     },
     {
-      title: 'Participant',
-      width: '15%',
-      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
+      title: 'Participants',
+      key: 'participants',
+      dataIndex: 'participants',
+      width: '10%',
+      render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 0,
+              rowSpan: 0,
+            },
+          };
+        } else {
+          return (
+            <Text>
+              {record.participants || 0} / {record.max_participants}
+            </Text>
+          );
+        }
+      },
     },
     {
       title: 'Actions',
       width: isPast ? '10%' : '25%',
-      render: (record) => ({ props: { colSpan: 0, rowSpan: 0 } }),
-    },
-  ];
-
-  let sessionColumns = [
-    {
-      title: '',
-      key: 'name',
-      width: '20%',
-      render: (record) => {
-        return {
-          props: {
-            style: {
-              borderLeft: `6px solid ${record.color_code || '#fff'}`,
-            },
-          },
-          children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
-        };
-      },
-    },
-    {
-      title: '',
-      dataIndex: 'type',
-      key: 'type',
-      width: '10%',
-    },
-    {
-      title: '',
-      dataIndex: 'duration',
-      key: 'duration',
-      width: '10%',
-    },
-    {
-      title: '',
-      dataIndex: 'time',
-      key: 'time',
-      width: '15%',
-    },
-    {
-      title: '',
-      key: 'participants',
-      dataIndex: 'participants',
-      width: '10%',
-      render: (text, record) => (
-        <Text>
-          {record.participants || 0} / {record.max_participants}
-        </Text>
-      ),
-    },
-    {
-      title: '',
-      width: isPast ? '10%' : '25%',
       render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 0,
+              rowSpan: 0,
+            },
+          };
+        }
+
         const isDisabled = record.participants > 0;
         return isPast ? (
           <Row justify="start">
@@ -283,19 +308,20 @@ const SessionsInventories = ({ match }) => {
     },
   ];
 
-  const renderDetailedTable = (record) => {
-    const inventoryData = record.sessionsList;
-    return (
-      <div className="inner-table">
-        <Table
-          showHeader={false}
-          columns={sessionColumns}
-          data={inventoryData}
-          rowKeys={(record) => record.inventory_id}
-        />
-      </div>
-    );
-  };
+  let mobileTableColumns = [
+    {
+      title: '',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text, record) => {
+        return (
+          <Text strong className={styles.textAlignLeft}>
+            {moment(text).format('dddd[,] D MMMM YYYY')}
+          </Text>
+        );
+      },
+    },
+  ];
 
   const renderSessionItem = (item) => {
     const isCancelDisabled = item.participants > 0;
@@ -398,11 +424,12 @@ const SessionsInventories = ({ match }) => {
             <Loader loading={isLoading} size="large" text="Loading sessions">
               {sessions.length > 0 ? (
                 <Table
+                  columns={mobileTableColumns}
                   data={filteredByDateSession}
                   loading={isLoading}
                   rowKey={(record) => record.start_time}
                   expandable={{
-                    expandedRowRender: (record) => <> {record.sessionsList.map(renderSessionItem)} </>,
+                    expandedRowRender: (record) => <> {record.children.map(renderSessionItem)} </>,
                     expandRowByClick: true,
                     expandIcon: ({ expanded, onExpand, record }) =>
                       expanded ? (
@@ -423,16 +450,6 @@ const SessionsInventories = ({ match }) => {
               data={filteredByDateSession}
               loading={isLoading}
               rowKey={(record) => record.start_time}
-              expandable={{
-                expandedRowRender: renderDetailedTable,
-                expandRowByClick: true,
-                expandIcon: ({ expanded, onExpand, record }) =>
-                  expanded ? (
-                    <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                  ) : (
-                    <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                  ),
-              }}
             />
           )}
         </>
