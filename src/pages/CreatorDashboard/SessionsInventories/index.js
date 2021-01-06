@@ -203,7 +203,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Participants',
       key: 'participants',
       dataIndex: 'participants',
-      width: '10%',
+      width: '12%',
       render: (text, record) =>
         renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
     },
