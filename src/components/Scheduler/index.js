@@ -35,11 +35,16 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   }, [slots]);
 
   useEffect(() => {
-    if (recurring && recurringDatesRange && recurringDatesRange.length) {
-      setDate(moment(recurringDatesRange[0]));
+    if (sessionSlots && sessionSlots.length) {
+      setDate(moment(sessionSlots[0].start_time));
     } else {
-      setDate(moment());
+      if (recurring && recurringDatesRange && recurringDatesRange.length) {
+        setDate(moment(recurringDatesRange[0]));
+      } else {
+        setDate(moment(selectedDate));
+      }
     }
+    // eslint-disable-next-line
   }, [recurring, recurringDatesRange, sessionSlots]);
 
   useEffect(() => {
