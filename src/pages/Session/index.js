@@ -71,6 +71,8 @@ const initialSession = {
   prerequisites: '',
 };
 
+const whiteColor = '#ffffff';
+
 const Session = ({ match, history }) => {
   const location = useLocation();
   const [form] = Form.useForm();
@@ -88,7 +90,7 @@ const Session = ({ match, history }) => {
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
-  const [colorCode, setColorCode] = useState('#ffffff');
+  const [colorCode, setColorCode] = useState(whiteColor);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -140,7 +142,7 @@ const Session = ({ match, history }) => {
             is_refundable: data?.is_refundable ? 'Yes' : 'No',
             refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
-            color_code: data?.color_code || '#ffffff',
+            color_code: data?.color_code || whiteColor,
           });
           setSessionImageUrl(data.session_image_url);
           setSessionDocumentUrl(data.document_url);
@@ -150,7 +152,7 @@ const Session = ({ match, history }) => {
           setSessionRefundable(data?.is_refundable);
           setRefundBeforeHours(data?.refund_before_hours || 0);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
-          setColorCode(data?.color_code || '#ffffff');
+          setColorCode(data?.color_code || whiteColor);
           setIsLoading(false);
           await getCreatorStripeDetails(data);
         }
@@ -188,7 +190,7 @@ const Session = ({ match, history }) => {
         recurring: false,
         is_refundable: 'Yes',
         refund_before_hours: 0,
-        color_code: '#ffffff',
+        color_code: whiteColor,
       });
       setIsLoading(false);
     }
@@ -301,8 +303,8 @@ const Session = ({ match, history }) => {
   };
 
   const handleColorChange = (color) => {
-    setColorCode(color.hex || '#fff');
-    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || '#ffffff' });
+    setColorCode(color.hex || whiteColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
   };
 
   const onFinish = async (values) => {

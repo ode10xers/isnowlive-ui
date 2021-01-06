@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty } from 'antd';
 import { DeleteOutlined, DownCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
-import moment from 'moment';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -23,7 +22,7 @@ import {
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLocaleTime, toLongDateWithDay },
+  formatDate: { toLocaleTime, toLongDateWithDay, toLongDateWithLongDay, toLocaleDate },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { creator } = mixPanelEventTags;
@@ -65,14 +64,14 @@ const SessionsInventories = ({ match }) => {
 
         unfilteredSessions.forEach((session) => {
           const foundIndex = filterByDateSessions.findIndex(
-            (val) => val.start_time === moment(session.start_time).format('L')
+            (val) => val.start_time === toLocaleDate(session.start_time)
           );
 
           if (foundIndex >= 0) {
             filterByDateSessions[foundIndex].children.push(session);
           } else {
             filterByDateSessions.push({
-              start_time: moment(session.start_time).format('L'),
+              start_time: toLocaleDate(session.start_time),
               name: session.start_time,
               is_date: true,
               children: [session],
@@ -140,6 +139,15 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
+  const emptyTableCell = {
+    props: {
+      colSpan: 0,
+      rowSpan: 0,
+    },
+  };
+
+  const renderSimpleTableCell = (shouldNotRender, text) => (shouldNotRender ? emptyTableCell : <Text> {text} </Text>);
+
   let dateColumns = [
     {
       title: 'Session Name',
@@ -154,7 +162,7 @@ const SessionsInventories = ({ match }) => {
             },
             children: (
               <Text strong className={styles.textAlignLeft}>
-                {moment(text).format('dddd[,] D MMMM YYYY')}
+                {toLongDateWithLongDay(text)}
               </Text>
             ),
           };
@@ -175,88 +183,36 @@ const SessionsInventories = ({ match }) => {
       dataIndex: 'type',
       key: 'type',
       width: '10%',
-      render: (text, record) => {
-        if (record.is_date) {
-          return {
-            props: {
-              colSpan: 0,
-              rowSpan: 0,
-            },
-          };
-        } else {
-          return <Text>{text}</Text>;
-        }
-      },
+      render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
       width: '15%',
-      render: (text, record) => {
-        if (record.is_date) {
-          return {
-            props: {
-              colSpan: 0,
-              rowSpan: 0,
-            },
-          };
-        } else {
-          return <Text>{text}</Text>;
-        }
-      },
+      render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
       width: '15%',
-      render: (text, record) => {
-        if (record.is_date) {
-          return {
-            props: {
-              colSpan: 0,
-              rowSpan: 0,
-            },
-          };
-        } else {
-          return <Text>{text}</Text>;
-        }
-      },
+      render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Participants',
       key: 'participants',
       dataIndex: 'participants',
       width: '10%',
-      render: (text, record) => {
-        if (record.is_date) {
-          return {
-            props: {
-              colSpan: 0,
-              rowSpan: 0,
-            },
-          };
-        } else {
-          return (
-            <Text>
-              {record.participants || 0} / {record.max_participants}
-            </Text>
-          );
-        }
-      },
+      render: (text, record) =>
+        renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
     },
     {
       title: 'Actions',
       width: isPast ? '10%' : '25%',
       render: (text, record) => {
         if (record.is_date) {
-          return {
-            props: {
-              colSpan: 0,
-              rowSpan: 0,
-            },
-          };
+          return emptyTableCell;
         }
 
         const isDisabled = record.participants > 0;
@@ -313,13 +269,11 @@ const SessionsInventories = ({ match }) => {
       title: '',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => {
-        return (
-          <Text strong className={styles.textAlignLeft}>
-            {moment(text).format('dddd[,] D MMMM YYYY')}
-          </Text>
-        );
-      },
+      render: (text, record) => (
+        <Text strong className={styles.textAlignLeft}>
+          {toLongDateWithLongDay(text)}
+        </Text>
+      ),
     },
   ];
 
@@ -328,10 +282,10 @@ const SessionsInventories = ({ match }) => {
 
     const layout = (label, value) => (
       <Row>
-        <Col span={9}>
+        <Col span={8}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={15}>: {value}</Col>
+        <Col span={16}>: {value}</Col>
       </Row>
     );
 
@@ -378,7 +332,6 @@ const SessionsInventories = ({ match }) => {
       >
         {layout('Type', <Text>{item.type}</Text>)}
         {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Day', <Text>{item.days}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
         {layout(
           isPast ? 'Registrations' : 'Attendees',
