@@ -12,6 +12,7 @@ const formatDate = {
   toShortMonth: (date) => moment(date).format('MMM'),
   toDate: (date) => moment(date).format('DD'),
   toLongDateWithDay: (date) => moment(date).format('ddd, DD MMM YYYY'),
+  toLongDateWithLongDay: (date) => moment(date).format('dddd, D MMMM YYYY'),
   toLongDateWithTime: (date) => moment(date).format('lll'),
   toLongDateWithDayTime: (date) => moment(date).format('llll'),
   toUtcStartOfDay: (date) => moment(date).utc().startOf('day').format(),
