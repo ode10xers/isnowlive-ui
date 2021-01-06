@@ -113,8 +113,17 @@ const ManageSessions = () => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '15%',
-      render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
+      width: '12%',
+      render: (record) => {
+        return {
+          props: {
+            style: {
+              borderLeft: `6px solid ${record.color_code || '#fff'}`,
+            },
+          },
+          children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+        };
+      },
     },
     {
       title: 'Type',
@@ -205,6 +214,7 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
+            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
             onClick={() =>
               trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
                 beginning: item.beginning,

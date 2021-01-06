@@ -28,7 +28,7 @@ const SessionsInventories = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
-  const [view, setView] = useState('calendar');
+  const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
 
   const getStaffSession = useCallback(async (sessionType) => {
@@ -321,8 +321,8 @@ const SessionsInventories = ({ match }) => {
     <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
       <Radio.Group value={view} onChange={handleViewChange}>
-        <Radio.Button value="calendar">Calendar</Radio.Button>
         <Radio.Button value="list">List</Radio.Button>
+        <Radio.Button value="calendar">Calendar</Radio.Button>
       </Radio.Group>
       {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
