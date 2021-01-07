@@ -234,7 +234,7 @@ const SessionReschedule = () => {
                 cancelText="No"
                 onConfirm={() => handleSessionReschedule(record)}
               >
-                <Button type="link" className={styles.detailsButton} onClick={() => handleSessionReschedule(record)}>
+                <Button type="link" className={styles.detailsButton}>
                   Reschedule
                 </Button>
               </Popconfirm>

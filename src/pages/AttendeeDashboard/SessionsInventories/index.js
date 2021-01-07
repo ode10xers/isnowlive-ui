@@ -209,9 +209,6 @@ const SessionsInventories = ({ match }) => {
       price: data.price,
     };
 
-    console.log(data);
-    console.log(passedData);
-
     window.open(`${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`);
   };
 
