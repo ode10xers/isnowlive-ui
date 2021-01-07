@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
-import { Row, Col, Typography, Button, Image, Space, Popconfirm, Card, message } from 'antd';
+import { useLocation } from 'react-router-dom';
+import { Row, Col, Typography, Button, Image, Space, Popconfirm, Card, Modal, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -34,6 +34,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
+//TODO: Add MixPanel Tracking later
 const SessionReschedule = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -42,12 +43,15 @@ const SessionReschedule = () => {
   const [profile, setProfile] = useState({});
   const [availableSessions, setAvailableSessions] = useState([]);
 
-  const history = useHistory();
   const location = useLocation();
   const { inventory_id = null, order_id = null, price = -1 } = parseQueryString(location.search);
   const username = window.location.hostname.split('.')[0];
 
-  const returnToPublicPage = () => history.push(Routes.root);
+  const openSessionInventoryDetails = (item) => {
+    if (item.username && item.inventory_id) {
+      window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
+    }
+  };
 
   const getProfileDetails = useCallback(async () => {
     setIsLoading(true);
@@ -89,10 +93,12 @@ const SessionReschedule = () => {
         }));
 
         const isNotCurrentInventory = (session) => parseInt(session.inventory_id) !== parseInt(inventory_id);
+        const isNotFull = (session) => session.participants < session.max_participants;
 
         let filterByDateSessions = [];
         unfilteredSessions
           .filter(isNotCurrentInventory) // Filter out current session
+          .filter(isNotFull)
           .forEach((session) => {
             const foundIndex = filterByDateSessions.findIndex(
               (val) => val.start_time === toLocaleDate(session.start_time)
@@ -132,7 +138,15 @@ const SessionReschedule = () => {
 
       if (data) {
         message.success('Session rescheduled successfully');
-        setTimeout(() => returnToPublicPage(), 3000);
+        Modal.success({
+          centered: true,
+          closable: true,
+          maskClosable: true,
+          title: 'Reschedule Success',
+          onOk: () => {
+            window.location.href = `${generateUrlFromUsername('app')}${Routes.attendeeDashboard.rootPath}`;
+          },
+        });
       }
     } catch (error) {
       message.error(error.message || 'Failed to reschedule session');
@@ -211,14 +225,6 @@ const SessionReschedule = () => {
         ),
     },
     {
-      title: 'Participants',
-      key: 'participants',
-      dataIndex: 'participants',
-      width: '12%',
-      render: (text, record) =>
-        renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
-    },
-    {
       title: 'Actions',
       width: '13%',
       render: (text, record) => {
@@ -273,9 +279,7 @@ const SessionReschedule = () => {
       <Card
         className={styles.card}
         title={
-          <div
-          // onClick={() => openSessionInventoryDetails(item)}
-          >
+          <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
           </div>
         }
@@ -293,12 +297,6 @@ const SessionReschedule = () => {
         {layout('Type', <Text>{item.type}</Text>)}
         {layout('Duration', <Text>{item.duration}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
-        {layout(
-          'Participants',
-          <Text>
-            {item.participants || 0} {'/'} {item.max_participants}
-          </Text>
-        )}
       </Card>
     );
   };
