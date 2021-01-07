@@ -11,6 +11,7 @@ const Routes = {
   session: '/creator/session',
   sessionDetails: '/e/:inventory_id',
   sessionUpdate: '/creator/session/:id/edit',
+  sessionReschedule: '/e/:inventory_id/reschedule',
   profilePreview: '/profile/preview',
   stripeAccountValidate: '/stripe/account/validate',
   stripePaymentSuccess: '/stripe/payment/success',

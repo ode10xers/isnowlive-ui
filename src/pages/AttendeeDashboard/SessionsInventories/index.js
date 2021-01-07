@@ -201,6 +201,10 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
+  const rescheduleSession = (data) => {
+    window.open(`${generateUrlFromUsername(data.username)}/e/${data.inventory_id}/reschedule`);
+  };
+
   let sessionColumns = [
     {
       title: 'Session Name',
@@ -246,7 +250,7 @@ const SessionsInventories = ({ match }) => {
           </Row>
         ) : (
           <Row justify="start">
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={5}>
               <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
@@ -254,13 +258,18 @@ const SessionsInventories = ({ match }) => {
 
             {!isPast && (
               <>
-                <Col md={24} lg={24} xl={8}>
+                <Col md={24} lg={24} xl={5}>
                   <Button type="link" disabled={!record.join_url} onClick={() => trackAndJoinSession(record)}>
                     Join
                   </Button>
                 </Col>
-                <Col md={24} lg={24} xl={8}>
+                <Col md={24} lg={24} xl={5}>
                   {renderRefundPopup(record)}
+                </Col>
+                <Col md={24} lg={24} xl={5}>
+                  <Button type="link" onClick={() => rescheduleSession(record)}>
+                    Reschedule
+                  </Button>
                 </Col>
               </>
             )}
@@ -288,9 +297,6 @@ const SessionsInventories = ({ match }) => {
           </div>
         }
         actions={[
-          <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
-            Details
-          </Button>,
           <>
             {!isPast && (
               <Button type="link" disabled={!item.join_url} onClick={() => trackAndJoinSession(item)}>
@@ -299,6 +305,9 @@ const SessionsInventories = ({ match }) => {
             )}
           </>,
           <>{!isPast && renderRefundPopup(item)}</>,
+          <Button type="link" onClick={() => rescheduleSession(item)}>
+            Reschedule
+          </Button>,
         ]}
       >
         {layout('Type', <Text>{item.type}</Text>)}
@@ -341,13 +350,19 @@ const SessionsInventories = ({ match }) => {
       ) : (
         <>
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
-              {sessions.length > 0 ? (
-                sessions.map(renderSessionItem)
-              ) : (
-                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
-              )}
-            </Loader>
+            <>
+              <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
+                {' '}
+                Click on the card to show session details{' '}
+              </Text>
+              <Loader loading={isLoading} size="large" text="Loading sessions">
+                {sessions.length > 0 ? (
+                  sessions.map(renderSessionItem)
+                ) : (
+                  <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                )}
+              </Loader>
+            </>
           ) : (
             <Table columns={sessionColumns} data={sessions} loading={isLoading} />
           )}

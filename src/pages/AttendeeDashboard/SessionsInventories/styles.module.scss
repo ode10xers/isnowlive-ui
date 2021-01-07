@@ -6,3 +6,6 @@
 .danger {
   color: map-get($colors, $key: 'FireBrick');
 }
+.helperText {
+  display: block;
+}
