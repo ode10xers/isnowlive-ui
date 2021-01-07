@@ -291,7 +291,7 @@ const Session = ({ match, history }) => {
   const handleSlotDelete = (value) => {
     let tempDeleteSlots = deleteSlot;
     tempDeleteSlots.push(value);
-    tempDeleteSlots = tempDeleteSlots.filter((item, index) => tempDeleteSlots.indexOf(item) === index);
+    tempDeleteSlots = [...new Set(tempDeleteSlots)];
     setDeleteSlot(tempDeleteSlots);
   };
 
@@ -343,12 +343,32 @@ const Session = ({ match, history }) => {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
         if (session.session_id) {
-          await apis.session.update(session.session_id, data);
-          trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
-          message.success('Session successfully updated.');
-          const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
-          const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
-          getSessionDetails(match.params.id, startDate, endDate);
+          const updatedSessionResponse = await apis.session.update(session.session_id, data);
+          if (isAPISuccess(updatedSessionResponse.status)) {
+            trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
+            message.success('Session successfully updated.');
+
+            Modal.confirm({
+              icon: <CheckCircleOutlined />,
+              title: `${data.name} session successfully upadted`,
+              className: styles.confirmModal,
+              okText: 'Done',
+              cancelText: 'Add New',
+              onCancel: () => {
+                trackSimpleEvent(eventTagObject.addNewInModal);
+                const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
+                const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
+                getSessionDetails(match.params.id, startDate, endDate);
+                window.location.reload();
+                window.scrollTo(0, 0);
+              },
+              onOk: () => {
+                trackSimpleEvent(eventTagObject.doneInModal);
+                history.push(`${Routes.creatorDashboard.rootPath}/${Routes.creatorDashboard.createSessions}`);
+                window.scrollTo(0, 0);
+              },
+            });
+          }
         } else {
           const newSessionResponse = await apis.session.create(data);
 
