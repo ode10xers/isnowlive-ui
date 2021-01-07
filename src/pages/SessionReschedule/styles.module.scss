@@ -1,2 +1,107 @@
 @import '../../styles/variables.scss';
 
+.imageWrapper {
+  position: relative;
+  max-height: 300px;
+  margin-bottom: 10%;
+  margin-top: 50px;
+}
+
+.coverImageWrapper {
+  background-color: map-get($colors, $key: 'WhiteSmoke');
+  text-align: center;
+  border-radius: 8px;
+  margin: -20px;
+}
+.coverImage img {
+  border-radius: 8px;
+  max-height: 300px;
+}
+
+.profileImage {
+  position: relative;
+  border-radius: 4px;
+  width: 100%;
+}
+.profileImage img {
+  border: 2px solid map-get($colors, $key: 'White');
+  max-width: 120px;
+  border-radius: 4px;
+}
+
+.timeText {
+  display: block;
+}
+.userName {
+  position: absolute;
+  bottom: -15px;
+  left: 140px;
+}
+.shareButton {
+  position: absolute;
+  bottom: 0px;
+  right: 45px;
+}
+.socialIcon {
+  font-size: 24px;
+  margin: 5px;
+}
+
+.detailsButton {
+  padding-left: 0px !important;
+}
+.card {
+  margin-top: 10px !important;
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-height: 100%;
+    margin: 10px !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
+  }
+  .imageWrapper {
+    position: relative;
+    max-height: 300px;
+    margin-bottom: 20px;
+    margin-top: 50px;
+  }
+  .profileImage {
+    border-radius: 4px;
+    bottom: 20px;
+    width: 100%;
+    left: 0px;
+  }
+  .profileImage img {
+    max-width: 70px;
+    border: 2px solid map-get($colors, $key: 'White');
+    border-radius: 4px;
+  }
+  .userName {
+    position: absolute;
+    bottom: -15px;
+    left: 75px;
+  }
+  .shareButton {
+    position: absolute;
+    bottom: 0px;
+    right: -15px;
+  }
+}
+@media (min-width: 768px) and (max-width: 1400px) {
+  .imageWrapper {
+    margin-bottom: 0px;
+  }
+}
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  background: map-get($colors, $key: 'White1');
+}
+::-webkit-scrollbar-thumb {
+  background-color: map-get($colors, $key: 'WhiteSmoke1');
+  border-radius: 20px;
+  border: 3px solid map-get($colors, $key: 'White');
+}

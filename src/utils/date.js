@@ -21,6 +21,7 @@ const formatDate = {
 };
 
 const timeCalculation = {
+  isBeforeDate: (date) => moment().isBefore(moment(date)),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
 };
 

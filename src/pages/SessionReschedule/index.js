@@ -10,7 +10,6 @@ import {
   UpCircleOutlined,
   DownCircleOutlined,
 } from '@ant-design/icons';
-import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
@@ -43,7 +42,6 @@ const SessionReschedule = () => {
 
   const { inventory_id } = useParams();
   const username = window.location.hostname.split('.')[0];
-  console.log(username);
 
   const getProfileDetails = useCallback(async () => {
     setIsLoading(true);
@@ -77,28 +75,18 @@ const SessionReschedule = () => {
           time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
           start_time: i?.start_time,
           end_time: i?.end_time,
-          participants: i.num_participants,
-          join_url: i.join_url,
-          inventory_id: i?.inventory_id,
+          participants: i.total_bookings,
+          inventory_id: i.inventory_id,
           session_id: i.session_id,
-          order_id: i.order_id,
           max_participants: i.max_participants,
-          username: i.creator_username,
           currency: i.currency || 'SGD',
-          refund_amount: i.refund_amount || 0,
-          is_refundable: i.is_refundable || false,
-          refund_before_hours: i.refund_before_hours || 24,
         }));
 
-        const isNotCurrentInventory = (session) => session.inventory_id !== inventory_id;
-        const haveSlot = (session) => session.participants < session.max_participants;
-        const isNotFinished = (session) => moment().isBefore(moment(session.end_time));
+        const isNotCurrentInventory = (session) => parseInt(session.inventory_id) !== parseInt(inventory_id);
 
         let filterByDateSessions = [];
         unfilteredSessions
-          .filter(isNotCurrentInventory)
-          .filter(haveSlot)
-          .filter(isNotFinished)
+          .filter(isNotCurrentInventory) // Filter out current session
           .forEach((session) => {
             const foundIndex = filterByDateSessions.findIndex(
               (val) => val.start_time === toLocaleDate(session.start_time)
@@ -116,7 +104,6 @@ const SessionReschedule = () => {
             }
           });
 
-        console.log(filterByDateSessions);
         setAvailableSessions(filterByDateSessions);
         setIsSessionLoading(false);
       }
@@ -150,7 +137,7 @@ const SessionReschedule = () => {
       title: 'Session Name',
       dataIndex: 'name',
       key: 'name',
-      width: '25%',
+      width: '30%',
       render: (text, record) => {
         if (record.is_date) {
           return {
@@ -179,34 +166,34 @@ const SessionReschedule = () => {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
-      width: '15%',
+      width: '10%',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      width: '15%',
+      width: '25%',
       render: (text, record) =>
         renderSimpleTableCell(
           record.is_date,
           <>
-            <Text> {text} </Text>
+            <Text className={styles.timeText}> {text} </Text>
             <Text type="secondary"> {getCurrentLongTimezone()} </Text>
           </>
         ),
     },
     {
-      title: 'Available Slots',
+      title: 'Participants',
       key: 'participants',
       dataIndex: 'participants',
-      width: '10%',
+      width: '12%',
       render: (text, record) =>
         renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
     },
     {
       title: 'Actions',
-      width: '25%',
+      width: '13%',
       render: (text, record) => {
         if (record.is_date) {
           return emptyTableCell;
@@ -280,7 +267,7 @@ const SessionReschedule = () => {
         {layout('Duration', <Text>{item.duration}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
         {layout(
-          'Available Slots',
+          'Participants',
           <Text>
             {item.participants || 0} {'/'} {item.max_participants}
           </Text>
@@ -362,7 +349,7 @@ const SessionReschedule = () => {
       </div>
 
       <Row className={styles.mt50}>
-        <Col span={24}>
+        <Col span={24} className={styles.mb20}>
           <Title level={isMobileDevice ? 4 : 2}>Available Sessions</Title>
           <Text type="primary" strong>
             All event times shown below are in your local time zone ({getCurrentLongTimezone()})

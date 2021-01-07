@@ -80,7 +80,6 @@ function App() {
       }
     };
     const authToken = getAuthCookie();
-    console.log(authToken);
     if (authToken && authToken !== '') {
       getUserDetails();
     } else {
