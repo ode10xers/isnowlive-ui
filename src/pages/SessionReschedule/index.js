@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { Row, Col, Typography, Button, Image, Space, Popconfirm, Card, message } from 'antd';
 import {
   GlobalOutlined,
@@ -13,6 +13,7 @@ import {
 import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
@@ -22,6 +23,7 @@ import DefaultImage from 'components/Icons/DefaultImage/index';
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
 import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import parseQueryString from 'utils/parseQueryString';
 
 import styles from './styles.module.scss';
 
@@ -40,8 +42,12 @@ const SessionReschedule = () => {
   const [profile, setProfile] = useState({});
   const [availableSessions, setAvailableSessions] = useState([]);
 
-  const { inventory_id } = useParams();
+  const history = useHistory();
+  const location = useLocation();
+  const { inventory_id = null, order_id = null, price = -1 } = parseQueryString(location.search);
   const username = window.location.hostname.split('.')[0];
+
+  const returnToPublicPage = () => history.push(Routes.root);
 
   const getProfileDetails = useCallback(async () => {
     setIsLoading(true);
@@ -54,21 +60,21 @@ const SessionReschedule = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      message.error(error.message || 'Failed to load profile details');
       setIsLoading(false);
     }
   }, [username]);
 
-  const getSessionDetails = useCallback(async () => {
+  const getAvailableSessions = useCallback(async () => {
     setIsSessionLoading(true);
     try {
-      const { data } = await apis.user.getSessionsByUsername(username, 'upcoming');
+      const { data } = await apis.session.getRescheduleableSessionsByPrice(username, parseInt(price));
       if (data) {
         const unfilteredSessions = data.map((i, index) => ({
           index,
           key: i.inventory_id,
           name: i.name,
-          type: i.max_participants > 1 ? 'Group' : '1-on-1',
+          type: i.group ? 'Group' : '1-on-1',
           duration: getDuration(i.start_time, i.end_time),
           days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
           session_date: i?.session_date,
@@ -109,19 +115,39 @@ const SessionReschedule = () => {
       }
     } catch (error) {
       setIsSessionLoading(false);
-      message.error('Failed to load user session details');
+      message.error(error.message || 'Failed to load user session details');
     }
-  }, [inventory_id, username]);
+  }, [inventory_id, username, price]);
 
-  const handleSessionReschedule = (data) => {
-    console.log(data);
-    //TODO: Fire API here
+  const handleSessionReschedule = async (newInventory) => {
+    setIsLoading(true);
+
+    const payload = {
+      inventory_id: newInventory.inventory_id,
+    };
+
+    try {
+      const { data } = await apis.session.rescheduleSession(order_id, payload);
+
+      if (data) {
+        message.success('Session rescheduled successfully');
+        setTimeout(() => returnToPublicPage(), 3000);
+      }
+    } catch (error) {
+      message.error(error.message || 'Failed to reschedule session');
+    }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    getProfileDetails();
-    getSessionDetails();
-  }, [getProfileDetails, getSessionDetails]);
+    if (!inventory_id || !order_id || price < 0) {
+      message.error('Invalid Search Params');
+    } else {
+      getProfileDetails();
+      getAvailableSessions();
+    }
+  }, [getProfileDetails, getAvailableSessions, inventory_id, order_id, price]);
 
   const emptyTableCell = {
     props: {
@@ -259,7 +285,7 @@ const SessionReschedule = () => {
             cancelText="No"
             onConfirm={() => handleSessionReschedule(item)}
           >
-            <Button type="text">Reschedule</Button>
+            <Button type="link">Reschedule</Button>
           </Popconfirm>,
         ]}
       >

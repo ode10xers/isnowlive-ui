@@ -7,7 +7,7 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import { getDuration, generateUrlFromUsername, generateQueryString } from 'utils/helper';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -57,6 +57,7 @@ const SessionsInventories = ({ match }) => {
             order_id: i.order_id,
             max_participants: i.max_participants,
             username: i.creator_username,
+            price: i.price,
             currency: i.currency || 'SGD',
             refund_amount: i.refund_amount || 0,
             is_refundable: i.is_refundable || false,
@@ -202,7 +203,16 @@ const SessionsInventories = ({ match }) => {
   };
 
   const rescheduleSession = (data) => {
-    window.open(`${generateUrlFromUsername(data.username)}/e/${data.inventory_id}/reschedule`);
+    const passedData = {
+      inventory_id: data.inventory_id,
+      order_id: data.order_id,
+      price: data.price,
+    };
+
+    console.log(data);
+    console.log(passedData);
+
+    window.open(`${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`);
   };
 
   let sessionColumns = [
