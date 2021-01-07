@@ -30,7 +30,7 @@ import styles from './styles.module.scss';
 const { Title, Text } = Typography;
 
 const {
-  formatDate: { toLongDateWithDay, toLocaleTime, toLocaleDate, toLongDateWithLongDay },
+  formatDate: { toLongDateWithDay, toLocaleTime, toLocaleDate, toLongDateWithLongDay, getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
@@ -110,6 +110,7 @@ const SessionReschedule = () => {
             }
           });
 
+        filterByDateSessions.sort((a, b) => getTimeDiff(a.name, b.name, 'seconds'));
         setAvailableSessions(filterByDateSessions);
         setIsSessionLoading(false);
       }
