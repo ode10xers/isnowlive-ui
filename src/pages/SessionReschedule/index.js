@@ -23,7 +23,6 @@ import DefaultImage from 'components/Icons/DefaultImage/index';
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
 import { getDuration, generateUrlFromUsername } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
 
@@ -34,7 +33,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
-const SessionReschedule = ({ username = null }) => {
+const SessionReschedule = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
@@ -43,11 +42,13 @@ const SessionReschedule = ({ username = null }) => {
   const [availableSessions, setAvailableSessions] = useState([]);
 
   const { inventory_id } = useParams();
+  const username = window.location.hostname.split('.')[0];
+  console.log(username);
 
   const getProfileDetails = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { data } = await apis.user.getProfileByUsername(username);
       if (data) {
         setProfile(data);
         setCoverImage(data.cover_image_url);
@@ -63,13 +64,7 @@ const SessionReschedule = ({ username = null }) => {
   const getSessionDetails = useCallback(async () => {
     setIsSessionLoading(true);
     try {
-      let profileUsername = '';
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-      const { data } = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
+      const { data } = await apis.user.getSessionsByUsername(username, 'upcoming');
       if (data) {
         const unfilteredSessions = data.map((i, index) => ({
           index,
@@ -129,7 +124,7 @@ const SessionReschedule = ({ username = null }) => {
       setIsSessionLoading(false);
       message.error('Failed to load user session details');
     }
-  }, [username, inventory_id]);
+  }, [inventory_id, username]);
 
   const handleSessionReschedule = (data) => {
     console.log(data);
