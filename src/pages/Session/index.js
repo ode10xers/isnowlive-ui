@@ -292,7 +292,6 @@ const Session = ({ match, history }) => {
     let tempDeleteSlots = deleteSlot;
     tempDeleteSlots.push(value);
     tempDeleteSlots = [...new Set(tempDeleteSlots)];
-    console.log(tempDeleteSlots);
     setDeleteSlot(tempDeleteSlots);
   };
 

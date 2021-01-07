@@ -36,7 +36,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   useEffect(() => {
     if (sessionSlots && sessionSlots.length) {
-      setDate(moment(sessionSlots[0].start_time));
+      const sortedSessionSlots = sessionSlots.sort((a, b) =>
+        a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
+      );
+      setDate(moment(sortedSessionSlots[0].start_time));
     } else {
       if (recurring && recurringDatesRange && recurringDatesRange.length) {
         setDate(moment(recurringDatesRange[0]));
