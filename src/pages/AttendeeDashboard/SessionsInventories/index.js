@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, Popconfirm, message, Popover, Radio, Empty } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover, Radio, Empty } from 'antd';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
@@ -77,25 +77,13 @@ const SessionsInventories = ({ match }) => {
       setSessions([]);
       setIsLoading(true);
 
-      let monitorRefundPolling = null;
-
       if (match?.params?.session_type === 'past') {
         setIsPast(true);
       } else {
         setIsPast(false);
-
-        //Set polling to dynamically adjust Refund/Cancel Popup
-        monitorRefundPolling = setInterval(() => {
-          getStaffSession(match?.params?.session_type);
-        }, 5000);
       }
+
       getStaffSession(match?.params?.session_type);
-
-      if (monitorRefundPolling) {
-        return () => {
-          clearInterval(monitorRefundPolling);
-        };
-      }
     }
   }, [match.params.session_type, getStaffSession]);
 
@@ -127,13 +115,20 @@ const SessionsInventories = ({ match }) => {
     try {
       await apis.session.cancelCustomerOrder(orderId, { reason: 'requested_by_customer' });
       trackSuccessEvent(attendee.click.sessions.cancelOrder, { order_id: orderId });
-      message.success('Refund Successful');
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      Modal.success({
+        closable: true,
+        maskClosable: true,
+        title: 'Refund Successful',
+      });
+      getStaffSession(match?.params?.session_type);
     } catch (error) {
       trackFailedEvent(attendee.click.sessions.cancelOrder, error, { order_id: orderId });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      Modal.error({
+        closable: true,
+        maskClosable: true,
+        title: 'An Error Occured',
+        content: error.response?.data?.message || 'Something went wrong.',
+      });
     }
   };
 
@@ -155,7 +150,10 @@ const SessionsInventories = ({ match }) => {
             okText="Yes, Refund Session"
             cancelText="No"
           >
-            <Button type="link"> Cancel </Button>
+            <Button type="text" danger>
+              {' '}
+              Cancel{' '}
+            </Button>
           </Popconfirm>
         );
       } else {
@@ -178,7 +176,10 @@ const SessionsInventories = ({ match }) => {
               </Text>
             }
           >
-            <Button type="link"> Cancel </Button>
+            <Button type="text" danger>
+              {' '}
+              Cancel{' '}
+            </Button>
           </Popover>
         );
       }
@@ -196,7 +197,10 @@ const SessionsInventories = ({ match }) => {
             </Text>
           }
         >
-          <Button type="link"> Cancel </Button>
+          <Button type="text" danger>
+            {' '}
+            Cancel{' '}
+          </Button>
         </Popover>
       );
     }
@@ -250,35 +254,42 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
+              <Button type="text" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
           </Row>
         ) : (
           <Row justify="start">
-            <Col md={24} lg={24} xl={5}>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
-                Details
-              </Button>
-            </Col>
-
             {!isPast && (
               <>
                 <Col md={24} lg={24} xl={5}>
-                  <Button type="link" disabled={!record.join_url} onClick={() => trackAndJoinSession(record)}>
+                  <Button
+                    type="text"
+                    className={styles.success}
+                    disabled={!record.join_url}
+                    onClick={() => trackAndJoinSession(record)}
+                  >
                     Join
                   </Button>
                 </Col>
                 <Col md={24} lg={24} xl={5}>
                   {renderRefundPopup(record)}
                 </Col>
-                <Col md={24} lg={24} xl={5}>
-                  <Button type="link" onClick={() => rescheduleSession(record)}>
-                    Reschedule
-                  </Button>
-                </Col>
               </>
+            )}
+            <Col md={24} lg={24} xl={5}>
+              <Button type="link" onClick={() => openSessionInventoryDetails(record)}>
+                Details
+              </Button>
+            </Col>
+
+            {!isPast && (
+              <Col md={24} lg={24} xl={5}>
+                <Button type="text" className={styles.warning} onClick={() => rescheduleSession(record)}>
+                  Reschedule
+                </Button>
+              </Col>
             )}
           </Row>
         );
@@ -306,21 +317,28 @@ const SessionsInventories = ({ match }) => {
         actions={[
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.join_url} onClick={() => trackAndJoinSession(item)}>
+              <Button
+                type="text"
+                disabled={!item.join_url}
+                onClick={() => trackAndJoinSession(item)}
+                className={styles.success}
+              >
                 Join
               </Button>
             )}
           </>,
           <>{!isPast && renderRefundPopup(item)}</>,
-          <Button type="link" onClick={() => rescheduleSession(item)}>
+          <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
             Reschedule
           </Button>,
         ]}
       >
-        {layout('Type', <Text>{item.type}</Text>)}
-        {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Day', <Text>{item.days}</Text>)}
-        {layout('Time', <Text>{item.time}</Text>)}
+        <div onClick={() => openSessionInventoryDetails(item)}>
+          {layout('Type', <Text>{item.type}</Text>)}
+          {layout('Duration', <Text>{item.duration}</Text>)}
+          {layout('Day', <Text>{item.days}</Text>)}
+          {layout('Time', <Text>{item.time}</Text>)}
+        </div>
       </Card>
     );
   };

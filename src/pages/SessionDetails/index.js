@@ -252,19 +252,23 @@ const SessionDetails = ({ match, history }) => {
               </div>
             </>
           )}
-          <Title level={5} className={styles.mt50}>
-            Session Prerequisite
-          </Title>
-          {showPrerequisite ? (
-            <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
-          ) : (
+          {session?.prerequisites && (
             <>
-              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
-                {ReactHtmlParser(session?.prerequisites)}
-              </Paragraph>
-              <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
-                Read More
-              </div>
+              <Title level={5} className={styles.mt50}>
+                Session Prerequisite
+              </Title>
+              {showPrerequisite ? (
+                <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
+              ) : (
+                <>
+                  <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                    {ReactHtmlParser(session?.prerequisites)}
+                  </Paragraph>
+                  <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
+                    Read More
+                  </div>
+                </>
+              )}
             </>
           )}
         </Col>

@@ -27,6 +27,8 @@ const {
 const { Text, Title } = Typography;
 const { creator } = mixPanelEventTags;
 
+const whiteColor = '#FFFFFF';
+
 const SessionsInventories = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
@@ -170,7 +172,7 @@ const SessionsInventories = ({ match }) => {
           return {
             props: {
               style: {
-                borderLeft: `6px solid ${record.color_code || '#fff'}`,
+                borderLeft: `6px solid ${record.color_code || whiteColor}`,
               },
             },
             children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
@@ -294,7 +296,7 @@ const SessionsInventories = ({ match }) => {
         className={styles.card}
         title={
           <div
-            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
+            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
             <Text>{item.name}</Text>

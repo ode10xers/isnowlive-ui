@@ -34,6 +34,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
+const whiteColor = '#FFFFFF';
 //TODO: Add MixPanel Tracking later
 const SessionReschedule = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -137,12 +138,11 @@ const SessionReschedule = () => {
       const { data } = await apis.session.rescheduleSession(order_id, payload);
 
       if (data) {
-        message.success('Session rescheduled successfully');
         Modal.success({
           centered: true,
           closable: true,
           maskClosable: true,
-          title: 'Reschedule Success',
+          title: 'Session Successfully Rescheduled',
           onOk: () => {
             window.location.href = `${generateUrlFromUsername('app')}${Routes.attendeeDashboard.rootPath}`;
           },
@@ -192,7 +192,14 @@ const SessionReschedule = () => {
             ),
           };
         } else {
-          return <Text className={styles.textAlignLeft}>{record.name}</Text>;
+          return {
+            props: {
+              style: {
+                borderLeft: `6px solid ${record.color_code || whiteColor}`,
+              },
+            },
+            children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+          };
         }
       },
     },
@@ -278,8 +285,9 @@ const SessionReschedule = () => {
     return (
       <Card
         className={styles.card}
+        onClick={() => openSessionInventoryDetails(item)}
         title={
-          <div onClick={() => openSessionInventoryDetails(item)}>
+          <div style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}>
             <Text>{item.name}</Text>
           </div>
         }
