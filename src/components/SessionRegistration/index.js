@@ -43,7 +43,7 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
         </Col>
         <Col xs={24} md={24}>
           <Text>
-            <a href="https://zoom.us/download"> Zoom </a> details to join will be sent with the email and are always
+            <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are always
             available in your
             <a href={`${generateUrlFromUsername('app')}${Routes.attendeeDashboard.defaultPath}`}> dashboard </a>.
           </Text>

@@ -114,7 +114,7 @@ function App() {
         <RouteWithLayout layout={DefaultLayout} path={Routes.emailVerification} component={EmailVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
-        <Route path={Route.stripeAccountValidate}>
+        <Route path={Routes.stripeAccountValidate}>
           <Redirect
             to={{
               pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
