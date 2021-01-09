@@ -10,11 +10,11 @@ import LiveStream from 'pages/LiveStream';
 const AttendeeDashboard = ({ match }) => {
   return (
     <Switch>
-      <Route exact path={match.url + Routes.creatorDashboard.sessions} component={SessionsInventories} />
-      <Route exact path={match.url + Routes.creatorDashboard.profile} component={ProfilePreview} />
-      <Route exact path={match.url + Routes.creatorDashboard.editProfile} component={Profile} />
-      <Route exact path={match.url + Routes.creatorDashboard.livestream} component={LiveStream} />
-      <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
+      <Route exact path={match.url + Routes.attendeeDashboard.sessions} component={SessionsInventories} />
+      <Route exact path={match.url + Routes.attendeeDashboard.profile} component={ProfilePreview} />
+      <Route exact path={match.url + Routes.attendeeDashboard.editProfile} component={Profile} />
+      <Route exact path={match.url + Routes.attendeeDashboard.livestream} component={LiveStream} />
+      <Redirect to={match.url + Routes.attendeeDashboard.defaultPath} />
     </Switch>
   );
 };

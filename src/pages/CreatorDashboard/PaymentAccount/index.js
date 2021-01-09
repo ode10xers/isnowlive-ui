@@ -125,7 +125,7 @@ const PaymentAccount = () => {
           <Col xs={24} md={12}>
             <Paragraph>
               We use Stripe as our payment processor. Stripe lets you accept credit/debit cards, Apple, Google and
-              Micorsoft Pay. All charges will show up immediately in your account. You don't need an existing Stripe
+              Microsoft Pay. All charges will show up immediately in your account. You don't need an existing Stripe
               account to connect.
             </Paragraph>
           </Col>

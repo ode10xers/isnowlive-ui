@@ -5,6 +5,12 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+export const generateQueryString = (data) => {
+  return Object.entries(data)
+    .map(([key, val]) => `${key}=${val}`)
+    .join('&');
+};
+
 const appendScript = (src, charset) => {
   const script = document.createElement('script');
   script.src = src;

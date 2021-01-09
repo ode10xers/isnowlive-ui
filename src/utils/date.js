@@ -15,12 +15,13 @@ const formatDate = {
   toLongDateWithLongDay: (date) => moment(date).format('dddd, D MMMM YYYY'),
   toLongDateWithTime: (date) => moment(date).format('lll'),
   toLongDateWithDayTime: (date) => moment(date).format('llll'),
-  toUtcStartOfDay: (date) => moment(date).utc().startOf('day').format(),
-  toUtcEndOfDay: (date) => moment(date).utc().endOf('day').format(),
+  toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
+  toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
 };
 
 const timeCalculation = {
+  isBeforeDate: (date) => moment().isBefore(moment(date)),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
 };
 
