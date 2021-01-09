@@ -25,6 +25,7 @@ import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
 import PaymentVerification from 'pages/PaymentVerification';
+import SessionReschedule from 'pages/SessionReschedule';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -102,6 +103,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
@@ -112,7 +114,7 @@ function App() {
         <RouteWithLayout layout={DefaultLayout} path={Routes.emailVerification} component={EmailVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
-        <Route path={Route.stripeAccountValidate}>
+        <Route path={Routes.stripeAccountValidate}>
           <Redirect
             to={{
               pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,

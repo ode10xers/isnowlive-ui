@@ -299,7 +299,6 @@ const ProfilePreview = ({ username = null }) => {
         </Row>
 
         {/* =====TESTIMONIALS======== */}
-
         {profile && profile?.profile?.testimonials ? (
           <Row className={styles.mt50}>
             <Col span={24}>
@@ -322,4 +321,5 @@ const ProfilePreview = ({ username = null }) => {
     </Loader>
   );
 };
+
 export default ProfilePreview;

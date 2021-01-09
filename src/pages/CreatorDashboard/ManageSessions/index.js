@@ -113,7 +113,7 @@ const ManageSessions = () => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '12%',
+      width: '20%',
       render: (record) => {
         return {
           props: {
@@ -126,17 +126,29 @@ const ManageSessions = () => {
       },
     },
     {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      width: '10%',
+      render: (text, record) => (
+        <Text>
+          {' '}
+          {record.price} {record.currency}{' '}
+        </Text>
+      ),
+    },
+    {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '5%',
+      width: '10%',
       render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
     },
     {
       title: 'Session Date',
       dataIndex: 'session_date',
       key: 'session_date',
-      width: '15%',
+      width: '20%',
       render: (text, record) => (
         <>
           {record.recurring ? (
