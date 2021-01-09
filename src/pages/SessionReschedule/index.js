@@ -18,7 +18,7 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import Share from 'components/Share';
-import DefaultImage from 'components/Icons/DefaultImage/index';
+import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
@@ -398,7 +398,7 @@ const SessionReschedule = () => {
                   loading={isLoading}
                   rowKey={(record) => record.start_time}
                   expandable={{
-                    expandedRowRender: (record) => <> {record.children.map(renderSessionItem)} </>,
+                    expandedRowRender: (record) => record.children.map(renderSessionItem),
                     expandRowByClick: true,
                     expandIcon: ({ expanded, onExpand, record }) =>
                       expanded ? (

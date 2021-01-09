@@ -151,8 +151,7 @@ const SessionsInventories = ({ match }) => {
             cancelText="No"
           >
             <Button type="text" danger>
-              {' '}
-              Cancel{' '}
+              Cancel
             </Button>
           </Popconfirm>
         );
@@ -168,17 +167,15 @@ const SessionsInventories = ({ match }) => {
                 Sorry, as per the cancellation policy of <br />
                 this session,
                 <strong>
-                  {' '}
                   it can only be cancelled <br />
-                  {data.refund_before_hours} hours{' '}
+                  {data.refund_before_hours} hours
                 </strong>
                 before the session starts.
               </Text>
             }
           >
             <Button type="text" danger>
-              {' '}
-              Cancel{' '}
+              Cancel
             </Button>
           </Popover>
         );
@@ -198,8 +195,7 @@ const SessionsInventories = ({ match }) => {
           }
         >
           <Button type="text" danger>
-            {' '}
-            Cancel{' '}
+            Cancel
           </Button>
         </Popover>
       );
@@ -360,7 +356,6 @@ const SessionsInventories = ({ match }) => {
       </Radio.Group>
       {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
-          {' '}
           {sessions.length > 0 ? (
             <CalendarView
               inventories={sessions}
@@ -377,8 +372,7 @@ const SessionsInventories = ({ match }) => {
           {isMobileDevice ? (
             <>
               <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                {' '}
-                Click on the card to show session details{' '}
+                Click on the card to show session details
               </Text>
               <Loader loading={isLoading} size="large" text="Loading sessions">
                 {sessions.length > 0 ? (
