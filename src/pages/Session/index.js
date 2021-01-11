@@ -48,7 +48,7 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -276,11 +276,6 @@ const Session = ({ match, history }) => {
     return current && current < moment().startOf('day');
   };
 
-  const handleRecurringDatesRange = (value) => {
-    setRecurringDatesRanges(value);
-    form.setFieldsValue({ ...form.getFieldsValue(), recurring_dates_range: value });
-  };
-
   const handleSlotsChange = (inventory) => {
     setSession({
       ...session,
@@ -293,6 +288,35 @@ const Session = ({ match, history }) => {
     tempDeleteSlots.push(value);
     tempDeleteSlots = [...new Set(tempDeleteSlots)];
     setDeleteSlot(tempDeleteSlots);
+  };
+
+  const handleRecurringDatesRange = (value) => {
+    setRecurringDatesRanges(value);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      recurring_dates_range: value,
+    });
+
+    // For Repeating Sessions, if date range changes remove the inventories which are out of range
+    if (value?.length && session?.inventory?.length) {
+      const newSlots = [];
+
+      for (let i = 0; i < session.inventory.length; i++) {
+        const slot = session.inventory[i];
+        if (
+          (getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
+            getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0) ||
+          (slot.num_participants !== 0 && slot.num_participants !== undefined)
+        ) {
+          newSlots.push(slot);
+        } else {
+          if (slot.inventory_id) {
+            handleSlotDelete(slot.inventory_id);
+          }
+        }
+      }
+      handleSlotsChange(newSlots);
+    }
   };
 
   const handleRefundBeforeHoursChange = (e) => {
@@ -670,8 +694,9 @@ const Session = ({ match, history }) => {
               />
             </Form.Item>
           )}
+
           <Scheduler
-            sessionSlots={session?.inventory || []}
+            sessionSlots={session?.inventory?.length ? session.inventory : []}
             recurring={isSessionRecurring}
             recurringDatesRange={recurringDatesRanges}
             handleSlotsChange={handleSlotsChange}
