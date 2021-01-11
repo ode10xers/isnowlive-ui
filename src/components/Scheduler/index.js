@@ -47,6 +47,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         setDate(moment(selectedDate));
       }
     }
+    if (sessionSlots.length !== slots.length) {
+      setSlots(sessionSlots);
+    }
     // eslint-disable-next-line
   }, [recurring, recurringDatesRange, sessionSlots]);
 
