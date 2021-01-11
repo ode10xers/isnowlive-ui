@@ -244,7 +244,7 @@ const SessionDetails = ({ match, history }) => {
             <Paragraph type="secondary"> {ReactHtmlParser(session?.description)}</Paragraph>
           ) : (
             <>
-              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+              <Paragraph type="secondary" className={styles.sessionDesc} ellipsis={{ rows: 5 }}>
                 {ReactHtmlParser(session?.description)}
               </Paragraph>
               <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
@@ -261,7 +261,7 @@ const SessionDetails = ({ match, history }) => {
                 <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
               ) : (
                 <>
-                  <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                  <Paragraph type="secondary" className={styles.sessionPrereq} ellipsis={{ rows: 5 }}>
                     {ReactHtmlParser(session?.prerequisites)}
                   </Paragraph>
                   <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
