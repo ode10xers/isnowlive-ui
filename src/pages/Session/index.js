@@ -48,7 +48,7 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate, toLongDateWithDay },
   timeCalculation: { createPreviousWeekRange, getRangeDiff, createRange },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
@@ -291,12 +291,46 @@ const Session = ({ match, history }) => {
     setDeleteSlot(tempDeleteSlots);
   };
 
-  const handleRecurringDatesRange = (value) => {
+  const handleDateRangeChange = (value) => {
     const oldDateRange = form.getFieldsValue().recurring_dates_range;
     const newDateRange = value;
     let rangeDiff = [];
 
     if (oldDateRange && newDateRange) {
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
+    if (rangeDiff.length > 0) {
+      Modal.confirm({
+        centered: true,
+        closable: true,
+        mask: true,
+        maskClosable: true,
+        autoFocusButton: 'cancel',
+        title: 'Update Session Schedule?',
+        okText: `Copy until ${toLongDateWithDay(newDateRange[1])}`,
+        cancelText: 'Leave it as is',
+        content: (
+          <Text>
+            You have changed the date range, would you like us to copy the sessions currently on the calender to this
+            date range?
+          </Text>
+        ),
+        onOk: () => handleRecurringDatesRange(value, true),
+        onCancel: () => handleRecurringDatesRange(value, false),
+        afterClose: () => handleRecurringDatesRange(value, false),
+      });
+    } else {
+      handleRecurringDatesRange(value, false);
+    }
+  };
+
+  const handleRecurringDatesRange = (value, updateInventoriesForNewDate) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+
+    if (updateInventoriesForNewDate && oldDateRange && newDateRange) {
       rangeDiff = getRangeDiff(oldDateRange, newDateRange);
     }
 
@@ -326,7 +360,7 @@ const Session = ({ match, history }) => {
       }
 
       //Add new inventories here if the date range extends to the future
-      if (rangeDiff.length > 0) {
+      if (updateInventoriesForNewDate && rangeDiff.length > 0) {
         const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
 
         const lastInventory = session.inventory[session.inventory.length - 1];
@@ -350,7 +384,6 @@ const Session = ({ match, history }) => {
                 .startOf('day')
                 .format();
               const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
-
               const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
 
               newSlots.push({
@@ -409,7 +442,6 @@ const Session = ({ match, history }) => {
 
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
-        //TODO: Also manipulate filter here
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
         );
@@ -739,7 +771,7 @@ const Session = ({ match, history }) => {
                 className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
                 disabledDate={disabledDate}
-                onChange={handleRecurringDatesRange}
+                onChange={handleDateRangeChange}
                 onFocus={handleCalenderPop}
               />
             </Form.Item>
