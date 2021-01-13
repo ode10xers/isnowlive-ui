@@ -18,6 +18,7 @@
     "mixpanel-browser": "^2.40.0",
     "mobile-detect": "^1.4.4",
     "moment": "^2.29.0",
+    "moment-range": "^4.0.2",
     "node-sass": "^4.14.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",

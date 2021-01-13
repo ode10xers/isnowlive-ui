@@ -49,6 +49,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
+  timeCalculation: { createWeekRange, getRangeDiff, createRange },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -290,7 +291,54 @@ const Session = ({ match, history }) => {
     setDeleteSlot(tempDeleteSlots);
   };
 
-  const handleRecurringDatesRange = (value) => {
+  const handleDateRangeChange = (value) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+
+    if (oldDateRange && newDateRange) {
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
+    if (rangeDiff.length > 0) {
+      Modal.confirm({
+        centered: true,
+        closable: true,
+        mask: true,
+        maskClosable: true,
+        autoFocusButton: 'cancel',
+        title: 'Update Session Schedule?',
+        okText: `Copy on new dates`,
+        cancelText: 'Leave it as is',
+        content: (
+          <Text>
+            You have changed the date range, would you like us to copy the sessions currently on the calender to this
+            date range?
+          </Text>
+        ),
+        onOk: () => handleRecurringDatesRange(value, true),
+        onCancel: () => handleRecurringDatesRange(value, false),
+        afterClose: () => handleRecurringDatesRange(value, false),
+      });
+    } else {
+      handleRecurringDatesRange(value, false);
+    }
+  };
+
+  const handleRecurringDatesRange = (value, updateInventoriesForNewDate) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+    let takeLastWeek = true;
+
+    if (updateInventoriesForNewDate && oldDateRange && newDateRange) {
+      if (oldDateRange[1].isSame(newDateRange[1])) {
+        takeLastWeek = false;
+      }
+
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
     setRecurringDatesRanges(value);
     form.setFieldsValue({
       ...form.getFieldsValue(),
@@ -304,9 +352,8 @@ const Session = ({ match, history }) => {
       for (let i = 0; i < session.inventory.length; i++) {
         const slot = session.inventory[i];
         if (
-          (getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
-            getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0) ||
-          (slot.num_participants !== 0 && slot.num_participants !== undefined)
+          getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
+          getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0
         ) {
           newSlots.push(slot);
         } else {
@@ -315,6 +362,46 @@ const Session = ({ match, history }) => {
           }
         }
       }
+
+      //Add new inventories here if the date range extends to the future
+      if (updateInventoriesForNewDate && rangeDiff.length > 0) {
+        const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
+
+        const referenceInventory = session.inventory[takeLastWeek ? session.inventory.length - 1 : 0];
+        const copiedRange = createWeekRange(referenceInventory.start_time, takeLastWeek);
+
+        const copiedInventories = session.inventory.filter(
+          (inventory) => inventory.num_participants === 0 && moment(inventory.start_time).within(copiedRange)
+        );
+
+        Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
+          if (extraDay.within(oldRange)) {
+            return;
+          }
+
+          copiedInventories.forEach((inventory) => {
+            const invStartMoment = moment(inventory.start_time);
+            const invEndMoment = moment(inventory.end_time);
+            if (extraDay.day() === invStartMoment.day()) {
+              const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
+
+              const session_date = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()])
+                .startOf('day')
+                .format();
+              const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
+              const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
+
+              newSlots.push({
+                num_participants: 0,
+                session_date: session_date,
+                start_time: start_time,
+                end_time: end_time,
+              });
+            }
+          });
+        });
+      }
+
       handleSlotsChange(newSlots);
     }
   };
@@ -354,8 +441,8 @@ const Session = ({ match, history }) => {
         color_code: colorCode,
       };
       if (isSessionRecurring) {
-        data.beginning = moment(values.recurring_dates_range[0]).utc().format();
-        data.expiry = moment(values.recurring_dates_range[1]).utc().format();
+        data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
+        data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
       }
 
       if (session?.inventory?.length) {
@@ -689,7 +776,7 @@ const Session = ({ match, history }) => {
                 className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
                 disabledDate={disabledDate}
-                onChange={handleRecurringDatesRange}
+                onChange={handleDateRangeChange}
                 onFocus={handleCalenderPop}
               />
             </Form.Item>
