@@ -48,8 +48,8 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate, toLongDateWithDay },
-  timeCalculation: { createPreviousWeekRange, getRangeDiff, createRange },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
+  timeCalculation: { createWeekRange, getRangeDiff, createRange },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -308,7 +308,7 @@ const Session = ({ match, history }) => {
         maskClosable: true,
         autoFocusButton: 'cancel',
         title: 'Update Session Schedule?',
-        okText: `Copy until ${toLongDateWithDay(newDateRange[1])}`,
+        okText: `Copy on new dates`,
         cancelText: 'Leave it as is',
         content: (
           <Text>
@@ -329,8 +329,13 @@ const Session = ({ match, history }) => {
     const oldDateRange = form.getFieldsValue().recurring_dates_range;
     const newDateRange = value;
     let rangeDiff = [];
+    let takeLastWeek = true;
 
     if (updateInventoriesForNewDate && oldDateRange && newDateRange) {
+      if (oldDateRange[1].isSame(newDateRange[1])) {
+        takeLastWeek = false;
+      }
+
       rangeDiff = getRangeDiff(oldDateRange, newDateRange);
     }
 
@@ -363,18 +368,23 @@ const Session = ({ match, history }) => {
       if (updateInventoriesForNewDate && rangeDiff.length > 0) {
         const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
 
-        const lastInventory = session.inventory[session.inventory.length - 1];
-        const lastWeekRange = createPreviousWeekRange(lastInventory.start_time);
-        const lastWeekInventories = session.inventory.filter((inventory) =>
-          moment(inventory.start_time).within(lastWeekRange)
+        const referenceInventory = session.inventory[takeLastWeek ? session.inventory.length - 1 : 0];
+        const copiedRange = createWeekRange(referenceInventory.start_time, takeLastWeek);
+
+        console.log(copiedRange);
+
+        const copiedInventories = session.inventory.filter((inventory) =>
+          moment(inventory.start_time).within(copiedRange)
         );
+
+        console.log(copiedInventories);
 
         Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
           if (extraDay.within(oldRange)) {
             return;
           }
 
-          lastWeekInventories.forEach((inventory) => {
+          copiedInventories.forEach((inventory) => {
             const invStartMoment = moment(inventory.start_time);
             const invEndMoment = moment(inventory.end_time);
             if (extraDay.day() === invStartMoment.day()) {

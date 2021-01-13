@@ -28,7 +28,8 @@ const timeCalculation = {
   isBeforeDate: (date) => moment().isBefore(moment(date)),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
   createRange: (startTime, endTime) => moment.range(startTime, endTime).snapTo('day'),
-  createPreviousWeekRange: (date) => moment.rangeFromInterval('day', -6, moment(date).endOf('day')).snapTo('day'),
+  createWeekRange: (date, isPrevious) =>
+    moment.rangeFromInterval('day', isPrevious ? -6 : 6, moment(date).endOf('day')).snapTo('day'),
   getRangeDiff: (rangeA, rangeB) =>
     moment.range(rangeB[0], rangeB[1]).snapTo('day').subtract(moment.range(rangeA[0], rangeA[1]).snapTo('day')),
 };
