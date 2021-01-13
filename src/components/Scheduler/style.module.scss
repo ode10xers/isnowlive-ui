@@ -6,7 +6,9 @@
   overflow: hidden;
   white-space: nowrap;
   margin: 0px;
-  padding: 0px;
+  padding: 0px !important;
+  color: map-get($map: $colors, $key: 'Razzmatazz') !important;
+  font-size: 12px;
 }
 .notesMonth {
   text-align: center;

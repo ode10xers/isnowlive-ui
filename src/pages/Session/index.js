@@ -296,8 +296,12 @@ const Session = ({ match, history }) => {
       ...form.getFieldsValue(),
       recurring_dates_range: value,
     });
+    console.log(value);
+    console.log(form.getFieldsValue());
 
     // For Repeating Sessions, if date range changes remove the inventories which are out of range
+    //TODO: Create new slots here
+
     if (value?.length && session?.inventory?.length) {
       const newSlots = [];
 
@@ -354,12 +358,13 @@ const Session = ({ match, history }) => {
         color_code: colorCode,
       };
       if (isSessionRecurring) {
-        data.beginning = moment(values.recurring_dates_range[0]).utc().format();
-        data.expiry = moment(values.recurring_dates_range[1]).utc().format();
+        data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
+        data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
       }
 
       if (session?.inventory?.length) {
         let allInventoryList = convertSchedulesToUTC(session.inventory);
+        //TODO: Also manipulate filter here
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
         );
