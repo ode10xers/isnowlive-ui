@@ -49,7 +49,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
-  timeCalculation: { createPreviousWeekRange, getRangeDiff },
+  timeCalculation: { createPreviousWeekRange, getRangeDiff, createRange },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -327,20 +327,28 @@ const Session = ({ match, history }) => {
 
       //Add new inventories here if the date range extends to the future
       if (rangeDiff.length > 0) {
+        const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
+
         const lastInventory = session.inventory[session.inventory.length - 1];
         const lastWeekRange = createPreviousWeekRange(lastInventory.start_time);
         const lastWeekInventories = session.inventory.filter((inventory) =>
           moment(inventory.start_time).within(lastWeekRange)
         );
 
-        Array.from(rangeDiff[0].by('day')).forEach((extraDay) => {
+        Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
+          if (extraDay.within(oldRange)) {
+            return;
+          }
+
           lastWeekInventories.forEach((inventory) => {
             const invStartMoment = moment(inventory.start_time);
             const invEndMoment = moment(inventory.start_time);
             if (extraDay.day() === invStartMoment.day()) {
               const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
 
-              const session_date = moment(createdDate).format();
+              const session_date = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()])
+                .startOf('day')
+                .format();
               const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
 
               const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
