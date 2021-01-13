@@ -342,7 +342,7 @@ const Session = ({ match, history }) => {
 
           lastWeekInventories.forEach((inventory) => {
             const invStartMoment = moment(inventory.start_time);
-            const invEndMoment = moment(inventory.start_time);
+            const invEndMoment = moment(inventory.end_time);
             if (extraDay.day() === invStartMoment.day()) {
               const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
 
