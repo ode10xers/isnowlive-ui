@@ -49,6 +49,7 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
   formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
+  timeCalculation: { createPreviousWeekRange, getRangeDiff },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -291,17 +292,21 @@ const Session = ({ match, history }) => {
   };
 
   const handleRecurringDatesRange = (value) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+
+    if (oldDateRange && newDateRange) {
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
     setRecurringDatesRanges(value);
     form.setFieldsValue({
       ...form.getFieldsValue(),
       recurring_dates_range: value,
     });
-    console.log(value);
-    console.log(form.getFieldsValue());
 
     // For Repeating Sessions, if date range changes remove the inventories which are out of range
-    //TODO: Create new slots here
-
     if (value?.length && session?.inventory?.length) {
       const newSlots = [];
 
@@ -319,6 +324,38 @@ const Session = ({ match, history }) => {
           }
         }
       }
+
+      //Add new inventories here if the date range extends to the future
+      if (rangeDiff.length > 0) {
+        const lastInventory = session.inventory[session.inventory.length - 1];
+        const lastWeekRange = createPreviousWeekRange(lastInventory.start_time);
+        const lastWeekInventories = session.inventory.filter((inventory) =>
+          moment(inventory.start_time).within(lastWeekRange)
+        );
+
+        Array.from(rangeDiff[0].by('day')).forEach((extraDay) => {
+          lastWeekInventories.forEach((inventory) => {
+            const invStartMoment = moment(inventory.start_time);
+            const invEndMoment = moment(inventory.start_time);
+            if (extraDay.day() === invStartMoment.day()) {
+              const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
+
+              const session_date = moment(createdDate).format();
+              const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
+
+              const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
+
+              newSlots.push({
+                num_participants: 0,
+                session_date: session_date,
+                start_time: start_time,
+                end_time: end_time,
+              });
+            }
+          });
+        });
+      }
+
       handleSlotsChange(newSlots);
     }
   };
