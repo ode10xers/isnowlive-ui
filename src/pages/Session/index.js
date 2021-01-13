@@ -352,9 +352,8 @@ const Session = ({ match, history }) => {
       for (let i = 0; i < session.inventory.length; i++) {
         const slot = session.inventory[i];
         if (
-          (getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
-            getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0) ||
-          (slot.num_participants !== 0 && slot.num_participants !== undefined)
+          getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
+          getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0
         ) {
           newSlots.push(slot);
         } else {
@@ -371,13 +370,9 @@ const Session = ({ match, history }) => {
         const referenceInventory = session.inventory[takeLastWeek ? session.inventory.length - 1 : 0];
         const copiedRange = createWeekRange(referenceInventory.start_time, takeLastWeek);
 
-        console.log(copiedRange);
-
-        const copiedInventories = session.inventory.filter((inventory) =>
-          moment(inventory.start_time).within(copiedRange)
+        const copiedInventories = session.inventory.filter(
+          (inventory) => inventory.num_participants === 0 && moment(inventory.start_time).within(copiedRange)
         );
-
-        console.log(copiedInventories);
 
         Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
           if (extraDay.within(oldRange)) {
