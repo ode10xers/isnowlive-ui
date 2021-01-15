@@ -135,6 +135,13 @@ const Session = ({ match, history }) => {
       try {
         const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
         if (data) {
+          // The session_date gets messed up here, so trying to fix it here
+          if (data.inventory.length > 0) {
+            data.inventory = data.inventory.map((inventory) => ({
+              ...inventory,
+              session_date: inventory.start_time,
+            }));
+          }
           setSession(data);
           form.setFieldsValue({
             ...data,
@@ -326,7 +333,6 @@ const Session = ({ match, history }) => {
   };
 
   const handleRecurringDatesRange = (value, updateInventoriesForNewDate) => {
-    console.log('Called');
     const oldDateRange = form.getFieldsValue().recurring_dates_range;
     const newDateRange = value;
     let rangeDiff = [];
@@ -386,10 +392,8 @@ const Session = ({ match, history }) => {
             if (extraDay.day() === invStartMoment.day()) {
               const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
 
-              const session_date = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()])
-                .startOf('day')
-                .format();
               const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
+              const session_date = start_time;
               const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
 
               newSlots.push({
@@ -449,6 +453,7 @@ const Session = ({ match, history }) => {
       if (session?.inventory?.length) {
         // Set proper beginning and expiry date for one time sessions
         if (!isSessionRecurring) {
+          console.log('Should get called here');
           data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
           data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
         }
@@ -468,7 +473,7 @@ const Session = ({ match, history }) => {
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${data.name} session successfully upadted`,
+              title: `${data.name} session successfully updated`,
               className: styles.confirmModal,
               okText: 'Done',
               cancelText: 'Add New',
