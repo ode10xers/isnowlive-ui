@@ -20,7 +20,7 @@ import {
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLongDateWithDay },
+  formatDate: { toLongDateWithDay, toUtcEndOfDay, toUtcStartOfDay },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { creator } = mixPanelEventTags;
@@ -157,7 +157,7 @@ const ManageSessions = () => {
             </Text>
           ) : (
             <Text>
-              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.session_date)}
+              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.start_time)}
             </Text>
           )}
         </>
@@ -174,8 +174,8 @@ const ManageSessions = () => {
                 className={styles.detailsButton}
                 onClick={() =>
                   trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
-                    beginning: record.beginning,
-                    expiry: record.expiry,
+                    beginning: record.recurring ? record.beginning : toUtcStartOfDay(record.inventory[0].start_time),
+                    expiry: record.recurring ? record.expiry : toUtcEndOfDay(record.inventory[0].start_time),
                   })
                 }
                 type="link"

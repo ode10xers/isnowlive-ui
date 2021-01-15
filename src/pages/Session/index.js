@@ -159,7 +159,16 @@ const Session = ({ match, history }) => {
           setIsSessionRecurring(data?.recurring);
           setSessionRefundable(data?.is_refundable);
           setRefundBeforeHours(data?.refund_before_hours || 0);
-          setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
+          setRecurringDatesRanges(
+            data?.recurring
+              ? [moment(data?.beginning), moment(data?.expiry)]
+              : data?.inventory?.length
+              ? [
+                  moment(data?.inventory[0].start_time).startOf('day').utc(),
+                  moment(data?.inventory[0].start_time).endOf('day').utc(),
+                ]
+              : []
+          );
           setColorCode(data?.color_code || whiteColor);
           setIsLoading(false);
           await getCreatorStripeDetails(data);
@@ -183,10 +192,10 @@ const Session = ({ match, history }) => {
     }
     if (match.params.id) {
       const startDate = location.state.beginning
-        ? toUtcStartOfDay(moment(location.state.beginning))
+        ? toUtcStartOfDay(location.state.beginning)
         : toUtcStartOfDay(moment().subtract(1, 'month'));
       const endDate = location.state.expiry
-        ? toUtcEndOfDay(moment(location.state.expiry))
+        ? toUtcEndOfDay(location.state.expiry)
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
@@ -277,6 +286,8 @@ const Session = ({ match, history }) => {
     } else {
       setIsSessionRecurring(false);
     }
+
+    // TODO: Prepare Modal Here
     setRecurringDatesRanges([]);
   };
 
@@ -609,7 +620,7 @@ const Session = ({ match, history }) => {
             name="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="  Please input description" />
+            <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
