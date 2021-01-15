@@ -326,6 +326,7 @@ const Session = ({ match, history }) => {
   };
 
   const handleRecurringDatesRange = (value, updateInventoriesForNewDate) => {
+    console.log('Called');
     const oldDateRange = form.getFieldsValue().recurring_dates_range;
     const newDateRange = value;
     let rangeDiff = [];
@@ -446,6 +447,12 @@ const Session = ({ match, history }) => {
       }
 
       if (session?.inventory?.length) {
+        // Set proper beginning and expiry date for one time sessions
+        if (!isSessionRecurring) {
+          data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
+          data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
+        }
+
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
