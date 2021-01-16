@@ -73,11 +73,15 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
               <>
                 <Item
                   extra={
-                    <Text disabled>
-                      If you have booked a session with us earlier but haven't set your password, please use the{' '}
-                      <a href onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                    <Text className={styles.passwordHelpText}>
+                      You have booked a session with us earlier, but if you haven't set your password, please use the{' '}
+                      <Button
+                        className={styles.linkButton}
+                        type="link"
+                        onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                      >
                         set new password
-                      </a>{' '}
+                      </Button>{' '}
                       option below{' '}
                     </Text>
                   }
@@ -99,9 +103,13 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
 
             {showPasswordField && (
               <Item {...sessionRegistrationTailLayout}>
-                <a href onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                <Button
+                  className={styles.linkButton}
+                  type="link"
+                  onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                >
                   Set a new password
-                </a>
+                </Button>
               </Item>
             )}
           </Form>
