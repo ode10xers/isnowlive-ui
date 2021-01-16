@@ -20,7 +20,7 @@ import {
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLongDateWithDay, toUtcEndOfDay, toUtcStartOfDay },
+  formatDate: { toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { creator } = mixPanelEventTags;
@@ -174,8 +174,8 @@ const ManageSessions = () => {
                 className={styles.detailsButton}
                 onClick={() =>
                   trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
-                    beginning: record.recurring ? record.beginning : toUtcStartOfDay(record.inventory[0].start_time),
-                    expiry: record.recurring ? record.expiry : toUtcEndOfDay(record.inventory[0].start_time),
+                    beginning: record.beginning,
+                    expiry: record.expiry,
                   })
                 }
                 type="link"

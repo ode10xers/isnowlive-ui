@@ -159,16 +159,7 @@ const Session = ({ match, history }) => {
           setIsSessionRecurring(data?.recurring);
           setSessionRefundable(data?.is_refundable);
           setRefundBeforeHours(data?.refund_before_hours || 0);
-          setRecurringDatesRanges(
-            data?.recurring
-              ? [moment(data?.beginning), moment(data?.expiry)]
-              : data?.inventory?.length
-              ? [
-                  moment(data?.inventory[0].start_time).startOf('day').utc(),
-                  moment(data?.inventory[0].start_time).endOf('day').utc(),
-                ]
-              : []
-          );
+          setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setColorCode(data?.color_code || whiteColor);
           setIsLoading(false);
           await getCreatorStripeDetails(data);
@@ -280,15 +271,41 @@ const Session = ({ match, history }) => {
     }
   };
 
-  const handleSessionRecurrance = (e) => {
-    if (e.target.value === 'true') {
-      setIsSessionRecurring(true);
-    } else {
-      setIsSessionRecurring(false);
-    }
-
-    // TODO: Prepare Modal Here
+  const changeSessionRecurrance = (isRecurring) => {
+    setIsSessionRecurring(isRecurring);
     setRecurringDatesRanges([]);
+  };
+
+  const handleSessionRecurrance = (e) => {
+    const isRecurring = e.target.value === 'true';
+
+    if (session.inventory.length > 0) {
+      Modal.confirm({
+        mask: true,
+        centered: true,
+        closable: true,
+        maskClosable: true,
+        title: 'Clear the sessions?',
+        content: <Text> Some sessions have been scheduled, would you like to clear them? </Text>,
+        okText: 'Yes, clear the sessions',
+        cancelText: 'No, retain the sessions',
+        onCancel: () => changeSessionRecurrance(isRecurring),
+        onOk: () => {
+          changeSessionRecurrance(isRecurring);
+          // Mark created inventories for deletion
+          session.inventory.forEach((inv) => {
+            if (inv.inventory_id) {
+              handleSlotDelete(inv.inventory_id);
+            }
+          });
+
+          // Set current state to empty array
+          setSession({ ...session, inventory: [] });
+        },
+      });
+    } else {
+      changeSessionRecurrance(isRecurring);
+    }
   };
 
   const disabledDate = (current) => {
