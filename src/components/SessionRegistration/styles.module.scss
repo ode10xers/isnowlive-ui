@@ -18,6 +18,12 @@
     max-width: 370px;
   }
 }
+.passwordHelpText {
+  color: map-get($colors, 'Charcoal')  !important;
+}
+.linkButton {
+  padding: 0px !important;
+}
 @media (max-width: 768px) {
   .nameInput {
     max-width: 100%;
