@@ -40,6 +40,7 @@ const TextEditor = ({ name, form, placeholder }) => {
 
   const handleChange = (e) => {
     let text = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    console.log(text);
     if (typeof name === 'string') {
       form.setFieldsValue({ ...form.getFieldsValue(), [name]: text });
     } else if (Array.isArray(name)) {

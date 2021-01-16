@@ -157,7 +157,7 @@ const ManageSessions = () => {
             </Text>
           ) : (
             <Text>
-              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.session_date)}
+              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.start_time)}
             </Text>
           )}
         </>
