@@ -184,6 +184,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         delete vs.inventory_id;
       }
 
+      if (moment(givenDate).isSame(moment(), 'day') && !moment(vs.start_time).isAfter(moment(), 'minute')) {
+        return;
+      }
+
       if (vs.start_time && vs.end_time) {
         let value = vs;
         let selected_date = moment(givenDate).format();
@@ -218,8 +222,8 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
     const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
-    let selected_date = toLocaleDate(recurringDatesRange ? moment(startDate).day(selectedDate.day()) : selectedDate);
-    // let selected_date = toLocaleDate(selectedDate);
+    const daysToBeAdded = moment(startDate).day() > selectedDate.day() ? selectedDate.day() + 7 : selectedDate.day();
+    let selected_date = toLocaleDate(recurringDatesRange ? moment(startDate).day(daysToBeAdded) : selectedDate);
     while (
       moment(selected_date).isBetween(startDate, endDate) ||
       moment(selected_date).isSame(startDate) ||
