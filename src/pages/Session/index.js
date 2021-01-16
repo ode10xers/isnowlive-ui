@@ -289,7 +289,7 @@ const Session = ({ match, history }) => {
         content: (
           <Text>
             You are switching from {isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'},
-            would you like to clear your existing session times marked on the calendar?
+            would you like to clear your existing session times marked on the calendar ?
           </Text>
         ),
         okText: 'Yes, clear sessions',
@@ -484,9 +484,7 @@ const Session = ({ match, history }) => {
       }
 
       if (session?.inventory?.length) {
-        // Set proper beginning and expiry date for one time sessions
         if (!isSessionRecurring) {
-          console.log('Should get called here');
           data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
           data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
         }
@@ -610,29 +608,42 @@ const Session = ({ match, history }) => {
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph className={styles.mt10} type="secondary">
             Setup the event you plan to host. Adding a name, session image and description for the attendees is
-            mandatory and you can also add pre-requisit or a document to make it more descriptive. Then select the days
+            mandatory and you can also add pre-requisite or a document to make it more descriptive. Then select the days
             and time you want to host this session.
           </Paragraph>
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form
+        form={form}
+        scrollToFirstError={true}
+        {...profileFormItemLayout}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
-          <div className={styles.imageWrapper}>
-            <ImageUpload
-              aspect={4}
-              className={classNames('avatar-uploader', styles.coverImage)}
-              name="session_image_url"
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              onChange={onSessionImageUpload}
-              value={sessionImageUrl}
-              label="Session Image"
-            />
-          </div>
+          <Form.Item
+            id="sessionImage"
+            name="sessionImage"
+            rules={[{ required: true, message: 'Please upload session Image!' }]}
+            wrapperCol={{ span: 24 }}
+          >
+            <div className={styles.imageWrapper}>
+              <ImageUpload
+                aspect={4}
+                className={classNames('avatar-uploader', styles.coverImage)}
+                name="session_image_url"
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                onChange={onSessionImageUpload}
+                value={sessionImageUrl}
+                label="Session Image"
+              />
+            </div>
+          </Form.Item>
 
-          <Form.Item label="Session Name" name="name" rules={validationRules.nameValidation}>
+          <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Enter Session Name" />
           </Form.Item>
 
@@ -640,6 +651,7 @@ const Session = ({ match, history }) => {
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
             label="Session Description"
             name="description"
+            id="description"
             rules={validationRules.requiredValidation}
           >
             <TextEditor name="description" form={form} placeholder="Please input description" />
@@ -674,6 +686,7 @@ const Session = ({ match, history }) => {
           <>
             <Form.Item
               name="type"
+              id="type"
               label="Session Type"
               rules={validationRules.requiredValidation}
               onChange={handleSessionType}
