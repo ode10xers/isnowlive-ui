@@ -70,9 +70,25 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
             </Item>
 
             {showPasswordField && (
-              <Item label="Password" name="password" rules={validationRules.passwordValidation} ref={passwordInput}>
-                <Password />
-              </Item>
+              <>
+                <Item
+                  extra={
+                    <Text disabled>
+                      If you have booked a session with us earlier but haven't set your password, please use the{' '}
+                      <a href onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                        set new password
+                      </a>{' '}
+                      option below{' '}
+                    </Text>
+                  }
+                  label="Password"
+                  name="password"
+                  rules={validationRules.passwordValidation}
+                  ref={passwordInput}
+                >
+                  <Password />
+                </Item>
+              </>
             )}
 
             <Item {...sessionRegistrationTailLayout}>

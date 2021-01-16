@@ -180,6 +180,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // create list of all new slots from form
     let newSlots = [];
     form.forEach((vs) => {
+      if (vs.inventory_id) {
+        delete vs.inventory_id;
+      }
+
       if (vs.start_time && vs.end_time) {
         let value = vs;
         let selected_date = moment(givenDate).format();
@@ -213,7 +217,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesAllSelectedDay = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
     let selected_date = toLocaleDate(selectedDate);
     while (
       moment(selected_date).isBetween(startDate, endDate) ||
@@ -229,7 +233,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesMultipleDays = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
     let selected_date = toLocaleDate(selectedDate);
 
     let slotdates = [];

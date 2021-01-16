@@ -135,6 +135,13 @@ const Session = ({ match, history }) => {
       try {
         const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
         if (data) {
+          // The session_date gets messed up here, so trying to fix it here
+          if (data.inventory.length > 0) {
+            data.inventory = data.inventory.map((inventory) => ({
+              ...inventory,
+              session_date: inventory.start_time,
+            }));
+          }
           setSession(data);
           form.setFieldsValue({
             ...data,
@@ -176,10 +183,10 @@ const Session = ({ match, history }) => {
     }
     if (match.params.id) {
       const startDate = location.state.beginning
-        ? toUtcStartOfDay(moment(location.state.beginning))
+        ? toUtcStartOfDay(location.state.beginning)
         : toUtcStartOfDay(moment().subtract(1, 'month'));
       const endDate = location.state.expiry
-        ? toUtcEndOfDay(moment(location.state.expiry))
+        ? toUtcEndOfDay(location.state.expiry)
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
@@ -264,13 +271,46 @@ const Session = ({ match, history }) => {
     }
   };
 
-  const handleSessionRecurrance = (e) => {
-    if (e.target.value === 'true') {
-      setIsSessionRecurring(true);
-    } else {
-      setIsSessionRecurring(false);
-    }
+  const changeSessionRecurrance = (isRecurring) => {
+    setIsSessionRecurring(isRecurring);
     setRecurringDatesRanges([]);
+  };
+
+  const handleSessionRecurrance = (e) => {
+    const isRecurring = e.target.value === 'true';
+
+    if (session.inventory.length > 0) {
+      Modal.confirm({
+        mask: true,
+        centered: true,
+        closable: true,
+        maskClosable: true,
+        title: 'Clear the sessions?',
+        content: (
+          <Text>
+            You are switching from {isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'},
+            would you like to clear your existing session times marked on the calendar?
+          </Text>
+        ),
+        okText: 'Yes, clear sessions',
+        cancelText: 'No, keep sessions',
+        onCancel: () => changeSessionRecurrance(isRecurring),
+        onOk: () => {
+          changeSessionRecurrance(isRecurring);
+          // Mark created inventories for deletion
+          session.inventory.forEach((inv) => {
+            if (inv.inventory_id) {
+              handleSlotDelete(inv.inventory_id);
+            }
+          });
+
+          // Set current state to empty array
+          setSession({ ...session, inventory: [] });
+        },
+      });
+    } else {
+      changeSessionRecurrance(isRecurring);
+    }
   };
 
   const disabledDate = (current) => {
@@ -385,10 +425,8 @@ const Session = ({ match, history }) => {
             if (extraDay.day() === invStartMoment.day()) {
               const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
 
-              const session_date = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()])
-                .startOf('day')
-                .format();
               const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
+              const session_date = start_time;
               const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
 
               newSlots.push({
@@ -446,6 +484,13 @@ const Session = ({ match, history }) => {
       }
 
       if (session?.inventory?.length) {
+        // Set proper beginning and expiry date for one time sessions
+        if (!isSessionRecurring) {
+          console.log('Should get called here');
+          data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
+          data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
+        }
+
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
@@ -461,7 +506,7 @@ const Session = ({ match, history }) => {
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${data.name} session successfully upadted`,
+              title: `${data.name} session successfully updated`,
               className: styles.confirmModal,
               okText: 'Done',
               cancelText: 'Add New',
@@ -597,7 +642,7 @@ const Session = ({ match, history }) => {
             name="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="  Please input description" />
+            <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
