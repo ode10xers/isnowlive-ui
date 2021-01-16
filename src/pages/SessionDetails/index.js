@@ -140,7 +140,7 @@ const SessionDetails = ({ match, history }) => {
             content: (
               <>
                 <Paragraph>
-                  We have sent you a confirmation email on {userEmail}. Look out for an email from{' '}
+                  We have sent you a confirmation email on <Text strong>{userEmail}</Text>. Look out for an email from{' '}
                   <Text strong> friends@passion.do. </Text>
                 </Paragraph>
                 <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -218,12 +218,12 @@ const SessionDetails = ({ match, history }) => {
           title: 'Set a new password',
           content: (
             <>
-              <Paragraph>We have sent you a link to setup your new password on your email {email}.</Paragraph>
               <Paragraph>
-                Didn't get it?{' '}
+                We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
+              </Paragraph>
+              <Paragraph>
                 <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
-                  {' '}
-                  Send again.{' '}
+                  Didn't get it? Send again.
                 </Button>
               </Paragraph>
             </>
