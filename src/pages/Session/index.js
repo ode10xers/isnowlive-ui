@@ -286,9 +286,14 @@ const Session = ({ match, history }) => {
         closable: true,
         maskClosable: true,
         title: 'Clear the sessions?',
-        content: <Text> Some sessions have been scheduled, would you like to clear them? </Text>,
-        okText: 'Yes, clear the sessions',
-        cancelText: 'No, retain the sessions',
+        content: (
+          <Text>
+            You are switching from {isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'},
+            would you like to clear your existing session times marked on the calendar?
+          </Text>
+        ),
+        okText: 'Yes, clear sessions',
+        cancelText: 'No, keep sessions',
         onCancel: () => changeSessionRecurrance(isRecurring),
         onOk: () => {
           changeSessionRecurrance(isRecurring);

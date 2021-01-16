@@ -217,7 +217,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesAllSelectedDay = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
     let selected_date = toLocaleDate(selectedDate);
     while (
       moment(selected_date).isBetween(startDate, endDate) ||
@@ -233,7 +233,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesMultipleDays = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
     let selected_date = toLocaleDate(selectedDate);
 
     let slotdates = [];
