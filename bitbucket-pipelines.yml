@@ -23,7 +23,7 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${PD_PROD_S3_BUCKET} --region ${PD_PROD_AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${PD_PROD_CLOUDFRONT_ID} --paths "/*"
-    develop:
+    feature/LIVE-138-zoom-oauth:
       - step:
           name: Build
           image: node:11
@@ -42,14 +42,14 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
-  pull-requests:
-    '**':
-      - step:
-          name: Build
-          image: node:11
-          caches:
-            - node
-            - npm
-          script:
-            - npm install --cache .npmcache
-            - npm run build
+  # pull-requests:
+  #   '**':
+  #     - step:
+  #         name: Build
+  #         image: node:11
+  #         caches:
+  #           - node
+  #           - npm
+  #         script:
+  #           - npm install --cache .npmcache
+  #           - npm run build
