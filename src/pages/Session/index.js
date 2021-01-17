@@ -420,14 +420,27 @@ const Session = ({ match, history }) => {
           }
 
           copiedInventories.forEach((inventory) => {
+            const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
             const invStartMoment = moment(inventory.start_time);
-            const invEndMoment = moment(inventory.end_time);
+
+            // Skip creating it if the newly copied inventory will exist in the past
+            if (
+              extraDay.isSameOrBefore(moment(), 'day') &&
+              moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).isSameOrBefore(
+                moment(),
+                'minute'
+              )
+            ) {
+              console.log('Past inventory will be created, skipping...');
+              return;
+            }
+
             if (extraDay.day() === invStartMoment.day()) {
-              const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
+              const invEndMoment = moment(inventory.end_time);
 
               const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
-              const session_date = start_time;
               const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
+              const session_date = start_time;
 
               newSlots.push({
                 num_participants: 0,
@@ -625,9 +638,9 @@ const Session = ({ match, history }) => {
         <Section>
           <Title level={4}>1. Primary Information</Title>
           <Form.Item
-            id="sessionImage"
-            name="sessionImage"
-            rules={[{ required: true, message: 'Please upload session Image!' }]}
+            id="session_image_url"
+            name="session_image_url"
+            rules={validationRules.requiredValidation}
             wrapperCol={{ span: 24 }}
           >
             <div className={styles.imageWrapper}>
