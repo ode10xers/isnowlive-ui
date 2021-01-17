@@ -184,6 +184,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         delete vs.inventory_id;
       }
 
+      if (moment(givenDate).isSame(moment(), 'day') && !moment(vs.start_time).isAfter(moment(), 'minute')) {
+        return;
+      }
+
       if (vs.start_time && vs.end_time) {
         let value = vs;
         let selected_date = moment(givenDate).format();
@@ -218,7 +222,8 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
     const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
-    let selected_date = toLocaleDate(selectedDate);
+    const daysToBeAdded = moment(startDate).day() > selectedDate.day() ? selectedDate.day() + 7 : selectedDate.day();
+    let selected_date = toLocaleDate(recurringDatesRange ? moment(startDate).day(daysToBeAdded) : selectedDate);
     while (
       moment(selected_date).isBetween(startDate, endDate) ||
       moment(selected_date).isSame(startDate) ||
@@ -234,7 +239,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
     const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
-    let selected_date = toLocaleDate(selectedDate);
+    let selected_date = recurringDatesRange ? startDate : toLocaleDate(selectedDate);
 
     let slotdates = [];
     while (
@@ -259,10 +264,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     switch (typeOfSessionCreation) {
       case 0:
         tempSlots = createOneTimeSchedule(selectedDate, slots);
+        setDayList(null);
         handleCancel();
         break;
       case 1:
         tempSlots = createSchedulesAllSelectedDay();
+        setDayList(null);
         handleCancel();
         break;
       case 2:
@@ -275,6 +282,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         break;
       default:
         createOneTimeSchedule(selectedDate, slots);
+        setDayList(null);
         break;
     }
     setSlots(tempSlots);
