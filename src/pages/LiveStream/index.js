@@ -100,7 +100,7 @@ const LiveStream = () => {
 
   const connectZoomAccount = () => {
     window.open(config.zoom.oAuthURL, '_self');
-  }
+  };
 
   const verifyZoomProfile = async (code) => {
     await apis.user.authZoom(code);
