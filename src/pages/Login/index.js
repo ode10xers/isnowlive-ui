@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Form, Input, Button, Row, Col, message } from 'antd';
+import { Form, Input, Button, Row, Col, message, Modal, Typography } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -11,6 +11,8 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+
 import http from 'services/http';
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
@@ -22,6 +24,7 @@ import styles from './style.module.scss';
 const { Item } = Form;
 const { Password } = Input;
 const { user } = mixPanelEventTags;
+const { Paragraph, Text } = Typography;
 
 const Login = ({ history }) => {
   const [loginForm] = Form.useForm();
@@ -70,17 +73,40 @@ const Login = ({ history }) => {
     }
   };
 
-  const sendNewPasswordEmail = async (values) => {
+  const sendNewPasswordEmail = async (values) => await apis.user.sendNewPasswordEmail(values);
+
+  const handleSendNewPasswordEmail = async (values) => {
     const eventTag = user.click.sendNewPasswordEmail;
 
     try {
       setIsLoading(true);
-      const { status } = await apis.user.sendNewPasswordEmail(values);
+      const { status } = await sendNewPasswordEmail(values);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag, { email: values.email });
 
         setIsLoading(false);
-        message.success('Email sent successfully.');
+        Modal.confirm({
+          mask: true,
+          center: true,
+          closable: true,
+          maskClosable: true,
+          title: 'Set a new password',
+          content: (
+            <>
+              <Paragraph>
+                We have sent you a link to setup your new password on your email <Text strong>{values.email}</Text>.
+              </Paragraph>
+              <Paragraph>
+                <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(values)}>
+                  Didn't get it? Send again.
+                </Button>
+              </Paragraph>
+            </>
+          ),
+          okText: 'Okay',
+          cancelText: 'Talk to us',
+          onCancel: () => openFreshChatWidget(),
+        });
       }
     } catch (error) {
       setIsLoading(false);
@@ -142,7 +168,7 @@ const Login = ({ history }) => {
           </Col>
         </Row>
 
-        <Form form={emailPasswordForm} {...formLayout} name="basic" onFinish={sendNewPasswordEmail}>
+        <Form form={emailPasswordForm} {...formLayout} name="basic" onFinish={handleSendNewPasswordEmail}>
           <Item label="Email" name="email" rules={validationRules.emailValidation}>
             <Input />
           </Item>

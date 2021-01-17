@@ -184,13 +184,28 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         delete vs.inventory_id;
       }
 
-      if (moment(givenDate).isSame(moment(), 'day') && !moment(vs.start_time).isAfter(moment(), 'minute')) {
+      const givenDateMoment = moment(givenDate);
+      const startTimeMoment = moment(vs.start_time);
+      const newInventoryTime = [
+        givenDateMoment.year(),
+        givenDateMoment.month(),
+        givenDateMoment.date(),
+        startTimeMoment.hour(),
+        startTimeMoment.minute(),
+      ];
+
+      // Skip creating it if the newly created inventory will exist in the past
+      if (
+        givenDateMoment.isSameOrBefore(moment(), 'day') &&
+        moment(newInventoryTime).isSameOrBefore(moment(), 'minute')
+      ) {
+        console.log('Past inventory will be created, skipping...');
         return;
       }
 
       if (vs.start_time && vs.end_time) {
         let value = vs;
-        let selected_date = moment(givenDate).format();
+        let selected_date = givenDateMoment.format();
         value.start_time = selected_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
         value.session_date = value.start_time;
