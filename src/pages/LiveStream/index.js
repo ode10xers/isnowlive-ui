@@ -54,11 +54,36 @@ const LiveStream = () => {
     }
   }, [form]);
 
+  const verifyZoomProfile = useCallback(
+    async (code) => {
+      try {
+        const { status } = await apis.user.authZoom(code);
+        if (isAPISuccess(status)) {
+          const localUserDetails = getLocalUserDetails();
+          localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
+          localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+          message.success('Zoom successfully setup!');
+          // setTimeout is used for better user experince suggest by Rahul
+          setTimeout(() => {
+            if (isOnboarding) {
+              history.push(Routes.session);
+            } else {
+              history.push(Routes.creatorDashboard.rootPath);
+            }
+          }, 2000);
+        }
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
+    },
+    [history, isOnboarding]
+  );
+
   useEffect(() => {
     if (code) {
       verifyZoomProfile(code);
     }
-  }, [code]);
+  }, [code, verifyZoomProfile]);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
@@ -102,28 +127,6 @@ const LiveStream = () => {
 
   const connectZoomAccount = () => {
     window.open(config.zoom.oAuthURL, '_self');
-  };
-
-  const verifyZoomProfile = async (code) => {
-    try {
-      const { status } = await apis.user.authZoom(code);
-      if (isAPISuccess(status)) {
-        const localUserDetails = getLocalUserDetails();
-        localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
-        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
-        message.success('Zoom successfully setup!');
-        // setTimeout is used for better user experince suggest by Rahul
-        setTimeout(() => {
-          if (isOnboarding) {
-            history.push(Routes.session);
-          } else {
-            history.push(Routes.creatorDashboard.rootPath);
-          }
-        }, 2000);
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
-    }
   };
 
   return (
