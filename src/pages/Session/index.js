@@ -281,19 +281,23 @@ const Session = ({ match, history }) => {
 
     if (session.inventory.length > 0) {
       Modal.confirm({
+        autoFocusButton: 'cancel',
         mask: true,
         centered: true,
         closable: true,
         maskClosable: true,
-        title: 'Clear the sessions?',
+        title: 'Keep Existing Slots?',
         content: (
-          <Text>
-            You are switching from {isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'},
-            would you like to clear your existing session times marked on the calendar ?
-          </Text>
+          <Paragraph>
+            You are switching from{' '}
+            <Text strong>{isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'} </Text>,
+            would you like to <Text strong> keep your existing time slots </Text> marked on the calendar?
+          </Paragraph>
         ),
-        okText: 'Yes, clear sessions',
-        cancelText: 'No, keep sessions',
+        okText: 'No, Clear Slots',
+        okButtonProps: { type: 'default' },
+        cancelText: 'Yes, Keep Slots',
+        cancelButtonProps: { type: 'primary' },
         onCancel: () => changeSessionRecurrance(isRecurring),
         onOk: () => {
           changeSessionRecurrance(isRecurring);
