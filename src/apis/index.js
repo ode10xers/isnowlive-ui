@@ -20,6 +20,7 @@ export default {
     getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     convertUserToCreator: () => http.post('/secure/user/convert'),
+    authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
   },
   payment: {
     stripe: {
