@@ -64,7 +64,9 @@ const LiveStream = () => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnboarding(false);
     }
-    setSelectedZoomOption(zoom_connected);
+    if (zoom_connected !== ZoomAuthType.NOT_CONNECTED) {
+      setSelectedZoomOption(zoom_connected);
+    }
     if (zoom_connected === ZoomAuthType.JWT) {
       getZoomJWTDetails();
     }
@@ -80,7 +82,7 @@ const LiveStream = () => {
         trackSuccessEvent(eventTag);
         message.success('Zoom successfully setup!');
         const localUserDetails = getLocalUserDetails();
-        localUserDetails.zoom_connected = true;
+        localUserDetails.zoom_connected = ZoomAuthType.JWT;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         // setTimeout is used for better user experince suggest by Rahul
         setTimeout(() => {
@@ -103,9 +105,25 @@ const LiveStream = () => {
   };
 
   const verifyZoomProfile = async (code) => {
-    await apis.user.authZoom(code);
-    // setUserDetails({ ...userDetails, zoom_connected: true });
-    // setZoomAuthorized(true);
+    try {
+      const { status } = await apis.user.authZoom(code);
+      if (isAPISuccess(status)) {
+        const localUserDetails = getLocalUserDetails();
+        localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
+        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+        message.success('Zoom successfully setup!');
+        // setTimeout is used for better user experince suggest by Rahul
+        setTimeout(() => {
+          if (isOnboarding) {
+            history.push(Routes.session);
+          } else {
+            history.push(Routes.creatorDashboard.rootPath);
+          }
+        }, 2000);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
   };
 
   return (
@@ -130,20 +148,30 @@ const LiveStream = () => {
 
         {selectedZoomOption === ZoomAuthType.OAUTH && (
           <Row align="center" className={styles.zoomConnectAccount}>
-            <p className={styles.textAlignCenter}>
-              We will connect your Zoom Account. You will be taken to Zoom authorization page. You'll be taken back to
-              this page.
-            </p>
-            <Button
-              type="primary"
-              className={styles.mt30}
-              onClick={() => {
-                connectZoomAccount();
-                trackSimpleEvent(creator.click.livestream.connectZoomAccount);
-              }}
-            >
-              Connect my Zoom Account
-            </Button>
+            {zoom_connected === ZoomAuthType.OAUTH ? (
+              <>
+                <Button type="primary" className={styles.success}>
+                  Zoom account is connected
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className={styles.textAlignCenter}>
+                  We will connect your Zoom Account. You will be taken to Zoom authorization page. You'll be taken back
+                  to this page.
+                </p>
+                <Button
+                  type="primary"
+                  className={styles.mt30}
+                  onClick={() => {
+                    connectZoomAccount();
+                    trackSimpleEvent(creator.click.livestream.connectZoomAccount);
+                  }}
+                >
+                  Connect my Zoom Account
+                </Button>
+              </>
+            )}
           </Row>
         )}
         {selectedZoomOption === ZoomAuthType.JWT && (
