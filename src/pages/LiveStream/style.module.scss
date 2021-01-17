@@ -13,7 +13,6 @@
 }
 .zoomConnectAccountForm {
   @extend .mt50;
-  color: map-get($colors, $key: 'SuvaGrey');
   margin-left: map-get($spacing, '20');
   margin-bottom: map-get($spacing, '20');
 }

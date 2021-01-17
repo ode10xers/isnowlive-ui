@@ -29,7 +29,7 @@ const LiveStream = () => {
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
-  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
+  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.JWT);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const {
@@ -198,7 +198,11 @@ const LiveStream = () => {
               </p>
               <ol>
                 <li>
-                  Go to <a href>https://marketplace.zoom.us</a> and Sign In.
+                  Go to{' '}
+                  <a href="https://marketplace.zoom.us" target="_blank" rel="noopener noreferrer">
+                    https://marketplace.zoom.us
+                  </a>{' '}
+                  and Sign In.
                 </li>
                 <li>Top right, select Develop and then Build App.</li>
                 <li>Click Create under JWT app type.</li>
