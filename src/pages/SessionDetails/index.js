@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography, Modal } from 'antd';
+import { Row, Col, Image, message, Typography, Button, Modal } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
@@ -20,6 +20,7 @@ import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess, generateUrl } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
@@ -27,7 +28,7 @@ import styles from './style.module.scss';
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },
@@ -86,7 +87,7 @@ const SessionDetails = ({ match, history }) => {
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
-        createOrder();
+        createOrder(values.email);
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
@@ -122,7 +123,7 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const createOrder = async () => {
+  const createOrder = async (userEmail) => {
     try {
       const { status, data } = await apis.session.createOrderForUser({
         inventory_id: parseInt(match.params.inventory_id),
@@ -135,7 +136,17 @@ const SessionDetails = ({ match, history }) => {
           initiatePaymentForOrder(data);
         } else {
           Modal.success({
-            content: 'Session is been booked successfully',
+            title: 'Registration Successful',
+            content: (
+              <>
+                <Paragraph>
+                  We have sent you a confirmation email on <Text strong>{userEmail}</Text>. Look out for an email from{' '}
+                  <Text strong> friends@passion.do. </Text>
+                </Paragraph>
+                <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+              </>
+            ),
+            okText: 'Go To Dashboard',
             onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
           });
         }
@@ -147,7 +158,9 @@ const SessionDetails = ({ match, history }) => {
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         Modal.warning({
+          title: 'Session Already Booked',
           content: 'It seems you have already booked this session, please check your dashboard',
+          okText: 'Go To Dashboard',
           onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
         });
       }
@@ -172,7 +185,7 @@ const SessionDetails = ({ match, history }) => {
           if (data) {
             http.setAuthToken(data.auth_token);
             logIn(data, true);
-            createOrder();
+            createOrder(values.email);
           }
         } catch (error) {
           setIsLoading(false);
@@ -181,7 +194,7 @@ const SessionDetails = ({ match, history }) => {
       } else if (!getLocalUserDetails()) {
         signupUser(values);
       } else {
-        createOrder();
+        createOrder(values.email);
       }
     } catch (error) {
       setIsLoading(false);
@@ -189,13 +202,36 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const sendNewPasswordEmail = async (email) => {
+  const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
+
+  const handleSendNewPasswordEmail = async (email) => {
     try {
       setIsLoading(true);
-      const { status } = await apis.user.sendNewPasswordEmail({ email });
+      const { status } = await sendNewPasswordEmail(email);
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        message.success('Email sent successfully.');
+        Modal.confirm({
+          mask: true,
+          center: true,
+          closable: true,
+          maskClosable: true,
+          title: 'Set a new password',
+          content: (
+            <>
+              <Paragraph>
+                We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
+              </Paragraph>
+              <Paragraph>
+                <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
+                  Didn't get it? Send again.
+                </Button>
+              </Paragraph>
+            </>
+          ),
+          okText: 'Okay',
+          cancelText: 'Talk to us',
+          onCancel: () => openFreshChatWidget(),
+        });
       }
     } catch (error) {
       setIsLoading(false);
@@ -252,19 +288,23 @@ const SessionDetails = ({ match, history }) => {
               </div>
             </>
           )}
-          <Title level={5} className={styles.mt50}>
-            Session Prerequisite
-          </Title>
-          {showPrerequisite ? (
-            <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
-          ) : (
+          {session?.prerequisites && (
             <>
-              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
-                {ReactHtmlParser(session?.prerequisites)}
-              </Paragraph>
-              <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
-                Read More
-              </div>
+              <Title level={5} className={styles.mt50}>
+                Session Prerequisite
+              </Title>
+              {showPrerequisite ? (
+                <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
+              ) : (
+                <>
+                  <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
+                    {ReactHtmlParser(session?.prerequisites)}
+                  </Paragraph>
+                  <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
+                    Read More
+                  </div>
+                </>
+              )}
             </>
           )}
         </Col>
@@ -273,12 +313,12 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
         <Col xs={24} lg={15} className={styles.mt50}>
-          {session?.start_time && getTimeDiff(session?.start_time, moment(), 'minutes') > 0 && (
+          {session?.end_time && getTimeDiff(session?.end_time, moment(), 'minutes') > 0 && (
             <SessionRegistration
               user={currentUser}
               showPasswordField={showPasswordField}
               onFinish={onFinish}
-              onSetNewPassword={sendNewPasswordEmail}
+              onSetNewPassword={handleSendNewPasswordEmail}
             />
           )}
         </Col>

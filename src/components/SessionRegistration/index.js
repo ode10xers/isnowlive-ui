@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Row, Col, Button, Form, Input, Typography } from 'antd';
 
+import Routes from 'routes';
+
 import validationRules from 'utils/validation';
-import { scrollToErrorField } from 'utils/helper';
+import { generateUrlFromUsername, scrollToErrorField } from 'utils/helper';
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
@@ -40,7 +42,11 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
           <Title level={3}>Registration</Title>
         </Col>
         <Col xs={24} md={24}>
-          <Text>After you register, we will send you an email with the event login information.</Text>
+          <Text>
+            <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are always
+            available in your
+            <a href={`${generateUrlFromUsername('app')}${Routes.attendeeDashboard.defaultPath}`}> dashboard </a>.
+          </Text>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           <Form
@@ -64,9 +70,29 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
             </Item>
 
             {showPasswordField && (
-              <Item label="Password" name="password" rules={validationRules.passwordValidation} ref={passwordInput}>
-                <Password />
-              </Item>
+              <>
+                <Item
+                  extra={
+                    <Text className={styles.passwordHelpText}>
+                      You have booked a session with us earlier, but if you haven't set your password, please use the{' '}
+                      <Button
+                        className={styles.linkButton}
+                        type="link"
+                        onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                      >
+                        set new password
+                      </Button>{' '}
+                      option below{' '}
+                    </Text>
+                  }
+                  label="Password"
+                  name="password"
+                  rules={validationRules.passwordValidation}
+                  ref={passwordInput}
+                >
+                  <Password />
+                </Item>
+              </>
             )}
 
             <Item {...sessionRegistrationTailLayout}>
@@ -77,9 +103,13 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
 
             {showPasswordField && (
               <Item {...sessionRegistrationTailLayout}>
-                <a href onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                <Button
+                  className={styles.linkButton}
+                  type="link"
+                  onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                >
                   Set a new password
-                </a>
+                </Button>
               </Item>
             )}
           </Form>

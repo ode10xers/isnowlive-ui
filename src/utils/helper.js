@@ -5,6 +5,12 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+export const generateQueryString = (data) => {
+  return Object.entries(data)
+    .map(([key, val]) => `${key}=${val}`)
+    .join('&');
+};
+
 const appendScript = (src, charset) => {
   const script = document.createElement('script');
   script.src = src;
@@ -139,8 +145,9 @@ export const getDuration = (start_time, end_time) => {
 };
 
 export const scrollToErrorField = (errorFields) => {
-  document.getElementById(errorFields[0].name).focus();
-  document.getElementById(errorFields[0].name).scrollIntoView();
+  const errorElement = document.getElementById(errorFields[0].name);
+  errorElement.focus();
+  errorElement.scrollIntoView();
 };
 
 export const getPaymentStatus = (status) => {

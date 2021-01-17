@@ -21,6 +21,7 @@ export const mixPanelEventTags = {
           publishSession: '(Creator) Publish Session Clicked',
           unpublishSession: '(Creator) Unpublish Session Clicked',
           editSession: '(Creator) Edit Session Clicked',
+          deleteSession: '(Creator) Delete Session Clicked',
           backToManageSessionsList: '(Creator) Back to Manage Sessions Clicked',
         },
         details: {

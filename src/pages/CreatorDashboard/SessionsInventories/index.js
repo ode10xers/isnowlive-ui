@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty } from 'antd';
+import { DeleteOutlined, DownCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -9,6 +9,7 @@ import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
+import CalendarView from 'components/CalendarView';
 import { isAPISuccess, getDuration } from 'utils/helper';
 
 import {
@@ -21,41 +22,66 @@ import {
 import styles from './styles.module.scss';
 
 const {
-  formatDate: { toLocaleTime, toLongDateWithDay },
+  formatDate: { toLocaleTime, toLongDateWithDay, toLongDateWithLongDay, toLocaleDate },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { creator } = mixPanelEventTags;
+
+const whiteColor = '#FFFFFF';
 
 const SessionsInventories = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
+  const [filteredByDateSession, setFilteredByDateSession] = useState([]);
   const [isPast, setIsPast] = useState(false);
+  const [view, setView] = useState('list');
+  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
       const { data } =
         sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
       if (data) {
-        setSessions(
-          data.map((i, index) => ({
-            index,
-            key: i.session_id,
-            name: i.name,
-            type: i.max_participants > 1 ? 'Group' : '1-on-1',
-            duration: getDuration(i.start_time, i.end_time),
-            days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
-            session_date: i?.session_date,
-            time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
-            start_time: i?.start_time,
-            end_time: i?.end_time,
-            participants: i.num_participants,
-            start_url: i.start_url,
-            inventory_id: i?.inventory_id,
-            session_id: i.session_id,
-            max_participants: i.max_participants,
-          }))
-        );
+        const unfilteredSessions = data.map((i, index) => ({
+          index,
+          key: i?.inventory_id,
+          name: i.name,
+          type: i.max_participants > 1 ? 'Group' : '1-on-1',
+          duration: getDuration(i.start_time, i.end_time),
+          days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
+          session_date: i?.session_date,
+          time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
+          start_time: i?.start_time,
+          end_time: i?.end_time,
+          participants: i.num_participants,
+          start_url: i.start_url,
+          inventory_id: i?.inventory_id,
+          session_id: i.session_id,
+          max_participants: i.max_participants,
+          color_code: i.color_code,
+        }));
+
+        let filterByDateSessions = [];
+
+        unfilteredSessions.forEach((session) => {
+          const foundIndex = filterByDateSessions.findIndex(
+            (val) => val.start_time === toLocaleDate(session.start_time)
+          );
+
+          if (foundIndex >= 0) {
+            filterByDateSessions[foundIndex].children.push(session);
+          } else {
+            filterByDateSessions.push({
+              start_time: toLocaleDate(session.start_time),
+              name: session.start_time,
+              is_date: true,
+              children: [session],
+            });
+          }
+        });
+        setSessions(unfilteredSessions);
+        setFilteredByDateSession(filterByDateSessions);
       }
       setIsLoading(false);
     } catch (error) {
@@ -115,52 +141,82 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
-  let sessionColumns = [
+  const emptyTableCell = {
+    props: {
+      colSpan: 0,
+      rowSpan: 0,
+    },
+  };
+
+  const renderSimpleTableCell = (shouldNotRender, text) => (shouldNotRender ? emptyTableCell : <Text> {text} </Text>);
+
+  let dateColumns = [
     {
       title: 'Session Name',
+      dataIndex: 'name',
       key: 'name',
-      width: '12%',
-      render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
+      width: '25%',
+      render: (text, record) => {
+        if (record.is_date) {
+          return {
+            props: {
+              colSpan: 6,
+            },
+            children: (
+              <Text strong className={styles.textAlignLeft}>
+                {toLongDateWithLongDay(text)}
+              </Text>
+            ),
+          };
+        } else {
+          return {
+            props: {
+              style: {
+                borderLeft: `6px solid ${record.color_code || whiteColor}`,
+              },
+            },
+            children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+          };
+        }
+      },
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '4%',
-    },
-    {
-      title: 'Day',
-      key: 'days',
-      dataIndex: 'days',
-      width: '12%',
+      width: '10%',
+      render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
-      width: '4%',
+      width: '15%',
+      render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
       width: '15%',
+      render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: isPast ? 'Registrations' : 'Attendees',
+      title: 'Participants',
       key: 'participants',
       dataIndex: 'participants',
-      width: '2%',
-      render: (text, record) => (
-        <Text>
-          {record.participants || 0} / {record.max_participants}
-        </Text>
-      ),
+      width: '12%',
+      render: (text, record) =>
+        renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
     },
     {
       title: 'Actions',
-      width: isPast ? '4%' : '20%',
+      width: isPast ? '10%' : '25%',
       render: (text, record) => {
+        if (record.is_date) {
+          return emptyTableCell;
+        }
+
         const isDisabled = record.participants > 0;
         return isPast ? (
           <Row justify="start">
@@ -210,15 +266,28 @@ const SessionsInventories = ({ match }) => {
     },
   ];
 
+  let mobileTableColumns = [
+    {
+      title: '',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text, record) => (
+        <Text strong className={styles.textAlignLeft}>
+          {toLongDateWithLongDay(text)}
+        </Text>
+      ),
+    },
+  ];
+
   const renderSessionItem = (item) => {
     const isCancelDisabled = item.participants > 0;
 
     const layout = (label, value) => (
       <Row>
-        <Col span={9}>
+        <Col span={8}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={15}>: {value}</Col>
+        <Col span={16}>: {value}</Col>
       </Row>
     );
 
@@ -226,7 +295,10 @@ const SessionsInventories = ({ match }) => {
       <Card
         className={styles.card}
         title={
-          <div onClick={() => openSessionInventoryDetails(item)}>
+          <div
+            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
+            onClick={() => openSessionInventoryDetails(item)}
+          >
             <Text>{item.name}</Text>
           </div>
         }
@@ -262,7 +334,6 @@ const SessionsInventories = ({ match }) => {
       >
         {layout('Type', <Text>{item.type}</Text>)}
         {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Day', <Text>{item.days}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
         {layout(
           isPast ? 'Registrations' : 'Attendees',
@@ -274,19 +345,69 @@ const SessionsInventories = ({ match }) => {
     );
   };
 
+  const handleViewChange = (e) => {
+    setView(e.target.value);
+  };
+
+  const onViewChange = (e) => {
+    setCalendarView(e);
+  };
+
   return (
     <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
-      {isMobileDevice ? (
+      <Radio.Group value={view} onChange={handleViewChange}>
+        <Radio.Button value="list">List</Radio.Button>
+        <Radio.Button value="calendar">Calendar</Radio.Button>
+      </Radio.Group>
+      {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
           {sessions.length > 0 ? (
-            sessions.map(renderSessionItem)
+            <CalendarView
+              inventories={sessions}
+              onSelectInventory={openSessionInventoryDetails}
+              onViewChange={onViewChange}
+              calendarView={calendarView}
+            />
           ) : (
-            <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+            <Empty />
           )}
         </Loader>
       ) : (
-        <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+        <>
+          {isMobileDevice ? (
+            <Loader loading={isLoading} size="large" text="Loading sessions">
+              {sessions.length > 0 ? (
+                <Table
+                  columns={mobileTableColumns}
+                  data={filteredByDateSession}
+                  loading={isLoading}
+                  rowKey={(record) => record.start_time}
+                  expandable={{
+                    expandedRowRender: (record) => <> {record.children.map(renderSessionItem)} </>,
+                    expandRowByClick: true,
+                    expandIcon: ({ expanded, onExpand, record }) =>
+                      expanded ? (
+                        <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                      ) : (
+                        <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                      ),
+                  }}
+                />
+              ) : (
+                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+              )}
+            </Loader>
+          ) : (
+            <Table
+              sticky={true}
+              columns={dateColumns}
+              data={filteredByDateSession}
+              loading={isLoading}
+              rowKey={(record) => record.start_time}
+            />
+          )}
+        </>
       )}
     </div>
   );

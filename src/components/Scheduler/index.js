@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
-import { DeleteFilled, CarryOutOutlined, TeamOutlined } from '@ant-design/icons';
+import { DeleteFilled, TeamOutlined } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -23,6 +23,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const [slots, setSlots] = useState(convertSchedulesToLocal(sessionSlots));
   const [dayList, setDayList] = useState(null);
   const [slotsList] = useState(() => generateTimes());
+  const [formDeletedIndex, setFormDeletedIndex] = useState([]);
+  const isPannelChanged = useRef(false);
+  const [disableDuplicateEndTime, setDisableDuplicateEndTime] = useState([]);
 
   useEffect(() => {
     if (slots) {
@@ -30,6 +33,25 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     }
     // eslint-disable-next-line
   }, [slots]);
+
+  useEffect(() => {
+    if (sessionSlots && sessionSlots.length) {
+      const sortedSessionSlots = sessionSlots.sort((a, b) =>
+        a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
+      );
+      setDate(moment(sortedSessionSlots[0].start_time));
+    } else {
+      if (recurring && recurringDatesRange && recurringDatesRange.length) {
+        setDate(moment(recurringDatesRange[0]));
+      } else {
+        setDate(moment(selectedDate));
+      }
+    }
+    if (sessionSlots.length !== slots.length) {
+      setSlots(sessionSlots);
+    }
+    // eslint-disable-next-line
+  }, [recurring, recurringDatesRange, sessionSlots]);
 
   useEffect(() => {
     if (openModal) {
@@ -40,69 +62,87 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   }, [openModal]);
 
   const onSelect = (selecetedCalendarDate) => {
-    if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
-      // check if slots are present for selected date
-      const slotsForSelectedDate = slots?.filter(
-        (item) => toLocaleDate(item.session_date) === toLocaleDate(selecetedCalendarDate)
-      );
-      const formattedSlots = slotsForSelectedDate.map((obj) => ({
-        id: obj.inventory_id,
-        session_date: moment(obj.session_date),
-        start_time: obj.start_time,
-        end_time: obj.end_time,
-        num_participants: obj.num_participants,
-      }));
-      const defaultSlot = {
-        session_date: moment(selecetedCalendarDate).format(),
-        start_time: null,
-        end_time: null,
-        num_participants: 0,
-      };
+    if (!isPannelChanged.current) {
+      if (moment(selecetedCalendarDate).endOf('day') >= moment().startOf('day')) {
+        // check if slots are present for selected date
+        const slotsForSelectedDate = slots?.filter(
+          (item) => toLocaleDate(item.start_time) === toLocaleDate(selecetedCalendarDate)
+        );
+        const formattedSlots = slotsForSelectedDate.map((obj) => ({
+          inventory_id: obj.inventory_id,
+          session_date: obj.start_time,
+          start_time: obj.start_time,
+          end_time: obj.end_time,
+          num_participants: obj.num_participants,
+        }));
+        const defaultSlot = {
+          session_date: moment(selecetedCalendarDate).format(),
+          start_time: null,
+          end_time: null,
+          num_participants: 0,
+        };
 
-      setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
-      setDate(selecetedCalendarDate);
-      setSelectedDate(selecetedCalendarDate);
-      setOpenModal(true);
+        setForm(slotsForSelectedDate.length ? [...formattedSlots, defaultSlot] : [defaultSlot]);
+        setDate(selecetedCalendarDate);
+        setSelectedDate(selecetedCalendarDate);
+        setOpenModal(true);
+      }
     }
   };
 
   const onPanelChange = (calendarDate) => {
+    isPannelChanged.current = true;
     setDate(calendarDate);
+    setTimeout(() => {
+      isPannelChanged.current = false;
+    }, 500);
   };
 
   const handleCancel = () => {
     setForm(null);
+    setFormDeletedIndex([]);
     setOpenModal(false);
   };
 
   const getSlotsList = (value) => {
-    return slots?.filter((event) => (toLocaleDate(event.session_date) === toLocaleDate(value) ? event : null));
+    return slots?.filter((event) => (toLocaleDate(event.start_time) === toLocaleDate(value) ? event : null));
   };
 
   const renderDateCell = (calendarDate) => {
     const slotsForDate = getSlotsList(calendarDate);
     if (slotsForDate?.length && !isMobileDevice) {
       return (
-        <Popover
-          content={
-            <List
-              size="small"
-              bordered
-              dataSource={slotsForDate}
-              renderItem={(item) => (
-                <List.Item className={styles.slot}>
-                  {toLocaleTime(item['start_time'])}
-                  {' - '} {toLocaleTime(item['end_time'])}
-                </List.Item>
-              )}
-            />
-          }
-          title="Schedules"
-        >
-          <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
-            <CarryOutOutlined />
-          </Badge>
-        </Popover>
+        <List
+          size="small"
+          itemLayout="vertical"
+          dataSource={slotsForDate}
+          renderItem={(item) => (
+            <List.Item className={styles.slot}>
+              {toLocaleTime(item['start_time'])}
+              {' - '} {toLocaleTime(item['end_time'])}
+            </List.Item>
+          )}
+        />
+        // <Popover
+        //   content={
+        //     <List
+        //       size="small"
+        //       bordered
+        //       dataSource={slotsForDate}
+        //       renderItem={(item) => (
+        //         <List.Item className={styles.slot}>
+        //           {toLocaleTime(item['start_time'])}
+        //           {' - '} {toLocaleTime(item['end_time'])}
+        //         </List.Item>
+        //       )}
+        //     />
+        //   }
+        //   title="Schedules"
+        // >
+        //   <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
+        //     <CarryOutOutlined />
+        //   </Badge>
+        // </Popover>
       );
     } else if (slotsForDate?.length && isMobileDevice) {
       return <Badge className={styles.badge} size="small" count={slotsForDate?.length}></Badge>;
@@ -112,10 +152,38 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   };
 
   const createOneTimeSchedule = (givenDate, givenSlots) => {
-    // remove all the slots for selected date
-    let tempSlots = givenSlots?.filter((item) => toLocaleDate(item.session_date) !== toLocaleDate(givenDate));
+    // filter slots for selected and other days
+    let otherDateSlots = givenSlots?.filter((item) => toLocaleDate(item.start_time) !== toLocaleDate(givenDate));
+    let givenDateSlots = givenSlots?.filter((item) => toLocaleDate(item.start_time) === toLocaleDate(givenDate));
 
+    // Delete the given date slots which match same dates with deleted slot dates
+    if (givenDateSlots && givenDateSlots.length && formDeletedIndex && formDeletedIndex.length) {
+      formDeletedIndex.forEach((deletedSlot) => {
+        let deletedGivenDateSlotsList = givenDateSlots.filter(
+          (givenDateSlot) =>
+            toShortTimeWithPeriod(givenDateSlot.start_time) === toShortTimeWithPeriod(deletedSlot.start_time) &&
+            toShortTimeWithPeriod(givenDateSlot.end_time) === toShortTimeWithPeriod(deletedSlot.end_time)
+        );
+        if (deletedGivenDateSlotsList && deletedGivenDateSlotsList.length) {
+          deletedGivenDateSlotsList.forEach((elementdeletedGivenDateSlot) => {
+            if (elementdeletedGivenDateSlot.inventory_id) {
+              handleSlotDelete(elementdeletedGivenDateSlot.inventory_id);
+            }
+            givenDateSlots = givenDateSlots.filter(
+              (givenDateSlot) => givenDateSlot.inventory_id !== elementdeletedGivenDateSlot.inventory_id
+            );
+          });
+        }
+      });
+    }
+
+    // create list of all new slots from form
+    let newSlots = [];
     form.forEach((vs) => {
+      if (vs.inventory_id) {
+        delete vs.inventory_id;
+      }
+
       if (vs.start_time && vs.end_time) {
         let value = vs;
         let selected_date = moment(givenDate).format();
@@ -123,20 +191,33 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
         value.session_date = value.start_time;
 
-        // remove slot as BE does not need it(Strong params check)
-        delete value.slot;
-
-        // NOTE: deep clone the object else moment dates will be mutate
-        tempSlots.push(JSON.parse(JSON.stringify(value)));
+        if (givenDateSlots && givenDateSlots.length) {
+          let tempGivenDateSlots = givenDateSlots.filter(
+            (givenDateSlot) =>
+              toShortTimeWithPeriod(givenDateSlot.start_time) === toShortTimeWithPeriod(value.start_time) &&
+              toShortTimeWithPeriod(givenDateSlot.end_time) === toShortTimeWithPeriod(value.end_time)
+          );
+          if (tempGivenDateSlots && tempGivenDateSlots.length) {
+            // NOTE: deep clone the object else moment dates will be mutate
+            newSlots.push(JSON.parse(JSON.stringify(tempGivenDateSlots[0])));
+          } else {
+            // NOTE: deep clone the object else moment dates will be mutate
+            newSlots.push(JSON.parse(JSON.stringify(value)));
+          }
+        } else {
+          // NOTE: deep clone the object else moment dates will be mutate
+          newSlots.push(JSON.parse(JSON.stringify(value)));
+        }
       }
     });
-    return tempSlots;
+
+    return [...newSlots, ...otherDateSlots];
   };
 
   const createSchedulesAllSelectedDay = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
     let selected_date = toLocaleDate(selectedDate);
     while (
       moment(selected_date).isBetween(startDate, endDate) ||
@@ -152,7 +233,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesMultipleDays = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
     let selected_date = toLocaleDate(selectedDate);
 
     let slotdates = [];
@@ -243,18 +324,28 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         session_date: moment(date).format(),
         start_time: null,
         end_time: null,
+        num_participants: 0,
       });
       setForm(tempForm);
     } else {
+      let duplicateSlots = [];
+      tempForm.forEach((slot) => {
+        if (toShortTimeWithPeriod(slot.start_time) === toShortTimeWithPeriod(tempForm[index].start_time)) {
+          duplicateSlots.push(toShortTimeWithPeriod(slot.end_time));
+        }
+        return;
+      });
+      setDisableDuplicateEndTime(duplicateSlots);
       setForm(tempForm);
     }
   };
 
   const handleDeleteSlot = (index) => {
     let tempForm = [...form];
-    if (tempForm[index].id) {
-      handleSlotDelete(tempForm[index].id);
+    if (tempForm[index].inventory_id) {
+      handleSlotDelete(tempForm[index].inventory_id);
     }
+    setFormDeletedIndex([...formDeletedIndex, tempForm[index]]);
     tempForm.splice(index, 1);
     setForm(tempForm);
   };
@@ -334,7 +425,14 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                           ) &&
                           getTimeDiff(item.value, slot.start_time, 'minute') > 0
                         ) {
-                          return <Option value={item.value}>{item.label}</Option>;
+                          return (
+                            <Option
+                              value={item.value}
+                              disabled={disableDuplicateEndTime.includes(toShortTimeWithPeriod(item.value))}
+                            >
+                              {item.label}
+                            </Option>
+                          );
                         }
                         return null;
                       })}

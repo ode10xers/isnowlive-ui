@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
+import { BlockPicker } from 'react-color';
 import classNames from 'classnames';
 import {
   Form,
@@ -46,7 +48,8 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
+  timeCalculation: { createWeekRange, getRangeDiff, createRange },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -65,11 +68,14 @@ const initialSession = {
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
   is_refundable: true,
-  refund_before_hours: 24,
+  refund_before_hours: 0,
   prerequisites: '',
 };
 
+const whiteColor = '#ffffff';
+
 const Session = ({ match, history }) => {
+  const location = useLocation();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
@@ -85,20 +91,66 @@ const Session = ({ match, history }) => {
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
+  const [colorCode, setColorCode] = useState(whiteColor);
+
+  const getCreatorStripeDetails = useCallback(
+    async (sessionData = null) => {
+      try {
+        setIsLoading(true);
+        const { status, data } = await apis.session.getCreatorBalance();
+        if (isAPISuccess(status) && data) {
+          setStripeCurrency(data.currency);
+          if (!sessionData) {
+            form.setFieldsValue({
+              ...form.getFieldsValue(),
+              price_type: 'Paid',
+              currency: data?.currency?.toUpperCase() || 'SGD',
+              price: 10,
+            });
+            setIsSessionFree(false);
+          }
+        }
+        setIsLoading(false);
+      } catch (error) {
+        if (error.response?.data?.message === 'unable to fetch user payment details') {
+          setStripeCurrency(null);
+          form.setFieldsValue({
+            ...form.getFieldsValue(),
+            price_type: 'Free',
+            price: 0,
+            currency: 'SGD',
+          });
+          setIsSessionFree(true);
+        } else {
+          message.error(error.response?.data?.message || 'Something went wrong.');
+        }
+        setIsLoading(false);
+      }
+    },
+    [form]
+  );
 
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
       try {
         const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
         if (data) {
+          // The session_date gets messed up here, so trying to fix it here
+          if (data.inventory.length > 0) {
+            data.inventory = data.inventory.map((inventory) => ({
+              ...inventory,
+              session_date: inventory.start_time,
+            }));
+          }
           setSession(data);
           form.setFieldsValue({
             ...data,
             type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
             price_type: data?.price === 0 ? 'Free' : 'Paid',
             is_refundable: data?.is_refundable ? 'Yes' : 'No',
-            refund_before_hours: data?.refund_before_hours || 24,
+            refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
+            color_code: data?.color_code || whiteColor,
           });
           setSessionImageUrl(data.session_image_url);
           setSessionDocumentUrl(data.document_url);
@@ -106,9 +158,11 @@ const Session = ({ match, history }) => {
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
           setSessionRefundable(data?.is_refundable);
-          setRefundBeforeHours(data?.refund_before_hours || 24);
+          setRefundBeforeHours(data?.refund_before_hours || 0);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
+          setColorCode(data?.color_code || whiteColor);
           setIsLoading(false);
+          await getCreatorStripeDetails(data);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -120,64 +174,38 @@ const Session = ({ match, history }) => {
         }
       }
     },
-    [form, history, isOnboarding]
+    [form, history, isOnboarding, getCreatorStripeDetails]
   );
-  const getCreatorStripeDetails = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const { status, data } = await apis.session.getCreatorBalance();
-      if (isAPISuccess(status) && data) {
-        setStripeCurrency(data.currency);
-        form.setFieldsValue({
-          ...form.getFieldsValue(),
-          price_type: 'Paid',
-          currency: data?.currency?.toUpperCase() || 'SGD',
-          price: 10,
-        });
-        setIsSessionFree(false);
-      }
-      setIsLoading(false);
-    } catch (error) {
-      if (error.response?.data?.message === 'unable to fetch user payment details') {
-        setStripeCurrency(null);
-        form.setFieldsValue({
-          ...form.getFieldsValue(),
-          price_type: 'Free',
-          price: 0,
-          currency: 'SGD',
-        });
-        setIsSessionFree(true);
-      } else {
-        message.error(error.response?.data?.message || 'Something went wrong.');
-      }
-      setIsLoading(false);
-    }
-  }, [form]);
 
   useEffect(() => {
     if (match.path.includes('manage')) {
       setIsOnboarding(false);
     }
-    getCreatorStripeDetails();
     if (match.params.id) {
-      const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
-      const endDate = toUtcEndOfDay(moment().add(1, 'month'));
+      const startDate = location.state.beginning
+        ? toUtcStartOfDay(location.state.beginning)
+        : toUtcStartOfDay(moment().subtract(1, 'month'));
+      const endDate = location.state.expiry
+        ? toUtcEndOfDay(location.state.expiry)
+        : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
+      getCreatorStripeDetails();
       form.setFieldsValue({
         ...form.getFieldsValue(),
         type: 'Group',
         max_participants: 2,
         recurring: false,
         is_refundable: 'Yes',
-        refund_before_hours: 24,
+        refund_before_hours: 0,
+        color_code: whiteColor,
       });
       setIsLoading(false);
     }
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-  }, [form, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -238,27 +266,55 @@ const Session = ({ match, history }) => {
       setSessionRefundable(true);
     } else {
       setSessionRefundable(false);
-      setRefundBeforeHours(24);
-      form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: 24 });
+      setRefundBeforeHours(0);
+      form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: 0 });
     }
   };
 
-  const handleSessionRecurrance = (e) => {
-    if (e.target.value === 'true') {
-      setIsSessionRecurring(true);
-    } else {
-      setIsSessionRecurring(false);
-    }
+  const changeSessionRecurrance = (isRecurring) => {
+    setIsSessionRecurring(isRecurring);
     setRecurringDatesRanges([]);
+  };
+
+  const handleSessionRecurrance = (e) => {
+    const isRecurring = e.target.value === 'true';
+
+    if (session.inventory.length > 0) {
+      Modal.confirm({
+        mask: true,
+        centered: true,
+        closable: true,
+        maskClosable: true,
+        title: 'Clear the sessions?',
+        content: (
+          <Text>
+            You are switching from {isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'},
+            would you like to clear your existing session times marked on the calendar ?
+          </Text>
+        ),
+        okText: 'Yes, clear sessions',
+        cancelText: 'No, keep sessions',
+        onCancel: () => changeSessionRecurrance(isRecurring),
+        onOk: () => {
+          changeSessionRecurrance(isRecurring);
+          // Mark created inventories for deletion
+          session.inventory.forEach((inv) => {
+            if (inv.inventory_id) {
+              handleSlotDelete(inv.inventory_id);
+            }
+          });
+
+          // Set current state to empty array
+          setSession({ ...session, inventory: [] });
+        },
+      });
+    } else {
+      changeSessionRecurrance(isRecurring);
+    }
   };
 
   const disabledDate = (current) => {
     return current && current < moment().startOf('day');
-  };
-
-  const handleRecurringDatesRange = (value) => {
-    setRecurringDatesRanges(value);
-    form.setFieldsValue({ ...form.getFieldsValue(), recurring_dates_range: value });
   };
 
   const handleSlotsChange = (inventory) => {
@@ -271,15 +327,133 @@ const Session = ({ match, history }) => {
   const handleSlotDelete = (value) => {
     let tempDeleteSlots = deleteSlot;
     tempDeleteSlots.push(value);
-    tempDeleteSlots = tempDeleteSlots.filter((item, index) => tempDeleteSlots.indexOf(item) === index);
+    tempDeleteSlots = [...new Set(tempDeleteSlots)];
     setDeleteSlot(tempDeleteSlots);
   };
 
+  const handleDateRangeChange = (value) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+
+    if (oldDateRange && newDateRange) {
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
+    if (rangeDiff.length > 0) {
+      Modal.confirm({
+        centered: true,
+        closable: true,
+        mask: true,
+        maskClosable: true,
+        autoFocusButton: 'cancel',
+        title: 'Update Session Schedule?',
+        okText: `Copy on new dates`,
+        cancelText: 'Leave it as is',
+        content: (
+          <Text>
+            You have changed the date range, would you like us to copy the sessions currently on the calender to this
+            date range?
+          </Text>
+        ),
+        onOk: () => handleRecurringDatesRange(value, true),
+        onCancel: () => handleRecurringDatesRange(value, false),
+        afterClose: () => handleRecurringDatesRange(value, false),
+      });
+    } else {
+      handleRecurringDatesRange(value, false);
+    }
+  };
+
+  const handleRecurringDatesRange = (value, updateInventoriesForNewDate) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+    let takeLastWeek = true;
+
+    if (updateInventoriesForNewDate && oldDateRange && newDateRange) {
+      if (oldDateRange[1].isSame(newDateRange[1])) {
+        takeLastWeek = false;
+      }
+
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
+    setRecurringDatesRanges(value);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      recurring_dates_range: value,
+    });
+
+    // For Repeating Sessions, if date range changes remove the inventories which are out of range
+    if (value?.length && session?.inventory?.length) {
+      const newSlots = [];
+
+      for (let i = 0; i < session.inventory.length; i++) {
+        const slot = session.inventory[i];
+        if (
+          getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
+          getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0
+        ) {
+          newSlots.push(slot);
+        } else {
+          if (slot.inventory_id) {
+            handleSlotDelete(slot.inventory_id);
+          }
+        }
+      }
+
+      //Add new inventories here if the date range extends to the future
+      if (updateInventoriesForNewDate && rangeDiff.length > 0) {
+        const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
+
+        const referenceInventory = session.inventory[takeLastWeek ? session.inventory.length - 1 : 0];
+        const copiedRange = createWeekRange(referenceInventory.start_time, takeLastWeek);
+
+        const copiedInventories = session.inventory.filter(
+          (inventory) => inventory.num_participants === 0 && moment(inventory.start_time).within(copiedRange)
+        );
+
+        Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
+          if (extraDay.within(oldRange)) {
+            return;
+          }
+
+          copiedInventories.forEach((inventory) => {
+            const invStartMoment = moment(inventory.start_time);
+            const invEndMoment = moment(inventory.end_time);
+            if (extraDay.day() === invStartMoment.day()) {
+              const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
+
+              const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
+              const session_date = start_time;
+              const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
+
+              newSlots.push({
+                num_participants: 0,
+                session_date: session_date,
+                start_time: start_time,
+                end_time: end_time,
+              });
+            }
+          });
+        });
+      }
+
+      handleSlotsChange(newSlots);
+    }
+  };
+
   const handleRefundBeforeHoursChange = (e) => {
-    const value = Math.max(1, parseInt(e.target.value));
+    const value = Math.max(0, parseInt(e.target.value));
 
     setRefundBeforeHours(value);
     form.setFieldsValue({ ...form.getFieldsValue(), refund_before_hours: value });
+  };
+
+  const handleColorChange = (color) => {
+    setColorCode(color.hex || whiteColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
   };
 
   const onFinish = async (values) => {
@@ -288,8 +462,8 @@ const Session = ({ match, history }) => {
     try {
       setIsLoading(true);
       const data = {
-        price: values.price,
-        currency: values.currency,
+        price: values.price || 0,
+        currency: values.currency || stripeCurrency || 'SGD',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
@@ -302,13 +476,19 @@ const Session = ({ match, history }) => {
         refund_before_hours: refundBeforeHours,
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
+        color_code: colorCode,
       };
       if (isSessionRecurring) {
-        data.beginning = moment(values.recurring_dates_range[0]).utc().format();
-        data.expiry = moment(values.recurring_dates_range[1]).utc().format();
+        data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
+        data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
       }
 
       if (session?.inventory?.length) {
+        if (!isSessionRecurring) {
+          data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
+          data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
+        }
+
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
@@ -317,12 +497,32 @@ const Session = ({ match, history }) => {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
         if (session.session_id) {
-          await apis.session.update(session.session_id, data);
-          trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
-          message.success('Session successfully updated.');
-          const startDate = toUtcStartOfDay(moment().subtract(1, 'month'));
-          const endDate = toUtcEndOfDay(moment().add(1, 'month'));
-          getSessionDetails(match.params.id, startDate, endDate);
+          const updatedSessionResponse = await apis.session.update(session.session_id, data);
+          if (isAPISuccess(updatedSessionResponse.status)) {
+            trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
+            message.success('Session successfully updated.');
+
+            Modal.confirm({
+              icon: <CheckCircleOutlined />,
+              title: `${data.name} session successfully updated`,
+              className: styles.confirmModal,
+              okText: 'Done',
+              cancelText: 'Add New',
+              onCancel: () => {
+                trackSimpleEvent(eventTagObject.addNewInModal);
+                const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
+                const endDate = data.expiry || toUtcEndOfDay(moment().add(1, 'month'));
+                getSessionDetails(match.params.id, startDate, endDate);
+                window.location.reload();
+                window.scrollTo(0, 0);
+              },
+              onOk: () => {
+                trackSimpleEvent(eventTagObject.doneInModal);
+                history.push(`${Routes.creatorDashboard.rootPath}/${Routes.creatorDashboard.createSessions}`);
+                window.scrollTo(0, 0);
+              },
+            });
+          }
         } else {
           const newSessionResponse = await apis.session.create(data);
 
@@ -408,29 +608,42 @@ const Session = ({ match, history }) => {
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph className={styles.mt10} type="secondary">
             Setup the event you plan to host. Adding a name, session image and description for the attendees is
-            mandatory and you can also add pre-requisit or a document to make it more descriptive. Then select the days
+            mandatory and you can also add pre-requisite or a document to make it more descriptive. Then select the days
             and time you want to host this session.
           </Paragraph>
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form
+        form={form}
+        scrollToFirstError={true}
+        {...profileFormItemLayout}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
-          <div className={styles.imageWrapper}>
-            <ImageUpload
-              aspect={4}
-              className={classNames('avatar-uploader', styles.coverImage)}
-              name="session_image_url"
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              onChange={onSessionImageUpload}
-              value={sessionImageUrl}
-              label="Session Image"
-            />
-          </div>
+          <Form.Item
+            id="sessionImage"
+            name="sessionImage"
+            rules={[{ required: true, message: 'Please upload session Image!' }]}
+            wrapperCol={{ span: 24 }}
+          >
+            <div className={styles.imageWrapper}>
+              <ImageUpload
+                aspect={4}
+                className={classNames('avatar-uploader', styles.coverImage)}
+                name="session_image_url"
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                onChange={onSessionImageUpload}
+                value={sessionImageUrl}
+                label="Session Image"
+              />
+            </div>
+          </Form.Item>
 
-          <Form.Item label="Session Name" name="name" rules={validationRules.nameValidation}>
+          <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Enter Session Name" />
           </Form.Item>
 
@@ -438,9 +651,10 @@ const Session = ({ match, history }) => {
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
             label="Session Description"
             name="description"
+            id="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="  Please input description" />
+            <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -472,6 +686,7 @@ const Session = ({ match, history }) => {
           <>
             <Form.Item
               name="type"
+              id="type"
               label="Session Type"
               rules={validationRules.requiredValidation}
               onChange={handleSessionType}
@@ -561,6 +776,33 @@ const Session = ({ match, history }) => {
               </>
             )}
           </>
+          <Form.Item
+            name="color_code"
+            label="Color Tag"
+            rules={validationRules.requiredValidation}
+            style={{ marginTop: 32 }}
+          >
+            <BlockPicker
+              color={colorCode}
+              onChangeComplete={handleColorChange}
+              triangle="hide"
+              width={144}
+              colors={[
+                '#f44336',
+                '#e91e63',
+                '#9c27b0',
+                '#673ab7',
+                '#1890ff',
+                '#009688',
+                '#4caf50',
+                '#ffc107',
+                '#ff9800',
+                '#ff5722',
+                '#795548',
+                '#607d8b',
+              ]}
+            />
+          </Form.Item>
         </Section>
 
         {/* ========= SESSION SCHEDULE =========== */}
@@ -592,13 +834,14 @@ const Session = ({ match, history }) => {
                 className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
                 disabledDate={disabledDate}
-                onChange={handleRecurringDatesRange}
+                onChange={handleDateRangeChange}
                 onFocus={handleCalenderPop}
               />
             </Form.Item>
           )}
+
           <Scheduler
-            sessionSlots={session?.inventory || []}
+            sessionSlots={session?.inventory?.length ? session.inventory : []}
             recurring={isSessionRecurring}
             recurringDatesRange={recurringDatesRanges}
             handleSlotsChange={handleSlotsChange}

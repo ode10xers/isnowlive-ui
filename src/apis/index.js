@@ -43,6 +43,8 @@ export default {
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
     getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
     getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
+    getRescheduleableSessionsByPrice: (creatorName, price) =>
+      http.get(`/sessions/${creatorName}/reschedulable?price=${price}`),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
@@ -54,5 +56,7 @@ export default {
     cancelCustomerOrder: (orderId, payload) => http.post(`/secure/customer/orders/${orderId}/cancel`, payload),
     publishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
     unpublishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
+    deleteSession: (sessionId) => http.delete(`/secure/creator/sessions/${sessionId}`),
+    rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
   },
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
@@ -77,9 +78,31 @@ const ManageSessions = () => {
     setIsLoading(false);
   };
 
-  const trackAndNavigate = (destination) => {
+  const deleteSession = async (sessionId) => {
+    setIsLoading(true);
+    const eventTag = creator.click.sessions.manage.deleteSession;
+
+    try {
+      await apis.session.deleteSession(sessionId);
+
+      trackSuccessEvent(eventTag, { session_id: sessionId });
+      message.success('Session deleted successfully!');
+      getSessionsList();
+    } catch (error) {
+      trackFailedEvent(eventTag, error, { session_id: sessionId });
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const trackAndNavigate = (destination, data = null) => {
     trackSimpleEvent(creator.click.sessions.manage.editSession);
-    history.push(destination);
+    if (data) {
+      history.push(destination, { ...data });
+    } else {
+      history.push(destination);
+    }
   };
 
   useEffect(() => {
@@ -90,21 +113,42 @@ const ManageSessions = () => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '12%',
-      render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
+      width: '20%',
+      render: (record) => {
+        return {
+          props: {
+            style: {
+              borderLeft: `6px solid ${record.color_code || '#fff'}`,
+            },
+          },
+          children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+        };
+      },
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      width: '10%',
+      render: (text, record) => (
+        <Text>
+          {' '}
+          {record.price} {record.currency}{' '}
+        </Text>
+      ),
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '5%',
+      width: '10%',
       render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
     },
     {
       title: 'Session Date',
       dataIndex: 'session_date',
       key: 'session_date',
-      width: '15%',
+      width: '20%',
       render: (text, record) => (
         <>
           {record.recurring ? (
@@ -113,41 +157,33 @@ const ManageSessions = () => {
             </Text>
           ) : (
             <Text>
-              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.session_date)}
+              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.start_time)}
             </Text>
           )}
         </>
       ),
     },
     {
-      title: 'Registrations',
-      key: 'participants',
-      dataIndex: 'participants',
-      width: '2%',
-      render: (text, record) => (
-        <Text>
-          {record.total_bookings || 0} / {record.max_participants}
-        </Text>
-      ),
-    },
-    {
       title: 'Actions',
-      width: '4%',
+      width: '15%',
       render: (text, record) => {
         return (
           <Row justify="start">
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={6}>
               <Button
                 className={styles.detailsButton}
                 onClick={() =>
-                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`)
+                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
+                    beginning: record.beginning,
+                    expiry: record.expiry,
+                  })
                 }
                 type="link"
               >
                 Edit
               </Button>
             </Col>
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={14}>
               {!record.is_active ? (
                 <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
                   Publish
@@ -157,6 +193,17 @@ const ManageSessions = () => {
                   Unpublish
                 </Button>
               )}
+            </Col>
+            <Col md={24} lg={24} xl={4}>
+              <Popconfirm
+                title="Do you want to delete session?"
+                icon={<DeleteOutlined className={styles.danger} />}
+                okText="Yes"
+                cancelText="No"
+                onConfirm={() => deleteSession(record.session_id)}
+              >
+                <Button danger type="text" icon={<DeleteOutlined />} />
+              </Popconfirm>
             </Col>
           </Row>
         );
@@ -179,8 +226,12 @@ const ManageSessions = () => {
         className={styles.card}
         title={
           <div
+            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
             onClick={() =>
-              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
+                beginning: item.beginning,
+                expiry: item.expiry,
+              })
             }
           >
             <Text>{item.name}</Text>
@@ -191,7 +242,10 @@ const ManageSessions = () => {
             type="link"
             className={styles.detailsButton}
             onClick={() =>
-              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`)
+              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
+                beginning: item.beginning,
+                expiry: item.expiry,
+              })
             }
           >
             Edit
@@ -207,6 +261,17 @@ const ManageSessions = () => {
               </Button>
             )}
           </>,
+          <Popconfirm
+            title="Do you want to delete session?"
+            icon={<DeleteOutlined className={styles.danger} />}
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => deleteSession(item.session_id)}
+          >
+            <Button danger type="text">
+              Delete
+            </Button>
+          </Popconfirm>,
         ]}
       >
         {layout('Type', <Text>{item.group ? 'Group Session' : '1-to-1 Session'}</Text>)}

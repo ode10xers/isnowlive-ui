@@ -1,30 +1,26 @@
 @import '../../styles/variables.scss';
 
-.button {
-  margin-right: 20px;
-}
-.dot {
-  height: 10px;
-  width: 10px;
-  background-color: map-get($colors, $key: 'Silver');
-  border-radius: 50%;
-  display: inline-block;
-}
 .imageWrapper {
   position: relative;
   max-height: 300px;
   margin-bottom: 10%;
   margin-top: 50px;
 }
+
+.coverImageWrapper {
+  background-color: map-get($colors, $key: 'WhiteSmoke');
+  text-align: center;
+  border-radius: 8px;
+  margin: -20px;
+}
 .coverImage img {
   border-radius: 8px;
   max-height: 300px;
 }
+
 .profileImage {
   position: relative;
   border-radius: 4px;
-  bottom: 50px;
-  left: 50px;
   width: 100%;
 }
 .profileImage img {
@@ -32,21 +28,9 @@
   max-width: 120px;
   border-radius: 4px;
 }
-.socialIcon {
-  font-size: 24px;
-  margin: 5px;
-}
-.coverImageWrapper {
-  background-color: map-get($colors, $key: 'WhiteSmoke');
-  text-align: center;
-  border-radius: 8px;
-  margin: -20px;
-}
-.card {
-  margin: 10px !important;
-  max-height: 600px;
-  height: 100%;
-  overflow: auto;
+
+.timeText {
+  display: block;
 }
 .userName {
   position: absolute;
@@ -58,13 +42,19 @@
   bottom: 0px;
   right: 45px;
 }
-.profilePreviewContainer {
-  margin: 80px;
+.socialIcon {
+  font-size: 24px;
+  margin: 5px;
 }
+
+.detailsButton {
+  padding-left: 0px !important;
+}
+.card {
+  margin-top: 10px !important;
+}
+
 @media (max-width: 768px) {
-  .profilePreviewContainer {
-    margin: 5px;
-  }
   .card {
     max-height: 100%;
     margin: 10px !important;

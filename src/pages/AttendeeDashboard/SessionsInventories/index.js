@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, Popconfirm, message, Popover } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover, Radio, Empty } from 'antd';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import CalendarView from 'components/CalendarView';
+import { getDuration, generateUrlFromUsername, generateQueryString } from 'utils/helper';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -27,6 +28,8 @@ const SessionsInventories = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
+  const [view, setView] = useState('list');
+  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
@@ -54,6 +57,7 @@ const SessionsInventories = ({ match }) => {
             order_id: i.order_id,
             max_participants: i.max_participants,
             username: i.creator_username,
+            price: i.price,
             currency: i.currency || 'SGD',
             refund_amount: i.refund_amount || 0,
             is_refundable: i.is_refundable || false,
@@ -73,25 +77,13 @@ const SessionsInventories = ({ match }) => {
       setSessions([]);
       setIsLoading(true);
 
-      let monitorRefundPolling = null;
-
       if (match?.params?.session_type === 'past') {
         setIsPast(true);
       } else {
         setIsPast(false);
-
-        //Set polling to dynamically adjust Refund/Cancel Popup
-        monitorRefundPolling = setInterval(() => {
-          getStaffSession(match?.params?.session_type);
-        }, 5000);
       }
+
       getStaffSession(match?.params?.session_type);
-
-      if (monitorRefundPolling) {
-        return () => {
-          clearInterval(monitorRefundPolling);
-        };
-      }
     }
   }, [match.params.session_type, getStaffSession]);
 
@@ -123,13 +115,20 @@ const SessionsInventories = ({ match }) => {
     try {
       await apis.session.cancelCustomerOrder(orderId, { reason: 'requested_by_customer' });
       trackSuccessEvent(attendee.click.sessions.cancelOrder, { order_id: orderId });
-      message.success('Refund Successful');
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      Modal.success({
+        closable: true,
+        maskClosable: true,
+        title: 'Refund Successful',
+      });
+      getStaffSession(match?.params?.session_type);
     } catch (error) {
       trackFailedEvent(attendee.click.sessions.cancelOrder, error, { order_id: orderId });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      Modal.error({
+        closable: true,
+        maskClosable: true,
+        title: 'An Error Occured',
+        content: error.response?.data?.message || 'Something went wrong.',
+      });
     }
   };
 
@@ -151,7 +150,9 @@ const SessionsInventories = ({ match }) => {
             okText="Yes, Refund Session"
             cancelText="No"
           >
-            <Button type="link"> Cancel </Button>
+            <Button type="text" danger>
+              Cancel
+            </Button>
           </Popconfirm>
         );
       } else {
@@ -166,15 +167,16 @@ const SessionsInventories = ({ match }) => {
                 Sorry, as per the cancellation policy of <br />
                 this session,
                 <strong>
-                  {' '}
                   it can only be cancelled <br />
-                  {data.refund_before_hours} hours{' '}
+                  {data.refund_before_hours} hours
                 </strong>
                 before the session starts.
               </Text>
             }
           >
-            <Button type="link"> Cancel </Button>
+            <Button type="text" danger>
+              Cancel
+            </Button>
           </Popover>
         );
       }
@@ -192,10 +194,22 @@ const SessionsInventories = ({ match }) => {
             </Text>
           }
         >
-          <Button type="link"> Cancel </Button>
+          <Button type="text" danger>
+            Cancel
+          </Button>
         </Popover>
       );
     }
+  };
+
+  const rescheduleSession = (data) => {
+    const passedData = {
+      inventory_id: data.inventory_id,
+      order_id: data.order_id,
+      price: data.price,
+    };
+
+    window.open(`${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`);
   };
 
   let sessionColumns = [
@@ -236,30 +250,42 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
+              <Button type="text" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
           </Row>
         ) : (
           <Row justify="start">
-            <Col md={24} lg={24} xl={8}>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
+            {!isPast && (
+              <>
+                <Col md={24} lg={24} xl={5}>
+                  <Button
+                    type="text"
+                    className={styles.success}
+                    disabled={!record.join_url}
+                    onClick={() => trackAndJoinSession(record)}
+                  >
+                    Join
+                  </Button>
+                </Col>
+                <Col md={24} lg={24} xl={5}>
+                  {renderRefundPopup(record)}
+                </Col>
+              </>
+            )}
+            <Col md={24} lg={24} xl={5}>
+              <Button type="link" onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
 
             {!isPast && (
-              <>
-                <Col md={24} lg={24} xl={8}>
-                  <Button type="link" disabled={!record.join_url} onClick={() => trackAndJoinSession(record)}>
-                    Join
-                  </Button>
-                </Col>
-                <Col md={24} lg={24} xl={8}>
-                  {renderRefundPopup(record)}
-                </Col>
-              </>
+              <Col md={24} lg={24} xl={5}>
+                <Button type="text" className={styles.warning} onClick={() => rescheduleSession(record)}>
+                  Reschedule
+                </Button>
+              </Col>
             )}
           </Row>
         );
@@ -285,40 +311,81 @@ const SessionsInventories = ({ match }) => {
           </div>
         }
         actions={[
-          <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
-            Details
-          </Button>,
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.join_url} onClick={() => trackAndJoinSession(item)}>
+              <Button
+                type="text"
+                disabled={!item.join_url}
+                onClick={() => trackAndJoinSession(item)}
+                className={styles.success}
+              >
                 Join
               </Button>
             )}
           </>,
           <>{!isPast && renderRefundPopup(item)}</>,
+          <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
+            Reschedule
+          </Button>,
         ]}
       >
-        {layout('Type', <Text>{item.type}</Text>)}
-        {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Day', <Text>{item.days}</Text>)}
-        {layout('Time', <Text>{item.time}</Text>)}
+        <div onClick={() => openSessionInventoryDetails(item)}>
+          {layout('Type', <Text>{item.type}</Text>)}
+          {layout('Duration', <Text>{item.duration}</Text>)}
+          {layout('Day', <Text>{item.days}</Text>)}
+          {layout('Time', <Text>{item.time}</Text>)}
+        </div>
       </Card>
     );
+  };
+
+  const handleViewChange = (e) => {
+    setView(e.target.value);
+  };
+
+  const onViewChange = (e) => {
+    setCalendarView(e);
   };
 
   return (
     <div className={styles.box}>
       <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
-      {isMobileDevice ? (
+      <Radio.Group value={view} onChange={handleViewChange}>
+        <Radio.Button value="list">List</Radio.Button>
+        <Radio.Button value="calendar">Calendar</Radio.Button>
+      </Radio.Group>
+      {view === 'calendar' ? (
         <Loader loading={isLoading} size="large" text="Loading sessions">
           {sessions.length > 0 ? (
-            sessions.map(renderSessionItem)
+            <CalendarView
+              inventories={sessions}
+              onSelectInventory={openSessionInventoryDetails}
+              onViewChange={onViewChange}
+              calendarView={calendarView}
+            />
           ) : (
-            <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+            <Empty />
           )}
         </Loader>
       ) : (
-        <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+        <>
+          {isMobileDevice ? (
+            <>
+              <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
+                Click on the card to show session details
+              </Text>
+              <Loader loading={isLoading} size="large" text="Loading sessions">
+                {sessions.length > 0 ? (
+                  sessions.map(renderSessionItem)
+                ) : (
+                  <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                )}
+              </Loader>
+            </>
+          ) : (
+            <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+          )}
+        </>
       )}
     </div>
   );

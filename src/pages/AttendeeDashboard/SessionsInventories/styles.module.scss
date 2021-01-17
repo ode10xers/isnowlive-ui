@@ -4,5 +4,14 @@
   padding-left: 0px !important;
 }
 .danger {
-  color: map-get($colors, $key: 'FireBrick');
+  color: map-get($colors, $key: 'FireBrick') !important;
+}
+.success {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+}
+.warning {
+  color: map-get($colors, $key: 'Pumpkin') !important;
+}
+.helperText {
+  display: block;
 }

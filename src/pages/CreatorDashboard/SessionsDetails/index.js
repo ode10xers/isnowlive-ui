@@ -84,13 +84,17 @@ const SessionsDetails = ({ match }) => {
     </Card>
   );
 
-  const trackAndNavigate = (destination, eventTag, newWindow = false) => {
+  const trackAndNavigate = (destination, eventTag, newWindow = false, data = null) => {
     trackSimpleEvent(eventTag);
 
     if (newWindow) {
       window.open(destination);
     } else {
-      history.push(destination);
+      if (data) {
+        history.push(destination, { ...data });
+      } else {
+        history.push(destination);
+      }
     }
   };
 
@@ -101,7 +105,7 @@ const SessionsDetails = ({ match }) => {
       const { status } = await apis.session.delete(JSON.stringify([inventory_id]));
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag, { inventory_id: inventory_id });
-        history.push(Routes.creatorDashboard);
+        history.push(Routes.creatorDashboard.rootPath);
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
@@ -225,7 +229,12 @@ const SessionsDetails = ({ match }) => {
                   onClick={() =>
                     trackAndNavigate(
                       `${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`,
-                      creator.click.sessions.details.editSession
+                      creator.click.sessions.details.editSession,
+                      false,
+                      {
+                        beginning: session.beginning,
+                        expiry: session.expiry,
+                      }
                     )
                   }
                 >
