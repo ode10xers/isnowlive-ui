@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
+  TagsOutlined,
+  VideoCameraOutlined,
   GlobalOutlined,
   FacebookOutlined,
   InstagramOutlined,
@@ -17,6 +19,7 @@ import ReactHtmlParser from 'react-html-parser';
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
+import ClassPasses from 'components/ClassPasses';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
@@ -43,7 +46,7 @@ const ProfilePreview = ({ username = null }) => {
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedSessionTab, setSelectedSessionTab] = useState(0);
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
@@ -52,6 +55,10 @@ const ProfilePreview = ({ username = null }) => {
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
   const [calendarSession, setCalendarSession] = useState([]);
+  const [selectedListTab, setSelectedListTab] = useState(0);
+  const [isListLoading, setIsListLoading] = useState(false);
+  const [isPassesLoading, setIsPassesLoading] = useState(true);
+  const [passes, setPasses] = useState([]);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -90,6 +97,29 @@ const ProfilePreview = ({ username = null }) => {
     [username]
   );
 
+  const getPassesDetails = useCallback(async () => {
+    try {
+      let profileUsername = '';
+
+      if (username) {
+        profileUsername = username;
+      } else {
+        profileUsername = getLocalUserDetails().username;
+      }
+
+      const { data } = await apis.passes.getPassesByUsername(profileUsername);
+
+      if (data) {
+        console.log(data);
+        setPasses(data);
+        setIsPassesLoading(false);
+      }
+    } catch (error) {
+      setIsPassesLoading(false);
+      message.error('Failed to load class pass details');
+    }
+  }, [username]);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnDashboard(true);
@@ -98,9 +128,22 @@ const ProfilePreview = ({ username = null }) => {
     getSessionDetails('upcoming');
   }, [history.location.pathname, getProfileDetails, getSessionDetails]);
 
-  const handleChangeTab = (key) => {
+  const handleChangeListTab = (key) => {
+    setIsListLoading(true);
+    setSelectedListTab(key);
+
+    if (parseInt(key) === 0) {
+      handleChangeSessionTab(selectedSessionTab);
+    } else {
+      getPassesDetails();
+    }
+
+    setIsListLoading(false);
+  };
+
+  const handleChangeSessionTab = (key) => {
     setIsSessionLoading(true);
-    setSelectedTab(key);
+    setSelectedSessionTab(key);
     if (parseInt(key) === 0) {
       trackSimpleEvent(user.click.profile.upcomingSessionsTab);
       getSessionDetails('upcoming');
@@ -256,47 +299,81 @@ const ProfilePreview = ({ username = null }) => {
           </Col>
         </Row>
 
-        {/* =====SESSION======== */}
-        <Row className={styles.mt50}>
-          <Col span={24}>
-            <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
-            <Text type="primary" strong>
-              All event times shown below are in your local time zone ({getCurrentLongTimezone()})
-            </Text>
-          </Col>
-          <Col span={24} className={styles.mt10}>
-            <Radio.Group value={view} onChange={handleViewChange}>
-              <Radio.Button value="list">List View</Radio.Button>
-              <Radio.Button value="calendar">Calendar View</Radio.Button>
-            </Radio.Group>
-          </Col>
-          <Col span={24}>
-            {view === 'calendar' ? (
-              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                {calendarSession.length > 0 ? (
-                  <CalendarView
-                    inventories={calendarSession}
-                    onSelectInventory={showInventoryDetails}
-                    onViewChange={onViewChange}
-                    calendarView={calendarView}
-                  />
-                ) : (
-                  <Empty />
-                )}
-              </Loader>
-            ) : (
-              <Tabs defaultActiveKey={selectedTab} onChange={handleChangeTab}>
-                {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
-                  <Tabs.TabPane tab={item} key={index}>
+        {/* =====TAB SELECT===== */}
+
+        <Loader loading={isListLoading} size="large">
+          <Tabs size="large" defaultActiveKey={selectedListTab} onChange={handleChangeListTab}>
+            <Tabs.TabPane
+              key={0}
+              tab={
+                <div className={styles.largeTabHeader}>
+                  <VideoCameraOutlined />
+                  Sessions
+                </div>
+              }
+            >
+              {/* =====SESSION======== */}
+              <Row className={styles.mt20}>
+                <Col span={24}>
+                  <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
+                  <Text type="primary" strong>
+                    All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+                  </Text>
+                </Col>
+                <Col span={24} className={styles.mt10}>
+                  <Radio.Group value={view} onChange={handleViewChange}>
+                    <Radio.Button value="list">List View</Radio.Button>
+                    <Radio.Button value="calendar">Calendar View</Radio.Button>
+                  </Radio.Group>
+                </Col>
+                <Col span={24}>
+                  {view === 'calendar' ? (
                     <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                      <Sessions username={username} sessions={sessions} />
+                      {calendarSession.length > 0 ? (
+                        <CalendarView
+                          inventories={calendarSession}
+                          onSelectInventory={showInventoryDetails}
+                          onViewChange={onViewChange}
+                          calendarView={calendarView}
+                        />
+                      ) : (
+                        <Empty />
+                      )}
                     </Loader>
-                  </Tabs.TabPane>
-                ))}
-              </Tabs>
-            )}
-          </Col>
-        </Row>
+                  ) : (
+                    <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
+                      {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
+                        <Tabs.TabPane tab={item} key={index}>
+                          <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                            <Sessions username={username} sessions={sessions} />
+                          </Loader>
+                        </Tabs.TabPane>
+                      ))}
+                    </Tabs>
+                  )}
+                </Col>
+              </Row>
+            </Tabs.TabPane>
+            <Tabs.TabPane
+              key={1}
+              tab={
+                <div className={styles.largeTabHeader}>
+                  <TagsOutlined />
+                  Passes
+                </div>
+              }
+            >
+              <Row className={styles.mt20}>
+                <Col span={24}></Col>
+                <Col span={24}>
+                  <Loader loading={isPassesLoading} size="large" text="Loading class passes">
+                    <ClassPasses passes={passes} />
+                  </Loader>
+                </Col>
+              </Row>
+            </Tabs.TabPane>
+          </Tabs>
+        </Loader>
 
         {/* =====TESTIMONIALS======== */}
         {profile && profile?.profile?.testimonials ? (

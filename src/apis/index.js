@@ -59,4 +59,7 @@ export default {
     deleteSession: (sessionId) => http.delete(`/secure/creator/sessions/${sessionId}`),
     rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
   },
+  passes: {
+    getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
+  },
 };
