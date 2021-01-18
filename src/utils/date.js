@@ -1,4 +1,8 @@
-import moment from 'moment';
+import Moment from 'moment';
+//Pending Use
+import { extendMoment } from 'moment-range';
+
+const moment = extendMoment(Moment);
 
 const formatDate = {
   toLocaleTime: (date) => moment(date).format('LT'),
@@ -23,6 +27,11 @@ const formatDate = {
 const timeCalculation = {
   isBeforeDate: (date) => moment().isBefore(moment(date)),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
+  createRange: (startTime, endTime) => moment.range(startTime, endTime).snapTo('day'),
+  createWeekRange: (date, isPrevious) =>
+    moment.rangeFromInterval('day', isPrevious ? -6 : 6, moment(date).endOf('day')).snapTo('day'),
+  getRangeDiff: (rangeA, rangeB) =>
+    moment.range(rangeB[0], rangeB[1]).snapTo('day').subtract(moment.range(rangeA[0], rangeA[1]).snapTo('day')),
 };
 
 const timezoneUtils = {

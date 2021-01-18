@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
+import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
-import { DeleteFilled, CarryOutOutlined, TeamOutlined } from '@ant-design/icons';
+import { DeleteFilled, TeamOutlined } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -46,6 +46,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       } else {
         setDate(moment(selectedDate));
       }
+    }
+    if (sessionSlots.length !== slots.length) {
+      setSlots(sessionSlots);
     }
     // eslint-disable-next-line
   }, [recurring, recurringDatesRange, sessionSlots]);
@@ -109,26 +112,37 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     const slotsForDate = getSlotsList(calendarDate);
     if (slotsForDate?.length && !isMobileDevice) {
       return (
-        <Popover
-          content={
-            <List
-              size="small"
-              bordered
-              dataSource={slotsForDate}
-              renderItem={(item) => (
-                <List.Item className={styles.slot}>
-                  {toLocaleTime(item['start_time'])}
-                  {' - '} {toLocaleTime(item['end_time'])}
-                </List.Item>
-              )}
-            />
-          }
-          title="Schedules"
-        >
-          <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
-            <CarryOutOutlined />
-          </Badge>
-        </Popover>
+        <List
+          size="small"
+          itemLayout="vertical"
+          dataSource={slotsForDate}
+          renderItem={(item) => (
+            <List.Item className={styles.slot}>
+              {toLocaleTime(item['start_time'])}
+              {' - '} {toLocaleTime(item['end_time'])}
+            </List.Item>
+          )}
+        />
+        // <Popover
+        //   content={
+        //     <List
+        //       size="small"
+        //       bordered
+        //       dataSource={slotsForDate}
+        //       renderItem={(item) => (
+        //         <List.Item className={styles.slot}>
+        //           {toLocaleTime(item['start_time'])}
+        //           {' - '} {toLocaleTime(item['end_time'])}
+        //         </List.Item>
+        //       )}
+        //     />
+        //   }
+        //   title="Schedules"
+        // >
+        //   <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
+        //     <CarryOutOutlined />
+        //   </Badge>
+        // </Popover>
       );
     } else if (slotsForDate?.length && isMobileDevice) {
       return <Badge className={styles.badge} size="small" count={slotsForDate?.length}></Badge>;
