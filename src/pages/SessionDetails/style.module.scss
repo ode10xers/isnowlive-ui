@@ -10,6 +10,13 @@
 .subText {
   margin-top: 0px !important;
 }
+
+.sessionDesc, .sessionPrereq {
+  span {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  }
+}
 .linkButton {
   padding: 0px !important;
 }

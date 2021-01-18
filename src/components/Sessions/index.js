@@ -94,7 +94,9 @@ const Sessions = ({ sessions, username }) => {
                             <Title className={styles.title} level={5}>
                               {session.name}
                             </Title>
-                            <Paragraph ellipsis={{ rows: 3 }}>{ReactHtmlParser(session?.description)}</Paragraph>
+                            <Paragraph className={styles.sessionDesc} ellipsis={{ rows: 3 }}>
+                              {ReactHtmlParser(session?.description)}
+                            </Paragraph>
                           </div>
                         </Col>
                         <Col xs={24} md={8} lg={6}>
