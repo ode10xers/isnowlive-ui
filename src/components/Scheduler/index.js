@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Popover, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
+import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
-import { DeleteFilled, CarryOutOutlined, TeamOutlined } from '@ant-design/icons';
+import { DeleteFilled, TeamOutlined } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -46,6 +46,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       } else {
         setDate(moment(selectedDate));
       }
+    }
+    if (sessionSlots.length !== slots.length) {
+      setSlots(sessionSlots);
     }
     // eslint-disable-next-line
   }, [recurring, recurringDatesRange, sessionSlots]);
@@ -109,26 +112,37 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     const slotsForDate = getSlotsList(calendarDate);
     if (slotsForDate?.length && !isMobileDevice) {
       return (
-        <Popover
-          content={
-            <List
-              size="small"
-              bordered
-              dataSource={slotsForDate}
-              renderItem={(item) => (
-                <List.Item className={styles.slot}>
-                  {toLocaleTime(item['start_time'])}
-                  {' - '} {toLocaleTime(item['end_time'])}
-                </List.Item>
-              )}
-            />
-          }
-          title="Schedules"
-        >
-          <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
-            <CarryOutOutlined />
-          </Badge>
-        </Popover>
+        <List
+          size="small"
+          itemLayout="vertical"
+          dataSource={slotsForDate}
+          renderItem={(item) => (
+            <List.Item className={styles.slot}>
+              {toLocaleTime(item['start_time'])}
+              {' - '} {toLocaleTime(item['end_time'])}
+            </List.Item>
+          )}
+        />
+        // <Popover
+        //   content={
+        //     <List
+        //       size="small"
+        //       bordered
+        //       dataSource={slotsForDate}
+        //       renderItem={(item) => (
+        //         <List.Item className={styles.slot}>
+        //           {toLocaleTime(item['start_time'])}
+        //           {' - '} {toLocaleTime(item['end_time'])}
+        //         </List.Item>
+        //       )}
+        //     />
+        //   }
+        //   title="Schedules"
+        // >
+        //   <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
+        //     <CarryOutOutlined />
+        //   </Badge>
+        // </Popover>
       );
     } else if (slotsForDate?.length && isMobileDevice) {
       return <Badge className={styles.badge} size="small" count={slotsForDate?.length}></Badge>;
@@ -166,9 +180,32 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     // create list of all new slots from form
     let newSlots = [];
     form.forEach((vs) => {
+      if (vs.inventory_id) {
+        delete vs.inventory_id;
+      }
+
+      const givenDateMoment = moment(givenDate);
+      const startTimeMoment = moment(vs.start_time);
+      const newInventoryTime = [
+        givenDateMoment.year(),
+        givenDateMoment.month(),
+        givenDateMoment.date(),
+        startTimeMoment.hour(),
+        startTimeMoment.minute(),
+      ];
+
+      // Skip creating it if the newly created inventory will exist in the past
+      if (
+        givenDateMoment.isSameOrBefore(moment(), 'day') &&
+        moment(newInventoryTime).isSameOrBefore(moment(), 'minute')
+      ) {
+        console.log('Past inventory will be created, skipping...');
+        return;
+      }
+
       if (vs.start_time && vs.end_time) {
         let value = vs;
-        let selected_date = moment(givenDate).format();
+        let selected_date = givenDateMoment.format();
         value.start_time = selected_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
         value.session_date = value.start_time;
@@ -199,8 +236,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesAllSelectedDay = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
-    let selected_date = toLocaleDate(selectedDate);
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
+    const daysToBeAdded = moment(startDate).day() > selectedDate.day() ? selectedDate.day() + 7 : selectedDate.day();
+    let selected_date = toLocaleDate(recurringDatesRange ? moment(startDate).day(daysToBeAdded) : selectedDate);
     while (
       moment(selected_date).isBetween(startDate, endDate) ||
       moment(selected_date).isSame(startDate) ||
@@ -215,8 +253,8 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const createSchedulesMultipleDays = () => {
     let tempSlots = slots;
     const startDate = recurringDatesRange && toLocaleDate(recurringDatesRange[0]);
-    const endDate = recurringDatesRange && toLocaleDate(moment(recurringDatesRange[1]).add(1, 'days'));
-    let selected_date = toLocaleDate(selectedDate);
+    const endDate = recurringDatesRange && toLocaleDate(recurringDatesRange[1]);
+    let selected_date = recurringDatesRange ? startDate : toLocaleDate(selectedDate);
 
     let slotdates = [];
     while (
@@ -241,10 +279,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     switch (typeOfSessionCreation) {
       case 0:
         tempSlots = createOneTimeSchedule(selectedDate, slots);
+        setDayList(null);
         handleCancel();
         break;
       case 1:
         tempSlots = createSchedulesAllSelectedDay();
+        setDayList(null);
         handleCancel();
         break;
       case 2:
@@ -257,6 +297,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         break;
       default:
         createOneTimeSchedule(selectedDate, slots);
+        setDayList(null);
         break;
     }
     setSlots(tempSlots);

@@ -157,7 +157,7 @@ const ManageSessions = () => {
             </Text>
           ) : (
             <Text>
-              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.session_date)}
+              {record?.inventory && record.inventory[0] && toLongDateWithDay(record.inventory[0]?.start_time)}
             </Text>
           )}
         </>
@@ -183,7 +183,7 @@ const ManageSessions = () => {
                 Edit
               </Button>
             </Col>
-            <Col md={24} lg={24} xl={10}>
+            <Col md={24} lg={24} xl={14}>
               {!record.is_active ? (
                 <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
                   Publish
@@ -194,7 +194,7 @@ const ManageSessions = () => {
                 </Button>
               )}
             </Col>
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={4}>
               <Popconfirm
                 title="Do you want to delete session?"
                 icon={<DeleteOutlined className={styles.danger} />}

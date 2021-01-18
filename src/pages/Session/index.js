@@ -48,7 +48,8 @@ const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
-  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff },
+  formatDate: { toUtcStartOfDay, toUtcEndOfDay, getTimeDiff, toLocaleDate },
+  timeCalculation: { createWeekRange, getRangeDiff, createRange },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
@@ -134,6 +135,13 @@ const Session = ({ match, history }) => {
       try {
         const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
         if (data) {
+          // The session_date gets messed up here, so trying to fix it here
+          if (data.inventory.length > 0) {
+            data.inventory = data.inventory.map((inventory) => ({
+              ...inventory,
+              session_date: inventory.start_time,
+            }));
+          }
           setSession(data);
           form.setFieldsValue({
             ...data,
@@ -175,10 +183,10 @@ const Session = ({ match, history }) => {
     }
     if (match.params.id) {
       const startDate = location.state.beginning
-        ? toUtcStartOfDay(moment(location.state.beginning))
+        ? toUtcStartOfDay(location.state.beginning)
         : toUtcStartOfDay(moment().subtract(1, 'month'));
       const endDate = location.state.expiry
-        ? toUtcEndOfDay(moment(location.state.expiry))
+        ? toUtcEndOfDay(location.state.expiry)
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
@@ -263,22 +271,54 @@ const Session = ({ match, history }) => {
     }
   };
 
-  const handleSessionRecurrance = (e) => {
-    if (e.target.value === 'true') {
-      setIsSessionRecurring(true);
-    } else {
-      setIsSessionRecurring(false);
-    }
+  const changeSessionRecurrance = (isRecurring) => {
+    setIsSessionRecurring(isRecurring);
     setRecurringDatesRanges([]);
+  };
+
+  const handleSessionRecurrance = (e) => {
+    const isRecurring = e.target.value === 'true';
+
+    if (session.inventory.length > 0) {
+      Modal.confirm({
+        autoFocusButton: 'cancel',
+        mask: true,
+        centered: true,
+        closable: true,
+        maskClosable: true,
+        title: 'Keep Existing Slots?',
+        content: (
+          <Paragraph>
+            You are switching from{' '}
+            <Text strong>{isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'} </Text>,
+            would you like to <Text strong> keep your existing time slots </Text> marked on the calendar?
+          </Paragraph>
+        ),
+        okText: 'No, Clear Slots',
+        okButtonProps: { type: 'default' },
+        cancelText: 'Yes, Keep Slots',
+        cancelButtonProps: { type: 'primary' },
+        onCancel: () => changeSessionRecurrance(isRecurring),
+        onOk: () => {
+          changeSessionRecurrance(isRecurring);
+          // Mark created inventories for deletion
+          session.inventory.forEach((inv) => {
+            if (inv.inventory_id) {
+              handleSlotDelete(inv.inventory_id);
+            }
+          });
+
+          // Set current state to empty array
+          setSession({ ...session, inventory: [] });
+        },
+      });
+    } else {
+      changeSessionRecurrance(isRecurring);
+    }
   };
 
   const disabledDate = (current) => {
     return current && current < moment().startOf('day');
-  };
-
-  const handleRecurringDatesRange = (value) => {
-    setRecurringDatesRanges(value);
-    form.setFieldsValue({ ...form.getFieldsValue(), recurring_dates_range: value });
   };
 
   const handleSlotsChange = (inventory) => {
@@ -293,6 +333,132 @@ const Session = ({ match, history }) => {
     tempDeleteSlots.push(value);
     tempDeleteSlots = [...new Set(tempDeleteSlots)];
     setDeleteSlot(tempDeleteSlots);
+  };
+
+  const handleDateRangeChange = (value) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+
+    if (oldDateRange && newDateRange) {
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
+    if (rangeDiff.length > 0) {
+      Modal.confirm({
+        centered: true,
+        closable: true,
+        mask: true,
+        maskClosable: true,
+        autoFocusButton: 'cancel',
+        title: 'Update Session Schedule?',
+        okText: `Copy on new dates`,
+        cancelText: 'Leave it as is',
+        content: (
+          <Text>
+            You have changed the date range, would you like us to copy the sessions currently on the calender to this
+            date range?
+          </Text>
+        ),
+        onOk: () => handleRecurringDatesRange(value, true),
+        onCancel: () => handleRecurringDatesRange(value, false),
+        afterClose: () => handleRecurringDatesRange(value, false),
+      });
+    } else {
+      handleRecurringDatesRange(value, false);
+    }
+  };
+
+  const handleRecurringDatesRange = (value, updateInventoriesForNewDate) => {
+    const oldDateRange = form.getFieldsValue().recurring_dates_range;
+    const newDateRange = value;
+    let rangeDiff = [];
+    let takeLastWeek = true;
+
+    if (updateInventoriesForNewDate && oldDateRange && newDateRange) {
+      if (oldDateRange[1].isSame(newDateRange[1])) {
+        takeLastWeek = false;
+      }
+
+      rangeDiff = getRangeDiff(oldDateRange, newDateRange);
+    }
+
+    setRecurringDatesRanges(value);
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      recurring_dates_range: value,
+    });
+
+    // For Repeating Sessions, if date range changes remove the inventories which are out of range
+    if (value?.length && session?.inventory?.length) {
+      const newSlots = [];
+
+      for (let i = 0; i < session.inventory.length; i++) {
+        const slot = session.inventory[i];
+        if (
+          getTimeDiff(toLocaleDate(value[0]), toLocaleDate(slot.start_time), 'days') <= 0 &&
+          getTimeDiff(toLocaleDate(value[1]), toLocaleDate(slot.end_time), 'days') >= 0
+        ) {
+          newSlots.push(slot);
+        } else {
+          if (slot.inventory_id) {
+            handleSlotDelete(slot.inventory_id);
+          }
+        }
+      }
+
+      //Add new inventories here if the date range extends to the future
+      if (updateInventoriesForNewDate && rangeDiff.length > 0) {
+        const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
+
+        const referenceInventory = session.inventory[takeLastWeek ? session.inventory.length - 1 : 0];
+        const copiedRange = createWeekRange(referenceInventory.start_time, takeLastWeek);
+
+        const copiedInventories = session.inventory.filter(
+          (inventory) => inventory.num_participants === 0 && moment(inventory.start_time).within(copiedRange)
+        );
+
+        Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
+          if (extraDay.within(oldRange)) {
+            return;
+          }
+
+          copiedInventories.forEach((inventory) => {
+            const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
+            const invStartMoment = moment(inventory.start_time);
+
+            // Skip creating it if the newly copied inventory will exist in the past
+            if (
+              extraDay.isSameOrBefore(moment(), 'day') &&
+              moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).isSameOrBefore(
+                moment(),
+                'minute'
+              )
+            ) {
+              console.log('Past inventory will be created, skipping...');
+              return;
+            }
+
+            if (extraDay.day() === invStartMoment.day()) {
+              const invEndMoment = moment(inventory.end_time);
+
+              const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
+              const end_time = moment([...createdDate, invEndMoment.hour(), invEndMoment.minute()]).format();
+              const session_date = start_time;
+
+              newSlots.push({
+                num_participants: 0,
+                session_date: session_date,
+                start_time: start_time,
+                end_time: end_time,
+              });
+            }
+          });
+        });
+      }
+
+      handleSlotsChange(newSlots);
+    }
   };
 
   const handleRefundBeforeHoursChange = (e) => {
@@ -330,11 +496,16 @@ const Session = ({ match, history }) => {
         color_code: colorCode,
       };
       if (isSessionRecurring) {
-        data.beginning = moment(values.recurring_dates_range[0]).utc().format();
-        data.expiry = moment(values.recurring_dates_range[1]).utc().format();
+        data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
+        data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
       }
 
       if (session?.inventory?.length) {
+        if (!isSessionRecurring) {
+          data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
+          data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
+        }
+
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
@@ -350,7 +521,7 @@ const Session = ({ match, history }) => {
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${data.name} session successfully upadted`,
+              title: `${data.name} session successfully updated`,
               className: styles.confirmModal,
               okText: 'Done',
               cancelText: 'Add New',
@@ -454,29 +625,42 @@ const Session = ({ match, history }) => {
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph className={styles.mt10} type="secondary">
             Setup the event you plan to host. Adding a name, session image and description for the attendees is
-            mandatory and you can also add pre-requisit or a document to make it more descriptive. Then select the days
+            mandatory and you can also add pre-requisite or a document to make it more descriptive. Then select the days
             and time you want to host this session.
           </Paragraph>
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form
+        form={form}
+        scrollToFirstError={true}
+        {...profileFormItemLayout}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
-          <div className={styles.imageWrapper}>
-            <ImageUpload
-              aspect={4}
-              className={classNames('avatar-uploader', styles.coverImage)}
-              name="session_image_url"
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              onChange={onSessionImageUpload}
-              value={sessionImageUrl}
-              label="Session Image"
-            />
-          </div>
+          <Form.Item
+            id="session_image_url"
+            name="session_image_url"
+            rules={validationRules.requiredValidation}
+            wrapperCol={{ span: 24 }}
+          >
+            <div className={styles.imageWrapper}>
+              <ImageUpload
+                aspect={4}
+                className={classNames('avatar-uploader', styles.coverImage)}
+                name="session_image_url"
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                onChange={onSessionImageUpload}
+                value={sessionImageUrl}
+                label="Session Image"
+              />
+            </div>
+          </Form.Item>
 
-          <Form.Item label="Session Name" name="name" rules={validationRules.nameValidation}>
+          <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Enter Session Name" />
           </Form.Item>
 
@@ -484,9 +668,10 @@ const Session = ({ match, history }) => {
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
             label="Session Description"
             name="description"
+            id="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="  Please input description" />
+            <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -518,6 +703,7 @@ const Session = ({ match, history }) => {
           <>
             <Form.Item
               name="type"
+              id="type"
               label="Session Type"
               rules={validationRules.requiredValidation}
               onChange={handleSessionType}
@@ -665,13 +851,14 @@ const Session = ({ match, history }) => {
                 className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
                 disabledDate={disabledDate}
-                onChange={handleRecurringDatesRange}
+                onChange={handleDateRangeChange}
                 onFocus={handleCalenderPop}
               />
             </Form.Item>
           )}
+
           <Scheduler
-            sessionSlots={session?.inventory || []}
+            sessionSlots={session?.inventory?.length ? session.inventory : []}
             recurring={isSessionRecurring}
             recurringDatesRange={recurringDatesRanges}
             handleSlotsChange={handleSlotsChange}
