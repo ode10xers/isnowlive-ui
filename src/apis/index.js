@@ -61,5 +61,7 @@ export default {
   },
   passes: {
     getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
+    getCreatorPasses: () => http.get(`/secure/creator/passes`),
+    getAttendeePasses: () => http.get(`/secure/attendee/passes`),
   },
 };

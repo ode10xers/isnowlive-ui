@@ -10,6 +10,26 @@ const validationRules = {
   emailValidation: [{ type: 'email', required: true, message: 'Please input your email' }],
   passwordValidation: [{ required: true, message: 'Please input your password' }],
   requiredValidation: [{ required: true, message: 'This field is required.' }],
+  arrayValidation: [
+    {
+      type: 'array',
+      required: true,
+      message: 'Please select at least one item',
+      validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
+    },
+  ],
+  numberValidation: (message, min = 0, maxLimited = true, max = 10000) => {
+    const errorMessage = message || `Please input valid amount (${min} - ${max})`;
+    const invalidValue = (value) => value === undefined || value === null || value < min || (maxLimited && value > max);
+
+    return [
+      {
+        required: true,
+        message: errorMessage,
+        validator: (_, value) => (invalidValue(value) ? Promise.reject(errorMessage) : Promise.resolve()),
+      },
+    ];
+  },
 };
 
 export default validationRules;
