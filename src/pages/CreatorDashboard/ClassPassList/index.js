@@ -1,26 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { Row, Col, Table, Typography, Button } from 'antd';
-import { DownCircleTwoTone, UpCircleTwoTone, PlusCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button } from 'antd';
+import { DownOutlined, UpOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
+import Table from 'components/Table';
 import CreateClassPassModal from './CreateClassPassModal';
+import SessionCards from './SessionCards';
 
 import dateUtil from 'utils/date';
 import { isAPISuccess } from 'utils/helper';
 import { showErrorModal } from 'utils/modals';
+import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 const ClassPassList = () => {
   const history = useHistory();
+  const username = getLocalUserDetails().username;
 
+  const [editPassId, setEditPassId] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -29,13 +35,32 @@ const ClassPassList = () => {
   const showCreatePassesModal = () => setCreateModalVisible(true);
   const hideCreatePassesModal = () => setCreateModalVisible(false);
 
+  const showEditPassesModal = (passId) => {
+    setEditPassId(passId);
+    showCreatePassesModal();
+  };
+
   const getPassesForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data } = await apis.passes.getCreatorPasses();
 
       if (data) {
-        setPasses(data);
+        setPasses(
+          data.map((classPass, index) => ({
+            index,
+            key: classPass.id,
+            id: classPass.id,
+            name: classPass.name,
+            price: classPass.price,
+            limited: classPass.limited,
+            currency: classPass.currency,
+            validity: classPass.validity,
+            class_count: classPass.class_count,
+            is_published: classPass.is_published,
+            sessions: classPass.sessions,
+          }))
+        );
       }
     } catch (error) {
       showErrorModal('Failed fetching Passes', error.response?.data?.message || 'Something went wrong');
@@ -45,7 +70,15 @@ const ClassPassList = () => {
 
   useEffect(() => {
     getPassesForCreator();
-  }, [getPassesForCreator]);
+    //eslint-disable-next-line
+  }, []);
+
+  const publishPass = (passId) => {
+    console.log(passId);
+  };
+  const unpublishPass = (passId) => {
+    console.log(passId);
+  };
 
   const expandRow = (rowKey) => {
     const tempExpandedRowsArray = expandedRowKeys;
@@ -58,52 +91,76 @@ const ClassPassList = () => {
   const passesColumns = [
     {
       title: 'Pass Name',
-      dataIndex: '',
-      key: '',
+      dataIndex: 'name',
+      key: 'name',
+      width: '25%',
     },
     {
       title: 'Pass Count',
-      dataIndex: '',
-      key: '',
+      dataIndex: 'class_count',
+      key: 'class_count',
+      width: '15%',
+      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
     },
     {
       title: 'Validity',
-      dataIndex: '',
-      key: '',
-    },
-    {
-      title: 'Expires On',
-      dataIndex: '',
-      key: '',
+      dataIndex: 'validity',
+      key: 'validity',
+      width: '15%',
+      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
-      dataIndex: '',
-      key: '',
+      dataIndex: 'price',
+      key: 'price',
+      width: '15%',
+      render: (text, record) => `${text} ${record.currency}`,
     },
     {
-      title: '',
-      render: (text, record) => {
-        return expandedRowKeys.includes(record.id) ? (
-          <Button type="link" onClick={() => collapseRow(record.id)}>
-            {' '}
-            Close{' '}
+      title: 'Actions',
+      render: (text, record) => (
+        <>
+          <Button type="link" onClick={() => showEditPassesModal(record.id)}>
+            Edit
           </Button>
-        ) : (
-          <Button type="link" onClick={() => expandRow(record.id)}>
-            {' '}
-            More{' '}
-          </Button>
-        );
-      },
+          {record.is_published ? (
+            <Button type="link" danger onClick={() => unpublishPass(record.id)}>
+              {' '}
+              Unpublish{' '}
+            </Button>
+          ) : (
+            <Button className={styles.successBtn} onClick={() => publishPass(record.id)}>
+              {' '}
+              Publish{' '}
+            </Button>
+          )}
+          {expandedRowKeys.includes(record.id) ? (
+            <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
+              Close
+            </Button>
+          ) : (
+            <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
+              More
+            </Button>
+          )}
+        </>
+      ),
     },
   ];
 
-  const renderClassesList = () => {};
+  const renderClassesList = (record) => (
+    <Row>
+      <Col xs={24}>
+        {' '}
+        <Text className={styles.ml20}> Applicable to below class(es) </Text>{' '}
+      </Col>
+      <Col xs={24}>{/* TODO: Implement the new Session Cards Here */}</Col>
+    </Row>
+  );
 
   return (
     <div className={styles.box}>
-      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} />
+      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editPassId={editPassId} />
       <Row>
         <Col xs={12} md={18} lg={20}>
           <Title level={4}> Class Passes </Title>
@@ -114,30 +171,25 @@ const ClassPassList = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          <Loader loading={isLoading} size="large" text="Loading Class Passes">
-            {passes.length > 0 ? (
-              <Table
-                columns={passesColumns}
-                data={passes}
-                loading={isLoading}
-                rowKey={(record) => record.id}
-                expandable={{
-                  expandedRowRender: (record) => renderClassesList(record),
-                  expandRowByClick: true,
-                  expandIconColumnIndex: 6,
-                  expandedRowKeys: expandedRowKeys,
-                  expandIcon: ({ expanded, onExpand, record }) =>
-                    expanded ? (
-                      <UpCircleTwoTone style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                    ) : (
-                      <DownCircleTwoTone style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                    ),
-                }}
-              />
-            ) : (
-              <div className="text-empty"> No Class Passes </div>
-            )}
-          </Loader>
+          {isMobileDevice ? (
+            <Loader loading={isLoading} size="large" text="Loading Class Passes">
+              Mobile Cards Here
+            </Loader>
+          ) : (
+            <Table
+              sticky={true}
+              columns={passesColumns}
+              data={passes}
+              loading={isLoading}
+              rowKey={(record) => record.id}
+              expandable={{
+                expandedRowRender: (record) => renderClassesList(record),
+                expandRowByClick: true,
+                expandIconColumnIndex: -1,
+                expandedRowKeys: expandedRowKeys,
+              }}
+            />
+          )}
         </Col>
       </Row>
     </div>

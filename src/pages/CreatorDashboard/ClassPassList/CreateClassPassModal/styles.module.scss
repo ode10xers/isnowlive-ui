@@ -1,1 +1,17 @@
-@import '../../../styles/variables.scss';
+@import '../../../../styles/variables.scss';
+
+.numericInput {
+  width: 100% !important;
+}
+
+.modalActionRow {
+  margin-top: 10px;
+}
+
+.confirmModal {
+  :global {
+    .anticon {
+      color: map-get($colors, $key: 'KellyGreen') !important;
+    }
+  }
+}

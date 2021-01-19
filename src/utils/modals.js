@@ -6,3 +6,10 @@ export const showErrorModal = (title, message = '') => {
     message: message,
   });
 };
+
+export const showSuccessModal = (title, message = '') => {
+  Modal.success({
+    title: title || 'Success',
+    message: message,
+  });
+};

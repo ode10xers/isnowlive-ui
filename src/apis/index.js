@@ -61,7 +61,10 @@ export default {
   },
   passes: {
     getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
+    getPassById: (passId) => http.get(`/passes/${passId}`),
     getCreatorPasses: () => http.get(`/secure/creator/passes`),
     getAttendeePasses: () => http.get(`/secure/attendee/passes`),
+    createClassPass: (payload) => http.post(`/secure/creator/passes`, payload),
+    updateClassPass: (passId, payload) => http.put(`/secure/creator/passes/${passId}`, payload),
   },
 };
