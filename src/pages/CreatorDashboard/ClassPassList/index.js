@@ -1,31 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Typography, Button } from 'antd';
 import { DownOutlined, UpOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
-import Routes from 'routes';
 
-import Loader from 'components/Loader';
 import Table from 'components/Table';
-import CreateClassPassModal from './CreateClassPassModal';
-import SessionCards from './SessionCards';
+import Loader from 'components/Loader';
+import SessionCards from 'components/SessionCards';
+import CreateClassPassModal from 'components/CreateClassPassModal';
 
-import dateUtil from 'utils/date';
-import { isAPISuccess } from 'utils/helper';
-import { showErrorModal } from 'utils/modals';
+import { showErrorModal, showSuccessModal } from 'utils/modals';
 import { isMobileDevice } from 'utils/device';
-import { getLocalUserDetails } from 'utils/storage';
+import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Text } = Typography;
 
 const ClassPassList = () => {
-  const history = useHistory();
-  const username = getLocalUserDetails().username;
-
   const [editPassId, setEditPassId] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +28,7 @@ const ClassPassList = () => {
   const showCreatePassesModal = () => {
     setCreateModalVisible(true);
   };
+
   const hideCreatePassesModal = (shouldRefresh = false) => {
     setCreateModalVisible(false);
     setEditPassId(null);
@@ -47,6 +41,40 @@ const ClassPassList = () => {
   const showEditPassesModal = (passId) => {
     setEditPassId(passId);
     showCreatePassesModal();
+  };
+
+  const publishPass = async (passId) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.passes.publishPass(passId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Class Pass Published');
+        getPassesForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message);
+    }
+
+    setIsLoading(false);
+  };
+
+  const unpublishPass = async (passId) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.passes.unpublishPass(passId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Class Pass Unpublished');
+        getPassesForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message);
+    }
+
+    setIsLoading(false);
   };
 
   const getPassesForCreator = useCallback(async () => {
@@ -82,12 +110,8 @@ const ClassPassList = () => {
     //eslint-disable-next-line
   }, []);
 
-  const publishPass = (passId) => {
-    console.log(passId);
-  };
-  const unpublishPass = (passId) => {
-    console.log(passId);
-  };
+  const expandAllRow = () => setExpandedRowKeys(passes.map((pass) => pass.id));
+  const collapseAllRow = () => setExpandedRowKeys([]);
 
   const expandRow = (rowKey) => {
     const tempExpandedRowsArray = expandedRowKeys;
@@ -102,12 +126,13 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '25%',
+      width: '35%',
     },
     {
       title: 'Pass Count',
       dataIndex: 'class_count',
       key: 'class_count',
+      align: 'right',
       width: '15%',
       render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
     },
@@ -115,44 +140,53 @@ const ClassPassList = () => {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
-      width: '15%',
+      align: 'center',
+      width: '12%',
       render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '15%',
+      align: 'left',
+      width: '10%',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
-      title: 'Actions',
+      title: '',
+      align: 'right',
       render: (text, record) => (
-        <>
-          <Button type="link" onClick={() => showEditPassesModal(record.id)}>
-            Edit
-          </Button>
-          {record.is_published ? (
-            <Button type="link" danger onClick={() => unpublishPass(record.id)}>
-              {' '}
-              Unpublish{' '}
+        <Row gutter={8}>
+          <Col xs={8}>
+            <Button type="link" onClick={() => showEditPassesModal(record.id)}>
+              Edit
             </Button>
-          ) : (
-            <Button className={styles.successBtn} onClick={() => publishPass(record.id)}>
-              {' '}
-              Publish{' '}
-            </Button>
-          )}
-          {expandedRowKeys.includes(record.id) ? (
-            <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
-              Close
-            </Button>
-          ) : (
-            <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
-              More
-            </Button>
-          )}
-        </>
+          </Col>
+          <Col xs={8}>
+            {record.is_published ? (
+              <Button type="link" danger onClick={() => unpublishPass(record.id)}>
+                {' '}
+                Unpublish{' '}
+              </Button>
+            ) : (
+              <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
+                {' '}
+                Publish{' '}
+              </Button>
+            )}
+          </Col>
+          <Col xs={8}>
+            {expandedRowKeys.includes(record.id) ? (
+              <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
+                Close
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
+                More
+              </Button>
+            )}
+          </Col>
+        </Row>
       ),
     },
   ];
@@ -171,12 +205,22 @@ const ClassPassList = () => {
   return (
     <div className={styles.box}>
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editPassId={editPassId} />
-      <Row>
-        <Col xs={12} md={18} lg={20}>
+      <Row gutter={8}>
+        <Col xs={12} md={10} lg={14}>
           <Title level={4}> Class Passes </Title>
         </Col>
+        <Col xs={24} md={4} lg={3}>
+          <Button block shape="round" type="primary" onClick={() => expandAllRow()}>
+            Expand All
+          </Button>
+        </Col>
+        <Col xs={24} md={4} lg={3}>
+          <Button block shape="round" type="default" onClick={() => collapseAllRow()}>
+            Collapse All
+          </Button>
+        </Col>
         <Col xs={12} md={6} lg={4}>
-          <Button type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
+          <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
             Create New Pass
           </Button>
         </Col>

@@ -61,10 +61,14 @@ export default {
   },
   passes: {
     getPassById: (passId) => http.get(`/passes/${passId}`),
+    getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
     getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getCreatorPasses: () => http.get(`/secure/creator/passes`),
-    getAttendeePasses: () => http.get(`/secure/attendee/passes`),
     createClassPass: (payload) => http.post(`/secure/creator/passes`, payload),
     updateClassPass: (passId, payload) => http.put(`/secure/creator/passes/${passId}`, payload),
+    createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
+    getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
+    publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
+    unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
   },
 };

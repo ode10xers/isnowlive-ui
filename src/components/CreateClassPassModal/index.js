@@ -81,14 +81,13 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
     }
 
     setIsLoading(false);
-  }, [editPassId]);
+  }, [editPassId, form]);
 
   useEffect(() => {
     if (visible) {
       if (editPassId) {
         fetchPassInfo();
       } else {
-        console.log('Resetting');
         form.resetFields();
       }
 
@@ -99,7 +98,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
       ...form.getFieldsValue(),
-      classCount: passLimitType === passTypes.UNLIMITED.name ? 100 : 10,
+      classCount: passLimitType === passTypes.UNLIMITED.name ? 1000 : 10,
     });
     setPassType(passLimitType);
   };
@@ -127,7 +126,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
         validity: values.validity,
         session_ids: selectedClasses || values.classList || [],
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
-        limited: passTypes.LIMITED.name === passType || true,
+        limited: passTypes.LIMITED.name === passType,
       };
 
       const response = editPassId

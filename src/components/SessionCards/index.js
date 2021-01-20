@@ -4,12 +4,12 @@ import MobileDetect from 'mobile-detect';
 
 import { Card, Image, Row, Col, Typography, Empty, Tag } from 'antd';
 
-import { isValidFile, generateUrlFromUsername } from 'utils/helper';
+import { isValidFile } from 'utils/helper';
 
 import styles from './styles.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
-const { Text, Title, Paragraph } = Typography;
+const { Title, Paragraph } = Typography;
 
 const SessionCards = ({ sessions }) => {
   const md = new MobileDetect(window.navigator.userAgent);
@@ -34,12 +34,14 @@ const SessionCards = ({ sessions }) => {
                         src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                       />
                     </Col>
-                    <Col xs={24} md={8} lg={12}>
+                    <Col xs={24} md={8} lg={10}>
                       <Row>
-                        <Col xs={24} md={18}>
-                          <Title level={5}>{session.name}</Title>
+                        <Col xs={24} md={16}>
+                          <Title ellipsis={{ rows: 1 }} level={5}>
+                            {session.name}
+                          </Title>
                         </Col>
-                        <Col xs={24} md={6}>
+                        <Col xs={24} md={8}>
                           <Tag color="cyan" className={styles.tags}>
                             {session.group ? 'Group Session' : '1-to-1 Session'}
                           </Tag>
@@ -49,7 +51,7 @@ const SessionCards = ({ sessions }) => {
                         </Col>
                       </Row>
                     </Col>
-                    <Col xs={24} md={8} lg={4}>
+                    <Col xs={24} md={8} lg={6}>
                       {/* For The Available Days */}
                       <Row gutter={[8, 8]}>
                         {daysForSessions.map((days) => (

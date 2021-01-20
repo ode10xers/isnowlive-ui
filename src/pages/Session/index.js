@@ -99,7 +99,7 @@ const Session = ({ match, history }) => {
         setIsLoading(true);
         const { status, data } = await apis.session.getCreatorBalance();
         if (isAPISuccess(status) && data) {
-          setStripeCurrency(data.currency);
+          setStripeCurrency(data.currency.toUpperCase());
           if (!sessionData) {
             form.setFieldsValue({
               ...form.getFieldsValue(),
