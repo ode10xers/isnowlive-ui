@@ -32,8 +32,17 @@ const ClassPassList = () => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
 
-  const showCreatePassesModal = () => setCreateModalVisible(true);
-  const hideCreatePassesModal = () => setCreateModalVisible(false);
+  const showCreatePassesModal = () => {
+    setCreateModalVisible(true);
+  };
+  const hideCreatePassesModal = (shouldRefresh = false) => {
+    setCreateModalVisible(false);
+    setEditPassId(null);
+
+    if (shouldRefresh) {
+      getPassesForCreator();
+    }
+  };
 
   const showEditPassesModal = (passId) => {
     setEditPassId(passId);
@@ -151,10 +160,11 @@ const ClassPassList = () => {
   const renderClassesList = (record) => (
     <Row>
       <Col xs={24}>
-        {' '}
-        <Text className={styles.ml20}> Applicable to below class(es) </Text>{' '}
+        <Text className={styles.ml20}> Applicable to below class(es) </Text>
       </Col>
-      <Col xs={24}>{/* TODO: Implement the new Session Cards Here */}</Col>
+      <Col xs={24}>
+        <SessionCards sessions={record.sessions} />
+      </Col>
     </Row>
   );
 

@@ -11,7 +11,7 @@ import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const passTypes = {
   LIMITED: {
@@ -64,12 +64,12 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
       const { data } = await apis.passes.getPassById(editPassId);
 
       if (data) {
-        setSelectedClasses(data.sessions.map((session) => ({ value: session.session_id, label: session.name })));
+        setSelectedClasses(data.sessions.map((session) => session.session_id));
         setPassType(data.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
 
         form.setFieldsValue({
           passName: data.name,
-          classList: data.sessions.map((session) => ({ value: session.session_id, label: session.name })),
+          classList: data.sessions.map((session) => session.session_id),
           passType: data.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
           classCount: data.class_count,
           validity: data.validity,
@@ -87,14 +87,12 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
     if (visible) {
       if (editPassId) {
         fetchPassInfo();
+      } else {
+        console.log('Resetting');
+        form.resetFields();
       }
 
       fetchAllClasses();
-    } else {
-      form.setFieldsValue({
-        ...form.getFieldsValue(),
-        ...formInitialValues,
-      });
     }
   }, [visible, editPassId, fetchAllClasses, fetchPassInfo, form]);
 
@@ -123,29 +121,22 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
       }
 
       let data = {
+        currency: currency,
+        price: values.price,
         name: values.passName,
+        validity: values.validity,
         session_ids: selectedClasses || values.classList || [],
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
-        validity: values.validity,
-        price: values.price,
-        currency: currency,
         limited: passTypes.LIMITED.name === passType || true,
       };
 
-      if (editPassId) {
-        const response = await apis.passes.updateClassPass(editPassId, data);
+      const response = editPassId
+        ? await apis.passes.updateClassPass(editPassId, data)
+        : await apis.passes.createClassPass(data);
 
-        if (isAPISuccess(response.status)) {
-          showSuccessModal(`${data.name} successfully updated`);
-          closeModal();
-        }
-      } else {
-        const response = await apis.passes.createClassPass(data);
-
-        if (isAPISuccess(response.status)) {
-          showSuccessModal(`${data.name} successfully created`);
-          closeModal();
-        }
+      if (isAPISuccess(response.status)) {
+        showSuccessModal(`${data.name} successfully ${editPassId ? 'updated' : 'created'}`);
+        closeModal(true);
       }
     } catch (error) {
       showErrorModal(`Failed to ${editPassId ? 'update' : 'create'} new pass`);
@@ -156,15 +147,21 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
 
   return (
     <Modal
-      title="Create New Class Pass"
+      title={`${editPassId ? 'Edit' : 'Create New'} Class Pass`}
       centered={true}
       visible={visible}
       footer={null}
-      destroyOnClose={true}
-      onCancel={() => closeModal()}
+      onCancel={() => closeModal(false)}
+      width={720}
     >
       <Loader size="large" loading={isLoading}>
-        <Form layout="vertical" name="createClassPass" form={form} onFinish={handleFinish}>
+        <Form
+          layout="vertical"
+          name="classPassForm"
+          form={form}
+          onFinish={handleFinish}
+          initialValues={formInitialValues}
+        >
           <Row className="class-pass-row">
             <Col xs={12}>
               <Form.Item id="passName" name="passName" label="Class Pass Name" rules={validationRules.nameValidation}>
@@ -176,7 +173,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
                 id="classList"
                 name="classList"
                 label="Apply to Class(es)"
-                extra="The classes that will be bookable using this pass"
+                extra={<Text className={styles.helpText}> The classes that will be bookable using this pass </Text>}
                 rules={validationRules.arrayValidation}
               >
                 <Select
@@ -198,7 +195,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
                 id="passType"
                 name="passType"
                 label="Class Pass Type"
-                extra="Type of usage limit this pass will have"
+                extra={<Text className={styles.helpText}>Type of usage limit this pass will have</Text>}
                 rules={validationRules.requiredValidation}
               >
                 <Radio.Group
@@ -217,7 +214,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
                 id="classCount"
                 name="classCount"
                 label="Class Count"
-                extra="The maximum amount of classes bookable with this pass"
+                extra={<Text className={styles.helpText}>The maximum amount of classes bookable with this pass</Text>}
                 rules={[
                   {
                     required: true,
@@ -245,7 +242,9 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
                 id="validity"
                 name="validity"
                 label="Pass Validity (days)"
-                extra="The duration in days this pass will be usable after purchase"
+                extra={
+                  <Text className={styles.helpText}>The duration in days this pass will be usable after purchase</Text>
+                }
                 rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
               >
                 <InputNumber min={1} placeholder="Pass Validity" className={styles.numericInput} />
@@ -262,15 +261,15 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row justify="end" align="center" className={styles.modalActionRow}>
-            <Col xs={8} md={5}>
-              <Button type="default" onClick={() => closeModal()} loading={isSubmitting}>
+          <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
+            <Col xs={8} md={4}>
+              <Button block type="default" onClick={() => closeModal(false)} loading={isSubmitting}>
                 Cancel
               </Button>
             </Col>
-            <Col xs={8} md={7}>
-              <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                Create Class Pass
+            <Col xs={8} md={6}>
+              <Button block type="primary" htmlType="submit" loading={isSubmitting}>
+                {editPassId ? 'Update' : 'Create'} Class Pass
               </Button>
             </Col>
           </Row>

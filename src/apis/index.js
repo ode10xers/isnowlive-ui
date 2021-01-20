@@ -60,8 +60,8 @@ export default {
     rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
   },
   passes: {
-    getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getPassById: (passId) => http.get(`/passes/${passId}`),
+    getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getCreatorPasses: () => http.get(`/secure/creator/passes`),
     getAttendeePasses: () => http.get(`/secure/attendee/passes`),
     createClassPass: (payload) => http.post(`/secure/creator/passes`, payload),

@@ -15,3 +15,8 @@
     }
   }
 }
+
+.helpText {
+  color: map-get($map: $colors, $key: 'SuvaGrey') !important;
+  font-size: 12px;
+}
