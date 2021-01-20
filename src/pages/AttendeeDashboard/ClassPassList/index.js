@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Modal } from 'antd';
 
 import apis from 'apis';
+import { showErrorModal } from 'utils/modals';
 
-import styles from './styles.module.scss';
+// import styles from './styles.module.scss';
 
 const ClassPassList = () => {
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  console.log(passes);
+  console.log(isLoading);
 
   const getPassesForAttendee = useCallback(async () => {
     setIsLoading(true);
@@ -18,7 +21,7 @@ const ClassPassList = () => {
         setPasses(data);
       }
     } catch (error) {
-      Modal.error({});
+      showErrorModal('Something wrong happened', error.response?.data?.message);
     }
     setIsLoading(false);
   }, []);
@@ -60,6 +63,8 @@ const ClassPassList = () => {
       },
     },
   ];
+
+  console.log(passesColumns);
 
   return <div></div>;
 };
