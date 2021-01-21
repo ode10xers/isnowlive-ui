@@ -4,7 +4,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { message, Row } from 'antd';
 
 import Loader from 'components/Loader';
-import { showBookingSuccessModal, showErrorModal } from 'components/modals';
+import { showBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/modals';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -26,7 +26,6 @@ const PaymentVerification = () => {
   const location = useLocation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
-  //TODO: Adjust flow to new params
   const { order_id, transaction_id, order_type, inventory_id } = parseQueryString(location.search);
 
   useEffect(() => {
@@ -34,7 +33,6 @@ const PaymentVerification = () => {
       const verifyPayment = async () => {
         setIsLoading(true);
         try {
-          //TODO: Try if any params need to be changed
           const { status } = await apis.payment.verifyPaymentForOrder({
             order_id,
             transaction_id,
@@ -52,17 +50,26 @@ const PaymentVerification = () => {
               }
 
               if (inventory_id) {
-                //Continue to book the class after Pass Purchase is successful
-                const followUpBooking = await apis.session.createOrderForUser({
-                  inventory_id: parseInt(inventory_id),
-                  user_timezone_offset: new Date().getTimezoneOffset(),
-                  user_timezone: getCurrentLongTimezone(),
-                  payment_source: paymentSource.CLASS_PASS,
-                  source_id: order_id,
-                });
+                try {
+                  //Continue to book the class after Pass Purchase is successful
+                  const followUpBooking = await apis.session.createOrderForUser({
+                    inventory_id: parseInt(inventory_id),
+                    user_timezone_offset: new Date().getTimezoneOffset(),
+                    user_timezone: getCurrentLongTimezone(),
+                    payment_source: paymentSource.CLASS_PASS,
+                    source_id: order_id,
+                  });
 
-                if (isAPISuccess(followUpBooking.status)) {
-                  showBookingSuccessModal(userDetails.email, usersPass, true, true);
+                  if (isAPISuccess(followUpBooking.status)) {
+                    showBookingSuccessModal(userDetails.email, usersPass, true, true);
+                  }
+                } catch (error) {
+                  if (
+                    error.response?.data?.message ===
+                    'It seems you have already booked this session, please check your dashboard'
+                  ) {
+                    showAlreadyBookedModal(false);
+                  }
                 }
               } else {
                 showBookingSuccessModal(userDetails.email, usersPass, false, false);
