@@ -28,6 +28,7 @@ const SessionRegistration = ({
   showPasses,
   availablePasses = [],
   setSelectedPass,
+  selectedPass = null,
 }) => {
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -196,7 +197,7 @@ const SessionRegistration = ({
               {...sessionRegistrationTailLayout}
               name="booking_type"
               rules={validationRules.requiredValidation}
-              initialValue="Class"
+              initialValue={showPasses ? 'Pass' : 'Class'}
             >
               <Radio.Group onChange={(e) => setBookingType(e.target.value)}>
                 <Radio value="Class"> Book This Class </Radio>
@@ -215,6 +216,20 @@ const SessionRegistration = ({
                     expandIconColumnIndex: -1,
                     expandedRowKeys: expandedRowKeys,
                   }}
+                  rowSelection={{
+                    selectedRowKeys: [selectedPass.id],
+                    checkStrictly: true,
+                    hideSelectAll: true,
+                    type: 'radio',
+                    onSelect: (record, selected, _, e) => {
+                      console.log(record);
+                      console.log(selected);
+
+                      if (selected) {
+                        setSelectedPass(record);
+                      }
+                    },
+                  }}
                 />
               </div>
             )}
@@ -222,7 +237,7 @@ const SessionRegistration = ({
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10}>
                 <Col>
-                  <Button type="primary" htmlType="submit">
+                  <Button type="primary" htmlType="submit" disabled={showPasses && !selectedPass}>
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>

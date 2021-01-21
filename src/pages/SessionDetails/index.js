@@ -82,6 +82,7 @@ const SessionDetails = ({ match, history }) => {
         const { data } = await apis.passes.getAttendeePasses();
         //TODO: Confirm response for the above and adjust accordingly
         setUserPasses(data);
+        console.log(data);
         setAvailablePasses(
           availablePasses.map((pass) => {
             let passUsableByUser = false;
@@ -420,6 +421,7 @@ const SessionDetails = ({ match, history }) => {
                 showPasses={bookingType === 'Pass'}
                 availablePasses={availablePasses}
                 setSelectedPass={setSelectedPass}
+                selectedPass={selectedPass}
               />
             ))}
         </Col>
