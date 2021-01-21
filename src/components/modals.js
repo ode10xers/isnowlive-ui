@@ -113,6 +113,10 @@ export const showBookingSuccessModal = (
 
 export const showAlreadyBookedModal = (isPass = false) => {
   Modal.warning({
+    mask: true,
+    center: true,
+    closable: true,
+    maskClosable: true,
     title: isPass ? 'Pass Already Purchased' : 'Session Already Booked',
     content: (
       <Paragraph>

@@ -57,6 +57,7 @@ const SessionDetails = ({ match, history }) => {
   const [availablePasses, setAvailablePasses] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState(null);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -94,7 +95,7 @@ const SessionDetails = ({ match, history }) => {
 
             return {
               ...pass,
-              class_count: passOwnedByUser.classes_remaining,
+              classes_remaining: passOwnedByUser.classes_remaining,
               user_usable: passUsableByUser,
             };
           })
@@ -120,7 +121,7 @@ const SessionDetails = ({ match, history }) => {
       selectedPass &&
       availablePasses.filter((availablePass) => availablePass.id === selectedPass.id)
     ) {
-      return userPasses.filter((userPass) => userPass.id === selectedPass.id);
+      return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id);
     }
 
     return null;
@@ -144,10 +145,12 @@ const SessionDetails = ({ match, history }) => {
   }, [match.params.inventory_id]);
 
   useEffect(() => {
-    getUsablePassesForUser();
+    if (!isCreatingOrder) {
+      getUsablePassesForUser();
+    }
 
     //eslint-disable-next-line
-  }, [currentUser]);
+  }, [currentUser, isCreatingOrder]);
 
   const signupUser = async (values) => {
     try {
@@ -163,11 +166,10 @@ const SessionDetails = ({ match, history }) => {
         createOrder(values.email);
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setIsLoading(false);
         setShowPasswordField(true);
-        setCurrentUser(values);
         message.info('Enter password to register session');
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
@@ -299,8 +301,11 @@ const SessionDetails = ({ match, history }) => {
           if (data) {
             http.setAuthToken(data.auth_token);
             logIn(data, true);
-            getUsablePassesForUser();
-            // createOrder(values.email);
+            setCurrentUser(data);
+            setIsCreatingOrder(true);
+            await getUsablePassesForUser();
+            await createOrder(values.email);
+            setIsCreatingOrder(false);
           }
         } catch (error) {
           setIsLoading(false);

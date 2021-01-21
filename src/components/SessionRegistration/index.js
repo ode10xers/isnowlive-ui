@@ -71,7 +71,12 @@ const SessionRegistration = ({
       key: 'class_count',
       align: 'right',
       width: '30%',
-      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
+      render: (text, record) =>
+        record.limited
+          ? record.user_usable
+            ? `${record.classes_remaining}/${record.class_count} remaining`
+            : `${text} Classes`
+          : 'Unlimited Classes',
     },
     {
       title: 'Validity',
@@ -222,9 +227,6 @@ const SessionRegistration = ({
                     hideSelectAll: true,
                     type: 'radio',
                     onSelect: (record, selected, _, e) => {
-                      console.log(record);
-                      console.log(selected);
-
                       if (selected) {
                         setSelectedPass(record);
                       }
