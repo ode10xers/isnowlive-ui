@@ -140,11 +140,15 @@ const SessionDetails = ({ match, history }) => {
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
     }
-  }, [match.params.inventory_id, getDetails, getUsablePassesForUser]);
+
+    //eslint-disable-next-line
+  }, [match.params.inventory_id]);
 
   useEffect(() => {
     getUsablePassesForUser();
-  }, [currentUser, getUsablePassesForUser]);
+
+    //eslint-disable-next-line
+  }, [currentUser]);
 
   const signupUser = async (values) => {
     try {
