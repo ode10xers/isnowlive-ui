@@ -7,7 +7,7 @@ import Loader from 'components/Loader';
 import { showBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/modals';
 
 import apis from 'apis';
-import Routes from 'routes';
+// import Routes from 'routes';
 
 import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
@@ -29,6 +29,11 @@ const PaymentVerification = () => {
   const { order_id, transaction_id, order_type, inventory_id } = parseQueryString(location.search);
 
   useEffect(() => {
+    console.log(order_id);
+    console.log(transaction_id);
+    console.log(order_type);
+    console.log(inventory_id);
+
     if (order_id && transaction_id) {
       const verifyPayment = async () => {
         setIsLoading(true);
@@ -88,7 +93,7 @@ const PaymentVerification = () => {
     } else {
       setIsLoading(false);
       showErrorModal('Something went wrong');
-      history.push(Routes.attendeeDashboard.rootPath);
+      // history.push(Routes.attendeeDashboard.rootPath);
     }
   }, [order_id, transaction_id, order_type, inventory_id, history, userDetails]);
 
