@@ -39,6 +39,7 @@ const { Title, Paragraph } = Typography;
 const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 //TODO: Adjust to new booking flow
@@ -85,16 +86,15 @@ const SessionDetails = ({ match, history }) => {
         setAvailablePasses(
           availablePasses.map((pass) => {
             let passUsableByUser = false;
-            const passOwnedByUser = data.filter((userPass) => userPass.id === pass.id);
+            const passOwnedByUser = data.filter((userPass) => userPass.pass_id === pass.id);
 
             if (passOwnedByUser) {
-              //TODO: Probably have to check for the response, does it have validity as a checkable thing
-              passUsableByUser = passOwnedByUser.class_count > 0;
+              passUsableByUser = passOwnedByUser.classes_remaining > 0 && isBeforeDate(passOwnedByUser.expiry);
             }
 
             return {
               ...pass,
-              class_count: data.class_count,
+              class_count: passOwnedByUser.classes_remaining,
               user_usable: passUsableByUser,
             };
           })
@@ -163,6 +163,7 @@ const SessionDetails = ({ match, history }) => {
         createOrder(values.email);
       }
     } catch (error) {
+      console.log(error);
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setIsLoading(false);
         setShowPasswordField(true);
