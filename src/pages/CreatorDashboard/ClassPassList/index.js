@@ -38,8 +38,8 @@ const ClassPassList = () => {
     }
   };
 
-  const showEditPassesModal = (passId) => {
-    setEditPassId(passId);
+  const showEditPassesModal = (pass) => {
+    setEditPassId(pass);
     showCreatePassesModal();
   };
 
@@ -158,7 +158,7 @@ const ClassPassList = () => {
       render: (text, record) => (
         <Row gutter={8}>
           <Col xs={8}>
-            <Button type="link" onClick={() => showEditPassesModal(record.id)}>
+            <Button type="link" onClick={() => showEditPassesModal(record)}>
               Edit
             </Button>
           </Col>

@@ -30,7 +30,7 @@ const formInitialValues = {
   passType: passTypes.LIMITED.name,
 };
 
-const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
+const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
@@ -40,7 +40,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
 
-  const fetchAllClasses = useCallback(async () => {
+  const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
 
     try {
@@ -57,43 +57,24 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
     setIsLoading(false);
   }, []);
 
-  const fetchPassInfo = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const { data } = await apis.passes.getPassById(editPassId);
-
-      if (data) {
-        setSelectedClasses(data.sessions.map((session) => session.session_id));
-        setPassType(data.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
-
-        form.setFieldsValue({
-          passName: data.name,
-          classList: data.sessions.map((session) => session.session_id),
-          passType: data.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
-          classCount: data.class_count,
-          validity: data.validity,
-          price: data.price,
-        });
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch pass info', error?.response?.data?.message || 'Something went wrong');
-    }
-
-    setIsLoading(false);
-  }, [editPassId, form]);
-
   useEffect(() => {
     if (visible) {
-      if (editPassId) {
-        fetchPassInfo();
+      if (editedPass) {
+        form.setFieldsValue({
+          passName: editedPass.name,
+          classList: editedPass.sessions.map((session) => session.session_id),
+          passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
+          classCount: editedPass.class_count,
+          validity: editedPass.validity,
+          price: editedPass.price,
+        });
       } else {
         form.resetFields();
       }
 
-      fetchAllClasses();
+      fetchAllClassesForCreator();
     }
-  }, [visible, editPassId, fetchAllClasses, fetchPassInfo, form]);
+  }, [visible, editedPass, fetchAllClassesForCreator, form]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
@@ -129,16 +110,16 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
         limited: passTypes.LIMITED.name === passType,
       };
 
-      const response = editPassId
-        ? await apis.passes.updateClassPass(editPassId, data)
+      const response = editedPass
+        ? await apis.passes.updateClassPass(editedPass.id, data)
         : await apis.passes.createClassPass(data);
 
       if (isAPISuccess(response.status)) {
-        showSuccessModal(`${data.name} successfully ${editPassId ? 'updated' : 'created'}`);
+        showSuccessModal(`${data.name} successfully ${editedPass ? 'updated' : 'created'}`);
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editPassId ? 'update' : 'create'} new pass`);
+      showErrorModal(`Failed to ${editedPass ? 'update' : 'create'} new pass`);
     }
 
     setIsSubmitting(false);
@@ -146,7 +127,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
 
   return (
     <Modal
-      title={`${editPassId ? 'Edit' : 'Create New'} Class Pass`}
+      title={`${editedPass ? 'Edit' : 'Create New'} Class Pass`}
       centered={true}
       visible={visible}
       footer={null}
@@ -268,7 +249,7 @@ const CreateClassPassModal = ({ visible, closeModal, editPassId = null }) => {
             </Col>
             <Col xs={8} md={6}>
               <Button block type="primary" htmlType="submit" loading={isSubmitting}>
-                {editPassId ? 'Update' : 'Create'} Class Pass
+                {editedPass ? 'Update' : 'Create'} Class Pass
               </Button>
             </Col>
           </Row>
