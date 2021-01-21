@@ -41,6 +41,7 @@ const PaymentVerification = () => {
           const { status } = await apis.payment.verifyPaymentForOrder({
             order_id,
             transaction_id,
+            order_type,
           });
 
           if (isAPISuccess(status)) {
