@@ -9,11 +9,16 @@ import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import { showErrorModal } from 'components/modals';
 
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+
+const {
+  formatDate: { toShortDate },
+} = dateUtil;
 
 const ClassPassList = () => {
   const [passes, setPasses] = useState([]);
@@ -30,15 +35,16 @@ const ClassPassList = () => {
           data.map((pass, index) => ({
             index,
             key: pass.pass_order_id,
-            pass_id: pass.id,
+            pass_id: pass.pass_id,
             pass_order_id: pass.pass_order_id,
-            name: pass.name,
+            name: pass.pass_name,
             price: pass.price,
             limited: pass.limited,
             currency: pass.currency,
             validity: pass.validity,
             class_count: pass.class_count,
-            sessions: pass.sessions,
+            classes_remaining: pass.classes_remaining,
+            sessions: pass.session,
           }))
         );
       }
@@ -76,20 +82,16 @@ const ClassPassList = () => {
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
-    },
-    {
-      title: 'Validity',
-      dataIndex: 'validity',
-      key: 'validity',
-      align: 'center',
-      width: '12%',
-      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) =>
+        record.limited ? `${record.class_count}/${record.classes_remaining} Classes` : 'Unlimited Classes',
     },
     {
       title: 'Expires On',
-      dataIndex: '',
-      key: '',
+      dataIndex: 'expiry',
+      key: 'expiry',
+      align: 'center',
+      width: '10%',
+      render: (text, record) => toShortDate(text),
     },
     {
       title: 'Price',
@@ -101,6 +103,7 @@ const ClassPassList = () => {
     },
     {
       title: '',
+      align: 'right',
       render: (text, record) =>
         expandedRowKeys.includes(record.id) ? (
           <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>

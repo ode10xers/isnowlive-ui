@@ -78,11 +78,10 @@ const SessionDetails = ({ match, history }) => {
 
   const getUsablePassesForUser = useCallback(async () => {
     try {
+      console.log(currentUser);
       if (currentUser) {
         const { data } = await apis.passes.getAttendeePasses();
-        //TODO: Confirm response for the above and adjust accordingly
         setUserPasses(data);
-        console.log(data);
         setAvailablePasses(
           availablePasses.map((pass) => {
             let passUsableByUser = false;
