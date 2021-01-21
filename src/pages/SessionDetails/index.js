@@ -172,10 +172,19 @@ const SessionDetails = ({ match, history }) => {
 
   const initiatePaymentForOrder = async (orderDetails) => {
     try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+      let payload = {
         order_id: orderDetails.order_id,
         order_type: selectedPass ? orderType.PASS : orderType.CLASS,
-      });
+      };
+
+      if (selectedPass) {
+        payload = {
+          ...payload,
+          inventory_id: parseInt(match.params.inventory_id),
+        };
+      }
+
+      const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
       if (isAPISuccess(status) && data) {
         const stripe = await stripePromise;
