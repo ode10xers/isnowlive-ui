@@ -204,7 +204,7 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
-      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editPassId={editPassId} />
+      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={editPassId} />
       <Row gutter={8}>
         <Col xs={24} md={10} lg={14}>
           <Title level={4}> Class Passes </Title>
