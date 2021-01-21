@@ -1,9 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Row, Col, Button, Form, Input, Typography } from 'antd';
+import { Row, Col, Button, Form, Input, Radio, Typography, Tag } from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
+
+import Table from 'components/Table';
 
 import validationRules from 'utils/validation';
 import { generateUrlFromUsername, scrollToErrorField } from 'utils/helper';
@@ -15,9 +18,20 @@ const { Title, Text } = Typography;
 const { Item } = Form;
 const { Password } = Input;
 
-const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPassword }) => {
+const SessionRegistration = ({
+  onFinish,
+  showPasswordField,
+  user,
+  onSetNewPassword,
+  showSignInForm,
+  setBookingType,
+  showPasses,
+  availablePasses = [],
+  setSelectedPass,
+}) => {
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -35,6 +49,80 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
     scrollToErrorField(errorFields);
   };
 
+  const expandRow = (rowKey) => {
+    const tempExpandedRowsArray = expandedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
+
+  const passesColumns = [
+    {
+      title: 'Pass Name',
+      dataIndex: 'name',
+      key: 'name',
+      width: '30%',
+    },
+    {
+      title: 'Pass Count',
+      dataIndex: 'class_count',
+      key: 'class_count',
+      align: 'right',
+      width: '30%',
+      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
+    },
+    {
+      title: 'Validity',
+      dataIndex: 'validity',
+      key: 'validity',
+      align: 'center',
+      width: '15%',
+      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      align: 'left',
+      sortOrder: 'descend',
+      width: '15%',
+      render: (text, record) => `${text} ${record.currency}`,
+    },
+    {
+      title: '',
+      align: 'right',
+      render: (text, record) => (
+        <>
+          {expandedRowKeys.includes(record.id) ? (
+            <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
+              Close
+            </Button>
+          ) : (
+            <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
+              More
+            </Button>
+          )}
+        </>
+      ),
+    },
+  ];
+
+  const renderClassesList = (record) => (
+    <Row>
+      <Col xs={24}>
+        <Text className={styles.ml20}> Applicable to below class(es) </Text>
+      </Col>
+      <Col xs={24}>
+        <div className={classNames(styles.ml20, styles.mt10)}>
+          {record.sessions.slice(0, 11).map((session) => (
+            <Tag color="blue"> {session.name} </Tag>
+          ))}
+        </div>
+      </Col>
+    </Row>
+  );
+
   return (
     <div className={classNames(styles.box, styles.p50)}>
       <Row>
@@ -51,7 +139,7 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
               }`}
             >
               {' '}
-              dashboard{' '}
+              dashboard
             </a>
             .
           </Text>
@@ -80,6 +168,7 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
             {showPasswordField && (
               <>
                 <Item
+                  className={styles.emailInput}
                   extra={
                     <Text className={styles.passwordHelpText}>
                       You have booked a session with us earlier, but if you haven't set your password, please use the{' '}
@@ -103,10 +192,46 @@ const SessionRegistration = ({ onFinish, showPasswordField, user, onSetNewPasswo
               </>
             )}
 
+            <Item
+              {...sessionRegistrationTailLayout}
+              name="booking_type"
+              rules={validationRules.requiredValidation}
+              initialValue="Class"
+            >
+              <Radio.Group onChange={(e) => setBookingType(e.target.value)}>
+                <Radio value="Class"> Book This Class </Radio>
+                <Radio value="Pass"> Buy Pass & Book </Radio>
+              </Radio.Group>
+            </Item>
+
+            {showPasses && (
+              <div>
+                <Table
+                  columns={passesColumns}
+                  data={availablePasses}
+                  rowKey={(record) => record.id}
+                  expandable={{
+                    expandedRowRender: renderClassesList,
+                    expandIconColumnIndex: -1,
+                    expandedRowKeys: expandedRowKeys,
+                  }}
+                />
+              </div>
+            )}
+
             <Item {...sessionRegistrationTailLayout}>
-              <Button type="primary" htmlType="submit">
-                Register
-              </Button>
+              <Row className={styles.mt10}>
+                <Col>
+                  <Button type="primary" htmlType="submit">
+                    {user ? 'Buy' : 'Register'}
+                  </Button>
+                </Col>
+                <Col>
+                  <Button type="link" onClick={() => showSignInForm()} disabled={Boolean(user)}>
+                    Already have an account? Sign In
+                  </Button>
+                </Col>
+              </Row>
             </Item>
 
             {showPasswordField && (

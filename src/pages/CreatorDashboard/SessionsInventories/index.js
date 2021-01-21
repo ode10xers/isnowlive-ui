@@ -37,6 +37,7 @@ const SessionsInventories = ({ match }) => {
   const [isPast, setIsPast] = useState(false);
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
@@ -149,6 +150,17 @@ const SessionsInventories = ({ match }) => {
   };
 
   const renderSimpleTableCell = (shouldNotRender, text) => (shouldNotRender ? emptyTableCell : <Text> {text} </Text>);
+
+  const expandAllRow = () => setExpandedRowKeys(filteredByDateSession.map((date) => date.start_time));
+  const collapseAllRow = () => setExpandedRowKeys([]);
+
+  const expandRow = (rowKey) => {
+    const tempExpandedRowsArray = expandedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
   let dateColumns = [
     {
@@ -353,62 +365,87 @@ const SessionsInventories = ({ match }) => {
     setCalendarView(e);
   };
 
+  //TODO: Rework desktop one to use expandable
   return (
     <div className={styles.box}>
-      <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
-      <Radio.Group value={view} onChange={handleViewChange}>
-        <Radio.Button value="list">List</Radio.Button>
-        <Radio.Button value="calendar">Calendar</Radio.Button>
-      </Radio.Group>
-      {view === 'calendar' ? (
-        <Loader loading={isLoading} size="large" text="Loading sessions">
-          {sessions.length > 0 ? (
-            <CalendarView
-              inventories={sessions}
-              onSelectInventory={openSessionInventoryDetails}
-              onViewChange={onViewChange}
-              calendarView={calendarView}
-            />
-          ) : (
-            <Empty />
-          )}
-        </Loader>
-      ) : (
-        <>
-          {isMobileDevice ? (
+      <Row gutter={8}>
+        <Col xs={24} md={10} lg={18}>
+          <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
+          <Radio.Group value={view} onChange={handleViewChange}>
+            <Radio.Button value="list">List</Radio.Button>
+            <Radio.Button value="calendar">Calendar</Radio.Button>
+          </Radio.Group>
+        </Col>
+        <Col xs={24} md={4} lg={3}>
+          <Button block shape="round" type="primary" onClick={() => expandAllRow()}>
+            Expand All
+          </Button>
+        </Col>
+        <Col xs={24} md={4} lg={3}>
+          <Button block shape="round" type="default" onClick={() => collapseAllRow()}>
+            Collapse All
+          </Button>
+        </Col>
+        <Col xs={24}>
+          {view === 'calendar' ? (
             <Loader loading={isLoading} size="large" text="Loading sessions">
               {sessions.length > 0 ? (
-                <Table
-                  columns={mobileTableColumns}
-                  data={filteredByDateSession}
-                  loading={isLoading}
-                  rowKey={(record) => record.start_time}
-                  expandable={{
-                    expandedRowRender: (record) => <> {record.children.map(renderSessionItem)} </>,
-                    expandRowByClick: true,
-                    expandIcon: ({ expanded, onExpand, record }) =>
-                      expanded ? (
-                        <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                      ) : (
-                        <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                      ),
-                  }}
+                <CalendarView
+                  inventories={sessions}
+                  onSelectInventory={openSessionInventoryDetails}
+                  onViewChange={onViewChange}
+                  calendarView={calendarView}
                 />
               ) : (
-                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                <Empty />
               )}
             </Loader>
           ) : (
-            <Table
-              sticky={true}
-              columns={dateColumns}
-              data={filteredByDateSession}
-              loading={isLoading}
-              rowKey={(record) => record.start_time}
-            />
+            <>
+              {isMobileDevice ? (
+                <Loader loading={isLoading} size="large" text="Loading sessions">
+                  {sessions.length > 0 ? (
+                    <Table
+                      columns={mobileTableColumns}
+                      data={filteredByDateSession}
+                      loading={isLoading}
+                      rowKey={(record) => record.start_time}
+                      expandable={{
+                        expandedRowRender: (record) => <> {record.children.map(renderSessionItem)} </>,
+                        expandRowByClick: true,
+                        onExpand: (expanded, record) => {
+                          if (expanded) {
+                            expandRow(record.start_time);
+                          } else {
+                            collapseRow(record.start_time);
+                          }
+                        },
+                        expandedRowKeys: expandedRowKeys,
+                        expandIcon: ({ expanded, onExpand, record }) =>
+                          expanded ? (
+                            <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                          ) : (
+                            <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                          ),
+                      }}
+                    />
+                  ) : (
+                    <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                  )}
+                </Loader>
+              ) : (
+                <Table
+                  sticky={true}
+                  columns={dateColumns}
+                  data={filteredByDateSession}
+                  loading={isLoading}
+                  rowKey={(record) => record.start_time}
+                />
+              )}
+            </>
           )}
-        </>
-      )}
+        </Col>
+      </Row>
     </div>
   );
 };

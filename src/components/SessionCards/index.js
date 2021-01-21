@@ -24,7 +24,7 @@ const SessionCards = ({ sessions }) => {
           <>
             {sessions.map((session) => (
               <Col span={24} key={session.id}>
-                <Card hoverable className={styles.sessionCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                <Card className={styles.sessionCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
                   <Row gutter={16}>
                     <Col xs={24} md={8} lg={8}>
                       <Image

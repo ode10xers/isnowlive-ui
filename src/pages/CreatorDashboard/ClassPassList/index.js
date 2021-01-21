@@ -10,7 +10,7 @@ import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import CreateClassPassModal from 'components/CreateClassPassModal';
 
-import { showErrorModal, showSuccessModal } from 'utils/modals';
+import { showErrorModal, showSuccessModal } from 'components/modals';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
@@ -206,7 +206,7 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editPassId={editPassId} />
       <Row gutter={8}>
-        <Col xs={12} md={10} lg={14}>
+        <Col xs={24} md={10} lg={14}>
           <Title level={4}> Class Passes </Title>
         </Col>
         <Col xs={24} md={4} lg={3}>

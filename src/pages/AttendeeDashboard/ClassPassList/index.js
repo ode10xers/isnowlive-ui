@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 import apis from 'apis';
-import { showErrorModal } from 'utils/modals';
+import { showErrorModal } from 'components/modals';
 
 // import styles from './styles.module.scss';
 

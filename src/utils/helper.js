@@ -172,3 +172,13 @@ export const StripeAccountStatus = {
   VERIFICATION_PENDING: 'VERIFICATION_PENDING',
   CONNECTED: 'CONNECTED',
 };
+
+export const paymentSource = {
+  GATEWAY: 'PAYMENT_GATEWAY',
+  CLASS_PASS: 'PASS',
+};
+
+export const orderType = {
+  CLASS: 'SESSION_ORDER',
+  PASS: 'PASS_ORDER',
+};

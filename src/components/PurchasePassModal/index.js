@@ -4,14 +4,12 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Form, Input, Typography, Modal, Button, message } from 'antd';
 
 import config from 'config';
-import Routes from 'routes';
 import apis from 'apis';
 
-import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, generateUrl, scrollToErrorField } from 'utils/helper';
-import { showErrorModal, showSuccessModal } from 'utils/modals';
+import { isAPISuccess, scrollToErrorField } from 'utils/helper';
+import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/modals';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
@@ -25,10 +23,6 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Paragraph } = Typography;
 
-const {
-  timezoneUtils: { getCurrentLongTimezone },
-} = dateUtil;
-
 const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const { logIn } = useGlobalContext();
   const [form] = Form.useForm();
@@ -37,12 +31,9 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
 
-  console.log(getCurrentLongTimezone());
-
   useEffect(() => {
     if (!currentUser) {
       const user = getLocalUserDetails();
-      console.log(user);
 
       if (user) {
         setCurrentUser(user);
@@ -86,7 +77,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const initiatePaymentForOrder = async (orderDetails) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.order_id,
+        order_id: orderDetails.pass_order_id,
         order_type: 'PASS_ORDER',
       });
 
@@ -113,7 +104,6 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     }
 
     try {
-      console.log(pass);
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: pass.id,
         price: pass.price,
@@ -124,21 +114,13 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
-          showSuccessModal('Successfully Purchased Class Pass');
+          showBookingSuccessModal(currentUser.email, pass, false, false);
         }
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
-      if (
-        // TODO: Check the error messages for when user tries to purchase an already purchased pass
-        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
-      ) {
-        Modal.warning({
-          title: 'Pass Already Purchased',
-          content: 'It seems you have already booked this class pass, please check your dashboard',
-          okText: 'Go To Dashboard',
-          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-        });
+      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true);
       }
     }
 

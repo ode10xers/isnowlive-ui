@@ -110,7 +110,6 @@ const ProfilePreview = ({ username = null }) => {
       const { data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (data) {
-        console.log(data);
         setPasses(data);
         setIsPassesLoading(false);
       }

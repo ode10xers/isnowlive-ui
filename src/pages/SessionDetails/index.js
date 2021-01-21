@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography, Button, Modal } from 'antd';
+import { Row, Col, Image, message, Typography } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
@@ -9,31 +9,39 @@ import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
+import Share from 'components/Share';
+import Loader from 'components/Loader';
+import HostDetails from 'components/HostDetails';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
-import SessionRegistration from 'components/SessionRegistration';
-import Loader from 'components/Loader';
+import SignInForm from 'components/SignInForm';
 import DefaultImage from 'components/Icons/DefaultImage/index';
-import HostDetails from 'components/HostDetails';
-import Share from 'components/Share';
+import SessionRegistration from 'components/SessionRegistration';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, generateUrl } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
+import {
+  showErrorModal,
+  showBookingSuccessModal,
+  showAlreadyBookedModal,
+  showSetNewPasswordModal,
+  sendNewPasswordEmail,
+} from 'components/modals';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
+//TODO: Adjust to new booking flow
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
@@ -43,14 +51,21 @@ const SessionDetails = ({ match, history }) => {
   const { logIn } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
+  const [showSignInForm, setShowSignInForm] = useState(false);
+  const [bookingType, setBookingType] = useState('Class');
+  const [availablePasses, setAvailablePasses] = useState([]);
+  const [selectedPass, setSelectedPass] = useState(null);
+  const [userPasses, setUserPasses] = useState(null);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
       try {
         const inventoryDetails = await apis.session.getPublicInventoryById(inventory_id);
         const userDetails = await apis.user.getProfileByUsername(username);
+        const passes = await apis.passes.getPassesBySessionId(inventoryDetails.data.session_id);
         setSession(inventoryDetails.data);
         setCreator(userDetails.data);
+        setAvailablePasses(passes.data.map((pass) => ({ ...pass, user_usable: false })));
         setIsLoading(false);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -60,6 +75,56 @@ const SessionDetails = ({ match, history }) => {
     },
     [history]
   );
+
+  const getUsablePassesForUser = useCallback(async () => {
+    try {
+      if (currentUser) {
+        const { data } = await apis.passes.getAttendeePasses();
+        //TODO: Confirm response for the above and adjust accordingly
+        setUserPasses(data);
+        setAvailablePasses(
+          availablePasses.map((pass) => {
+            let passUsableByUser = false;
+            const passOwnedByUser = data.filter((userPass) => userPass.id === pass.id);
+
+            if (passOwnedByUser) {
+              //TODO: Probably have to check for the response, does it have validity as a checkable thing
+              passUsableByUser = passOwnedByUser.class_count > 0;
+            }
+
+            return {
+              ...pass,
+              class_count: data.class_count,
+              user_usable: passUsableByUser,
+            };
+          })
+        );
+      }
+    } catch (error) {
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  }, [currentUser, availablePasses]);
+
+  const handleBookingTypeChange = (bookingType) => {
+    if (bookingType === 'Pass' && !selectedPass && availablePasses.length) {
+      setSelectedPass(availablePasses[0] || null);
+    }
+
+    setBookingType(bookingType);
+  };
+
+  const getUserPurchasedPass = () => {
+    if (
+      availablePasses.length &&
+      userPasses.length &&
+      selectedPass &&
+      availablePasses.filter((availablePass) => availablePass.id === selectedPass.id)
+    ) {
+      return userPasses.filter((userPass) => userPass.id === selectedPass.id);
+    }
+
+    return null;
+  };
 
   useEffect(() => {
     if (match.params.inventory_id) {
@@ -74,7 +139,11 @@ const SessionDetails = ({ match, history }) => {
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
     }
-  }, [match.params.inventory_id, getDetails]);
+  }, [match.params.inventory_id, getDetails, getUsablePassesForUser]);
+
+  useEffect(() => {
+    getUsablePassesForUser();
+  }, [currentUser, getUsablePassesForUser]);
 
   const signupUser = async (values) => {
     try {
@@ -105,6 +174,7 @@ const SessionDetails = ({ match, history }) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.order_id,
+        order_type: selectedPass ? orderType.PASS : orderType.CLASS,
       });
 
       if (isAPISuccess(status) && data) {
@@ -123,32 +193,65 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
+  const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
+  const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
+
   const createOrder = async (userEmail) => {
     try {
-      const { status, data } = await apis.session.createOrderForUser({
+      // Default payload if user book single class
+      let payload = {
         inventory_id: parseInt(match.params.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
-      });
+        payment_source: paymentSource.GATEWAY,
+      };
+      let usersPass = null;
+
+      if (selectedPass) {
+        // payment_source will be PAYMENT_GATEWAY if payment is required
+        // e.g. user buys single class / user buys new pass
+        // Booking class after pass is bought will be done in redirection
+
+        usersPass = getUserPurchasedPass();
+
+        if (usersPass) {
+          payload = {
+            ...payload,
+            payment_source: paymentSource.CLASS_PASS,
+            source_id: usersPass.pass_order_id,
+          };
+        } else {
+          payload = {
+            pass_id: selectedPass.id,
+            price: selectedPass.price,
+            currency: selectedPass.currency,
+          };
+        }
+      }
+
+      const { status, data } = selectedPass && !usersPass ? await buyPass(payload) : await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
-          Modal.success({
-            title: 'Registration Successful',
-            content: (
-              <>
-                <Paragraph>
-                  We have sent you a confirmation email on <Text strong>{userEmail}</Text>. Look out for an email from{' '}
-                  <Text strong> friends@passion.do. </Text>
-                </Paragraph>
-                <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-              </>
-            ),
-            okText: 'Go To Dashboard',
-            onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-          });
+          if (selectedPass && !usersPass) {
+            // If user (for some reason) buys a free pass (if any exists)
+            // we then immediately followUp the Booking Process
+            const followUpBooking = await bookClass({
+              inventory_id: parseInt(match.params.inventory_id),
+              user_timezone_offset: new Date().getTimezoneOffset(),
+              user_timezone: getCurrentLongTimezone(),
+              payment_source: paymentSource.CLASS_PASS,
+              source_id: data.pass_order_id,
+            });
+
+            if (isAPISuccess(followUpBooking.status)) {
+              showBookingSuccessModal(userEmail, usersPass);
+            }
+          } else {
+            showBookingSuccessModal(userEmail, usersPass);
+          }
         }
       }
     } catch (error) {
@@ -157,12 +260,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        Modal.warning({
-          title: 'Session Already Booked',
-          content: 'It seems you have already booked this session, please check your dashboard',
-          okText: 'Go To Dashboard',
-          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-        });
+        showAlreadyBookedModal(false);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true);
       }
     }
   };
@@ -185,7 +285,8 @@ const SessionDetails = ({ match, history }) => {
           if (data) {
             http.setAuthToken(data.auth_token);
             logIn(data, true);
-            createOrder(values.email);
+            getUsablePassesForUser();
+            // createOrder(values.email);
           }
         } catch (error) {
           setIsLoading(false);
@@ -202,41 +303,23 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
-
   const handleSendNewPasswordEmail = async (email) => {
     try {
       setIsLoading(true);
       const { status } = await sendNewPasswordEmail(email);
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        Modal.confirm({
-          mask: true,
-          center: true,
-          closable: true,
-          maskClosable: true,
-          title: 'Set a new password',
-          content: (
-            <>
-              <Paragraph>
-                We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
-              </Paragraph>
-              <Paragraph>
-                <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
-                  Didn't get it? Send again.
-                </Button>
-              </Paragraph>
-            </>
-          ),
-          okText: 'Okay',
-          cancelText: 'Talk to us',
-          onCancel: () => openFreshChatWidget(),
-        });
+        showSetNewPasswordModal(email);
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
+  };
+
+  const hideSignInForm = () => {
+    setShowSignInForm(false);
+    setCurrentUser(getLocalUserDetails());
   };
 
   return (
@@ -313,14 +396,23 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
         <Col xs={24} lg={15} className={styles.mt50}>
-          {session?.end_time && getTimeDiff(session?.end_time, moment(), 'minutes') > 0 && (
-            <SessionRegistration
-              user={currentUser}
-              showPasswordField={showPasswordField}
-              onFinish={onFinish}
-              onSetNewPassword={handleSendNewPasswordEmail}
-            />
-          )}
+          {session?.end_time &&
+            getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
+            (showSignInForm ? (
+              <SignInForm user={currentUser} hideSignInForm={() => hideSignInForm()} />
+            ) : (
+              <SessionRegistration
+                user={currentUser}
+                showPasswordField={showPasswordField}
+                onFinish={onFinish}
+                onSetNewPassword={handleSendNewPasswordEmail}
+                showSignInForm={() => setShowSignInForm(true)}
+                setBookingType={handleBookingTypeChange}
+                showPasses={bookingType === 'Pass'}
+                availablePasses={availablePasses}
+                setSelectedPass={setSelectedPass}
+              />
+            ))}
         </Col>
       </Row>
     </Loader>
