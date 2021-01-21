@@ -11,7 +11,7 @@ import { scrollToErrorField } from 'utils/helper';
 import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
-import { showErrorModal } from 'components/modals';
+import { showErrorModal } from 'components/Modals/modals';
 
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
 

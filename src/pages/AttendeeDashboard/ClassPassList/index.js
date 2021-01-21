@@ -7,7 +7,7 @@ import apis from 'apis';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
-import { showErrorModal } from 'components/modals';
+import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';

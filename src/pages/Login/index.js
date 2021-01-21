@@ -17,7 +17,7 @@ import {
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
 import { isAPISuccess, ZoomAuthType } from 'utils/helper';
-import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/modals';
+import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 

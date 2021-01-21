@@ -10,7 +10,7 @@ import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import CreateClassPassModal from 'components/CreateClassPassModal';
 
-import { showErrorModal, showSuccessModal } from 'components/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 

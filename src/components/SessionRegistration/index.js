@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Row, Col, Button, Form, Input, Radio, Typography, Tag } from 'antd';
+import { Row, Col, Button, Form, Input, Typography, Tag } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 
 import Table from 'components/Table';
 
+import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { generateUrlFromUsername, scrollToErrorField } from 'utils/helper';
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
@@ -18,17 +19,20 @@ const { Title, Text } = Typography;
 const { Item } = Form;
 const { Password } = Input;
 
+const {
+  formatDate: { toShortDate },
+} = dateUtil;
+
 const SessionRegistration = ({
   onFinish,
   showPasswordField,
   user,
   onSetNewPassword,
   showSignInForm,
-  setBookingType,
-  showPasses,
   availablePasses = [],
   setSelectedPass,
   selectedPass = null,
+  classDetails,
 }) => {
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -58,6 +62,24 @@ const SessionRegistration = ({
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
+  const singleClassColumns = [
+    {
+      title: '',
+      dataIndex: 'name',
+      key: 'name',
+      align: 'left',
+      width: '80%',
+    },
+    {
+      title: '',
+      dataIndex: 'price',
+      key: 'price',
+      align: 'right',
+      width: '20%',
+      render: (text, record) => `${record.price} ${record.currency}`,
+    },
+  ];
+
   const passesColumns = [
     {
       title: 'Pass Name',
@@ -75,7 +97,7 @@ const SessionRegistration = ({
         record.limited
           ? record.user_usable
             ? `${record.classes_remaining}/${record.class_count} remaining`
-            : `${text} Classes`
+            : `${record.class_count} Classes`
           : 'Unlimited Classes',
     },
     {
@@ -84,7 +106,16 @@ const SessionRegistration = ({
       key: 'validity',
       align: 'center',
       width: '15%',
-      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) => {
+        if (record.user_usable) {
+          return {
+            props: { colSpan: 2 },
+            children: `Before ${toShortDate(record.expiry)}`,
+          };
+        } else {
+          return `${text} day${parseInt(text) > 1 ? 's' : ''}`;
+        }
+      },
     },
     {
       title: 'Price',
@@ -93,24 +124,30 @@ const SessionRegistration = ({
       align: 'left',
       sortOrder: 'descend',
       width: '15%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => {
+        if (record.user_usable) {
+          return {
+            props: { colSpan: 0 },
+            children: '',
+          };
+        } else {
+          return `${text} ${record.currency}`;
+        }
+      },
     },
     {
       title: '',
       align: 'right',
-      render: (text, record) => (
-        <>
-          {expandedRowKeys.includes(record.id) ? (
-            <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
-              Close
-            </Button>
-          ) : (
-            <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
-              More
-            </Button>
-          )}
-        </>
-      ),
+      render: (text, record) =>
+        expandedRowKeys.includes(record.id) ? (
+          <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
+            Close
+          </Button>
+        ) : (
+          <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
+            More
+          </Button>
+        ),
     },
   ];
 
@@ -198,48 +235,54 @@ const SessionRegistration = ({
               </>
             )}
 
-            <Item
-              {...sessionRegistrationTailLayout}
-              name="booking_type"
-              rules={validationRules.requiredValidation}
-              initialValue={showPasses ? 'Pass' : 'Class'}
-            >
-              <Radio.Group onChange={(e) => setBookingType(e.target.value)}>
-                <Radio value="Class"> Book This Class </Radio>
-                <Radio value="Pass"> Buy Pass & Book </Radio>
-              </Radio.Group>
-            </Item>
+            <div>
+              <Title level={5}> Book Only this class </Title>
+              <Table
+                columns={singleClassColumns}
+                data={[classDetails]}
+                rowKey={(record) => 'dropIn'}
+                rowSelection={{
+                  hideSelectAll: true,
+                  selectedRowKeys: selectedPass ? [] : ['dropIn'],
+                  type: 'radio',
+                  onSelect: (record, selected, _, e) => {
+                    if (selected) {
+                      setSelectedPass(null);
+                    }
+                  },
+                }}
+              />
+            </div>
 
-            {showPasses && (
-              <div>
-                <Table
-                  columns={passesColumns}
-                  data={availablePasses}
-                  rowKey={(record) => record.id}
-                  expandable={{
-                    expandedRowRender: renderClassesList,
-                    expandIconColumnIndex: -1,
-                    expandedRowKeys: expandedRowKeys,
-                  }}
-                  rowSelection={{
-                    selectedRowKeys: [selectedPass.id],
-                    checkStrictly: true,
-                    hideSelectAll: true,
-                    type: 'radio',
-                    onSelect: (record, selected, _, e) => {
-                      if (selected) {
-                        setSelectedPass(record);
-                      }
-                    },
-                  }}
-                />
-              </div>
-            )}
+            <div className={styles.mt20}>
+              <Title level={5}> Buy Pass & Book </Title>
+              <Table
+                columns={passesColumns}
+                data={availablePasses}
+                rowKey={(record) => record.id}
+                expandable={{
+                  expandedRowRender: renderClassesList,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedRowKeys,
+                }}
+                rowSelection={{
+                  selectedRowKeys: selectedPass ? [selectedPass.id] : [],
+                  checkStrictly: true,
+                  hideSelectAll: true,
+                  type: 'radio',
+                  onSelect: (record, selected, _, e) => {
+                    if (selected) {
+                      setSelectedPass(record);
+                    }
+                  },
+                }}
+              />
+            </div>
 
             <Item {...sessionRegistrationTailLayout}>
-              <Row className={styles.mt10}>
+              <Row className={styles.mt20}>
                 <Col>
-                  <Button type="primary" htmlType="submit" disabled={showPasses && !selectedPass}>
+                  <Button type="primary" htmlType="submit">
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>

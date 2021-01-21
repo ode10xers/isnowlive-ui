@@ -8,6 +8,8 @@ import { generateUrl } from 'utils/helper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
+import styles from './style.modules.scss';
+
 const { Text, Paragraph } = Typography;
 
 export const showErrorModal = (title, message = '') => {
@@ -39,7 +41,7 @@ export const showSetNewPasswordModal = (email) => {
           We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
         </Paragraph>
         <Paragraph>
-          <Button style={{ padding: '0px !important' }} type="link" onClick={() => sendNewPasswordEmail(email)}>
+          <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
             Didn't get it? Send again.
           </Button>
         </Paragraph>
@@ -58,6 +60,8 @@ export const showBookingSuccessModal = (
   userDidPayment = false
 ) => {
   Modal.success({
+    closable: true,
+    maskClosable: false,
     title: 'Registration Successful',
     content: isContinuedFlow ? (
       userDidPayment ? (
@@ -113,10 +117,9 @@ export const showBookingSuccessModal = (
 
 export const showAlreadyBookedModal = (isPass = false) => {
   Modal.warning({
-    mask: true,
     center: true,
     closable: true,
-    maskClosable: true,
+    maskClosable: false,
     title: isPass ? 'Pass Already Purchased' : 'Session Already Booked',
     content: (
       <Paragraph>

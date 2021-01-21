@@ -4,7 +4,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { message, Row } from 'antd';
 
 import Loader from 'components/Loader';
-import { showBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/modals';
+import { showBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import apis from 'apis';
 // import Routes from 'routes';

@@ -5,7 +5,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 
-import { showErrorModal, showSuccessModal } from 'components/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 

@@ -30,7 +30,7 @@ import {
   showAlreadyBookedModal,
   showSetNewPasswordModal,
   sendNewPasswordEmail,
-} from 'components/modals';
+} from 'components/Modals/modals';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -53,11 +53,10 @@ const SessionDetails = ({ match, history }) => {
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
-  const [bookingType, setBookingType] = useState('Class');
   const [availablePasses, setAvailablePasses] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
-  const [userPasses, setUserPasses] = useState(null);
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const [userPasses, setUserPasses] = useState([]);
+  const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -80,39 +79,40 @@ const SessionDetails = ({ match, history }) => {
 
   const getUsablePassesForUser = useCallback(async () => {
     try {
-      console.log(currentUser);
-      if (currentUser) {
+      const loggedInUserData = getLocalUserDetails();
+
+      if (loggedInUserData) {
         const { data } = await apis.passes.getAttendeePasses();
         setUserPasses(data);
         setAvailablePasses(
           availablePasses.map((pass) => {
             let passUsableByUser = false;
-            const passOwnedByUser = data.filter((userPass) => userPass.pass_id === pass.id);
+            const passOwnedByUser = data.filter((userPass) => userPass.pass_id === pass.id)[0];
 
             if (passOwnedByUser) {
               passUsableByUser = passOwnedByUser.classes_remaining > 0 && isBeforeDate(passOwnedByUser.expiry);
             }
 
-            return {
-              ...pass,
-              classes_remaining: passOwnedByUser.classes_remaining,
-              user_usable: passUsableByUser,
-            };
+            if (passUsableByUser) {
+              return {
+                ...pass,
+                classes_remaining: passOwnedByUser.classes_remaining,
+                expiry: passOwnedByUser.expiry,
+                user_usable: true,
+              };
+            } else {
+              return {
+                ...pass,
+                user_usable: false,
+              };
+            }
           })
         );
       }
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
-  }, [currentUser, availablePasses]);
-
-  const handleBookingTypeChange = (bookingType) => {
-    if (bookingType === 'Pass' && !selectedPass && availablePasses.length) {
-      setSelectedPass(availablePasses[0] || null);
-    }
-
-    setBookingType(bookingType);
-  };
+  }, [availablePasses]);
 
   const getUserPurchasedPass = () => {
     if (
@@ -121,7 +121,7 @@ const SessionDetails = ({ match, history }) => {
       selectedPass &&
       availablePasses.filter((availablePass) => availablePass.id === selectedPass.id)
     ) {
-      return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id);
+      return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id)[0];
     }
 
     return null;
@@ -145,12 +145,18 @@ const SessionDetails = ({ match, history }) => {
   }, [match.params.inventory_id]);
 
   useEffect(() => {
-    if (!isCreatingOrder) {
-      getUsablePassesForUser();
+    getUsablePassesForUser();
+
+    //eslint-disable-next-line
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (createFollowUpOrder) {
+      createOrder(createFollowUpOrder);
     }
 
     //eslint-disable-next-line
-  }, [currentUser, isCreatingOrder]);
+  }, [createFollowUpOrder]);
 
   const signupUser = async (values) => {
     try {
@@ -170,6 +176,7 @@ const SessionDetails = ({ match, history }) => {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setIsLoading(false);
         setShowPasswordField(true);
+        setCurrentUser(values);
         message.info('Enter password to register session');
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
@@ -213,6 +220,7 @@ const SessionDetails = ({ match, history }) => {
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
   const createOrder = async (userEmail) => {
+    setCreateFollowUpOrder(null);
     try {
       // Default payload if user book single class
       let payload = {
@@ -229,6 +237,7 @@ const SessionDetails = ({ match, history }) => {
         // Booking class after pass is bought will be done in redirection
 
         usersPass = getUserPurchasedPass();
+        console.log(usersPass);
 
         if (usersPass) {
           payload = {
@@ -245,11 +254,17 @@ const SessionDetails = ({ match, history }) => {
         }
       }
 
+      console.log(payload);
+
       const { status, data } = selectedPass && !usersPass ? await buyPass(payload) : await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          if (selectedPass && !usersPass) {
+            initiatePaymentForOrder({ ...data, order_id: data.pass_order_id });
+          } else {
+            initiatePaymentForOrder(data);
+          }
         } else {
           if (selectedPass && !usersPass) {
             // If user (for some reason) buys a free pass (if any exists)
@@ -301,11 +316,8 @@ const SessionDetails = ({ match, history }) => {
           if (data) {
             http.setAuthToken(data.auth_token);
             logIn(data, true);
-            setCurrentUser(data);
-            setIsCreatingOrder(true);
             await getUsablePassesForUser();
-            await createOrder(values.email);
-            setIsCreatingOrder(false);
+            setCreateFollowUpOrder(values.email);
           }
         } catch (error) {
           setIsLoading(false);
@@ -426,11 +438,10 @@ const SessionDetails = ({ match, history }) => {
                 onFinish={onFinish}
                 onSetNewPassword={handleSendNewPasswordEmail}
                 showSignInForm={() => setShowSignInForm(true)}
-                setBookingType={handleBookingTypeChange}
-                showPasses={bookingType === 'Pass'}
                 availablePasses={availablePasses}
                 setSelectedPass={setSelectedPass}
                 selectedPass={selectedPass}
+                classDetails={session}
               />
             ))}
         </Col>

@@ -9,7 +9,7 @@ import apis from 'apis';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess, scrollToErrorField } from 'utils/helper';
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/modals';
+import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
