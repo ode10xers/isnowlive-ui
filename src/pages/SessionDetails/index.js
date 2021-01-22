@@ -277,7 +277,10 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (
-            <Paragraph type="secondary"> {ReactHtmlParser(session?.description)}</Paragraph>
+            <Paragraph type="secondary" className={styles.sessionDesc}>
+              {' '}
+              {ReactHtmlParser(session?.description)}
+            </Paragraph>
           ) : (
             <>
               <Paragraph type="secondary" className={styles.sessionDesc} ellipsis={{ rows: 5 }}>
@@ -294,7 +297,10 @@ const SessionDetails = ({ match, history }) => {
                 Session Prerequisite
               </Title>
               {showPrerequisite ? (
-                <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
+                <Paragraph type="secondary" className={styles.sessionPrereq}>
+                  {' '}
+                  {ReactHtmlParser(session?.prerequisites)}
+                </Paragraph>
               ) : (
                 <>
                   <Paragraph type="secondary" className={styles.sessionPrereq} ellipsis={{ rows: 5 }}>
