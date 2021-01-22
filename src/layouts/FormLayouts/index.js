@@ -41,3 +41,10 @@ export const purchasePassModalFormLayout = {
 export const purchasePassModalTailLayout = {
   wrapperCol: { span: 8, offset: 8 },
 };
+export const signInFormLayout = {
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
+};
+export const signInTailLayout = {
+  wrapperCol: { span: 20, offset: 4 },
+};

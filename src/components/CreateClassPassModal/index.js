@@ -145,7 +145,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
           <Row className="class-pass-row">
             <Col xs={12}>
               <Form.Item id="passName" name="passName" label="Class Pass Name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Class Pass Name" />
+                <Input placeholder="Enter Class Pass Name" maxLength={50} />
               </Form.Item>
             </Col>
             <Col xs={{ span: 11, offset: 1 }}>

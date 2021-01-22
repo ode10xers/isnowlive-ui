@@ -15,7 +15,7 @@ import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'la
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Item } = Form;
 const { Password } = Input;
 
@@ -30,9 +30,11 @@ const SessionRegistration = ({
   onSetNewPassword,
   showSignInForm,
   availablePasses = [],
+  userPasses = [],
   setSelectedPass,
   selectedPass = null,
   classDetails,
+  logOut,
 }) => {
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -85,37 +87,15 @@ const SessionRegistration = ({
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '30%',
-    },
-    {
-      title: 'Pass Count',
-      dataIndex: 'class_count',
-      key: 'class_count',
-      align: 'right',
-      width: '30%',
-      render: (text, record) =>
-        record.limited
-          ? record.user_usable
-            ? `${record.classes_remaining}/${record.class_count} remaining`
-            : `${record.class_count} Classes`
-          : 'Unlimited Classes',
+      width: '50%',
     },
     {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
-      align: 'center',
-      width: '15%',
-      render: (text, record) => {
-        if (record.user_usable) {
-          return {
-            props: { colSpan: 2 },
-            children: `Before ${toShortDate(record.expiry)}`,
-          };
-        } else {
-          return `${text} day${parseInt(text) > 1 ? 's' : ''}`;
-        }
-      },
+      align: 'right',
+      width: '13%',
+      render: (text, record) => `${record.validity} day${parseInt(record.validity) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
@@ -123,31 +103,54 @@ const SessionRegistration = ({
       key: 'price',
       align: 'left',
       sortOrder: 'descend',
-      width: '15%',
-      render: (text, record) => {
-        if (record.user_usable) {
-          return {
-            props: { colSpan: 0 },
-            children: '',
-          };
-        } else {
-          return `${text} ${record.currency}`;
-        }
-      },
+      width: '13%',
+      render: (text, record) => `${text} ${record.currency}`,
     },
     {
-      title: '',
+      title: 'Class Count',
+      dataIndex: 'class_count',
+      key: 'class_count',
       align: 'right',
-      render: (text, record) =>
-        expandedRowKeys.includes(record.id) ? (
-          <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
-            Close
+      render: (text, record) => {
+        const btnText = record.limited
+          ? record.user_usable
+            ? `${record.classes_remaining}/${record.class_count} remaining `
+            : `${record.class_count} Classes `
+          : 'Unlimited Classes ';
+
+        return expandedRowKeys.includes(record.id) ? (
+          <Button type="link" onClick={() => collapseRow(record.id)}>
+            {btnText} <UpOutlined />
           </Button>
         ) : (
-          <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
-            More
+          <Button type="link" onClick={() => expandRow(record.id)}>
+            {btnText} <DownOutlined />
           </Button>
-        ),
+        );
+      },
+    },
+  ];
+
+  const userPassesColumns = [
+    {
+      title: 'Pass Name',
+      dataIndex: 'name',
+      key: 'name',
+      align: 'left',
+    },
+    {
+      title: 'Classes Left',
+      dataIndex: 'classes_remaining',
+      key: 'classes_remaining',
+      width: '20%',
+      render: (text, record) => `${record.classes_remaining}/${record.class_count}`,
+    },
+    {
+      title: 'Valid Till',
+      dataIndex: 'expiry',
+      key: 'expiry',
+      width: '20%',
+      render: (text, record) => toShortDate(record.expiry),
     },
   ];
 
@@ -167,7 +170,7 @@ const SessionRegistration = ({
   );
 
   return (
-    <div className={classNames(styles.box, styles.p50)}>
+    <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
         <Col xs={24} md={24}>
           <Title level={3}>Registration</Title>
@@ -195,17 +198,19 @@ const SessionRegistration = ({
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
           >
-            <Item label="Name" className={styles.nameInputWrapper}>
-              <Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-                <Input placeholder="First Name" disabled={showPasswordField} />
+            {!user && (
+              <Item label="Name" className={styles.nameInputWrapper}>
+                <Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
+                  <Input placeholder="First Name" disabled={showPasswordField} />
+                </Item>
+                <Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
+                  <Input placeholder="Last Name" disabled={showPasswordField} />
+                </Item>
               </Item>
-              <Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-                <Input placeholder="Last Name" disabled={showPasswordField} />
-              </Item>
-            </Item>
+            )}
 
             <Item className={styles.emailInput} label="Email" name="email" rules={validationRules.emailValidation}>
-              <Input placeholder="Enter your email" disabled={showPasswordField} />
+              <Input placeholder="Enter your email" disabled={user} />
             </Item>
 
             {showPasswordField && (
@@ -235,62 +240,105 @@ const SessionRegistration = ({
               </>
             )}
 
-            <div>
-              <Title level={5}> Book Only this class </Title>
-              <Table
-                columns={singleClassColumns}
-                data={[classDetails]}
-                rowKey={(record) => 'dropIn'}
-                rowSelection={{
-                  hideSelectAll: true,
-                  selectedRowKeys: selectedPass ? [] : ['dropIn'],
-                  type: 'radio',
-                  onSelect: (record, selected, _, e) => {
-                    if (selected) {
-                      setSelectedPass(null);
-                    }
-                  },
-                }}
-              />
-            </div>
+            {user ? (
+              <>
+                <Item {...sessionRegistrationTailLayout}>
+                  <Button type="link" onClick={() => logOut()}>
+                    Not this account? Log Out
+                  </Button>
+                </Item>
+                <div>
+                  <Table
+                    columns={userPassesColumns}
+                    data={userPasses}
+                    rowKey={(record) => record.pass_order_id}
+                    rowSelection={{
+                      hideSelectAll: true,
+                      selectedRowKeys: selectedPass ? [selectedPass.pass_order_id] : [],
+                      type: 'radio',
+                      onSelect: (record, selected, _, e) => {
+                        if (selected) {
+                          setSelectedPass(record);
+                        }
+                      },
+                    }}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <Item {...sessionRegistrationTailLayout}>
+                  <Button type="link" onClick={() => showSignInForm()}>
+                    Already have an account? Sign In
+                  </Button>
+                </Item>
+                <div>
+                  <Title level={5}> Book this class </Title>
+                  <Table
+                    columns={singleClassColumns}
+                    data={[classDetails]}
+                    rowKey={(record) => 'dropIn'}
+                    rowSelection={{
+                      hideSelectAll: true,
+                      selectedRowKeys: selectedPass ? [] : ['dropIn'],
+                      type: 'radio',
+                      onSelect: (record, selected, _, e) => {
+                        if (selected) {
+                          setSelectedPass(null);
+                        }
+                      },
+                    }}
+                  />
+                </div>
 
-            <div className={styles.mt20}>
-              <Title level={5}> Buy Pass & Book </Title>
-              <Table
-                columns={passesColumns}
-                data={availablePasses}
-                rowKey={(record) => record.id}
-                expandable={{
-                  expandedRowRender: renderClassesList,
-                  expandIconColumnIndex: -1,
-                  expandedRowKeys: expandedRowKeys,
-                }}
-                rowSelection={{
-                  selectedRowKeys: selectedPass ? [selectedPass.id] : [],
-                  checkStrictly: true,
-                  hideSelectAll: true,
-                  type: 'radio',
-                  onSelect: (record, selected, _, e) => {
-                    if (selected) {
-                      setSelectedPass(record);
-                    }
-                  },
-                }}
-              />
-            </div>
+                <div className={styles.mt20}>
+                  <Title level={5}> Buy Pass & this class </Title>
+                  <Table
+                    columns={passesColumns}
+                    data={availablePasses}
+                    rowKey={(record) => record.id}
+                    expandable={{
+                      expandedRowRender: renderClassesList,
+                      expandIconColumnIndex: -1,
+                      expandedRowKeys: expandedRowKeys,
+                    }}
+                    rowSelection={{
+                      selectedRowKeys: selectedPass ? [selectedPass.id] : [],
+                      checkStrictly: true,
+                      hideSelectAll: true,
+                      type: 'radio',
+                      onSelect: (record, selected, _, e) => {
+                        if (selected) {
+                          setSelectedPass(record);
+                        }
+                      },
+                    }}
+                  />
+                </div>
+              </>
+            )}
 
             <Item {...sessionRegistrationTailLayout}>
-              <Row className={styles.mt20}>
+              <Row className={styles.mt10}>
+                {user && selectedPass && userPasses.length && (
+                  <Paragraph>
+                    Booking this class for{' '}
+                    <Text delete>
+                      {' '}
+                      {classDetails.price} {classDetails.currency}{' '}
+                    </Text>
+                    <Text strong> 0 {classDetails.currency} </Text> using your purchased pass{' '}
+                    <Text strong> {selectedPass.name} </Text>
+                  </Paragraph>
+                )}
+              </Row>
+              <Row className={styles.mt10}>
                 <Col>
                   <Button type="primary" htmlType="submit">
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
-                <Col>
-                  <Button type="link" onClick={() => showSignInForm()} disabled={Boolean(user)}>
-                    Already have an account? Sign In
-                  </Button>
-                </Col>
+                {!user && <Col></Col>}
               </Row>
             </Item>
 

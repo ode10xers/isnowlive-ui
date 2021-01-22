@@ -39,17 +39,15 @@ const { Title, Paragraph } = Typography;
 const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },
-  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
-//TODO: Adjust to new booking flow
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const { logIn } = useGlobalContext();
+  const { logIn, logOut } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
@@ -83,45 +81,29 @@ const SessionDetails = ({ match, history }) => {
 
       if (loggedInUserData) {
         const { data } = await apis.passes.getAttendeePasses();
-        setUserPasses(data);
-        setAvailablePasses(
-          availablePasses.map((pass) => {
-            let passUsableByUser = false;
-            const passOwnedByUser = data.filter((userPass) => userPass.pass_id === pass.id)[0];
-
-            if (passOwnedByUser) {
-              passUsableByUser = passOwnedByUser.classes_remaining > 0 && isBeforeDate(passOwnedByUser.expiry);
-            }
-
-            if (passUsableByUser) {
-              return {
-                ...pass,
-                classes_remaining: passOwnedByUser.classes_remaining,
-                expiry: passOwnedByUser.expiry,
-                user_usable: true,
-              };
-            } else {
-              return {
-                ...pass,
-                user_usable: false,
-              };
-            }
-          })
+        setUserPasses(
+          data.map((userPass) => ({
+            ...userPass,
+            id: userPass.pass_id,
+            name: userPass.pass_name,
+            sessions: userPass.session,
+          }))
         );
+        setSelectedPass(getUserPurchasedPass());
       }
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
-  }, [availablePasses]);
+    //eslint-disable-next-line
+  }, []);
 
   const getUserPurchasedPass = () => {
-    if (
-      availablePasses.length &&
-      userPasses.length &&
-      selectedPass &&
-      availablePasses.filter((availablePass) => availablePass.id === selectedPass.id)
-    ) {
-      return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id)[0];
+    if (userPasses.length) {
+      if (selectedPass) {
+        return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id)[0];
+      } else {
+        return userPasses[0];
+      }
     }
 
     return null;
@@ -143,12 +125,6 @@ const SessionDetails = ({ match, history }) => {
 
     //eslint-disable-next-line
   }, [match.params.inventory_id]);
-
-  useEffect(() => {
-    getUsablePassesForUser();
-
-    //eslint-disable-next-line
-  }, [currentUser]);
 
   useEffect(() => {
     if (createFollowUpOrder) {
@@ -312,6 +288,7 @@ const SessionDetails = ({ match, history }) => {
           if (data) {
             http.setAuthToken(data.auth_token);
             logIn(data, true);
+            setCurrentUser(data);
             await getUsablePassesForUser();
             setCreateFollowUpOrder(values.email);
           }
@@ -346,7 +323,12 @@ const SessionDetails = ({ match, history }) => {
 
   const hideSignInForm = () => {
     setShowSignInForm(false);
-    setCurrentUser(getLocalUserDetails());
+
+    const userDetails = getLocalUserDetails();
+
+    setCurrentUser(userDetails);
+
+    if (userDetails) getUsablePassesForUser();
   };
 
   return (
@@ -422,7 +404,7 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={9}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} className={styles.mt50}>
+        <Col xs={24} lg={showSignInForm ? 14 : 18} className={styles.mt50}>
           {session?.end_time &&
             getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
             (showSignInForm ? (
@@ -435,9 +417,15 @@ const SessionDetails = ({ match, history }) => {
                 onSetNewPassword={handleSendNewPasswordEmail}
                 showSignInForm={() => setShowSignInForm(true)}
                 availablePasses={availablePasses}
+                userPasses={userPasses}
                 setSelectedPass={setSelectedPass}
                 selectedPass={selectedPass}
                 classDetails={session}
+                logOut={() => {
+                  logOut(history, false);
+                  setCurrentUser(null);
+                  setShowSignInForm(true);
+                }}
               />
             ))}
         </Col>

@@ -13,7 +13,7 @@ import validationRules from 'utils/validation';
 import styles from './style.module.scss';
 import { showErrorModal } from 'components/Modals/modals';
 
-import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
+import { signInFormLayout, signInTailLayout } from 'layouts/FormLayouts';
 
 const { Title, Text } = Typography;
 
@@ -48,7 +48,7 @@ const SignInForm = ({ user, hideSignInForm }) => {
   };
 
   return (
-    <div className={classNames(styles.box, styles.p50)}>
+    <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
         <Col xs={24} md={24}>
           <Title level={3}> Sign In </Title>
@@ -57,20 +57,14 @@ const SignInForm = ({ user, hideSignInForm }) => {
           <Text>If you have an existing account with an active pass, you need to sign in first to use it</Text>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
-          <Form
-            form={form}
-            labelAlign="left"
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-            {...sessionRegistrationformLayout}
-          >
+          <Form form={form} labelAlign="left" onFinish={onFinish} onFinishFailed={onFinishFailed} {...signInFormLayout}>
             <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-              <Input placeholder="Enter your email" />
+              <Input className={styles.signInInput} placeholder="Enter your email" />
             </Form.Item>
             <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-              <Input.Password placeholder="Enter your password" />
+              <Input.Password className={styles.signInInput} placeholder="Enter your password" />
             </Form.Item>
-            <Form.Item {...sessionRegistrationTailLayout}>
+            <Form.Item {...signInTailLayout}>
               <Row>
                 <Col>
                   <Button type="primary" htmlType="submit">

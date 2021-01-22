@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import classNames from 'classnames';
 import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
@@ -143,40 +142,6 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     closeModal();
   };
 
-  // const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
-
-  // const handleSendNewPasswordEmail = async (email) => {
-  //   try {
-  //     const { status } = await sendNewPasswordEmail(email);
-  //     if (isAPISuccess(status)) {
-  //       Modal.confirm({
-  //         mask: true,
-  //         center: true,
-  //         closable: true,
-  //         maskClosable: true,
-  //         title: 'Set a new password',
-  //         content: (
-  //           <>
-  //             <Paragraph>
-  //               We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
-  //             </Paragraph>
-  //             <Paragraph>
-  //               <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
-  //                 Didn't get it? Send again.
-  //               </Button>
-  //             </Paragraph>
-  //           </>
-  //         ),
-  //         okText: 'Okay',
-  //         cancelText: 'Talk to us',
-  //         onCancel: () => openFreshChatWidget(),
-  //       });
-  //     }
-  //   } catch (error) {
-  //     message.error(error.response?.data?.message || 'Something went wrong.');
-  //   }
-  // };
-
   const onFinish = async (values) => {
     try {
       // check if user is login
@@ -279,59 +244,3 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
 };
 
 export default PurchasePassModal;
-
-/*
-
-          <Form
-            form={form}
-            labelAlign="left"
-            {...sessionRegistrationformLayout}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Form.Item label="Name" className={styles.nameInputWrapper}>
-              <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-                <Input placeholder="First Name" disabled={showPasswordField} />
-              </Form.Item>
-              <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-                <Input placeholder="Last Name" disabled={showPasswordField} />
-              </Form.Item>
-            </Form.Item>
-
-            <Form.Item className={styles.emailInput} label="Email" name="email" rules={validationRules.emailValidation}>
-              <Input placeholder="Enter your email" disabled={showPasswordField} />
-            </Form.Item>
-
-            {showPasswordField && (
-              <>
-                <Form.Item
-                  label="Password"
-                  name="password"
-                  rules={validationRules.passwordValidation}
-                  ref={passwordInput}
-                >
-                  <Input.Password placeholder="Enter your password" />
-                </Form.Item>
-              </>
-            )}
-
-            <Form.Item {...sessionRegistrationTailLayout}>
-              <Button type="primary" htmlType="submit">
-                Register
-              </Button>
-            </Form.Item>
-
-            {showPasswordField && (
-              <Form.Item {...sessionRegistrationTailLayout}>
-                <Button
-                  className={styles.linkButton}
-                  type="link"
-                  onClick={() => handleSendNewPasswordEmail(form.getFieldsValue().email)}
-                >
-                  Set a new password
-                </Button>
-              </Form.Item>
-            )}
-          </Form>
-
-*/
