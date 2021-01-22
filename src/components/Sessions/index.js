@@ -12,7 +12,7 @@ import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpa
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
-const { Text, Title, Paragraph } = Typography;
+const { Text, Title } = Typography;
 const {
   formatDate: { toDate, toShortMonth, toDayOfWeek, toLocaleTime },
   timezoneUtils: { getCurrentLongTimezone },
@@ -94,9 +94,7 @@ const Sessions = ({ sessions, username }) => {
                             <Title className={styles.title} level={5}>
                               {session.name}
                             </Title>
-                            <Paragraph className={styles.sessionDesc} ellipsis={{ rows: 3 }}>
-                              {ReactHtmlParser(session?.description)}
-                            </Paragraph>
+                            <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
                           </div>
                         </Col>
                         <Col xs={24} md={8} lg={6}>
