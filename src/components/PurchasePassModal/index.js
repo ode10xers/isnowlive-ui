@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import classNames from 'classnames';
 import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
@@ -34,6 +35,13 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const toggleSignInState = () => {
     if (showSignIn) {
       setShowPasswordField(false);
+    } else {
+      form.setFieldsValue({
+        ...form.getFieldsValue(),
+        first_name: '',
+        last_name: '',
+        password: '',
+      });
     }
 
     setShowSignIn(!showSignIn);
@@ -224,6 +232,20 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
                 </Paragraph>
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
+                {!showSignIn && (
+                  <Form.Item label="Name" className={styles.nameInputWrapper}>
+                    <Form.Item
+                      className={styles.firstNameInput}
+                      name="first_name"
+                      rules={validationRules.nameValidation}
+                    >
+                      <Input placeholder="First Name" disabled={showPasswordField} />
+                    </Form.Item>
+                    <Form.Item className={styles.lastNameInput} name="last_name" rules={validationRules.nameValidation}>
+                      <Input placeholder="Last Name" disabled={showPasswordField} />
+                    </Form.Item>
+                  </Form.Item>
+                )}
                 <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
                   <Input placeholder="Enter your email" />
                 </Form.Item>
