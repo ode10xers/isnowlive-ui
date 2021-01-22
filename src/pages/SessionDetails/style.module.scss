@@ -12,11 +12,16 @@
 }
 
 .sessionDesc, .sessionPrereq {
-  span {
+  p, span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+
+    width: 100%;
   }
+
+  -webkit-box-orient: inline-axis !important;
 }
+
 .linkButton {
   padding: 0px !important;
 }
