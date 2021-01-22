@@ -71,14 +71,13 @@
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
   }
 
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  max-height: 80px;
+  overflow-y: auto;
+  margin: 10px 0;
 }
 
-// @media (max-width: 767px) {
-//   .card {
-//     max-width: 280px;
-//   }
-// }
+@media (max-width: 767px) {
+  .sessionDesc {
+    max-height: 120px;
+  }
+}
