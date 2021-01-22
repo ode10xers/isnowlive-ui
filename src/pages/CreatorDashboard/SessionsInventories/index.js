@@ -151,8 +151,13 @@ const SessionsInventories = ({ match }) => {
 
   const renderSimpleTableCell = (shouldNotRender, text) => (shouldNotRender ? emptyTableCell : <Text> {text} </Text>);
 
-  const expandAllRow = () => setExpandedRowKeys(filteredByDateSession.map((date) => date.start_time));
-  const collapseAllRow = () => setExpandedRowKeys([]);
+  const toggleExpandAll = () => {
+    if (expandedRowKeys.length > 0) {
+      setExpandedRowKeys([]);
+    } else {
+      setExpandedRowKeys(filteredByDateSession.map((date) => date.start_time));
+    }
+  };
 
   const expandRow = (rowKey) => {
     const tempExpandedRowsArray = expandedRowKeys;
@@ -365,27 +370,22 @@ const SessionsInventories = ({ match }) => {
     setCalendarView(e);
   };
 
-  //TODO: Rework desktop one to use expandable
   return (
     <div className={styles.box}>
       <Row gutter={8}>
-        <Col xs={24} md={10} lg={18}>
+        <Col xs={24} md={18} lg={20}>
           <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
           <Radio.Group value={view} onChange={handleViewChange}>
             <Radio.Button value="list">List</Radio.Button>
             <Radio.Button value="calendar">Calendar</Radio.Button>
           </Radio.Group>
         </Col>
-        <Col xs={24} md={4} lg={3}>
-          <Button block shape="round" type="primary" onClick={() => expandAllRow()}>
-            Expand All
+        <Col xs={24} md={6} lg={4}>
+          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
+            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={24} md={4} lg={3}>
-          <Button block shape="round" type="default" onClick={() => collapseAllRow()}>
-            Collapse All
-          </Button>
-        </Col>
+
         <Col xs={24}>
           {view === 'calendar' ? (
             <Loader loading={isLoading} size="large" text="Loading sessions">
@@ -440,6 +440,16 @@ const SessionsInventories = ({ match }) => {
                   data={filteredByDateSession}
                   loading={isLoading}
                   rowKey={(record) => record.start_time}
+                  expandable={{
+                    expandedRowKeys: expandedRowKeys,
+                    onExpand: (expanded, record) => {
+                      if (expanded) {
+                        expandRow(record.start_time);
+                      } else {
+                        collapseRow(record.start_time);
+                      }
+                    },
+                  }}
                 />
               )}
             </>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 
-import { Form, Input, Typography, Modal, Button, message } from 'antd';
+import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
 
 import config from 'config';
 import apis from 'apis';
@@ -13,15 +13,14 @@ import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
-import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
+import { purchasePassModalFormLayout, purchasePassModalTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
-const { Text, Paragraph } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
 const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const { logIn } = useGlobalContext();
@@ -30,6 +29,15 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(true);
+
+  const toggleSignInState = () => {
+    if (showSignIn) {
+      setShowPasswordField(false);
+    }
+
+    setShowSignIn(!showSignIn);
+  };
 
   useEffect(() => {
     if (!currentUser) {
@@ -127,39 +135,39 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     closeModal();
   };
 
-  const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
+  // const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
 
-  const handleSendNewPasswordEmail = async (email) => {
-    try {
-      const { status } = await sendNewPasswordEmail(email);
-      if (isAPISuccess(status)) {
-        Modal.confirm({
-          mask: true,
-          center: true,
-          closable: true,
-          maskClosable: true,
-          title: 'Set a new password',
-          content: (
-            <>
-              <Paragraph>
-                We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
-              </Paragraph>
-              <Paragraph>
-                <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
-                  Didn't get it? Send again.
-                </Button>
-              </Paragraph>
-            </>
-          ),
-          okText: 'Okay',
-          cancelText: 'Talk to us',
-          onCancel: () => openFreshChatWidget(),
-        });
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
-    }
-  };
+  // const handleSendNewPasswordEmail = async (email) => {
+  //   try {
+  //     const { status } = await sendNewPasswordEmail(email);
+  //     if (isAPISuccess(status)) {
+  //       Modal.confirm({
+  //         mask: true,
+  //         center: true,
+  //         closable: true,
+  //         maskClosable: true,
+  //         title: 'Set a new password',
+  //         content: (
+  //           <>
+  //             <Paragraph>
+  //               We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
+  //             </Paragraph>
+  //             <Paragraph>
+  //               <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
+  //                 Didn't get it? Send again.
+  //               </Button>
+  //             </Paragraph>
+  //           </>
+  //         ),
+  //         okText: 'Okay',
+  //         cancelText: 'Talk to us',
+  //         onCancel: () => openFreshChatWidget(),
+  //       });
+  //     }
+  //   } catch (error) {
+  //     message.error(error.response?.data?.message || 'Something went wrong.');
+  //   }
+  // };
 
   const onFinish = async (values) => {
     try {
@@ -199,15 +207,59 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
 
   return (
     <div>
-      <Modal
-        visible={visible}
-        centered={true}
-        title="Purchase Class Pass"
-        onCancel={() => closeModal()}
-        width={640}
-        footer={null}
-      >
+      <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
         {pass ? (
+          <Form
+            form={form}
+            labelAlign="left"
+            {...purchasePassModalFormLayout}
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
+          >
+            <Row gutter={[8, 8]}>
+              <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <Paragraph className={styles.textAlignCenter}>
+                  <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
+                  {`${showSignIn ? 'Sign in' : 'Signing up helps'} to book and manage your passes`}
+                </Paragraph>
+              </Col>
+              <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
+                  <Input placeholder="Enter your email" />
+                </Form.Item>
+                {(showSignIn || showPasswordField) && (
+                  <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
+                    <Input.Password placeholder="Enter your password" />
+                  </Form.Item>
+                )}
+              </Col>
+              <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <Form.Item {...purchasePassModalTailLayout}>
+                  <Button block type="primary" htmlType="submit">
+                    Sign {showSignIn ? 'In' : 'Up'}
+                  </Button>
+                </Form.Item>
+                <Paragraph className={styles.textAlignCenter}>
+                  {showSignIn ? 'Already' : "Don't"} have an account?{' '}
+                  <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
+                    Sign {showSignIn ? 'Up' : 'In'}
+                  </Button>
+                </Paragraph>
+              </Col>
+            </Row>
+          </Form>
+        ) : (
+          <Text className={styles.textAlignCenter}> Please Select a valid Class Pass </Text>
+        )}
+      </Modal>
+    </div>
+  );
+};
+
+export default PurchasePassModal;
+
+/*
+
           <Form
             form={form}
             labelAlign="left"
@@ -259,12 +311,5 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
               </Form.Item>
             )}
           </Form>
-        ) : (
-          <Text className={styles.textAlignCenter}> Please Select a valid Class Pass </Text>
-        )}
-      </Modal>
-    </div>
-  );
-};
 
-export default PurchasePassModal;
+*/

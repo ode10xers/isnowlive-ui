@@ -29,11 +29,6 @@ const PaymentVerification = () => {
   const { order_id, transaction_id, order_type, inventory_id } = parseQueryString(location.search);
 
   useEffect(() => {
-    console.log(order_id);
-    console.log(transaction_id);
-    console.log(order_type);
-    console.log(inventory_id);
-
     if (order_id && transaction_id) {
       const verifyPayment = async () => {
         setIsLoading(true);
@@ -48,15 +43,11 @@ const PaymentVerification = () => {
             if (order_type === orderType.PASS) {
               let usersPass = null;
               const userPassResponse = await apis.passes.getAttendeePasses();
-              console.log(userPassResponse);
               if (isAPISuccess(userPassResponse.status)) {
-                console.log('Req success');
-                usersPass = userPassResponse.data.filter((userPass) => userPass.pass_order_id === order_id);
+                usersPass = userPassResponse.data.filter((userPass) => userPass.pass_order_id === order_id)[0];
               } else {
                 showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
               }
-
-              console.log(usersPass);
 
               if (inventory_id) {
                 try {

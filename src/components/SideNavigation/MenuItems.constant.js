@@ -123,8 +123,8 @@ export const attendeeMenuItems = [
   },
   {
     order: 3,
-    key: 'packages',
-    title: 'Packages',
+    key: 'Passes',
+    title: 'Passes',
     mixPanelTag: attendee.click.dashboard.passesNav,
     icon: <TagsOutlined />,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes,

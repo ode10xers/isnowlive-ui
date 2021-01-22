@@ -133,6 +133,8 @@ export const generateUrl = () => {
   return newUrl;
 };
 
+export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
 export const getDuration = (start_time, end_time) => {
   let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration >= 60) {

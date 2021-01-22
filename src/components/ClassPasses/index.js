@@ -25,8 +25,13 @@ const ClassPasses = ({ passes }) => {
     setShowPurchasePassModal(false);
   };
 
-  const expandAllRow = () => setExpandedRowKeys(passes.map((pass) => pass.id));
-  const collapseAllRow = () => setExpandedRowKeys([]);
+  const toggleExpandAll = () => {
+    if (expandedRowKeys.length > 0) {
+      setExpandedRowKeys([]);
+    } else {
+      setExpandedRowKeys(passes.map((pass) => pass.id));
+    }
+  };
 
   const expandRow = (rowKey) => {
     const tempExpandedRowsArray = expandedRowKeys;
@@ -113,18 +118,9 @@ const ClassPasses = ({ passes }) => {
           </Paragraph>
         </Col>
         <Col xs={4}>
-          <Row gutter={[8, 8]}>
-            <Col xs={24}>
-              <Button block shape="round" type="primary" onClick={() => expandAllRow()}>
-                Expand All
-              </Button>
-            </Col>
-            <Col xs={24}>
-              <Button block shape="round" type="default" onClick={() => collapseAllRow()}>
-                Collapse All
-              </Button>
-            </Col>
-          </Row>
+          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
+            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          </Button>
         </Col>
         <Col xs={24}>
           <Table

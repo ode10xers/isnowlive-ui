@@ -11,10 +11,10 @@ import apis from 'apis';
 import http from 'services/http';
 import Share from 'components/Share';
 import Loader from 'components/Loader';
+import SignInForm from 'components/SignInForm';
 import HostDetails from 'components/HostDetails';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
-import SignInForm from 'components/SignInForm';
 import DefaultImage from 'components/Icons/DefaultImage/index';
 import SessionRegistration from 'components/SessionRegistration';
 import { isMobileDevice } from 'utils/device';
@@ -172,7 +172,6 @@ const SessionDetails = ({ match, history }) => {
         createOrder(values.email);
       }
     } catch (error) {
-      console.log(error.response);
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setIsLoading(false);
         setShowPasswordField(true);
@@ -237,7 +236,6 @@ const SessionDetails = ({ match, history }) => {
         // Booking class after pass is bought will be done in redirection
 
         usersPass = getUserPurchasedPass();
-        console.log(usersPass);
 
         if (usersPass) {
           payload = {
@@ -253,8 +251,6 @@ const SessionDetails = ({ match, history }) => {
           };
         }
       }
-
-      console.log(payload);
 
       const { status, data } = selectedPass && !usersPass ? await buyPass(payload) : await bookClass(payload);
 

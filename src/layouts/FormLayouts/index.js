@@ -34,3 +34,10 @@ export const sessionRegistrationformLayout = {
 export const sessionRegistrationTailLayout = {
   wrapperCol: { offset: 4, span: 20 },
 };
+export const purchasePassModalFormLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+export const purchasePassModalTailLayout = {
+  wrapperCol: { span: 8, offset: 8 },
+};
