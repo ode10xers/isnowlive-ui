@@ -58,8 +58,13 @@ const ClassPassList = () => {
     getPassesForAttendee();
   }, [getPassesForAttendee]);
 
-  const expandAllRow = () => setExpandedRowKeys(passes.map((pass) => pass.id));
-  const collapseAllRow = () => setExpandedRowKeys([]);
+  const toggleExpandAll = () => {
+    if (expandedRowKeys.length > 0) {
+      setExpandedRowKeys([]);
+    } else {
+      setExpandedRowKeys(passes.map((pass) => pass.pass_order_id));
+    }
+  };
 
   const expandRow = (rowKey) => {
     const tempExpandedRowsArray = expandedRowKeys;
@@ -74,7 +79,7 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '40%',
+      width: '50%',
     },
     {
       title: 'Pass Count',
@@ -105,12 +110,12 @@ const ClassPassList = () => {
       title: '',
       align: 'right',
       render: (text, record) =>
-        expandedRowKeys.includes(record.id) ? (
-          <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
+        expandedRowKeys.includes(record.pass_order_id) ? (
+          <Button type="link" onClick={() => collapseRow(record.pass_order_id)} icon={<UpOutlined />}>
             Close
           </Button>
         ) : (
-          <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
+          <Button type="link" onClick={() => expandRow(record.pass_order_id)} icon={<DownOutlined />}>
             More
           </Button>
         ),
@@ -131,17 +136,12 @@ const ClassPassList = () => {
   return (
     <div className={styles.box}>
       <Row gutter={8}>
-        <Col xs={24} md={10} lg={18}>
+        <Col xs={24} md={14} lg={21}>
           <Title level={4}> Class Passes </Title>
         </Col>
         <Col xs={24} md={4} lg={3}>
-          <Button block shape="round" type="primary" onClick={() => expandAllRow()}>
-            Expand All
-          </Button>
-        </Col>
-        <Col xs={24} md={4} lg={3}>
-          <Button block shape="round" type="default" onClick={() => collapseAllRow()}>
-            Collapse All
+          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
+            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
         <Col xs={24}>
@@ -155,7 +155,7 @@ const ClassPassList = () => {
               columns={passesColumns}
               data={passes}
               loading={isLoading}
-              rowKey={(record) => record.id}
+              rowKey={(record) => record.pass_order_id}
               expandable={{
                 expandedRowRender: (record) => renderClassesList(record),
                 expandRowByClick: true,
