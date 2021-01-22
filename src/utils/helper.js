@@ -184,3 +184,5 @@ export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',
 };
+
+export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
