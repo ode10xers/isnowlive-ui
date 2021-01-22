@@ -65,13 +65,19 @@
   padding: 5px 10px 5px 10px;
 }
 
-.sessionDesc, .sessionPrereq {
+.sessionDesc {
   p, span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-
-    width: 100%;
   }
 
-  -webkit-box-orient: inline-axis !important;
+  max-height: 80px;
+  overflow-y: auto;
+  margin: 10px 0;
+}
+
+@media (max-width: 767px) {
+  .sessionDesc {
+    max-height: 120px;
+  }
 }
