@@ -75,12 +75,12 @@ const SessionDetails = ({ match, history }) => {
     [history]
   );
 
-  const getUsablePassesForUser = useCallback(async () => {
+  const getUsablePassesForUser = async () => {
     try {
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData) {
-        const { data } = await apis.passes.getAttendeePasses();
+        const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
         setUserPasses(
           data.map((userPass) => ({
             ...userPass,
@@ -94,8 +94,7 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
-    //eslint-disable-next-line
-  }, []);
+  };
 
   const getUserPurchasedPass = () => {
     if (userPasses.length) {
