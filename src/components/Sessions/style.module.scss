@@ -75,3 +75,9 @@
 
   -webkit-box-orient: inline-axis !important;
 }
+
+@media (max-width: 767px) {
+  .card {
+    max-width: 280px;
+  }
+}
