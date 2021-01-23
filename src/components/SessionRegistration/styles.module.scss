@@ -18,8 +18,18 @@
     max-width: 370px;
   }
 }
+.passwordInput {
+  span {
+    max-width: 370px;
+  }
+}
+
 .passwordHelpText {
-  color: map-get($colors, 'Charcoal')  !important;
+  max-width: 500px;
+  
+  .span {
+    color: map-get($colors, 'Charcoal')  !important;
+  }
 }
 .linkButton {
   padding: 0px !important;

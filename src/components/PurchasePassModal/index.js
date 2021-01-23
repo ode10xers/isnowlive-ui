@@ -206,7 +206,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
                 <Col xs={24} md={{ span: 18, offset: 3 }}>
                   <Paragraph className={styles.textAlignCenter}>
                     <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
-                    {`${showSignIn ? 'Sign in' : 'Signing up helps'} to book and manage your passes`}
+                    {`Sign ${showSignIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
                   </Paragraph>
                 </Col>
                 <Col xs={24} md={{ span: 18, offset: 3 }}>

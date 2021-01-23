@@ -68,7 +68,7 @@ export const showBookingSuccessModal = (
         //* Purchase Class Pass & Immediately Book Class
         <>
           <Paragraph>
-            You have purchased the pass <Text strong> {userPass?.name} </Text> and we have{' '}
+            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text> and we have{' '}
             <Text strong> used 1 class credit </Text>
             to book this class for you.
           </Paragraph>
@@ -82,8 +82,8 @@ export const showBookingSuccessModal = (
         //* Book class from previously purchased Class Pass
         <>
           <Paragraph>
-            We have used 1 credit from your purchased Class Pass <Text strong> {userPass?.name} </Text> to book this
-            class for you
+            We have booked this session using 1 class credit from your pass{' '}
+            <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
           </Paragraph>
           <Paragraph>
             You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
@@ -96,7 +96,7 @@ export const showBookingSuccessModal = (
       //* Purchase Individual Class Pass without Booking Class
       <>
         <Paragraph>
-          You have purchased the pass <Text strong> {userPass.name} </Text>
+          You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
         </Paragraph>
         <Paragraph>You can see your Class Passes in 1 place on your dashboard.</Paragraph>
       </>
@@ -104,7 +104,7 @@ export const showBookingSuccessModal = (
       //* Book Class without Class Pass
       <>
         <Paragraph>
-          We have sent you a confirmation email on <Text strong>{userEmail}</Text>. Look out for an email from{' '}
+          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>

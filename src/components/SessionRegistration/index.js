@@ -216,9 +216,17 @@ const SessionRegistration = ({
             {showPasswordField && (
               <>
                 <Item
-                  className={styles.emailInput}
-                  extra={
-                    <Text className={styles.passwordHelpText}>
+                  className={styles.passwordInput}
+                  label="Password"
+                  name="password"
+                  rules={validationRules.passwordValidation}
+                  ref={passwordInput}
+                >
+                  <Password />
+                </Item>
+                <Item>
+                  <div className={styles.passwordHelpText}>
+                    <Text>
                       You have booked a session with us earlier, but if you haven't set your password, please use the{' '}
                       <Button
                         className={styles.linkButton}
@@ -229,30 +237,40 @@ const SessionRegistration = ({
                       </Button>{' '}
                       option below{' '}
                     </Text>
-                  }
-                  label="Password"
-                  name="password"
-                  rules={validationRules.passwordValidation}
-                  ref={passwordInput}
-                >
-                  <Password />
+                  </div>
                 </Item>
               </>
             )}
 
-            {user ? (
-              <Item {...sessionRegistrationTailLayout}>
-                <Button type="link" onClick={() => logOut()}>
-                  Not this account? Logout
-                </Button>
-              </Item>
-            ) : (
-              <Item {...sessionRegistrationTailLayout}>
-                <Button type="link" onClick={() => showSignInForm()}>
-                  Already have an account? Sign In
-                </Button>
-              </Item>
-            )}
+            <Item {...sessionRegistrationTailLayout}>
+              <Row gutter={8}>
+                {showPasswordField && (
+                  <>
+                    <Col>
+                      <Button
+                        className={styles.linkButton}
+                        type="link"
+                        onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                      >
+                        Set a new password
+                      </Button>
+                    </Col>
+                    <Col xs={2}></Col>
+                  </>
+                )}
+                <Col>
+                  {user ? (
+                    <Button type="link" onClick={() => logOut()}>
+                      Not this account? Logout
+                    </Button>
+                  ) : (
+                    <Button type="link" onClick={() => showSignInForm()}>
+                      Already have an account? Sign In
+                    </Button>
+                  )}
+                </Col>
+              </Row>
+            </Item>
 
             {user && userPasses.length > 0 ? (
               <div>
@@ -348,18 +366,6 @@ const SessionRegistration = ({
                 </Col>
               </Row>
             </Item>
-
-            {showPasswordField && (
-              <Item {...sessionRegistrationTailLayout}>
-                <Button
-                  className={styles.linkButton}
-                  type="link"
-                  onClick={() => onSetNewPassword(form.getFieldsValue().email)}
-                >
-                  Set a new password
-                </Button>
-              </Item>
-            )}
           </Form>
         </Col>
       </Row>

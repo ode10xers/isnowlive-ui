@@ -17,9 +17,18 @@ import { signInFormLayout, signInTailLayout } from 'layouts/FormLayouts';
 
 const { Title, Text } = Typography;
 
-const SignInForm = ({ user, hideSignInForm }) => {
+const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
+
+  const handleSetNewPassword = async () => {
+    try {
+      const values = await form.validateFields(['email']);
+      onSetNewPassword(values.email);
+    } catch (error) {
+      showErrorModal('Please input your email first!');
+    }
+  };
 
   const onFinish = async (values) => {
     if (user) {
@@ -54,7 +63,10 @@ const SignInForm = ({ user, hideSignInForm }) => {
           <Title level={3}> Sign In </Title>
         </Col>
         <Col xs={24} md={24}>
-          <Text>If you have an existing account with an active pass, you need to sign in first to use it</Text>
+          <Text>
+            If you have ever bought a session with us, then you have an account. Please sign in or use the set new
+            password option to set a password if you haven’t already
+          </Text>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           <Form form={form} labelAlign="left" onFinish={onFinish} onFinishFailed={onFinishFailed} {...signInFormLayout}>
@@ -63,6 +75,11 @@ const SignInForm = ({ user, hideSignInForm }) => {
             </Form.Item>
             <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
               <Input.Password className={styles.signInInput} placeholder="Enter your password" />
+            </Form.Item>
+            <Form.Item {...signInTailLayout}>
+              <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
+                Set a new password
+              </Button>
             </Form.Item>
             <Form.Item {...signInTailLayout}>
               <Row>

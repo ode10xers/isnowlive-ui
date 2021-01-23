@@ -81,7 +81,7 @@ const SessionDetails = ({ match, history }) => {
       console.log(loggedInUserData);
       console.log(session);
 
-      if (loggedInUserData) {
+      if (loggedInUserData && session) {
         const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
         setUserPasses(
           data.map((userPass) => ({
@@ -337,6 +337,7 @@ const SessionDetails = ({ match, history }) => {
 
   const hideSignInForm = () => {
     setShowSignInForm(false);
+    setShowPasswordField(false);
 
     const userDetails = getLocalUserDetails();
 
@@ -422,14 +423,21 @@ const SessionDetails = ({ match, history }) => {
           {session?.end_time &&
             getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
             (showSignInForm ? (
-              <SignInForm user={currentUser} hideSignInForm={() => hideSignInForm()} />
+              <SignInForm
+                user={currentUser}
+                onSetNewPassword={handleSendNewPasswordEmail}
+                hideSignInForm={() => hideSignInForm()}
+              />
             ) : (
               <SessionRegistration
                 user={currentUser}
                 showPasswordField={showPasswordField}
                 onFinish={onFinish}
                 onSetNewPassword={handleSendNewPasswordEmail}
-                showSignInForm={() => setShowSignInForm(true)}
+                showSignInForm={() => {
+                  setShowPasswordField(false);
+                  setShowSignInForm(true);
+                }}
                 availablePasses={availablePasses}
                 userPasses={userPasses}
                 setSelectedPass={setSelectedPass}
