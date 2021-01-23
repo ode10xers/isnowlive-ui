@@ -393,12 +393,10 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (
-            <Paragraph type="secondary"> {ReactHtmlParser(session?.description)}</Paragraph>
+            <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
           ) : (
             <>
-              <Paragraph type="secondary" className={styles.sessionDesc} ellipsis={{ rows: 5 }}>
-                {ReactHtmlParser(session?.description)}
-              </Paragraph>
+              <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
               <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
                 Read More
               </div>
@@ -410,12 +408,10 @@ const SessionDetails = ({ match, history }) => {
                 Session Prerequisite
               </Title>
               {showPrerequisite ? (
-                <Paragraph type="secondary"> {ReactHtmlParser(session?.prerequisites)}</Paragraph>
+                <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.prerequisites)}</div>
               ) : (
                 <>
-                  <Paragraph type="secondary" className={styles.sessionPrereq} ellipsis={{ rows: 5 }}>
-                    {ReactHtmlParser(session?.prerequisites)}
-                  </Paragraph>
+                  <div className={styles.sessionPrereq}>{ReactHtmlParser(session?.prerequisites)}</div>
                   <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
                     Read More
                   </div>

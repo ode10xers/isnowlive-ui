@@ -66,8 +66,18 @@
 }
 
 .sessionDesc {
-  span {
+  p, span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+  }
+
+  max-height: 80px;
+  overflow-y: auto;
+  margin: 10px 0;
+}
+
+@media (max-width: 767px) {
+  .sessionDesc {
+    max-height: 120px;
   }
 }
