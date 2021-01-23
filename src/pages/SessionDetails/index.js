@@ -35,7 +35,7 @@ import {
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },

@@ -27,15 +27,15 @@
 .passwordHelpText {
   margin-top: -30px;
   max-width: 370px;
-  
+
   .span {
-    color: map-get($colors, 'Charcoal')  !important;
+    color: map-get($colors, 'Charcoal') !important;
   }
 
   .linkButton {
     // padding: 0px !important;
     cursor: pointer;
-    color: map-get($colors, 'DodgerBlue')  !important;
+    color: map-get($colors, 'DodgerBlue') !important;
   }
 }
 
