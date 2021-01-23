@@ -254,7 +254,7 @@ const SessionRegistration = ({
               </Item>
             )}
 
-            {user && userPasses.length ? (
+            {user && userPasses.length > 0 ? (
               <div>
                 <Title level={5}> Purchased Pass Usable for this Class </Title>
                 <Table
@@ -275,7 +275,7 @@ const SessionRegistration = ({
               </div>
             ) : (
               <>
-                {availablePasses.length && (
+                {availablePasses.length > 0 && (
                   <>
                     <div>
                       <Title level={5}> Book this class </Title>
