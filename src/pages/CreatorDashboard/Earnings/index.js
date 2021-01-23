@@ -364,8 +364,21 @@ const Earnings = () => {
       key: 'total_earned',
       dataIndex: 'total_earned',
       align: 'right',
-      width: '50%',
+      width: '40%',
       render: (text, record) => `${record.total_earned} ${record.currency}`,
+    },
+    {
+      title: '',
+      width: '10%',
+      render: (text, record) => (
+        <Row justify="start">
+          <Col>
+            <Button type="link" className={styles.detailsButton} onClick={() => openPassDetails(record)}>
+              Details
+            </Button>
+          </Col>
+        </Row>
+      ),
     },
   ];
 
@@ -431,7 +444,7 @@ const Earnings = () => {
         <Row className={styles.mt20}>
           <Col xs={24}>
             <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
-              <Panel header="Sessions" key="Sessions">
+              <Panel header={<Title level={5}> Sessions </Title>} key="Sessions">
                 <Row className={styles.mt10}>
                   <Col span={24}>
                     {isMobileDevice ? (
@@ -464,7 +477,7 @@ const Earnings = () => {
                   </Col>
                 </Row>
               </Panel>
-              <Panel header="Class Pass" key="ClassPass">
+              <Panel header={<Title level={5}> Class Pass </Title>} key="ClassPass">
                 <Row className={styles.mt10}>
                   <Col span={24}>
                     {isMobileDevice ? (
