@@ -101,11 +101,9 @@ const SessionDetails = ({ match, history }) => {
 
     if (userPasses.length) {
       if (selectedPass && !getDefault) {
-        console.log('Finding usable pass based on selected pass');
         return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
       }
 
-      console.log('Returning first pass options');
       return userPasses[0];
     }
 
@@ -233,7 +231,6 @@ const SessionDetails = ({ match, history }) => {
         // Booking class after pass is bought will be done in redirection
 
         usersPass = getUserPurchasedPass(false);
-        console.log(usersPass);
 
         if (usersPass) {
           payload = {

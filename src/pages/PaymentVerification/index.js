@@ -49,8 +49,6 @@ const PaymentVerification = () => {
                 showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
               }
 
-              console.log(usersPass);
-
               if (inventory_id) {
                 try {
                   //Continue to book the class after Pass Purchase is successful
@@ -71,6 +69,8 @@ const PaymentVerification = () => {
                     'It seems you have already booked this session, please check your dashboard'
                   ) {
                     showAlreadyBookedModal(false);
+                  } else {
+                    showErrorModal('Something went wrong', error.response?.data?.message);
                   }
                 }
               } else {
