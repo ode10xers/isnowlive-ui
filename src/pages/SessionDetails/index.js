@@ -101,7 +101,13 @@ const SessionDetails = ({ match, history }) => {
       if (selectedPass) {
         return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id)[0];
       } else {
-        return userPasses[0];
+        console.log('Here');
+        return {
+          ...userPasses[0],
+          id: userPasses[0].pass_id,
+          name: userPasses[0].pass_name,
+          sessions: userPasses[0].session,
+        };
       }
     }
 
@@ -120,6 +126,7 @@ const SessionDetails = ({ match, history }) => {
     }
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
+      getUsablePassesForUser();
     }
 
     //eslint-disable-next-line

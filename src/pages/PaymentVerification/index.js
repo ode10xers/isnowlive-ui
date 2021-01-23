@@ -49,6 +49,8 @@ const PaymentVerification = () => {
                 showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
               }
 
+              console.log(usersPass);
+
               if (inventory_id) {
                 try {
                   //Continue to book the class after Pass Purchase is successful
@@ -61,7 +63,7 @@ const PaymentVerification = () => {
                   });
 
                   if (isAPISuccess(followUpBooking.status)) {
-                    showBookingSuccessModal(userDetails.email, usersPass, true, true);
+                    showBookingSuccessModal(userDetails.email, { ...usersPass, name: usersPass.pass_name }, true, true);
                   }
                 } catch (error) {
                   if (
@@ -72,7 +74,7 @@ const PaymentVerification = () => {
                   }
                 }
               } else {
-                showBookingSuccessModal(userDetails.email, usersPass, false, false);
+                showBookingSuccessModal(userDetails.email, { ...usersPass, name: usersPass.pass_name }, false, false);
               }
             } else {
               showBookingSuccessModal(userDetails.email, null, false, false);

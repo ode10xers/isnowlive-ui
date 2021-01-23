@@ -88,7 +88,7 @@ const ClassPassList = () => {
       align: 'right',
       width: '15%',
       render: (text, record) =>
-        record.limited ? `${record.class_count}/${record.classes_remaining} Classes` : 'Unlimited Classes',
+        record.limited ? `${record.classes_remaining}/${record.class_count} Classes` : 'Unlimited Classes',
     },
     {
       title: 'Expires On',

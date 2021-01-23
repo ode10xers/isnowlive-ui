@@ -243,7 +243,7 @@ const SessionRegistration = ({
             {user ? (
               <Item {...sessionRegistrationTailLayout}>
                 <Button type="link" onClick={() => logOut()}>
-                  Not this account? Log Out
+                  Not this account? Logout
                 </Button>
               </Item>
             ) : (
@@ -298,7 +298,7 @@ const SessionRegistration = ({
                     </div>
 
                     <div className={styles.mt20}>
-                      <Title level={5}> Buy Pass & this class </Title>
+                      <Title level={5}> Buy pass & book this class </Title>
                       <Table
                         columns={passesColumns}
                         data={availablePasses}
@@ -328,7 +328,7 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10}>
-                {user && selectedPass && userPasses.length && (
+                {user && selectedPass && userPasses.length > 0 && (
                   <Paragraph>
                     Booking this class for{' '}
                     <Text delete>
@@ -346,7 +346,6 @@ const SessionRegistration = ({
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
-                {!user && <Col></Col>}
               </Row>
             </Item>
 
