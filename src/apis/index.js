@@ -49,9 +49,13 @@ export default {
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
-    getCreatorEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings?page_no=${pageNo}&per_page=${perPage}`),
-    getEarningsByInventoryId: (inventoryId) => http.get(`/secure/creator/payments/earnings/id/${inventoryId}`),
+    getCreatorInventoryEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/inventories?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorPassEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
+    getEarningsByInventoryId: (inventoryId) =>
+      http.get(`/secure/creator/payments/earnings/inventories/id/${inventoryId}`),
+    getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
     getCreatorBalance: () => http.get('/secure/creator/payments/earnings/balance'),
     createCreatorBalancePayout: () => http.post('/secure/creator/payments/payouts'),
     cancelCustomerOrder: (orderId, payload) => http.post(`/secure/customer/orders/${orderId}/cancel`, payload),

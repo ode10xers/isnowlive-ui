@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm } from 'antd';
+import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm, Collapse } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -27,6 +27,7 @@ const checkIcon = require('assets/images/check.png');
 const timerIcon = require('assets/images/timer.png');
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 const {
   formatDate: { toLongDateWithDayTime },
 } = dateUtil;
@@ -36,6 +37,7 @@ const Earnings = () => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
+  const [passes, setPasses] = useState([]);
   const [balance, setBalance] = useState(null);
   const [isLoadingPayout, setIsLoadingPayout] = useState(false);
   const {
@@ -44,21 +46,32 @@ const Earnings = () => {
     },
   } = useGlobalContext();
 
-  const [showMore, setShowMore] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const sessionPerPage = 10;
+  const [showMorePasses, setShowMorePasses] = useState(false);
+  const [showMoreSession, setShowMoreSession] = useState(false);
+  const [currentSessionPage, setCurrentSessionPage] = useState(1);
+  const [currentPassesPage, setCurrentPassesPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const [expandedSection, setExpandedSection] = useState([]);
 
   const getEarningData = useCallback(async () => {
     try {
       setIsLoading(true);
-      let [creatorEarningResponse, creatorBalanceResponse] = await Promise.all([
-        apis.session.getCreatorEarnings(1, sessionPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
+      let [creatorInventoryEarningResponse, creatorPassEarningResponse, creatorBalanceResponse] = await Promise.all([
+        apis.session.getCreatorInventoryEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
+        apis.session.getCreatorPassEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
         apis.session.getCreatorBalance(),
       ]);
-      if (isAPISuccess(creatorEarningResponse.status) && isAPISuccess(creatorBalanceResponse.status)) {
+      if (
+        isAPISuccess(creatorInventoryEarningResponse.status) &&
+        isAPISuccess(creatorPassEarningResponse.status) &&
+        isAPISuccess(creatorBalanceResponse.status)
+      ) {
         setIsLoading(false);
-        setSessions(creatorEarningResponse.data.earnings);
-        setShowMore(creatorEarningResponse.data.next_page || false);
+        setSessions(creatorInventoryEarningResponse.data.earnings);
+        setShowMoreSession(creatorInventoryEarningResponse.data.next_page || false);
+        setPasses(creatorPassEarningResponse.data.earnings);
+        setShowMorePasses(creatorPassEarningResponse.data.next_page || false);
         setBalance(creatorBalanceResponse.data);
       }
     } catch (error) {
@@ -71,14 +84,34 @@ const Earnings = () => {
     const eventTag = creator.click.payment.showMoreEarnings;
     try {
       setIsLoading(true);
-      let pageNo = currentPage + 1;
-      const { status, data } = await apis.session.getCreatorEarnings(pageNo, sessionPerPage);
+      let pageNo = currentSessionPage + 1;
+      const { status, data } = await apis.session.getCreatorInventoryEarnings(pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
         setSessions([...sessions, ...data.earnings]);
-        setCurrentPage(pageNo);
-        setShowMore(data.next_page || false);
+        setCurrentSessionPage(pageNo);
+        setShowMoreSession(data.next_page || false);
+      }
+    } catch (error) {
+      trackFailedEvent(eventTag, error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  };
+
+  const handleShowMorePasses = async () => {
+    const eventTag = creator.click.payment.showMoreEarnings;
+    try {
+      setIsLoading(true);
+      let pageNo = currentPassesPage + 1;
+      const { status, data } = await apis.session.getCreatorPassEarnings(pageNo, itemsPerPage);
+      if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag);
+        setIsLoading(false);
+        setPasses([...passes, ...data.earnings]);
+        setCurrentPassesPage(pageNo);
+        setShowMorePasses(data.next_page || false);
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
@@ -316,6 +349,60 @@ const Earnings = () => {
     );
   };
 
+  const openPassDetails = (item) => console.log(item);
+
+  let passColumns = [
+    {
+      title: 'Pass Name',
+      key: 'name',
+      dataIndex: 'name',
+      align: 'left',
+      width: '50%',
+    },
+    {
+      title: 'Total Earned',
+      key: 'total_earned',
+      dataIndex: 'total_earned',
+      align: 'right',
+      width: '50%',
+      render: (text, record) => `${record.total_earned} ${record.currency}`,
+    },
+  ];
+
+  const renderPassItem = (item) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Card
+        className={styles.card}
+        title={
+          <div onClick={() => openPassDetails(item)}>
+            <Text>{item.name}</Text>
+          </div>
+        }
+        actions={[
+          <Button type="link" className={styles.detailsButton} onClick={() => openPassDetails(item)}>
+            Details
+          </Button>,
+        ]}
+      >
+        {layout(
+          'Earnings',
+          <Text>
+            {item.currency} {item.total_earned}
+          </Text>
+        )}
+      </Card>
+    );
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading Earning Details">
       <div className={styles.box}>
@@ -342,30 +429,75 @@ const Earnings = () => {
           </Col>
         </Row>
         <Row className={styles.mt20}>
-          <Col span={24}>
-            {isMobileDevice ? (
-              <Loader loading={isLoading} size="large" text="Loading sessions">
-                {sessions.length > 0 ? (
-                  sessions.map(renderSessionItem)
-                ) : (
-                  <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                    Sessions List
-                    <Empty />
-                  </div>
-                )}
-              </Loader>
-            ) : (
-              <Table columns={sessionColumns} data={sessions} loading={isLoading} />
-            )}
-          </Col>
-          <Col span={24}>
-            <Row justify="center" className={styles.mt50}>
-              <Col>
-                <Button onClick={() => handleShowMoreSession()} disabled={!showMore} className={styles.ml20}>
-                  Show More
-                </Button>
-              </Col>
-            </Row>
+          <Col xs={24}>
+            <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
+              <Panel header="Sessions" key="Sessions">
+                <Row className={styles.mt10}>
+                  <Col span={24}>
+                    {isMobileDevice ? (
+                      <Loader loading={isLoading} size="large" text="Loading sessions">
+                        {sessions.length > 0 ? (
+                          sessions.map(renderSessionItem)
+                        ) : (
+                          <div className={classNames(styles.textAlignCenter, 'text-empty')}>
+                            Sessions List
+                            <Empty />
+                          </div>
+                        )}
+                      </Loader>
+                    ) : (
+                      <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+                    )}
+                  </Col>
+                  <Col span={24}>
+                    <Row justify="center" className={styles.mt50}>
+                      <Col>
+                        <Button
+                          onClick={() => handleShowMoreSession()}
+                          disabled={!showMoreSession}
+                          className={styles.ml20}
+                        >
+                          Show More
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Panel>
+              <Panel header="Class Pass" key="ClassPass">
+                <Row className={styles.mt10}>
+                  <Col span={24}>
+                    {isMobileDevice ? (
+                      <Loader loading={isLoading} size="large" text="Loading passes">
+                        {passes.length > 0 ? (
+                          passes.map(renderPassItem)
+                        ) : (
+                          <div className={classNames(styles.textAlignCenter, 'text-empty')}>
+                            Class Pass List
+                            <Empty />
+                          </div>
+                        )}
+                      </Loader>
+                    ) : (
+                      <Table columns={passColumns} data={passes} loading={isLoading} />
+                    )}
+                  </Col>
+                  <Col span={24}>
+                    <Row justify="center" className={styles.mt50}>
+                      <Col>
+                        <Button
+                          onClick={() => handleShowMorePasses()}
+                          disabled={!showMorePasses}
+                          className={styles.ml20}
+                        >
+                          Show More
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Panel>
+            </Collapse>
           </Col>
         </Row>
       </div>
