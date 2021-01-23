@@ -11,6 +11,7 @@ import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
 import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
 import SessionEarnings from 'pages/CreatorDashboard/SessionEarnings';
+import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
 
 const CreatorDashboard = ({ match }) => {
   return (
@@ -25,6 +26,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.livestream} component={LiveStream} />
       <Route exact path={match.url + Routes.creatorDashboard.paymentAccount} component={PaymentAccount} />
       <Route exact path={match.url + Routes.creatorDashboard.sessionEarnings} component={SessionEarnings} />
+      <Route exact path={match.url + Routes.creatorDashboard.passes} component={ClassPassList} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>
   );

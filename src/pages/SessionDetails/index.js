@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography, Button, Modal } from 'antd';
+import { Row, Col, Image, message, Typography } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
@@ -9,26 +9,33 @@ import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
+import Share from 'components/Share';
+import Loader from 'components/Loader';
+import SignInForm from 'components/SignInForm';
+import HostDetails from 'components/HostDetails';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
-import SessionRegistration from 'components/SessionRegistration';
-import Loader from 'components/Loader';
 import DefaultImage from 'components/Icons/DefaultImage/index';
-import HostDetails from 'components/HostDetails';
-import Share from 'components/Share';
+import SessionRegistration from 'components/SessionRegistration';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, generateUrl } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
+import {
+  showErrorModal,
+  showBookingSuccessModal,
+  showAlreadyBookedModal,
+  showSetNewPasswordModal,
+  sendNewPasswordEmail,
+} from 'components/Modals/modals';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
-const { Title, Paragraph, Text } = Typography;
+const { Title } = Typography;
 const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone },
@@ -40,17 +47,25 @@ const SessionDetails = ({ match, history }) => {
   const [creator, setCreator] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const { logIn } = useGlobalContext();
+  const { logIn, logOut } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
+  const [showSignInForm, setShowSignInForm] = useState(false);
+  const [availablePasses, setAvailablePasses] = useState([]);
+  const [selectedPass, setSelectedPass] = useState(null);
+  const [userPasses, setUserPasses] = useState([]);
+  const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
+  const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
       try {
         const inventoryDetails = await apis.session.getPublicInventoryById(inventory_id);
         const userDetails = await apis.user.getProfileByUsername(username);
+        const passes = await apis.passes.getPassesBySessionId(inventoryDetails.data.session_id);
         setSession(inventoryDetails.data);
         setCreator(userDetails.data);
+        setAvailablePasses(passes.data);
         setIsLoading(false);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -60,6 +75,40 @@ const SessionDetails = ({ match, history }) => {
     },
     [history]
   );
+
+  const getUsablePassesForUser = async () => {
+    try {
+      const loggedInUserData = getLocalUserDetails();
+
+      if (loggedInUserData && session) {
+        const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
+        setUserPasses(
+          data.active.map((userPass) => ({
+            ...userPass,
+            id: userPass.pass_id,
+            name: userPass.pass_name,
+            sessions: userPass.session,
+          }))
+        );
+      }
+    } catch (error) {
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  };
+
+  const getUserPurchasedPass = (getDefault = false) => {
+    setShouldSetDefaultPass(false);
+
+    if (userPasses.length) {
+      if (selectedPass && !getDefault) {
+        return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
+      }
+
+      return userPasses[0];
+    }
+
+    return null;
+  };
 
   useEffect(() => {
     if (match.params.inventory_id) {
@@ -74,7 +123,33 @@ const SessionDetails = ({ match, history }) => {
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
     }
-  }, [match.params.inventory_id, getDetails]);
+
+    //eslint-disable-next-line
+  }, [match.params.inventory_id]);
+
+  // Logic for when user lands in the page already logged in
+  useEffect(() => {
+    if (session && getLocalUserDetails() && userPasses.length === 0) {
+      getUsablePassesForUser();
+      setShouldSetDefaultPass(true);
+    }
+    //eslint-disable-next-line
+  }, [session]);
+
+  useEffect(() => {
+    if (createFollowUpOrder) {
+      createOrder(createFollowUpOrder);
+    }
+
+    //eslint-disable-next-line
+  }, [createFollowUpOrder]);
+
+  useEffect(() => {
+    if (userPasses.length && shouldSetDefaultPass) {
+      setSelectedPass(getUserPurchasedPass(true));
+    }
+    //eslint-disable-next-line
+  }, [userPasses, shouldSetDefaultPass]);
 
   const signupUser = async (values) => {
     try {
@@ -102,10 +177,21 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
     try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+      let payload = {
         order_id: orderDetails.order_id,
-      });
+        order_type: selectedPass ? orderType.PASS : orderType.CLASS,
+      };
+
+      if (selectedPass) {
+        payload = {
+          ...payload,
+          inventory_id: parseInt(match.params.inventory_id),
+        };
+      }
+
+      const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
       if (isAPISuccess(status) && data) {
         const stripe = await stripePromise;
@@ -121,48 +207,85 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
+    setIsLoading(false);
   };
 
+  const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
+  const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
+
   const createOrder = async (userEmail) => {
+    setCreateFollowUpOrder(null);
     try {
-      const { status, data } = await apis.session.createOrderForUser({
+      // Default payload if user book single class
+      let payload = {
         inventory_id: parseInt(match.params.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
-      });
+        payment_source: paymentSource.GATEWAY,
+      };
+      let usersPass = null;
+
+      if (selectedPass) {
+        // payment_source will be PAYMENT_GATEWAY if payment is required
+        // e.g. user buys single class / user buys new pass
+        // Booking class after pass is bought will be done in redirection
+
+        usersPass = getUserPurchasedPass(false);
+
+        if (usersPass) {
+          payload = {
+            ...payload,
+            payment_source: paymentSource.CLASS_PASS,
+            source_id: usersPass.pass_order_id,
+          };
+        } else {
+          payload = {
+            pass_id: selectedPass.id,
+            price: selectedPass.price,
+            currency: selectedPass.currency,
+          };
+        }
+      }
+
+      const { status, data } = selectedPass && !usersPass ? await buyPass(payload) : await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          if (selectedPass && !usersPass) {
+            initiatePaymentForOrder({ ...data, order_id: data.pass_order_id });
+          } else {
+            initiatePaymentForOrder(data);
+          }
         } else {
-          Modal.success({
-            title: 'Registration Successful',
-            content: (
-              <>
-                <Paragraph>
-                  We have sent you a confirmation email on <Text strong>{userEmail}</Text>. Look out for an email from{' '}
-                  <Text strong> friends@passion.do. </Text>
-                </Paragraph>
-                <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-              </>
-            ),
-            okText: 'Go To Dashboard',
-            onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-          });
+          if (selectedPass && !usersPass) {
+            // If user (for some reason) buys a free pass (if any exists)
+            // we then immediately followUp the Booking Process
+            const followUpBooking = await bookClass({
+              inventory_id: parseInt(match.params.inventory_id),
+              user_timezone_offset: new Date().getTimezoneOffset(),
+              user_timezone: getCurrentLongTimezone(),
+              payment_source: paymentSource.CLASS_PASS,
+              source_id: data.pass_order_id,
+            });
+
+            if (isAPISuccess(followUpBooking.status)) {
+              showBookingSuccessModal(userEmail, usersPass, true);
+            }
+          } else {
+            showBookingSuccessModal(userEmail, usersPass, true);
+          }
         }
       }
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        Modal.warning({
-          title: 'Session Already Booked',
-          content: 'It seems you have already booked this session, please check your dashboard',
-          okText: 'Go To Dashboard',
-          onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
-        });
+        showAlreadyBookedModal(false);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true);
       }
     }
   };
@@ -185,7 +308,9 @@ const SessionDetails = ({ match, history }) => {
           if (data) {
             http.setAuthToken(data.auth_token);
             logIn(data, true);
-            createOrder(values.email);
+            setCurrentUser(data);
+            await getUsablePassesForUser();
+            setCreateFollowUpOrder(values.email);
           }
         } catch (error) {
           setIsLoading(false);
@@ -202,40 +327,31 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
-
   const handleSendNewPasswordEmail = async (email) => {
     try {
       setIsLoading(true);
       const { status } = await sendNewPasswordEmail(email);
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        Modal.confirm({
-          mask: true,
-          center: true,
-          closable: true,
-          maskClosable: true,
-          title: 'Set a new password',
-          content: (
-            <>
-              <Paragraph>
-                We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
-              </Paragraph>
-              <Paragraph>
-                <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
-                  Didn't get it? Send again.
-                </Button>
-              </Paragraph>
-            </>
-          ),
-          okText: 'Okay',
-          cancelText: 'Talk to us',
-          onCancel: () => openFreshChatWidget(),
-        });
+        showSetNewPasswordModal(email);
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const hideSignInForm = () => {
+    setShowSignInForm(false);
+    setShowPasswordField(false);
+
+    const userDetails = getLocalUserDetails();
+
+    setCurrentUser(userDetails);
+
+    if (userDetails) {
+      getUsablePassesForUser();
+      setShouldSetDefaultPass(true);
     }
   };
 
@@ -308,15 +424,39 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={9}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} className={styles.mt50}>
-          {session?.end_time && getTimeDiff(session?.end_time, moment(), 'minutes') > 0 && (
-            <SessionRegistration
-              user={currentUser}
-              showPasswordField={showPasswordField}
-              onFinish={onFinish}
-              onSetNewPassword={handleSendNewPasswordEmail}
-            />
-          )}
+        <Col xs={24} lg={showSignInForm ? 14 : 18} className={styles.mt50}>
+          {session?.end_time &&
+            getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
+            (showSignInForm ? (
+              <SignInForm
+                user={currentUser}
+                onSetNewPassword={handleSendNewPasswordEmail}
+                hideSignInForm={() => hideSignInForm()}
+              />
+            ) : (
+              <SessionRegistration
+                user={currentUser}
+                showPasswordField={showPasswordField}
+                onFinish={onFinish}
+                onSetNewPassword={handleSendNewPasswordEmail}
+                showSignInForm={() => {
+                  setShowPasswordField(false);
+                  setShowSignInForm(true);
+                }}
+                availablePasses={availablePasses}
+                userPasses={userPasses}
+                setSelectedPass={setSelectedPass}
+                selectedPass={selectedPass}
+                classDetails={session}
+                logOut={() => {
+                  logOut(history, true);
+                  setCurrentUser(null);
+                  setSelectedPass(null);
+                  setUserPasses([]);
+                  setShowSignInForm(true);
+                }}
+              />
+            ))}
         </Col>
       </Row>
     </Loader>

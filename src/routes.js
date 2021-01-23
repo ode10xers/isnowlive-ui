@@ -28,6 +28,7 @@ const Routes = {
     livestream: '/livestream',
     paymentAccount: '/payments',
     sessionEarnings: '/payments/:inventory_id',
+    passes: '/passes',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
@@ -35,6 +36,7 @@ const Routes = {
     sessions: '/sessions/:session_type',
     sessionsDetails: '/sessions/e/:inventory_id/details',
     profile: '/profile',
+    passes: '/passes',
     editProfile: '/profile/edit',
     livestream: '/livestream',
   },

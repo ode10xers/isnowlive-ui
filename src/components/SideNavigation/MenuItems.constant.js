@@ -1,8 +1,8 @@
 import React from 'react';
 import {
-  // ControlOutlined,
   // TeamOutlined,
   // UserOutlined,
+  TagsOutlined,
   VideoCameraOutlined,
   ToolOutlined,
   DollarOutlined,
@@ -57,13 +57,14 @@ export const creatorMenuItems = [
   //   mixPanelTag: creator.click.dashboard.attendeeNav,
   //   icon: <TeamOutlined />,
   // },
-  // {
-  //   order: 3,
-  //   key: 'packages',
-  //   title: 'Packages',
-  //   mixPanelTag: creator.click.dashboard.packagesNav,
-  //   icon: <ControlOutlined />,
-  // },
+  {
+    order: 3,
+    key: 'passes',
+    title: 'Class Pass',
+    mixPanelTag: creator.click.dashboard.packagesNav,
+    icon: <TagsOutlined />,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes,
+  },
   {
     order: 4,
     key: 'livestream',
@@ -120,13 +121,14 @@ export const attendeeMenuItems = [
       },
     ],
   },
-  // {
-  //   order: 3,
-  //   key: 'packages',
-  //   title: 'Packages',
-  //   mixPanelTag: attendee.click.dashboard.packagesNav,
-  //   icon: <ControlOutlined />,
-  // },
+  {
+    order: 3,
+    key: 'Passes',
+    title: 'Passes',
+    mixPanelTag: attendee.click.dashboard.passesNav,
+    icon: <TagsOutlined />,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes,
+  },
   // {
   //   order: 7,
   //   key: 'account',

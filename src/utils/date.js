@@ -22,6 +22,7 @@ const formatDate = {
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
+  getISODayOfWeek: (date) => moment(date).isoWeekday(),
 };
 
 const timeCalculation = {
