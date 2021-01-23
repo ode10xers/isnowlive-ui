@@ -4,7 +4,7 @@ import { Typography, Card, Row, Col } from 'antd';
 import Table from 'components/Table';
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
-import { getPaymentStatus } from 'utils/helper';
+import { getPaymentStatus, paymentSource } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -48,7 +48,9 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       key: 'net_price',
       width: '12%',
       render: (text, record, index) =>
-        record?.net_price && (
+        record.booking_type === paymentSource.CLASS_PASS ? (
+          'PASS'
+        ) : (
           <Text className={styles.textAlignLeft}>
             {currency} {record?.net_price}
           </Text>
