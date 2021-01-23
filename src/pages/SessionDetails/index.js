@@ -91,7 +91,6 @@ const SessionDetails = ({ match, history }) => {
             sessions: userPass.session,
           }))
         );
-        setSelectedPass(getUserPurchasedPass());
       }
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
@@ -102,14 +101,6 @@ const SessionDetails = ({ match, history }) => {
     if (userPasses.length) {
       if (selectedPass) {
         return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id)[0];
-      } else {
-        console.log('Here');
-        return {
-          ...userPasses[0],
-          id: userPasses[0].pass_id,
-          name: userPasses[0].pass_name,
-          sessions: userPasses[0].session,
-        };
       }
     }
 

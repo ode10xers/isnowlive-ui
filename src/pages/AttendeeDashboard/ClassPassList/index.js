@@ -79,10 +79,10 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '50%',
+      width: '35%',
     },
     {
-      title: 'Pass Count',
+      title: 'Classes Left',
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
@@ -95,7 +95,7 @@ const ClassPassList = () => {
       dataIndex: 'expiry',
       key: 'expiry',
       align: 'center',
-      width: '10%',
+      width: '18%',
       render: (text, record) => toShortDate(text),
     },
     {
@@ -103,7 +103,7 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '10%',
+      width: '18%',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
