@@ -9,6 +9,8 @@ import apis from 'apis';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess, scrollToErrorField } from 'utils/helper';
+
+import Loader from 'components/Loader';
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
 import http from 'services/http';
@@ -27,9 +29,10 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(getLocalUserDetails());
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showSignIn, setShowSignIn] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSignInState = () => {
     if (showSignIn) {
@@ -55,8 +58,10 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         form.setFieldsValue(user);
       }
     } else {
+      createOrder();
       form.setFieldsValue(currentUser);
     }
+    //eslint-disable-next-line
   }, [form, currentUser]);
 
   useEffect(() => {
@@ -90,6 +95,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   };
 
   const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.pass_order_id,
@@ -110,6 +116,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
+    setIsLoading(false);
   };
 
   const createOrder = async () => {
@@ -117,6 +124,8 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
       showErrorModal('Something went wrong', 'Invalid Class Pass ID');
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const { status, data } = await apis.passes.createOrderForUser({
@@ -131,15 +140,17 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         } else {
           showBookingSuccessModal(currentUser.email, pass, false, false);
         }
+        closeModal();
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(true);
+        closeModal();
       }
     }
 
-    closeModal();
+    setIsLoading(false);
   };
 
   const onFinish = async (values) => {
@@ -182,59 +193,65 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     <div>
       <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
         {pass ? (
-          <Form
-            form={form}
-            labelAlign="left"
-            {...purchasePassModalFormLayout}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Row gutter={[8, 8]}>
-              <Col xs={24} md={{ span: 18, offset: 3 }}>
-                <Paragraph className={styles.textAlignCenter}>
-                  <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
-                  {`${showSignIn ? 'Sign in' : 'Signing up helps'} to book and manage your passes`}
-                </Paragraph>
-              </Col>
-              <Col xs={24} md={{ span: 18, offset: 3 }}>
-                {!showSignIn && (
-                  <Form.Item label="Name" className={styles.nameInputWrapper}>
-                    <Form.Item
-                      className={styles.firstNameInput}
-                      name="first_name"
-                      rules={validationRules.nameValidation}
-                    >
-                      <Input placeholder="First Name" disabled={showPasswordField} />
+          <Loader loading={isLoading}>
+            <Form
+              form={form}
+              labelAlign="left"
+              {...purchasePassModalFormLayout}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+            >
+              <Row gutter={[8, 8]}>
+                <Col xs={24} md={{ span: 18, offset: 3 }}>
+                  <Paragraph className={styles.textAlignCenter}>
+                    <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
+                    {`${showSignIn ? 'Sign in' : 'Signing up helps'} to book and manage your passes`}
+                  </Paragraph>
+                </Col>
+                <Col xs={24} md={{ span: 18, offset: 3 }}>
+                  {!showSignIn && (
+                    <Form.Item label="Name" className={styles.nameInputWrapper}>
+                      <Form.Item
+                        className={styles.firstNameInput}
+                        name="first_name"
+                        rules={validationRules.nameValidation}
+                      >
+                        <Input placeholder="First Name" disabled={showPasswordField} />
+                      </Form.Item>
+                      <Form.Item
+                        className={styles.lastNameInput}
+                        name="last_name"
+                        rules={validationRules.nameValidation}
+                      >
+                        <Input placeholder="Last Name" disabled={showPasswordField} />
+                      </Form.Item>
                     </Form.Item>
-                    <Form.Item className={styles.lastNameInput} name="last_name" rules={validationRules.nameValidation}>
-                      <Input placeholder="Last Name" disabled={showPasswordField} />
+                  )}
+                  <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
+                    <Input placeholder="Enter your email" />
+                  </Form.Item>
+                  {(showSignIn || showPasswordField) && (
+                    <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
+                      <Input.Password placeholder="Enter your password" />
                     </Form.Item>
+                  )}
+                </Col>
+                <Col xs={24} md={{ span: 18, offset: 3 }}>
+                  <Form.Item {...purchasePassModalTailLayout}>
+                    <Button block type="primary" htmlType="submit">
+                      Sign {showSignIn ? 'In' : 'Up'}
+                    </Button>
                   </Form.Item>
-                )}
-                <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                  <Input placeholder="Enter your email" />
-                </Form.Item>
-                {(showSignIn || showPasswordField) && (
-                  <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-                    <Input.Password placeholder="Enter your password" />
-                  </Form.Item>
-                )}
-              </Col>
-              <Col xs={24} md={{ span: 18, offset: 3 }}>
-                <Form.Item {...purchasePassModalTailLayout}>
-                  <Button block type="primary" htmlType="submit">
-                    Sign {showSignIn ? 'In' : 'Up'}
-                  </Button>
-                </Form.Item>
-                <Paragraph className={styles.textAlignCenter}>
-                  {showSignIn ? 'Already' : "Don't"} have an account?{' '}
-                  <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
-                    Sign {showSignIn ? 'Up' : 'In'}
-                  </Button>
-                </Paragraph>
-              </Col>
-            </Row>
-          </Form>
+                  <Paragraph className={styles.textAlignCenter}>
+                    {showSignIn ? 'Already' : "Don't"} have an account?{' '}
+                    <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
+                      Sign {showSignIn ? 'Up' : 'In'}
+                    </Button>
+                  </Paragraph>
+                </Col>
+              </Row>
+            </Form>
+          </Loader>
         ) : (
           <Text className={styles.textAlignCenter}> Please Select a valid Class Pass </Text>
         )}
