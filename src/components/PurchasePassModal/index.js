@@ -50,19 +50,20 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   };
 
   useEffect(() => {
-    if (!currentUser) {
-      const user = getLocalUserDetails();
+    if (visible) {
+      if (!currentUser) {
+        const user = getLocalUserDetails();
 
-      if (user) {
-        setCurrentUser(user);
-        form.setFieldsValue(user);
+        if (user) {
+          setCurrentUser(user);
+          form.setFieldsValue(user);
+        }
+      } else {
+        form.setFieldsValue(currentUser);
       }
-    } else {
-      createOrder();
-      form.setFieldsValue(currentUser);
     }
     //eslint-disable-next-line
-  }, [form, currentUser]);
+  }, [form, currentUser, visible]);
 
   useEffect(() => {
     if (showPasswordField && passwordInput.current) {
@@ -119,7 +120,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     setIsLoading(false);
   };
 
-  const createOrder = async () => {
+  const createOrder = async (userEmail) => {
     if (!pass) {
       showErrorModal('Something went wrong', 'Invalid Class Pass ID');
       return;
@@ -138,7 +139,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
-          showBookingSuccessModal(currentUser.email, pass, false, false);
+          showBookingSuccessModal(userEmail, pass, false, false);
         }
         closeModal();
       }
@@ -243,7 +244,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
                     </Button>
                   </Form.Item>
                   <Paragraph className={styles.textAlignCenter}>
-                    {showSignIn ? 'Already' : "Don't"} have an account?{' '}
+                    {showSignIn ? "Don't" : 'Already'} have an account?{' '}
                     <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
                       Sign {showSignIn ? 'Up' : 'In'}
                     </Button>

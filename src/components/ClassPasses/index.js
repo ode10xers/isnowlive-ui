@@ -11,8 +11,8 @@ import styles from './style.module.scss';
 const { Text, Paragraph } = Typography;
 
 const ClassPasses = ({ passes }) => {
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [showPurchasePassModal, setShowPurchasePassModal] = useState(false);
 
   const showPurchaseModal = (passId) => {

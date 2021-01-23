@@ -241,45 +241,46 @@ const SessionRegistration = ({
             )}
 
             {user ? (
-              <>
-                <Item {...sessionRegistrationTailLayout}>
-                  <Button type="link" onClick={() => logOut()}>
-                    Not this account? Log Out
-                  </Button>
-                </Item>
-                {userPasses.length && (
-                  <div>
-                    <Table
-                      columns={userPassesColumns}
-                      data={userPasses}
-                      rowKey={(record) => record.pass_order_id}
-                      rowSelection={{
-                        hideSelectAll: true,
-                        selectedRowKeys: selectedPass ? [selectedPass.pass_order_id] : [],
-                        type: 'radio',
-                        onSelect: (record, selected, _, e) => {
-                          if (selected) {
-                            setSelectedPass(record);
-                          }
-                        },
-                      }}
-                    />
-                  </div>
-                )}
-              </>
+              <Item {...sessionRegistrationTailLayout}>
+                <Button type="link" onClick={() => logOut()}>
+                  Not this account? Log Out
+                </Button>
+              </Item>
+            ) : (
+              <Item {...sessionRegistrationTailLayout}>
+                <Button type="link" onClick={() => showSignInForm()}>
+                  Already have an account? Sign In
+                </Button>
+              </Item>
+            )}
+
+            {user && userPasses.length ? (
+              <div>
+                <Title level={5}> Purchased Pass Usable for this Class </Title>
+                <Table
+                  columns={userPassesColumns}
+                  data={userPasses}
+                  rowKey={(record) => record.pass_order_id}
+                  rowSelection={{
+                    hideSelectAll: true,
+                    selectedRowKeys: selectedPass ? [selectedPass.pass_order_id] : [],
+                    type: 'radio',
+                    onSelect: (record, selected, _, e) => {
+                      if (selected) {
+                        setSelectedPass(record);
+                      }
+                    },
+                  }}
+                />
+              </div>
             ) : (
               <>
-                <Item {...sessionRegistrationTailLayout}>
-                  <Button type="link" onClick={() => showSignInForm()}>
-                    Already have an account? Sign In
-                  </Button>
-                </Item>
-
                 {availablePasses.length && (
                   <>
                     <div>
                       <Title level={5}> Book this class </Title>
                       <Table
+                        showHeader={false}
                         columns={singleClassColumns}
                         data={[classDetails]}
                         rowKey={(record) => 'dropIn'}
@@ -334,7 +335,7 @@ const SessionRegistration = ({
                       {' '}
                       {classDetails.price} {classDetails.currency}{' '}
                     </Text>
-                    <Text strong> 0 {classDetails.currency} </Text> using your purchased pass{' '}
+                    <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass{' '}
                     <Text strong> {selectedPass.name} </Text>
                   </Paragraph>
                 )}
