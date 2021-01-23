@@ -22,7 +22,7 @@ const {
 } = dateUtil;
 
 const ClassPassList = () => {
-  const [editPassId, setEditPassId] = useState(null);
+  const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -34,7 +34,7 @@ const ClassPassList = () => {
 
   const hideCreatePassesModal = (shouldRefresh = false) => {
     setCreateModalVisible(false);
-    setEditPassId(null);
+    setTargetPass(null);
 
     if (shouldRefresh) {
       getPassesForCreator();
@@ -42,7 +42,7 @@ const ClassPassList = () => {
   };
 
   const showEditPassesModal = (pass) => {
-    setEditPassId(pass);
+    setTargetPass(pass);
     showCreatePassesModal();
   };
 
@@ -98,7 +98,7 @@ const ClassPassList = () => {
             validity: classPass.validity,
             class_count: classPass.class_count,
             is_published: classPass.is_published,
-            // sessions: classPass.sessions,
+            sessions: classPass.sessions,
             subscribers: classPass.subscribers.map((subs) => ({ ...subs, currency: classPass.currency })),
           }))
         );
@@ -237,7 +237,7 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
-      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={editPassId} />
+      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={8}>
         <Col xs={24} md={14} lg={17}>
           <Title level={4}> Class Passes </Title>

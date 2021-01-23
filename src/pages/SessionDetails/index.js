@@ -421,7 +421,7 @@ const SessionDetails = ({ match, history }) => {
                 selectedPass={selectedPass}
                 classDetails={session}
                 logOut={() => {
-                  logOut(history, false);
+                  logOut(history, true);
                   setCurrentUser(null);
                   setShowSignInForm(true);
                 }}

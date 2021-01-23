@@ -66,8 +66,8 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'SET_USER_AUTHENTICATED', payload: status });
   }
 
-  function logOut(history, fromAdmin = false) {
-    if (!fromAdmin) {
+  function logOut(history, dontRedirect = false) {
+    if (!dontRedirect) {
       history.push(Routes.login);
     }
 

@@ -247,23 +247,25 @@ const SessionRegistration = ({
                     Not this account? Log Out
                   </Button>
                 </Item>
-                <div>
-                  <Table
-                    columns={userPassesColumns}
-                    data={userPasses}
-                    rowKey={(record) => record.pass_order_id}
-                    rowSelection={{
-                      hideSelectAll: true,
-                      selectedRowKeys: selectedPass ? [selectedPass.pass_order_id] : [],
-                      type: 'radio',
-                      onSelect: (record, selected, _, e) => {
-                        if (selected) {
-                          setSelectedPass(record);
-                        }
-                      },
-                    }}
-                  />
-                </div>
+                {userPasses.length && (
+                  <div>
+                    <Table
+                      columns={userPassesColumns}
+                      data={userPasses}
+                      rowKey={(record) => record.pass_order_id}
+                      rowSelection={{
+                        hideSelectAll: true,
+                        selectedRowKeys: selectedPass ? [selectedPass.pass_order_id] : [],
+                        type: 'radio',
+                        onSelect: (record, selected, _, e) => {
+                          if (selected) {
+                            setSelectedPass(record);
+                          }
+                        },
+                      }}
+                    />
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -272,49 +274,54 @@ const SessionRegistration = ({
                     Already have an account? Sign In
                   </Button>
                 </Item>
-                <div>
-                  <Title level={5}> Book this class </Title>
-                  <Table
-                    columns={singleClassColumns}
-                    data={[classDetails]}
-                    rowKey={(record) => 'dropIn'}
-                    rowSelection={{
-                      hideSelectAll: true,
-                      selectedRowKeys: selectedPass ? [] : ['dropIn'],
-                      type: 'radio',
-                      onSelect: (record, selected, _, e) => {
-                        if (selected) {
-                          setSelectedPass(null);
-                        }
-                      },
-                    }}
-                  />
-                </div>
 
-                <div className={styles.mt20}>
-                  <Title level={5}> Buy Pass & this class </Title>
-                  <Table
-                    columns={passesColumns}
-                    data={availablePasses}
-                    rowKey={(record) => record.id}
-                    expandable={{
-                      expandedRowRender: renderClassesList,
-                      expandIconColumnIndex: -1,
-                      expandedRowKeys: expandedRowKeys,
-                    }}
-                    rowSelection={{
-                      selectedRowKeys: selectedPass ? [selectedPass.id] : [],
-                      checkStrictly: true,
-                      hideSelectAll: true,
-                      type: 'radio',
-                      onSelect: (record, selected, _, e) => {
-                        if (selected) {
-                          setSelectedPass(record);
-                        }
-                      },
-                    }}
-                  />
-                </div>
+                {availablePasses.length && (
+                  <>
+                    <div>
+                      <Title level={5}> Book this class </Title>
+                      <Table
+                        columns={singleClassColumns}
+                        data={[classDetails]}
+                        rowKey={(record) => 'dropIn'}
+                        rowSelection={{
+                          hideSelectAll: true,
+                          selectedRowKeys: selectedPass ? [] : ['dropIn'],
+                          type: 'radio',
+                          onSelect: (record, selected, _, e) => {
+                            if (selected) {
+                              setSelectedPass(null);
+                            }
+                          },
+                        }}
+                      />
+                    </div>
+
+                    <div className={styles.mt20}>
+                      <Title level={5}> Buy Pass & this class </Title>
+                      <Table
+                        columns={passesColumns}
+                        data={availablePasses}
+                        rowKey={(record) => record.id}
+                        expandable={{
+                          expandedRowRender: renderClassesList,
+                          expandIconColumnIndex: -1,
+                          expandedRowKeys: expandedRowKeys,
+                        }}
+                        rowSelection={{
+                          selectedRowKeys: selectedPass ? [selectedPass.id] : [],
+                          checkStrictly: true,
+                          hideSelectAll: true,
+                          type: 'radio',
+                          onSelect: (record, selected, _, e) => {
+                            if (selected) {
+                              setSelectedPass(record);
+                            }
+                          },
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
               </>
             )}
 
