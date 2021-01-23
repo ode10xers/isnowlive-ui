@@ -31,8 +31,8 @@ const ClassPassList = () => {
       const { data } = await apis.passes.getAttendeePasses();
 
       if (data) {
-        setPasses(
-          data.map((pass, index) => ({
+        setPasses([
+          ...data.active.map((pass, index) => ({
             index,
             key: pass.pass_order_id,
             pass_id: pass.pass_id,
@@ -45,8 +45,24 @@ const ClassPassList = () => {
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
             sessions: pass.session,
-          }))
-        );
+            expired: false,
+          })),
+          ...data.expired.map((pass, index) => ({
+            index,
+            key: pass.pass_order_id,
+            pass_id: pass.pass_id,
+            pass_order_id: pass.pass_order_id,
+            name: pass.pass_name,
+            price: pass.price,
+            limited: pass.limited,
+            currency: pass.currency,
+            validity: pass.validity,
+            class_count: pass.class_count,
+            classes_remaining: pass.classes_remaining,
+            sessions: pass.session,
+            expired: true,
+          })),
+        ]);
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message);
@@ -96,7 +112,8 @@ const ClassPassList = () => {
       key: 'expiry',
       align: 'center',
       width: '18%',
-      render: (text, record) => toShortDate(text),
+      render: (text, record) =>
+        record.expired ? <Text danger>{toShortDate(text)}</Text> : <Text> {toShortDate(text)} </Text>,
     },
     {
       title: 'Price',

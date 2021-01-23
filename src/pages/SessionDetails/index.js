@@ -83,7 +83,7 @@ const SessionDetails = ({ match, history }) => {
       if (loggedInUserData && session) {
         const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
         setUserPasses(
-          data.map((userPass) => ({
+          data.active.map((userPass) => ({
             ...userPass,
             id: userPass.pass_id,
             name: userPass.pass_name,
@@ -179,6 +179,7 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
     try {
       let payload = {
         order_id: orderDetails.order_id,
@@ -208,6 +209,7 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
+    setIsLoading(false);
   };
 
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
@@ -277,6 +279,7 @@ const SessionDetails = ({ match, history }) => {
           }
         }
       }
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');

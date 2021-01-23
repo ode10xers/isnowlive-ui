@@ -44,7 +44,7 @@ const PaymentVerification = () => {
               let usersPass = null;
               const userPassResponse = await apis.passes.getAttendeePasses();
               if (isAPISuccess(userPassResponse.status)) {
-                usersPass = userPassResponse.data.filter((userPass) => userPass.pass_order_id === order_id)[0];
+                usersPass = userPassResponse.data.active.filter((userPass) => userPass.pass_order_id === order_id)[0];
               } else {
                 showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
               }
