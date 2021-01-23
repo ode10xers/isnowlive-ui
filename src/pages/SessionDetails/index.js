@@ -78,6 +78,8 @@ const SessionDetails = ({ match, history }) => {
   const getUsablePassesForUser = async () => {
     try {
       const loggedInUserData = getLocalUserDetails();
+      console.log(loggedInUserData);
+      console.log(session);
 
       if (loggedInUserData) {
         const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
@@ -126,11 +128,17 @@ const SessionDetails = ({ match, history }) => {
     }
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
-      getUsablePassesForUser();
     }
 
     //eslint-disable-next-line
   }, [match.params.inventory_id]);
+
+  useEffect(() => {
+    if (session && getLocalUserDetails() && userPasses.length === 0) {
+      getUsablePassesForUser();
+    }
+    //eslint-disable-next-line
+  }, [session]);
 
   useEffect(() => {
     if (createFollowUpOrder) {
@@ -430,6 +438,8 @@ const SessionDetails = ({ match, history }) => {
                 logOut={() => {
                   logOut(history, true);
                   setCurrentUser(null);
+                  setSelectedPass(null);
+                  setUserPasses([]);
                   setShowSignInForm(true);
                 }}
               />
