@@ -43,14 +43,19 @@ export default {
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
     getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
     getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
+    getInventoriesForSession: (sessionId) => http.get(`/session/${sessionId}`),
     getRescheduleableSessionsByPrice: (creatorName, price) =>
       http.get(`/sessions/${creatorName}/reschedulable?price=${price}`),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
-    getCreatorEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings?page_no=${pageNo}&per_page=${perPage}`),
-    getEarningsByInventoryId: (inventoryId) => http.get(`/secure/creator/payments/earnings/id/${inventoryId}`),
+    getCreatorInventoryEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/inventories?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorPassEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
+    getEarningsByInventoryId: (inventoryId) =>
+      http.get(`/secure/creator/payments/earnings/inventories/id/${inventoryId}`),
+    getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
     getCreatorBalance: () => http.get('/secure/creator/payments/earnings/balance'),
     createCreatorBalancePayout: () => http.post('/secure/creator/payments/payouts'),
     cancelCustomerOrder: (orderId, payload) => http.post(`/secure/customer/orders/${orderId}/cancel`, payload),
@@ -58,5 +63,18 @@ export default {
     unpublishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
     deleteSession: (sessionId) => http.delete(`/secure/creator/sessions/${sessionId}`),
     rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
+  },
+  passes: {
+    getPassById: (passId) => http.get(`/passes/${passId}`),
+    getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
+    getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
+    getCreatorPasses: () => http.get(`/secure/creator/passes`),
+    createClassPass: (payload) => http.post(`/secure/creator/passes`, payload),
+    updateClassPass: (passId, payload) => http.put(`/secure/creator/passes/${passId}`, payload),
+    createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
+    getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
+    getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
+    publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
+    unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
   },
 };

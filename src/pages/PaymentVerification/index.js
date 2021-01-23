@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
-import { message, Row, Modal, Typography } from 'antd';
+import { message, Row } from 'antd';
+
 import Loader from 'components/Loader';
+import { showBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+
 import apis from 'apis';
-import Routes from 'routes';
-import config from 'config';
-import { isAPISuccess } from 'utils/helper';
+// import Routes from 'routes';
+
+import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
 import { useGlobalContext } from 'services/globalContext';
+import { isAPISuccess, paymentSource, orderType } from 'utils/helper';
 
-const { Text, Paragraph } = Typography;
+const {
+  timezoneUtils: { getCurrentLongTimezone },
+} = dateUtil;
 
 const PaymentVerification = () => {
   const {
@@ -20,8 +26,7 @@ const PaymentVerification = () => {
   const location = useLocation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
-
-  const { order_id, transaction_id } = parseQueryString(location.search);
+  const { order_id, transaction_id, order_type, inventory_id } = parseQueryString(location.search);
 
   useEffect(() => {
     if (order_id && transaction_id) {
@@ -31,23 +36,49 @@ const PaymentVerification = () => {
           const { status } = await apis.payment.verifyPaymentForOrder({
             order_id,
             transaction_id,
+            order_type,
           });
 
           if (isAPISuccess(status)) {
-            Modal.success({
-              title: 'Registration Successful',
-              content: (
-                <>
-                  <Paragraph>
-                    We have sent you a confirmation email on <Text strong> {userDetails.email} </Text>. Look out for an
-                    email from <Text strong> friends@passion.do. </Text>
-                  </Paragraph>
-                  <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-                </>
-              ),
-              okText: 'Go To Dashboard',
-              onOk: () => window.open(config.client.platformBaseURL, '_self'),
-            });
+            if (order_type === orderType.PASS) {
+              let usersPass = null;
+              const userPassResponse = await apis.passes.getAttendeePasses();
+              if (isAPISuccess(userPassResponse.status)) {
+                usersPass = userPassResponse.data.active.filter((userPass) => userPass.pass_order_id === order_id)[0];
+              } else {
+                showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
+              }
+
+              if (inventory_id) {
+                try {
+                  //Continue to book the class after Pass Purchase is successful
+                  const followUpBooking = await apis.session.createOrderForUser({
+                    inventory_id: parseInt(inventory_id),
+                    user_timezone_offset: new Date().getTimezoneOffset(),
+                    user_timezone: getCurrentLongTimezone(),
+                    payment_source: paymentSource.CLASS_PASS,
+                    source_id: order_id,
+                  });
+
+                  if (isAPISuccess(followUpBooking.status)) {
+                    showBookingSuccessModal(userDetails.email, { ...usersPass, name: usersPass.pass_name }, true, true);
+                  }
+                } catch (error) {
+                  if (
+                    error.response?.data?.message ===
+                    'It seems you have already booked this session, please check your dashboard'
+                  ) {
+                    showAlreadyBookedModal(false);
+                  } else {
+                    showErrorModal('Something went wrong', error.response?.data?.message);
+                  }
+                }
+              } else {
+                showBookingSuccessModal(userDetails.email, { ...usersPass, name: usersPass.pass_name }, false, false);
+              }
+            } else {
+              showBookingSuccessModal(userDetails.email, null, false, false);
+            }
           }
           setIsLoading(false);
         } catch (error) {
@@ -58,10 +89,10 @@ const PaymentVerification = () => {
       verifyPayment();
     } else {
       setIsLoading(false);
-      message.error('Something went wrong.');
-      history.push(Routes.attendeeDashboard.rootPath);
+      showErrorModal('Something went wrong');
+      // history.push(Routes.attendeeDashboard.rootPath);
     }
-  }, [order_id, transaction_id, history, userDetails]);
+  }, [order_id, transaction_id, order_type, inventory_id, history, userDetails]);
 
   return (
     <Row justify="center">

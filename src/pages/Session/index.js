@@ -31,7 +31,13 @@ import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
-import { getCurrencyList, convertSchedulesToUTC, isAPISuccess, scrollToErrorField } from 'utils/helper';
+import {
+  getCurrencyList,
+  convertSchedulesToUTC,
+  isAPISuccess,
+  scrollToErrorField,
+  generateRandomColor,
+} from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
@@ -74,6 +80,21 @@ const initialSession = {
 
 const whiteColor = '#ffffff';
 
+const colorPickerChoices = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#1890ff',
+  '#009688',
+  '#4caf50',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+];
+
 const Session = ({ match, history }) => {
   const location = useLocation();
   const [form] = Form.useForm();
@@ -91,7 +112,7 @@ const Session = ({ match, history }) => {
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
-  const [colorCode, setColorCode] = useState(whiteColor);
+  const [colorCode, setColorCode] = useState(generateRandomColor);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -99,7 +120,7 @@ const Session = ({ match, history }) => {
         setIsLoading(true);
         const { status, data } = await apis.session.getCreatorBalance();
         if (isAPISuccess(status) && data) {
-          setStripeCurrency(data.currency);
+          setStripeCurrency(data.currency.toUpperCase());
           if (!sessionData) {
             form.setFieldsValue({
               ...form.getFieldsValue(),
@@ -804,20 +825,7 @@ const Session = ({ match, history }) => {
               onChangeComplete={handleColorChange}
               triangle="hide"
               width={144}
-              colors={[
-                '#f44336',
-                '#e91e63',
-                '#9c27b0',
-                '#673ab7',
-                '#1890ff',
-                '#009688',
-                '#4caf50',
-                '#ffc107',
-                '#ff9800',
-                '#ff5722',
-                '#795548',
-                '#607d8b',
-              ]}
+              colors={colorPickerChoices}
             />
           </Form.Item>
         </Section>

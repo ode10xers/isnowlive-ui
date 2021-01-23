@@ -1,0 +1,19 @@
+@import '../../styles/variables.scss';
+
+.linkBtn {
+  padding: 0px !important;
+}
+
+.nameInputWrapper {
+  margin: 0px !important;
+
+  .firstNameInput {
+    max-width: 128px;
+    display: inline-block !important;
+  }
+
+  .lastNameInput {
+    @extend .firstNameInput;
+    margin-left: 8px !important;
+  }
+}
