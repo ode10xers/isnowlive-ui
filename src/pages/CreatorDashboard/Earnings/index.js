@@ -75,7 +75,10 @@ const Earnings = () => {
         setBalance(creatorBalanceResponse.data);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      if (error.response?.status !== 404) {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
+
       setIsLoading(false);
     }
   }, []);
@@ -187,7 +190,7 @@ const Earnings = () => {
     <div className={styles.box1}>
       <Row>
         <Col xs={24}>
-          <Text className={styles.box1Text}>Availabe for Payout</Text>
+          <Text className={styles.box1Text}>Available for Payout</Text>
         </Col>
         <Col xs={24} sm={12}>
           <ShowAmount amount={balance?.available} currency={balance?.currency} />
