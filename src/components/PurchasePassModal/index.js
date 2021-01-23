@@ -60,6 +60,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         }
       } else {
         form.setFieldsValue(currentUser);
+        createOrder(currentUser.email);
       }
     }
     //eslint-disable-next-line
@@ -203,7 +204,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
               onFinishFailed={onFinishFailed}
             >
               <Row gutter={[8, 8]}>
-                <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <Col xs={24}>
                   <Paragraph className={styles.textAlignCenter}>
                     <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
                     {`Sign ${showSignIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}

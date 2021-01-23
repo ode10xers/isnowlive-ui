@@ -25,15 +25,20 @@
 }
 
 .passwordHelpText {
-  max-width: 500px;
+  margin-top: -30px;
+  max-width: 370px;
   
   .span {
     color: map-get($colors, 'Charcoal')  !important;
   }
+
+  .linkButton {
+    // padding: 0px !important;
+    cursor: pointer;
+    color: map-get($colors, 'DodgerBlue')  !important;
+  }
 }
-.linkButton {
-  padding: 0px !important;
-}
+
 @media (max-width: 768px) {
   .nameInput {
     max-width: 100%;

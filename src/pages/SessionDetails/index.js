@@ -55,6 +55,7 @@ const SessionDetails = ({ match, history }) => {
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
+  const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -64,7 +65,7 @@ const SessionDetails = ({ match, history }) => {
         const passes = await apis.passes.getPassesBySessionId(inventoryDetails.data.session_id);
         setSession(inventoryDetails.data);
         setCreator(userDetails.data);
-        setAvailablePasses(passes.data.map((pass) => ({ ...pass, user_usable: false })));
+        setAvailablePasses(passes.data);
         setIsLoading(false);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -78,8 +79,6 @@ const SessionDetails = ({ match, history }) => {
   const getUsablePassesForUser = async () => {
     try {
       const loggedInUserData = getLocalUserDetails();
-      console.log(loggedInUserData);
-      console.log(session);
 
       if (loggedInUserData && session) {
         const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
@@ -97,11 +96,17 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const getUserPurchasedPass = () => {
+  const getUserPurchasedPass = (getDefault = false) => {
+    setShouldSetDefaultPass(false);
+
     if (userPasses.length) {
-      if (selectedPass) {
-        return userPasses.filter((userPass) => userPass.pass_id === selectedPass.id)[0];
+      if (selectedPass && !getDefault) {
+        console.log('Finding usable pass based on selected pass');
+        return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
       }
+
+      console.log('Returning first pass options');
+      return userPasses[0];
     }
 
     return null;
@@ -124,9 +129,11 @@ const SessionDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.inventory_id]);
 
+  // Logic for when user lands in the page already logged in
   useEffect(() => {
     if (session && getLocalUserDetails() && userPasses.length === 0) {
       getUsablePassesForUser();
+      setShouldSetDefaultPass(true);
     }
     //eslint-disable-next-line
   }, [session]);
@@ -138,6 +145,13 @@ const SessionDetails = ({ match, history }) => {
 
     //eslint-disable-next-line
   }, [createFollowUpOrder]);
+
+  useEffect(() => {
+    if (userPasses.length && shouldSetDefaultPass) {
+      setSelectedPass(getUserPurchasedPass(true));
+    }
+    //eslint-disable-next-line
+  }, [userPasses, shouldSetDefaultPass]);
 
   const signupUser = async (values) => {
     try {
@@ -216,7 +230,8 @@ const SessionDetails = ({ match, history }) => {
         // e.g. user buys single class / user buys new pass
         // Booking class after pass is bought will be done in redirection
 
-        usersPass = getUserPurchasedPass();
+        usersPass = getUserPurchasedPass(false);
+        console.log(usersPass);
 
         if (usersPass) {
           payload = {
@@ -255,10 +270,10 @@ const SessionDetails = ({ match, history }) => {
             });
 
             if (isAPISuccess(followUpBooking.status)) {
-              showBookingSuccessModal(userEmail, usersPass);
+              showBookingSuccessModal(userEmail, usersPass, true);
             }
           } else {
-            showBookingSuccessModal(userEmail, usersPass);
+            showBookingSuccessModal(userEmail, usersPass, true);
           }
         }
       }
@@ -334,7 +349,10 @@ const SessionDetails = ({ match, history }) => {
 
     setCurrentUser(userDetails);
 
-    if (userDetails) getUsablePassesForUser();
+    if (userDetails) {
+      getUsablePassesForUser();
+      setShouldSetDefaultPass(true);
+    }
   };
 
   return (

@@ -224,18 +224,13 @@ const SessionRegistration = ({
                 >
                   <Password />
                 </Item>
-                <Item>
+                <Item {...sessionRegistrationTailLayout}>
                   <div className={styles.passwordHelpText}>
                     <Text>
-                      You have booked a session with us earlier, but if you haven't set your password, please use the{' '}
-                      <Button
-                        className={styles.linkButton}
-                        type="link"
-                        onClick={() => onSetNewPassword(form.getFieldsValue().email)}
-                      >
-                        set new password
-                      </Button>{' '}
-                      option below{' '}
+                      You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                      <Text className={styles.linkButton} onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                        set a new password
+                      </Text>
                     </Text>
                   </div>
                 </Item>
@@ -243,38 +238,20 @@ const SessionRegistration = ({
             )}
 
             <Item {...sessionRegistrationTailLayout}>
-              <Row gutter={8}>
-                {showPasswordField && (
-                  <>
-                    <Col>
-                      <Button
-                        className={styles.linkButton}
-                        type="link"
-                        onClick={() => onSetNewPassword(form.getFieldsValue().email)}
-                      >
-                        Set a new password
-                      </Button>
-                    </Col>
-                    <Col xs={2}></Col>
-                  </>
-                )}
-                <Col>
-                  {user ? (
-                    <Button type="link" onClick={() => logOut()}>
-                      Not this account? Logout
-                    </Button>
-                  ) : (
-                    <Button type="link" onClick={() => showSignInForm()}>
-                      Already have an account? Sign In
-                    </Button>
-                  )}
-                </Col>
-              </Row>
+              {user ? (
+                <Button type="link" onClick={() => logOut()}>
+                  Not this account? Logout
+                </Button>
+              ) : (
+                <Button type="link" onClick={() => showSignInForm()}>
+                  Already have an account? Sign In
+                </Button>
+              )}
             </Item>
 
             {user && userPasses.length > 0 ? (
               <div>
-                <Title level={5}> Purchased Pass Usable for this Class </Title>
+                <Title level={5}> Purchased pass(es) usable for this class </Title>
                 <Table
                   columns={userPassesColumns}
                   data={userPasses}
@@ -344,20 +321,21 @@ const SessionRegistration = ({
               </>
             )}
 
+            <Row className={styles.mt10}>
+              {user && selectedPass && userPasses.length > 0 && (
+                <Paragraph>
+                  Booking this class for{' '}
+                  <Text delete>
+                    {' '}
+                    {classDetails.price} {classDetails.currency}{' '}
+                  </Text>
+                  <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass{' '}
+                  <Text strong> {selectedPass.name} </Text>
+                </Paragraph>
+              )}
+            </Row>
+
             <Item {...sessionRegistrationTailLayout}>
-              <Row className={styles.mt10}>
-                {user && selectedPass && userPasses.length > 0 && (
-                  <Paragraph>
-                    Booking this class for{' '}
-                    <Text delete>
-                      {' '}
-                      {classDetails.price} {classDetails.currency}{' '}
-                    </Text>
-                    <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass{' '}
-                    <Text strong> {selectedPass.name} </Text>
-                  </Paragraph>
-                )}
-              </Row>
               <Row className={styles.mt10}>
                 <Col>
                   <Button type="primary" htmlType="submit">
