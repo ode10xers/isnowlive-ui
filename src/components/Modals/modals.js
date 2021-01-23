@@ -68,8 +68,10 @@ export const showBookingSuccessModal = (
         //* Purchase Class Pass & Immediately Book Class
         <>
           <Paragraph>
-            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text> and we have{' '}
-            <Text strong> used 1 class credit </Text>
+            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+          </Paragraph>
+          <Paragraph>
+            We have <Text strong> used 1 class credit </Text>
             to book this class for you.
           </Paragraph>
           <Paragraph>
