@@ -14,7 +14,7 @@ import { isValidFile, isoDayOfWeek } from 'utils/helper';
 import styles from './styles.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const {
   formatDate: { getISODayOfWeek },
 } = dateUtil;
@@ -85,7 +85,7 @@ const SessionCards = ({ sessions }) => {
                             </Tag>
                           </Col>
                           <Col xs={24}>
-                            <Paragraph ellipsis={{ rows: 3 }}>{ReactHtmlParser(session?.description)}</Paragraph>
+                            <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
                           </Col>
                         </Row>
                       </Col>

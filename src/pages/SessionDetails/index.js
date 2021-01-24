@@ -38,7 +38,7 @@ const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? 
 const { Title } = Typography;
 const {
   formatDate: { getTimeDiff },
-  timezoneUtils: { getCurrentLongTimezone },
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
@@ -220,6 +220,7 @@ const SessionDetails = ({ match, history }) => {
       let payload = {
         inventory_id: parseInt(match.params.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
         payment_source: paymentSource.GATEWAY,
       };
@@ -272,7 +273,7 @@ const SessionDetails = ({ match, history }) => {
               showBookingSuccessModal(userEmail, usersPass, true);
             }
           } else {
-            showBookingSuccessModal(userEmail, usersPass, true);
+            showBookingSuccessModal(userEmail);
           }
         }
       }
