@@ -15,7 +15,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { isAPISuccess, paymentSource, orderType } from 'utils/helper';
 
 const {
-  timezoneUtils: { getCurrentLongTimezone },
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
 const PaymentVerification = () => {
@@ -55,6 +55,7 @@ const PaymentVerification = () => {
                   const followUpBooking = await apis.session.createOrderForUser({
                     inventory_id: parseInt(inventory_id),
                     user_timezone_offset: new Date().getTimezoneOffset(),
+                    user_timezone_location: getTimezoneLocation(),
                     user_timezone: getCurrentLongTimezone(),
                     payment_source: paymentSource.CLASS_PASS,
                     source_id: order_id,

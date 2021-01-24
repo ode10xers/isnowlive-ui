@@ -1,6 +1,5 @@
 @import '../../styles/variables.scss';
 
-//TODO: Adjust here and in JS after syncing with hotfix from master
 .sessionCard {
   margin: 10px !important;
   cursor: pointer;
@@ -25,5 +24,25 @@
     width: 100%;
     text-align: center;
     font-size: 14px;
+  }
+
+  .sessionDesc {
+    p,
+    span {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    }
+  
+    max-height: 80px;
+    overflow-y: auto;
+    margin: 10px 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .sessionCard {
+    .sessionDesc {
+      max-height: 120px;
+    }
   }
 }

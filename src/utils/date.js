@@ -41,6 +41,7 @@ const timezoneUtils = {
     const longTimezone = timeString.substr(timeString.indexOf('('));
     return longTimezone.substring(1, longTimezone.length - 1);
   },
+  getTimezoneLocation: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
 const dateUtil = {
