@@ -273,7 +273,7 @@ const SessionDetails = ({ match, history }) => {
               showBookingSuccessModal(userEmail, usersPass, true);
             }
           } else {
-            showBookingSuccessModal(userEmail, usersPass, true);
+            showBookingSuccessModal(userEmail);
           }
         }
       }

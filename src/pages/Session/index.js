@@ -428,7 +428,7 @@ const Session = ({ match, history }) => {
         }
       }
 
-      //Add new inventories here if the date range extends to the future
+      //Add new inventories here if the date range extends
       if (updateInventoriesForNewDate && rangeDiff.length > 0) {
         const oldRange = createRange(oldDateRange[0], oldDateRange[1]);
 
@@ -457,6 +457,7 @@ const Session = ({ match, history }) => {
               )
             ) {
               console.log('Past inventory will be created, skipping...');
+              console.log([...createdDate, invStartMoment.hour(), invStartMoment.minute()]);
               return;
             }
 
