@@ -258,19 +258,23 @@ const SessionDetails = ({ match, history }) => {
             initiatePaymentForOrder(data);
           }
         } else {
-          if (selectedPass && !usersPass) {
-            // If user (for some reason) buys a free pass (if any exists)
-            // we then immediately followUp the Booking Process
-            const followUpBooking = await bookClass({
-              inventory_id: parseInt(match.params.inventory_id),
-              user_timezone_offset: new Date().getTimezoneOffset(),
-              user_timezone: getCurrentLongTimezone(),
-              payment_source: paymentSource.CLASS_PASS,
-              source_id: data.pass_order_id,
-            });
+          if (selectedPass) {
+            if (!usersPass) {
+              // If user (for some reason) buys a free pass (if any exists)
+              // we then immediately followUp the Booking Process
+              const followUpBooking = await bookClass({
+                inventory_id: parseInt(match.params.inventory_id),
+                user_timezone_offset: new Date().getTimezoneOffset(),
+                user_timezone: getCurrentLongTimezone(),
+                payment_source: paymentSource.CLASS_PASS,
+                source_id: data.pass_order_id,
+              });
 
-            if (isAPISuccess(followUpBooking.status)) {
-              showBookingSuccessModal(userEmail, usersPass, true);
+              if (isAPISuccess(followUpBooking.status)) {
+                showBookingSuccessModal(userEmail, selectedPass, true);
+              }
+            } else {
+              showBookingSuccessModal(userEmail, selectedPass, true);
             }
           } else {
             showBookingSuccessModal(userEmail);
