@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
-import { DeleteFilled, TeamOutlined } from '@ant-design/icons';
+import { DeleteFilled } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -463,24 +463,9 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   {form.length > 1 && (
                     <Col xs={2} md={2}>
-                      {slot?.num_participants > 0 ? (
-                        <Tooltip
-                          title={`Unable to update this session as ${slot?.num_participants} participants have already registered`}
-                        >
-                          <Badge count={slot?.num_participants} size="small">
-                            <TeamOutlined />
-                          </Badge>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Delete">
-                          <Button
-                            disabled={slot?.num_participants && slot?.num_participants > 0}
-                            shape="circle"
-                            onClick={() => handleDeleteSlot(index)}
-                            icon={<DeleteFilled />}
-                          />
-                        </Tooltip>
-                      )}
+                      <Tooltip title="Delete">
+                        <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
+                      </Tooltip>
                     </Col>
                   )}
                 </Row>
