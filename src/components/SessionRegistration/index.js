@@ -286,21 +286,7 @@ const SessionRegistration = ({
             {user && userPasses.length > 0 ? (
               <div>
                 <Title level={5}> Purchased pass(es) usable for this class </Title>
-                <Table
-                  columns={userPassesColumns}
-                  data={userPasses}
-                  rowKey={(record) => record.pass_order_id}
-                  rowSelection={{
-                    hideSelectAll: true,
-                    selectedRowKeys: selectedPass ? [selectedPass.pass_order_id] : [],
-                    type: 'radio',
-                    onSelect: (record, selected, _, e) => {
-                      if (selected) {
-                        setSelectedPass(record);
-                      }
-                    },
-                  }}
-                />
+                <Table columns={userPassesColumns} data={userPasses} rowKey={(record) => record.pass_order_id} />
               </div>
             ) : (
               <>
