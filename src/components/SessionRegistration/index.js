@@ -68,6 +68,15 @@ const SessionRegistration = ({
   const singleClassColumns = [
     {
       title: '',
+      dataIndex: 'id',
+      key: 'id',
+      width: '18px',
+      render: (text, record) => (
+        <div className={selectedPass ? styles.roundBtn : styles.roundBtnActive} onClick={() => setSelectedPass(null)} />
+      ),
+    },
+    {
+      title: '',
       dataIndex: 'name',
       key: 'name',
       align: 'left',
@@ -84,6 +93,18 @@ const SessionRegistration = ({
   ];
 
   const passesColumns = [
+    {
+      title: '',
+      dataIndex: 'id',
+      key: 'id',
+      width: '18px',
+      render: (text, record) => (
+        <div
+          className={selectedPass?.id === record.id ? styles.roundBtnActive : styles.roundBtn}
+          onClick={() => setSelectedPass(record)}
+        />
+      ),
+    },
     {
       title: 'Pass Name',
       dataIndex: 'name',
@@ -280,16 +301,6 @@ const SessionRegistration = ({
                         columns={singleClassColumns}
                         data={[classDetails]}
                         rowKey={(record) => 'dropIn'}
-                        rowSelection={{
-                          hideSelectAll: true,
-                          selectedRowKeys: selectedPass ? [] : ['dropIn'],
-                          type: 'radio',
-                          onSelect: (record, selected, _, e) => {
-                            if (selected) {
-                              setSelectedPass(null);
-                            }
-                          },
-                        }}
                       />
                     </div>
 
@@ -303,17 +314,6 @@ const SessionRegistration = ({
                           expandedRowRender: renderClassesList,
                           expandIconColumnIndex: -1,
                           expandedRowKeys: expandedRowKeys,
-                        }}
-                        rowSelection={{
-                          selectedRowKeys: selectedPass ? [selectedPass.id] : [],
-                          checkStrictly: true,
-                          hideSelectAll: true,
-                          type: 'radio',
-                          onSelect: (record, selected, _, e) => {
-                            if (selected) {
-                              setSelectedPass(record);
-                            }
-                          },
                         }}
                       />
                     </div>

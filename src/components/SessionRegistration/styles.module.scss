@@ -39,6 +39,24 @@
   }
 }
 
+.roundBtn {
+  cursor: pointer;
+  margin-top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  border: solid 1px map-get($colors, 'NightRider');
+}
+.roundBtn:hover{
+  border: solid 1px map-get($colors, 'DodgerBlue');
+}
+.roundBtnActive {
+  @extend .roundBtn;
+  padding: 2px;
+  background-color: map-get($map: $colors, $key: 'DodgerBlue');
+  border: solid 1px map-get($map: $colors, $key: 'DodgerBlue');
+}
+
 @media (max-width: 768px) {
   .nameInput {
     max-width: 100%;
