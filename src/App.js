@@ -19,7 +19,7 @@ import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
 import Session from 'pages/Session';
-import SessionDetails from 'pages/InventoryDetails';
+import InventoryDetails from 'pages/InventoryDetails';
 import CreatorDashboard from 'pages/CreatorDashboard';
 import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
@@ -106,7 +106,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+        <RouteWithLayout layout={DefaultLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />

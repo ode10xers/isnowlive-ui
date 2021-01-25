@@ -41,7 +41,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-const SessionDetails = ({ match, history }) => {
+const InventoryDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
@@ -468,4 +468,4 @@ const SessionDetails = ({ match, history }) => {
   );
 };
 
-export default SessionDetails;
+export default InventoryDetails;

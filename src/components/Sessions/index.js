@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MobileDetect from 'mobile-detect';
 import ReactHtmlParser from 'react-html-parser';
 import { Card, Image, Row, Col, Typography, Empty, Button } from 'antd';
+
+import SessionCards from 'components/SessionCards';
 
 import { isValidFile, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
@@ -23,10 +25,11 @@ const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [sessionCount, setSessionCount] = useState(4);
+  const [reformattedSessions, setReformattedSessions] = useState([]);
 
   const showMore = () => {
     trackSimpleEvent(user.click.profile.showMore);
-    if (sessionCount <= sessions.length) {
+    if (sessionCount <= reformattedSessions.length) {
       setSessionCount(sessionCount + 4);
     }
   };
@@ -65,14 +68,44 @@ const Sessions = ({ sessions, username }) => {
     window.open(`${baseurl}/e/${inventory_id}`);
   };
 
+  useEffect(() => {
+    reformatSessions();
+    //eslint-disable-next-line
+  }, []);
+
+  const reformatSessions = () => {
+    let formattedSessions = [];
+
+    sessions.forEach((inventory) => {
+      const foundSessionIndex = formattedSessions.findIndex((val) => val.session_id === inventory.session_id);
+
+      if (foundSessionIndex >= 0) {
+        formattedSessions[foundSessionIndex].inventory.push(inventory);
+      } else {
+        formattedSessions.push({
+          session_id: inventory.session_id,
+          session_image_url: inventory.session_image_url,
+          name: inventory.name,
+          group: inventory.group,
+          description: inventory.description,
+          username: username,
+          inventory: [inventory],
+        });
+      }
+    });
+
+    setReformattedSessions(formattedSessions);
+  };
+
   return (
     <div className={styles.box}>
       <Row justify="space-around">
-        {sessions && sessions.length ? (
+        {reformattedSessions && reformattedSessions.length ? (
           <>
-            {sessions.slice(0, sessionCount).map((session) => (
+            <SessionCards sessions={reformattedSessions.slice(0, sessionCount)} shouldFetchInventories={false} />
+            {/* {reformattedSessions.slice(0, sessionCount).map((session) => (
               <div key={session.id}>
-                {session.name && (
+                {{session.name && (
                   <Col xs={24}>
                     <Card
                       hoverable
@@ -108,10 +141,10 @@ const Sessions = ({ sessions, username }) => {
                       </Row>
                     </Card>
                   </Col>
-                )}
+                )}}
               </div>
-            ))}
-            {sessionCount < sessions.length && (
+            ))} */}
+            {sessionCount < reformattedSessions.length && (
               <Col span={24} className={styles.textAlignCenter}>
                 <Button type="primary" onClick={() => showMore()}>
                   Show more
