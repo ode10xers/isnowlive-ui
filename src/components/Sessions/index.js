@@ -22,12 +22,12 @@ const { user } = mixPanelEventTags;
 const Sessions = ({ sessions, username }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  const [sessionCount, setSessionCount] = useState(4);
+  const [sessionCount, setSessionCount] = useState(6);
 
   const showMore = () => {
     trackSimpleEvent(user.click.profile.showMore);
     if (sessionCount <= sessions.length) {
-      setSessionCount(sessionCount + 4);
+      setSessionCount(sessionCount + 6);
     }
   };
 
@@ -114,7 +114,7 @@ const Sessions = ({ sessions, username }) => {
             {sessionCount < sessions.length && (
               <Col span={24} className={styles.textAlignCenter}>
                 <Button type="primary" onClick={() => showMore()}>
-                  Show more
+                  Click to show more
                 </Button>
               </Col>
             )}
