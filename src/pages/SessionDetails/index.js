@@ -30,13 +30,13 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
+import { SessionInventorySelect } from 'components/SessionInventorySelect/SessionInventorySelect';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 const { Title } = Typography;
 const {
-  formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
@@ -55,6 +55,7 @@ const SessionDetails = ({ match, history }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState(null);
 
   const getDetails = useCallback(
     async (username, session_id) => {
@@ -186,7 +187,7 @@ const SessionDetails = ({ match, history }) => {
       if (selectedPass) {
         payload = {
           ...payload,
-          inventory_id: parseInt(match.params.session_id), //TODO: Adjust changes here
+          inventory_id: parseInt(selectedInventory.inventory_id),
         };
       }
 
@@ -217,7 +218,7 @@ const SessionDetails = ({ match, history }) => {
     try {
       // Default payload if user book single class
       let payload = {
-        inventory_id: parseInt(match.params.session_id), //TODO: Adjust changes here
+        inventory_id: parseInt(selectedInventory.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
@@ -262,7 +263,7 @@ const SessionDetails = ({ match, history }) => {
               // If user (for some reason) buys a free pass (if any exists)
               // we then immediately followUp the Booking Process
               const followUpBooking = await bookClass({
-                inventory_id: parseInt(match.params.session_id), //TODO: Adjust Changes Here
+                inventory_id: parseInt(selectedInventory.inventory_id),
                 user_timezone_offset: new Date().getTimezoneOffset(),
                 user_timezone: getCurrentLongTimezone(),
                 payment_source: paymentSource.CLASS_PASS,
@@ -374,9 +375,6 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={13}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
-        {/* <Col xs={24} lg={11}>
-          <SessionDate schedule={session} />
-        </Col> */}
       </Row>
       <Row justify="space-between" className={styles.mt50}>
         <Col xs={24} lg={12}>
@@ -424,44 +422,54 @@ const SessionDetails = ({ match, history }) => {
             </>
           )}
         </Col>
-        <Col xs={24} lg={1}></Col>
-        <Col xs={24} lg={9}>
+        <Col xs={24} lg={{ span: 8, offset: 1 }}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={showSignInForm ? 14 : 18} className={styles.mt50}>
-          {session?.end_time &&
-            getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
-            (showSignInForm ? (
-              <SignInForm
-                user={currentUser}
-                onSetNewPassword={handleSendNewPasswordEmail}
-                hideSignInForm={() => hideSignInForm()}
-              />
-            ) : (
-              <SessionRegistration
-                user={currentUser}
-                showPasswordField={showPasswordField}
-                onFinish={onFinish}
-                onSetNewPassword={handleSendNewPasswordEmail}
-                showSignInForm={() => {
-                  setShowPasswordField(false);
-                  setShowSignInForm(true);
-                }}
-                availablePasses={availablePasses}
-                userPasses={userPasses}
-                setSelectedPass={setSelectedPass}
-                selectedPass={selectedPass}
-                classDetails={session}
-                logOut={() => {
-                  logOut(history, true);
-                  setCurrentUser(null);
-                  setSelectedPass(null);
-                  setUserPasses([]);
-                  setShowSignInForm(true);
-                }}
-              />
-            ))}
+        <Col xs={24} lg={15} className={styles.mt50}>
+          {showSignInForm ? (
+            <SignInForm
+              user={currentUser}
+              onSetNewPassword={handleSendNewPasswordEmail}
+              hideSignInForm={() => hideSignInForm()}
+            />
+          ) : (
+            <SessionRegistration
+              user={currentUser}
+              showPasswordField={showPasswordField}
+              onFinish={onFinish}
+              onSetNewPassword={handleSendNewPasswordEmail}
+              showSignInForm={() => {
+                setShowPasswordField(false);
+                setShowSignInForm(true);
+              }}
+              availablePasses={availablePasses}
+              userPasses={userPasses}
+              setSelectedPass={setSelectedPass}
+              selectedPass={selectedPass}
+              classDetails={session}
+              selectedInventory={selectedInventory}
+              logOut={() => {
+                logOut(history, true);
+                setCurrentUser(null);
+                setSelectedPass(null);
+                setUserPasses([]);
+                setShowSignInForm(true);
+              }}
+            />
+          )}
         </Col>
+        {!showSignInForm && (
+          <Col xs={24} lg={{ span: 8, offset: 1 }} className={styles.mt50}>
+            <SessionInventorySelect
+              inventories={session?.inventory.sort((a, b) => moment(a.start_time).isBefore(moment(b.start_time))) || []}
+              selectedSlot={selectedInventory}
+              handleSubmit={(val) => {
+                console.log(val);
+                setSelectedInventory(val);
+              }}
+            />
+          </Col>
+        )}
       </Row>
     </Loader>
   );

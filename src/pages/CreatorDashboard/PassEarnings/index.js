@@ -19,7 +19,7 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
-  formatDate: { toLongDateWithDay, toLongDateWithTime },
+  formatDate: { toLongDateWithTime },
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 

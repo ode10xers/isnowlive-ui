@@ -33,6 +33,7 @@ const SessionRegistration = ({
   userPasses = [],
   setSelectedPass,
   selectedPass = null,
+  selectedInventory,
   classDetails,
   logOut,
 }) => {
@@ -338,7 +339,7 @@ const SessionRegistration = ({
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10}>
                 <Col>
-                  <Button type="primary" htmlType="submit">
+                  <Button type="primary" htmlType="submit" disabled={!selectedInventory}>
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
