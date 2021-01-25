@@ -155,6 +155,18 @@ const SessionRegistration = ({
 
   const userPassesColumns = [
     {
+      title: '',
+      dataIndex: 'id',
+      key: 'id',
+      width: '18px',
+      render: (text, record) => (
+        <div
+          className={selectedPass?.id === record.id ? styles.roundBtnActive : styles.roundBtn}
+          onClick={() => setSelectedPass(record)}
+        />
+      ),
+    },
+    {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
