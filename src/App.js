@@ -19,7 +19,7 @@ import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
 import Session from 'pages/Session';
-import SessionDetails from 'pages/SessionDetails';
+import SessionDetails from 'pages/InventoryDetails';
 import CreatorDashboard from 'pages/CreatorDashboard';
 import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
