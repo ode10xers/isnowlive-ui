@@ -114,7 +114,7 @@ const Sessions = ({ sessions, username }) => {
             {sessionCount < sessions.length && (
               <Col span={24} className={styles.textAlignCenter}>
                 <Button type="primary" onClick={() => showMore()}>
-                  Click to show more
+                  View more sessions
                 </Button>
               </Col>
             )}

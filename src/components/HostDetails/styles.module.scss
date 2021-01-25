@@ -37,8 +37,12 @@
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
   }
 
-  max-height: 280px;
+  max-height: 240px;
   overflow: hidden;
+}
+
+.readMoreText {
+  margin-top: 10px !important;
 }
 
 .longTextExpanded {
