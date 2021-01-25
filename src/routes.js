@@ -27,7 +27,8 @@ const Routes = {
     editProfile: '/profile/edit',
     livestream: '/livestream',
     paymentAccount: '/payments',
-    sessionEarnings: '/payments/:inventory_id',
+    sessionEarnings: '/payments/inventory/:inventory_id',
+    passEarnings: '/payments/pass/:pass_id',
     passes: '/passes',
   },
   attendeeDashboard: {
