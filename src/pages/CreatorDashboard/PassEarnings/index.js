@@ -31,7 +31,7 @@ const PassEarnings = ({ match }) => {
   const getEarningData = useCallback(
     async (pass_id) => {
       try {
-        const { status, data } = await apis.passes.getEarningsByInventoryId(pass_id);
+        const { status, data } = await apis.passes.getEarningsByPassId(pass_id);
         if (isAPISuccess(status)) {
           setIsLoading(false);
           setEarnings(data);
