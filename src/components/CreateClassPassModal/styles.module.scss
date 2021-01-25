@@ -20,3 +20,13 @@
   color: map-get($map: $colors, $key: 'SuvaGrey') !important;
   font-size: 12px;
 }
+
+.colorPicker {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.colorPickerPreview {
+  border-width: 18px;
+  border-style: solid;
+}
