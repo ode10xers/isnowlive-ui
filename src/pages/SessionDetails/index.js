@@ -13,7 +13,6 @@ import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SignInForm from 'components/SignInForm';
 import HostDetails from 'components/HostDetails';
-import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';

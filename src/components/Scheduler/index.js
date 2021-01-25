@@ -464,18 +464,24 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   {form.length > 1 && (
                     <Col xs={2} md={2}>
-                      <Tooltip
-                        title={
-                          <Paragraph>
-                            This is an existing slot which is already booked but{' '}
-                            <Text strong> you can still delete it </Text> and modify this and future dates
-                          </Paragraph>
-                        }
-                      >
-                        <Badge dot>
+                      {slot?.num_participants > 0 ? (
+                        <Tooltip
+                          title={
+                            <Paragraph>
+                              This is an existing slot which is already booked but{' '}
+                              <Text strong> you can still delete it </Text> and modify this and future dates
+                            </Paragraph>
+                          }
+                        >
+                          <Badge dot>
+                            <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
+                          </Badge>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title="Delete">
                           <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
-                        </Badge>
-                      </Tooltip>
+                        </Tooltip>
+                      )}
                     </Col>
                   )}
                 </Row>
