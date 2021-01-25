@@ -19,7 +19,7 @@ const {
   formatDate: { getISODayOfWeek },
 } = dateUtil;
 
-const SessionCards = ({ sessions, shouldFetchInventories = false, username = null }) => {
+const SessionCards = ({ sessions, shouldFetchInventories = true, username = null }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
