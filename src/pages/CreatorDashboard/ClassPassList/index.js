@@ -18,7 +18,7 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
-  formatDate: { toLongDateWithLongDay },
+  formatDate: { toDateAndTime },
 } = dateUtil;
 
 const ClassPassList = () => {
@@ -223,7 +223,7 @@ const ClassPassList = () => {
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
       width: '30%',
-      render: (text, record) => toLongDateWithLongDay(record.date_of_purchase),
+      render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
       title: 'Net Price',

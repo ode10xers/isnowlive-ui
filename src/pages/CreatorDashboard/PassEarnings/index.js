@@ -75,11 +75,6 @@ const PassEarnings = ({ match }) => {
 
   const showPassName = showPassLayout('Pass Name', <Title level={3}>{earnings?.name}</Title>);
 
-  const showPassDate = showPassLayout(
-    'Pass Day and Date',
-    <Title level={3}>{toLongDateWithDay(earnings?.session_date)}</Title>
-  );
-
   const showPassEarnings = showPassLayout(
     'Total Earning',
     <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency} />
@@ -200,11 +195,8 @@ const PassEarnings = ({ match }) => {
           <Col xs={24} md={24}>
             <Title level={5}>Pass Earning Details</Title>
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} md={16}>
             {showPassName}
-          </Col>
-          <Col xs={24} md={8}>
-            {showPassDate}
           </Col>
           <Col xs={24} md={8}>
             {showPassEarnings}
