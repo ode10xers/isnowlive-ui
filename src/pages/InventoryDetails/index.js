@@ -453,6 +453,7 @@ const InventoryDetails = ({ match, history }) => {
                 setSelectedPass={setSelectedPass}
                 selectedPass={selectedPass}
                 classDetails={session}
+                selectedInventory={session}
                 logOut={() => {
                   logOut(history, true);
                   setCurrentUser(null);

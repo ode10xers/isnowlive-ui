@@ -32,11 +32,13 @@
     color: map-get($colors, 'Charcoal') !important;
   }
 
-  .linkButton {
-    // padding: 0px !important;
-    cursor: pointer;
-    color: map-get($colors, 'DodgerBlue') !important;
-  }
+  
+}
+
+.linkBtn {
+  padding: 0px !important;
+  cursor: pointer;
+  color: map-get($colors, 'DodgerBlue') !important;
 }
 
 .roundBtn {
@@ -49,12 +51,6 @@
 }
 .roundBtn:hover{
   border: solid 1px map-get($colors, 'DodgerBlue');
-}
-.roundBtnActive {
-  @extend .roundBtn;
-  padding: 2px;
-  background-color: map-get($map: $colors, $key: 'DodgerBlue');
-  border: solid 1px map-get($map: $colors, $key: 'DodgerBlue');
 }
 
 @media (max-width: 768px) {

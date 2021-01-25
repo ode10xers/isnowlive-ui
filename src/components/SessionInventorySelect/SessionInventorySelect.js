@@ -49,14 +49,16 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
 
   const dateCellRender = (date) => {
     const filteredInventory = filterSessionByDate(date);
-    return filteredInventory.length ? <ul className={styles.events}></ul> : null;
+    return filteredInventory.length ? (
+      <ul className={isSameOrBeforeToday(date) ? styles.pastEvents : styles.events}></ul>
+    ) : null;
   };
 
   const showSlots = (slot) => {
     if (selectedSlot && selectedSlot.inventory_id === slot.inventory_id) {
       return (
         <>
-          <Col xs={12}>
+          <Col xs={24}>
             <Button shape="round" className={styles.slotBtn} type="primary" onClick={() => handleSubmit(null)}>
               {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
             </Button>
@@ -65,7 +67,7 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
       );
     }
     return (
-      <Col xs={12}>
+      <Col xs={24}>
         <Button shape="round" className={styles.slotBtn} type="secondary" onClick={() => handleSubmit(slot)}>
           {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
         </Button>
@@ -96,7 +98,9 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
               <Text type="secondary"> {slots?.length > 0 ? 'Select time' : 'No timeslot available'} </Text>
             </Col>
             <Col xs={24} className={styles.mt10}>
-              <Row justify="center">{slots?.map(showSlots)}</Row>
+              <Row justify="center" gutter={[8, 8]}>
+                {slots?.map(showSlots)}
+              </Row>
             </Col>
           </Row>
         </Col>

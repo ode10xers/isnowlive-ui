@@ -74,7 +74,11 @@ const ClassPasses = ({ passes }) => {
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
-      title: '',
+      title: (
+        <Button shape="round" type="primary" onClick={() => toggleExpandAll()}>
+          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ),
       align: 'right',
       render: (text, record) => (
         <>
@@ -111,17 +115,14 @@ const ClassPasses = ({ passes }) => {
       <PurchasePassModal visible={showPurchasePassModal} pass={selectedPass} closeModal={closePurchaseModal} />
       <Row gutter={[16, 16]}>
         <Col xs={20}>
+          <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
           <Paragraph>
-            Et quo magnam dignissimos eveniet nulla dolor. Voluptatibus et tempora ut ut rerum accusantium ducimus quos
-            quod. Ut quisquam perspiciatis suscipit neque. Itaque nam et laudantium praesentium voluptate. Dicta et
-            doloremque.
+            Check out the passes below and the classes included in them. Once you have bought the pass you can use the
+            class credits to pay for classes in 1 click it wihout needing to touch your wallet again. Class pass is
+            valid from from the date you buy it until the validity period.
           </Paragraph>
         </Col>
-        <Col xs={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
-        </Col>
+        <Col xs={4}></Col>
         <Col xs={24}>
           <Table
             sticky={true}

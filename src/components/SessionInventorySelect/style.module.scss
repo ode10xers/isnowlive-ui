@@ -13,6 +13,12 @@
   padding: 10px 13px !important;
   border-radius: 5px;
 }
+
+.pastEvents {
+  @extend .events;
+  border: 2px solid map-get($colors, 'DarkGray');
+}
+
 .slotWrapper {
   margin: 10px;
   text-align: center;

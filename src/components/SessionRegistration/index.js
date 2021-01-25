@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Row, Col, Button, Form, Input, Typography, Tag } from 'antd';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import Routes from 'routes';
 
@@ -71,9 +71,14 @@ const SessionRegistration = ({
       dataIndex: 'id',
       key: 'id',
       width: '18px',
-      render: (text, record) => (
-        <div className={selectedPass ? styles.roundBtn : styles.roundBtnActive} onClick={() => setSelectedPass(null)} />
-      ),
+      render: (text, record) =>
+        selectedPass ? (
+          <div className={styles.roundBtn} onClick={() => setSelectedPass(null)} />
+        ) : (
+          <div onClick={() => setSelectedPass(null)}>
+            <CheckCircleTwoTone />
+          </div>
+        ),
     },
     {
       title: '',
@@ -98,12 +103,14 @@ const SessionRegistration = ({
       dataIndex: 'id',
       key: 'id',
       width: '18px',
-      render: (text, record) => (
-        <div
-          className={selectedPass?.id === record.id ? styles.roundBtnActive : styles.roundBtn}
-          onClick={() => setSelectedPass(record)}
-        />
-      ),
+      render: (text, record) =>
+        selectedPass?.id === record.id ? (
+          <div onClick={() => setSelectedPass(record)}>
+            <CheckCircleTwoTone />
+          </div>
+        ) : (
+          <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
+        ),
     },
     {
       title: 'Pass Name',
@@ -116,7 +123,7 @@ const SessionRegistration = ({
       dataIndex: 'validity',
       key: 'validity',
       align: 'right',
-      width: '13%',
+      width: '15%',
       render: (text, record) => `${record.validity} day${parseInt(record.validity) > 1 ? 's' : ''}`,
     },
     {
@@ -125,7 +132,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'left',
       sortOrder: 'descend',
-      width: '13%',
+      width: '15%',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
@@ -141,11 +148,11 @@ const SessionRegistration = ({
           : 'Unlimited Classes ';
 
         return expandedRowKeys.includes(record.id) ? (
-          <Button type="link" onClick={() => collapseRow(record.id)}>
+          <Button className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
             {btnText} <UpOutlined />
           </Button>
         ) : (
-          <Button type="link" onClick={() => expandRow(record.id)}>
+          <Button className={styles.linkBtn} type="link" onClick={() => expandRow(record.id)}>
             {btnText} <DownOutlined />
           </Button>
         );
@@ -159,12 +166,14 @@ const SessionRegistration = ({
       dataIndex: 'id',
       key: 'id',
       width: '18px',
-      render: (text, record) => (
-        <div
-          className={selectedPass?.id === record.id ? styles.roundBtnActive : styles.roundBtn}
-          onClick={() => setSelectedPass(record)}
-        />
-      ),
+      render: (text, record) =>
+        selectedPass?.id === record.id ? (
+          <div onClick={() => setSelectedPass(record)}>
+            <CheckCircleTwoTone />
+          </div>
+        ) : (
+          <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
+        ),
     },
     {
       title: 'Pass Name',
@@ -273,11 +282,11 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               {user ? (
-                <Button type="link" onClick={() => logOut()}>
+                <Button className={styles.linkBtn} type="link" onClick={() => logOut()}>
                   Not this account? Logout
                 </Button>
               ) : (
-                <Button type="link" onClick={() => showSignInForm()}>
+                <Button className={styles.linkBtn} type="link" onClick={() => showSignInForm()}>
                   Already have an account? Sign In
                 </Button>
               )}
@@ -286,7 +295,12 @@ const SessionRegistration = ({
             {user && userPasses.length > 0 ? (
               <div>
                 <Title level={5}> Purchased pass(es) usable for this class </Title>
-                <Table columns={userPassesColumns} data={userPasses} rowKey={(record) => record.pass_order_id} />
+                <Table
+                  size="small"
+                  columns={userPassesColumns}
+                  data={userPasses}
+                  rowKey={(record) => record.pass_order_id}
+                />
               </div>
             ) : (
               <>
@@ -295,6 +309,7 @@ const SessionRegistration = ({
                     <div>
                       <Title level={5}> Book this class </Title>
                       <Table
+                        size="small"
                         showHeader={false}
                         columns={singleClassColumns}
                         data={[classDetails]}
@@ -305,6 +320,7 @@ const SessionRegistration = ({
                     <div className={styles.mt20}>
                       <Title level={5}> Buy pass & book this class </Title>
                       <Table
+                        size="small"
                         columns={passesColumns}
                         data={availablePasses}
                         rowKey={(record) => record.id}
