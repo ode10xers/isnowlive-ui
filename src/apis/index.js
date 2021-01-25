@@ -43,7 +43,7 @@ export default {
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
     getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
     getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
-    getInventoriesForSession: (sessionId) => http.get(`/session/${sessionId}`),
+    getSessionDetails: (sessionId) => http.get(`/session/${sessionId}`),
     getRescheduleableSessionsByPrice: (creatorName, price) =>
       http.get(`/sessions/${creatorName}/reschedulable?price=${price}`),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),

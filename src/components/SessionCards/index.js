@@ -31,7 +31,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = false, username = nul
 
   const getDaysForSession = async (sessionId) => {
     try {
-      const { data } = await apis.session.getInventoriesForSession(sessionId);
+      const { data } = await apis.session.getSessionDetails(sessionId);
       return mapInventoryDays(data.inventory);
     } catch (error) {
       message.error('Something wrong happened!');
