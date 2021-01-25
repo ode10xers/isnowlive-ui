@@ -58,6 +58,8 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
   };
 
   const redirectToSessionsPage = (session) => {
+    console.log(session);
+    console.log(username);
     const baseUrl = generateUrlFromUsername(username || session.username || 'app');
     window.open(`${baseUrl}/s/${session.session_id}`);
   };
@@ -74,7 +76,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
           {adjustedSessions && adjustedSessions.length > 0 ? (
             <>
               {adjustedSessions.map((session) => (
-                <Col span={24} key={session.session_id}>
+                <Col span={24} key={session.key || session.session_id}>
                   <Card
                     className={styles.sessionCard}
                     bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}

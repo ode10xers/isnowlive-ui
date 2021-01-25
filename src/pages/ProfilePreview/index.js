@@ -110,7 +110,17 @@ const ProfilePreview = ({ username = null }) => {
       const { data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (data) {
-        setPasses(data);
+        setPasses(
+          data.map((pass) => ({
+            ...pass,
+            sessions:
+              pass.sessions?.map((session) => ({
+                ...session,
+                key: `${pass.id}_${session.session_id}`,
+                username: profileUsername,
+              })) || [],
+          }))
+        );
         setIsPassesLoading(false);
       }
     } catch (error) {
