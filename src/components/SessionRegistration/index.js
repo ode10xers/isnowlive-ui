@@ -210,7 +210,7 @@ const SessionRegistration = ({
       </Col>
       <Col xs={24}>
         <div className={classNames(styles.ml20, styles.mt10)}>
-          {record.sessions.slice(0, 11).map((session) => (
+          {record.sessions.map((session) => (
             <Tag color="blue"> {session.name} </Tag>
           ))}
         </div>
@@ -274,7 +274,7 @@ const SessionRegistration = ({
             </Col>
             <Col xs={24}>
               <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.slice(0, 11).map((session) => (
+                {pass.sessions.map((session) => (
                   <Tag color="blue"> {session.name} </Tag>
                 ))}
               </div>

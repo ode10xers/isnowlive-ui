@@ -158,7 +158,7 @@ const ClassPasses = ({ passes }) => {
             </Col>
             <Col xs={24}>
               <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.slice(0, 11).map((session) => (
+                {pass.sessions.map((session) => (
                   <Tag color="blue"> {session.name} </Tag>
                 ))}
               </div>
