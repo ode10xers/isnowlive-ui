@@ -39,6 +39,7 @@ const SessionRegistration = ({
   selectedInventory,
   classDetails,
   logOut,
+  username,
 }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
@@ -203,6 +204,11 @@ const SessionRegistration = ({
     },
   ];
 
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(session.username || window.location.hostname.split('.')[0] || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
+  };
+
   const renderClassesList = (record) => (
     <Row>
       <Col xs={24}>
@@ -211,7 +217,10 @@ const SessionRegistration = ({
       <Col xs={24}>
         <div className={classNames(styles.ml20, styles.mt10)}>
           {record.sessions.map((session) => (
-            <Tag color="blue"> {session.name} </Tag>
+            <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+              {' '}
+              {session.name}{' '}
+            </Tag>
           ))}
         </div>
       </Col>
@@ -275,7 +284,10 @@ const SessionRegistration = ({
             <Col xs={24}>
               <div className={classNames(styles.ml20, styles.mt10)}>
                 {pass.sessions.map((session) => (
-                  <Tag color="blue"> {session.name} </Tag>
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
                 ))}
               </div>
             </Col>

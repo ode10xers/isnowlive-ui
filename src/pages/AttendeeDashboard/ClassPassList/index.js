@@ -12,6 +12,7 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -89,6 +90,11 @@ const ClassPassList = () => {
   useEffect(() => {
     getPassesForAttendee();
   }, [getPassesForAttendee]);
+
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(session.username || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
+  };
 
   const toggleExpandAllActivePasses = () => {
     if (expandedActiveRowKeys.length > 0) {
@@ -245,7 +251,10 @@ const ClassPassList = () => {
             <Col xs={24}>
               <div className={classNames(styles.ml20, styles.mt10)}>
                 {pass.sessions.map((session) => (
-                  <Tag color="blue"> {session.name} </Tag>
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
                 ))}
               </div>
             </Col>
