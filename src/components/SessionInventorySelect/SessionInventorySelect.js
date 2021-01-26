@@ -19,9 +19,7 @@ const {
 } = dateUtil;
 
 export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
-  const [selectedDate, setSelectedDate] = useState(
-    toLongDate(inventories.length > 0 ? moment(inventories[0].start_time) : moment())
-  );
+  const [selectedDate, setSelectedDate] = useState(toLongDate(moment(selectedSlot?.start_time)));
   const [slots, setSlots] = useState([]);
 
   const filterSessionByDate = useCallback(
@@ -113,6 +111,7 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
               onSelect={handleOnSelect}
               dateCellRender={dateCellRender}
               defaultValue={moment(selectedSlot?.start_time)}
+              value={moment(selectedSlot?.start_time)}
             />
           </div>
         </Col>
