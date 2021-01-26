@@ -53,7 +53,7 @@ const ProfilePreview = ({ username = null }) => {
   const [profile, setProfile] = useState({});
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [view, setView] = useState('list');
-  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
+  const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(0);
   const [isListLoading, setIsListLoading] = useState(false);
