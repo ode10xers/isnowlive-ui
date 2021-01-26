@@ -19,7 +19,7 @@ const {
 } = dateUtil;
 
 export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
-  const [selectedDate, setSelectedDate] = useState(toLongDate(moment()));
+  const [selectedDate, setSelectedDate] = useState(moment(selectedSlot?.start_time).format());
   const [slots, setSlots] = useState([]);
 
   const filterSessionByDate = useCallback(
@@ -35,7 +35,7 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
 
   const handleOnSelect = useCallback(
     (date) => {
-      setSelectedDate(toLongDate(date));
+      setSelectedDate(date);
       const filteredInventory = filterSessionByDate(date);
       if (filteredInventory && filteredInventory.length) {
         setSlots(filteredInventory);
@@ -48,7 +48,6 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
 
   useEffect(() => {
     if (selectedSlot) {
-      console.log(selectedSlot);
       handleOnSelect(moment(selectedSlot.start_time));
     } else {
       handleOnSelect(moment());
@@ -111,14 +110,14 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
               disabledDate={handleDisableDate}
               onSelect={handleOnSelect}
               dateCellRender={dateCellRender}
-              defaultValue={moment(selectedSlot?.start_time)}
+              value={moment(selectedDate)}
             />
           </div>
         </Col>
         <Col xs={24}>
           <Row className={styles.slotWrapper}>
             <Col xs={24}>
-              <Title level={4}>{selectedDate}</Title>
+              <Title level={4}>{toLongDate(selectedDate)}</Title>
               <Text type="secondary"> {slots?.length > 0 ? 'Select time' : 'No timeslot available'} </Text>
             </Col>
             <Col xs={24} className={styles.mt10}>

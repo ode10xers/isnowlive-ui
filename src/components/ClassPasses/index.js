@@ -9,14 +9,15 @@ import Table from 'components/Table';
 import SessionCards from 'components/SessionCards';
 import PurchasePassModal from 'components/PurchasePassModal';
 
+import { generateUrlFromUsername } from 'utils/helper';
+
 import styles from './style.module.scss';
 
 const { Text, Paragraph } = Typography;
 
-const ClassPasses = ({ passes }) => {
+const ClassPasses = ({ username, passes }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  console.log(isMobileDevice);
 
   const [selectedPass, setSelectedPass] = useState(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -30,6 +31,11 @@ const ClassPasses = ({ passes }) => {
   const closePurchaseModal = () => {
     setSelectedPass(null);
     setShowPurchasePassModal(false);
+  };
+
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(session.username || username || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
   const toggleExpandAll = () => {
@@ -159,7 +165,10 @@ const ClassPasses = ({ passes }) => {
             <Col xs={24}>
               <div className={classNames(styles.ml20, styles.mt10)}>
                 {pass.sessions.map((session) => (
-                  <Tag color="blue"> {session.name} </Tag>
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
                 ))}
               </div>
             </Col>

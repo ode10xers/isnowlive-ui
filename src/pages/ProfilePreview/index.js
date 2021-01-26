@@ -376,7 +376,7 @@ const ProfilePreview = ({ username = null }) => {
                 <Col span={24}></Col>
                 <Col span={24}>
                   <Loader loading={isPassesLoading} size="large" text="Loading class passes">
-                    <ClassPasses passes={passes} />
+                    <ClassPasses passes={passes} username={username} />
                   </Loader>
                 </Col>
               </Row>

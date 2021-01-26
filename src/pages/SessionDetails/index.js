@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography } from 'antd';
 import classNames from 'classnames';
-import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
 import { loadStripe } from '@stripe/stripe-js';
 
@@ -38,6 +37,7 @@ const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? 
 const { Title } = Typography;
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
@@ -56,7 +56,7 @@ const SessionDetails = ({ match, history }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
-  const [selectedInventory, setSelectedInventory] = useState(null);
+  const [selectedInventory, setSelectedInventory] = useState();
 
   const getDetails = useCallback(
     async (username, session_id) => {
@@ -68,6 +68,10 @@ const SessionDetails = ({ match, history }) => {
         setCreator(userDetails.data);
         setAvailablePasses(passes.data);
         setIsLoading(false);
+        const latestInventories = inventoryDetails.data.inventory
+          .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0))
+          .filter((inventory) => isBeforeDate(inventory.end_time));
+        setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
@@ -480,10 +484,13 @@ const SessionDetails = ({ match, history }) => {
             className={isMobileDevice ? styles.mt20 : styles.mt50}
           >
             <SessionInventorySelect
-              inventories={session?.inventory.sort((a, b) => moment(a.start_time).isBefore(moment(b.start_time))) || []}
+              inventories={
+                session?.inventory.sort((a, b) =>
+                  a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
+                ) || []
+              }
               selectedSlot={selectedInventory}
               handleSubmit={(val) => {
-                console.log(val);
                 setSelectedInventory(val);
               }}
             />
