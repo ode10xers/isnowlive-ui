@@ -26,6 +26,11 @@
     font-size: 14px;
   }
 
+  .tagsDisabled {
+    @extend .tags;
+    opacity: 0.4;
+  }
+
   .sessionDesc {
     p,
     span {
@@ -47,6 +52,12 @@
   .sessionCard {
     .sessionDesc {
       max-height: 120px;
+    }
+
+    .tags {
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
     }
   }
 }

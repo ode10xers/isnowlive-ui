@@ -44,8 +44,13 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
   );
 
   useEffect(() => {
-    handleOnSelect(moment());
-  }, [handleOnSelect]);
+    if (selectedSlot) {
+      console.log(selectedSlot);
+      handleOnSelect(moment(selectedSlot.start_time));
+    } else {
+      handleOnSelect(moment());
+    }
+  }, [handleOnSelect, selectedSlot]);
 
   const dateCellRender = (date) => {
     const filteredInventory = filterSessionByDate(date);
@@ -88,6 +93,7 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
               disabledDate={handleDisableDate}
               onSelect={handleOnSelect}
               dateCellRender={dateCellRender}
+              defaultValue={moment(selectedSlot?.start_time)}
             />
           </div>
         </Col>

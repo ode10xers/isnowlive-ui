@@ -15,24 +15,22 @@
 }
 .emailInput {
   input {
-    max-width: 370px;
+    max-width: 320px;
   }
 }
 .passwordInput {
   span {
-    max-width: 370px;
+    max-width: 320px;
   }
 }
 
 .passwordHelpText {
   margin-top: -30px;
-  max-width: 370px;
+  max-width: 320px;
 
   .span {
     color: map-get($colors, 'Charcoal') !important;
   }
-
-  
 }
 
 .linkBtn {
@@ -58,5 +56,13 @@
     max-width: 100%;
     display: block !important;
     margin-right: 10px !important;
+  }
+
+  .passwordHelpText {
+    font-size: 12px;
+    
+    .linkBtn {
+      font-size: 12px;
+    }
   }
 }

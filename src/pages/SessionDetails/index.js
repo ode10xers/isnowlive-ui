@@ -45,6 +45,7 @@ const SessionDetails = ({ match, history }) => {
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { logIn, logOut } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
@@ -272,16 +273,18 @@ const SessionDetails = ({ match, history }) => {
 
               if (isAPISuccess(followUpBooking.status)) {
                 showBookingSuccessModal(userEmail, selectedPass, true);
+                setIsLoading(false);
               }
             } else {
               showBookingSuccessModal(userEmail, selectedPass, true);
+              setIsLoading(false);
             }
           } else {
             showBookingSuccessModal(userEmail);
+            setIsLoading(false);
           }
         }
       }
-      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
@@ -298,6 +301,7 @@ const SessionDetails = ({ match, history }) => {
   const onFinish = async (values) => {
     try {
       setIsLoading(true);
+      setIncorrectPassword(false);
       // check if user is login
 
       // NOTE: Reason the check have getLocalUserDetails() and not currentUser
@@ -319,7 +323,13 @@ const SessionDetails = ({ match, history }) => {
           }
         } catch (error) {
           setIsLoading(false);
-          message.error(error.response?.data?.message || 'Something went wrong');
+
+          if (error.response?.status === 403) {
+            setIncorrectPassword(true);
+            message.error('Incorrect email or password');
+          } else {
+            message.error(error.response?.data?.message || 'Something went wrong');
+          }
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
@@ -349,6 +359,7 @@ const SessionDetails = ({ match, history }) => {
   const hideSignInForm = () => {
     setShowSignInForm(false);
     setShowPasswordField(false);
+    setIncorrectPassword(false);
 
     const userDetails = getLocalUserDetails();
 
@@ -377,12 +388,11 @@ const SessionDetails = ({ match, history }) => {
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} lg={12}>
+        <Col xs={12}>
           <SessionInfo session={session} />
         </Col>
-        <Col xs={24} lg={9}></Col>
         {creator && (
-          <Col xs={24} lg={3}>
+          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/s/${session.session_id}`}
@@ -422,26 +432,24 @@ const SessionDetails = ({ match, history }) => {
             </>
           )}
         </Col>
-        <Col xs={24} lg={{ span: 8, offset: 1 }}>
+        <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} className={styles.mt50}>
+        <Col xs={24} lg={15} order={isMobileDevice ? 2 : 1} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           {showSignInForm ? (
             <SignInForm
               user={currentUser}
               onSetNewPassword={handleSendNewPasswordEmail}
               hideSignInForm={() => hideSignInForm()}
+              incorrectPassword={incorrectPassword}
             />
           ) : (
             <SessionRegistration
               user={currentUser}
               showPasswordField={showPasswordField}
+              incorrectPassword={incorrectPassword}
               onFinish={onFinish}
               onSetNewPassword={handleSendNewPasswordEmail}
-              showSignInForm={() => {
-                setShowPasswordField(false);
-                setShowSignInForm(true);
-              }}
               availablePasses={availablePasses}
               userPasses={userPasses}
               setSelectedPass={setSelectedPass}
@@ -454,12 +462,23 @@ const SessionDetails = ({ match, history }) => {
                 setSelectedPass(null);
                 setUserPasses([]);
                 setShowSignInForm(true);
+                setIncorrectPassword(false);
+              }}
+              showSignInForm={() => {
+                setShowPasswordField(false);
+                setShowSignInForm(true);
+                setIncorrectPassword(false);
               }}
             />
           )}
         </Col>
         {!showSignInForm && (
-          <Col xs={24} lg={{ span: 8, offset: 1 }} className={styles.mt50}>
+          <Col
+            xs={24}
+            lg={{ span: 8, offset: 1 }}
+            order={isMobileDevice ? 1 : 2}
+            className={isMobileDevice ? styles.mt20 : styles.mt50}
+          >
             <SessionInventorySelect
               inventories={session?.inventory.sort((a, b) => moment(a.start_time).isBefore(moment(b.start_time))) || []}
               selectedSlot={selectedInventory}

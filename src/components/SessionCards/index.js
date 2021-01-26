@@ -82,49 +82,99 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                     bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
                     onClick={() => redirectToSessionsPage(session)}
                   >
-                    <Row gutter={16}>
-                      <Col xs={24} md={8} lg={8}>
-                        <Image
-                          preview={false}
-                          height={100}
-                          className={styles.cardImage}
-                          src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
-                        />
-                      </Col>
-                      <Col xs={24} md={8} lg={10}>
-                        <Row>
-                          <Col xs={24} md={16}>
-                            <Title ellipsis={{ rows: 1 }} level={5}>
-                              {session.name}
-                            </Title>
-                          </Col>
-                          <Col xs={24}>
-                            <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
-                          </Col>
-                        </Row>
-                      </Col>
-                      <Col xs={24} md={8} lg={6}>
-                        <Row>
-                          <Col xs={24}>
-                            {/* For The Available Days */}
-                            <Row gutter={[8, 8]}>
-                              {session.inventory_days.map((days) => (
-                                <Col xs={12} md={8} key={`${session.session_id}_${days}`}>
-                                  <Tag color="blue" className={styles.tags}>
-                                    {isoDayOfWeek[days - 1]}
+                    {isMobileDevice ? (
+                      <Row gutter={[8, 4]}>
+                        <Col xs={24}>
+                          <Image
+                            preview={false}
+                            height={100}
+                            className={styles.cardImage}
+                            src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                          />
+                        </Col>
+                        <Col xs={24}>
+                          <Title ellipsis={{ rows: 1 }} level={5}>
+                            {session.name}
+                          </Title>
+                        </Col>
+                        <Col xs={24}>
+                          <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
+                        </Col>
+                        <Col xs={24}>
+                          <Row gutter={[8, 4]}>
+                            {isoDayOfWeek.map((day, index) => (
+                              <Col xs={6}>
+                                <Tag
+                                  key={`${session.session_id}_day`}
+                                  className={
+                                    session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
+                                  }
+                                  color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
+                                >
+                                  {day}
+                                </Tag>
+                              </Col>
+                            ))}
+                            <Col xs={6}>
+                              <Tag color="cyan" className={styles.tags}>
+                                {session.group ? 'Group' : '1-to-1'}
+                              </Tag>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    ) : (
+                      <Row gutter={16}>
+                        <Col xs={24} md={8}>
+                          <Image
+                            preview={false}
+                            height={100}
+                            className={styles.cardImage}
+                            src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
+                          />
+                        </Col>
+                        <Col xs={24} md={16}>
+                          <Row>
+                            <Col xs={24}>
+                              <Title ellipsis={{ rows: 1 }} level={5}>
+                                {session.name}
+                              </Title>
+                            </Col>
+                            <Col xs={24}>
+                              <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
+                            </Col>
+                            <Col xs={24}>
+                              <Row gutter={8}>
+                                <Col xs={18}>
+                                  <Row gutter={[8, 4]}>
+                                    {isoDayOfWeek.map((day, index) => (
+                                      <Col xs={8} lg={3}>
+                                        <Tag
+                                          key={`${session.session_id}_day`}
+                                          className={
+                                            session.inventory_days.includes(index + 1)
+                                              ? styles.tags
+                                              : styles.tagsDisabled
+                                          }
+                                          color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
+                                        >
+                                          {day}
+                                        </Tag>
+                                      </Col>
+                                    ))}
+                                  </Row>
+                                </Col>
+                                <Col xs={6}>
+                                  <Tag color="cyan" className={styles.tags}>
+                                    {session.group ? 'Group Session' : '1-to-1 Session'}
                                   </Tag>
                                 </Col>
-                              ))}
-                            </Row>
-                          </Col>
-                          <Col xs={24} className={styles.alignBottom}>
-                            <Tag color="cyan" className={styles.tags}>
-                              {session.group ? 'Group Session' : '1-to-1 Session'}
-                            </Tag>
-                          </Col>
-                        </Row>
-                      </Col>
-                    </Row>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    )}
                   </Card>
                 </Col>
               ))}

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import MobileDetect from 'mobile-detect';
+
 import { Row, Col, Typography, Button } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
@@ -11,6 +13,9 @@ import styles from './style.module.scss';
 const { Text, Paragraph } = Typography;
 
 const ClassPasses = ({ passes }) => {
+  const md = new MobileDetect(window.navigator.userAgent);
+  const isMobileDevice = Boolean(md.mobile());
+
   const [selectedPass, setSelectedPass] = useState(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [showPurchasePassModal, setShowPurchasePassModal] = useState(false);
@@ -114,7 +119,7 @@ const ClassPasses = ({ passes }) => {
     <div className={styles.box}>
       <PurchasePassModal visible={showPurchasePassModal} pass={selectedPass} closeModal={closePurchaseModal} />
       <Row gutter={[16, 16]}>
-        <Col xs={20}>
+        <Col xs={24}>
           <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
           <Paragraph>
             Check out the passes below and the classes included in them. Once you have bought the pass you can use the
@@ -122,7 +127,6 @@ const ClassPasses = ({ passes }) => {
             valid from from the date you buy it until the validity period.
           </Paragraph>
         </Col>
-        <Col xs={4}></Col>
         <Col xs={24}>
           <Table
             sticky={true}

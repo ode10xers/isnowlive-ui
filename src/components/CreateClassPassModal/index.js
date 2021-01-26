@@ -84,7 +84,6 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   useEffect(() => {
     if (visible) {
       if (editedPass) {
-        console.log(editedPass);
         form.setFieldsValue({
           passName: editedPass.name,
           classList: editedPass.sessions.map((session) => session.session_id),
@@ -98,6 +97,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
         setColorCode(editedPass.color_code || whiteColor);
+        form.validateFields(['classList']);
       } else {
         form.resetFields();
       }

@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import MobileDetect from 'mobile-detect';
+
 import { Row, Col, Button, Form, Input, Typography, Tag } from 'antd';
 import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
@@ -26,6 +28,7 @@ const {
 const SessionRegistration = ({
   onFinish,
   showPasswordField,
+  incorrectPassword = false,
   user,
   onSetNewPassword,
   showSignInForm,
@@ -37,6 +40,9 @@ const SessionRegistration = ({
   classDetails,
   logOut,
 }) => {
+  const md = new MobileDetect(window.navigator.userAgent);
+  const isMobileDevice = Boolean(md.mobile());
+
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -76,7 +82,7 @@ const SessionRegistration = ({
           <div className={styles.roundBtn} onClick={() => setSelectedPass(null)} />
         ) : (
           <div onClick={() => setSelectedPass(null)}>
-            <CheckCircleTwoTone />
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
           </div>
         ),
     },
@@ -106,7 +112,7 @@ const SessionRegistration = ({
       render: (text, record) =>
         selectedPass?.id === record.id ? (
           <div onClick={() => setSelectedPass(record)}>
-            <CheckCircleTwoTone />
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
           </div>
         ) : (
           <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
@@ -119,12 +125,11 @@ const SessionRegistration = ({
       width: '50%',
     },
     {
-      title: 'Validity',
+      title: 'Validity (days)',
       dataIndex: 'validity',
       key: 'validity',
       align: 'right',
       width: '15%',
-      render: (text, record) => `${record.validity} day${parseInt(record.validity) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
@@ -169,7 +174,7 @@ const SessionRegistration = ({
       render: (text, record) =>
         selectedPass?.id === record.id ? (
           <div onClick={() => setSelectedPass(record)}>
-            <CheckCircleTwoTone />
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
           </div>
         ) : (
           <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
@@ -215,10 +220,10 @@ const SessionRegistration = ({
   return (
     <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
-        <Col xs={24} md={24}>
+        <Col xs={24}>
           <Title level={3}>Registration</Title>
         </Col>
-        <Col xs={24} md={24}>
+        <Col xs={24}>
           <Text>
             <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are always
             available in your
@@ -233,7 +238,7 @@ const SessionRegistration = ({
             .
           </Text>
         </Col>
-        <Col xs={24} md={24} className={styles.mt10}>
+        <Col xs={24} className={styles.mt10}>
           <Form
             form={form}
             labelAlign="left"
@@ -268,14 +273,22 @@ const SessionRegistration = ({
                   <Password />
                 </Item>
                 <Item {...sessionRegistrationTailLayout}>
-                  <div className={styles.passwordHelpText}>
-                    <Text>
-                      You have booked a session with us earlier, but if you haven't set your password, please{' '}
-                      <Text className={styles.linkButton} onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
-                        set a new password
+                  {incorrectPassword ? (
+                    <Text danger>Email or password you entered was incorrect, please try again</Text>
+                  ) : (
+                    <div className={styles.passwordHelpText}>
+                      <Text>
+                        You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                        <Button
+                          type="link"
+                          className={styles.linkBtn}
+                          onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                        >
+                          set a new password
+                        </Button>
                       </Text>
-                    </Text>
-                  </div>
+                    </div>
+                  )}
                 </Item>
               </>
             )}
@@ -351,12 +364,19 @@ const SessionRegistration = ({
             </Row>
 
             <Item {...sessionRegistrationTailLayout}>
-              <Row className={styles.mt10}>
-                <Col>
-                  <Button type="primary" htmlType="submit" disabled={!selectedInventory}>
+              <Row className={styles.mt10} gutter={[8, 8]}>
+                <Col xs={24}>
+                  <Button size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
+                {!selectedInventory && (
+                  <Col xs={24}>
+                    <Paragraph>
+                      Please select the date & time for the class you wish to attend, in the calendar on the right
+                    </Paragraph>
+                  </Col>
+                )}
               </Row>
             </Item>
           </Form>
