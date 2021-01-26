@@ -51,6 +51,8 @@
 
 @media (max-width: 767px) {
   .sessionCard {
+    margin: 0px !important;
+
     .sessionDesc {
       max-height: 72px;
     }

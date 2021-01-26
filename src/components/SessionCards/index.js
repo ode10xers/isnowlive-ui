@@ -72,7 +72,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
   return (
     <div className={styles.box}>
       <Loader loading={isLoading} text="Fetching session informations">
-        <Row>
+        <Row gutter={[8, 8]}>
           {adjustedSessions && adjustedSessions.length > 0 ? (
             <>
               {adjustedSessions.map((session) => (

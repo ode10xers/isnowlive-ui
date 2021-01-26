@@ -84,67 +84,24 @@ const Sessions = ({ sessions, username }) => {
   };
 
   return (
-    <div className={styles.box}>
-      <Row justify="space-around">
-        {reformattedSessions && reformattedSessions.length ? (
-          <>
-            <SessionCards sessions={reformattedSessions.slice(0, sessionCount)} shouldFetchInventories={false} />
-            {/* {reformattedSessions.slice(0, sessionCount).map((session) => (
-              <div key={session.id}>
-                {{session.name && (
-                  <Col xs={24}>
-                    <Card
-                      hoverable
-                      className={styles.card}
-                      bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
-                      onClick={() => showInventoryDetails(session.inventory_id)}
-                    >
-                      <Row>
-                        <Col xs={24} md={8} lg={8}>
-                          <Image
-                            preview={false}
-                            height={100}
-                            className={styles.cardImage}
-                            src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
-                          />
-                        </Col>
-                        <Col xs={24} md={8} lg={10}>
-                          <div className={styles.wrapper}>
-                            <Title className={styles.title} level={5}>
-                              {session.name}
-                            </Title>
-                            <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
-                          </div>
-                        </Col>
-                        <Col xs={24} md={8} lg={6}>
-                          <div className={styles.wrapper}>
-                            {session.session_date && eventSchedule(session)}
-                            <Text className={styles.sessionType} type="secondary">
-                              {session.group ? 'Group Session' : '1-to-1 Session'}
-                            </Text>
-                          </div>
-                        </Col>
-                      </Row>
-                    </Card>
-                  </Col>
-                )}}
-              </div>
-            ))} */}
-            {sessionCount < reformattedSessions.length && (
-              <Col span={24} className={styles.textAlignCenter}>
-                <Button type="primary" onClick={() => showMore()}>
-                  Show more
-                </Button>
-              </Col>
-            )}
-          </>
-        ) : (
-          <Col span={24}>
-            <Empty description={false} />
-          </Col>
-        )}
-      </Row>
-    </div>
+    <Row justify="space-around">
+      {reformattedSessions && reformattedSessions.length ? (
+        <>
+          <SessionCards sessions={reformattedSessions.slice(0, sessionCount)} shouldFetchInventories={false} />
+          {sessionCount < reformattedSessions.length && (
+            <Col span={24} className={styles.textAlignCenter}>
+              <Button type="primary" onClick={() => showMore()}>
+                Show more
+              </Button>
+            </Col>
+          )}
+        </>
+      ) : (
+        <Col span={24}>
+          <Empty description={false} />
+        </Col>
+      )}
+    </Row>
   );
 };
 export default Sessions;
