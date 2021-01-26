@@ -351,7 +351,7 @@ const ProfilePreview = ({ username = null }) => {
                     </Loader>
                   ) : (
                     <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                      {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
+                      {['Upcoming Sessions'].map((item, index) => (
                         <Tabs.TabPane tab={item} key={index}>
                           <Loader loading={isSessionLoading} size="large" text="Loading sessions">
                             <Sessions username={username} sessions={sessions} />

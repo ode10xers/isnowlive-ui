@@ -101,9 +101,9 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                           <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
                         </Col>
                         <Col xs={24}>
-                          <Row gutter={[8, 4]}>
+                          <Row gutter={[4]} justify="space-around">
                             {isoDayOfWeek.map((day, index) => (
-                              <Col xs={6}>
+                              <Col xs={3}>
                                 <Tag
                                   key={`${session.session_id}_day`}
                                   className={
@@ -111,16 +111,16 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                                   }
                                   color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
                                 >
-                                  {day}
+                                  {day[0]}
                                 </Tag>
                               </Col>
                             ))}
-                            <Col xs={6}>
-                              <Tag color="cyan" className={styles.tags}>
-                                {session.group ? 'Group' : '1-to-1'}
-                              </Tag>
-                            </Col>
                           </Row>
+                        </Col>
+                        <Col xs={24}>
+                          <Tag color="cyan" className={styles.tags}>
+                            {session.group ? 'Group Session' : '1-to-1 Session'}
+                          </Tag>
                         </Col>
                       </Row>
                     ) : (
