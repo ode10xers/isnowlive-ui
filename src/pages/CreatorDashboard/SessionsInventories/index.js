@@ -294,6 +294,12 @@ const SessionsInventories = ({ match }) => {
         </Text>
       ),
     },
+    // {
+    //   title: '',
+    //   dataIndex: 'children',
+    //   key: 'children',
+    //   render: (text, record) => <> {record.children.map(renderSessionItem)} </>
+    // },
   ];
 
   const renderSessionItem = (item) => {
@@ -372,7 +378,7 @@ const SessionsInventories = ({ match }) => {
 
   return (
     <div className={styles.box}>
-      <Row gutter={8}>
+      <Row gutter={[8, 8]}>
         <Col xs={24} md={18} lg={20}>
           <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
           <Radio.Group value={view} onChange={handleViewChange}>
@@ -407,11 +413,16 @@ const SessionsInventories = ({ match }) => {
                   {sessions.length > 0 ? (
                     <Table
                       columns={mobileTableColumns}
-                      data={filteredByDateSession}
+                      data={filteredByDateSession.map((session) => ({
+                        start_time: session.start_time,
+                        name: session.name,
+                        is_date: session.is_date,
+                        sessions: session.children,
+                      }))}
                       loading={isLoading}
                       rowKey={(record) => record.start_time}
                       expandable={{
-                        expandedRowRender: (record) => <> {record.children.map(renderSessionItem)} </>,
+                        expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
                         expandRowByClick: true,
                         onExpand: (expanded, record) => {
                           if (expanded) {

@@ -114,7 +114,7 @@ const ManageSessions = () => {
       title: 'Session Name',
       key: 'name',
       width: '20%',
-      render: (record) => {
+      render: (text, record) => {
         return {
           props: {
             style: {

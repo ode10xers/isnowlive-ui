@@ -53,7 +53,7 @@ const ProfilePreview = ({ username = null }) => {
   const [profile, setProfile] = useState({});
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [view, setView] = useState('list');
-  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
+  const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(0);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -110,7 +110,17 @@ const ProfilePreview = ({ username = null }) => {
       const { data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (data) {
-        setPasses(data);
+        setPasses(
+          data.map((pass) => ({
+            ...pass,
+            sessions:
+              pass.sessions?.map((session) => ({
+                ...session,
+                key: `${pass.id}_${session.session_id}`,
+                username: profileUsername,
+              })) || [],
+          }))
+        );
         setIsPassesLoading(false);
       }
     } catch (error) {
@@ -341,7 +351,7 @@ const ProfilePreview = ({ username = null }) => {
                     </Loader>
                   ) : (
                     <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                      {['Upcoming Sessions', 'Past Sessions'].map((item, index) => (
+                      {['Upcoming Sessions'].map((item, index) => (
                         <Tabs.TabPane tab={item} key={index}>
                           <Loader loading={isSessionLoading} size="large" text="Loading sessions">
                             <Sessions username={username} sessions={sessions} />

@@ -13,6 +13,7 @@ import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SignInForm from 'components/SignInForm';
 import HostDetails from 'components/HostDetails';
+import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
@@ -30,22 +31,21 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
-import { SessionInventorySelect } from 'components/SessionInventorySelect/SessionInventorySelect';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 const { Title } = Typography;
 const {
+  formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-const SessionDetails = ({ match, history }) => {
+const InventoryDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
-  const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const { logIn, logOut } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
@@ -56,14 +56,13 @@ const SessionDetails = ({ match, history }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
-  const [selectedInventory, setSelectedInventory] = useState(null);
 
   const getDetails = useCallback(
-    async (username, session_id) => {
+    async (username, inventory_id) => {
       try {
-        const inventoryDetails = await apis.session.getSessionDetails(session_id);
+        const inventoryDetails = await apis.session.getPublicInventoryById(inventory_id);
         const userDetails = await apis.user.getProfileByUsername(username);
-        const passes = await apis.passes.getPassesBySessionId(session_id);
+        const passes = await apis.passes.getPassesBySessionId(inventoryDetails.data.session_id);
         setSession(inventoryDetails.data);
         setCreator(userDetails.data);
         setAvailablePasses(passes.data);
@@ -112,10 +111,10 @@ const SessionDetails = ({ match, history }) => {
   };
 
   useEffect(() => {
-    if (match.params.session_id) {
+    if (match.params.inventory_id) {
       const username = window.location.hostname.split('.')[0];
       if (username && !reservedDomainName.includes(username)) {
-        getDetails(username, match.params.session_id);
+        getDetails(username, match.params.inventory_id);
       }
     } else {
       setIsLoading(false);
@@ -126,7 +125,7 @@ const SessionDetails = ({ match, history }) => {
     }
 
     //eslint-disable-next-line
-  }, [match.params.session_id]);
+  }, [match.params.inventory_id]);
 
   // Logic for when user lands in the page already logged in
   useEffect(() => {
@@ -188,7 +187,7 @@ const SessionDetails = ({ match, history }) => {
       if (selectedPass) {
         payload = {
           ...payload,
-          inventory_id: parseInt(selectedInventory.inventory_id),
+          inventory_id: parseInt(match.params.inventory_id),
         };
       }
 
@@ -219,7 +218,7 @@ const SessionDetails = ({ match, history }) => {
     try {
       // Default payload if user book single class
       let payload = {
-        inventory_id: parseInt(selectedInventory.inventory_id),
+        inventory_id: parseInt(match.params.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
@@ -264,7 +263,7 @@ const SessionDetails = ({ match, history }) => {
               // If user (for some reason) buys a free pass (if any exists)
               // we then immediately followUp the Booking Process
               const followUpBooking = await bookClass({
-                inventory_id: parseInt(selectedInventory.inventory_id),
+                inventory_id: parseInt(match.params.inventory_id),
                 user_timezone_offset: new Date().getTimezoneOffset(),
                 user_timezone: getCurrentLongTimezone(),
                 payment_source: paymentSource.CLASS_PASS,
@@ -273,18 +272,16 @@ const SessionDetails = ({ match, history }) => {
 
               if (isAPISuccess(followUpBooking.status)) {
                 showBookingSuccessModal(userEmail, selectedPass, true);
-                setIsLoading(false);
               }
             } else {
               showBookingSuccessModal(userEmail, selectedPass, true);
-              setIsLoading(false);
             }
           } else {
             showBookingSuccessModal(userEmail);
-            setIsLoading(false);
           }
         }
       }
+      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
@@ -301,7 +298,6 @@ const SessionDetails = ({ match, history }) => {
   const onFinish = async (values) => {
     try {
       setIsLoading(true);
-      setIncorrectPassword(false);
       // check if user is login
 
       // NOTE: Reason the check have getLocalUserDetails() and not currentUser
@@ -323,13 +319,7 @@ const SessionDetails = ({ match, history }) => {
           }
         } catch (error) {
           setIsLoading(false);
-
-          if (error.response?.status === 403) {
-            setIncorrectPassword(true);
-            message.error('Incorrect email or password');
-          } else {
-            message.error(error.response?.data?.message || 'Something went wrong');
-          }
+          message.error(error.response?.data?.message || 'Something went wrong');
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
@@ -359,7 +349,6 @@ const SessionDetails = ({ match, history }) => {
   const hideSignInForm = () => {
     setShowSignInForm(false);
     setShowPasswordField(false);
-    setIncorrectPassword(false);
 
     const userDetails = getLocalUserDetails();
 
@@ -386,16 +375,20 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={13}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
+        <Col xs={24} lg={11}>
+          <SessionDate schedule={session} />
+        </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={12}>
+        <Col xs={24} lg={12}>
           <SessionInfo session={session} />
         </Col>
+        <Col xs={24} lg={9}></Col>
         {creator && (
-          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
+          <Col xs={24} lg={3}>
             <Share
               label="Share"
-              shareUrl={`${generateUrlFromUsername(creator?.username)}/s/${session.session_id}`}
+              shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
               title={`${session?.name} - ${creator?.first_name} ${creator?.last_name}`}
             />
           </Col>
@@ -432,66 +425,48 @@ const SessionDetails = ({ match, history }) => {
             </>
           )}
         </Col>
-        <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col xs={24} lg={1}></Col>
+        <Col xs={24} lg={9}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} order={isMobileDevice ? 2 : 1} className={isMobileDevice ? styles.mt20 : styles.mt50}>
-          {showSignInForm ? (
-            <SignInForm
-              user={currentUser}
-              onSetNewPassword={handleSendNewPasswordEmail}
-              hideSignInForm={() => hideSignInForm()}
-              incorrectPassword={incorrectPassword}
-            />
-          ) : (
-            <SessionRegistration
-              user={currentUser}
-              showPasswordField={showPasswordField}
-              incorrectPassword={incorrectPassword}
-              onFinish={onFinish}
-              onSetNewPassword={handleSendNewPasswordEmail}
-              availablePasses={availablePasses}
-              userPasses={userPasses}
-              setSelectedPass={setSelectedPass}
-              selectedPass={selectedPass}
-              classDetails={session}
-              selectedInventory={selectedInventory}
-              logOut={() => {
-                logOut(history, true);
-                setCurrentUser(null);
-                setSelectedPass(null);
-                setUserPasses([]);
-                setShowSignInForm(true);
-                setIncorrectPassword(false);
-              }}
-              showSignInForm={() => {
-                setShowPasswordField(false);
-                setShowSignInForm(true);
-                setIncorrectPassword(false);
-              }}
-            />
-          )}
+        <Col xs={24} lg={showSignInForm ? 14 : 18} className={styles.mt50}>
+          {session?.end_time &&
+            getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
+            (showSignInForm ? (
+              <SignInForm
+                user={currentUser}
+                onSetNewPassword={handleSendNewPasswordEmail}
+                hideSignInForm={() => hideSignInForm()}
+              />
+            ) : (
+              <SessionRegistration
+                user={currentUser}
+                showPasswordField={showPasswordField}
+                onFinish={onFinish}
+                onSetNewPassword={handleSendNewPasswordEmail}
+                showSignInForm={() => {
+                  setShowPasswordField(false);
+                  setShowSignInForm(true);
+                }}
+                availablePasses={availablePasses}
+                userPasses={userPasses}
+                setSelectedPass={setSelectedPass}
+                selectedPass={selectedPass}
+                classDetails={session}
+                selectedInventory={session}
+                logOut={() => {
+                  logOut(history, true);
+                  setCurrentUser(null);
+                  setSelectedPass(null);
+                  setUserPasses([]);
+                  setShowSignInForm(true);
+                }}
+              />
+            ))}
         </Col>
-        {!showSignInForm && (
-          <Col
-            xs={24}
-            lg={{ span: 8, offset: 1 }}
-            order={isMobileDevice ? 1 : 2}
-            className={isMobileDevice ? styles.mt20 : styles.mt50}
-          >
-            <SessionInventorySelect
-              inventories={session?.inventory.sort((a, b) => moment(a.start_time).isBefore(moment(b.start_time))) || []}
-              selectedSlot={selectedInventory}
-              handleSubmit={(val) => {
-                console.log(val);
-                setSelectedInventory(val);
-              }}
-            />
-          </Col>
-        )}
       </Row>
     </Loader>
   );
 };
 
-export default SessionDetails;
+export default InventoryDetails;

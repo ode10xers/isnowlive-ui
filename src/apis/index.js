@@ -43,7 +43,7 @@ export default {
     getUpcomingSession: () => http.get('/secure/creator/inventories/upcoming'),
     getAttendeePastSession: () => http.get('/secure/customer/orders/past'),
     getAttendeeUpcomingSession: () => http.get('/secure/customer/orders/upcoming'),
-    getInventoriesForSession: (sessionId) => http.get(`/session/${sessionId}`),
+    getSessionDetails: (sessionId) => http.get(`/session/${sessionId}`),
     getRescheduleableSessionsByPrice: (creatorName, price) =>
       http.get(`/sessions/${creatorName}/reschedulable?price=${price}`),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
@@ -69,6 +69,7 @@ export default {
     getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
     getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getCreatorPasses: () => http.get(`/secure/creator/passes`),
+    getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
     createClassPass: (payload) => http.post(`/secure/creator/passes`, payload),
     updateClassPass: (passId, payload) => http.put(`/secure/creator/passes/${passId}`, payload),
     createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),

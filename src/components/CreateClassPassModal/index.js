@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
+import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
 
@@ -7,7 +8,7 @@ import Loader from 'components/Loader';
 
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import validationRules from 'utils/validation';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -30,6 +31,28 @@ const formInitialValues = {
   passType: passTypes.LIMITED.name,
 };
 
+const whiteColor = '#ffffff';
+
+const colorPickerChoices = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#1890ff',
+  '#009688',
+  '#4caf50',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+  '#9ae2b6',
+  '#bf6d11',
+  '#f379b2',
+  '#34727c',
+  '#5030fd',
+];
+
 const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   const [form] = Form.useForm();
 
@@ -39,6 +62,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
+  const [colorCode, setColorCode] = useState(generateRandomColor());
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -67,7 +91,13 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
           classCount: editedPass.class_count,
           validity: editedPass.validity,
           price: editedPass.price,
+          color_code: editedPass.color_code || whiteColor,
         });
+        setCurrency(editedPass.currency);
+        setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
+        setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
+        setColorCode(editedPass.color_code || whiteColor);
+        form.validateFields(['classList']);
       } else {
         form.resetFields();
       }
@@ -82,6 +112,11 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
       classCount: passLimitType === passTypes.UNLIMITED.name ? 1000 : 10,
     });
     setPassType(passLimitType);
+  };
+
+  const handleColorChange = (color) => {
+    setColorCode(color.hex || whiteColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
   };
 
   const handleFinish = async (values) => {
@@ -108,6 +143,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         session_ids: selectedClasses || values.classList || [],
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
         limited: passTypes.LIMITED.name === passType,
+        color_code: colorCode,
       };
 
       const response = editedPass
@@ -142,7 +178,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
           onFinish={handleFinish}
           initialValues={formInitialValues}
         >
-          <Row className="class-pass-row">
+          <Row className={styles.classPassRow}>
             <Col xs={12}>
               <Form.Item id="passName" name="passName" label="Class Pass Name" rules={validationRules.nameValidation}>
                 <Input placeholder="Enter Class Pass Name" maxLength={50} />
@@ -169,7 +205,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row className="class-pass-row">
+          <Row className={styles.classPassRow}>
             <Col xs={12}>
               <Form.Item
                 id="passType"
@@ -216,28 +252,47 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row className="class-pass-row">
+          <Row className={styles.classPassRow}>
             <Col xs={12}>
-              <Form.Item
-                id="validity"
-                name="validity"
-                label="Pass Validity (days)"
-                extra={
-                  <Text className={styles.helpText}>The duration in days this pass will be usable after purchase</Text>
-                }
-                rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
-              >
-                <InputNumber min={1} placeholder="Pass Validity" className={styles.numericInput} />
-              </Form.Item>
+              <Row>
+                <Col xs={24}>
+                  <Form.Item
+                    id="validity"
+                    name="validity"
+                    label="Pass Validity (days)"
+                    extra={
+                      <Text className={styles.helpText}>
+                        The duration in days this pass will be usable after purchase
+                      </Text>
+                    }
+                    rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
+                  >
+                    <InputNumber min={1} placeholder="Pass Validity" className={styles.numericInput} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24}>
+                  <Form.Item
+                    id="price"
+                    name="price"
+                    label="Class Pass Price"
+                    rules={validationRules.numberValidation('Please Input Pass Price', 1, false)}
+                  >
+                    <InputNumber min={0} placeholder="Class Pass Price" className={styles.numericInput} />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Col>
             <Col xs={{ span: 11, offset: 1 }}>
-              <Form.Item
-                id="price"
-                name="price"
-                label="Class Pass Price"
-                rules={validationRules.numberValidation('Please Input Pass Price', 1, false)}
-              >
-                <InputNumber min={0} placeholder="Class Pass Price" className={styles.numericInput} />
+              <Form.Item name="color_code" label="Color Tag" rules={validationRules.requiredValidation}>
+                <div className={styles.colorPickerPreview} style={{ borderColor: colorCode }}>
+                  <TwitterPicker
+                    className={styles.colorPicker}
+                    color={colorCode}
+                    onChangeComplete={handleColorChange}
+                    triangle="hide"
+                    colors={colorPickerChoices}
+                  />
+                </div>
               </Form.Item>
             </Col>
           </Row>

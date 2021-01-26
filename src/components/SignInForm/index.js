@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Form, Row, Col, Input, Typography, Button } from 'antd';
+import { Form, Row, Col, Input, Typography, Button, message } from 'antd';
 
 import apis from 'apis';
 
@@ -20,6 +20,7 @@ const { Title, Text } = Typography;
 const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const handleSetNewPassword = async () => {
     try {
@@ -31,6 +32,7 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
   };
 
   const onFinish = async (values) => {
+    setIncorrectPassword(false);
     if (user) {
       showErrorModal('You are already signed in!');
       return;
@@ -48,7 +50,12 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
         hideSignInForm();
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      if (error.response?.status === 403) {
+        setIncorrectPassword(true);
+        message.error('Incorrect email or password');
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
     }
   };
 
@@ -76,6 +83,11 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
             <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
               <Input.Password className={styles.signInInput} placeholder="Enter your password" />
             </Form.Item>
+            {incorrectPassword && (
+              <Form.Item {...signInTailLayout}>
+                <Text type="danger">Email or password you entered was incorrect, please try again</Text>
+              </Form.Item>
+            )}
             <Form.Item {...signInTailLayout}>
               <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
                 Set a new password
@@ -83,13 +95,13 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
             </Form.Item>
             <Form.Item {...signInTailLayout}>
               <Row>
-                <Col>
-                  <Button type="primary" htmlType="submit">
+                <Col xs={24} md={6} lg={6}>
+                  <Button size="large" type="primary" htmlType="submit">
                     Sign In
                   </Button>
                 </Col>
-                <Col>
-                  <Button type="link" onClick={() => hideSignInForm()}>
+                <Col xs={24} md={18} lg={18}>
+                  <Button className={styles.linkBtn} type="link" onClick={() => hideSignInForm()}>
                     Don't have an account? Register Now
                   </Button>
                 </Col>

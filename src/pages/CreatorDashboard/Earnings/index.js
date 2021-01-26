@@ -272,7 +272,7 @@ const Earnings = () => {
   const openSessionDetails = (item) => {
     trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
     if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/${item.inventory_id}`);
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/inventory/${item.inventory_id}`);
     }
   };
 
@@ -352,7 +352,11 @@ const Earnings = () => {
     );
   };
 
-  const openPassDetails = (item) => console.log(item);
+  const openPassDetails = (item) => {
+    if (item.pass_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/pass/${item.pass_id}`);
+    }
+  };
 
   let passColumns = [
     {

@@ -16,9 +16,9 @@ import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const {
-  formatDate: { toLongDateWithLongDay },
+  formatDate: { toDateAndTime },
 } = dateUtil;
 
 const ClassPassList = () => {
@@ -100,6 +100,7 @@ const ClassPassList = () => {
             is_published: classPass.is_published,
             sessions: classPass.sessions,
             subscribers: classPass.subscribers.map((subs) => ({ ...subs, currency: classPass.currency })),
+            color_code: classPass.color_code,
           }))
         );
       }
@@ -136,6 +137,16 @@ const ClassPassList = () => {
       dataIndex: 'name',
       key: 'name',
       width: '35%',
+      render: (text, record) => {
+        return {
+          props: {
+            style: {
+              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
+            },
+          },
+          children: <Text> {record.name} </Text>,
+        };
+      },
     },
     {
       title: 'Pass Count',
@@ -212,7 +223,7 @@ const ClassPassList = () => {
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
       width: '30%',
-      render: (text, record) => toLongDateWithLongDay(record.date_of_purchase),
+      render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
       title: 'Net Price',
