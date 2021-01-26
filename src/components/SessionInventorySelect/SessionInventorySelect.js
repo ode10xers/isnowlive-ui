@@ -111,7 +111,6 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
               onSelect={handleOnSelect}
               dateCellRender={dateCellRender}
               defaultValue={moment(selectedSlot?.start_time)}
-              value={moment(selectedSlot?.start_time)}
             />
           </div>
         </Col>

@@ -22,7 +22,7 @@ const { Item } = Form;
 const { Password } = Input;
 
 const {
-  formatDate: { toShortDate },
+  formatDate: { toShortDate, toLongDateWithTime },
 } = dateUtil;
 
 const SessionRegistration = ({
@@ -39,7 +39,6 @@ const SessionRegistration = ({
   selectedInventory,
   classDetails,
   logOut,
-  username,
 }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
@@ -468,7 +467,10 @@ const SessionRegistration = ({
                 {availablePasses.length > 0 && (
                   <>
                     <div>
-                      <Title level={5}> Book this class </Title>
+                      <Title level={5}>
+                        {' '}
+                        Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class{' '}
+                      </Title>
                       <Table
                         size="small"
                         showHeader={false}
@@ -479,7 +481,13 @@ const SessionRegistration = ({
                     </div>
 
                     <div className={styles.mt20}>
-                      <Title level={5}> Buy pass & book this class </Title>
+                      <Title level={5}>
+                        {' '}
+                        Buy pass & book {selectedInventory
+                          ? toLongDateWithTime(selectedInventory.start_time)
+                          : 'this'}{' '}
+                        class{' '}
+                      </Title>
                       {isMobileDevice ? (
                         availablePasses.map(renderPassItem)
                       ) : (
@@ -502,9 +510,9 @@ const SessionRegistration = ({
             )}
 
             <Row className={styles.mt10}>
-              {user && selectedPass && userPasses.length > 0 && (
+              {user && selectedInventory && selectedPass && userPasses.length > 0 && (
                 <Paragraph>
-                  Booking this class for{' '}
+                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
                   <Text delete>
                     {' '}
                     {classDetails.price} {classDetails.currency}{' '}

@@ -71,7 +71,6 @@ const SessionDetails = ({ match, history }) => {
         const latestInventories = inventoryDetails.data.inventory
           .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0))
           .filter((inventory) => isBeforeDate(inventory.end_time));
-        console.log(latestInventories);
         setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
