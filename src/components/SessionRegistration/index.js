@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import MobileDetect from 'mobile-detect';
 
-import { Row, Col, Button, Form, Input, Typography, Tag } from 'antd';
+import { Row, Col, Button, Form, Input, Typography, Tag, Card } from 'antd';
 import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -218,6 +218,73 @@ const SessionRegistration = ({
     </Row>
   );
 
+  const renderPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <div>
+        <Card
+          className={styles.card}
+          title={
+            <Row>
+              <Col xs={4}>
+                {selectedPass?.id === pass.id ? (
+                  <div onClick={() => setSelectedPass(pass)}>
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                  </div>
+                ) : (
+                  <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
+                )}
+              </Col>
+              <Col xs={20}>
+                <Text>{pass.name}</Text>
+              </Col>
+            </Row>
+          }
+          actions={[
+            <Button type="primary" onClick={() => setSelectedPass(pass)}>
+              Select Pass
+            </Button>,
+            expandedRowKeys.includes(pass.id) ? (
+              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
+                Close
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
+                More
+              </Button>
+            ),
+          ]}
+        >
+          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+        </Card>
+        {expandedRowKeys.includes(pass.id) && (
+          <Row className={styles.cardExpansion}>
+            <Col xs={24}>
+              <Text className={styles.ml20}> Applicable to below class(es) </Text>
+            </Col>
+            <Col xs={24}>
+              <div className={classNames(styles.ml20, styles.mt10)}>
+                {pass.sessions.slice(0, 11).map((session) => (
+                  <Tag color="blue"> {session.name} </Tag>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
@@ -329,17 +396,21 @@ const SessionRegistration = ({
 
                     <div className={styles.mt20}>
                       <Title level={5}> Buy pass & book this class </Title>
-                      <Table
-                        size="small"
-                        columns={passesColumns}
-                        data={availablePasses}
-                        rowKey={(record) => record.id}
-                        expandable={{
-                          expandedRowRender: renderClassesList,
-                          expandIconColumnIndex: -1,
-                          expandedRowKeys: expandedRowKeys,
-                        }}
-                      />
+                      {isMobileDevice ? (
+                        availablePasses.map(renderPassItem)
+                      ) : (
+                        <Table
+                          size="small"
+                          columns={passesColumns}
+                          data={availablePasses}
+                          rowKey={(record) => record.id}
+                          expandable={{
+                            expandedRowRender: renderClassesList,
+                            expandIconColumnIndex: -1,
+                            expandedRowKeys: expandedRowKeys,
+                          }}
+                        />
+                      )}
                     </div>
                   </>
                 )}

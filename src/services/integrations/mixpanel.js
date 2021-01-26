@@ -124,7 +124,7 @@ export const mixPanelEventTags = {
 };
 
 const env = process.env.REACT_APP_ENV || 'development';
-const isDevelopment = () => env === 'development';
+const isDevelopment = () => env === 'development' || env === 'staging';
 
 export const initMixPanel = () => {
   if (isDevelopment()) return;

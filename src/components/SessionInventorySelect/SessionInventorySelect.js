@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Row, Col, Calendar, Typography, Button } from 'antd';
+import { CheckCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import moment from 'moment';
 
@@ -66,7 +67,13 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
       return (
         <>
           <Col xs={24}>
-            <Button shape="round" className={styles.slotBtn} type="primary" onClick={() => handleSubmit(null)}>
+            <Button
+              shape="round"
+              type="primary"
+              className={styles.slotBtn}
+              onClick={() => handleSubmit(null)}
+              icon={<CheckCircleTwoTone />}
+            >
               {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
             </Button>
           </Col>
@@ -75,7 +82,13 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
     }
     return (
       <Col xs={24}>
-        <Button shape="round" className={styles.slotBtn} type="secondary" onClick={() => handleSubmit(slot)}>
+        <Button
+          shape="round"
+          type="secondary"
+          className={styles.slotBtn}
+          onClick={() => handleSubmit(slot)}
+          icon={<CheckCircleOutlined />}
+        >
           {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
         </Button>
       </Col>

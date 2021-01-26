@@ -1,1 +1,11 @@
 @import '../../styles/variables.scss';
+
+.card {
+  margin-top: 10px !important;
+}
+
+.cardExpansion {
+  border: 1px solid map-get($map: $colors, $key: 'White1');
+  background-color: map-get($map: $colors, $key: 'White');
+  padding: 8px;
+}
