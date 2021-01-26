@@ -8,7 +8,7 @@ import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 const HostDetails = ({ host }) => {
   const [showMore, setShowMore] = useState(false);
@@ -54,12 +54,10 @@ const HostDetails = ({ host }) => {
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           {showMore ? (
-            <Paragraph type="secondary">{ReactHtmlParser(host?.profile?.bio)}</Paragraph>
+            <div className={styles.longTextExpanded}>{ReactHtmlParser(host?.profile?.bio)}</div>
           ) : (
             <>
-              <Paragraph type="secondary" ellipsis={{ rows: 5 }}>
-                {ReactHtmlParser(host?.profile?.bio)}
-              </Paragraph>
+              <div className={styles.creatorBio}>{ReactHtmlParser(host?.profile?.bio)}</div>
               <div className={styles.readMoreText} onClick={() => setShowMore(true)}>
                 Read More
               </div>
