@@ -42,6 +42,7 @@ const SessionRegistration = ({
 }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
+  console.log(isMobileDevice);
 
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -99,7 +100,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'right',
       width: '20%',
-      render: (text, record) => `${record.price} ${record.currency}`,
+      render: (text, record) => `${record.price}`,
     },
   ];
 
@@ -138,7 +139,7 @@ const SessionRegistration = ({
       align: 'left',
       sortOrder: 'descend',
       width: '15%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text}`,
     },
     {
       title: 'Class Count',
@@ -278,14 +279,10 @@ const SessionRegistration = ({
                   ) : (
                     <div className={styles.passwordHelpText}>
                       <Text>
-                        You have booked a session with us earlier, but if you haven't set your password, please{' '}
-                        <Button
-                          type="link"
-                          className={styles.linkBtn}
-                          onClick={() => onSetNewPassword(form.getFieldsValue().email)}
-                        >
+                        You have booked a session with us earlier, but if you haven't set your password, please
+                        <Text className={styles.linkBtn} onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
                           set a new password
-                        </Button>
+                        </Text>
                       </Text>
                     </div>
                   )}
@@ -304,6 +301,12 @@ const SessionRegistration = ({
                 </Button>
               )}
             </Item>
+
+            {classDetails?.currency && (
+              <Paragraph>
+                All prices below are in <Text strong> {classDetails.currency} </Text>
+              </Paragraph>
+            )}
 
             {user && userPasses.length > 0 ? (
               <div>

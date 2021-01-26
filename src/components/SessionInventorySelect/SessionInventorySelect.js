@@ -13,7 +13,8 @@ const { Title, Text } = Typography;
 
 const {
   formatDate: { toLongDate, toLocaleDate, toLocaleTime },
-  timeCalculation: { isSameOrBeforeToday },
+  timeCalculation: { isSameOrBeforeToday, isBeforeDate },
+  timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
 export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
@@ -21,7 +22,8 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
   const [slots, setSlots] = useState([]);
 
   const filterSessionByDate = useCallback(
-    (date) => inventories?.filter((i) => toLocaleDate(i.start_time) === toLocaleDate(date)) || [],
+    (date) =>
+      inventories?.filter((i) => toLocaleDate(i.start_time) === toLocaleDate(date) && isBeforeDate(i.end_time)) || [],
     [inventories]
   );
 
@@ -87,6 +89,7 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
           <Title className={styles.textAlignCenter} level={4}>
             Select date and time
           </Title>
+          <Text strong>All times shown below are in your local time zone ({getCurrentLongTimezone()})</Text>
           <div className={styles.siteCalendarCard}>
             <Calendar
               fullscreen={false}

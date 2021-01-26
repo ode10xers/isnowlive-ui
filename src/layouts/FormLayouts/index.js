@@ -61,5 +61,8 @@ export const signInFormLayout = {
   },
 };
 export const signInTailLayout = {
-  wrapperCol: { span: 20, offset: 4 },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 20, offset: 4 },
+  },
 };

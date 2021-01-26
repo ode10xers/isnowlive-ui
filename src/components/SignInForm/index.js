@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Form, Row, Col, Input, Typography, Button } from 'antd';
+import { Form, Row, Col, Input, Typography, Button, message } from 'antd';
 
 import apis from 'apis';
 
@@ -17,9 +17,10 @@ import { signInFormLayout, signInTailLayout } from 'layouts/FormLayouts';
 
 const { Title, Text } = Typography;
 
-const SignInForm = ({ user, hideSignInForm, onSetNewPassword, incorrectPassword }) => {
+const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const handleSetNewPassword = async () => {
     try {
@@ -31,6 +32,7 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword, incorrectPassword 
   };
 
   const onFinish = async (values) => {
+    setIncorrectPassword(false);
     if (user) {
       showErrorModal('You are already signed in!');
       return;
@@ -48,7 +50,12 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword, incorrectPassword 
         hideSignInForm();
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      if (error.response?.status === 403) {
+        setIncorrectPassword(true);
+        message.error('Incorrect email or password');
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
     }
   };
 
