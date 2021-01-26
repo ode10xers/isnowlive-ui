@@ -86,10 +86,12 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
     <div className={classNames(styles.box, styles.p10, styles.mb20)}>
       <Row>
         <Col xs={24}>
-          <Title className={styles.textAlignCenter} level={4}>
+          <Title className={styles.textAlignCenter} level={3}>
             Select date and time
           </Title>
-          <Text strong>All times shown below are in your local time zone ({getCurrentLongTimezone()})</Text>
+          <Title className={styles.textAlignCenter} level={5}>
+            All times shown below are in your local time zone ({getCurrentLongTimezone()})
+          </Title>
           <div className={styles.siteCalendarCard}>
             <Calendar
               fullscreen={false}

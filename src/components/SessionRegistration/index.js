@@ -362,7 +362,7 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={5}>
+                <Col xs={8} md={5}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                     {user ? 'Buy' : 'Register'}
                   </Button>
