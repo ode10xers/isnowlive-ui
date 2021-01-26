@@ -38,9 +38,10 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
     }
   
-    max-height: 80px;
-    overflow-y: auto;
-    margin: 10px 0;
+    max-height: 72px;
+    // overflow-y: auto;
+    overflow: hidden;
+    margin: 5px 0;
   }
 }
 
@@ -51,7 +52,7 @@
 @media (max-width: 767px) {
   .sessionCard {
     .sessionDesc {
-      max-height: 120px;
+      max-height: 72px;
     }
 
     .tags {

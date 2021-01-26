@@ -92,14 +92,14 @@ const SessionRegistration = ({
       dataIndex: 'name',
       key: 'name',
       align: 'left',
-      width: '80%',
+      width: '50%',
     },
     {
       title: '',
       dataIndex: 'price',
       key: 'price',
       align: 'right',
-      width: '20%',
+      width: '50%',
       render: (text, record) => `${record.price} ${record.currency}`,
     },
   ];
@@ -120,7 +120,7 @@ const SessionRegistration = ({
         ),
     },
     {
-      title: 'Pass Name',
+      title: 'Pass',
       dataIndex: 'name',
       key: 'name',
       width: '50%',
@@ -182,7 +182,7 @@ const SessionRegistration = ({
         ),
     },
     {
-      title: 'Pass Name',
+      title: 'Pass',
       dataIndex: 'name',
       key: 'name',
       align: 'left',
@@ -370,7 +370,8 @@ const SessionRegistration = ({
                 {!selectedInventory && (
                   <Col xs={24}>
                     <Paragraph>
-                      Please select the date & time for the class you wish to attend, in the calendar on the right
+                      Please select the date & time for the class you wish to attend{' '}
+                      {isMobileDevice ? '' : ', in the calendar on the right'}
                     </Paragraph>
                   </Col>
                 )}
