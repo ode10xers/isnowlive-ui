@@ -9,34 +9,46 @@
   margin: 0px !important;
 }
 .nameInput {
-  max-width: 180px;
+  max-width: 155px;
   display: inline-block !important;
   margin-right: 10px !important;
 }
 .emailInput {
   input {
-    max-width: 370px;
+    max-width: 320px;
   }
 }
 .passwordInput {
   span {
-    max-width: 370px;
+    max-width: 320px;
   }
 }
 
 .passwordHelpText {
-  margin-top: -30px;
-  max-width: 370px;
+  margin-top: -26px;
+  max-width: 320px;
 
   .span {
     color: map-get($colors, 'Charcoal') !important;
   }
+}
 
-  .linkButton {
-    // padding: 0px !important;
-    cursor: pointer;
-    color: map-get($colors, 'DodgerBlue') !important;
-  }
+.linkBtn {
+  padding: 0px !important;
+  cursor: pointer;
+  color: map-get($colors, 'DodgerBlue') !important;
+}
+
+.roundBtn {
+  cursor: pointer;
+  margin-top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  border: solid 1px map-get($colors, 'NightRider');
+}
+.roundBtn:hover{
+  border: solid 1px map-get($colors, 'DodgerBlue');
 }
 
 @media (max-width: 768px) {
@@ -44,5 +56,14 @@
     max-width: 100%;
     display: block !important;
     margin-right: 10px !important;
+  }
+
+  .passwordHelpText {
+    margin-top: -24px;
+    font-size: 12px;
+    
+    .linkBtn {
+      font-size: 12px;
+    }
   }
 }

@@ -47,7 +47,12 @@ const ClassPassList = () => {
             validity: pass.validity,
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
-            sessions: pass.session,
+            sessions:
+              pass.session?.map((session) => ({
+                ...session,
+                key: `${pass.pass_order_id}_${session.session_id}`,
+                username: pass.creator_username,
+              })) || [],
             expired: false,
           }))
         );
@@ -64,7 +69,12 @@ const ClassPassList = () => {
             validity: pass.validity,
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
-            sessions: pass.session,
+            sessions:
+              pass.session?.map((session) => ({
+                ...session,
+                key: `${pass.pass_order_id}_${session.session_id}`,
+                username: pass.creator_username,
+              })) || [],
             expired: true,
           }))
         );

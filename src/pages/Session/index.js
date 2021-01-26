@@ -112,7 +112,7 @@ const Session = ({ match, history }) => {
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
-  const [colorCode, setColorCode] = useState(generateRandomColor);
+  const [colorCode, setColorCode] = useState(generateRandomColor());
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {

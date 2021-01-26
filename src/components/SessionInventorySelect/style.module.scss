@@ -1,0 +1,50 @@
+@import '../../styles/variables.scss';
+
+.siteCalendarCard {
+  max-width: 350px;
+  border: 1px solid map-get($colors, 'WhiteSmoke1');
+  border-radius: 2px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.events {
+  border: 2px solid map-get($colors, 'DodgerBlue');
+  height: 28px;
+  margin-top: -26px;
+  padding: 10px 13px !important;
+  border-radius: 5px;
+}
+
+.pastEvents {
+  @extend .events;
+  border: 2px solid map-get($colors, 'DarkGray');
+}
+
+.slotWrapper {
+  margin: 10px;
+  text-align: center;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border: none !important;
+}
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-today {
+  border-color: map-get($colors, 'DodgerBlue') !important;
+}
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  height: 30px;
+  width: 30px;
+  padding-top: 2px;
+  border-radius: 5px;
+  color: map-get($colors, 'White');
+  background: map-get($colors, 'DodgerBlue') !important;
+}
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-today {
+  border-color: map-get($colors, 'DodgerBlue') !important;
+}
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-calendar-date-today .ant-picker-calendar-date-value {
+  color: map-get($colors, 'White') !important;
+}

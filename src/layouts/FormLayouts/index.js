@@ -28,11 +28,20 @@ export const formTailLayout = {
   wrapperCol: { span: 12, offset: 6 },
 };
 export const sessionRegistrationformLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 20 },
+  labelCol: {
+    xs: { span: 24 },
+    md: { span: 4 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 20 },
+  },
 };
 export const sessionRegistrationTailLayout = {
-  wrapperCol: { offset: 4, span: 20 },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { offset: 4, span: 20 },
+  },
 };
 export const purchasePassModalFormLayout = {
   labelCol: { span: 6 },
@@ -42,9 +51,18 @@ export const purchasePassModalTailLayout = {
   wrapperCol: { span: 8, offset: 8 },
 };
 export const signInFormLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 20 },
+  labelCol: {
+    xs: { span: 24 },
+    md: { span: 4 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 20 },
+  },
 };
 export const signInTailLayout = {
-  wrapperCol: { span: 20, offset: 4 },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 20, offset: 4 },
+  },
 };

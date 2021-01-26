@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip } from 'antd';
+import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip, Typography } from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
 import { DeleteFilled } from '@ant-design/icons';
@@ -11,6 +11,7 @@ import { isMobileDevice } from 'utils/device';
 import styles from './style.module.scss';
 
 const { Option } = Select;
+const { Paragraph, Text } = Typography;
 const {
   formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek, getTimeDiff },
 } = dateUtil;
@@ -463,9 +464,24 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   {form.length > 1 && (
                     <Col xs={2} md={2}>
-                      <Tooltip title="Delete">
-                        <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
-                      </Tooltip>
+                      {slot?.num_participants > 0 ? (
+                        <Tooltip
+                          title={
+                            <Paragraph>
+                              This is an existing slot which is already booked but{' '}
+                              <Text strong> you can still delete it </Text> and modify this and future dates
+                            </Paragraph>
+                          }
+                        >
+                          <Badge dot>
+                            <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
+                          </Badge>
+                        </Tooltip>
+                      ) : (
+                        <Tooltip title="Delete">
+                          <Button shape="circle" onClick={() => handleDeleteSlot(index)} icon={<DeleteFilled />} />
+                        </Tooltip>
+                      )}
                     </Col>
                   )}
                 </Row>
