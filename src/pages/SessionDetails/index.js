@@ -483,7 +483,6 @@ const SessionDetails = ({ match, history }) => {
               inventories={session?.inventory.sort((a, b) => moment(a.start_time).isBefore(moment(b.start_time))) || []}
               selectedSlot={selectedInventory}
               handleSubmit={(val) => {
-                console.log(val);
                 setSelectedInventory(val);
               }}
             />

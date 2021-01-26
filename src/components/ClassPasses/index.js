@@ -18,7 +18,6 @@ const { Text, Paragraph } = Typography;
 const ClassPasses = ({ username, passes }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  console.log(isMobileDevice);
 
   const [selectedPass, setSelectedPass] = useState(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);

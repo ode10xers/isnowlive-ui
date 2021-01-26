@@ -19,7 +19,9 @@ const {
 } = dateUtil;
 
 export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
-  const [selectedDate, setSelectedDate] = useState(toLongDate(moment()));
+  const [selectedDate, setSelectedDate] = useState(
+    toLongDate(inventories.length > 0 ? moment(inventories[0].start_time) : moment())
+  );
   const [slots, setSlots] = useState([]);
 
   const filterSessionByDate = useCallback(
@@ -48,7 +50,6 @@ export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit
 
   useEffect(() => {
     if (selectedSlot) {
-      console.log(selectedSlot);
       handleOnSelect(moment(selectedSlot.start_time));
     } else {
       handleOnSelect(moment());
