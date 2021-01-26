@@ -30,17 +30,17 @@ export const formTailLayout = {
 export const sessionRegistrationformLayout = {
   labelCol: {
     xs: { span: 24 },
-    md: { span: 3 },
+    md: { span: 4 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    md: { span: 21 },
+    md: { span: 20 },
   },
 };
 export const sessionRegistrationTailLayout = {
   wrapperCol: {
     xs: { span: 24 },
-    md: { offset: 3, span: 21 },
+    md: { offset: 4, span: 20 },
   },
 };
 export const purchasePassModalFormLayout = {

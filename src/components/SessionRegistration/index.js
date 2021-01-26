@@ -275,11 +275,11 @@ const SessionRegistration = ({
                 </Item>
                 <Item {...sessionRegistrationTailLayout}>
                   {incorrectPassword ? (
-                    <Text danger>Email or password you entered was incorrect, please try again</Text>
+                    <Text type="danger">Email or password you entered was incorrect, please try again</Text>
                   ) : (
                     <div className={styles.passwordHelpText}>
                       <Text>
-                        You have booked a session with us earlier, but if you haven't set your password, please
+                        You have booked a session with us earlier, but if you haven't set your password, please{' '}
                         <Text className={styles.linkBtn} onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
                           set a new password
                         </Text>
@@ -362,8 +362,8 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={24}>
-                  <Button size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
+                <Col xs={5}>
+                  <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                     {user ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
