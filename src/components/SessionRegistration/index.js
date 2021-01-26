@@ -100,7 +100,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'right',
       width: '20%',
-      render: (text, record) => `${record.price}`,
+      render: (text, record) => `${record.price} ${record.currency}`,
     },
   ];
 
@@ -126,20 +126,20 @@ const SessionRegistration = ({
       width: '50%',
     },
     {
-      title: 'Validity (days)',
+      title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
       align: 'right',
-      width: '15%',
+      width: '13%',
+      render: (text, record) => `${record.validity} day`,
     },
     {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      sortOrder: 'descend',
       width: '15%',
-      render: (text, record) => `${text}`,
+      render: (text, record) => `${text} ${record.currency}`,
     },
     {
       title: 'Class Count',
@@ -301,12 +301,6 @@ const SessionRegistration = ({
                 </Button>
               )}
             </Item>
-
-            {classDetails?.currency && (
-              <Paragraph>
-                All prices below are in <Text strong> {classDetails.currency} </Text>
-              </Paragraph>
-            )}
 
             {user && userPasses.length > 0 ? (
               <div>
