@@ -15,6 +15,7 @@ import HostDetails from 'components/HostDetails';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
+import SessionInventorySelect from 'components/SessionInventorySelect';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
@@ -29,7 +30,6 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
-import { SessionInventorySelect } from 'components/SessionInventorySelect/SessionInventorySelect';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 

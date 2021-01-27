@@ -20,40 +20,6 @@ const Sessions = ({ sessions, username }) => {
     }
   };
 
-  // const eventSchedule = (session) => {
-  //   return (
-  //     <div className={styles.eventBoxWrap}>
-  //       <Row>
-  //         <Col xs={8} className={styles.eventBox}>
-  //           <Text className={styles.text} strong>
-  //             {toDate(session.start_time)}
-  //           </Text>
-  //           <Text className={styles.subtext} strong>
-  //             {toShortMonth(session.start_time)?.toUpperCase()}
-  //           </Text>
-  //         </Col>
-  //         <Col xs={16} className={styles.eventBox2}>
-  //           <Text className={styles.text} strong>
-  //             {toDayOfWeek(session.start_time)}
-  //           </Text>
-  //           <Text className={styles.subtext} strong>
-  //             {toLocaleTime(session.start_time)}
-  //             {' - '}
-  //             {toLocaleTime(session.end_time)}
-  //           </Text>
-  //           <Text className={styles.subtext}>{getCurrentLongTimezone()}</Text>
-  //         </Col>
-  //       </Row>
-  //     </div>
-  //   );
-  // };
-
-  // const showInventoryDetails = (inventory_id) => {
-  //   trackSimpleEvent(user.click.profile.sessionCard, { inventory_id: inventory_id });
-  //   const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
-  //   window.open(`${baseurl}/e/${inventory_id}`);
-  // };
-
   useEffect(() => {
     reformatSessions();
     //eslint-disable-next-line

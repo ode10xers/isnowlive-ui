@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Card, Tag } from 'antd';
+import { Row, Col, Typography, Button, Card, Tag, Space } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
@@ -94,7 +94,7 @@ const ClassPasses = ({ username, passes }) => {
       ),
       align: 'right',
       render: (text, record) => (
-        <>
+        <Space size="small">
           <Button type="primary" onClick={() => showPurchaseModal(record.id)}>
             Buy Pass
           </Button>
@@ -107,7 +107,7 @@ const ClassPasses = ({ username, passes }) => {
               More
             </Button>
           )}
-        </>
+        </Space>
       ),
     },
   ];
