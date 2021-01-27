@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { Row, Col, Typography, Button, Tooltip, message } from 'antd';
-import { DownOutlined, UpOutlined, PlusCircleOutlined, EditOutlined, CopyOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  UpOutlined,
+  PlusCircleOutlined,
+  EditOutlined,
+  CopyOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -188,7 +195,12 @@ const ClassPassList = () => {
               borderLeft: `6px solid ${record.color_code || '#FFF'}`,
             },
           },
-          children: <Text> {record.name} </Text>,
+          children: (
+            <>
+              <Text> {record.name} </Text>
+              {record.is_active ? null : <EyeInvisibleOutlined />}
+            </>
+          ),
         };
       },
     },

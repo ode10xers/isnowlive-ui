@@ -51,16 +51,15 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
 
   useEffect(() => {
     if (visible) {
-      if (!currentUser) {
-        const user = getLocalUserDetails();
-
-        if (user) {
+      const user = getLocalUserDetails();
+      if (user) {
+        if (!currentUser) {
           setCurrentUser(user);
           form.setFieldsValue(user);
         }
-      } else {
-        form.setFieldsValue(currentUser);
-        createOrder(currentUser.email);
+
+        form.setFieldsValue(user);
+        createOrder(user.email);
       }
     }
     //eslint-disable-next-line
