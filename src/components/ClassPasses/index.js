@@ -38,11 +38,6 @@ const ClassPasses = ({ username, passes }) => {
     window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
-  const redirectToPassPage = (pass) => {
-    const baseUrl = generateUrlFromUsername(username || 'app');
-    window.open(`${baseUrl}/p/${pass.id}`);
-  };
-
   const toggleExpandAll = () => {
     if (expandedRowKeys.length > 0) {
       setExpandedRowKeys([]);
@@ -100,9 +95,6 @@ const ClassPasses = ({ username, passes }) => {
       align: 'right',
       render: (text, record) => (
         <Space size="small">
-          <Button type="default" onClick={() => redirectToPassPage(record)}>
-            Details
-          </Button>
           <Button type="primary" onClick={() => showPurchaseModal(record.id)}>
             Buy Pass
           </Button>
@@ -146,7 +138,6 @@ const ClassPasses = ({ username, passes }) => {
         <Card
           className={styles.card}
           title={<Text>{pass.name}</Text>}
-          onClick={() => redirectToPassPage(pass)}
           actions={[
             <Button type="primary" onClick={() => showPurchaseModal(pass.id)}>
               Buy Pass
