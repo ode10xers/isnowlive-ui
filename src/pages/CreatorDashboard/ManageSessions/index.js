@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, Popconfirm, message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, message } from 'antd';
+import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
 import apis from 'apis';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 
@@ -18,6 +19,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
+import { generateUrlFromUsername } from 'utils/helper';
 
 const {
   formatDate: { toLongDateWithDay },
@@ -109,6 +111,49 @@ const ManageSessions = () => {
     getSessionsList();
   }, [getSessionsList]);
 
+  const copyPageLinkToClipboard = (sessionId) => {
+    const username = getLocalUserDetails().username;
+    const pageLink = `${generateUrlFromUsername(username)}/s/${sessionId}`;
+
+    // Fallback method if navigator.clipboard is not supported
+    if (!navigator.clipboard) {
+      var textArea = document.createElement('textarea');
+      textArea.value = pageLink;
+
+      // Avoid scrolling to bottom
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        var successful = document.execCommand('copy');
+
+        if (successful) {
+          message.success('Page link copied to clipboard!');
+        } else {
+          message.error('Failed to copy link to clipboard');
+        }
+      } catch (err) {
+        message.error('Failed to copy link to clipboard');
+      }
+
+      document.body.removeChild(textArea);
+    } else {
+      navigator.clipboard.writeText(pageLink).then(
+        function () {
+          message.success('Page link copied to clipboard!');
+        },
+        function (err) {
+          message.error('Failed to copy link to clipboard');
+        }
+      );
+    }
+  };
+
   let sessionColumns = [
     {
       title: 'Session Name',
@@ -121,7 +166,13 @@ const ManageSessions = () => {
               borderLeft: `6px solid ${record.color_code || '#fff'}`,
             },
           },
-          children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+          children: (
+            <>
+              {' '}
+              <Text className={styles.textAlignLeft}>{record.name}</Text>{' '}
+              {record.is_active ? null : <EyeInvisibleOutlined />}{' '}
+            </>
+          ),
         };
       },
     },
@@ -169,32 +220,43 @@ const ManageSessions = () => {
       render: (text, record) => {
         return (
           <Row justify="start">
-            <Col md={24} lg={24} xl={6}>
-              <Button
-                className={styles.detailsButton}
-                onClick={() =>
-                  trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
-                    beginning: record.beginning,
-                    expiry: record.expiry,
-                  })
-                }
-                type="link"
-              >
-                Edit
-              </Button>
+            <Col md={24} lg={4} xl={4}>
+              <Tooltip title="Edit">
+                <Button
+                  className={styles.detailsButton}
+                  type="text"
+                  onClick={() =>
+                    trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
+                      beginning: record.beginning,
+                      expiry: record.expiry,
+                    })
+                  }
+                  icon={<EditOutlined />}
+                />
+              </Tooltip>
             </Col>
-            <Col md={24} lg={24} xl={14}>
+            <Col md={24} lg={4} xl={4}>
+              <Tooltip title="Copy Session Link">
+                <Button
+                  type="text"
+                  className={styles.detailsButton}
+                  onClick={() => copyPageLinkToClipboard(record.session_id)}
+                  icon={<CopyOutlined />}
+                />
+              </Tooltip>
+            </Col>
+            <Col md={24} lg={6} xl={6}>
               {!record.is_active ? (
                 <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
-                  Publish
+                  Show
                 </Button>
               ) : (
                 <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
-                  Unpublish
+                  Hide
                 </Button>
               )}
             </Col>
-            <Col md={24} lg={24} xl={4}>
+            <Col md={24} lg={4} xl={4}>
               <Popconfirm
                 title="Do you want to delete session?"
                 icon={<DeleteOutlined className={styles.danger} />}
@@ -234,30 +296,35 @@ const ManageSessions = () => {
               })
             }
           >
-            <Text>{item.name}</Text>
+            <Text>{item.name}</Text> {item.is_active ? null : <EyeInvisibleOutlined />}
           </div>
         }
         actions={[
           <Button
-            type="link"
             className={styles.detailsButton}
+            type="text"
             onClick={() =>
               trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
                 beginning: item.beginning,
                 expiry: item.expiry,
               })
             }
-          >
-            Edit
-          </Button>,
+            icon={<EditOutlined />}
+          />,
+          <Button
+            type="text"
+            className={styles.detailsButton}
+            onClick={() => copyPageLinkToClipboard(item.session_id)}
+            icon={<CopyOutlined />}
+          />,
           <>
             {!item.is_active ? (
               <Button type="text" className={styles.sucessButton} onClick={() => publishSession(item.session_id)}>
-                Publish
+                Show
               </Button>
             ) : (
               <Button type="text" danger onClick={() => unpublishSession(item.session_id)}>
-                Unpublish
+                Hide
               </Button>
             )}
           </>,
@@ -268,9 +335,7 @@ const ManageSessions = () => {
             cancelText="No"
             onConfirm={() => deleteSession(item.session_id)}
           >
-            <Button danger type="text">
-              Delete
-            </Button>
+            <Button danger type="text" icon={<DeleteOutlined />} />
           </Popconfirm>,
         ]}
       >
