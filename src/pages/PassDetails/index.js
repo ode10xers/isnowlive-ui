@@ -176,7 +176,7 @@ const PassDetails = ({ match, history }) => {
           </Row>
         </Col>
         <Col xs={24}>
-          {pass && pass.sessions?.length > 0 && (
+          {pass && (
             <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
               <Col xs={24} className={styles.p20}>
                 <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
@@ -217,16 +217,19 @@ const PassDetails = ({ match, history }) => {
                   </Row>
                 </Card>
               </Col>
-              <Col xs={24}>
-                <Row gutter={[8, 8]}>
-                  <Col xs={24}>
-                    <Text className={styles.ml20}> Applicable to below class(es) </Text>
-                  </Col>
-                  <Col xs={24}>
-                    <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
-                  </Col>
-                </Row>
-              </Col>
+
+              {pass.sessions?.length > 0 && (
+                <Col xs={24}>
+                  <Row gutter={[8, 8]}>
+                    <Col xs={24}>
+                      <Text className={styles.ml20}> Applicable to below class(es) </Text>
+                    </Col>
+                    <Col xs={24}>
+                      <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
+                    </Col>
+                  </Row>
+                </Col>
+              )}
             </Row>
           )}
         </Col>

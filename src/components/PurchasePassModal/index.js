@@ -112,12 +112,13 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
 
         if (result.error) {
           message.error('Cannot initiate payment at this time, please try again...');
+          setIsLoading(false);
         }
       }
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
     }
-    setIsLoading(false);
   };
 
   const createOrder = async (userEmail) => {
@@ -127,7 +128,6 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     }
 
     setIsLoading(true);
-
     try {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: pass.id,
@@ -139,19 +139,19 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
+          setIsLoading(false);
           showBookingSuccessModal(userEmail, pass, false, false);
+          closeModal();
         }
-        closeModal();
       }
     } catch (error) {
+      setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(true);
         closeModal();
       }
     }
-
-    setIsLoading(false);
   };
 
   const onFinish = async (values) => {

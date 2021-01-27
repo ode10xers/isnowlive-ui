@@ -146,6 +146,7 @@ const ClassPasses = ({ username, passes }) => {
         <Card
           className={styles.card}
           title={<Text>{pass.name}</Text>}
+          onClick={() => redirectToPassPage(pass)}
           actions={[
             <Button type="primary" onClick={() => showPurchaseModal(pass.id)}>
               Buy Pass
