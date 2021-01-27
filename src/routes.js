@@ -9,6 +9,7 @@ const Routes = {
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/creator/session',
+  passDetails: '/p/:pass_id',
   inventoryDetails: '/e/:inventory_id',
   sessionDetails: '/s/:session_id',
   sessionUpdate: '/creator/session/:id/edit',

@@ -27,6 +27,7 @@ import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
 import PaymentVerification from 'pages/PaymentVerification';
 import SessionReschedule from 'pages/SessionReschedule';
+import PassDetails from 'pages/PassDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -109,6 +110,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+        <RouteWithLayout layout={DefaultLayout} exact path={Routes.passDetails} component={PassDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
