@@ -56,6 +56,7 @@ const InventoryDetails = ({ match, history }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const getDetails = useCallback(
     async (username, inventory_id) => {
@@ -272,16 +273,18 @@ const InventoryDetails = ({ match, history }) => {
 
               if (isAPISuccess(followUpBooking.status)) {
                 showBookingSuccessModal(userEmail, selectedPass, true);
+                setIsLoading(false);
               }
             } else {
               showBookingSuccessModal(userEmail, selectedPass, true);
+              setIsLoading(false);
             }
           } else {
             showBookingSuccessModal(userEmail);
+            setIsLoading(false);
           }
         }
       }
-      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
@@ -298,6 +301,7 @@ const InventoryDetails = ({ match, history }) => {
   const onFinish = async (values) => {
     try {
       setIsLoading(true);
+      setIncorrectPassword(false);
       // check if user is login
 
       // NOTE: Reason the check have getLocalUserDetails() and not currentUser
@@ -319,7 +323,13 @@ const InventoryDetails = ({ match, history }) => {
           }
         } catch (error) {
           setIsLoading(false);
-          message.error(error.response?.data?.message || 'Something went wrong');
+
+          if (error.response?.status === 403) {
+            setIncorrectPassword(true);
+            message.error('Incorrect email or password');
+          } else {
+            message.error(error.response?.data?.message || 'Something went wrong');
+          }
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
@@ -349,6 +359,7 @@ const InventoryDetails = ({ match, history }) => {
   const hideSignInForm = () => {
     setShowSignInForm(false);
     setShowPasswordField(false);
+    setIncorrectPassword(false);
 
     const userDetails = getLocalUserDetails();
 
@@ -380,12 +391,11 @@ const InventoryDetails = ({ match, history }) => {
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} lg={12}>
+        <Col xs={12}>
           <SessionInfo session={session} />
         </Col>
-        <Col xs={24} lg={9}></Col>
         {creator && (
-          <Col xs={24} lg={3}>
+          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
@@ -395,7 +405,7 @@ const InventoryDetails = ({ match, history }) => {
         )}
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} lg={14}>
+        <Col xs={24} lg={15}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (
             <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
@@ -425,11 +435,10 @@ const InventoryDetails = ({ match, history }) => {
             </>
           )}
         </Col>
-        <Col xs={24} lg={1}></Col>
-        <Col xs={24} lg={9}>
+        <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={showSignInForm ? 14 : 18} className={styles.mt50}>
+        <Col xs={24} lg={15} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           {session?.end_time &&
             getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
             (showSignInForm ? (
@@ -437,17 +446,15 @@ const InventoryDetails = ({ match, history }) => {
                 user={currentUser}
                 onSetNewPassword={handleSendNewPasswordEmail}
                 hideSignInForm={() => hideSignInForm()}
+                incorrectPassword={incorrectPassword}
               />
             ) : (
               <SessionRegistration
                 user={currentUser}
                 showPasswordField={showPasswordField}
+                incorrectPassword={incorrectPassword}
                 onFinish={onFinish}
                 onSetNewPassword={handleSendNewPasswordEmail}
-                showSignInForm={() => {
-                  setShowPasswordField(false);
-                  setShowSignInForm(true);
-                }}
                 availablePasses={availablePasses}
                 userPasses={userPasses}
                 setSelectedPass={setSelectedPass}
@@ -460,6 +467,12 @@ const InventoryDetails = ({ match, history }) => {
                   setSelectedPass(null);
                   setUserPasses([]);
                   setShowSignInForm(true);
+                  setIncorrectPassword(false);
+                }}
+                showSignInForm={() => {
+                  setShowPasswordField(false);
+                  setShowSignInForm(true);
+                  setIncorrectPassword(false);
                 }}
               />
             ))}
