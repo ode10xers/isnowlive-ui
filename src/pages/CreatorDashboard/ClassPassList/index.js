@@ -349,7 +349,11 @@ const ClassPassList = () => {
       <Col xs={24}>
         <Card
           className={styles.card}
-          title={<Text>{pass.name}</Text>}
+          title={
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${pass.color_code || '#FFF'}` }}>
+              <Text>{pass.name}</Text>
+            </div>
+          }
           actions={[
             <Tooltip title="Edit">
               <Button
