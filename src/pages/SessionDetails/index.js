@@ -61,16 +61,16 @@ const SessionDetails = ({ match, history }) => {
   const getDetails = useCallback(
     async (username, session_id) => {
       try {
-        const inventoryDetails = await apis.session.getSessionDetails(session_id);
+        const sessionDetails = await apis.session.getSessionDetails(session_id);
         const userDetails = await apis.user.getProfileByUsername(username);
         const passes = await apis.passes.getPassesBySessionId(session_id);
-        setSession(inventoryDetails.data);
+        setSession(sessionDetails.data);
         setCreator(userDetails.data);
         setAvailablePasses(passes.data);
         setIsLoading(false);
-        const latestInventories = inventoryDetails.data.inventory
-          .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0))
-          .filter((inventory) => isBeforeDate(inventory.end_time));
+        const latestInventories = sessionDetails.data.inventory
+          .filter((inventory) => isBeforeDate(inventory.end_time))
+          .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
         setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -406,7 +406,7 @@ const SessionDetails = ({ match, history }) => {
         )}
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} lg={14}>
+        <Col xs={24} lg={15}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (
             <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>

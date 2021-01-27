@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty } from 'antd';
-import { DeleteOutlined, DownCircleOutlined, UpCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty, Tooltip } from 'antd';
+import {
+  DeleteOutlined,
+  DownCircleOutlined,
+  UpCircleOutlined,
+  CopyOutlined,
+  EyeInvisibleOutlined,
+  PlayCircleOutlined,
+} from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -10,7 +17,8 @@ import { isMobileDevice } from 'utils/device';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import { isAPISuccess, getDuration } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 import {
   mixPanelEventTags,
@@ -61,6 +69,7 @@ const SessionsInventories = ({ match }) => {
           session_id: i.session_id,
           max_participants: i.max_participants,
           color_code: i.color_code,
+          is_published: i.is_published,
         }));
 
         let filterByDateSessions = [];
@@ -142,6 +151,49 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
+  const copyPageLinkToClipboard = (inventoryId) => {
+    const username = getLocalUserDetails().username;
+    const pageLink = `${generateUrlFromUsername(username)}/e/${inventoryId}`;
+
+    // Fallback method if navigator.clipboard is not supported
+    if (!navigator.clipboard) {
+      var textArea = document.createElement('textarea');
+      textArea.value = pageLink;
+
+      // Avoid scrolling to bottom
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        var successful = document.execCommand('copy');
+
+        if (successful) {
+          message.success('Page link copied to clipboard!');
+        } else {
+          message.error('Failed to copy link to clipboard');
+        }
+      } catch (err) {
+        message.error('Failed to copy link to clipboard');
+      }
+
+      document.body.removeChild(textArea);
+    } else {
+      navigator.clipboard.writeText(pageLink).then(
+        function () {
+          message.success('Page link copied to clipboard!');
+        },
+        function (err) {
+          message.error('Failed to copy link to clipboard');
+        }
+      );
+    }
+  };
+
   const emptyTableCell = {
     props: {
       colSpan: 0,
@@ -192,7 +244,13 @@ const SessionsInventories = ({ match }) => {
                 borderLeft: `6px solid ${record.color_code || whiteColor}`,
               },
             },
-            children: <Text className={styles.textAlignLeft}>{record.name}</Text>,
+            children: (
+              <>
+                {' '}
+                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
+                <Text className={styles.textAlignLeft}>{record.name}</Text>{' '}
+              </>
+            ),
           };
         }
       },
@@ -245,16 +303,25 @@ const SessionsInventories = ({ match }) => {
           </Row>
         ) : (
           <Row justify="start">
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={6}>
               <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={4}>
+              <Tooltip title="Copy Event Page Link">
+                <Button
+                  type="text"
+                  onClick={() => copyPageLinkToClipboard(record.inventory_id)}
+                  icon={<CopyOutlined />}
+                />
+              </Tooltip>
+            </Col>
+            <Col md={24} lg={24} xl={4}>
               {isDisabled ? (
-                <Button type="text" disabled={isDisabled}>
-                  Cancel
-                </Button>
+                <Tooltip title="Event cannot be cancelled">
+                  <Button type="text" disabled icon={<DeleteOutlined />} />
+                </Tooltip>
               ) : (
                 <Popconfirm
                   title="Do you want to cancel session?"
@@ -263,18 +330,23 @@ const SessionsInventories = ({ match }) => {
                   cancelText="No"
                   onConfirm={() => deleteInventory(record.inventory_id)}
                 >
-                  <Button type="text" danger>
-                    Cancel
-                  </Button>
+                  <Tooltip title="Cancel event">
+                    <Button type="text" danger icon={<DeleteOutlined />} />
+                  </Tooltip>
                 </Popconfirm>
               )}
             </Col>
 
-            <Col md={24} lg={24} xl={8}>
+            <Col md={24} lg={24} xl={4}>
               {!isPast && (
-                <Button type="link" disabled={!record.start_url} onClick={() => trackAndStartSession(record)}>
-                  Start
-                </Button>
+                <Tooltip title="Start event">
+                  <Button
+                    type="text"
+                    disabled={!record.start_url}
+                    onClick={() => trackAndStartSession(record)}
+                    icon={<PlayCircleOutlined style={{ color: '#52c41a' }} />}
+                  />
+                </Tooltip>
               )}
             </Col>
           </Row>
@@ -294,12 +366,6 @@ const SessionsInventories = ({ match }) => {
         </Text>
       ),
     },
-    // {
-    //   title: '',
-    //   dataIndex: 'children',
-    //   key: 'children',
-    //   render: (text, record) => <> {record.children.map(renderSessionItem)} </>
-    // },
   ];
 
   const renderSessionItem = (item) => {
@@ -316,23 +382,24 @@ const SessionsInventories = ({ match }) => {
 
     return (
       <Card
-        className={styles.card}
+        className={item.is_published ? styles.card : styles.unpublished}
         title={
           <div
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
-            <Text>{item.name}</Text>
+            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>
           </div>
         }
         actions={[
-          <Button className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)} type="link">
+          <Button onClick={() => openSessionInventoryDetails(item)} type="link">
             Details
           </Button>,
+          <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />,
           isCancelDisabled ? (
-            <Button type="text" disabled={true}>
-              Cancel
-            </Button>
+            <Tooltip title="Event cannot be cancelled">
+              <Button type="text" disabled icon={<DeleteOutlined />} />
+            </Tooltip>
           ) : (
             <Popconfirm
               title="Do you want to cancel session?"
@@ -341,16 +408,21 @@ const SessionsInventories = ({ match }) => {
               cancelText={'No'}
               onConfirm={() => deleteInventory(item.inventory_id)}
             >
-              <Button type="text" danger>
-                Cancel
-              </Button>
+              <Tooltip title="Cancel event">
+                <Button type="text" danger icon={<DeleteOutlined />} />
+              </Tooltip>
             </Popconfirm>
           ),
           <>
             {!isPast && (
-              <Button type="link" disabled={!item.start_url} onClick={() => trackAndStartSession(item)}>
-                Start
-              </Button>
+              <Tooltip title="Start event">
+                <Button
+                  type="text"
+                  disabled={!item.start_url}
+                  onClick={() => trackAndStartSession(item)}
+                  icon={<PlayCircleOutlined style={{ color: '#52c41a' }} />}
+                />
+              </Tooltip>
             )}
           </>,
         ]}
@@ -451,6 +523,7 @@ const SessionsInventories = ({ match }) => {
                   data={filteredByDateSession}
                   loading={isLoading}
                   rowKey={(record) => record.start_time}
+                  rowClassName={(record, index) => (!record.is_date && !record.is_published ? styles.unpublished : '')}
                   expandable={{
                     expandedRowKeys: expandedRowKeys,
                     onExpand: (expanded, record) => {
