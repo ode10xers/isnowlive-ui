@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import MobileDetect from 'mobile-detect';
 
-import { Row, Col, Button, Form, Input, Typography, Tag } from 'antd';
+import { Row, Col, Button, Form, Input, Typography, Tag, Card } from 'antd';
 import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -22,7 +22,7 @@ const { Item } = Form;
 const { Password } = Input;
 
 const {
-  formatDate: { toShortDate },
+  formatDate: { toShortDate, toLongDateWithTime },
 } = dateUtil;
 
 const SessionRegistration = ({
@@ -42,7 +42,6 @@ const SessionRegistration = ({
 }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  console.log(isMobileDevice);
 
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -203,6 +202,11 @@ const SessionRegistration = ({
     },
   ];
 
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(session.username || window.location.hostname.split('.')[0] || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
+  };
+
   const renderClassesList = (record) => (
     <Row>
       <Col xs={24}>
@@ -210,13 +214,155 @@ const SessionRegistration = ({
       </Col>
       <Col xs={24}>
         <div className={classNames(styles.ml20, styles.mt10)}>
-          {record.sessions.slice(0, 11).map((session) => (
-            <Tag color="blue"> {session.name} </Tag>
+          {record.sessions.map((session) => (
+            <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+              {' '}
+              {session.name}{' '}
+            </Tag>
           ))}
         </div>
       </Col>
     </Row>
   );
+
+  const renderPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <div>
+        <Card
+          className={styles.card}
+          title={
+            <Row>
+              <Col xs={4}>
+                {selectedPass?.id === pass.id ? (
+                  <div onClick={() => setSelectedPass(pass)}>
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                  </div>
+                ) : (
+                  <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
+                )}
+              </Col>
+              <Col xs={20}>
+                <Text>{pass.name}</Text>
+              </Col>
+            </Row>
+          }
+          actions={[
+            <Button type="primary" onClick={() => setSelectedPass(pass)}>
+              Select Pass
+            </Button>,
+            expandedRowKeys.includes(pass.id) ? (
+              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
+                Close
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
+                More
+              </Button>
+            ),
+          ]}
+        >
+          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+        </Card>
+        {expandedRowKeys.includes(pass.id) && (
+          <Row className={styles.cardExpansion}>
+            <Col xs={24}>
+              <Text className={styles.ml20}> Applicable to below class(es) </Text>
+            </Col>
+            <Col xs={24}>
+              <div className={classNames(styles.ml20, styles.mt10)}>
+                {pass.sessions.map((session) => (
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
+      </div>
+    );
+  };
+
+  const renderUserPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <div>
+        <Card
+          className={styles.card}
+          title={
+            <Row>
+              <Col xs={4}>
+                {selectedPass?.id === pass.id ? (
+                  <div onClick={() => setSelectedPass(pass)}>
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                  </div>
+                ) : (
+                  <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
+                )}
+              </Col>
+              <Col xs={20}>
+                <Text>{pass.name}</Text>
+              </Col>
+            </Row>
+          }
+          actions={[
+            <Button type="primary" onClick={() => setSelectedPass(pass)}>
+              Select Pass
+            </Button>,
+            expandedRowKeys.includes(pass.id) ? (
+              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
+                Close
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
+                More
+              </Button>
+            ),
+          ]}
+        >
+          {layout('Classes Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
+          {layout('Expiry', <Text>{toShortDate(pass.expiry)}</Text>)}
+        </Card>
+        {expandedRowKeys.includes(pass.id) && (
+          <Row className={styles.cardExpansion}>
+            <Col xs={24}>
+              <Text className={styles.ml20}> Applicable to below class(es) </Text>
+            </Col>
+            <Col xs={24}>
+              <div className={classNames(styles.ml20, styles.mt10)}>
+                {pass.sessions.map((session) => (
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={classNames(styles.box, styles.p50, styles.mb20)}>
@@ -305,19 +451,26 @@ const SessionRegistration = ({
             {user && userPasses.length > 0 ? (
               <div>
                 <Title level={5}> Purchased pass(es) usable for this class </Title>
-                <Table
-                  size="small"
-                  columns={userPassesColumns}
-                  data={userPasses}
-                  rowKey={(record) => record.pass_order_id}
-                />
+                {isMobileDevice ? (
+                  userPasses.map(renderUserPassItem)
+                ) : (
+                  <Table
+                    size="small"
+                    columns={userPassesColumns}
+                    data={userPasses}
+                    rowKey={(record) => record.pass_order_id}
+                  />
+                )}
               </div>
             ) : (
               <>
                 {availablePasses.length > 0 && (
                   <>
                     <div>
-                      <Title level={5}> Book this class </Title>
+                      <Title level={5}>
+                        {' '}
+                        Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class{' '}
+                      </Title>
                       <Table
                         size="small"
                         showHeader={false}
@@ -328,18 +481,28 @@ const SessionRegistration = ({
                     </div>
 
                     <div className={styles.mt20}>
-                      <Title level={5}> Buy pass & book this class </Title>
-                      <Table
-                        size="small"
-                        columns={passesColumns}
-                        data={availablePasses}
-                        rowKey={(record) => record.id}
-                        expandable={{
-                          expandedRowRender: renderClassesList,
-                          expandIconColumnIndex: -1,
-                          expandedRowKeys: expandedRowKeys,
-                        }}
-                      />
+                      <Title level={5}>
+                        {' '}
+                        Buy pass & book {selectedInventory
+                          ? toLongDateWithTime(selectedInventory.start_time)
+                          : 'this'}{' '}
+                        class{' '}
+                      </Title>
+                      {isMobileDevice ? (
+                        availablePasses.map(renderPassItem)
+                      ) : (
+                        <Table
+                          size="small"
+                          columns={passesColumns}
+                          data={availablePasses}
+                          rowKey={(record) => record.id}
+                          expandable={{
+                            expandedRowRender: renderClassesList,
+                            expandIconColumnIndex: -1,
+                            expandedRowKeys: expandedRowKeys,
+                          }}
+                        />
+                      )}
                     </div>
                   </>
                 )}
@@ -347,9 +510,9 @@ const SessionRegistration = ({
             )}
 
             <Row className={styles.mt10}>
-              {user && selectedPass && userPasses.length > 0 && (
+              {user && selectedInventory && selectedPass && userPasses.length > 0 && (
                 <Paragraph>
-                  Booking this class for{' '}
+                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
                   <Text delete>
                     {' '}
                     {classDetails.price} {classDetails.currency}{' '}

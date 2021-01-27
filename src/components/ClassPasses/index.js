@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
+import classNames from 'classnames';
 
-import { Row, Col, Typography, Button } from 'antd';
+import { Row, Col, Typography, Button, Card, Tag } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
 import SessionCards from 'components/SessionCards';
 import PurchasePassModal from 'components/PurchasePassModal';
 
+import { generateUrlFromUsername } from 'utils/helper';
+
 import styles from './style.module.scss';
 
 const { Text, Paragraph } = Typography;
 
-const ClassPasses = ({ passes }) => {
+const ClassPasses = ({ username, passes }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
-  console.log(isMobileDevice);
 
   const [selectedPass, setSelectedPass] = useState(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
@@ -29,6 +31,11 @@ const ClassPasses = ({ passes }) => {
   const closePurchaseModal = () => {
     setSelectedPass(null);
     setShowPurchasePassModal(false);
+  };
+
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(session.username || username || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
   const toggleExpandAll = () => {
@@ -116,6 +123,61 @@ const ClassPasses = ({ passes }) => {
     </Row>
   );
 
+  const renderPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <div>
+        <Card
+          className={styles.card}
+          title={<Text>{pass.name}</Text>}
+          actions={[
+            <Button type="primary" onClick={() => showPurchaseModal(pass.id)}>
+              Buy Pass
+            </Button>,
+            expandedRowKeys.includes(pass.id) ? (
+              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
+                Close
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
+                More
+              </Button>
+            ),
+          ]}
+        >
+          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+        </Card>
+        {expandedRowKeys.includes(pass.id) && (
+          <Row className={styles.cardExpansion}>
+            <Col xs={24}>
+              <Text className={styles.ml20}> Applicable to below class(es) </Text>
+            </Col>
+            <Col xs={24}>
+              <div className={classNames(styles.ml20, styles.mt10)}>
+                {pass.sessions.map((session) => (
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.box}>
       <PurchasePassModal visible={showPurchasePassModal} pass={selectedPass} closeModal={closePurchaseModal} />
@@ -124,23 +186,34 @@ const ClassPasses = ({ passes }) => {
           <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
           <Paragraph>
             Check out the passes below and the classes included in them. Once you have bought the pass you can use the
-            class credits to pay for classes in 1 click it wihout needing to touch your wallet again. Class pass is
+            class credits to pay for classes in 1 click it without needing to touch your wallet again. Class pass is
             valid from from the date you buy it until the validity period.
           </Paragraph>
         </Col>
         <Col xs={24}>
-          <Table
-            sticky={true}
-            columns={passesColumns}
-            data={passes}
-            rowKey={(record) => record.id}
-            expandable={{
-              expandedRowRender: (record) => renderClassesList(record),
-              expandRowByClick: true,
-              expandIconColumnIndex: -1,
-              expandedRowKeys: expandedRowKeys,
-            }}
-          />
+          {isMobileDevice ? (
+            passes.length > 0 ? (
+              passes.map(renderPassItem)
+            ) : (
+              <div className={styles.textAlignCenter}>
+                {' '}
+                <Text disabled> No Passes </Text>{' '}
+              </div>
+            )
+          ) : (
+            <Table
+              sticky={true}
+              columns={passesColumns}
+              data={passes}
+              rowKey={(record) => record.id}
+              expandable={{
+                expandedRowRender: (record) => renderClassesList(record),
+                expandRowByClick: true,
+                expandIconColumnIndex: -1,
+                expandedRowKeys: expandedRowKeys,
+              }}
+            />
+          )}
         </Col>
       </Row>
     </div>

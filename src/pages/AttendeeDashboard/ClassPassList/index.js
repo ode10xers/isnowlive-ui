@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Button, Typography, Collapse } from 'antd';
+import classNames from 'classnames';
+import { Row, Col, Button, Typography, Collapse, Card, Tag } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -11,6 +12,7 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -88,6 +90,11 @@ const ClassPassList = () => {
   useEffect(() => {
     getPassesForAttendee();
   }, [getPassesForAttendee]);
+
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(session.username || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
+  };
 
   const toggleExpandAllActivePasses = () => {
     if (expandedActiveRowKeys.length > 0) {
@@ -191,6 +198,72 @@ const ClassPassList = () => {
     </Row>
   );
 
+  const renderPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <div>
+        <Card
+          className={styles.card}
+          title={<Text>{pass.name}</Text>}
+          actions={[
+            pass.expired ? (
+              expandedExpiredRowKeys.includes(pass.pass_order_id) ? (
+                <Button type="link" onClick={() => collapseExpiredRow(pass.pass_order_id)} icon={<UpOutlined />}>
+                  Close
+                </Button>
+              ) : (
+                <Button type="link" onClick={() => expandExpiredRow(pass.pass_order_id)} icon={<DownOutlined />}>
+                  More
+                </Button>
+              )
+            ) : expandedActiveRowKeys.includes(pass.pass_order_id) ? (
+              <Button type="link" onClick={() => collapseActiveRow(pass.pass_order_id)} icon={<UpOutlined />}>
+                Close
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandActiveRow(pass.pass_order_id)} icon={<DownOutlined />}>
+                More
+              </Button>
+            ),
+          ]}
+        >
+          {layout(
+            'Classes Left',
+            <Text>{pass.limited ? `${pass.classes_remaining}/${pass.class_count} Classes` : 'Unlimited Classes'}</Text>
+          )}
+          {layout('Expires On', <Text>{toShortDate(pass.expiry)}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+        </Card>
+        {((pass.expired && expandedExpiredRowKeys.includes(pass.pass_order_id)) ||
+          expandedActiveRowKeys.includes(pass.pass_order_id)) && (
+          <Row className={styles.cardExpansion}>
+            <Col xs={24}>
+              <Text className={styles.ml20}> Applicable to below class(es) </Text>
+            </Col>
+            <Col xs={24}>
+              <div className={classNames(styles.ml20, styles.mt10)}>
+                {pass.sessions.map((session) => (
+                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
+                    {' '}
+                    {session.name}{' '}
+                  </Tag>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={styles.box}>
       <Row gutter={8}>
@@ -210,7 +283,7 @@ const ClassPassList = () => {
                 <Col xs={24}>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Active Class Passes">
-                      Mobile Cards Here
+                      {passes.map(renderPassItem)}
                     </Loader>
                   ) : (
                     <Table
@@ -241,7 +314,7 @@ const ClassPassList = () => {
                 <Col xs={24}>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Expired Class Passes">
-                      Mobile Cards Here
+                      {expiredPasses.map(renderPassItem)}
                     </Loader>
                   ) : (
                     <Table

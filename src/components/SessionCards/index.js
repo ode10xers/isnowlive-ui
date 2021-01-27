@@ -58,8 +58,6 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
   };
 
   const redirectToSessionsPage = (session) => {
-    console.log(session);
-    console.log(username);
     const baseUrl = generateUrlFromUsername(username || session.username || 'app');
     window.open(`${baseUrl}/s/${session.session_id}`);
   };
