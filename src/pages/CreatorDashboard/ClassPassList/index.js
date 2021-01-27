@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, message } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -198,7 +198,7 @@ const ClassPassList = () => {
           children: (
             <>
               <Text> {record.name} </Text>
-              {record.is_active ? null : <EyeInvisibleOutlined />}
+              {record.is_published ? null : <EyeInvisibleOutlined />}
             </>
           ),
         };
@@ -319,19 +319,100 @@ const ClassPassList = () => {
     );
   };
 
+  const renderMobileSubscriberCards = (subscriber) => (
+    <Card>
+      <Row>
+        <Col xs={24}>
+          <Title level={5}> {subscriber.name} </Title>
+        </Col>
+        <Col xs={24}>
+          <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
+        </Col>
+        <Col xs={24}>
+          <Text> {`${subscriber.price_paid} ${subscriber.currency}`} </Text>
+        </Col>
+      </Row>
+    </Card>
+  );
+
+  const renderPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Col xs={24}>
+        <Card
+          className={styles.card}
+          title={<Text>{pass.name}</Text>}
+          actions={[
+            <Tooltip title="Edit">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showEditPassesModal(pass)}
+                icon={<EditOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title="Copy Pass Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(pass.id)}
+                icon={<CopyOutlined />}
+              />
+            </Tooltip>,
+            pass.is_published ? (
+              <Tooltip title="Hide Session">
+                <Button type="link" danger onClick={() => unpublishPass(pass.id)}>
+                  Hide
+                </Button>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Unhide Session">
+                <Button type="link" className={styles.successBtn} onClick={() => publishPass(pass.id)}>
+                  Show
+                </Button>
+              </Tooltip>
+            ),
+            expandedRowKeys.includes(pass.id) ? (
+              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />} />
+            ) : (
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />} />
+            ),
+          ]}
+        >
+          {layout('Class Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+        </Card>
+        {expandedRowKeys.includes(pass.id) && (
+          <Row className={styles.cardExpansion}>
+            <div className={styles.mb20}>{pass.subscribers.map(renderMobileSubscriberCards)}</div>
+          </Row>
+        )}
+      </Col>
+    );
+  };
+
   return (
     <div className={styles.box}>
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
-      <Row gutter={8}>
-        <Col xs={24} md={14} lg={17}>
+      <Row gutter={[8, 24]}>
+        <Col xs={12} md={14} lg={17}>
           <Title level={4}> Class Passes </Title>
         </Col>
-        <Col xs={24} md={4} lg={3}>
+        <Col xs={12} md={4} lg={3}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={12} md={6} lg={4}>
+        <Col xs={24} md={6} lg={4}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
             Create New Pass
           </Button>
@@ -339,7 +420,7 @@ const ClassPassList = () => {
         <Col xs={24}>
           {isMobileDevice ? (
             <Loader loading={isLoading} size="large" text="Loading Class Passes">
-              Mobile Cards Here
+              <Row gutter={[8, 16]}>{passes.map(renderPassItem)}</Row>
             </Loader>
           ) : (
             <Table
