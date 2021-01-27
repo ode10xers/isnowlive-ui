@@ -5,13 +5,12 @@ import { TwitterPicker } from 'react-color';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
-import { ISO_8601 } from 'moment';
 
 const { Text } = Typography;
 
@@ -253,7 +252,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row className={styles.classPassRow} gutter={[ISO_8601, 16]}>
+          <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
               <Row>
                 <Col xs={24}>

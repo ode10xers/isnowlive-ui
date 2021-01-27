@@ -7,18 +7,24 @@ import {
   CopyOutlined,
   EyeInvisibleOutlined,
   PlayCircleOutlined,
+  VideoCameraAddOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
 import Routes from 'routes';
-import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import { isAPISuccess, getDuration, generateUrlFromUsername } from 'utils/helper';
+import ZoomDetailsModal from 'components/ZoomDetailsModal';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+
+import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
+import { isAPISuccess, getDuration, generateUrlFromUsername } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -26,6 +32,8 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+
+import Icons from 'assets/icons';
 
 import styles from './styles.module.scss';
 
@@ -46,6 +54,7 @@ const SessionsInventories = ({ match }) => {
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [selectedInventoryForZoom, setSelectedInventoryForZoom] = useState(null);
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
@@ -95,7 +104,7 @@ const SessionsInventories = ({ match }) => {
       }
       setIsLoading(false);
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      showErrorModal('Something went wrong', error.response?.data?.message);
       setIsLoading(false);
     }
   }, []);
@@ -144,10 +153,11 @@ const SessionsInventories = ({ match }) => {
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag, { inventory_id: inventory_id });
         getStaffSession(match?.params?.session_type);
+        showSuccessModal('Event has been cancelled');
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      showErrorModal('Something went wrong', error.response?.data?.message);
     }
   };
 
@@ -296,17 +306,27 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
-                Details
-              </Button>
+              <Tooltip title="Event Details">
+                <Button
+                  type="link"
+                  className={styles.detailsButton}
+                  onClick={() => openSessionInventoryDetails(record)}
+                  icon={<InfoCircleOutlined />}
+                />
+              </Tooltip>
             </Col>
           </Row>
         ) : (
-          <Row justify="start">
-            <Col md={24} lg={24} xl={6}>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
-                Details
-              </Button>
+          <Row justify="start" gutter={[8, 8]}>
+            <Col md={24} lg={24} xl={4}>
+              <Tooltip title="Event Details">
+                <Button
+                  type="link"
+                  className={styles.detailsButton}
+                  onClick={() => openSessionInventoryDetails(record)}
+                  icon={<InfoCircleOutlined />}
+                />
+              </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
               <Tooltip title="Copy Event Page Link">
@@ -337,18 +357,39 @@ const SessionsInventories = ({ match }) => {
               )}
             </Col>
 
-            <Col md={24} lg={24} xl={4}>
-              {!isPast && (
-                <Tooltip title="Start event">
-                  <Button
-                    type="text"
-                    disabled={!record.start_url}
-                    onClick={() => trackAndStartSession(record)}
-                    icon={<PlayCircleOutlined style={{ color: '#52c41a' }} />}
-                  />
-                </Tooltip>
-              )}
-            </Col>
+            {!isPast &&
+              (record.start_url ? (
+                <>
+                  <Col md={24} lg={24} xl={4}>
+                    <Tooltip title="Show Zoom Meeting Details">
+                      <Button
+                        type="link"
+                        icon={<Icons.VideoLink />}
+                        onClick={() => setSelectedInventoryForZoom(record)}
+                      />
+                    </Tooltip>
+                  </Col>
+                  <Col md={24} lg={24} xl={4}>
+                    <Tooltip title="Start event">
+                      <Button
+                        type="text"
+                        onClick={() => trackAndStartSession(record)}
+                        icon={<PlayCircleOutlined style={{ color: '#52c41a' }} />}
+                      />
+                    </Tooltip>
+                  </Col>
+                </>
+              ) : (
+                <Col md={24} lg={24} xl={4}>
+                  <Tooltip title="Add Zoom Meeting Details">
+                    <Button
+                      type="link"
+                      icon={<VideoCameraAddOutlined />}
+                      onClick={() => setSelectedInventoryForZoom(record)}
+                    />
+                  </Tooltip>
+                </Col>
+              ))}
           </Row>
         );
       },
@@ -380,9 +421,68 @@ const SessionsInventories = ({ match }) => {
       </Row>
     );
 
+    const meetingDetailsButton = (
+      <Tooltip title="Show Zoom Meeting Details">
+        <Button type="link" icon={<Icons.VideoLink />} onClick={() => setSelectedInventoryForZoom(item)} />
+      </Tooltip>
+    );
+
+    const startMeetingButton = (
+      <Tooltip title="Start event">
+        <Button
+          type="text"
+          onClick={() => trackAndStartSession(item)}
+          icon={<PlayCircleOutlined style={{ color: '#52c41a' }} />}
+        />
+      </Tooltip>
+    );
+
+    const addMeetingDetailsButton = (
+      <Tooltip title="Add Zoom Meeting Details">
+        <Button type="link" icon={<VideoCameraAddOutlined />} onClick={() => setSelectedInventoryForZoom(item)} />
+      </Tooltip>
+    );
+
+    const actionButtons = [
+      <Tooltip title="Event Details">
+        <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
+      </Tooltip>,
+      <Tooltip title="Copy Event Page Link">
+        <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />
+      </Tooltip>,
+      isCancelDisabled ? (
+        <Tooltip title="Event cannot be cancelled">
+          <Button type="text" disabled icon={<DeleteOutlined />} />
+        </Tooltip>
+      ) : (
+        <Popconfirm
+          title="Do you want to cancel session?"
+          icon={<DeleteOutlined className={styles.danger} />}
+          okText="Yes"
+          cancelText={'No'}
+          onConfirm={() => deleteInventory(item.inventory_id)}
+        >
+          <Tooltip title="Cancel event">
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Tooltip>
+        </Popconfirm>
+      ),
+    ];
+
+    if (!isPast) {
+      if (item.start_url) {
+        actionButtons.push(meetingDetailsButton);
+        actionButtons.push(startMeetingButton);
+      } else {
+        actionButtons.push(addMeetingDetailsButton);
+      }
+    }
+
     return (
       <Card
+        key={`${item.session_id}_${item.start_time}`}
         className={item.is_published ? styles.card : styles.unpublished}
+        actions={actionButtons}
         title={
           <div
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
@@ -391,41 +491,6 @@ const SessionsInventories = ({ match }) => {
             {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>
           </div>
         }
-        actions={[
-          <Button onClick={() => openSessionInventoryDetails(item)} type="link">
-            Details
-          </Button>,
-          <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />,
-          isCancelDisabled ? (
-            <Tooltip title="Event cannot be cancelled">
-              <Button type="text" disabled icon={<DeleteOutlined />} />
-            </Tooltip>
-          ) : (
-            <Popconfirm
-              title="Do you want to cancel session?"
-              icon={<DeleteOutlined className={styles.danger} />}
-              okText="Yes"
-              cancelText={'No'}
-              onConfirm={() => deleteInventory(item.inventory_id)}
-            >
-              <Tooltip title="Cancel event">
-                <Button type="text" danger icon={<DeleteOutlined />} />
-              </Tooltip>
-            </Popconfirm>
-          ),
-          <>
-            {!isPast && (
-              <Tooltip title="Start event">
-                <Button
-                  type="text"
-                  disabled={!item.start_url}
-                  onClick={() => trackAndStartSession(item)}
-                  icon={<PlayCircleOutlined style={{ color: '#52c41a' }} />}
-                />
-              </Tooltip>
-            )}
-          </>,
-        ]}
       >
         {layout('Type', <Text>{item.type}</Text>)}
         {layout('Duration', <Text>{item.duration}</Text>)}
@@ -448,99 +513,118 @@ const SessionsInventories = ({ match }) => {
     setCalendarView(e);
   };
 
-  return (
-    <div className={styles.box}>
-      <Row gutter={[8, 8]}>
-        <Col xs={24} md={18} lg={20}>
-          <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
-          <Radio.Group value={view} onChange={handleViewChange}>
-            <Radio.Button value="list">List</Radio.Button>
-            <Radio.Button value="calendar">Calendar</Radio.Button>
-          </Radio.Group>
-        </Col>
-        <Col xs={24} md={6} lg={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
-        </Col>
+  const handleCloseZoomDetailsModal = (shouldRefetch) => {
+    setSelectedInventoryForZoom(null);
 
-        <Col xs={24}>
-          {view === 'calendar' ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
-              {sessions.length > 0 ? (
-                <CalendarView
-                  inventories={sessions}
-                  onSelectInventory={openSessionInventoryDetails}
-                  onViewChange={onViewChange}
-                  calendarView={calendarView}
-                />
-              ) : (
-                <Empty />
-              )}
-            </Loader>
-          ) : (
-            <>
-              {isMobileDevice ? (
-                <Loader loading={isLoading} size="large" text="Loading sessions">
-                  {sessions.length > 0 ? (
-                    <Table
-                      columns={mobileTableColumns}
-                      data={filteredByDateSession.map((session) => ({
-                        start_time: session.start_time,
-                        name: session.name,
-                        is_date: session.is_date,
-                        sessions: session.children,
-                      }))}
-                      loading={isLoading}
-                      rowKey={(record) => record.start_time}
-                      expandable={{
-                        expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
-                        expandRowByClick: true,
-                        onExpand: (expanded, record) => {
-                          if (expanded) {
-                            expandRow(record.start_time);
-                          } else {
-                            collapseRow(record.start_time);
-                          }
-                        },
-                        expandedRowKeys: expandedRowKeys,
-                        expandIcon: ({ expanded, onExpand, record }) =>
-                          expanded ? (
-                            <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                          ) : (
-                            <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                          ),
-                      }}
-                    />
-                  ) : (
-                    <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
-                  )}
-                </Loader>
-              ) : (
-                <Table
-                  sticky={true}
-                  columns={dateColumns}
-                  data={filteredByDateSession}
-                  loading={isLoading}
-                  rowKey={(record) => record.start_time}
-                  rowClassName={(record, index) => (!record.is_date && !record.is_published ? styles.unpublished : '')}
-                  expandable={{
-                    expandedRowKeys: expandedRowKeys,
-                    onExpand: (expanded, record) => {
-                      if (expanded) {
-                        expandRow(record.start_time);
-                      } else {
-                        collapseRow(record.start_time);
-                      }
-                    },
-                  }}
-                />
-              )}
-            </>
-          )}
-        </Col>
-      </Row>
-    </div>
+    if (shouldRefetch) {
+      setIsLoading(true);
+      getStaffSession(isPast ? 'past' : 'upcoming');
+    }
+  };
+
+  return (
+    <>
+      <ZoomDetailsModal selectedInventory={selectedInventoryForZoom} closeModal={handleCloseZoomDetailsModal} />
+      <div className={styles.box}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} md={18} lg={20}>
+            <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
+            <Radio.Group value={view} onChange={handleViewChange}>
+              <Radio.Button value="list">List</Radio.Button>
+              <Radio.Button value="calendar">Calendar</Radio.Button>
+            </Radio.Group>
+          </Col>
+          <Col xs={24} md={6} lg={4}>
+            <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
+              {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          </Col>
+
+          <Col xs={24}>
+            {view === 'calendar' ? (
+              <Loader loading={isLoading} size="large" text="Loading sessions">
+                {sessions.length > 0 ? (
+                  <CalendarView
+                    inventories={sessions}
+                    onSelectInventory={openSessionInventoryDetails}
+                    onViewChange={onViewChange}
+                    calendarView={calendarView}
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Loader>
+            ) : (
+              <>
+                {isMobileDevice ? (
+                  <Loader loading={isLoading} size="large" text="Loading sessions">
+                    {sessions.length > 0 ? (
+                      <Table
+                        columns={mobileTableColumns}
+                        data={filteredByDateSession.map((session) => ({
+                          session_id: session.session_id,
+                          start_time: session.start_time,
+                          name: session.name,
+                          is_date: session.is_date,
+                          sessions: session.children,
+                        }))}
+                        loading={isLoading}
+                        rowKey={(record) =>
+                          record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                        }
+                        expandable={{
+                          expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
+                          expandRowByClick: true,
+                          onExpand: (expanded, record) => {
+                            if (expanded) {
+                              expandRow(record.start_time);
+                            } else {
+                              collapseRow(record.start_time);
+                            }
+                          },
+                          expandedRowKeys: expandedRowKeys,
+                          expandIcon: ({ expanded, onExpand, record }) =>
+                            expanded ? (
+                              <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                            ) : (
+                              <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                            ),
+                        }}
+                      />
+                    ) : (
+                      <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                    )}
+                  </Loader>
+                ) : (
+                  <Table
+                    sticky={true}
+                    columns={dateColumns}
+                    data={filteredByDateSession}
+                    loading={isLoading}
+                    rowKey={(record) =>
+                      record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                    }
+                    rowClassName={(record, index) =>
+                      !record.is_date && !record.is_published ? styles.unpublished : ''
+                    }
+                    expandable={{
+                      expandedRowKeys: expandedRowKeys,
+                      onExpand: (expanded, record) => {
+                        if (expanded) {
+                          expandRow(record.start_time);
+                        } else {
+                          collapseRow(record.start_time);
+                        }
+                      },
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </Col>
+        </Row>
+      </div>
+    </>
   );
 };
 
