@@ -172,10 +172,15 @@ const ProfilePreview = ({ username = null }) => {
     }
   };
 
-  const showInventoryDetails = (session) => {
-    trackSimpleEvent(user.click.profile.sessionCard, { inventory_id: session.inventory_id });
-    const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
-    window.open(`${baseurl}/e/${session.inventory_id}`);
+  // const showInventoryDetails = (session) => {
+  //   trackSimpleEvent(user.click.profile.sessionCard, { inventory_id: session.inventory_id });
+  //   const baseurl = generateUrlFromUsername(username || getLocalUserDetails().username);
+  //   window.open(`${baseurl}/e/${session.inventory_id}`);
+  // };
+
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(username || session.username || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
   const handleViewChange = async (e) => {
@@ -341,7 +346,7 @@ const ProfilePreview = ({ username = null }) => {
                       {calendarSession.length > 0 ? (
                         <CalendarView
                           inventories={calendarSession}
-                          onSelectInventory={showInventoryDetails}
+                          onSelectInventory={redirectToSessionsPage}
                           onViewChange={onViewChange}
                           calendarView={calendarView}
                         />
