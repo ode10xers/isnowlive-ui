@@ -158,7 +158,7 @@ const ManageSessions = () => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '20%',
+      width: '25%',
       render: (text, record) => {
         return {
           props: {
@@ -199,7 +199,7 @@ const ManageSessions = () => {
       title: 'Session Date',
       dataIndex: 'session_date',
       key: 'session_date',
-      width: '20%',
+      width: '25%',
       render: (text, record) => (
         <>
           {record.recurring ? (
@@ -216,11 +216,10 @@ const ManageSessions = () => {
     },
     {
       title: 'Actions',
-      width: '15%',
       render: (text, record) => {
         return (
-          <Row justify="start">
-            <Col md={24} lg={4} xl={4}>
+          <Row justify="start" gutter={8}>
+            <Col xs={24} md={4}>
               <Tooltip title="Edit">
                 <Button
                   className={styles.detailsButton}
@@ -235,7 +234,7 @@ const ManageSessions = () => {
                 />
               </Tooltip>
             </Col>
-            <Col md={24} lg={4} xl={4}>
+            <Col xs={24} md={4}>
               <Tooltip title="Copy Session Link">
                 <Button
                   type="text"
@@ -245,27 +244,31 @@ const ManageSessions = () => {
                 />
               </Tooltip>
             </Col>
-            <Col md={24} lg={6} xl={6}>
-              {!record.is_active ? (
-                <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
-                  Show
-                </Button>
-              ) : (
-                <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
-                  Hide
-                </Button>
-              )}
+            <Col xs={24} md={6}>
+              <Tooltip title={`${record.is_active ? 'Hide' : 'Unhide'} Session`}>
+                {!record.is_active ? (
+                  <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
+                    Show
+                  </Button>
+                ) : (
+                  <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
+                    Hide
+                  </Button>
+                )}
+              </Tooltip>
             </Col>
-            <Col md={24} lg={4} xl={4}>
-              <Popconfirm
-                title="Do you want to delete session?"
-                icon={<DeleteOutlined className={styles.danger} />}
-                okText="Yes"
-                cancelText="No"
-                onConfirm={() => deleteSession(record.session_id)}
-              >
-                <Button danger type="text" icon={<DeleteOutlined />} />
-              </Popconfirm>
+            <Col xs={24} md={4}>
+              <Tooltip title="Delete Session">
+                <Popconfirm
+                  title="Do you want to delete session?"
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => deleteSession(record.session_id)}
+                >
+                  <Button danger type="text" icon={<DeleteOutlined />} />
+                </Popconfirm>
+              </Tooltip>
             </Col>
           </Row>
         );

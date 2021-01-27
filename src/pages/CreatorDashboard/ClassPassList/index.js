@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button } from 'antd';
-import { DownOutlined, UpOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button, Tooltip, Card, message } from 'antd';
+import {
+  DownOutlined,
+  UpOutlined,
+  PlusCircleOutlined,
+  EditOutlined,
+  CopyOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -12,7 +19,8 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
 
@@ -115,6 +123,49 @@ const ClassPassList = () => {
     //eslint-disable-next-line
   }, []);
 
+  const copyPageLinkToClipboard = (passId) => {
+    const username = getLocalUserDetails().username;
+    const pageLink = `${generateUrlFromUsername(username)}/p/${passId}`;
+
+    // Fallback method if navigator.clipboard is not supported
+    if (!navigator.clipboard) {
+      var textArea = document.createElement('textarea');
+      textArea.value = pageLink;
+
+      // Avoid scrolling to bottom
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        var successful = document.execCommand('copy');
+
+        if (successful) {
+          message.success('Page link copied to clipboard!');
+        } else {
+          message.error('Failed to copy link to clipboard');
+        }
+      } catch (err) {
+        message.error('Failed to copy link to clipboard');
+      }
+
+      document.body.removeChild(textArea);
+    } else {
+      navigator.clipboard.writeText(pageLink).then(
+        function () {
+          message.success('Page link copied to clipboard!');
+        },
+        function (err) {
+          message.error('Failed to copy link to clipboard');
+        }
+      );
+    }
+  };
+
   const toggleExpandAll = () => {
     if (expandedRowKeys.length > 0) {
       setExpandedRowKeys([]);
@@ -144,7 +195,12 @@ const ClassPassList = () => {
               borderLeft: `6px solid ${record.color_code || '#FFF'}`,
             },
           },
-          children: <Text> {record.name} </Text>,
+          children: (
+            <>
+              <Text> {record.name} </Text>
+              {record.is_published ? null : <EyeInvisibleOutlined />}
+            </>
+          ),
         };
       },
     },
@@ -177,25 +233,42 @@ const ClassPassList = () => {
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
-          <Col xs={4}>
-            <Button type="link" onClick={() => showEditPassesModal(record)}>
-              Edit
-            </Button>
+          <Col xs={24} md={4}>
+            <Tooltip title="Edit">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showEditPassesModal(record)}
+                icon={<EditOutlined />}
+              />
+            </Tooltip>
           </Col>
-          <Col xs={8}>
+          <Col xs={24} md={4}>
+            <Tooltip title="Copy Pass Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(record.id)}
+                icon={<CopyOutlined />}
+              />
+            </Tooltip>
+          </Col>
+          <Col xs={24} md={5}>
             {record.is_published ? (
-              <Button type="link" danger onClick={() => unpublishPass(record.id)}>
-                {' '}
-                Unpublish{' '}
-              </Button>
+              <Tooltip title="Hide Session">
+                <Button type="link" danger onClick={() => unpublishPass(record.id)}>
+                  Hide
+                </Button>
+              </Tooltip>
             ) : (
-              <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
-                {' '}
-                Publish{' '}
-              </Button>
+              <Tooltip title="Unhide Session">
+                <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
+                  Show
+                </Button>
+              </Tooltip>
             )}
           </Col>
-          <Col xs={8}>
+          <Col xs={24} md={6}>
             {expandedRowKeys.includes(record.id) ? (
               <Button type="link" onClick={() => collapseRow(record.id)}>
                 {`${record.subscribers.length} Subscribers `} <UpOutlined />
@@ -246,19 +319,104 @@ const ClassPassList = () => {
     );
   };
 
+  const renderMobileSubscriberCards = (subscriber) => (
+    <Card>
+      <Row>
+        <Col xs={24}>
+          <Title level={5}> {subscriber.name} </Title>
+        </Col>
+        <Col xs={24}>
+          <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
+        </Col>
+        <Col xs={24}>
+          <Text> {`${subscriber.price_paid} ${subscriber.currency}`} </Text>
+        </Col>
+      </Row>
+    </Card>
+  );
+
+  const renderPassItem = (pass) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Col xs={24}>
+        <Card
+          className={styles.card}
+          title={
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${pass.color_code || '#FFF'}` }}>
+              <Text>{pass.name}</Text>
+            </div>
+          }
+          actions={[
+            <Tooltip title="Edit">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showEditPassesModal(pass)}
+                icon={<EditOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title="Copy Pass Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(pass.id)}
+                icon={<CopyOutlined />}
+              />
+            </Tooltip>,
+            pass.is_published ? (
+              <Tooltip title="Hide Session">
+                <Button type="link" danger onClick={() => unpublishPass(pass.id)}>
+                  Hide
+                </Button>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Unhide Session">
+                <Button type="link" className={styles.successBtn} onClick={() => publishPass(pass.id)}>
+                  Show
+                </Button>
+              </Tooltip>
+            ),
+            expandedRowKeys.includes(pass.id) ? (
+              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />} />
+            ) : (
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />} />
+            ),
+          ]}
+        >
+          {layout('Class Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+        </Card>
+        {expandedRowKeys.includes(pass.id) && (
+          <Row className={styles.cardExpansion}>
+            <div className={styles.mb20}>{pass.subscribers.map(renderMobileSubscriberCards)}</div>
+          </Row>
+        )}
+      </Col>
+    );
+  };
+
   return (
     <div className={styles.box}>
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
-      <Row gutter={8}>
-        <Col xs={24} md={14} lg={17}>
+      <Row gutter={[8, 24]}>
+        <Col xs={12} md={14} lg={17}>
           <Title level={4}> Class Passes </Title>
         </Col>
-        <Col xs={24} md={4} lg={3}>
+        <Col xs={12} md={4} lg={3}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={12} md={6} lg={4}>
+        <Col xs={24} md={6} lg={4}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
             Create New Pass
           </Button>
@@ -266,7 +424,7 @@ const ClassPassList = () => {
         <Col xs={24}>
           {isMobileDevice ? (
             <Loader loading={isLoading} size="large" text="Loading Class Passes">
-              Mobile Cards Here
+              <Row gutter={[8, 16]}>{passes.map(renderPassItem)}</Row>
             </Loader>
           ) : (
             <Table

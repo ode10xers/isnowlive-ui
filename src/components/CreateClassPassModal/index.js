@@ -11,6 +11,7 @@ import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import { ISO_8601 } from 'moment';
 
 const { Text } = Typography;
 
@@ -178,13 +179,13 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
           onFinish={handleFinish}
           initialValues={formInitialValues}
         >
-          <Row className={styles.classPassRow}>
-            <Col xs={12}>
+          <Row className={styles.classPassRow} gutter={[8, 16]}>
+            <Col xs={24} md={12}>
               <Form.Item id="passName" name="passName" label="Class Pass Name" rules={validationRules.nameValidation}>
                 <Input placeholder="Enter Class Pass Name" maxLength={50} />
               </Form.Item>
             </Col>
-            <Col xs={{ span: 11, offset: 1 }}>
+            <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item
                 id="classList"
                 name="classList"
@@ -205,8 +206,8 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row className={styles.classPassRow}>
-            <Col xs={12}>
+          <Row className={styles.classPassRow} gutter={[8, 16]}>
+            <Col xs={24} md={12}>
               <Form.Item
                 id="passType"
                 name="passType"
@@ -225,7 +226,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                 />
               </Form.Item>
             </Col>
-            <Col xs={{ span: 11, offset: 1 }}>
+            <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item
                 id="classCount"
                 name="classCount"
@@ -252,8 +253,8 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               </Form.Item>
             </Col>
           </Row>
-          <Row className={styles.classPassRow}>
-            <Col xs={12}>
+          <Row className={styles.classPassRow} gutter={[ISO_8601, 16]}>
+            <Col xs={24} md={12}>
               <Row>
                 <Col xs={24}>
                   <Form.Item
@@ -282,7 +283,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                 </Col>
               </Row>
             </Col>
-            <Col xs={{ span: 11, offset: 1 }}>
+            <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item name="color_code" label="Color Tag" rules={validationRules.requiredValidation}>
                 <div className={styles.colorPickerPreview} style={{ borderColor: colorCode }}>
                   <TwitterPicker
@@ -297,12 +298,12 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
             </Col>
           </Row>
           <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
-            <Col xs={8} md={4}>
+            <Col xs={12} md={4}>
               <Button block type="default" onClick={() => closeModal(false)} loading={isSubmitting}>
                 Cancel
               </Button>
             </Col>
-            <Col xs={8} md={6}>
+            <Col xs={12} md={6}>
               <Button block type="primary" htmlType="submit" loading={isSubmitting}>
                 {editedPass ? 'Update' : 'Create'} Class Pass
               </Button>

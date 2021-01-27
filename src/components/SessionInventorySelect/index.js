@@ -18,7 +18,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
-export const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
+const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
   const [selectedDate, setSelectedDate] = useState(moment(selectedSlot?.start_time).format());
   const [slots, setSlots] = useState([]);
 
@@ -136,3 +136,5 @@ SessionInventorySelect.propTypes = {
   inventories: PropTypes.arrayOf(PropTypes.object).isRequired,
   handleSubmit: PropTypes.func.isRequired,
 };
+
+export default SessionInventorySelect;
