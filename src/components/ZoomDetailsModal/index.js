@@ -94,6 +94,8 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
   };
 
   useEffect(() => {
+    form.resetFields();
+
     if (selectedInventory) {
       if (selectedInventory.start_url) {
         getZoomMeetingInformation(selectedInventory.inventory_id);
@@ -143,10 +145,6 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
     setIsSubmitting(false);
   };
 
-  if (!selectedInventory) {
-    return null;
-  }
-
   return (
     <div>
       <Modal
@@ -155,6 +153,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
         footer={null}
         width={560}
         onCancel={() => closeModal(false)}
+        destroyOnClose={true}
         title={
           !showForm ? (
             <Title level={3}> Zoom Details Sent to Attendee </Title>

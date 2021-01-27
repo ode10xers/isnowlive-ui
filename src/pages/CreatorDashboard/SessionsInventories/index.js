@@ -7,7 +7,6 @@ import {
   CopyOutlined,
   EyeInvisibleOutlined,
   PlayCircleOutlined,
-  VideoCameraOutlined,
   VideoCameraAddOutlined,
   InfoCircleOutlined,
 } from '@ant-design/icons';
@@ -33,6 +32,8 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+
+import Icons from 'assets/icons';
 
 import styles from './styles.module.scss';
 
@@ -363,7 +364,7 @@ const SessionsInventories = ({ match }) => {
                     <Tooltip title="Show Zoom Meeting Details">
                       <Button
                         type="link"
-                        icon={<VideoCameraOutlined />}
+                        icon={<Icons.VideoLink />}
                         onClick={() => setSelectedInventoryForZoom(record)}
                       />
                     </Tooltip>
@@ -422,7 +423,7 @@ const SessionsInventories = ({ match }) => {
 
     const meetingDetailsButton = (
       <Tooltip title="Show Zoom Meeting Details">
-        <Button type="link" icon={<VideoCameraOutlined />} onClick={() => setSelectedInventoryForZoom(item)} />
+        <Button type="link" icon={<Icons.VideoLink />} onClick={() => setSelectedInventoryForZoom(item)} />
       </Tooltip>
     );
 
@@ -522,104 +523,108 @@ const SessionsInventories = ({ match }) => {
   };
 
   return (
-    <div className={styles.box}>
+    <>
       <ZoomDetailsModal selectedInventory={selectedInventoryForZoom} closeModal={handleCloseZoomDetailsModal} />
-      <Row gutter={[8, 8]}>
-        <Col xs={24} md={18} lg={20}>
-          <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
-          <Radio.Group value={view} onChange={handleViewChange}>
-            <Radio.Button value="list">List</Radio.Button>
-            <Radio.Button value="calendar">Calendar</Radio.Button>
-          </Radio.Group>
-        </Col>
-        <Col xs={24} md={6} lg={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
-        </Col>
+      <div className={styles.box}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} md={18} lg={20}>
+            <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
+            <Radio.Group value={view} onChange={handleViewChange}>
+              <Radio.Button value="list">List</Radio.Button>
+              <Radio.Button value="calendar">Calendar</Radio.Button>
+            </Radio.Group>
+          </Col>
+          <Col xs={24} md={6} lg={4}>
+            <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
+              {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          </Col>
 
-        <Col xs={24}>
-          {view === 'calendar' ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
-              {sessions.length > 0 ? (
-                <CalendarView
-                  inventories={sessions}
-                  onSelectInventory={openSessionInventoryDetails}
-                  onViewChange={onViewChange}
-                  calendarView={calendarView}
-                />
-              ) : (
-                <Empty />
-              )}
-            </Loader>
-          ) : (
-            <>
-              {isMobileDevice ? (
-                <Loader loading={isLoading} size="large" text="Loading sessions">
-                  {sessions.length > 0 ? (
-                    <Table
-                      columns={mobileTableColumns}
-                      data={filteredByDateSession.map((session) => ({
-                        session_id: session.session_id,
-                        start_time: session.start_time,
-                        name: session.name,
-                        is_date: session.is_date,
-                        sessions: session.children,
-                      }))}
-                      loading={isLoading}
-                      rowKey={(record) =>
-                        record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
-                      }
-                      expandable={{
-                        expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
-                        expandRowByClick: true,
-                        onExpand: (expanded, record) => {
-                          if (expanded) {
-                            expandRow(record.start_time);
-                          } else {
-                            collapseRow(record.start_time);
-                          }
-                        },
-                        expandedRowKeys: expandedRowKeys,
-                        expandIcon: ({ expanded, onExpand, record }) =>
-                          expanded ? (
-                            <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                          ) : (
-                            <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
-                          ),
-                      }}
-                    />
-                  ) : (
-                    <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
-                  )}
-                </Loader>
-              ) : (
-                <Table
-                  sticky={true}
-                  columns={dateColumns}
-                  data={filteredByDateSession}
-                  loading={isLoading}
-                  rowKey={(record) =>
-                    record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
-                  }
-                  rowClassName={(record, index) => (!record.is_date && !record.is_published ? styles.unpublished : '')}
-                  expandable={{
-                    expandedRowKeys: expandedRowKeys,
-                    onExpand: (expanded, record) => {
-                      if (expanded) {
-                        expandRow(record.start_time);
-                      } else {
-                        collapseRow(record.start_time);
-                      }
-                    },
-                  }}
-                />
-              )}
-            </>
-          )}
-        </Col>
-      </Row>
-    </div>
+          <Col xs={24}>
+            {view === 'calendar' ? (
+              <Loader loading={isLoading} size="large" text="Loading sessions">
+                {sessions.length > 0 ? (
+                  <CalendarView
+                    inventories={sessions}
+                    onSelectInventory={openSessionInventoryDetails}
+                    onViewChange={onViewChange}
+                    calendarView={calendarView}
+                  />
+                ) : (
+                  <Empty />
+                )}
+              </Loader>
+            ) : (
+              <>
+                {isMobileDevice ? (
+                  <Loader loading={isLoading} size="large" text="Loading sessions">
+                    {sessions.length > 0 ? (
+                      <Table
+                        columns={mobileTableColumns}
+                        data={filteredByDateSession.map((session) => ({
+                          session_id: session.session_id,
+                          start_time: session.start_time,
+                          name: session.name,
+                          is_date: session.is_date,
+                          sessions: session.children,
+                        }))}
+                        loading={isLoading}
+                        rowKey={(record) =>
+                          record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                        }
+                        expandable={{
+                          expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
+                          expandRowByClick: true,
+                          onExpand: (expanded, record) => {
+                            if (expanded) {
+                              expandRow(record.start_time);
+                            } else {
+                              collapseRow(record.start_time);
+                            }
+                          },
+                          expandedRowKeys: expandedRowKeys,
+                          expandIcon: ({ expanded, onExpand, record }) =>
+                            expanded ? (
+                              <UpCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                            ) : (
+                              <DownCircleOutlined style={{ fontSize: 20 }} onClick={(e) => onExpand(record, e)} />
+                            ),
+                        }}
+                      />
+                    ) : (
+                      <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                    )}
+                  </Loader>
+                ) : (
+                  <Table
+                    sticky={true}
+                    columns={dateColumns}
+                    data={filteredByDateSession}
+                    loading={isLoading}
+                    rowKey={(record) =>
+                      record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                    }
+                    rowClassName={(record, index) =>
+                      !record.is_date && !record.is_published ? styles.unpublished : ''
+                    }
+                    expandable={{
+                      expandedRowKeys: expandedRowKeys,
+                      onExpand: (expanded, record) => {
+                        if (expanded) {
+                          expandRow(record.start_time);
+                        } else {
+                          collapseRow(record.start_time);
+                        }
+                      },
+                    }}
+                  />
+                )}
+              </>
+            )}
+          </Col>
+        </Row>
+      </div>
+    </>
   );
 };
 
