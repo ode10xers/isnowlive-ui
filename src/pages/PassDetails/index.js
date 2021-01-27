@@ -177,7 +177,7 @@ const PassDetails = ({ match, history }) => {
         </Col>
         <Col xs={24}>
           {pass && pass.sessions?.length > 0 && (
-            <Row className={classNames(styles.box, styles.p20)}>
+            <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
               <Col xs={24} className={styles.p20}>
                 <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
                   <Row gutter={[8, 16]} align="center">
