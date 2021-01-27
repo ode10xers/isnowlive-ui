@@ -305,23 +305,27 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button
-                type="link"
-                className={styles.detailsButton}
-                onClick={() => openSessionInventoryDetails(record)}
-                icon={<InfoCircleOutlined />}
-              />
+              <Tooltip title="Event Details">
+                <Button
+                  type="link"
+                  className={styles.detailsButton}
+                  onClick={() => openSessionInventoryDetails(record)}
+                  icon={<InfoCircleOutlined />}
+                />
+              </Tooltip>
             </Col>
           </Row>
         ) : (
           <Row justify="start" gutter={[8, 8]}>
             <Col md={24} lg={24} xl={4}>
-              <Button
-                type="link"
-                className={styles.detailsButton}
-                onClick={() => openSessionInventoryDetails(record)}
-                icon={<InfoCircleOutlined />}
-              />
+              <Tooltip title="Event Details">
+                <Button
+                  type="link"
+                  className={styles.detailsButton}
+                  onClick={() => openSessionInventoryDetails(record)}
+                  icon={<InfoCircleOutlined />}
+                />
+              </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
               <Tooltip title="Copy Event Page Link">
@@ -439,8 +443,12 @@ const SessionsInventories = ({ match }) => {
     );
 
     const actionButtons = [
-      <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />,
-      <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />,
+      <Tooltip title="Event Details">
+        <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
+      </Tooltip>,
+      <Tooltip title="Copy Event Page Link">
+        <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />
+      </Tooltip>,
       isCancelDisabled ? (
         <Tooltip title="Event cannot be cancelled">
           <Button type="text" disabled icon={<DeleteOutlined />} />
