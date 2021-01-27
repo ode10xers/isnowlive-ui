@@ -10,13 +10,13 @@ import styles from './style.module.scss';
 const { user } = mixPanelEventTags;
 
 const Sessions = ({ sessions, username }) => {
-  const [sessionCount, setSessionCount] = useState(4);
+  const [sessionCount, setSessionCount] = useState(6);
   const [reformattedSessions, setReformattedSessions] = useState([]);
 
   const showMore = () => {
     trackSimpleEvent(user.click.profile.showMore);
     if (sessionCount <= reformattedSessions.length) {
-      setSessionCount(sessionCount + 4);
+      setSessionCount(sessionCount + 6);
     }
   };
 
