@@ -14,6 +14,7 @@ const { Option } = Select;
 const { Paragraph, Text } = Typography;
 const {
   formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek, getTimeDiff },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
@@ -111,6 +112,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const renderDateCell = (calendarDate) => {
     const slotsForDate = getSlotsList(calendarDate);
+    const isUpcoming = isBeforeDate(calendarDate);
     if (slotsForDate?.length && !isMobileDevice) {
       return (
         <List
@@ -118,7 +120,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           itemLayout="vertical"
           dataSource={slotsForDate}
           renderItem={(item) => (
-            <List.Item className={styles.slot}>
+            <List.Item className={isUpcoming ? styles.slot : styles.pastSlot}>
               {toLocaleTime(item['start_time'])}
               {' - '} {toLocaleTime(item['end_time'])}
             </List.Item>

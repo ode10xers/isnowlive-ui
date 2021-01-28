@@ -10,6 +10,10 @@
   color: map-get($map: $colors, $key: 'Razzmatazz') !important;
   font-size: 10px;
 }
+.pastSlot {
+  @extend .slot;
+  color: map-get($map: $colors, $key: 'SuvaGrey') !important;
+}
 .notesMonth {
   text-align: center;
   font-size: 28px;
