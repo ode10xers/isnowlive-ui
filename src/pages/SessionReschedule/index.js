@@ -406,7 +406,7 @@ const SessionReschedule = () => {
                     record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
                   }
                   expandable={{
-                    expandedRowRender: (record) => record.children.map(renderSessionItem),
+                    expandedRowRender: (record) => record.sessions.map(renderSessionItem),
                     expandRowByClick: true,
                     expandIcon: ({ expanded, onExpand, record }) =>
                       expanded ? (
