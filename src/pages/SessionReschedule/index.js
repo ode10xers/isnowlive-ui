@@ -394,9 +394,17 @@ const SessionReschedule = () => {
               {availableSessions.length > 0 ? (
                 <Table
                   columns={mobileTableColumns}
-                  data={availableSessions}
+                  data={availableSessions.map((session) => ({
+                    session_id: session.session_id,
+                    start_time: session.start_time,
+                    name: session.name,
+                    is_date: session.is_date,
+                    sessions: session.children,
+                  }))}
                   loading={isLoading}
-                  rowKey={(record) => record.start_time}
+                  rowKey={(record) =>
+                    record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
+                  }
                   expandable={{
                     expandedRowRender: (record) => record.children.map(renderSessionItem),
                     expandRowByClick: true,
