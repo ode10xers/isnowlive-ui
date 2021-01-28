@@ -212,6 +212,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         value.start_time = selected_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
         value.session_date = value.start_time;
+        value.num_participants = 0;
 
         if (givenDateSlots && givenDateSlots.length) {
           let tempGivenDateSlots = givenDateSlots.filter(
