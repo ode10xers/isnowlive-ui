@@ -215,7 +215,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                     block
                     size="large"
                     type="primary"
-                    onClick={() => generateZoomMeetingInformation()}
+                    onClick={() => generateZoomMeetingInformation(selectedInventory)}
                     loading={isSubmitting}
                   >
                     Create a Zoom Meeting
