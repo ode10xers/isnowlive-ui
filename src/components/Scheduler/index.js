@@ -104,6 +104,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     setForm(null);
     setFormDeletedIndex([]);
     setOpenModal(false);
+    setDayList(null);
   };
 
   const getSlotsList = (value) => {
@@ -112,7 +113,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const renderDateCell = (calendarDate) => {
     const slotsForDate = getSlotsList(calendarDate);
-    const isUpcoming = isBeforeDate(calendarDate);
     if (slotsForDate?.length && !isMobileDevice) {
       return (
         <List
@@ -120,7 +120,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           itemLayout="vertical"
           dataSource={slotsForDate}
           renderItem={(item) => (
-            <List.Item className={isUpcoming ? styles.slot : styles.pastSlot}>
+            <List.Item className={isBeforeDate(item['end_time']) ? styles.slot : styles.pastSlot}>
               {toLocaleTime(item['start_time'])}
               {' - '} {toLocaleTime(item['end_time'])}
             </List.Item>
@@ -421,7 +421,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
-                      disabled={slot.num_participants === 0 ? false : true}
+                      disabled={!slot.inventory_id && slot.num_participants === 0 ? false : true}
                     >
                       {slotsList?.map((item) => {
                         if (
@@ -438,7 +438,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   <Col xs={11} md={11}>
                     <Select
-                      disabled={slot.start_time && slot.num_participants === 0 ? false : true}
+                      disabled={!slot.inventory_id && slot.start_time && slot.num_participants === 0 ? false : true}
                       value={slot.end_time && toShortTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
