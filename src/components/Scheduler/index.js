@@ -469,9 +469,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       {slot?.num_participants > 0 ? (
                         <Tooltip
                           title={
-                            <Paragraph>
+                            <Paragraph className={styles.textWhite}>
                               This is an existing slot which is already booked but{' '}
-                              <Text strong> you can still delete it </Text> and modify this and future dates
+                              <Text strong className={styles.textWhite}>
+                                {' '}
+                                you can still delete it{' '}
+                              </Text>{' '}
+                              and modify this and future dates
                             </Paragraph>
                           }
                         >
