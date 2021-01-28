@@ -435,9 +435,11 @@ const Session = ({ match, history }) => {
         const referenceInventory = session.inventory[takeLastWeek ? session.inventory.length - 1 : 0];
         const copiedRange = createWeekRange(referenceInventory.start_time, takeLastWeek);
 
-        const copiedInventories = session.inventory.filter(
-          (inventory) => inventory.num_participants === 0 && moment(inventory.start_time).within(copiedRange)
+        const copiedInventories = session.inventory.filter((inventory) =>
+          moment(inventory.start_time).within(copiedRange)
         );
+
+        console.log(copiedInventories);
 
         Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
           if (extraDay.within(oldRange)) {
