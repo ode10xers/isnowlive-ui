@@ -63,6 +63,10 @@ export default {
     unpublishSession: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
     deleteSession: (sessionId) => http.delete(`/secure/creator/sessions/${sessionId}`),
     rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
+    generateZoomMeetingInfo: (inventoryId) => http.post(`/secure/creator/inventories/id/${inventoryId}/zoom`),
+    submitZoomMeetingInfo: (inventoryId, payload) =>
+      http.patch(`/secure/creator/inventories/id/${inventoryId}/zoom`, payload),
+    getZoomMeetingInfo: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}/zoom`),
   },
   passes: {
     getPassById: (passId) => http.get(`/passes/${passId}`),
