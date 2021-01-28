@@ -338,11 +338,27 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const handleSelectChange = (field, value, index) => {
     // Need to deepclone as react does not rerender on change state
     let tempForm = JSON.parse(JSON.stringify(form));
+
+    // Since the dropdown values uses today's date, it's possible
+    // to create an inventory with a later start_time than the
+    // end_time. To prevent that, we need to make both the DATES
+    // of start_time and end_time the same, and then compare with
+    // the getTimeDiff method
     tempForm[index][field] = value;
+
+    const startTimeMoment = moment(tempForm[index].start_time);
+    // Need to be careful here since if end_time is null, this moment will use
+    // the current datetime value
+    // But if end_time is null, the getTimeDiff comparison won't get called anyway
+    const endTimeMoment = moment(tempForm[index].end_time)
+      .year(startTimeMoment.year())
+      .month(startTimeMoment.month())
+      .date(startTimeMoment.date());
+
     if (
       field === 'start_time' &&
       tempForm[index].end_time &&
-      getTimeDiff(tempForm[index].end_time, tempForm[index].start_time, 'minute') <= 0
+      getTimeDiff(endTimeMoment, startTimeMoment, 'minute') <= 0
     ) {
       tempForm[index].end_time = null;
     }
