@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, message } from 'antd';
-import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
 import Routes from 'routes';
@@ -49,7 +49,7 @@ const ManageSessions = () => {
 
       if (data) {
         trackSuccessEvent(eventTag, { session_id: sessionId });
-        message.success('Session published successfully!');
+        message.success('Session is now shown');
         getSessionsList();
       }
     } catch (error) {
@@ -69,7 +69,7 @@ const ManageSessions = () => {
 
       if (data) {
         trackSuccessEvent(eventTag, { session_id: sessionId });
-        message.success('Session is now unpublished!');
+        message.success('Session is now hidden');
         getSessionsList();
       }
     } catch (error) {
@@ -158,7 +158,6 @@ const ManageSessions = () => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '25%',
       render: (text, record) => {
         return {
           props: {
@@ -180,7 +179,7 @@ const ManageSessions = () => {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '10%',
+      width: '84px',
       render: (text, record) => (
         <Text>
           {' '}
@@ -192,14 +191,13 @@ const ManageSessions = () => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '10%',
+      width: '72px',
       render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
     },
     {
       title: 'Session Date',
       dataIndex: 'session_date',
       key: 'session_date',
-      width: '25%',
       render: (text, record) => (
         <>
           {record.recurring ? (
@@ -216,14 +214,17 @@ const ManageSessions = () => {
     },
     {
       title: 'Actions',
+      align: 'left',
+      width: '160px',
       render: (text, record) => {
         return (
-          <Row justify="start" gutter={8}>
-            <Col xs={24} md={4}>
+          <Row justify="start" gutter={[8, 8]}>
+            <Col xs={12} md={6}>
               <Tooltip title="Edit">
                 <Button
                   className={styles.detailsButton}
                   type="text"
+                  size="small"
                   onClick={() =>
                     trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
                       beginning: record.beginning,
@@ -234,30 +235,39 @@ const ManageSessions = () => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={12} md={6}>
               <Tooltip title="Copy Session Link">
                 <Button
                   type="text"
+                  size="small"
                   className={styles.detailsButton}
                   onClick={() => copyPageLinkToClipboard(record.session_id)}
                   icon={<CopyOutlined />}
                 />
               </Tooltip>
             </Col>
-            <Col xs={24} md={6}>
+            <Col xs={12} md={6}>
               <Tooltip title={`${record.is_active ? 'Hide' : 'Unhide'} Session`}>
                 {!record.is_active ? (
-                  <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
-                    Show
-                  </Button>
+                  <Button
+                    type="text"
+                    size="small"
+                    className={styles.sucessButton}
+                    onClick={() => publishSession(record.session_id)}
+                    icon={<EyeOutlined />}
+                  />
                 ) : (
-                  <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
-                    Hide
-                  </Button>
+                  <Button
+                    type="text"
+                    size="small"
+                    danger
+                    onClick={() => unpublishSession(record.session_id)}
+                    icon={<EyeInvisibleOutlined />}
+                  />
                 )}
               </Tooltip>
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={12} md={6}>
               <Tooltip title="Delete Session">
                 <Popconfirm
                   title="Do you want to delete session?"
@@ -266,7 +276,7 @@ const ManageSessions = () => {
                   cancelText="No"
                   onConfirm={() => deleteSession(record.session_id)}
                 >
-                  <Button danger type="text" icon={<DeleteOutlined />} />
+                  <Button danger type="text" size="small" icon={<DeleteOutlined />} />
                 </Popconfirm>
               </Tooltip>
             </Col>
@@ -374,7 +384,7 @@ const ManageSessions = () => {
           {sessions.length > 0 ? sessions.map(renderSessionItem) : <div className="text-empty">No Sessions </div>}
         </Loader>
       ) : (
-        <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+        <Table size="small" columns={sessionColumns} data={sessions} loading={isLoading} />
       )}
     </div>
   );

@@ -108,7 +108,7 @@ const SessionRegistration = ({
       title: '',
       dataIndex: 'id',
       key: 'id',
-      width: '12px',
+      width: '10px',
       render: (text, record) =>
         selectedPass?.id === record.id ? (
           <div onClick={() => setSelectedPass(record)}>

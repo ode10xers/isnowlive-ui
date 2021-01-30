@@ -293,7 +293,7 @@ const ClassPassList = () => {
         <Col xs={24}>
           <Collapse>
             <Panel header={<Title level={5}> Active Passes </Title>} key="Active">
-              <Row gutter={8}>
+              <Row gutter={[8, 16]}>
                 <Col xs={24} md={18} lg={20}></Col>
                 <Col xs={24} md={6} lg={4}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllActivePasses()}>
@@ -325,7 +325,7 @@ const ClassPassList = () => {
               </Row>
             </Panel>
             <Panel header={<Title level={5}> Expired Passes </Title>} key="Expired">
-              <Row gutter={8}>
+              <Row gutter={[8, 16]}>
                 <Col xs={24} md={18} lg={20}></Col>
                 <Col xs={24} md={6} lg={4}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllExpiredPasses()}>
