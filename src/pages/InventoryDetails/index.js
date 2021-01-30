@@ -405,7 +405,7 @@ const InventoryDetails = ({ match, history }) => {
         )}
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} lg={15}>
+        <Col xs={24} md={20} lg={16}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (
             <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
@@ -435,10 +435,10 @@ const InventoryDetails = ({ match, history }) => {
             </>
           )}
         </Col>
-        <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col xs={24} lg={{ span: 7, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col xs={24} md={20} lg={16} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           {session?.end_time &&
             getTimeDiff(session?.end_time, moment(), 'minutes') > 0 &&
             (showSignInForm ? (

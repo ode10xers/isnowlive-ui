@@ -118,7 +118,7 @@ function App() {
         <RouteWithLayout layout={DefaultLayout} path={Routes.createPassword} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.emailVerification} component={EmailVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
+        <RouteWithLayout layout={CompactLayout} exact path={Routes.root} component={Home} />
         <Route path={Routes.stripeAccountValidate}>
           <Redirect
             to={{
