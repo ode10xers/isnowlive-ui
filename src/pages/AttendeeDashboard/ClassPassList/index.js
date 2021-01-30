@@ -157,13 +157,13 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '90px',
+      width: '86px',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
       title: '',
       align: 'right',
-      width: '108px',
+      width: '90px',
       render: (text, record) =>
         record.expired ? (
           expandedExpiredRowKeys.includes(record.pass_order_id) ? (
@@ -195,7 +195,12 @@ const ClassPassList = () => {
             Close
           </Button>
         ) : (
-          <Button type="link" onClick={() => expandActiveRow(record.pass_order_id)} icon={<DownOutlined />}>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => expandActiveRow(record.pass_order_id)}
+            icon={<DownOutlined />}
+          >
             More
           </Button>
         ),
@@ -289,8 +294,8 @@ const ClassPassList = () => {
           <Collapse>
             <Panel header={<Title level={5}> Active Passes </Title>} key="Active">
               <Row gutter={8}>
-                <Col xs={24} md={14} lg={21}></Col>
-                <Col xs={24} md={4} lg={3}>
+                <Col xs={24} md={18} lg={20}></Col>
+                <Col xs={24} md={6} lg={4}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllActivePasses()}>
                     {expandedActiveRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
                   </Button>
@@ -307,6 +312,7 @@ const ClassPassList = () => {
                       data={passes}
                       loading={isLoading}
                       rowKey={(record) => record.pass_order_id}
+                      size="small"
                       expandable={{
                         expandedRowRender: (record) => renderClassesList(record),
                         expandRowByClick: true,
@@ -320,8 +326,8 @@ const ClassPassList = () => {
             </Panel>
             <Panel header={<Title level={5}> Expired Passes </Title>} key="Expired">
               <Row gutter={8}>
-                <Col xs={24} md={14} lg={21}></Col>
-                <Col xs={24} md={4} lg={3}>
+                <Col xs={24} md={18} lg={20}></Col>
+                <Col xs={24} md={6} lg={4}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllExpiredPasses()}>
                     {expandedExpiredRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
                   </Button>
@@ -337,6 +343,7 @@ const ClassPassList = () => {
                       columns={passesColumns}
                       data={expiredPasses}
                       loading={isLoading}
+                      size="small"
                       rowKey={(record) => record.pass_order_id}
                       expandable={{
                         expandedRowRender: (record) => renderClassesList(record),
