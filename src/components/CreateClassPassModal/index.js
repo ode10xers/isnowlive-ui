@@ -278,7 +278,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                     id="price"
                     name="price"
                     label="Class Pass Price"
-                    rules={validationRules.numberValidation('Please Input Pass Price', 1, false)}
+                    rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
                   >
                     <InputNumber min={0} placeholder="Class Pass Price" className={styles.numericInput} />
                   </Form.Item>

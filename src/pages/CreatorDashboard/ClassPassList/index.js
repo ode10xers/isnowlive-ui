@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Badge, message } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -8,6 +8,8 @@ import {
   EditOutlined,
   CopyOutlined,
   EyeInvisibleOutlined,
+  EyeOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -187,7 +189,6 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '35%',
       render: (text, record) => {
         return {
           props: {
@@ -209,7 +210,7 @@ const ClassPassList = () => {
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
-      width: '15%',
+      width: '136px',
       render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
     },
     {
@@ -217,7 +218,7 @@ const ClassPassList = () => {
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '12%',
+      width: '72px',
       render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -225,28 +226,33 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '10%',
+      width: '86px',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
       title: '',
       align: 'right',
+      width: '160px',
       render: (text, record) => (
-        <Row gutter={8}>
-          <Col xs={24} md={4}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} md={5}>
             <Tooltip title="Edit">
               <Button
+                block
                 className={styles.detailsButton}
                 type="text"
+                size="small"
                 onClick={() => showEditPassesModal(record)}
                 icon={<EditOutlined />}
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={4}>
+          <Col xs={24} md={5}>
             <Tooltip title="Copy Pass Link">
               <Button
+                block
                 type="text"
+                size="small"
                 className={styles.detailsButton}
                 onClick={() => copyPageLinkToClipboard(record.id)}
                 icon={<CopyOutlined />}
@@ -256,28 +262,46 @@ const ClassPassList = () => {
           <Col xs={24} md={5}>
             {record.is_published ? (
               <Tooltip title="Hide Session">
-                <Button type="link" danger onClick={() => unpublishPass(record.id)}>
-                  Hide
-                </Button>
+                <Button
+                  block
+                  type="link"
+                  size="small"
+                  danger
+                  onClick={() => unpublishPass(record.id)}
+                  icon={<EyeInvisibleOutlined />}
+                />
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Session">
-                <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
-                  Show
-                </Button>
+                <Button
+                  block
+                  type="link"
+                  size="small"
+                  className={styles.successBtn}
+                  onClick={() => publishPass(record.id)}
+                  icon={<EyeOutlined />}
+                />
               </Tooltip>
             )}
           </Col>
-          <Col xs={24} md={6}>
-            {expandedRowKeys.includes(record.id) ? (
-              <Button type="link" onClick={() => collapseRow(record.id)}>
-                {`${record.subscribers.length} Subscribers `} <UpOutlined />
-              </Button>
-            ) : (
-              <Button type="link" onClick={() => expandRow(record.id)}>
-                {`${record.subscribers.length} Subscribers`} <DownOutlined />
-              </Button>
-            )}
+          <Col xs={24} md={9}>
+            <Tooltip title="Subscribers of this pass">
+              {expandedRowKeys.includes(record.id) ? (
+                <Button type="link" size="small" onClick={() => collapseRow(record.id)}>
+                  <Badge showZero={true} size="small" count={record.subscribers.length}>
+                    <UserOutlined style={{ color: '#1890ff' }} />
+                  </Badge>
+                  <UpOutlined />
+                </Button>
+              ) : (
+                <Button type="link" size="small" onClick={() => expandRow(record.id)}>
+                  <Badge showZero={true} size="small" count={record.subscribers.length}>
+                    <UserOutlined style={{ color: '#1890ff' }} />
+                  </Badge>
+                  <DownOutlined />
+                </Button>
+              )}
+            </Tooltip>
           </Col>
         </Row>
       ),
@@ -408,15 +432,15 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={14} lg={17}>
+        <Col xs={12} md={10} lg={14}>
           <Title level={4}> Class Passes </Title>
         </Col>
-        <Col xs={12} md={4} lg={3}>
+        <Col xs={12} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={24} md={6} lg={4}>
+        <Col xs={24} md={8} lg={6}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
             Create New Pass
           </Button>
@@ -433,6 +457,7 @@ const ClassPassList = () => {
               data={passes}
               loading={isLoading}
               rowKey={(record) => record.id}
+              size="small"
               expandable={{
                 expandedRowRender: (record) => renderSubscribersList(record),
                 expandRowByClick: true,

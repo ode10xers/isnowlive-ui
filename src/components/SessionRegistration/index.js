@@ -108,7 +108,7 @@ const SessionRegistration = ({
       title: '',
       dataIndex: 'id',
       key: 'id',
-      width: '18px',
+      width: '10px',
       render: (text, record) =>
         selectedPass?.id === record.id ? (
           <div onClick={() => setSelectedPass(record)}>
@@ -122,14 +122,13 @@ const SessionRegistration = ({
       title: 'Pass',
       dataIndex: 'name',
       key: 'name',
-      width: '50%',
     },
     {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
       align: 'right',
-      width: '13%',
+      width: '72px',
       render: (text, record) => `${record.validity} day`,
     },
     {
@@ -137,7 +136,7 @@ const SessionRegistration = ({
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '15%',
+      width: '84px',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
@@ -145,6 +144,7 @@ const SessionRegistration = ({
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
+      width: '133px',
       render: (text, record) => {
         const btnText = record.limited
           ? record.user_usable
@@ -153,11 +153,11 @@ const SessionRegistration = ({
           : 'Unlimited Classes ';
 
         return expandedRowKeys.includes(record.id) ? (
-          <Button className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
+          <Button className={styles.linkBtn} type="link" size="small" onClick={() => collapseRow(record.id)}>
             {btnText} <UpOutlined />
           </Button>
         ) : (
-          <Button className={styles.linkBtn} type="link" onClick={() => expandRow(record.id)}>
+          <Button className={styles.linkBtn} type="link" size="small" onClick={() => expandRow(record.id)}>
             {btnText} <DownOutlined />
           </Button>
         );
@@ -241,7 +241,7 @@ const SessionRegistration = ({
           className={styles.card}
           title={
             <Row>
-              <Col xs={4}>
+              <Col xs={4} md={2}>
                 {selectedPass?.id === pass.id ? (
                   <div onClick={() => setSelectedPass(pass)}>
                     <CheckCircleTwoTone twoToneColor="#52c41a" />
@@ -250,7 +250,7 @@ const SessionRegistration = ({
                   <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
                 )}
               </Col>
-              <Col xs={20}>
+              <Col xs={20} md={22}>
                 <Text>{pass.name}</Text>
               </Col>
             </Row>
@@ -464,7 +464,7 @@ const SessionRegistration = ({
               </div>
             ) : (
               <>
-                {availablePasses.length > 0 && (
+                {availablePasses.length > 0 ? (
                   <>
                     <div>
                       <Title level={5}>
@@ -505,6 +505,12 @@ const SessionRegistration = ({
                       )}
                     </div>
                   </>
+                ) : (
+                  <Item {...sessionRegistrationTailLayout}>
+                    <Title level={5}>
+                      Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
+                    </Title>
+                  </Item>
                 )}
               </>
             )}
@@ -525,7 +531,7 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={8} md={5}>
+                <Col xs={8} md={6}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                     {user ? 'Buy' : 'Register'}
                   </Button>

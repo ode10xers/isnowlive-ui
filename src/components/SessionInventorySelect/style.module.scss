@@ -1,7 +1,8 @@
 @import '../../styles/variables.scss';
 
 .siteCalendarCard {
-  max-width: 350px;
+  min-width: 285px;
+  max-width: 320px;
   border: 1px solid map-get($colors, 'WhiteSmoke1');
   border-radius: 2px;
   margin-left: auto;
