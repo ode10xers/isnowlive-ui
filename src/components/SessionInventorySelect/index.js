@@ -39,11 +39,12 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
       const filteredInventory = filterSessionByDate(date);
       if (filteredInventory && filteredInventory.length) {
         setSlots(filteredInventory);
+        handleSubmit(filteredInventory[0]);
       } else {
         setSlots([]);
       }
     },
-    [filterSessionByDate]
+    [filterSessionByDate, handleSubmit]
   );
 
   useEffect(() => {

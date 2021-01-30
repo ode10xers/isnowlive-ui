@@ -508,7 +508,7 @@ const SessionRegistration = ({
                 ) : (
                   <Item {...sessionRegistrationTailLayout}>
                     <Title level={5}>
-                      Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
+                      Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
                     </Title>
                   </Item>
                 )}
