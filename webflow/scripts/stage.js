@@ -19,5 +19,14 @@ function setRedirectionToLogin() {
   });
 }
 
+function openFreshChatWindow() {
+  findSelectorAndAttachEvent("[data-talk-to-us-link='true']", 'click', function () {
+    if (!window.fcWidget.isOpen()) {
+      window.fcWidget.open();
+    }
+  });
+}
+
 setRedirectionToSignup();
 setRedirectionToLogin();
+openFreshChatWindow();

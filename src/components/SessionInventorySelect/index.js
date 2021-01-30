@@ -39,11 +39,12 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
       const filteredInventory = filterSessionByDate(date);
       if (filteredInventory && filteredInventory.length) {
         setSlots(filteredInventory);
+        handleSubmit(filteredInventory[0]);
       } else {
         setSlots([]);
       }
     },
-    [filterSessionByDate]
+    [filterSessionByDate, handleSubmit]
   );
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
               type="primary"
               className={styles.slotBtn}
               onClick={() => handleSubmit(null)}
-              icon={<CheckCircleTwoTone />}
+              icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
             >
               {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
             </Button>

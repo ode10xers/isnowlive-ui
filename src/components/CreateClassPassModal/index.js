@@ -25,10 +25,13 @@ const passTypes = {
   },
 };
 
+const initialColor = generateRandomColor();
+
 const formInitialValues = {
   passName: '',
   classList: [],
   passType: passTypes.LIMITED.name,
+  colorCode: initialColor,
 };
 
 const whiteColor = '#ffffff';
@@ -62,7 +65,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState([]);
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
-  const [colorCode, setColorCode] = useState(generateRandomColor());
+  const [colorCode, setColorCode] = useState(initialColor);
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -143,7 +146,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         session_ids: selectedClasses || values.classList || [],
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
         limited: passTypes.LIMITED.name === passType,
-        color_code: colorCode,
+        color_code: colorCode || whiteColor,
       };
 
       const response = editedPass
@@ -275,7 +278,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                     id="price"
                     name="price"
                     label="Class Pass Price"
-                    rules={validationRules.numberValidation('Please Input Pass Price', 1, false)}
+                    rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
                   >
                     <InputNumber min={0} placeholder="Class Pass Price" className={styles.numericInput} />
                   </Form.Item>
@@ -283,7 +286,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               </Row>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
-              <Form.Item name="color_code" label="Color Tag" rules={validationRules.requiredValidation}>
+              <Form.Item name="colorCode" label="Color Tag">
                 <div className={styles.colorPickerPreview} style={{ borderColor: colorCode }}>
                   <TwitterPicker
                     className={styles.colorPicker}

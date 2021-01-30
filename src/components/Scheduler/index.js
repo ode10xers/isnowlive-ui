@@ -14,6 +14,7 @@ const { Option } = Select;
 const { Paragraph, Text } = Typography;
 const {
   formatDate: { toLocaleTime, toLocaleDate, toShortTimeWithPeriod, toLongDate, toDayOfWeek, getTimeDiff },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
@@ -103,6 +104,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     setForm(null);
     setFormDeletedIndex([]);
     setOpenModal(false);
+    setDayList(null);
   };
 
   const getSlotsList = (value) => {
@@ -118,7 +120,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           itemLayout="vertical"
           dataSource={slotsForDate}
           renderItem={(item) => (
-            <List.Item className={styles.slot}>
+            <List.Item className={isBeforeDate(item['end_time']) ? styles.slot : styles.pastSlot}>
               {toLocaleTime(item['start_time'])}
               {' - '} {toLocaleTime(item['end_time'])}
             </List.Item>
@@ -210,6 +212,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         value.start_time = selected_date.split('T')[0] + 'T' + vs.start_time.split('T').pop();
         value.end_time = selected_date.split('T')[0] + 'T' + vs.end_time.split('T').pop();
         value.session_date = value.start_time;
+        value.num_participants = 0;
 
         if (givenDateSlots && givenDateSlots.length) {
           let tempGivenDateSlots = givenDateSlots.filter(
@@ -335,11 +338,27 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const handleSelectChange = (field, value, index) => {
     // Need to deepclone as react does not rerender on change state
     let tempForm = JSON.parse(JSON.stringify(form));
+
+    // Since the dropdown values uses today's date, it's possible
+    // to create an inventory with a later start_time than the
+    // end_time. To prevent that, we need to make both the DATES
+    // of start_time and end_time the same, and then compare with
+    // the getTimeDiff method
     tempForm[index][field] = value;
+
+    const startTimeMoment = moment(tempForm[index].start_time);
+    // Need to be careful here since if end_time is null, this moment will use
+    // the current datetime value
+    // But if end_time is null, the getTimeDiff comparison won't get called anyway
+    const endTimeMoment = moment(tempForm[index].end_time)
+      .year(startTimeMoment.year())
+      .month(startTimeMoment.month())
+      .date(startTimeMoment.date());
+
     if (
       field === 'start_time' &&
       tempForm[index].end_time &&
-      getTimeDiff(tempForm[index].end_time, tempForm[index].start_time, 'minute') <= 0
+      getTimeDiff(endTimeMoment, startTimeMoment, 'minute') <= 0
     ) {
       tempForm[index].end_time = null;
     }
@@ -418,7 +437,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
                       placeholder="Start time"
-                      disabled={slot.num_participants === 0 ? false : true}
+                      disabled={!slot.inventory_id && slot.num_participants === 0 ? false : true}
                     >
                       {slotsList?.map((item) => {
                         if (
@@ -435,7 +454,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   <Col xs={11} md={11}>
                     <Select
-                      disabled={slot.start_time && slot.num_participants === 0 ? false : true}
+                      disabled={!slot.inventory_id && slot.start_time && slot.num_participants === 0 ? false : true}
                       value={slot.end_time && toShortTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
@@ -467,9 +486,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       {slot?.num_participants > 0 ? (
                         <Tooltip
                           title={
-                            <Paragraph>
+                            <Paragraph className={styles.textWhite}>
                               This is an existing slot which is already booked but{' '}
-                              <Text strong> you can still delete it </Text> and modify this and future dates
+                              <Text strong className={styles.textWhite}>
+                                {' '}
+                                you can still delete it{' '}
+                              </Text>{' '}
+                              and modify this and future dates
                             </Paragraph>
                           }
                         >
