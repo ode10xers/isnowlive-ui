@@ -405,8 +405,8 @@ const SessionDetails = ({ match, history }) => {
           </Col>
         )}
       </Row>
-      <Row justify="space-between" className={styles.mt50} gutter={10}>
-        <Col xs={24} lg={15}>
+      <Row justify="space-between" className={styles.mt50} gutter={16}>
+        <Col xs={24} lg={14}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (
             <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
@@ -436,10 +436,15 @@ const SessionDetails = ({ match, history }) => {
             </>
           )}
         </Col>
-        <Col xs={24} lg={9} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} order={isMobileDevice ? 2 : 1} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col
+          xs={24}
+          lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
+          order={isMobileDevice ? 2 : 1}
+          className={isMobileDevice ? styles.mt20 : styles.mt50}
+        >
           {showSignInForm ? (
             <SignInForm
               user={currentUser}
@@ -477,7 +482,12 @@ const SessionDetails = ({ match, history }) => {
           )}
         </Col>
         {!showSignInForm && (
-          <Col xs={24} lg={9} order={isMobileDevice ? 1 : 2} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+          <Col
+            xs={24}
+            lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
+            order={isMobileDevice ? 1 : 2}
+            className={isMobileDevice ? styles.mt20 : styles.mt50}
+          >
             <SessionInventorySelect
               inventories={
                 session?.inventory.sort((a, b) =>

@@ -59,22 +59,23 @@ const ClassPasses = ({ username, passes }) => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
+      width: '35%',
     },
     {
       title: 'Pass Count',
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
-      width: '133px',
-      render: (text, record) => (record.limited ? `${text} Class` : 'Unlimited Class'),
+      width: '15%',
+      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
     },
     {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '72px',
-      render: (text, record) => `${text} day`,
+      width: '10%',
+      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
@@ -82,7 +83,7 @@ const ClassPasses = ({ username, passes }) => {
       key: 'price',
       align: 'left',
       sortOrder: 'descend',
-      width: '84px',
+      width: '10%',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
@@ -92,18 +93,17 @@ const ClassPasses = ({ username, passes }) => {
         </Button>
       ),
       align: 'right',
-      width: '150px',
       render: (text, record) => (
         <Space size="small">
-          <Button type="primary" size="small" onClick={() => showPurchaseModal(record.id)}>
+          <Button type="primary" onClick={() => showPurchaseModal(record.id)}>
             Buy Pass
           </Button>
           {expandedRowKeys.includes(record.id) ? (
-            <Button type="link" size="small" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
+            <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
               Close
             </Button>
           ) : (
-            <Button type="link" size="small" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
+            <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
               More
             </Button>
           )}
@@ -206,7 +206,6 @@ const ClassPasses = ({ username, passes }) => {
               columns={passesColumns}
               data={passes}
               rowKey={(record) => record.id}
-              size="small"
               expandable={{
                 expandedRowRender: (record) => renderClassesList(record),
                 expandRowByClick: true,
