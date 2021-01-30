@@ -405,7 +405,7 @@ const SessionDetails = ({ match, history }) => {
           </Col>
         )}
       </Row>
-      <Row justify="space-between" className={styles.mt50} gutter={16}>
+      <Row justify="space-between" className={styles.mt50} gutter={10}>
         <Col xs={24} lg={15}>
           <Title level={5}>Session Information</Title>
           {showDescription ? (

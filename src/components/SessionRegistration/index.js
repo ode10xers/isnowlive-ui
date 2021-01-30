@@ -241,7 +241,7 @@ const SessionRegistration = ({
           className={styles.card}
           title={
             <Row>
-              <Col xs={4}>
+              <Col xs={4} md={2}>
                 {selectedPass?.id === pass.id ? (
                   <div onClick={() => setSelectedPass(pass)}>
                     <CheckCircleTwoTone twoToneColor="#52c41a" />
@@ -250,7 +250,7 @@ const SessionRegistration = ({
                   <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
                 )}
               </Col>
-              <Col xs={20}>
+              <Col xs={20} md={22}>
                 <Text>{pass.name}</Text>
               </Col>
             </Row>
