@@ -134,14 +134,13 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '35%',
     },
     {
       title: 'Classes Left',
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
-      width: '15%',
+      width: '144px',
       render: (text, record) =>
         record.limited ? `${record.classes_remaining}/${record.class_count} Classes` : 'Unlimited Classes',
     },
@@ -150,7 +149,7 @@ const ClassPassList = () => {
       dataIndex: 'expiry',
       key: 'expiry',
       align: 'center',
-      width: '18%',
+      width: '120px',
       render: (text, record) => toShortDate(text),
     },
     {
@@ -158,25 +157,41 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '18%',
+      width: '90px',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
       title: '',
       align: 'right',
+      width: '108px',
       render: (text, record) =>
         record.expired ? (
           expandedExpiredRowKeys.includes(record.pass_order_id) ? (
-            <Button type="link" onClick={() => collapseExpiredRow(record.pass_order_id)} icon={<UpOutlined />}>
+            <Button
+              type="link"
+              size="small"
+              onClick={() => collapseExpiredRow(record.pass_order_id)}
+              icon={<UpOutlined />}
+            >
               Close
             </Button>
           ) : (
-            <Button type="link" onClick={() => expandExpiredRow(record.pass_order_id)} icon={<DownOutlined />}>
+            <Button
+              type="link"
+              size="small"
+              onClick={() => expandExpiredRow(record.pass_order_id)}
+              icon={<DownOutlined />}
+            >
               More
             </Button>
           )
         ) : expandedActiveRowKeys.includes(record.pass_order_id) ? (
-          <Button type="link" onClick={() => collapseActiveRow(record.pass_order_id)} icon={<UpOutlined />}>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => collapseActiveRow(record.pass_order_id)}
+            icon={<UpOutlined />}
+          >
             Close
           </Button>
         ) : (
