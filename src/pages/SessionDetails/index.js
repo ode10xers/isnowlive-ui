@@ -439,7 +439,12 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24} lg={15} order={isMobileDevice ? 2 : 1} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col
+          xs={24}
+          lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
+          order={isMobileDevice ? 2 : 1}
+          className={isMobileDevice ? styles.mt20 : styles.mt50}
+        >
           {showSignInForm ? (
             <SignInForm
               user={currentUser}
@@ -479,7 +484,7 @@ const SessionDetails = ({ match, history }) => {
         {!showSignInForm && (
           <Col
             xs={24}
-            lg={{ span: 8, offset: 1 }}
+            lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
             order={isMobileDevice ? 1 : 2}
             className={isMobileDevice ? styles.mt20 : styles.mt50}
           >
