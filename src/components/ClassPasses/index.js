@@ -74,7 +74,7 @@ const ClassPasses = ({ username, passes }) => {
       key: 'validity',
       align: 'center',
       width: '72px',
-      render: (text, record) => `${text} day}`,
+      render: (text, record) => `${text} day`,
     },
     {
       title: 'Price',

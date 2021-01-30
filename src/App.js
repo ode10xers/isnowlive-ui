@@ -111,7 +111,7 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
         <RouteWithLayout layout={CompactLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
         <RouteWithLayout layout={CompactLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.passDetails} component={PassDetails} />
+        <RouteWithLayout layout={CompactLayout} exact path={Routes.passDetails} component={PassDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
