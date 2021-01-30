@@ -61,6 +61,12 @@
   border: solid 1px map-get($colors, 'DodgerBlue');
 }
 
+@media (max-width: 1366px) {
+  .passName {
+    font-size: 11px;
+  }
+}
+
 @media (max-width: 768px) {
   .nameInput {
     max-width: 100%;
