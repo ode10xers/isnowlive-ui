@@ -464,7 +464,7 @@ const SessionRegistration = ({
               </div>
             ) : (
               <>
-                {availablePasses.length > 0 && (
+                {availablePasses.length > 0 ? (
                   <>
                     <div>
                       <Title level={5}>
@@ -505,6 +505,12 @@ const SessionRegistration = ({
                       )}
                     </div>
                   </>
+                ) : (
+                  <Item {...sessionRegistrationTailLayout}>
+                    <Title level={5}>
+                      Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
+                    </Title>
+                  </Item>
                 )}
               </>
             )}
