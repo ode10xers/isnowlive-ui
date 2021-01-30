@@ -390,7 +390,7 @@ const InventoryDetails = ({ match, history }) => {
             alt="Session Detail"
             width="100%"
           />
-          {session?.total_bookings === session?.max_participants && (
+          {session?.total_bookings >= session?.max_participants && (
             <div className={styles.darkOverlay}>
               <img className={styles.soldOutImage} src={SoldOutImage} alt="Sold out" />
             </div>
