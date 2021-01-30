@@ -122,7 +122,6 @@ const SessionRegistration = ({
       title: 'Pass',
       dataIndex: 'name',
       key: 'name',
-      render: (text, record) => <Text className={styles.passName}> {record.name} </Text>,
     },
     {
       title: 'Validity',

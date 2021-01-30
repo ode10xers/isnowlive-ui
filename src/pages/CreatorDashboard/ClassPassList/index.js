@@ -432,15 +432,15 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={14} lg={17}>
+        <Col xs={12} md={10} lg={14}>
           <Title level={4}> Class Passes </Title>
         </Col>
-        <Col xs={12} md={4} lg={3}>
+        <Col xs={12} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={24} md={6} lg={4}>
+        <Col xs={24} md={8} lg={6}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
             Create New Pass
           </Button>

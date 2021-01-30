@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography } from 'antd';
+import { Row, Col, message, Typography } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
@@ -40,6 +40,8 @@ const {
   formatDate: { getTimeDiff },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
+
+const SoldOutImage = require('assets/images/sold_out.png');
 
 const InventoryDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -374,19 +376,30 @@ const InventoryDetails = ({ match, history }) => {
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       <Row justify="space-between" className={styles.mt50}>
-        <Col span={24}>
-          <Image
+        <Col span={24} className={classNames(styles.imageWrapper, styles.mb20)}>
+          {/* <Image
             preview={false}
             width={'100%'}
             className={classNames(styles.coverImage, styles.mb20)}
             src={session?.session_image_url || 'error'}
             fallback={DefaultImage()}
+          /> */}
+          <img
+            className={styles.coverImage}
+            src={session?.session_image_url || DefaultImage()}
+            alt="Session Detail"
+            width="100%"
           />
+          {session?.total_bookings === session?.max_participants && (
+            <div className={styles.darkOverlay}>
+              <img className={styles.soldOutImage} src={SoldOutImage} alt="Sold out" />
+            </div>
+          )}
         </Col>
-        <Col xs={24} lg={13}>
+        <Col xs={24} lg={16}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
-        <Col xs={24} lg={11}>
+        <Col xs={24} lg={8}>
           <SessionDate schedule={session} />
         </Col>
       </Row>
