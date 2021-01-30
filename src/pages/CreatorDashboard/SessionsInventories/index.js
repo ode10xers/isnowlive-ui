@@ -242,16 +242,9 @@ const SessionsInventories = ({ match }) => {
               colSpan: 6,
             },
             children: (
-              <>
-                {expandedRowKeys.includes(record.start_time) ? (
-                  <UpCircleOutlined style={{ fontSize: 20 }} onClick={() => collapseRow(record.start_time)} />
-                ) : (
-                  <DownCircleOutlined style={{ fontSize: 20 }} onClick={() => expandRow(record.start_time)} />
-                )}
-                <Text strong className={styles.ml5}>
-                  {toLongDateWithLongDay(text)}
-                </Text>
-              </>
+              <Text strong className={styles.textAlignLeft}>
+                {toLongDateWithLongDay(text)}
+              </Text>
             ),
           };
         } else {
@@ -324,8 +317,8 @@ const SessionsInventories = ({ match }) => {
             </Col>
           </Row>
         ) : (
-          <Row justify="space-around" gutter={[8, 8]}>
-            <Col xs={24} md={5}>
+          <Row justify="start" gutter={[8, 8]}>
+            <Col md={24} lg={24} xl={4}>
               <Tooltip title="Event Details">
                 <Button
                   type="link"
@@ -335,7 +328,7 @@ const SessionsInventories = ({ match }) => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={24} md={5}>
+            <Col md={24} lg={24} xl={4}>
               <Tooltip title="Copy Event Page Link">
                 <Button
                   type="text"
@@ -344,7 +337,7 @@ const SessionsInventories = ({ match }) => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={12} md={5}>
+            <Col md={24} lg={24} xl={4}>
               {isDisabled ? (
                 <Tooltip title="Event cannot be cancelled">
                   <Button type="text" disabled icon={<DeleteOutlined />} />
@@ -367,7 +360,7 @@ const SessionsInventories = ({ match }) => {
             {!isPast &&
               (record.start_url ? (
                 <>
-                  <Col xs={6} md={5}>
+                  <Col md={24} lg={24} xl={4}>
                     <Tooltip title="Show Zoom Meeting Details">
                       <Button
                         type="link"
@@ -376,7 +369,7 @@ const SessionsInventories = ({ match }) => {
                       />
                     </Tooltip>
                   </Col>
-                  <Col xs={6} md={4}>
+                  <Col md={24} lg={24} xl={4}>
                     <Tooltip title="Start event">
                       <Button
                         type="text"
@@ -387,7 +380,7 @@ const SessionsInventories = ({ match }) => {
                   </Col>
                 </>
               ) : (
-                <Col xs={12} md={5}>
+                <Col md={24} lg={24} xl={4}>
                   <Tooltip title="Add Zoom Meeting Details">
                     <Button
                       type="link"
@@ -616,7 +609,6 @@ const SessionsInventories = ({ match }) => {
                     }
                     expandable={{
                       expandedRowKeys: expandedRowKeys,
-                      expandIconColumnIndex: -1,
                       onExpand: (expanded, record) => {
                         if (expanded) {
                           expandRow(record.start_time);

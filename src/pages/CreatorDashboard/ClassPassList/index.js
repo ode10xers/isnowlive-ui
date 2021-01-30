@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Badge, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, message } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -8,8 +8,6 @@ import {
   EditOutlined,
   CopyOutlined,
   EyeInvisibleOutlined,
-  EyeOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -189,6 +187,7 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
+      width: '35%',
       render: (text, record) => {
         return {
           props: {
@@ -210,7 +209,7 @@ const ClassPassList = () => {
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
-      width: '136px',
+      width: '15%',
       render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
     },
     {
@@ -218,7 +217,7 @@ const ClassPassList = () => {
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '72px',
+      width: '12%',
       render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -226,33 +225,28 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '86px',
+      width: '10%',
       render: (text, record) => `${text} ${record.currency}`,
     },
     {
       title: '',
       align: 'right',
-      width: '160px',
       render: (text, record) => (
-        <Row gutter={[8, 8]}>
-          <Col xs={24} md={5}>
+        <Row gutter={8}>
+          <Col xs={24} md={4}>
             <Tooltip title="Edit">
               <Button
-                block
                 className={styles.detailsButton}
                 type="text"
-                size="small"
                 onClick={() => showEditPassesModal(record)}
                 icon={<EditOutlined />}
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={5}>
+          <Col xs={24} md={4}>
             <Tooltip title="Copy Pass Link">
               <Button
-                block
                 type="text"
-                size="small"
                 className={styles.detailsButton}
                 onClick={() => copyPageLinkToClipboard(record.id)}
                 icon={<CopyOutlined />}
@@ -262,46 +256,28 @@ const ClassPassList = () => {
           <Col xs={24} md={5}>
             {record.is_published ? (
               <Tooltip title="Hide Session">
-                <Button
-                  block
-                  type="link"
-                  size="small"
-                  danger
-                  onClick={() => unpublishPass(record.id)}
-                  icon={<EyeInvisibleOutlined />}
-                />
+                <Button type="link" danger onClick={() => unpublishPass(record.id)}>
+                  Hide
+                </Button>
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Session">
-                <Button
-                  block
-                  type="link"
-                  size="small"
-                  className={styles.successBtn}
-                  onClick={() => publishPass(record.id)}
-                  icon={<EyeOutlined />}
-                />
+                <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
+                  Show
+                </Button>
               </Tooltip>
             )}
           </Col>
-          <Col xs={24} md={9}>
-            <Tooltip title="Subscribers of this pass">
-              {expandedRowKeys.includes(record.id) ? (
-                <Button type="link" size="small" onClick={() => collapseRow(record.id)}>
-                  <Badge showZero={true} size="small" count={record.subscribers.length}>
-                    <UserOutlined style={{ color: '#1890ff' }} />
-                  </Badge>
-                  <UpOutlined />
-                </Button>
-              ) : (
-                <Button type="link" size="small" onClick={() => expandRow(record.id)}>
-                  <Badge showZero={true} size="small" count={record.subscribers.length}>
-                    <UserOutlined style={{ color: '#1890ff' }} />
-                  </Badge>
-                  <DownOutlined />
-                </Button>
-              )}
-            </Tooltip>
+          <Col xs={24} md={6}>
+            {expandedRowKeys.includes(record.id) ? (
+              <Button type="link" onClick={() => collapseRow(record.id)}>
+                {`${record.subscribers.length} Subscribers `} <UpOutlined />
+              </Button>
+            ) : (
+              <Button type="link" onClick={() => expandRow(record.id)}>
+                {`${record.subscribers.length} Subscribers`} <DownOutlined />
+              </Button>
+            )}
           </Col>
         </Row>
       ),
@@ -457,7 +433,6 @@ const ClassPassList = () => {
               data={passes}
               loading={isLoading}
               rowKey={(record) => record.id}
-              size="small"
               expandable={{
                 expandedRowRender: (record) => renderSubscribersList(record),
                 expandRowByClick: true,
