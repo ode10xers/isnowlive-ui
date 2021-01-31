@@ -126,7 +126,8 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                         <Col xs={24} md={10}>
                           <Image
                             preview={false}
-                            height={132}
+                            height={136}
+                            width="100%"
                             className={styles.cardImage}
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
