@@ -1,0 +1,54 @@
+@import '../../styles/variables.scss';
+
+.numericInput {
+  width: 100% !important;
+}
+
+.modalActionRow {
+  margin-top: 10px;
+}
+
+.confirmModal {
+  :global {
+    .anticon {
+      color: map-get($colors, $key: 'KellyGreen') !important;
+    }
+  }
+}
+
+.helpText {
+  color: map-get($map: $colors, $key: 'SuvaGrey') !important;
+  font-size: 12px;
+}
+
+.colorPicker {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.colorPickerPreview {
+  border-width: 10px;
+  border-style: solid;
+}
+.imageWrapper {
+  position: relative;
+  height: 315px;
+}
+.coverImage {
+  & > div {
+    width: 100% !important;
+    height: 300px !important;
+  }
+}
+.uploadVideoBtn {
+  width: 100%;
+  height: 100px !important;
+}
+.videoUpload {
+  :global {
+    .ant-upload.ant-upload-select {
+      display: inline-block;
+      width: 100%;
+    }
+  }
+}

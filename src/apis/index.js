@@ -82,4 +82,18 @@ export default {
     publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
     unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
   },
+  videos: {
+    // getVideoById: (videoId) => http.get(`/passes/${videoId}`),
+    // getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
+    // getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
+    getCreatorVideos: () => http.get(`/secure/creator/passes`),
+    // getEarningsByPassId: (videoId) => http.get(`/secure/creator/payments/earnings/passes/id/${videoId}`),
+    // createClassPass: (payload) => http.post(`/secure/creator/passes`, payload),
+    // updateClassPass: (videoId, payload) => http.put(`/secure/creator/passes/${videoId}`, payload),
+    // createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
+    // getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
+    // getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
+    publishVideo: (videoId) => http.post(`/secure/creator/passes/${videoId}/publish`),
+    unpublishVideo: (videoId) => http.post(`/secure/creator/passes/${videoId}/unpublish`),
+  },
 };
