@@ -81,7 +81,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                     onClick={() => redirectToSessionsPage(session)}
                   >
                     {isMobileDevice ? (
-                      <Row gutter={[8, 4]}>
+                      <Row gutter={[8, 8]}>
                         <Col xs={24}>
                           <Image
                             preview={false}
@@ -123,15 +123,15 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                       </Row>
                     ) : (
                       <Row gutter={16}>
-                        <Col xs={24} md={8}>
+                        <Col xs={24} md={10}>
                           <Image
                             preview={false}
-                            height={100}
+                            height={132}
                             className={styles.cardImage}
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         </Col>
-                        <Col xs={24} md={16}>
+                        <Col xs={24} md={14}>
                           <Row>
                             <Col xs={24}>
                               <Title ellipsis={{ rows: 1 }} level={5}>
