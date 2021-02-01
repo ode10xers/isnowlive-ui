@@ -148,7 +148,9 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true);
+        const username = window.location.hostname.split('.')[0];
+
+        showAlreadyBookedModal(true, username);
         closeModal();
       }
     }

@@ -57,7 +57,8 @@ export const showBookingSuccessModal = (
   userEmail,
   userPass = null,
   isContinuedFlow = false,
-  userDidPayment = false
+  userDidPayment = false,
+  redirectDomainName = 'app'
 ) => {
   Modal.success({
     closable: true,
@@ -113,11 +114,11 @@ export const showBookingSuccessModal = (
       </>
     ),
     okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
+    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
 
-export const showAlreadyBookedModal = (isPass = false) => {
+export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app') => {
   Modal.warning({
     center: true,
     closable: true,
@@ -130,6 +131,6 @@ export const showAlreadyBookedModal = (isPass = false) => {
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl() + Routes.attendeeDashboard.rootPath),
+    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };

@@ -69,7 +69,9 @@ const PaymentVerification = () => {
                     error.response?.data?.message ===
                     'It seems you have already booked this session, please check your dashboard'
                   ) {
-                    showAlreadyBookedModal(false);
+                    const username = window.location.hostname.split('.')[0];
+
+                    showAlreadyBookedModal(false, username);
                   } else {
                     showErrorModal('Something went wrong', error.response?.data?.message);
                   }
