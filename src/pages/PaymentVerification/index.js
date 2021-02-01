@@ -32,6 +32,8 @@ const PaymentVerification = () => {
     if (order_id && transaction_id) {
       const verifyPayment = async () => {
         setIsLoading(true);
+        const username = window.location.hostname.split('.')[0];
+
         try {
           const { status } = await apis.payment.verifyPaymentForOrder({
             order_id,
@@ -62,25 +64,35 @@ const PaymentVerification = () => {
                   });
 
                   if (isAPISuccess(followUpBooking.status)) {
-                    showBookingSuccessModal(userDetails.email, { ...usersPass, name: usersPass.pass_name }, true, true);
+                    showBookingSuccessModal(
+                      userDetails.email,
+                      { ...usersPass, name: usersPass.pass_name },
+                      true,
+                      true,
+                      username
+                    );
                   }
                 } catch (error) {
                   if (
                     error.response?.data?.message ===
                     'It seems you have already booked this session, please check your dashboard'
                   ) {
-                    const username = window.location.hostname.split('.')[0];
-
                     showAlreadyBookedModal(false, username);
                   } else {
                     showErrorModal('Something went wrong', error.response?.data?.message);
                   }
                 }
               } else {
-                showBookingSuccessModal(userDetails.email, { ...usersPass, name: usersPass.pass_name }, false, false);
+                showBookingSuccessModal(
+                  userDetails.email,
+                  { ...usersPass, name: usersPass.pass_name },
+                  false,
+                  false,
+                  username
+                );
               }
             } else {
-              showBookingSuccessModal(userDetails.email, null, false, false);
+              showBookingSuccessModal(userDetails.email, null, false, false, username);
             }
           }
           setIsLoading(false);

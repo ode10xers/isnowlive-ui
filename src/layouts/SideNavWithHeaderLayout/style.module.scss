@@ -8,12 +8,20 @@
   }
 }
 
+.desktopHeader {
+  display: none;
+}
+
+.content {
+  padding-top: 64px;
+}
+
 .topHeader {
   background-color: map-get($colors, 'White') !important;
   border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
   padding: 0 20px !important;
   position: fixed;
-  z-index: 1;
+  z-index: 99;
   width: 100%;
 }
 .divider {
@@ -24,6 +32,12 @@
 .sideIcon {
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
 }
+@media screen and (max-width:1024px) {
+  .desktopHeader {
+    display: block;
+  }
+}
+
 @media (max-width: 768px) {
   .sideIcon {
     position: absolute !important;

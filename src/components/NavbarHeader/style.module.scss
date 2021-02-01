@@ -1,6 +1,7 @@
 @import '../../styles/variables.scss';
 
 .creatorSiteName {
+  margin-left: 12px;
   font-size: 24px;
   font-weight: 700;
   color: map-get($map: $colors, $key: 'DodgerBlue');
@@ -15,8 +16,56 @@
   font-size: 14px;
 }
 
-@media screen and (max-width: 576px) {
+.mobileMenuContainer {
+  display: none;
+}
+
+.mobileMenuModal {
+  .topRow {
+    margin-top: -12px;
+    margin-left: -4px;
+    margin-bottom: 10px;
+  }
+
+  ul.menuLinks {
+    list-style: none;
+    padding: 0;
+
+    & li {
+      font-size: 16px;
+      border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+      width: 100%;
+      text-align: center;
+      padding: 8px 4px 16px;
+
+      &.noBorder {
+        border-bottom: none;
+      }
+
+      &.divider {
+        padding: 0;
+        border-bottom: 1px solid map-get($map: $colors, $key: 'SuvaGrey');
+        margin-bottom: 12px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
   .menuContainer {
     max-width: 72px;
+  }
+
+  .inlineMenu {
+    display : none;
+  }
+
+  .mobileMenuContainer {
+    display: block;
+
+    .mobileMenu {
+      position: absolute;
+      right: 4px;
+    }
   }
 }

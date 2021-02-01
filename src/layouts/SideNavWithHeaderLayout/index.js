@@ -2,12 +2,12 @@ import React from 'react';
 import { Layout, Divider } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
-import Header from 'components/Header';
+import DashboardHeader from 'components/DashboardHeader';
 import NavbarHeader from 'components/NavbarHeader';
 
 import styles from './style.module.scss';
 
-const { Content, Sider } = Layout;
+const { Content, Sider, Header } = Layout;
 
 const SideNavWithHeaderLayout = ({ children }) => {
   const handleCollapsed = (collapsed) => {
@@ -22,19 +22,29 @@ const SideNavWithHeaderLayout = ({ children }) => {
 
   return (
     <>
-      <div className={styles.topHeader}>
+      <Header className={styles.topHeader}>
         <NavbarHeader />
-      </div>
-      <Header />
-      <Divider className={styles.divider} />
-      <Layout className={styles.container}>
-        <Sider className={styles.sideIcon} width={250} breakpoint="md" collapsedWidth="0" onCollapse={handleCollapsed}>
-          <SideNavigation />
-        </Sider>
-        <Layout className={styles.mainContent}>
-          <Content>{children}</Content>
+      </Header>
+      <div className={styles.content}>
+        <div className={styles.desktopHeader}>
+          <DashboardHeader />
+          <Divider className={styles.divider} />
+        </div>
+        <Layout className={styles.container}>
+          <Sider
+            className={styles.sideIcon}
+            width={250}
+            breakpoint="md"
+            collapsedWidth="0"
+            onCollapse={handleCollapsed}
+          >
+            <SideNavigation />
+          </Sider>
+          <Layout className={styles.mainContent}>
+            <Content>{children}</Content>
+          </Layout>
         </Layout>
-      </Layout>
+      </div>
     </>
   );
 };
