@@ -23,7 +23,7 @@ const SideNavWithHeaderLayout = ({ children }) => {
   return (
     <>
       <Header className={styles.topHeader}>
-        <NavbarHeader />
+        <NavbarHeader removePadding={true} />
       </Header>
       <div className={styles.content}>
         <div className={styles.desktopHeader}>
