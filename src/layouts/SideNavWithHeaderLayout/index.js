@@ -1,8 +1,7 @@
 import React from 'react';
-import { Layout, Divider } from 'antd';
+import { Layout } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
-import DashboardHeader from 'components/DashboardHeader';
 import NavbarHeader from 'components/NavbarHeader';
 
 import styles from './style.module.scss';
@@ -26,10 +25,10 @@ const SideNavWithHeaderLayout = ({ children }) => {
         <NavbarHeader removePadding={true} />
       </Header>
       <div className={styles.content}>
-        <div className={styles.desktopHeader}>
+        {/* <div className={styles.desktopHeader}>
           <DashboardHeader />
           <Divider className={styles.divider} />
-        </div>
+        </div> */}
         <Layout className={styles.container}>
           <Sider
             className={styles.sideIcon}

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
+import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 
@@ -11,13 +12,15 @@ import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
+import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const NavbarHeader = ({ removePadding = false }) => {
   const history = useHistory();
+  const location = useLocation();
 
   const [localUserDetails, setLocalUserDetails] = useState(getLocalUserDetails());
   const [authModalVisible, setAuthModalVisible] = useState(false);
@@ -46,6 +49,43 @@ const NavbarHeader = ({ removePadding = false }) => {
       setAuthModalState('signIn');
     }
   };
+
+  const isCreatorCheck = () => {
+    const userDetails = getLocalUserDetails();
+
+    if (userDetails.is_creator) {
+      history.push(Routes.creatorDashboard.rootPath);
+    } else {
+      Modal.confirm({
+        autoFocusButton: 'cancel',
+        centered: true,
+        closable: true,
+        maskClosable: true,
+        content: (
+          <>
+            <Paragraph>Ready to become a host and start making money by hosting live events?</Paragraph>
+            <Paragraph>
+              By clicking on "<strong>Become Host</strong>" your account will be upgraded to a host account and you will
+              get access to your dashboard and features empowering you to host live events on topics you are passionate
+              about and make money from it.
+            </Paragraph>
+          </>
+        ),
+        title: 'Become a Host',
+        okText: 'Become Host',
+        cancelText: 'Talk to Us',
+        onOk: () => history.push(Routes.profile),
+        onCancel: () => openFreshChatWidget(),
+      });
+    }
+  };
+
+  const isActive = (path) => {
+    return history.location.pathname.includes(path);
+  };
+
+  const inDashboard = () =>
+    location.pathname.includes('/attendee/dashboard') || location.pathname.includes('/creator/dashboard');
 
   const redirectToCreatorProfile = (section = 'session') => {
     setShowMobileMenu(false);
@@ -79,7 +119,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         <Col xs={0} md={removePadding ? 0 : 4} xl={removePadding ? 0 : 4}></Col>
         <Col xs={24} md={removePadding ? 24 : 16} xl={removePadding ? 24 : 16}>
           <Row>
-            <Col flex="3 1 auto">
+            <Col className={classNames(styles.domainNameWrapper, inDashboard() ? styles.dashboard : undefined)}>
               <div className={styles.siteHomeLink}>
                 <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('session')}>
                   {username.toUpperCase()}
@@ -87,7 +127,33 @@ const NavbarHeader = ({ removePadding = false }) => {
                 </span>
               </div>
             </Col>
-            <Col flex="0 0 auto" className={styles.inlineMenu}>
+            {localUserDetails && inDashboard() && (
+              <Col className={styles.modeSelectWrapper}>
+                <span
+                  className={classNames(
+                    styles.ml10,
+                    styles.navItem,
+                    isActive(Routes.creatorDashboard.rootPath) ? styles.active : undefined
+                  )}
+                  onClick={() => isCreatorCheck()}
+                >
+                  <VideoCameraAddOutlined className={styles.navItemIcon} />
+                  Hosting
+                </span>
+                <span
+                  className={classNames(
+                    styles.ml10,
+                    styles.navItem,
+                    isActive(Routes.attendeeDashboard.rootPath) ? styles.active : undefined
+                  )}
+                  onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
+                >
+                  <TeamOutlined className={styles.navItemIcon} />
+                  Attending
+                </span>
+              </Col>
+            )}
+            <Col className={styles.inlineMenu}>
               <Menu
                 mode="horizontal"
                 overflowedIndicator={<MenuOutlined className={styles.hamburgerMenu} />}
@@ -95,23 +161,19 @@ const NavbarHeader = ({ removePadding = false }) => {
               >
                 {isMobileDevice && (
                   <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('session')}>
-                    {' '}
-                    Home{' '}
+                    Home
                   </Menu.Item>
                 )}
                 {localUserDetails && (
                   <Menu.Item key="Dashboard" onClick={() => redirectToAttendeeDashboard()}>
-                    {' '}
-                    My Dashboard{' '}
+                    My Dashboard
                   </Menu.Item>
                 )}
                 <Menu.Item key="Sessions" onClick={() => redirectToCreatorProfile('session')}>
-                  {' '}
-                  Sessions{' '}
+                  Sessions
                 </Menu.Item>
                 <Menu.Item key="Passes" onClick={() => redirectToCreatorProfile('pass')}>
-                  {' '}
-                  Passes{' '}
+                  Passes
                 </Menu.Item>
                 {/* <Menu.Item key="Videos" onClick={() => redirectToCreatorProfile('video')}> Videos </Menu.Item> */}
                 {localUserDetails ? (
@@ -141,7 +203,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                 )}
               </Menu>
             </Col>
-            <Col flex="1 0 auto" className={styles.mobileMenuContainer}>
+            <Col className={styles.mobileMenuContainer}>
               <span className={styles.mobileMenu}>
                 <MenuOutlined size={50} onClick={() => setShowMobileMenu(true)} />
               </span>
@@ -155,32 +217,60 @@ const NavbarHeader = ({ removePadding = false }) => {
                 onOk={() => setShowMobileMenu(false)}
               >
                 <Row className={styles.topRow}>
-                  <Col xs={10}>
+                  <Col xs={20}>
                     <div className={styles.siteHomeLink}>
                       <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('session')}>
                         {username.toUpperCase()}
                       </span>
                     </div>
                   </Col>
-                  <Col xs={12}></Col>
+                  <Col xs={4}></Col>
                 </Row>
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
                     <ul className={styles.menuLinks}>
-                      <li key="Creator Home">
-                        <span className={styles.menuLink} onClick={() => redirectToCreatorProfile('session')}>
-                          {username.toUpperCase()} Home
-                        </span>
+                      {localUserDetails && inDashboard() && (
+                        <li key="Mode Selection">
+                          <Row gutter={[8, 8]}>
+                            <Col xs={12}>
+                              <span
+                                className={classNames(
+                                  styles.navItem,
+                                  isActive(Routes.creatorDashboard.rootPath) ? styles.active : undefined
+                                )}
+                                onClick={() => isCreatorCheck()}
+                              >
+                                <VideoCameraAddOutlined className={styles.navItemIcon} />
+                                Hosting
+                              </span>
+                            </Col>
+                            <Col xs={12}>
+                              <span
+                                className={classNames(
+                                  styles.navItem,
+                                  isActive(Routes.attendeeDashboard.rootPath) ? styles.active : undefined
+                                )}
+                                onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
+                              >
+                                <TeamOutlined className={styles.navItemIcon} />
+                                Attending
+                              </span>
+                            </Col>
+                          </Row>
+                        </li>
+                      )}
+                      <li key="Creator Home" onClick={() => redirectToCreatorProfile('session')}>
+                        <span className={styles.menuLink}>Home</span>
                       </li>
-                      <li key="Creator Sessions">
-                        <span className={styles.menuLink} onClick={() => redirectToCreatorProfile('session')}>
-                          {username.toUpperCase()} Sessions
-                        </span>
+                      <li key="Creator Sessions" onClick={() => redirectToCreatorProfile('session')}>
+                        <span className={styles.menuLink}>Sessions</span>
                       </li>
-                      <li key="Creator Passes" className={styles.noBorder}>
-                        <span className={styles.menuLink} onClick={() => redirectToCreatorProfile('pass')}>
-                          {username.toUpperCase()} Passes
-                        </span>
+                      <li
+                        key="Creator Passes"
+                        className={styles.noBorder}
+                        onClick={() => redirectToCreatorProfile('pass')}
+                      >
+                        <span className={styles.menuLink}>Passes</span>
                       </li>
                       {/* <li key="Creator Videos">
                         <span className={styles.menuLink} onClick={() => redirectToCreatorProfile('video')}>
@@ -191,26 +281,42 @@ const NavbarHeader = ({ removePadding = false }) => {
                       {localUserDetails && (
                         <>
                           <li key="Divider" className={styles.divider} />
-                          <li key="Attendee Upcoming Sessions">
+                          <li
+                            key="Attendee Upcoming Sessions"
+                            onClick={() => redirectToAttendeeDashboard('/sessions/upcoming')}
+                          >
                             <span
-                              className={styles.menuLink}
-                              onClick={() => redirectToAttendeeDashboard('/sessions/upcoming')}
+                              className={classNames(
+                                styles.menuLink,
+                                isActive('/attendee/dashboard/sessions/upcoming') ? styles.active : undefined
+                              )}
                             >
                               My Upcoming Sessions
                             </span>
                           </li>
-                          <li key="Attendee Past Sessions">
+                          <li
+                            key="Attendee Past Sessions"
+                            onClick={() => redirectToAttendeeDashboard('/sessions/past')}
+                          >
                             <span
-                              className={styles.menuLink}
-                              onClick={() => redirectToAttendeeDashboard('/sessions/past')}
+                              className={classNames(
+                                styles.menuLink,
+                                isActive('/attendee/dashboard/sessions/past') ? styles.active : undefined
+                              )}
                             >
                               My Past Sessions
                             </span>
                           </li>
-                          <li key="Attendee Passes" className={styles.noBorder}>
+                          <li
+                            key="Attendee Passes"
+                            className={styles.noBorder}
+                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.passes)}
+                          >
                             <span
-                              className={styles.menuLink}
-                              onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.passes)}
+                              className={classNames(
+                                styles.menuLink,
+                                isActive('/attendee/dashboard/passes') ? styles.active : undefined
+                              )}
                             >
                               My Passes
                             </span>
