@@ -10,6 +10,7 @@ import { isAPISuccess } from 'utils/helper';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
+import NavbarLayout from 'layouts/NavbarLayout';
 
 import Home from 'pages/Home';
 import Profile from 'pages/Profile';
@@ -107,17 +108,17 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.passDetails} component={PassDetails} />
+        <PrivateRoute layout={NavbarLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.passwordVerification} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.createPassword} component={ResetPassword} />
         <RouteWithLayout layout={DefaultLayout} path={Routes.emailVerification} component={EmailVerification} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.root} component={Home} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
         <Route path={Routes.stripeAccountValidate}>
           <Redirect
             to={{

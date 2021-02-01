@@ -1,0 +1,11 @@
+@import '../../styles/variables.scss';
+
+.mainContent {
+  background-color: map-get($colors, 'White') !important;
+}
+
+.topHeader {
+  @extend .mainContent;
+  border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+  padding: 0 20px !important;
+}

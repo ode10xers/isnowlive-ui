@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
   TagsOutlined,
@@ -42,6 +42,7 @@ const {
 
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
+  const location = useLocation();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
@@ -135,16 +136,33 @@ const ProfilePreview = ({ username = null }) => {
     }
     getProfileDetails();
     getSessionDetails('upcoming');
+    getPassesDetails();
+    //eslint-disable-next-line
   }, [history.location.pathname, getProfileDetails, getSessionDetails]);
+
+  useEffect(() => {
+    if (location.state) {
+      const sectionToShow = location.state.section;
+
+      if (sectionToShow === 'session') {
+        setSelectedListTab(sectionToShow);
+      } else if (sectionToShow === 'pass') {
+        if (passes.length) {
+          setSelectedListTab(sectionToShow);
+        } else {
+          // Fallback to show sessions
+          setSelectedListTab('session');
+        }
+      }
+    }
+  }, [location.state, passes]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
     setSelectedListTab(key);
 
-    if (parseInt(key) === 0) {
+    if (key === 'session') {
       handleChangeSessionTab(selectedSessionTab);
-    } else {
-      getPassesDetails();
     }
 
     setIsListLoading(false);
@@ -243,7 +261,7 @@ const ProfilePreview = ({ username = null }) => {
         </Row>
       )}
 
-      <div className={isOnDashboard && styles.profilePreviewContainer}>
+      <div className={isOnDashboard ? styles.profilePreviewContainer : undefined}>
         {/* ======INTRO========= */}
         <div className={styles.imageWrapper}>
           <div className={styles.coverImageWrapper}>
@@ -316,9 +334,14 @@ const ProfilePreview = ({ username = null }) => {
         {/* =====TAB SELECT===== */}
 
         <Loader loading={isListLoading} size="large">
-          <Tabs size="large" defaultActiveKey={selectedListTab} onChange={handleChangeListTab}>
+          <Tabs
+            size="large"
+            defaultActiveKey={selectedListTab}
+            activeKey={selectedListTab}
+            onChange={handleChangeListTab}
+          >
             <Tabs.TabPane
-              key={0}
+              key={'session'}
               tab={
                 <div className={styles.largeTabHeader}>
                   <VideoCameraOutlined />
@@ -369,7 +392,7 @@ const ProfilePreview = ({ username = null }) => {
               </Row>
             </Tabs.TabPane>
             <Tabs.TabPane
-              key={1}
+              key={'pass'}
               tab={
                 <div className={styles.largeTabHeader}>
                   <TagsOutlined />

@@ -1,0 +1,22 @@
+@import '../../styles/variables.scss';
+
+.creatorSiteName {
+  font-size: 24px;
+  font-weight: 700;
+  color: map-get($map: $colors, $key: 'DodgerBlue');
+  cursor: pointer;
+
+  .siteHomeText {
+    font-size: 14px;
+  }
+}
+
+.hamburgerMenu {
+  font-size: 14px;
+}
+
+@media screen and (max-width: 576px) {
+  .menuContainer {
+    max-width: 72px;
+  }
+}
