@@ -6,18 +6,19 @@ import apis from 'apis';
 
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
-import { scrollToErrorField } from 'utils/helper';
+import { isAPISuccess, scrollToErrorField } from 'utils/helper';
 
 import Loader from 'components/Loader';
+import { showErrorModal, sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
-import { purchasePassModalFormLayout, purchasePassModalTailLayout } from 'layouts/FormLayouts';
+import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
-const { Paragraph, Title } = Typography;
+const { Paragraph, Title, Text } = Typography;
 
 const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn }) => {
   const { logIn } = useGlobalContext();
@@ -26,12 +27,17 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
 
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   useEffect(() => {
     if (showPasswordField && passwordInput.current) {
       passwordInput.current.focus();
     }
   }, [showPasswordField]);
+
+  useEffect(() => {
+    setIncorrectPassword(false);
+  }, [toggleSigningIn]);
 
   const signinUser = (data) => {
     http.setAuthToken(data.auth_token);
@@ -63,7 +69,6 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     setIsLoading(false);
   };
 
-  //TODO: Remove Create order and show corresponding popup (success/failed sign in/up)
   const onFinish = async (values) => {
     setIsLoading(true);
 
@@ -85,7 +90,12 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
             signinUser(data);
           }
         } catch (error) {
-          message.error(error.response?.data?.message || 'Something went wrong');
+          if (error.response?.status === 403) {
+            setIncorrectPassword(true);
+            message.error('Incorrect email or password');
+          } else {
+            message.error(error.response?.data?.message || 'Something went wrong');
+          }
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
@@ -100,6 +110,29 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     scrollToErrorField(errorFields);
   };
 
+  const handleSetNewPassword = async () => {
+    try {
+      const values = await form.validateFields(['email']);
+      handleSendNewPasswordEmail(values.email);
+    } catch (error) {
+      showErrorModal('Please input your email first!');
+    }
+  };
+
+  const handleSendNewPasswordEmail = async (email) => {
+    try {
+      setIsLoading(true);
+      const { status } = await sendNewPasswordEmail(email);
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        showSetNewPasswordModal(email);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
   return (
     <div>
       <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
@@ -107,7 +140,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
           <Form
             form={form}
             labelAlign="left"
-            {...purchasePassModalFormLayout}
+            {...purchaseModalFormLayout}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
           >
@@ -137,13 +170,41 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                   <Input placeholder="Enter your email" disabled={!signingIn && showPasswordField} />
                 </Form.Item>
                 {(signingIn || showPasswordField) && (
-                  <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-                    <Input.Password placeholder="Enter your password" />
+                  <>
+                    <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
+                      <Input.Password placeholder="Enter your password" />
+                    </Form.Item>
+                    {incorrectPassword && (
+                      <Form.Item {...purchaseModalTailLayout}>
+                        <div className={styles.incorrectPasswordText}>
+                          <Text type="danger">Email or password you entered was incorrect, please try again</Text>
+                        </div>
+                      </Form.Item>
+                    )}
+                    {!signingIn && (
+                      <Form.Item {...purchaseModalTailLayout}>
+                        <div className={styles.passwordHelpText}>
+                          <Text>
+                            You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                            <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
+                              set a new password
+                            </Text>
+                          </Text>
+                        </div>
+                      </Form.Item>
+                    )}
+                  </>
+                )}
+                {signingIn && (
+                  <Form.Item {...purchaseModalCenterLayout}>
+                    <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
+                      Set a new password
+                    </Button>
                   </Form.Item>
                 )}
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
-                <Form.Item {...purchasePassModalTailLayout}>
+                <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
                     Sign {signingIn ? 'In' : 'Up'}
                   </Button>

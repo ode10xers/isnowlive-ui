@@ -2,6 +2,8 @@
 
 .linkBtn {
   padding: 0px !important;
+  cursor: pointer;
+  color: map-get($colors, 'DodgerBlue') !important;
 }
 
 .nameInputWrapper {
