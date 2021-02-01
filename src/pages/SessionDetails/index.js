@@ -47,7 +47,11 @@ const SessionDetails = ({ match, history }) => {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const { logIn, logOut } = useGlobalContext();
+  const {
+    state: { userDetails },
+    logIn,
+    logOut,
+  } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
@@ -155,6 +159,12 @@ const SessionDetails = ({ match, history }) => {
     }
     //eslint-disable-next-line
   }, [userPasses, shouldSetDefaultPass]);
+
+  useEffect(() => {
+    if (userDetails && getLocalUserDetails()) {
+      setCurrentUser(getLocalUserDetails());
+    }
+  }, [userDetails]);
 
   const signupUser = async (values) => {
     try {

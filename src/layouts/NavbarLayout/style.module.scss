@@ -1,6 +1,7 @@
 @import '../../styles/variables.scss';
 
 .mainContent {
+  padding-top: 64px;
   background-color: map-get($colors, 'White') !important;
 }
 
@@ -8,4 +9,7 @@
   @extend .mainContent;
   border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
   padding: 0 20px !important;
+  position: fixed;
+  z-index: 1;
+  width: 100%;
 }

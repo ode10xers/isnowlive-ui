@@ -64,8 +64,6 @@ const NavbarHeader = () => {
     return null;
   }
 
-  console.log(localUserDetails);
-
   return (
     <div className={styles.navbarWrapper}>
       <HeaderModal
@@ -81,7 +79,7 @@ const NavbarHeader = () => {
             <Col flex="2 1 auto">
               <div className={styles.siteHomeLink}>
                 <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('session')}>
-                  VKM
+                  {username.toUpperCase()}
                   {!isMobileDevice && <span className={styles.siteHomeText}> Site Home </span>}
                 </span>
               </div>

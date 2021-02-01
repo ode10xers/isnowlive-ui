@@ -56,7 +56,7 @@ const ProfilePreview = ({ username = null }) => {
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
-  const [selectedListTab, setSelectedListTab] = useState(0);
+  const [selectedListTab, setSelectedListTab] = useState('session');
   const [isListLoading, setIsListLoading] = useState(false);
   const [isPassesLoading, setIsPassesLoading] = useState(true);
   const [passes, setPasses] = useState([]);
