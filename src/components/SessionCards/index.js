@@ -123,7 +123,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                       </Row>
                     ) : (
                       <Row gutter={16}>
-                        <Col xs={24} md={10}>
+                        <Col xs={24} md={11}>
                           <Image
                             preview={false}
                             height={136}
@@ -132,7 +132,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         </Col>
-                        <Col xs={24} md={14}>
+                        <Col xs={24} md={13}>
                           <Row>
                             <Col xs={24}>
                               <Title ellipsis={{ rows: 1 }} level={5}>
