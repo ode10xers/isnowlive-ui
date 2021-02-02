@@ -73,10 +73,6 @@
         color: map-get($map: $colors, $key: 'DodgerBlue')
       }
 
-      &.noBorder {
-        border-bottom: none;
-      }
-
       &.divider {
         padding: 0;
         border-bottom: 1px solid map-get($map: $colors, $key: 'SuvaGrey');

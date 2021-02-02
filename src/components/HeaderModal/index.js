@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-
+import { useHistory } from 'react-router-dom';
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
 
 import apis from 'apis';
@@ -22,6 +22,7 @@ const { Paragraph, Title, Text } = Typography;
 
 const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn }) => {
   const { logIn } = useGlobalContext();
+  const history = useHistory();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
@@ -43,6 +44,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     http.setAuthToken(data.auth_token);
     logIn(data, true);
     message.success('You have logged in');
+    history.push('/attendee/dashboard/sessions/upcoming');
     closeModal();
   };
 

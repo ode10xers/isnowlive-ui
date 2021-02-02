@@ -8,7 +8,6 @@ import Routes from 'routes';
 
 import HeaderModal from 'components/HeaderModal';
 
-import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -80,16 +79,24 @@ const NavbarHeader = ({ removePadding = false }) => {
     }
   };
 
-  const isActive = (path) => {
-    return history.location.pathname.includes(path);
+  const isActive = (path) => location.pathname.includes(path);
+
+  const siteLinkActive = (section) => {
+    if (location.state && location.pathname === Routes.root) {
+      const sectionToShow = location.state.section;
+
+      return section === sectionToShow;
+    } else {
+      return false;
+    }
   };
 
   const inDashboard = () =>
     location.pathname.includes('/attendee/dashboard') || location.pathname.includes('/creator/dashboard');
 
-  const redirectToCreatorProfile = (section = 'session') => {
+  const redirectToCreatorProfile = (section) => {
     setShowMobileMenu(false);
-    history.push(Routes.root, { section: section || 'session' });
+    history.push(`${Routes.root}`, { section: section || 'home' });
   };
 
   const redirectToAttendeeDashboard = (subPage = Routes.attendeeDashboard.defaultPath) => {
@@ -100,6 +107,12 @@ const NavbarHeader = ({ removePadding = false }) => {
   useEffect(() => {
     setLocalUserDetails(getLocalUserDetails());
   }, [userDetails]);
+
+  useEffect(() => {
+    //For some reason, sometimes the modals locks the scrolling of <body>
+    //This line here is to remove the style element of <body>
+    document.body.removeAttribute('style');
+  }, []);
 
   const username = window.location.hostname.split('.')[0];
 
@@ -121,9 +134,8 @@ const NavbarHeader = ({ removePadding = false }) => {
           <Row>
             <Col className={classNames(styles.domainNameWrapper, inDashboard() ? styles.dashboard : undefined)}>
               <div className={styles.siteHomeLink}>
-                <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('session')}>
+                <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
                   {username.toUpperCase()}
-                  {!isMobileDevice && <span className={styles.siteHomeText}> Site Home </span>}
                 </span>
               </div>
             </Col>
@@ -159,16 +171,9 @@ const NavbarHeader = ({ removePadding = false }) => {
                 overflowedIndicator={<MenuOutlined className={styles.hamburgerMenu} />}
                 className={styles.menuContainer}
               >
-                {isMobileDevice && (
-                  <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('session')}>
-                    Home
-                  </Menu.Item>
-                )}
-                {localUserDetails && (
-                  <Menu.Item key="Dashboard" onClick={() => redirectToAttendeeDashboard()}>
-                    My Dashboard
-                  </Menu.Item>
-                )}
+                <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
+                  Site Home
+                </Menu.Item>
                 <Menu.Item key="Sessions" onClick={() => redirectToCreatorProfile('session')}>
                   Sessions
                 </Menu.Item>
@@ -178,6 +183,9 @@ const NavbarHeader = ({ removePadding = false }) => {
                 {/* <Menu.Item key="Videos" onClick={() => redirectToCreatorProfile('video')}> Videos </Menu.Item> */}
                 {localUserDetails ? (
                   <>
+                    <Menu.Item key="Dashboard" onClick={() => redirectToAttendeeDashboard()}>
+                      My Dashboard
+                    </Menu.Item>
                     <Menu.Item key="UserName" disabled>
                       <Text strong> Hi, {localUserDetails.first_name} </Text>
                     </Menu.Item>
@@ -213,13 +221,20 @@ const NavbarHeader = ({ removePadding = false }) => {
                 visible={showMobileMenu}
                 footer={null}
                 width="100vw"
-                onCancel={() => setShowMobileMenu(false)}
-                onOk={() => setShowMobileMenu(false)}
+                onCancel={() => {
+                  setShowMobileMenu(false);
+                  document.body.removeAttribute('style');
+                }}
+                onOk={() => {
+                  setShowMobileMenu(false);
+                  document.body.removeAttribute('style');
+                }}
+                afterClose={() => document.body.removeAttribute('style')}
               >
                 <Row className={styles.topRow}>
                   <Col xs={20}>
                     <div className={styles.siteHomeLink}>
-                      <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('session')}>
+                      <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('home')}>
                         {username.toUpperCase()}
                       </span>
                     </div>
@@ -259,15 +274,23 @@ const NavbarHeader = ({ removePadding = false }) => {
                           </Row>
                         </li>
                       )}
-                      <li key="Creator Home" onClick={() => redirectToCreatorProfile('session')}>
-                        <span className={styles.menuLink}>Home</span>
+                      <li
+                        key="Creator Home"
+                        className={siteLinkActive('home') ? styles.active : undefined}
+                        onClick={() => redirectToCreatorProfile('home')}
+                      >
+                        <span className={styles.menuLink}>Site Home</span>
                       </li>
-                      <li key="Creator Sessions" onClick={() => redirectToCreatorProfile('session')}>
+                      <li
+                        key="Creator Sessions"
+                        className={siteLinkActive('session') ? styles.active : undefined}
+                        onClick={() => redirectToCreatorProfile('session')}
+                      >
                         <span className={styles.menuLink}>Sessions</span>
                       </li>
                       <li
                         key="Creator Passes"
-                        className={styles.noBorder}
+                        className={siteLinkActive('pass') ? styles.active : undefined}
                         onClick={() => redirectToCreatorProfile('pass')}
                       >
                         <span className={styles.menuLink}>Passes</span>
@@ -283,43 +306,24 @@ const NavbarHeader = ({ removePadding = false }) => {
                           <li key="Divider" className={styles.divider} />
                           <li
                             key="Attendee Upcoming Sessions"
+                            className={isActive('/attendee/dashboard/sessions/upcoming') ? styles.active : undefined}
                             onClick={() => redirectToAttendeeDashboard('/sessions/upcoming')}
                           >
-                            <span
-                              className={classNames(
-                                styles.menuLink,
-                                isActive('/attendee/dashboard/sessions/upcoming') ? styles.active : undefined
-                              )}
-                            >
-                              My Upcoming Sessions
-                            </span>
+                            <span className={styles.menuLink}>My Upcoming Sessions</span>
                           </li>
                           <li
                             key="Attendee Past Sessions"
+                            className={isActive('/attendee/dashboard/sessions/past') ? styles.active : undefined}
                             onClick={() => redirectToAttendeeDashboard('/sessions/past')}
                           >
-                            <span
-                              className={classNames(
-                                styles.menuLink,
-                                isActive('/attendee/dashboard/sessions/past') ? styles.active : undefined
-                              )}
-                            >
-                              My Past Sessions
-                            </span>
+                            <span className={styles.menuLink}>My Past Sessions</span>
                           </li>
                           <li
                             key="Attendee Passes"
-                            className={styles.noBorder}
+                            className={isActive('/attendee/dashboard/passes') ? styles.active : undefined}
                             onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.passes)}
                           >
-                            <span
-                              className={classNames(
-                                styles.menuLink,
-                                isActive('/attendee/dashboard/passes') ? styles.active : undefined
-                              )}
-                            >
-                              My Passes
-                            </span>
+                            <span className={styles.menuLink}>My Passes</span>
                           </li>
                           {/* <li key="Attendee Videos">
                             <span className={styles.menuLink} onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.videos)}>

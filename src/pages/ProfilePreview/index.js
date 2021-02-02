@@ -143,19 +143,32 @@ const ProfilePreview = ({ username = null }) => {
   useEffect(() => {
     if (location.state) {
       const sectionToShow = location.state.section;
+      let targetElement = document.getElementById('session');
 
       if (sectionToShow === 'session') {
         setSelectedListTab(sectionToShow);
       } else if (sectionToShow === 'pass') {
         if (passes.length) {
           setSelectedListTab(sectionToShow);
+          targetElement = document.getElementById('pass');
         } else {
           // Fallback to show sessions
           setSelectedListTab('session');
         }
+      } else if (sectionToShow === 'home') {
+        targetElement = document.getElementById('home');
+        setSelectedListTab('session');
+      }
+
+      if (targetElement) {
+        targetElement.scrollIntoView();
+
+        if (targetElement !== 'home') {
+          window.scrollBy(0, -100);
+        }
       }
     }
-  }, [location.state, passes]);
+  }, [location.state, passes, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -263,7 +276,7 @@ const ProfilePreview = ({ username = null }) => {
 
       <div className={isOnDashboard ? styles.profilePreviewContainer : undefined}>
         {/* ======INTRO========= */}
-        <div className={styles.imageWrapper}>
+        <div className={styles.imageWrapper} id="home">
           <div className={styles.coverImageWrapper}>
             <Image
               preview={false}
@@ -341,9 +354,9 @@ const ProfilePreview = ({ username = null }) => {
             onChange={handleChangeListTab}
           >
             <Tabs.TabPane
-              key={'session'}
+              key="session"
               tab={
-                <div className={styles.largeTabHeader}>
+                <div className={styles.largeTabHeader} id="session">
                   <VideoCameraOutlined />
                   Sessions
                 </div>
@@ -392,9 +405,9 @@ const ProfilePreview = ({ username = null }) => {
               </Row>
             </Tabs.TabPane>
             <Tabs.TabPane
-              key={'pass'}
+              key="pass"
               tab={
-                <div className={styles.largeTabHeader}>
+                <div className={styles.largeTabHeader} id="pass">
                   <TagsOutlined />
                   Passes
                 </div>
