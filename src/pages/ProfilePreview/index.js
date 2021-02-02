@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
   TagsOutlined,
@@ -42,6 +42,7 @@ const {
 
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
+  const location = useLocation();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
@@ -55,7 +56,7 @@ const ProfilePreview = ({ username = null }) => {
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
-  const [selectedListTab, setSelectedListTab] = useState(0);
+  const [selectedListTab, setSelectedListTab] = useState('session');
   const [isListLoading, setIsListLoading] = useState(false);
   const [isPassesLoading, setIsPassesLoading] = useState(true);
   const [passes, setPasses] = useState([]);
@@ -138,11 +139,41 @@ const ProfilePreview = ({ username = null }) => {
     getPassesDetails();
   }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails]);
 
+  useEffect(() => {
+    if (location.state) {
+      const sectionToShow = location.state.section;
+      let targetElement = document.getElementById('session');
+
+      if (sectionToShow === 'session') {
+        setSelectedListTab(sectionToShow);
+      } else if (sectionToShow === 'pass') {
+        if (passes.length) {
+          setSelectedListTab(sectionToShow);
+          targetElement = document.getElementById('pass');
+        } else {
+          // Fallback to show sessions
+          setSelectedListTab('session');
+        }
+      } else if (sectionToShow === 'home') {
+        targetElement = document.getElementById('home');
+        setSelectedListTab('session');
+      }
+
+      if (targetElement) {
+        targetElement.scrollIntoView();
+
+        if (targetElement !== 'home') {
+          window.scrollBy(0, -100);
+        }
+      }
+    }
+  }, [location.state, passes, profile]);
+
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
     setSelectedListTab(key);
 
-    if (parseInt(key) === 0) {
+    if (key === 'session') {
       handleChangeSessionTab(selectedSessionTab);
     }
     setIsListLoading(false);
@@ -241,9 +272,9 @@ const ProfilePreview = ({ username = null }) => {
         </Row>
       )}
 
-      <div className={isOnDashboard && styles.profilePreviewContainer}>
+      <div className={isOnDashboard ? styles.profilePreviewContainer : undefined}>
         {/* ======INTRO========= */}
-        <div className={styles.imageWrapper}>
+        <div className={styles.imageWrapper} id="home">
           <div className={styles.coverImageWrapper}>
             <Image
               preview={false}
@@ -314,11 +345,16 @@ const ProfilePreview = ({ username = null }) => {
         {/* =====TAB SELECT===== */}
 
         <Loader loading={isListLoading} size="large">
-          <Tabs size="large" defaultActiveKey={selectedListTab} onChange={handleChangeListTab}>
+          <Tabs
+            size="large"
+            defaultActiveKey={selectedListTab}
+            activeKey={selectedListTab}
+            onChange={handleChangeListTab}
+          >
             <Tabs.TabPane
-              key={0}
+              key="session"
               tab={
-                <div className={styles.largeTabHeader}>
+                <div className={styles.largeTabHeader} id="session">
                   <VideoCameraOutlined />
                   Sessions
                 </div>
@@ -366,11 +402,11 @@ const ProfilePreview = ({ username = null }) => {
                 </Col>
               </Row>
             </Tabs.TabPane>
-            {passes.length > 0 && (
+            {passes.length && (
               <Tabs.TabPane
-                key={1}
+                key="pass"
                 tab={
-                  <div className={styles.largeTabHeader}>
+                  <div className={styles.largeTabHeader} id="pass">
                     <TagsOutlined />
                     Passes
                   </div>

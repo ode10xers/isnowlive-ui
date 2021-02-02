@@ -147,8 +147,10 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
+          const username = window.location.hostname.split('.')[0];
+
           setIsLoading(false);
-          showBookingSuccessModal(userEmail, pass, false, false);
+          showBookingSuccessModal(userEmail, pass, false, false, username);
           closeModal();
         }
       }
@@ -156,7 +158,9 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true);
+        const username = window.location.hostname.split('.')[0];
+
+        showAlreadyBookedModal(true, username);
         closeModal();
       }
     }

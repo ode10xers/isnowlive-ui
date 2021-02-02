@@ -17,7 +17,7 @@ const logo = require('assets/images/Logo-passion-transparent.png');
 const { user, attendee } = mixPanelEventTags;
 const { Paragraph } = Typography;
 
-const Header = () => {
+const DashboardHeader = () => {
   const { logOut } = useGlobalContext();
   const history = useHistory();
 
@@ -96,4 +96,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default DashboardHeader;

@@ -47,7 +47,11 @@ const SessionDetails = ({ match, history }) => {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const { logIn, logOut } = useGlobalContext();
+  const {
+    state: { userDetails },
+    logIn,
+    logOut,
+  } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
@@ -162,6 +166,10 @@ const SessionDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [userPasses, shouldSetDefaultPass]);
 
+  useEffect(() => {
+    setCurrentUser(getLocalUserDetails());
+  }, [userDetails]);
+
   const signupUser = async (values) => {
     try {
       const { data } = await apis.user.signup({
@@ -269,6 +277,8 @@ const SessionDetails = ({ match, history }) => {
             initiatePaymentForOrder(data);
           }
         } else {
+          const username = window.location.hostname.split('.')[0];
+
           if (selectedPass) {
             if (!usersPass) {
               // If user (for some reason) buys a free pass (if any exists)
@@ -282,15 +292,15 @@ const SessionDetails = ({ match, history }) => {
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true);
+                showBookingSuccessModal(userEmail, selectedPass, true, false, username);
                 setIsLoading(false);
               }
             } else {
-              showBookingSuccessModal(userEmail, selectedPass, true);
+              showBookingSuccessModal(userEmail, selectedPass, true, false, username);
               setIsLoading(false);
             }
           } else {
-            showBookingSuccessModal(userEmail);
+            showBookingSuccessModal(userEmail, null, false, false, username);
             setIsLoading(false);
           }
         }
@@ -298,12 +308,14 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
+      const username = window.location.hostname.split('.')[0];
+
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false);
+        showAlreadyBookedModal(false, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true);
+        showAlreadyBookedModal(true, username);
       }
     }
   };
