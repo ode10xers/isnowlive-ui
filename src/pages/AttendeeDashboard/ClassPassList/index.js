@@ -153,7 +153,7 @@ const ClassPassList = () => {
       key: 'expiry',
       align: 'center',
       width: '18%',
-      render: (text, record) => toShortDate(text),
+      render: (text, record) => toShortDate(record.expiry),
     },
     {
       title: 'Price',

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
+import { Row, Col, Menu, Button, Typography, Modal, message } from 'antd';
 import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
+import apis from 'apis';
 import Routes from 'routes';
 
 import HeaderModal from 'components/HeaderModal';
@@ -16,6 +17,7 @@ import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import styles from './style.module.scss';
 
 const { Text, Paragraph } = Typography;
+const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 
 const NavbarHeader = ({ removePadding = false }) => {
   const history = useHistory();
@@ -25,11 +27,24 @@ const NavbarHeader = ({ removePadding = false }) => {
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [authModalState, setAuthModalState] = useState('signIn');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
 
   const {
     state: { userDetails },
     logOut,
   } = useGlobalContext();
+
+  const checkShouldShowPassLink = async (username) => {
+    try {
+      const { data } = await apis.passes.getPassesByUsername(username);
+
+      if (data) {
+        setShouldShowPassLink(data.length > 0);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to fetch pass for username');
+    }
+  };
 
   const showSignInModal = () => {
     setAuthModalState('signIn');
@@ -108,15 +123,19 @@ const NavbarHeader = ({ removePadding = false }) => {
     setLocalUserDetails(getLocalUserDetails());
   }, [userDetails]);
 
+  const username = window.location.hostname.split('.')[0];
+
   useEffect(() => {
     //For some reason, sometimes the modals locks the scrolling of <body>
     //This line here is to remove the style element of <body>
     document.body.removeAttribute('style');
-  }, []);
 
-  const username = window.location.hostname.split('.')[0];
+    if (username && !reservedDomainName.includes(username)) {
+      checkShouldShowPassLink(username);
+    }
+  }, [username]);
 
-  if (username === 'app') {
+  if (reservedDomainName.includes(username)) {
     return null;
   }
 
@@ -175,13 +194,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                 >
                   Sessions
                 </Menu.Item>
-                <Menu.Item
-                  key="Pass"
-                  className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
-                  onClick={() => redirectToCreatorProfile('pass')}
-                >
-                  Passes
-                </Menu.Item>
+                {shouldShowPassLink && (
+                  <Menu.Item
+                    key="Pass"
+                    className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('pass')}
+                  >
+                    Passes
+                  </Menu.Item>
+                )}
                 {/* <Menu.Item key="Videos" onClick={() => redirectToCreatorProfile('video')}> Videos </Menu.Item> */}
                 {localUserDetails ? (
                   <>
@@ -294,13 +315,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                       >
                         <span className={styles.menuLink}>Sessions</span>
                       </li>
-                      <li
-                        key="Creator Passes"
-                        className={siteLinkActive('pass') ? styles.active : undefined}
-                        onClick={() => redirectToCreatorProfile('pass')}
-                      >
-                        <span className={styles.menuLink}>Passes</span>
-                      </li>
+                      {shouldShowPassLink && (
+                        <li
+                          key="Creator Passes"
+                          className={siteLinkActive('pass') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('pass')}
+                        >
+                          <span className={styles.menuLink}>Passes</span>
+                        </li>
+                      )}
                       {/* <li key="Creator Videos">
                         <span className={styles.menuLink} onClick={() => redirectToCreatorProfile('video')}>
                           {username.toUpperCase()} Videos
