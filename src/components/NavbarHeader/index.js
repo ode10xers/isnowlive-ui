@@ -171,11 +171,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                 overflowedIndicator={<MenuOutlined className={styles.hamburgerMenu} />}
                 className={styles.menuContainer}
               >
-                <Menu.Item
-                  key="Home"
-                  className={siteLinkActive('home') ? 'ant-menu-item-active' : undefined}
-                  onClick={() => redirectToCreatorProfile('home')}
-                >
+                <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
                   Site Home
                 </Menu.Item>
                 <Menu.Item
