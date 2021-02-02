@@ -400,10 +400,10 @@ const InventoryDetails = ({ match, history }) => {
             </div>
           )}
         </Col>
-        <Col xs={24} lg={16}>
+        <Col xs={24} lg={14}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
-        <Col xs={24} lg={8}>
+        <Col xs={24} lg={10}>
           <SessionDate schedule={session} />
         </Col>
       </Row>
