@@ -133,11 +133,9 @@ const NavbarHeader = ({ removePadding = false }) => {
         <Col xs={24} md={removePadding ? 24 : 16} xl={removePadding ? 24 : 16}>
           <Row>
             <Col className={classNames(styles.domainNameWrapper, inDashboard() ? styles.dashboard : undefined)}>
-              <div className={styles.siteHomeLink}>
-                <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
-                  {username.toUpperCase()}
-                </span>
-              </div>
+              <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
+                {username.toUpperCase()}
+              </span>
             </Col>
             {localUserDetails && inDashboard() && (
               <Col className={styles.modeSelectWrapper}>
@@ -166,11 +164,7 @@ const NavbarHeader = ({ removePadding = false }) => {
               </Col>
             )}
             <Col className={styles.inlineMenu}>
-              <Menu
-                mode="horizontal"
-                overflowedIndicator={<MenuOutlined className={styles.hamburgerMenu} />}
-                className={styles.menuContainer}
-              >
+              <Menu mode="horizontal" overflowedIndicator={<MenuOutlined size={50} />} className={styles.menuContainer}>
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
                   Site Home
                 </Menu.Item>
