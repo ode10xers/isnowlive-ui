@@ -19,7 +19,8 @@
   margin-bottom: 10%;
   margin-top: 50px;
 }
-.coverImage img {
+.coverImage {
+  object-fit: cover;
   border-radius: 8px;
   max-height: 300px;
 }

@@ -47,14 +47,12 @@ export const purchaseModalFormLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
 };
-
 export const purchaseModalTailLayout = {
   wrapperCol: {
     xs: { span: 24 },
     md: { span: 18, offset: 6 },
   },
 };
-
 export const purchaseModalCenterLayout = {
   wrapperCol: {
     xs: { span: 24 },
