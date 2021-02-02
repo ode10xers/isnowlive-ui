@@ -123,7 +123,7 @@ const SessionReschedule = () => {
       }
     } catch (error) {
       setIsSessionLoading(false);
-      message.error(error.message || 'Failed to load user session details');
+      message.error(error.response?.data?.message || 'Failed to load user session details');
     }
   }, [inventory_id, username, price]);
 
@@ -149,7 +149,7 @@ const SessionReschedule = () => {
         });
       }
     } catch (error) {
-      message.error(error.message || 'Failed to reschedule session');
+      message.error(error.response?.data?.message || 'Failed to reschedule session');
     }
 
     setIsLoading(false);

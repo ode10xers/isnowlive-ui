@@ -11,12 +11,18 @@ import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess, scrollToErrorField } from 'utils/helper';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+import {
+  showErrorModal,
+  showAlreadyBookedModal,
+  showBookingSuccessModal,
+  sendNewPasswordEmail,
+  showSetNewPasswordModal,
+} from 'components/Modals/modals';
 
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
-import { purchasePassModalFormLayout, purchasePassModalTailLayout } from 'layouts/FormLayouts';
+import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
@@ -33,6 +39,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showSignIn, setShowSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const toggleSignInState = () => {
     if (showSignIn) {
@@ -46,6 +53,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
       });
     }
 
+    setIncorrectPassword(false);
     setShowSignIn(!showSignIn);
   };
 
@@ -139,8 +147,10 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
+          const username = window.location.hostname.split('.')[0];
+
           setIsLoading(false);
-          showBookingSuccessModal(userEmail, pass, false, false);
+          showBookingSuccessModal(userEmail, pass, false, false, username);
           closeModal();
         }
       }
@@ -148,13 +158,16 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true);
+        const username = window.location.hostname.split('.')[0];
+
+        showAlreadyBookedModal(true, username);
         closeModal();
       }
     }
   };
 
   const onFinish = async (values) => {
+    setIncorrectPassword(false);
     try {
       // check if user is login
 
@@ -174,7 +187,12 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
             createOrder(values.email);
           }
         } catch (error) {
-          message.error(error.response?.data?.message || 'Something went wrong');
+          if (error.response?.status === 403) {
+            setIncorrectPassword(true);
+            message.error('Incorrect email or password');
+          } else {
+            message.error(error.response?.data?.message || 'Something went wrong');
+          }
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
@@ -190,6 +208,29 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
     scrollToErrorField(errorFields);
   };
 
+  const handleSetNewPassword = async () => {
+    try {
+      const values = await form.validateFields(['email']);
+      handleSendNewPasswordEmail(values.email);
+    } catch (error) {
+      showErrorModal('Please input your email first!');
+    }
+  };
+
+  const handleSendNewPasswordEmail = async (email) => {
+    try {
+      setIsLoading(true);
+      const { status } = await sendNewPasswordEmail(email);
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        showSetNewPasswordModal(email);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
   return (
     <div>
       <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
@@ -198,7 +239,7 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
             <Form
               form={form}
               labelAlign="left"
-              {...purchasePassModalFormLayout}
+              {...purchaseModalFormLayout}
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
             >
@@ -229,16 +270,44 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
                     </Form.Item>
                   )}
                   <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                    <Input placeholder="Enter your email" />
+                    <Input placeholder="Enter your email" disabled={!showSignIn && showPasswordField} />
                   </Form.Item>
                   {(showSignIn || showPasswordField) && (
-                    <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-                      <Input.Password placeholder="Enter your password" />
+                    <>
+                      <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
+                        <Input.Password placeholder="Enter your password" />
+                      </Form.Item>
+                      {incorrectPassword && (
+                        <Form.Item {...purchaseModalTailLayout}>
+                          <div className={styles.incorrectPasswordText}>
+                            <Text type="danger">Email or password you entered was incorrect, please try again</Text>
+                          </div>
+                        </Form.Item>
+                      )}
+                      {!showSignIn && (
+                        <Form.Item {...purchaseModalTailLayout}>
+                          <div className={styles.passwordHelpText}>
+                            <Text>
+                              You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                              <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
+                                set a new password
+                              </Text>
+                            </Text>
+                          </div>
+                        </Form.Item>
+                      )}
+                    </>
+                  )}
+                  {showSignIn && (
+                    <Form.Item {...purchaseModalCenterLayout}>
+                      <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
+                        Set a new password
+                      </Button>
                     </Form.Item>
                   )}
                 </Col>
                 <Col xs={24} md={{ span: 18, offset: 3 }}>
-                  <Form.Item {...purchasePassModalTailLayout}>
+                  <Form.Item {...purchaseModalCenterLayout}>
                     <Button block type="primary" htmlType="submit">
                       Sign {showSignIn ? 'In' : 'Up'}
                     </Button>

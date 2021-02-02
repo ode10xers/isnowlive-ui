@@ -43,12 +43,23 @@ export const sessionRegistrationTailLayout = {
     md: { offset: 4, span: 20 },
   },
 };
-export const purchasePassModalFormLayout = {
+export const purchaseModalFormLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
 };
-export const purchasePassModalTailLayout = {
-  wrapperCol: { span: 8, offset: 8 },
+
+export const purchaseModalTailLayout = {
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 18, offset: 6 },
+  },
+};
+
+export const purchaseModalCenterLayout = {
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 8, offset: 8 },
+  },
 };
 export const signInFormLayout = {
   labelCol: {

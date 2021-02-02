@@ -2,7 +2,7 @@ import React from 'react';
 import { Layout, Divider } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
-import Header from 'components/Header';
+import DashboardHeader from 'components/DashboardHeader';
 
 import styles from './style.module.scss';
 
@@ -21,7 +21,7 @@ const SideNavLayout = ({ children }) => {
 
   return (
     <>
-      <Header />
+      <DashboardHeader />
       <Divider className={styles.divider} />
       <Layout className={styles.container}>
         <Sider className={styles.sideIcon} width={250} breakpoint="md" collapsedWidth="0" onCollapse={handleCollapsed}>

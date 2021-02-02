@@ -1,0 +1,115 @@
+@import '../../styles/variables.scss';
+
+.domainNameWrapper {
+  flex: 1 1 auto;
+
+  &.dashboard {
+    flex: 0 1 auto;
+    width: 240px;
+  }
+}
+
+.modeSelectWrapper {
+  flex: 1 1 auto;
+}
+
+.creatorSiteName {
+  margin-left: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: map-get($map: $colors, $key: 'DodgerBlue');
+  cursor: pointer;
+
+  .siteHomeText {
+    font-size: 14px;
+  }
+}
+
+.inlineMenu {
+  flex: 0 0 auto;
+}
+
+.navItem {
+  cursor: pointer;
+
+  .navItemIcon {
+    margin-right: 5px;
+  }
+
+  &.active {
+    color: map-get($colors, 'DodgerBlue');
+  }
+}
+
+.hamburgerMenu {
+  font-size: 14px;
+}
+
+.mobileMenuContainer {
+  flex: 1 0 auto;
+  display: none;
+}
+
+.mobileMenuModal {
+  .topRow {
+    margin-top: -12px;
+    margin-left: -4px;
+    margin-bottom: 10px;
+  }
+
+  ul.menuLinks {
+    list-style: none;
+    padding: 0;
+
+    & li {
+      font-size: 16px;
+      border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+      width: 100%;
+      text-align: left;
+      padding: 8px 4px 16px;
+
+      &.active {
+        border-bottom: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+        color: map-get($map: $colors, $key: 'DodgerBlue')
+      }
+
+      &.divider {
+        padding: 0;
+        border-bottom: 1px solid map-get($map: $colors, $key: 'SuvaGrey');
+        margin-bottom: 12px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .domainNameWrapper {
+    flex: 3 1 auto;
+  }
+
+  .modeSelectWrapper {
+    display: none;
+  }
+
+  .menuContainer {
+    max-width: 72px;
+  }
+
+  .inlineMenu {
+    display : none;
+  }
+
+  .mobileMenuContainer {
+    display: block;
+
+    .mobileMenu {
+      position: absolute;
+      right: 4px;
+    }
+  }
+
+  .navItem {
+    margin-left: auto;
+    margin-right: auto;  
+  }
+}

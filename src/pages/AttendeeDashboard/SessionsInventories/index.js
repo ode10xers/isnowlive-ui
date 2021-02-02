@@ -324,9 +324,13 @@ const SessionsInventories = ({ match }) => {
             )}
           </>,
           <>{!isPast && renderRefundPopup(item)}</>,
-          <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
-            Reschedule
-          </Button>,
+          <>
+            {!isPast && (
+              <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
+                Reschedule
+              </Button>
+            )}{' '}
+          </>,
         ]}
       >
         <div onClick={() => openSessionInventoryDetails(item)}>
