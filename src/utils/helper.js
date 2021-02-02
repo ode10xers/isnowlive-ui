@@ -121,14 +121,14 @@ export const generateUrlFromUsername = (username) => {
   return newUrl;
 };
 
-export const generateUrl = () => {
+export const generateUrl = (targetDomain = 'app') => {
   let newUrl = '';
   if (process.env.NODE_ENV === 'development') {
-    newUrl = 'http://localhost:' + window.location.port;
+    newUrl = `http://${targetDomain === 'app' ? '' : targetDomain + '.'}localhost:` + window.location.port;
   } else if (window.location.origin.includes('stage')) {
-    newUrl = 'https://app.stage.passion.do';
+    newUrl = `https://${targetDomain}.stage.passion.do`;
   } else {
-    newUrl = 'https://app.passion.do';
+    newUrl = `https://${targetDomain}.passion.do`;
   }
   return newUrl;
 };

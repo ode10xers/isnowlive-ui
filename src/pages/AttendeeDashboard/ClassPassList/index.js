@@ -49,6 +49,7 @@ const ClassPassList = () => {
             validity: pass.validity,
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
+            expiry: pass.expiry,
             sessions:
               pass.session?.map((session) => ({
                 ...session,
@@ -71,6 +72,7 @@ const ClassPassList = () => {
             validity: pass.validity,
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
+            expiry: pass.expiry,
             sessions:
               pass.session?.map((session) => ({
                 ...session,

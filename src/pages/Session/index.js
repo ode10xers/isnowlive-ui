@@ -63,7 +63,7 @@ const { creator } = mixPanelEventTags;
 const initialSession = {
   price: 0,
   currency: 'SGD',
-  max_participants: 0,
+  max_participants: 1,
   group: true,
   name: '',
   description: '',
@@ -252,6 +252,7 @@ const Session = ({ match, history }) => {
       setIsSessionTypeGroup(false);
     } else {
       form.setFieldsValue({ ...form.getFieldsValue(), max_participants: 2 });
+      setSession({ ...session, max_participants: 2 });
       setIsSessionTypeGroup(true);
     }
   };
@@ -738,16 +739,15 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            {isSessionTypeGroup && (
-              <Form.Item
-                {...(!isMobileDevice && profileFormTailLayout)}
-                name="max_participants"
-                help="Maximum 100 supported"
-                rules={validationRules.requiredValidation}
-              >
-                <InputNumber min={2} max={100} />
-              </Form.Item>
-            )}
+            <Form.Item
+              {...(!isMobileDevice && profileFormTailLayout)}
+              name="max_participants"
+              help="Maximum 100 supported"
+              rules={validationRules.requiredValidation}
+              hidden={!isSessionTypeGroup}
+            >
+              {isSessionTypeGroup && <InputNumber min={2} max={100} />}
+            </Form.Item>
           </>
 
           {/* ---- Session Price ---- */}
