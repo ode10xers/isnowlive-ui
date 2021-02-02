@@ -290,12 +290,14 @@ const InventoryDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
+      const username = window.location.hostname.split('.')[0];
+
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false);
+        showAlreadyBookedModal(false, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true);
+        showAlreadyBookedModal(true, username);
       }
     }
   };

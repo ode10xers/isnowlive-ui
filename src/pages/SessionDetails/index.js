@@ -47,7 +47,11 @@ const SessionDetails = ({ match, history }) => {
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const { logIn, logOut } = useGlobalContext();
+  const {
+    state: { userDetails },
+    logIn,
+    logOut,
+  } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [showSignInForm, setShowSignInForm] = useState(false);
@@ -64,12 +68,18 @@ const SessionDetails = ({ match, history }) => {
         const sessionDetails = await apis.session.getSessionDetails(session_id);
         const userDetails = await apis.user.getProfileByUsername(username);
         const passes = await apis.passes.getPassesBySessionId(session_id);
-        setSession(sessionDetails.data);
+        setSession({
+          ...sessionDetails.data,
+          inventory: sessionDetails.data.inventory.filter(
+            (inventory) => inventory.num_participants < sessionDetails.data.max_participants
+          ),
+        });
         setCreator(userDetails.data);
         setAvailablePasses(passes.data);
         setIsLoading(false);
         const latestInventories = sessionDetails.data.inventory
           .filter((inventory) => isBeforeDate(inventory.end_time))
+          .filter((inventory) => inventory.num_participants < sessionDetails.data.max_participants)
           .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
         setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
       } catch (error) {
@@ -155,6 +165,10 @@ const SessionDetails = ({ match, history }) => {
     }
     //eslint-disable-next-line
   }, [userPasses, shouldSetDefaultPass]);
+
+  useEffect(() => {
+    setCurrentUser(getLocalUserDetails());
+  }, [userDetails]);
 
   const signupUser = async (values) => {
     try {
@@ -292,12 +306,14 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
+      const username = window.location.hostname.split('.')[0];
+
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false);
+        showAlreadyBookedModal(false, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true);
+        showAlreadyBookedModal(true, username);
       }
     }
   };

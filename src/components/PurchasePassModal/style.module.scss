@@ -2,6 +2,8 @@
 
 .linkBtn {
   padding: 0px !important;
+  cursor: pointer;
+  color: map-get($colors, 'DodgerBlue') !important;
 }
 
 .nameInputWrapper {
@@ -15,5 +17,37 @@
   .lastNameInput {
     @extend .firstNameInput;
     margin-left: 8px !important;
+  }
+}
+
+.passwordHelpText {
+  margin-top: -26px;
+  max-width: 320px;
+
+  .span {
+    color: map-get($colors, 'Charcoal') !important;
+  }
+}
+
+.incorrectPasswordText {
+  margin-top: -26px;
+}
+
+@media (max-width: 768px) {
+  .nameInputWrapper {
+    .firstNameInput, .lastNameInput {
+      max-width: 100%;
+      display: block !important;
+      margin-left: 0px !important;
+    }
+  }
+
+  .passwordHelpText {
+    margin-top: -24px;
+    font-size: 12px;
+    
+    .linkBtn {
+      font-size: 12px;
+    }
   }
 }
