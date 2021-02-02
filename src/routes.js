@@ -9,6 +9,7 @@ const Routes = {
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/creator/session',
+  videoDetails: '/v/:video_id',
   passDetails: '/p/:pass_id',
   inventoryDetails: '/e/:inventory_id',
   sessionDetails: '/s/:session_id',
@@ -43,6 +44,7 @@ const Routes = {
     passes: '/passes',
     editProfile: '/profile/edit',
     livestream: '/livestream',
+    videos: '/videos',
   },
 };
 

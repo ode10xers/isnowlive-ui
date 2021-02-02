@@ -4,6 +4,7 @@ import Routes from 'routes';
 
 import SessionsInventories from 'pages/AttendeeDashboard/SessionsInventories';
 import ClassPassList from 'pages/AttendeeDashboard/ClassPassList';
+import Videos from 'pages/AttendeeDashboard/Videos';
 import Profile from 'pages/Profile';
 import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
@@ -16,6 +17,7 @@ const AttendeeDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.attendeeDashboard.editProfile} component={Profile} />
       <Route exact path={match.url + Routes.attendeeDashboard.livestream} component={LiveStream} />
       <Route exact path={match.url + Routes.attendeeDashboard.passes} component={ClassPassList} />
+      <Route exact path={match.url + Routes.attendeeDashboard.videos} component={Videos} />
       <Redirect to={match.url + Routes.attendeeDashboard.defaultPath} />
     </Switch>
   );
