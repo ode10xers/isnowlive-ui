@@ -261,6 +261,8 @@ const InventoryDetails = ({ match, history }) => {
             initiatePaymentForOrder(data);
           }
         } else {
+          const username = window.location.hostname.split('.')[0];
+
           if (selectedPass) {
             if (!usersPass) {
               // If user (for some reason) buys a free pass (if any exists)
@@ -274,15 +276,15 @@ const InventoryDetails = ({ match, history }) => {
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true);
+                showBookingSuccessModal(userEmail, selectedPass, true, false, username);
                 setIsLoading(false);
               }
             } else {
-              showBookingSuccessModal(userEmail, selectedPass, true);
+              showBookingSuccessModal(userEmail, selectedPass, true, false, username);
               setIsLoading(false);
             }
           } else {
-            showBookingSuccessModal(userEmail);
+            showBookingSuccessModal(userEmail, null, false, false, username);
             setIsLoading(false);
           }
         }

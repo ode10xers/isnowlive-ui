@@ -147,8 +147,10 @@ const PurchasePassModal = ({ visible, closeModal, pass = null }) => {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
+          const username = window.location.hostname.split('.')[0];
+
           setIsLoading(false);
-          showBookingSuccessModal(userEmail, pass, false, false);
+          showBookingSuccessModal(userEmail, pass, false, false, username);
           closeModal();
         }
       }
