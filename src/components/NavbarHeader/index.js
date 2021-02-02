@@ -171,19 +171,35 @@ const NavbarHeader = ({ removePadding = false }) => {
                 overflowedIndicator={<MenuOutlined className={styles.hamburgerMenu} />}
                 className={styles.menuContainer}
               >
-                <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
+                <Menu.Item
+                  key="Home"
+                  className={siteLinkActive('home') ? 'ant-menu-item-active' : undefined}
+                  onClick={() => redirectToCreatorProfile('home')}
+                >
                   Site Home
                 </Menu.Item>
-                <Menu.Item key="Sessions" onClick={() => redirectToCreatorProfile('session')}>
+                <Menu.Item
+                  key="Session"
+                  className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
+                  onClick={() => redirectToCreatorProfile('session')}
+                >
                   Sessions
                 </Menu.Item>
-                <Menu.Item key="Passes" onClick={() => redirectToCreatorProfile('pass')}>
+                <Menu.Item
+                  key="Pass"
+                  className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
+                  onClick={() => redirectToCreatorProfile('pass')}
+                >
                   Passes
                 </Menu.Item>
                 {/* <Menu.Item key="Videos" onClick={() => redirectToCreatorProfile('video')}> Videos </Menu.Item> */}
                 {localUserDetails ? (
                   <>
-                    <Menu.Item key="Dashboard" onClick={() => redirectToAttendeeDashboard()}>
+                    <Menu.Item
+                      key="Dashboard"
+                      className={isActive('/attendee/dashboard') ? 'ant-menu-item-active' : undefined}
+                      onClick={() => redirectToAttendeeDashboard()}
+                    >
                       My Dashboard
                     </Menu.Item>
                     <Menu.Item key="UserName" disabled>
@@ -350,12 +366,12 @@ const NavbarHeader = ({ removePadding = false }) => {
                       ) : (
                         <>
                           <Col xs={12}>
-                            <Button block type="default" onClick={() => showSignInModal()}>
+                            <Button block type="primary" onClick={() => showSignInModal()}>
                               Sign In
                             </Button>
                           </Col>
                           <Col xs={12}>
-                            <Button block type="primary" onClick={() => showSignUpModal()}>
+                            <Button block type="default" onClick={() => showSignUpModal()}>
                               Sign Up
                             </Button>
                           </Col>

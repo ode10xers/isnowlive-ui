@@ -167,9 +167,7 @@ const SessionDetails = ({ match, history }) => {
   }, [userPasses, shouldSetDefaultPass]);
 
   useEffect(() => {
-    if (userDetails && getLocalUserDetails()) {
-      setCurrentUser(getLocalUserDetails());
-    }
+    setCurrentUser(getLocalUserDetails());
   }, [userDetails]);
 
   const signupUser = async (values) => {

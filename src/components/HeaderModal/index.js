@@ -45,6 +45,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     logIn(data, true);
     message.success('You have logged in');
     history.push('/attendee/dashboard/sessions/upcoming');
+    window.scrollTo(0, 0);
     closeModal();
   };
 
