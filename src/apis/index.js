@@ -83,7 +83,7 @@ export default {
     unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
   },
   videos: {
-    // getVideoById: (videoId) => http.get(`/passes/${videoId}`),
+    getVideoById: (videoId) => http.get(`/passes/${videoId}`),
     // getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
     // getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getCreatorVideos: () => http.get(`/secure/creator/passes`),

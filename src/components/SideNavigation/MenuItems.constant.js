@@ -138,6 +138,14 @@ export const attendeeMenuItems = [
     icon: <TagsOutlined />,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes,
   },
+  {
+    order: 4,
+    key: 'videos',
+    title: 'Videos',
+    icon: <PlayCircleOutlined />,
+    mixPanelTag: attendee.click.dashboard.videos,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos,
+  },
   // {
   //   order: 7,
   //   key: 'account',
