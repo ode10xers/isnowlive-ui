@@ -137,8 +137,7 @@ const ProfilePreview = ({ username = null }) => {
     getProfileDetails();
     getSessionDetails('upcoming');
     getPassesDetails();
-    //eslint-disable-next-line
-  }, [history.location.pathname, getProfileDetails, getSessionDetails]);
+  }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails]);
 
   useEffect(() => {
     if (location.state) {
@@ -177,7 +176,6 @@ const ProfilePreview = ({ username = null }) => {
     if (key === 'session') {
       handleChangeSessionTab(selectedSessionTab);
     }
-
     setIsListLoading(false);
   };
 
@@ -404,24 +402,26 @@ const ProfilePreview = ({ username = null }) => {
                 </Col>
               </Row>
             </Tabs.TabPane>
-            <Tabs.TabPane
-              key="pass"
-              tab={
-                <div className={styles.largeTabHeader} id="pass">
-                  <TagsOutlined />
-                  Passes
-                </div>
-              }
-            >
-              <Row className={styles.mt20}>
-                <Col span={24}></Col>
-                <Col span={24}>
-                  <Loader loading={isPassesLoading} size="large" text="Loading class passes">
-                    <ClassPasses passes={passes} username={username} />
-                  </Loader>
-                </Col>
-              </Row>
-            </Tabs.TabPane>
+            {passes.length && (
+              <Tabs.TabPane
+                key="pass"
+                tab={
+                  <div className={styles.largeTabHeader} id="pass">
+                    <TagsOutlined />
+                    Passes
+                  </div>
+                }
+              >
+                <Row className={styles.mt20}>
+                  <Col span={24}></Col>
+                  <Col span={24}>
+                    <Loader loading={isPassesLoading} size="large" text="Loading class passes">
+                      <ClassPasses passes={passes} username={username} />
+                    </Loader>
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+            )}
           </Tabs>
         </Loader>
 

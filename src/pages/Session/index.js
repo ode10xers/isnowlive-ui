@@ -60,6 +60,24 @@ const {
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 
+const whiteColor = '#ffffff';
+const initialColor = generateRandomColor();
+
+const colorPickerChoices = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#1890ff',
+  '#009688',
+  '#4caf50',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+];
+
 const initialSession = {
   price: 0,
   currency: 'SGD',
@@ -76,24 +94,8 @@ const initialSession = {
   is_refundable: true,
   refund_before_hours: 0,
   prerequisites: '',
+  color_code: initialColor,
 };
-
-const whiteColor = '#ffffff';
-
-const colorPickerChoices = [
-  '#f44336',
-  '#e91e63',
-  '#9c27b0',
-  '#673ab7',
-  '#1890ff',
-  '#009688',
-  '#4caf50',
-  '#ffc107',
-  '#ff9800',
-  '#ff5722',
-  '#795548',
-  '#607d8b',
-];
 
 const Session = ({ match, history }) => {
   const location = useLocation();
@@ -112,7 +114,7 @@ const Session = ({ match, history }) => {
   const [deleteSlot, setDeleteSlot] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
-  const [colorCode, setColorCode] = useState(generateRandomColor());
+  const [colorCode, setColorCode] = useState(initialColor || whiteColor);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -219,7 +221,7 @@ const Session = ({ match, history }) => {
         recurring: false,
         is_refundable: 'Yes',
         refund_before_hours: 0,
-        color_code: whiteColor,
+        color_code: initialColor || whiteColor,
       });
       setIsLoading(false);
     }
@@ -518,7 +520,7 @@ const Session = ({ match, history }) => {
         refund_before_hours: refundBeforeHours,
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
-        color_code: colorCode,
+        color_code: values.color_code || colorCode || whiteColor,
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
