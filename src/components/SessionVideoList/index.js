@@ -50,13 +50,11 @@ const SessionVideoList = ({ sessionVideos }) => {
                 </Col>
                 <Col xs={24}>
                   <Space size="large" split={<Divider type="vertical" />}>
-                    <Title level={5} className={styles.textAlignCenter}>
-                      {' '}
-                      {videoDetails.duration || 0} minutes{' '}
+                    <Title level={5} className={classNames(styles.textAlignCenter, styles.blueText)}>
+                      Validity
                     </Title>
                     <Title level={5} className={classNames(styles.textAlignCenter, styles.blueText)}>
-                      {' '}
-                      {videoDetails.validity || 0} days{' '}
+                      {videoDetails.validity || 0} hours
                     </Title>
                   </Space>
                 </Col>
@@ -78,18 +76,6 @@ const SessionVideoList = ({ sessionVideos }) => {
                   </Button>
                 </div>
               </div>
-              {/* <Row gutter={[8, 16]} justify="space-around" align="middle">
-                <Col xs={12} md={24}>
-                <Title level={4} className={classNames(styles.priceText, styles.textAlignCenter)}>
-                    {videoDetails.price} {videoDetails.currency.toUpperCase()}
-                  </Title>
-                </Col>
-                <Col xs={12} md={24}>
-                  <Button type="primary" size="large" block onClick={() => showPurchaseModal()}>
-                    Buy
-                  </Button>
-                </Col>
-              </Row> */}
             </Col>
           </Row>
         </Card>
