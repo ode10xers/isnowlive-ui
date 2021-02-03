@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Upload } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-// import * as tus from 'tus-js-client';
+import { UploadOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import * as tus from 'tus-js-client';
 
 import apis from 'apis';
 import Loader from 'components/Loader';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
@@ -37,10 +37,9 @@ const formInitialValues = {
   price: 0,
 };
 
-const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEditedVideo }) => {
+const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVideo = null, updateEditedVideo }) => {
   const [form] = Form.useForm();
 
-  const [formPart, setFormPart] = useState(1);
   const [classes, setClasses] = useState([]);
   const [currency, setCurrency] = useState('SGD');
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +47,8 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
   const [videoType, setVideoType] = useState(videoTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
+  const [fileLists, setFileLists] = useState([]);
+  const [isVideoPaused, setIsVideoPaused] = useState(false);
   const upload = useRef(null);
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -79,7 +80,6 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
-        setFormPart(2);
       } else {
         form.resetFields();
       }
@@ -88,7 +88,6 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
     }
     return () => {
       setCoverImageUrl(null);
-      setFormPart(1);
       setSelectedSessionIds([]);
       upload.current = null;
     };
@@ -122,7 +121,9 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
         : await apis.videos.createVideo(data);
 
       if (isAPISuccess(response.status)) {
-        updateEditedVideo(response.data);
+        if (response.data) {
+          updateEditedVideo(response.data);
+        }
         setFormPart(2);
       }
     } catch (error) {
@@ -140,23 +141,106 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
   const uploadVideoProps = {
     customRequest: async (fileDetails) => {
       try {
-        console.log('action:====', fileDetails);
         const response = await apis.videos.uploadVideo(editedVideo.external_id, {
           size: fileDetails.file.size,
         });
         if (isAPISuccess(response.status)) {
-          console.log(response);
-          // upload.current = new tus.Upload(file, {
-          //   endpoint: 'http://localhost:1080/files/',
-          //   onError: (err) => console.log(err),
-          //   onSuccess: (res) => console.log(res),
-          // });
+          setFileLists([
+            {
+              name: fileDetails.file.name,
+              status: 'uploading',
+              thumbUrl: coverImageUrl,
+            },
+          ]);
+          upload.current = new tus.Upload(fileDetails.file, {
+            endpoint: response.data.url,
+            resume: true,
+            metadata: {
+              filename: fileDetails.file.name,
+              filetype: fileDetails.file.type,
+            },
+            onProgress: (bytesUploaded, bytesTotal) => {
+              var percent = parseInt((bytesUploaded / bytesTotal) * 100);
+              setFileLists([
+                {
+                  name: fileDetails.file.name,
+                  status: 'uploading',
+                  thumbUrl: coverImageUrl,
+                  percent,
+                },
+              ]);
+            },
+            onSuccess: () => {
+              setFileLists([
+                {
+                  name: fileDetails.file.name,
+                  thumbUrl: coverImageUrl,
+                  status: 'success',
+                },
+              ]);
+              showSuccessModal('Video Published');
+              setTimeout(() => {
+                setFileLists([]);
+                closeModal(true);
+              }, 500);
+            },
+            onError: (err) => {
+              setFileLists([
+                {
+                  name: fileDetails.file.name,
+                  thumbUrl: coverImageUrl,
+                  status: 'error',
+                },
+              ]);
+              console.log('onError', err);
+              showErrorModal(`Failed to upload video`);
+              setTimeout(() => {
+                setFileLists([]);
+              }, 500);
+            },
+          });
+          upload.current.start();
         }
       } catch (error) {
         console.log(error);
+        showErrorModal(`Failed to upload video`);
       }
     },
     listType: 'picture',
+    fileList: fileLists,
+    showUploadList: {
+      showRemoveIcon: fileLists && fileLists.length && fileLists[0].status === 'uploading' ? true : false,
+      removeIcon: isVideoPaused ? (
+        <PlayCircleOutlined
+          className={styles.videoIcon}
+          onClick={() => {
+            // Retrieve a list of uploads that have been previously started for this file.
+            // These uploads will be queried from the URL Storage using the file's fingerprint.
+            upload.current.findPreviousUploads().then((previousUploads) => {
+              var chosenUpload = askToResumeUpload(previousUploads);
+              if (chosenUpload) {
+                upload.current.resumeFromPreviousUpload(chosenUpload);
+              }
+              upload.current.start();
+              setIsVideoPaused(false);
+            });
+
+            function askToResumeUpload(previousUploads) {
+              if (previousUploads.length === 0) return null;
+              return previousUploads[previousUploads.length - 1];
+            }
+          }}
+        />
+      ) : (
+        <PauseCircleOutlined
+          className={styles.videoIcon}
+          onClick={() => {
+            upload.current.abort(false);
+            setIsVideoPaused(true);
+          }}
+        />
+      ),
+    },
   };
 
   return (
@@ -165,6 +249,7 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
       centered={true}
       visible={visible}
       footer={null}
+      maskClosable={false}
       onCancel={() => closeModal(false)}
       width={720}
     >
@@ -293,7 +378,7 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEdite
             </Upload>
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => closeModal(false)} loading={isSubmitting}>
+                <Button block type="default" onClick={() => closeModal(true)} loading={isSubmitting}>
                   Cancel
                 </Button>
               </Col>

@@ -65,7 +65,6 @@ const PassDetails = ({ match, history }) => {
         const { data } = await apis.passes.getPassById(passId);
 
         if (data) {
-          console.log(data);
           setPass({
             ...data,
             sessions:

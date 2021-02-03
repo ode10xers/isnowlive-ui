@@ -23,7 +23,7 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${PD_PROD_S3_BUCKET} --region ${PD_PROD_AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${PD_PROD_CLOUDFRONT_ID} --paths "/*"
-    develop:
+    feature/LIVE-207-create-ui-for-video-selling:
       - step:
           name: Build
           image: node:11
