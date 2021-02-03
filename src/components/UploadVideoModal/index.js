@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
+// import * as tus from 'tus-js-client';
 
 import apis from 'apis';
 import Loader from 'components/Loader';
@@ -11,7 +12,7 @@ import ImageUpload from 'components/ImageUpload';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-// import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -36,7 +37,7 @@ const formInitialValues = {
   price: 0,
 };
 
-const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
+const UploadVideoModal = ({ visible, closeModal, editedVideo = null, updateEditedVideo }) => {
   const [form] = Form.useForm();
 
   const [formPart, setFormPart] = useState(1);
@@ -44,9 +45,10 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
   const [currency, setCurrency] = useState('SGD');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedClasses, setSelectedClasses] = useState([]);
+  const [selectedSessionIds, setSelectedSessionIds] = useState([]);
   const [videoType, setVideoType] = useState(videoTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
+  const upload = useRef(null);
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -70,13 +72,14 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
       if (editedVideo) {
         form.setFieldsValue({
           ...editedVideo,
+          session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType: editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
         });
         setCurrency(editedVideo.currency || 'SGD');
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
-        setSelectedClasses(editedVideo.sessions.map((session) => session.session_id));
-        setCoverImageUrl(editedVideo.cover_image);
-        form.validateFields(['classList']);
+        setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
+        setCoverImageUrl(editedVideo.thumbnail_url);
+        setFormPart(2);
       } else {
         form.resetFields();
       }
@@ -86,6 +89,8 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
     return () => {
       setCoverImageUrl(null);
       setFormPart(1);
+      setSelectedSessionIds([]);
+      upload.current = null;
     };
   }, [visible, editedVideo, fetchAllClassesForCreator, form]);
 
@@ -102,26 +107,24 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
     setIsSubmitting(true);
 
     try {
-      console.log(values);
-      // let data = {
-      //   currency: currency,
-      //   price: values.price,
-      //   title: values.title,
-      //   description: values.description,
-      //   validity: values.validity,
-      //   session_ids: selectedClasses || values.classList || [],
-      //   FREE: videoTypes.FREE.name === videoType,
-      // };
+      let data = {
+        currency: currency,
+        title: values.title,
+        description: values.description,
+        price: videoType === videoTypes.FREE.name ? 0 : values.price,
+        validity: values.validity,
+        session_ids: selectedSessionIds || values.session_ids || [],
+        thumbnail_url: coverImageUrl,
+      };
 
-      // const response = editedVideo
-      //   ? await apis.passes.updateClassPass(editedVideo.id, data)
-      //   : await apis.passes.createClassPass(data);
+      const response = editedVideo
+        ? await apis.videos.updateVideo(editedVideo.external_id, data)
+        : await apis.videos.createVideo(data);
 
-      // if (isAPISuccess(response.status)) {
-      //   showSuccessModal(`${data.name} successfully ${editedVideo ? 'updated' : 'created'}`);
-      //   closeModal(true);
-      // }
-      setFormPart(2);
+      if (isAPISuccess(response.status)) {
+        updateEditedVideo(response.data);
+        setFormPart(2);
+      }
     } catch (error) {
       showErrorModal(`Failed to ${editedVideo ? 'update' : 'create'} video`);
     }
@@ -131,25 +134,29 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
 
   const onCoverImageUpload = (imageUrl) => {
     setCoverImageUrl(imageUrl);
-    form.setFieldsValue({ ...form.getFieldsValue(), cover_image: imageUrl });
+    form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
   };
 
   const uploadVideoProps = {
-    action: '//jsonplaceholder.typicode.com/posts/',
-    listType: 'picture',
-    previewFile(file) {
-      console.log('Your upload file:', file);
-      // Your process logic. Here we just mock to the same file
-      return fetch('https://next.json-generator.com/api/json/get/4ytyBoLK8', {
-        method: 'POST',
-        body: file,
-      })
-        .then((res) => res.json())
-        .then(({ thumbnail }) => thumbnail)
-        .catch((error) =>
-          showErrorModal('Failed to upload video', error?.response?.data?.message || 'Something went wrong')
-        );
+    customRequest: async (fileDetails) => {
+      try {
+        console.log('action:====', fileDetails);
+        const response = await apis.videos.uploadVideo(editedVideo.external_id, {
+          size: fileDetails.file.size,
+        });
+        if (isAPISuccess(response.status)) {
+          console.log(response);
+          // upload.current = new tus.Upload(file, {
+          //   endpoint: 'http://localhost:1080/files/',
+          //   onError: (err) => console.log(err),
+          //   onSuccess: (res) => console.log(res),
+          // });
+        }
+      } catch (error) {
+        console.log(error);
+      }
     },
+    listType: 'picture',
   };
 
   return (
@@ -172,17 +179,12 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
           >
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Form.Item
-                  id="cover_image"
-                  name="cover_image"
-                  rules={validationRules.requiredValidation}
-                  wrapperCol={{ span: 24 }}
-                >
+                <Form.Item id="thumbnail_url" name="thumbnail_url" wrapperCol={{ span: 24 }}>
                   <div className={styles.imageWrapper}>
                     <ImageUpload
                       aspect={4}
                       className={classNames('avatar-uploader', styles.coverImage)}
-                      name="cover_image"
+                      name="thumbnail_url"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       onChange={onCoverImageUpload}
                       value={coverImageUrl}
@@ -207,12 +209,7 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item
-                  id="classList"
-                  name="classList"
-                  label="Related to Class(es)"
-                  rules={validationRules.arrayValidation}
-                >
+                <Form.Item id="session_ids" name="session_ids" label="Related to Class(es)">
                   <Select
                     showArrow
                     showSearch={false}
@@ -220,8 +217,8 @@ const UploadVideoModal = ({ visible, closeModal, editedVideo = null }) => {
                     mode="multiple"
                     maxTagCount={2}
                     options={classes}
-                    value={selectedClasses}
-                    onChange={(val) => setSelectedClasses(val)}
+                    value={selectedSessionIds}
+                    onChange={(val) => setSelectedSessionIds(val)}
                   />
                 </Form.Item>
               </Col>
