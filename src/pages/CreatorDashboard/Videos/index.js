@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Image } from 'antd';
 import { EditOutlined, CloudUploadOutlined, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -9,6 +9,7 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
+import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isAPISuccess } from 'utils/helper';
@@ -267,10 +268,11 @@ const Videos = () => {
 
   const videosColumns = [
     {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      width: '35%',
+      title: '',
+      dataIndex: 'thumnail_url',
+      key: 'thumnail_url',
+      align: 'center',
+      width: '12%',
       render: (text, record) => {
         return {
           props: {
@@ -279,13 +281,28 @@ const Videos = () => {
             },
           },
           children: (
-            <>
-              {record.is_published ? null : <EyeInvisibleOutlined />}
-              <Text> {record.title} </Text>
-            </>
+            <Image
+              src={record.thumbnail_url || 'error'}
+              alt={record.title}
+              height={50}
+              width={100}
+              fallback={DefaultImage()}
+            />
           ),
         };
       },
+    },
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      width: '35%',
+      render: (text, record) => (
+        <>
+          {record.is_published ? null : <EyeInvisibleOutlined />}
+          <Text> {record.title} </Text>
+        </>
+      ),
     },
     {
       title: 'Validity',
