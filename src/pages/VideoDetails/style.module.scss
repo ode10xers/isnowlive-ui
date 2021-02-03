@@ -1,5 +1,32 @@
 @import '../../styles/variables.scss';
 
+.showcaseCardContainer {
+  padding: 10px 30px !important;
+
+  .showcaseCard {
+    .videoThumbnail {
+      object-fit: cover;
+      min-height: 180px;
+    }
+
+    .videoDesc {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+    }
+
+    .blueText {
+      color: map-get($map: $colors, $key: 'DodgerBlue');
+    }
+
+    .priceText {
+      margin-bottom: 0px;
+    }
+  }
+}
+
 .imageWrapper {
   position: relative;
   margin-top: 128px !important;

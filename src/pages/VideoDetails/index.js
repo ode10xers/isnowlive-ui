@@ -68,6 +68,7 @@ const VideoDetails = ({ match, history }) => {
           setVideo({
             id: 3,
             cover_image: 'https://dkfqbuenrrvge.cloudfront.net/image/msJ9placWNxt8bGA_city01.jpeg',
+            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
             title: 'Test Video 3',
             description:
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ipsum dolor, gravida et blandit et, pellentesque a justo. Aenean id nulla nibh. Mauris euismod erat et quam auctor lobortis. Duis posuere neque a diam sollicitudin consequat. Aliquam sapien metus, lacinia quis pulvinar eget, gravida quis augue. Sed non pretium enim. Morbi ornare dignissim arcu, eget mollis erat tempus at. Proin convallis dui id pellentesque accumsan. Aenean finibus nibh sed dictum ultrices. Maecenas rutrum, odio quis consequat bibendum, urna orci tempor libero, quis pharetra nibh nisi eget massa. Fusce in commodo magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed lacus nec mi ullamcorper pretium. 2',
@@ -220,11 +221,51 @@ const VideoDetails = ({ match, history }) => {
                 </Card>
               </Col>
 
+              <Col xs={24} className={styles.showcaseCardContainer}>
+                <Card
+                  className={styles.showcaseCard}
+                  bordered={false}
+                  cover={
+                    <Image
+                      className={styles.videoThumbnail}
+                      src={video.thumbnail_url || 'error'}
+                      alt={video.title}
+                      fallback={DefaultImage()}
+                    />
+                  }
+                >
+                  <Row gutter={[16, 16]} justify="space-between">
+                    <Col xs={24}>
+                      <Row gutter={[8, 8]} justify="space-around">
+                        <Col xs={24}>
+                          <Title level={4} className={styles.textAlignLeft}>
+                            {video.title}
+                          </Title>
+                        </Col>
+                        <Col xs={24}>
+                          <Space size="large" split={<Divider type="vertical" />}>
+                            <Title level={5} className={classNames(styles.textAlignCenter, styles.blueText)}>
+                              Validity
+                            </Title>
+                            <Title level={5} className={classNames(styles.textAlignCenter, styles.blueText)}>
+                              {video.validity || 0} hours
+                            </Title>
+                          </Space>
+                        </Col>
+                        <Col xs={24}>
+                          <div className={styles.videoDesc}>{ReactHtmlParser(video.description)}</div>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Card>
+              </Col>
+
               {video.sessions?.length > 0 && (
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
                     <Col xs={24}>
-                      <Text className={styles.ml20}> Applicable to below class(es) </Text>
+                      <Text className={styles.ml20}> Related to these class(es) </Text>
                     </Col>
                     <Col xs={24}>
                       <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={username} />
