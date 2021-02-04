@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography } from 'antd';
+import { Row, Col, Image, message, Typography, Tabs } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { loadStripe } from '@stripe/stripe-js';
@@ -14,9 +14,10 @@ import SignInForm from 'components/SignInForm';
 import HostDetails from 'components/HostDetails';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
+import VideoCard from 'components/VideoCard';
+import PurchasePassModal from 'components/PurchasePassModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
-import SessionVideoList from 'components/SessionVideoList';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
@@ -63,6 +64,8 @@ const SessionDetails = ({ match, history }) => {
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
   const [sessionVideos, setSessionVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
 
   const getDetails = useCallback(
     async (username, session_id) => {
@@ -533,6 +536,23 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
+  const redirectToVideoPreview = (video) => {
+    if (video.username) {
+      const baseUrl = generateUrlFromUsername(video.username || 'app');
+      window.open(`${baseUrl}/v/${video.id}`);
+    }
+  };
+
+  //TODO: Need to implement showing the modal properly
+  const showPurchaseModal = (video) => {
+    setSelectedVideo(video);
+    setShowPurchaseVideoModal(true);
+  };
+
+  const closePurchaseModal = () => {
+    setShowPurchaseVideoModal(false);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       <Row justify="space-between" className={styles.mt50}>
@@ -663,11 +683,34 @@ const SessionDetails = ({ match, history }) => {
         )}
       </Row>
       {sessionVideos.length > 0 && (
-        <Row justify="space-between" className={styles.mt20}>
-          <Col xs={24}>
-            <SessionVideoList sessionVideos={sessionVideos} />
-          </Col>
-        </Row>
+        <>
+          <PurchasePassModal visible={showPurchaseVideoModal} video={selectedVideo} closeModal={closePurchaseModal} />
+          <Row justify="space-between" className={styles.mt20}>
+            <Col xs={24}>
+              <div className={styles.box}>
+                <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
+                  <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
+                    <Row gutter={[8, 20]}>
+                      {sessionVideos.length > 0 &&
+                        sessionVideos.map((videoDetails) => (
+                          <div key={videoDetails.id}>
+                            <Col xs={24}>
+                              <VideoCard
+                                video={videoDetails}
+                                buyable={true}
+                                onCardClick={redirectToVideoPreview}
+                                showPurchaseModal={showPurchaseModal}
+                              />
+                            </Col>
+                          </div>
+                        ))}
+                    </Row>
+                  </Tabs.TabPane>
+                </Tabs>
+              </div>
+            </Col>
+          </Row>
+        </>
       )}
     </Loader>
   );

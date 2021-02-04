@@ -14,6 +14,7 @@ import apis from 'apis';
 
 import Share from 'components/Share';
 import Loader from 'components/Loader';
+import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import PurchasePassModal from 'components/PurchasePassModal';
 
@@ -222,43 +223,12 @@ const VideoDetails = ({ match, history }) => {
               </Col>
 
               <Col xs={24} className={styles.showcaseCardContainer}>
-                <Card
-                  className={styles.showcaseCard}
-                  bordered={false}
-                  cover={
-                    <Image
-                      className={styles.videoThumbnail}
-                      src={video.thumbnail_url || 'error'}
-                      alt={video.title}
-                      fallback={DefaultImage()}
-                    />
-                  }
-                >
-                  <Row gutter={[16, 16]} justify="space-between">
-                    <Col xs={24}>
-                      <Row gutter={[8, 8]} justify="space-around">
-                        <Col xs={24}>
-                          <Title level={4} className={styles.textAlignLeft}>
-                            {video.title}
-                          </Title>
-                        </Col>
-                        <Col xs={24}>
-                          <Space size="large" split={<Divider type="vertical" />}>
-                            <Title level={5} className={classNames(styles.textAlignCenter, styles.blueText)}>
-                              Validity
-                            </Title>
-                            <Title level={5} className={classNames(styles.textAlignCenter, styles.blueText)}>
-                              {video.validity || 0} hours
-                            </Title>
-                          </Space>
-                        </Col>
-                        <Col xs={24}>
-                          <div className={styles.videoDesc}>{ReactHtmlParser(video.description)}</div>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
-                </Card>
+                <VideoCard
+                  video={video}
+                  buyable={false}
+                  // onCardClick={redirectToVideoPreview}
+                  // showPurchaseModal={showPurchaseModal}
+                />
               </Col>
 
               {video.sessions?.length > 0 && (
