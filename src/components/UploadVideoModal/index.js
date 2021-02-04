@@ -155,7 +155,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
           upload.current = new tus.Upload(fileDetails.file, {
             endpoint: response.data.url,
             headers: {
-              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
             },
             resume: true,
             metadata: {
