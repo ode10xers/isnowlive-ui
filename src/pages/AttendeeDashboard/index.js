@@ -11,6 +11,8 @@ import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
 
 const AttendeeDashboard = ({ match }) => {
+  console.log(match.url);
+
   return (
     <Switch>
       <Route exact path={match.url + Routes.attendeeDashboard.sessions} component={SessionsInventories} />

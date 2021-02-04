@@ -1,13 +1,13 @@
-@import '../../styles/variables.scss';
+@import '../../../styles/variables.scss';
 
 .showcaseCardContainer {
-  padding: 10px 30px !important;
+  padding: 20px 64px !important;
 }
 
 .imageWrapper {
   position: relative;
-  margin-top: 128px !important;
-  background-color: map-get($map: $colors, $key: 'White1');
+  margin: 64px !important;
+  background-color: map-get($map: $colors, $key: 'White');
 }
 .coverImageWrapper {
   background-color: map-get($colors, $key: 'WhiteSmoke');
@@ -44,40 +44,33 @@
   bottom: 0px;
   right: 100px;
 }
-.videoCard {
-  margin: 10px 32px !important;
-  border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
-
-  .blueText {
-    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
-  }
-}
 
 .bio {
   p,
   span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: map-get($map: $colors, $key: 'White1') !important;
+    background-color: map-get($map: $colors, $key: 'White') !important;
   }
 }
 
+.sessionListWrapper {
+  padding: 10px 64px;
+}
+
 @media (max-width: 768px) {
+  .showcaseCardContainer {
+    padding: 10px !important;
+  }
   .profilePreviewContainer {
     margin: 5px;
   }
-  .videoCard {
-    margin: 16px !important;
-    // max-height: 100%;
-    // margin: 10px !important;
-    // margin-left: -20px !important;
-    // margin-right: -20px !important;
+  .sessionListWrapper {
+    padding: 0px;
   }
   .imageWrapper {
     position: relative;
-    max-height: 300px;
-    margin-bottom: 20px;
-    margin-top: 50px;
+    margin: 10px !important;
   }
   .profileImage {
     border-radius: 4px;
@@ -97,12 +90,27 @@
   }
   .shareButton {
     position: absolute;
-    bottom: 0px;
-    right: -15px;
+    bottom: 25px;
+    right: 0px;
+  }
+  .bio {
+    padding: 10px;
   }
 }
 @media (min-width: 768px) and (max-width: 1400px) {
   .imageWrapper {
-    margin-bottom: 0px;
+    margin: 10px !important;
+  }
+
+  .showcaseCardContainer {
+    padding: 10px !important;
+  }
+  .sessionListWrapper {
+    padding: 10px;
+  }
+  .shareButton {
+    position: absolute;
+    bottom: 0px;
+    right: 10px;
   }
 }

@@ -12,11 +12,11 @@ const { Title } = Typography;
 
 const noop = () => {};
 
-const VideoCard = ({ video, buyable = false, onCardClick = noop, showPurchaseModal = noop }) => {
+const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noop, showPurchaseModal = noop }) => {
   return (
     <Card
       className={styles.videoCard}
-      hoverable={true}
+      hoverable={hoverable}
       bordered={false}
       footer={null}
       onClick={() => onCardClick(video)}
