@@ -154,6 +154,9 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
           ]);
           upload.current = new tus.Upload(fileDetails.file, {
             endpoint: response.data.url,
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+            },
             resume: true,
             metadata: {
               filename: fileDetails.file.name,
