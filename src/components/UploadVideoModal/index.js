@@ -63,7 +63,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   });
 
   uppy.use(Tus, {
-    endpoint: `${config.server.baseURL}/secure/creator/videos/${editedVideo?.external_id}/upload`,
+    endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     headers: {
       // 'auth-token': getAuthCookie() || '',
       'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
