@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Upload } from 'antd';
-import { UploadOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
+// import { UploadOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 // import * as tus from 'tus-js-client';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -10,7 +10,7 @@ import { DragDrop } from '@uppy/react';
 import config from 'config';
 import apis from 'apis';
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
@@ -52,8 +52,8 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
   const [videoType, setVideoType] = useState(videoTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
-  const [fileLists, setFileLists] = useState([]);
-  const [isVideoPaused, setIsVideoPaused] = useState(false);
+  // const [fileLists, setFileLists] = useState([]);
+  // const [isVideoPaused, setIsVideoPaused] = useState(false);
   const upload = useRef(null);
 
   let uppy = new Uppy({
