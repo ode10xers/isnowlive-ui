@@ -17,7 +17,7 @@ import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
-import { getAuthCookie } from 'services/authCookie';
+// import { getAuthCookie } from 'services/authCookie';
 
 import styles from './styles.module.scss';
 
@@ -65,7 +65,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   uppy.use(Tus, {
     endpoint: `${config.server.baseURL}/secure/creator/videos/${editedVideo?.external_id}/upload`,
     headers: {
-      'auth-token': getAuthCookie() || '',
+      // 'auth-token': getAuthCookie() || '',
       'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
     },
   });
