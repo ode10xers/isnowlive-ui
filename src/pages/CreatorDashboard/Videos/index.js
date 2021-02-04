@@ -27,10 +27,12 @@ const Videos = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [formPart, setFormPart] = useState(1);
 
-  const showUploadVideoModal = (video = null) => {
+  const showUploadVideoModal = (video = null, screen = 1) => {
     if (video !== null) {
       setSelectedVideo(video);
+      setFormPart(screen);
     }
     setCreateModalVisible(true);
   };
@@ -38,7 +40,7 @@ const Videos = () => {
   const hideUploadVideoModal = (shouldRefresh = false) => {
     setCreateModalVisible(false);
     setSelectedVideo(null);
-
+    setFormPart(1);
     if (shouldRefresh) {
       getVideosForCreator();
     }
@@ -82,163 +84,10 @@ const Videos = () => {
     setIsLoading(true);
     try {
       const { data } = await apis.videos.getCreatorVideos();
-      console.log(data);
-      setVideos([
-        {
-          title: 'Test Video 1',
-          description:
-            '\u003cp\u003e\u003cspan style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie diam id varius tristique. In felis nisi, lacinia ac urna vitae, pulvinar dapibus mauris. Integer consectetur ultricies arcu, nec elementum leo bibendum a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ultricies arcu ex, vulputate congue ante tempor ut. Phasellus ut risus eu justo egestas lobortis nec at lectus. Pellentesque at orci purus. Nam eleifend lectus ante, vel vulputate enim lobortis id. Morbi ut libero vitae risus porta interdum eu eget nulla. Nam porta efficitur magna, quis elementum elit viverra id. Donec sagittis dapibus felis eu imperdiet. Donec ut urna egestas, venenatis ex vitae, pretium diam. Aenean rutrum justo sit amet commodo scelerisque.\u003c/span\u003e\u003c/p\u003e\n',
-          validity: 24,
-          price: 10,
-          currency: 'SGD',
-          thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
-          sessions: [
-            {
-              session_id: 62,
-              price: 0,
-              currency: '',
-              max_participants: 2,
-              group: true,
-              name: 'test sesison',
-              description: 'some session details',
-              session_image_url:
-                'https://dkfqbuenrrvge.cloudfront.net/image/cudRIEOMNoFVnyWD_bsyh8th6gydes21e_mg-cthu--1h_nn3nqzi-unsplash.jpg',
-              category: '',
-              sub_category: '',
-              duration: 0,
-              document_url: '',
-              beginning: '0001-01-01 00:00:00 +0000 +0000',
-              expiry: '0001-01-01 00:00:00 +0000 +0000',
-              prerequisites: '',
-              pay_what_you_want: false,
-              recurring: false,
-              is_active: true,
-              is_refundable: false,
-              refund_before_hours: 0,
-              color_code: '',
-            },
-            {
-              session_id: 72,
-              price: 10,
-              currency: 'SGD',
-              max_participants: 2,
-              group: true,
-              name: 'New session',
-              description:
-                '\u003cp\u003e\u003cspan style="color: rgba(0,0,0,0.45);background-color: rgb(255,255,255);font-size: 14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. In velit neque, pharetra sit amet interdum eu, sollicitudin sit amet mi. Integer porta auctor mauris nec pellentesque. Mauris egestas, justo non porta venenatis, mauris dui luctus odio, quis pharetra neque dui viverra leo. Morbi vitae semper ante. Cras convallis nisl luctus lorem rutrum, a bibendum ligula ultrices. Phasellus est arcu, porta eget velit vel, porta tempus justo. Integer leo nibh, vestibulum at risus vitae, tempus malesuada tortor. Vestibulum a odio quis metus hendrerit tristique. Sed nec laoreet eros. Curabitur facilisis justo eget est faucibus, et vulputate purus maximus. Donec maximus velit enim, et blandit nisi ornare eget. Suspendisse vel pretium risus, vel tincidunt tortor. Nam congue, odio et pellentesque laoreet, quam diam luctus purus, sit amet dictum massa justo et metus. Cras tincidunt lectus sed dapibus luctus. Duis sit amet dui quam. Suspendisse iaculis, enim id condimentum condimentum, lacus nunc tempor erat, id auctor felis elit dictum nulla. Nunc tincidunt, risus ut venenatis interdum, enim ex lacinia eros, id volutpat quam nisi et odio. Aliquam imperdiet sem ligula, eu mollis sapien auctor sit amet. Integer at maximus urna, quis vehicula lorem. Praesent eu semper risus, ut tincidunt erat. Nulla finibus urna orci, ac viverra tortor consequat a. Duis commodo commodo massa id vehicula. Vestibulum a gravida urna. Donec purus orci, congue nec fringilla quis, porta tempus nulla. Maecenas mollis orci nibh, nec hendrerit metus interdum ac. Nunc suscipit scelerisque pellentesque. Mauris aliquam lectus in blandit vestibulum. Nunc pretium dui non metus tincidunt pretium. Praesent eleifend mauris vel malesuada varius.\u003c/span\u003e\u003c/p\u003e\n',
-              session_image_url:
-                'https://dkfqbuenrrvge.cloudfront.net/image/55eQ4KNcglY5ipnc_bsyh8th6gydes21e_mg-cthu--1h_nn3nqzi-unsplash.jpg',
-              category: '',
-              sub_category: '',
-              duration: 0,
-              document_url: 'https://dkfqbuenrrvge.cloudfront.net/document/lc1nnjFflOFV4fW4_test.pdf',
-              beginning: '2020-12-01 00:00:00 +0000 +0000',
-              expiry: '2020-12-31 00:00:00 +0000 +0000',
-              prerequisites:
-                '\u003cp\u003e\u003cspan style="color: rgba(0,0,0,0.45);background-color: rgb(255,255,255);font-size: 14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. In velit neque, pharetra sit amet interdum eu, sollicitudin sit amet mi. Integer porta auctor mauris nec pellentesque. Mauris egestas, justo non porta venenatis, mauris dui luctus odio, quis pharetra neque dui viverra leo. Morbi vitae semper ante. Cras convallis nisl luctus lorem rutrum, a bibendum ligula ultrices. Phasellus est arcu, porta eget velit vel, porta tempus justo. Integer leo nibh, vestibulum at risus vitae, tempus malesuada tortor. Vestibulum a odio quis metus hendrerit tristique. Sed nec laoreet eros. Curabitur facilisis justo eget est faucibus, et vulputate purus maximus. Donec maximus velit enim, et blandit nisi ornare eget. Suspendisse vel pretium risus, vel tincidunt tortor. Nam congue, odio et pellentesque laoreet, quam diam luctus purus, sit amet dictum massa justo et metus. Cras tincidunt lectus sed dapibus luctus. Duis sit amet dui quam. Suspendisse iaculis, enim id condimentum condimentum, lacus nunc tempor erat, id auctor felis elit dictum nulla. Nunc tincidunt, risus ut venenatis interdum, enim ex lacinia eros, id volutpat quam nisi et odio. Aliquam imperdiet sem ligula, eu mollis sapien auctor sit amet. Integer at maximus urna, quis vehicula lorem. Praesent eu semper risus, ut tincidunt erat. Nulla finibus urna orci, ac viverra tortor consequat a. Duis commodo commodo massa id vehicula. Vestibulum a gravida urna. Donec purus orci, congue nec fringilla quis, porta tempus nulla. Maecenas mollis orci nibh, nec hendrerit metus interdum ac. Nunc suscipit scelerisque pellentesque. Mauris aliquam lectus in blandit vestibulum. Nunc pretium dui non metus tincidunt pretium. Praesent eleifend mauris vel malesuada varius.\u003c/span\u003e\u003c/p\u003e\n',
-              pay_what_you_want: false,
-              recurring: true,
-              is_active: true,
-              is_refundable: false,
-              refund_before_hours: 24,
-              color_code: '',
-            },
-          ],
-          external_id: '7a4a977f-4504-4ac6-b22e-be4571c23ce0',
-          is_published: true,
-          video_url: '',
-          video_uid: '',
-          duration: 0,
-          status: '',
-        },
-        {
-          title: 'Test Video 1',
-          description:
-            '\u003cp\u003e\u003cspan style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie diam id varius tristique. In felis nisi, lacinia ac urna vitae, pulvinar dapibus mauris. Integer consectetur ultricies arcu, nec elementum leo bibendum a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ultricies arcu ex, vulputate congue ante tempor ut. Phasellus ut risus eu justo egestas lobortis nec at lectus. Pellentesque at orci purus. Nam eleifend lectus ante, vel vulputate enim lobortis id. Morbi ut libero vitae risus porta interdum eu eget nulla. Nam porta efficitur magna, quis elementum elit viverra id. Donec sagittis dapibus felis eu imperdiet. Donec ut urna egestas, venenatis ex vitae, pretium diam. Aenean rutrum justo sit amet commodo scelerisque.\u003c/span\u003e\u003c/p\u003e\n',
-          validity: 24,
-          price: 10,
-          currency: 'SGD',
-          thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
-          sessions: [
-            {
-              session_id: 62,
-              price: 0,
-              currency: '',
-              max_participants: 2,
-              group: true,
-              name: 'test sesison',
-              description: 'some session details',
-              session_image_url:
-                'https://dkfqbuenrrvge.cloudfront.net/image/cudRIEOMNoFVnyWD_bsyh8th6gydes21e_mg-cthu--1h_nn3nqzi-unsplash.jpg',
-              category: '',
-              sub_category: '',
-              duration: 0,
-              document_url: '',
-              beginning: '0001-01-01 00:00:00 +0000 +0000',
-              expiry: '0001-01-01 00:00:00 +0000 +0000',
-              prerequisites: '',
-              pay_what_you_want: false,
-              recurring: false,
-              is_active: true,
-              is_refundable: false,
-              refund_before_hours: 0,
-              color_code: '',
-            },
-            {
-              session_id: 73,
-              price: 10,
-              currency: 'SGD',
-              max_participants: 2,
-              group: true,
-              name: 'New session',
-              description:
-                '\u003cp\u003e\u003cspan style="color: rgba(0,0,0,0.45);background-color: rgb(255,255,255);font-size: 14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. In velit neque, pharetra sit amet interdum eu, sollicitudin sit amet mi. Integer porta auctor mauris nec pellentesque. Mauris egestas, justo non porta venenatis, mauris dui luctus odio, quis pharetra neque dui viverra leo. Morbi vitae semper ante. Cras convallis nisl luctus lorem rutrum, a bibendum ligula ultrices. Phasellus est arcu, porta eget velit vel, porta tempus justo. Integer leo nibh, vestibulum at risus vitae, tempus malesuada tortor. Vestibulum a odio quis metus hendrerit tristique. Sed nec laoreet eros. Curabitur facilisis justo eget est faucibus, et vulputate purus maximus. Donec maximus velit enim, et blandit nisi ornare eget. Suspendisse vel pretium risus, vel tincidunt tortor. Nam congue, odio et pellentesque laoreet, quam diam luctus purus, sit amet dictum massa justo et metus. Cras tincidunt lectus sed dapibus luctus. Duis sit amet dui quam. Suspendisse iaculis, enim id condimentum condimentum, lacus nunc tempor erat, id auctor felis elit dictum nulla. Nunc tincidunt, risus ut venenatis interdum, enim ex lacinia eros, id volutpat quam nisi et odio. Aliquam imperdiet sem ligula, eu mollis sapien auctor sit amet. Integer at maximus urna, quis vehicula lorem. Praesent eu semper risus, ut tincidunt erat. Nulla finibus urna orci, ac viverra tortor consequat a. Duis commodo commodo massa id vehicula. Vestibulum a gravida urna. Donec purus orci, congue nec fringilla quis, porta tempus nulla. Maecenas mollis orci nibh, nec hendrerit metus interdum ac. Nunc suscipit scelerisque pellentesque. Mauris aliquam lectus in blandit vestibulum. Nunc pretium dui non metus tincidunt pretium. Praesent eleifend mauris vel malesuada varius.\u003c/span\u003e\u003c/p\u003e\n',
-              session_image_url:
-                'https://dkfqbuenrrvge.cloudfront.net/image/55eQ4KNcglY5ipnc_bsyh8th6gydes21e_mg-cthu--1h_nn3nqzi-unsplash.jpg',
-              category: '',
-              sub_category: '',
-              duration: 0,
-              document_url: 'https://dkfqbuenrrvge.cloudfront.net/document/lc1nnjFflOFV4fW4_test.pdf',
-              beginning: '2020-12-01 00:00:00 +0000 +0000',
-              expiry: '2020-12-31 00:00:00 +0000 +0000',
-              prerequisites:
-                '\u003cp\u003e\u003cspan style="color: rgba(0,0,0,0.45);background-color: rgb(255,255,255);font-size: 14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. In velit neque, pharetra sit amet interdum eu, sollicitudin sit amet mi. Integer porta auctor mauris nec pellentesque. Mauris egestas, justo non porta venenatis, mauris dui luctus odio, quis pharetra neque dui viverra leo. Morbi vitae semper ante. Cras convallis nisl luctus lorem rutrum, a bibendum ligula ultrices. Phasellus est arcu, porta eget velit vel, porta tempus justo. Integer leo nibh, vestibulum at risus vitae, tempus malesuada tortor. Vestibulum a odio quis metus hendrerit tristique. Sed nec laoreet eros. Curabitur facilisis justo eget est faucibus, et vulputate purus maximus. Donec maximus velit enim, et blandit nisi ornare eget. Suspendisse vel pretium risus, vel tincidunt tortor. Nam congue, odio et pellentesque laoreet, quam diam luctus purus, sit amet dictum massa justo et metus. Cras tincidunt lectus sed dapibus luctus. Duis sit amet dui quam. Suspendisse iaculis, enim id condimentum condimentum, lacus nunc tempor erat, id auctor felis elit dictum nulla. Nunc tincidunt, risus ut venenatis interdum, enim ex lacinia eros, id volutpat quam nisi et odio. Aliquam imperdiet sem ligula, eu mollis sapien auctor sit amet. Integer at maximus urna, quis vehicula lorem. Praesent eu semper risus, ut tincidunt erat. Nulla finibus urna orci, ac viverra tortor consequat a. Duis commodo commodo massa id vehicula. Vestibulum a gravida urna. Donec purus orci, congue nec fringilla quis, porta tempus nulla. Maecenas mollis orci nibh, nec hendrerit metus interdum ac. Nunc suscipit scelerisque pellentesque. Mauris aliquam lectus in blandit vestibulum. Nunc pretium dui non metus tincidunt pretium. Praesent eleifend mauris vel malesuada varius.\u003c/span\u003e\u003c/p\u003e\n',
-              pay_what_you_want: false,
-              recurring: true,
-              is_active: true,
-              is_refundable: false,
-              refund_before_hours: 24,
-              color_code: '',
-            },
-          ],
-          external_id: '7a4a977f-4504-4ac6-b22e-be4571c23ce0',
-          is_published: true,
-          video_url: '',
-          video_uid: '',
-          duration: 0,
-          status: '',
-        },
-      ]);
 
-      // if (data) {
-      //   setVideos(
-      //     data.map((classPass, index) => ({
-      //       index,
-      //       key: classPass.id,
-      //       id: classPass.id,
-      //       name: classPass.name,
-      //       price: classPass.price,
-      //       limited: classPass.limited,
-      //       currency: classPass.currency,
-      //       validity: classPass.validity,
-      //       class_count: classPass.class_count,
-      //       is_published: classPass.is_published,
-      //       session_ids: classPass.session_ids,
-      //       sales: classPass.sales.map((subs) => ({ ...subs, currency: classPass.currency })),
-      //       color_code: classPass.color_code,
-      //     }))
-      //   );
-      // }
+      if (data) {
+        setVideos(data);
+      }
     } catch (error) {
       showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
     }
@@ -254,7 +103,7 @@ const Videos = () => {
     if (expandedRowKeys.length > 0) {
       setExpandedRowKeys([]);
     } else {
-      setExpandedRowKeys(videos.map((video) => video.id));
+      setExpandedRowKeys(videos.map((video) => video.external_id));
     }
   };
 
@@ -287,6 +136,7 @@ const Videos = () => {
               height={50}
               width={100}
               fallback={DefaultImage()}
+              className={styles.thumbnailImage}
             />
           ),
         };
@@ -335,29 +185,39 @@ const Videos = () => {
               />
             </Tooltip>
           </Col>
+          <Col xs={24} md={4}>
+            <Tooltip title="Upload Video">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showUploadVideoModal(record, 2)}
+                icon={<CloudUploadOutlined />}
+              />
+            </Tooltip>
+          </Col>
           <Col xs={24} md={5}>
             {record.is_published ? (
               <Tooltip title="Hide Session">
-                <Button type="link" danger onClick={() => unpublishVideo(record.id)}>
+                <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Session">
-                <Button type="link" className={styles.successBtn} onClick={() => publishVideo(record.id)}>
+                <Button type="link" className={styles.successBtn} onClick={() => publishVideo(record.external_id)}>
                   Show
                 </Button>
               </Tooltip>
             )}
           </Col>
           <Col xs={24} md={6}>
-            {expandedRowKeys.includes(record.id) ? (
-              <Button type="link" onClick={() => collapseRow(record.id)}>
-                {`${record?.sales?.length || 0} Sales `} <UpOutlined />
+            {expandedRowKeys.includes(record.external_id) ? (
+              <Button type="link" onClick={() => collapseRow(record.external_id)}>
+                {`${record?.subscribers?.length || 0} Buyers `} <UpOutlined />
               </Button>
             ) : (
-              <Button type="link" onClick={() => expandRow(record.id)}>
-                {`${record?.sales?.length || 0} Sales`} <DownOutlined />
+              <Button type="link" onClick={() => expandRow(record.external_id)}>
+                {`${record?.subscribers?.length || 0} Buyers`} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -366,7 +226,7 @@ const Videos = () => {
     },
   ];
 
-  const salesColumns = [
+  const subscriberColumns = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -388,11 +248,11 @@ const Videos = () => {
     },
   ];
 
-  const renderSalesList = (record) => {
+  const renderSubsciberList = (record) => {
     return (
       <div className={styles.mb20}>
         <Table
-          columns={salesColumns}
+          columns={subscriberColumns}
           data={record.sales}
           loading={isLoading}
           rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
@@ -433,7 +293,7 @@ const Videos = () => {
           className={styles.card}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${video.color_code || '#FFF'}` }}>
-              <Text>{video.name}</Text>
+              <Text>{video.title}</Text>
             </div>
           }
           actions={[
@@ -445,32 +305,40 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
+            <Tooltip title="Upload Video">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showUploadVideoModal(video, 2)}
+                icon={<CloudUploadOutlined />}
+              />
+            </Tooltip>,
             video.is_published ? (
               <Tooltip title="Hide Session">
-                <Button type="link" danger onClick={() => unpublishVideo(video.id)}>
+                <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Session">
-                <Button type="link" className={styles.successBtn} onClick={() => publishVideo(video.id)}>
+                <Button type="link" className={styles.successBtn} onClick={() => publishVideo(video.external_id)}>
                   Show
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video.id) ? (
-              <Button type="link" onClick={() => collapseRow(video.id)} icon={<UpOutlined />} />
+            expandedRowKeys.includes(video.external_id) ? (
+              <Button type="link" onClick={() => collapseRow(video.external_id)} icon={<UpOutlined />} />
             ) : (
-              <Button type="link" onClick={() => expandRow(video.id)} icon={<DownOutlined />} />
+              <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
             ),
           ]}
         >
           {layout('Validity', <Text>{`${video.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video.price} ${video.currency}`}</Text>)}
         </Card>
-        {expandedRowKeys.includes(video.id) && (
+        {expandedRowKeys.includes(video.external_id) && (
           <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{video.sales.map(renderMobileSubscriberCards)}</div>
+            <div className={styles.mb20}>{video?.sales?.map(renderMobileSubscriberCards)}</div>
           </Row>
         )}
       </Col>
@@ -480,6 +348,8 @@ const Videos = () => {
   return (
     <div className={styles.box}>
       <UploadVideoModal
+        formPart={formPart}
+        setFormPart={setFormPart}
         visible={createModalVisible}
         closeModal={hideUploadVideoModal}
         editedVideo={selectedVideo}
@@ -512,7 +382,7 @@ const Videos = () => {
               loading={isLoading}
               rowKey={(record) => record.external_id}
               expandable={{
-                expandedRowRender: (record) => renderSalesList(record),
+                expandedRowRender: (record) => renderSubsciberList(record),
                 expandRowByClick: true,
                 expandIconColumnIndex: -1,
                 expandedRowKeys: expandedRowKeys,

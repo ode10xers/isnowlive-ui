@@ -86,7 +86,7 @@ export default {
     getVideoById: (videoId) => http.get(`/passes/${videoId}`),
     // getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
     // getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
-    getCreatorVideos: () => http.get(`/secure/creator/passes`),
+    getCreatorVideos: () => http.get(`/secure/creator/videos`),
     // getEarningsByPassId: (videoId) => http.get(`/secure/creator/payments/earnings/passes/id/${videoId}`),
     createVideo: (payload) => http.post(`/secure/creator/videos`, payload),
     updateVideo: (videoId, payload) => http.put(`/secure/creator/videos/${videoId}`, payload),
@@ -94,7 +94,7 @@ export default {
     // createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
     // getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
     // getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
-    publishVideo: (videoId) => http.post(`/secure/creator/passes/${videoId}/publish`),
-    unpublishVideo: (videoId) => http.post(`/secure/creator/passes/${videoId}/unpublish`),
+    publishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/publish`),
+    unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
   },
 };
