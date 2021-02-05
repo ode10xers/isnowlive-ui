@@ -84,6 +84,7 @@ export default {
   },
   videos: {
     //TODO: Adjust this earning API once it's done
+    getEarningsByVideoId: (videoId) => http.get(`/secure/creator/payments/earnings/passes/id/${videoId}`),
     getCreatorVideosEarnings: (pageNo, perPage) =>
       http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
     getVideoById: (videoId) => http.get(`/passes/${videoId}`),

@@ -38,6 +38,7 @@ const Earnings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [passes, setPasses] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [balance, setBalance] = useState(null);
   const [isLoadingPayout, setIsLoadingPayout] = useState(false);
   const {
@@ -46,10 +47,12 @@ const Earnings = () => {
     },
   } = useGlobalContext();
 
+  const [showMoreVideos, setShowMoreVideos] = useState(false);
   const [showMorePasses, setShowMorePasses] = useState(false);
   const [showMoreSession, setShowMoreSession] = useState(false);
   const [currentSessionPage, setCurrentSessionPage] = useState(1);
   const [currentPassesPage, setCurrentPassesPage] = useState(1);
+  const [currentVideosPage, setCurrentVideosPage] = useState(1);
   const itemsPerPage = 10;
 
   const [expandedSection, setExpandedSection] = useState([]);
@@ -79,6 +82,8 @@ const Earnings = () => {
         setShowMoreSession(creatorInventoryEarningResponse.data.next_page || false);
         setPasses(creatorPassEarningResponse.data.earnings);
         setShowMorePasses(creatorPassEarningResponse.data.next_page || false);
+        setVideos(creatorVideoEarningResponse.data.earnings);
+        setShowMoreVideos(creatorVideoEarningResponse.data.next_page || false);
         setBalance(creatorBalanceResponse.data);
       }
     } catch (error) {
@@ -115,13 +120,34 @@ const Earnings = () => {
     try {
       setIsLoading(true);
       let pageNo = currentPassesPage + 1;
-      const { status, data } = await apis.session.getCreatorPassEarnings(pageNo, itemsPerPage);
+      const { status, data } = await apis.passes.getCreatorPassEarnings(pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
         setPasses([...passes, ...data.earnings]);
         setCurrentPassesPage(pageNo);
         setShowMorePasses(data.next_page || false);
+      }
+    } catch (error) {
+      trackFailedEvent(eventTag, error);
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
+  };
+
+  const handleShowMoreVideos = async () => {
+    const eventTag = creator.click.payment.showMoreEarnings;
+
+    try {
+      setIsLoading(true);
+      let pageNo = currentVideosPage + 1;
+      const { status, data } = await apis.videos.getCreatorVideosEarnings(pageNo, itemsPerPage);
+      if (isAPISuccess(status)) {
+        trackSuccessEvent(eventTag);
+        setIsLoading(false);
+        setVideos([...videos, ...data.earnings]);
+        setCurrentVideosPage(pageNo);
+        setShowMoreVideos(data.next_page || false);
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
@@ -430,6 +456,78 @@ const Earnings = () => {
     );
   };
 
+  const openVideoDetails = (item) => {
+    console.log(item);
+    if (item.video_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
+    }
+  };
+
+  let videoColumns = [
+    {
+      title: 'Video Name',
+      key: 'name',
+      dataIndex: 'name',
+      align: 'left',
+      width: '50%',
+    },
+    {
+      title: 'Total Earned',
+      key: 'total_earned',
+      dataIndex: 'total_earned',
+      align: 'right',
+      width: '40%',
+      render: (text, record) => `${record.total_earned} ${record.currency}`,
+    },
+    {
+      title: '',
+      width: '10%',
+      render: (text, record) => (
+        <Row justify="start">
+          <Col>
+            <Button type="link" className={styles.detailsButton} onClick={() => openVideoDetails(record)}>
+              Details
+            </Button>
+          </Col>
+        </Row>
+      ),
+    },
+  ];
+
+  const renderVideoItem = (item) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Card
+        className={styles.card}
+        title={
+          <div onClick={() => openVideoDetails(item)}>
+            <Text>{item.name}</Text>
+          </div>
+        }
+        actions={[
+          <Button type="link" className={styles.detailsButton} onClick={() => openVideoDetails(item)}>
+            Details
+          </Button>,
+        ]}
+      >
+        {layout(
+          'Earnings',
+          <Text>
+            {item.currency} {item.total_earned}
+          </Text>
+        )}
+      </Card>
+    );
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading Earning Details">
       <div className={styles.box}>
@@ -515,6 +613,39 @@ const Earnings = () => {
                         <Button
                           onClick={() => handleShowMorePasses()}
                           disabled={!showMorePasses}
+                          className={styles.ml20}
+                        >
+                          Show More
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Panel>
+              <Panel header={<Title level={5}> Videos </Title>} key="Videos">
+                <Row className={styles.mt10}>
+                  <Col span={24}>
+                    {isMobileDevice ? (
+                      <Loader loading={isLoading} size="large" text="Loading videos">
+                        {videos.length > 0 ? (
+                          videos.map(renderVideoItem)
+                        ) : (
+                          <div className={classNames(styles.textAlignCenter, 'text-empty')}>
+                            Videos List
+                            <Empty />
+                          </div>
+                        )}
+                      </Loader>
+                    ) : (
+                      <Table columns={videoColumns} data={videos} loading={isLoading} />
+                    )}
+                  </Col>
+                  <Col span={24}>
+                    <Row justify="center" className={styles.mt50}>
+                      <Col>
+                        <Button
+                          onClick={() => handleShowMoreVideos()}
+                          disabled={!showMoreVideos}
                           className={styles.ml20}
                         >
                           Show More
