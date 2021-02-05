@@ -525,14 +525,12 @@ const Session = ({ match, history }) => {
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
         data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
+      } else {
+        data.beginning = moment().startOf('day').utc().format();
+        data.expiry = moment().endOf('day').utc().format();
       }
 
       if (session?.inventory?.length) {
-        if (!isSessionRecurring) {
-          data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
-          data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
-        }
-
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
