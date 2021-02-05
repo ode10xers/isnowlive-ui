@@ -57,13 +57,20 @@ const Earnings = () => {
   const getEarningData = useCallback(async () => {
     try {
       setIsLoading(true);
-      let [creatorInventoryEarningResponse, creatorPassEarningResponse, creatorBalanceResponse] = await Promise.all([
+      let [
+        creatorInventoryEarningResponse,
+        creatorVideoEarningResponse,
+        creatorPassEarningResponse,
+        creatorBalanceResponse,
+      ] = await Promise.all([
         apis.session.getCreatorInventoryEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
-        apis.session.getCreatorPassEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
+        apis.videos.getCreatorVideosEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
+        apis.passes.getCreatorPassEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
         apis.session.getCreatorBalance(),
       ]);
       if (
         isAPISuccess(creatorInventoryEarningResponse.status) &&
+        isAPISuccess(creatorVideoEarningResponse.status) &&
         isAPISuccess(creatorPassEarningResponse.status) &&
         isAPISuccess(creatorBalanceResponse.status)
       ) {
