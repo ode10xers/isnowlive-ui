@@ -16,8 +16,9 @@ import {
   message,
   DatePicker,
   Modal,
+  Tooltip,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -525,14 +526,12 @@ const Session = ({ match, history }) => {
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
         data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
+      } else {
+        data.beginning = moment().startOf('day').utc().format();
+        data.expiry = moment().endOf('day').utc().format();
       }
 
       if (session?.inventory?.length) {
-        if (!isSessionRecurring) {
-          data.beginning = moment(session.inventory[0].start_time).startOf('day').utc().format();
-          data.expiry = moment(session.inventory[0].start_time).endOf('day').utc().format();
-        }
-
         let allInventoryList = convertSchedulesToUTC(session.inventory);
         data.inventory = allInventoryList.filter(
           (slot) => getTimeDiff(slot.session_date, moment(), 'minutes') > 0 && slot.num_participants === 0
@@ -709,13 +708,43 @@ const Session = ({ match, history }) => {
             <Text>or upload a session pre-requisite document</Text>
             <br />
             <br />
-            <FileUpload
-              name="document_url"
-              value={sessionDocumentUrl}
-              onChange={handleDocumentUrlUpload}
-              listType="text"
-              label="Upload a PDF file"
-            />
+            <Row>
+              <Col>
+                <FileUpload
+                  name="document_url"
+                  value={sessionDocumentUrl}
+                  onChange={handleDocumentUrlUpload}
+                  listType="text"
+                  label="Upload a PDF file"
+                />
+              </Col>
+
+              {sessionDocumentUrl && (
+                <Col>
+                  <Button
+                    type="text"
+                    icon={<FilePdfOutlined />}
+                    size="middle"
+                    onClick={() => window.open(sessionDocumentUrl)}
+                    className={styles.filenameButton}
+                  >
+                    {sessionDocumentUrl.split('_').slice(-1)[0]}
+                  </Button>
+                  <Tooltip title="Remove this file">
+                    <Button
+                      type="text"
+                      size="middle"
+                      danger
+                      icon={<CloseCircleOutlined />}
+                      onClick={() => {
+                        setSessionDocumentUrl(null);
+                        setSession({ ...session, document_url: '' });
+                      }}
+                    />
+                  </Tooltip>
+                </Col>
+              )}
+            </Row>
           </Form.Item>
 
           <Form.Item
