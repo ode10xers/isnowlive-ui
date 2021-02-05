@@ -137,6 +137,7 @@ const ProfilePreview = ({ username = null }) => {
   }, [username]);
 
   const getVideosDetails = useCallback(async () => {
+    setIsVideosLoading(true);
     try {
       //TODO: Implement API Here
 
@@ -175,6 +176,7 @@ const ProfilePreview = ({ username = null }) => {
     } catch (error) {
       message.error('Failed to load class pass details');
     }
+    setIsVideosLoading(false);
   }, []);
 
   useEffect(() => {
