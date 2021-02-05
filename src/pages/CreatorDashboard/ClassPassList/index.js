@@ -107,7 +107,7 @@ const ClassPassList = () => {
             class_count: classPass.class_count,
             is_published: classPass.is_published,
             sessions: classPass.sessions,
-            subscribers: classPass.subscribers.map((subs) => ({ ...subs, currency: classPass.currency })),
+            buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency })),
             color_code: classPass.color_code,
           }))
         );
@@ -271,11 +271,11 @@ const ClassPassList = () => {
           <Col xs={24} md={6}>
             {expandedRowKeys.includes(record.id) ? (
               <Button type="link" onClick={() => collapseRow(record.id)}>
-                {`${record.subscribers.length} Subscribers `} <UpOutlined />
+                {`${record.buyers.length} Buyers `} <UpOutlined />
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(record.id)}>
-                {`${record.subscribers.length} Subscribers`} <DownOutlined />
+                {`${record.buyers.length} Buyers `} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -284,7 +284,7 @@ const ClassPassList = () => {
     },
   ];
 
-  const subscribersColumns = [
+  const buyersColumns = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -306,12 +306,12 @@ const ClassPassList = () => {
     },
   ];
 
-  const renderSubscribersList = (record) => {
+  const renderBuyersList = (record) => {
     return (
       <div className={styles.mb20}>
         <Table
-          columns={subscribersColumns}
-          data={record.subscribers}
+          columns={buyersColumns}
+          data={record.buyers}
           loading={isLoading}
           rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
         />
@@ -397,7 +397,7 @@ const ClassPassList = () => {
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{pass.subscribers.map(renderMobileSubscriberCards)}</div>
+            <div className={styles.mb20}>{pass.buyers.map(renderMobileSubscriberCards)}</div>
           </Row>
         )}
       </Col>
@@ -434,7 +434,7 @@ const ClassPassList = () => {
               loading={isLoading}
               rowKey={(record) => record.id}
               expandable={{
-                expandedRowRender: (record) => renderSubscribersList(record),
+                expandedRowRender: (record) => renderBuyersList(record),
                 expandRowByClick: true,
                 expandIconColumnIndex: -1,
                 expandedRowKeys: expandedRowKeys,
