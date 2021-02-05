@@ -16,8 +16,9 @@ import {
   message,
   DatePicker,
   Modal,
+  Tooltip,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -707,13 +708,42 @@ const Session = ({ match, history }) => {
             <Text>or upload a session pre-requisite document</Text>
             <br />
             <br />
-            <FileUpload
-              name="document_url"
-              value={sessionDocumentUrl}
-              onChange={handleDocumentUrlUpload}
-              listType="text"
-              label="Upload a PDF file"
-            />
+            <Row>
+              <Col>
+                <FileUpload
+                  name="document_url"
+                  value={sessionDocumentUrl}
+                  onChange={handleDocumentUrlUpload}
+                  listType="text"
+                  label="Upload a PDF file"
+                />
+              </Col>
+
+              {sessionDocumentUrl && (
+                <Col>
+                  <Button
+                    type="link"
+                    icon={<FilePdfOutlined />}
+                    size="middle"
+                    onClick={() => window.open(sessionDocumentUrl)}
+                  >
+                    {sessionDocumentUrl.split('_').slice(-1)[0]}
+                  </Button>
+                  <Tooltip title="Remove this file">
+                    <Button
+                      type="text"
+                      size="middle"
+                      danger
+                      icon={<CloseCircleOutlined />}
+                      onClick={() => {
+                        setSessionDocumentUrl(null);
+                        setSession({ ...session, document_url: '' });
+                      }}
+                    />
+                  </Tooltip>
+                </Col>
+              )}
+            </Row>
           </Form.Item>
 
           <Form.Item
