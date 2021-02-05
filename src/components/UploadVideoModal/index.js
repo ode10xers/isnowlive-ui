@@ -67,7 +67,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     headers: {
       // 'auth-token': getAuthCookie() || '',
       'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
-      'Access-Control-Expose-Headers':
+      'Access-Control-Allow-Headers':
         'Upload-Offset, Location, Upload-Length, Tus-Version, Tus-Resumable, Tus-Max-Size, Tus-Extension, Upload-Metadata, Upload-Defer-Length, Upload-Concat, Location, Upload-Offset, Upload-Length',
     },
   });
