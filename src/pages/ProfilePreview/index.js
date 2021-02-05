@@ -11,6 +11,7 @@ import {
   ArrowLeftOutlined,
   EditOutlined,
   LinkedinOutlined,
+  PlayCircleOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
@@ -20,6 +21,7 @@ import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
 import ClassPasses from 'components/ClassPasses';
+import PublicVideoList from 'components/PublicVideoList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
@@ -58,8 +60,12 @@ const ProfilePreview = ({ username = null }) => {
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('session');
   const [isListLoading, setIsListLoading] = useState(false);
-  const [isPassesLoading, setIsPassesLoading] = useState(true);
+
   const [passes, setPasses] = useState([]);
+  const [isPassesLoading, setIsPassesLoading] = useState(true);
+
+  const [videos, setVideos] = useState([]);
+  const [isVideosLoading, setIsVideosLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -130,6 +136,47 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  const getVideosDetails = useCallback(async () => {
+    try {
+      //TODO: Implement API Here
+
+      setVideos([
+        {
+          title: 'Test Video 1',
+          description:
+            '\u003cp\u003e\u003cspan style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie diam id varius tristique. In felis nisi, lacinia ac urna vitae, pulvinar dapibus mauris. Integer consectetur ultricies arcu, nec elementum leo bibendum a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ultricies arcu ex, vulputate congue ante tempor ut. Phasellus ut risus eu justo egestas lobortis nec at lectus. Pellentesque at orci purus. Nam eleifend lectus ante, vel vulputate enim lobortis id. Morbi ut libero vitae risus porta interdum eu eget nulla. Nam porta efficitur magna, quis elementum elit viverra id. Donec sagittis dapibus felis eu imperdiet. Donec ut urna egestas, venenatis ex vitae, pretium diam. Aenean rutrum justo sit amet commodo scelerisque.\u003c/span\u003e\u003c/p\u003e\n',
+          validity: 24,
+          price: 10,
+          currency: 'SGD',
+          thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
+          external_id: '7a4a977f-4504-4ac6-b22e-be4571c23ce1',
+          is_published: true,
+          video_url: '',
+          video_uid: '',
+          duration: 0,
+          status: '',
+        },
+        {
+          title: 'Test Video 1',
+          description:
+            '\u003cp\u003e\u003cspan style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie diam id varius tristique. In felis nisi, lacinia ac urna vitae, pulvinar dapibus mauris. Integer consectetur ultricies arcu, nec elementum leo bibendum a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ultricies arcu ex, vulputate congue ante tempor ut. Phasellus ut risus eu justo egestas lobortis nec at lectus. Pellentesque at orci purus. Nam eleifend lectus ante, vel vulputate enim lobortis id. Morbi ut libero vitae risus porta interdum eu eget nulla. Nam porta efficitur magna, quis elementum elit viverra id. Donec sagittis dapibus felis eu imperdiet. Donec ut urna egestas, venenatis ex vitae, pretium diam. Aenean rutrum justo sit amet commodo scelerisque.\u003c/span\u003e\u003c/p\u003e\n',
+          validity: 24,
+          price: 10,
+          currency: 'SGD',
+          thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
+          external_id: '7a4a977f-4504-4ac6-b22e-be4571c23ce0',
+          is_published: true,
+          video_url: '',
+          video_uid: '',
+          duration: 0,
+          status: '',
+        },
+      ]);
+    } catch (error) {
+      message.error('Failed to load class pass details');
+    }
+  }, []);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnDashboard(true);
@@ -137,13 +184,15 @@ const ProfilePreview = ({ username = null }) => {
     getProfileDetails();
     getSessionDetails('upcoming');
     getPassesDetails();
-  }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails]);
+    getVideosDetails();
+  }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails, getVideosDetails]);
 
   useEffect(() => {
     if (location.state) {
       const sectionToShow = location.state.section;
       let targetElement = document.getElementById('session');
 
+      //TODO: Add condition here and update NavBar as well
       if (sectionToShow === 'session') {
         setSelectedListTab(sectionToShow);
       } else if (sectionToShow === 'pass') {
@@ -413,10 +462,28 @@ const ProfilePreview = ({ username = null }) => {
                 }
               >
                 <Row className={styles.mt20}>
-                  <Col span={24}></Col>
                   <Col span={24}>
                     <Loader loading={isPassesLoading} size="large" text="Loading class passes">
                       <ClassPasses passes={passes} username={username} />
+                    </Loader>
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+            )}
+            {videos.length && (
+              <Tabs.TabPane
+                key="video"
+                tab={
+                  <div className={styles.largeTabHeader} id="video">
+                    <PlayCircleOutlined />
+                    Videos
+                  </div>
+                }
+              >
+                <Row className={styles.mt20}>
+                  <Col span={24}>
+                    <Loader loading={isVideosLoading} size="large" text="Loading videos">
+                      <PublicVideoList videos={videos} />
                     </Loader>
                   </Col>
                 </Row>
