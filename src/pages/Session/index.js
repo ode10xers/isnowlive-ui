@@ -722,10 +722,11 @@ const Session = ({ match, history }) => {
               {sessionDocumentUrl && (
                 <Col>
                   <Button
-                    type="link"
+                    type="text"
                     icon={<FilePdfOutlined />}
                     size="middle"
                     onClick={() => window.open(sessionDocumentUrl)}
+                    className={styles.filenameButton}
                   >
                     {sessionDocumentUrl.split('_').slice(-1)[0]}
                   </Button>
