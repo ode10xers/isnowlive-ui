@@ -32,6 +32,7 @@ const Routes = {
     paymentAccount: '/payments',
     sessionEarnings: '/payments/inventory/:inventory_id',
     passEarnings: '/payments/pass/:pass_id',
+    videoEarnings: '/payments/video/:video_id',
     passes: '/passes',
     videos: '/videos',
   },
@@ -45,7 +46,7 @@ const Routes = {
     editProfile: '/profile/edit',
     livestream: '/livestream',
     videos: '/videos',
-    videoDetails: '/video/:video_id',
+    videoDetails: '/videos/:video_id/:video_order_id',
   },
 };
 
