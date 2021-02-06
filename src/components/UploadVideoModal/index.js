@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Upload } from 'antd';
-import { UploadOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import * as tus from 'tus-js-client';
+import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
+// import { UploadOutlined, PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+// import * as tus from 'tus-js-client';
+import Uppy from '@uppy/core';
+import Tus from '@uppy/tus';
+import { DragDrop } from '@uppy/react';
 
+import config from 'config';
 import apis from 'apis';
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
+// import { getAuthCookie } from 'services/authCookie';
 
 import styles from './styles.module.scss';
 
@@ -47,10 +52,28 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
   const [videoType, setVideoType] = useState(videoTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
-  const [fileLists, setFileLists] = useState([]);
-  const [isVideoPaused, setIsVideoPaused] = useState(false);
+  // const [fileLists, setFileLists] = useState([]);
+  // const [isVideoPaused, setIsVideoPaused] = useState(false);
   const upload = useRef(null);
 
+  let uppy = new Uppy({
+    meta: { type: 'avatar' },
+    restrictions: { maxNumberOfFiles: 1 },
+    autoProceed: true,
+  });
+
+  uppy.use(Tus, {
+    endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+    headers: {
+      'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
+      'Access-Control-Allow-Headers':
+        'Access-Control-Allow-Origin, Upload-Offset, Location, Upload-Length, Tus-Version, Tus-Resumable, Tus-Max-Size, Tus-Extension, Upload-Metadata, Upload-Defer-Length, Upload-Concat, Location, Upload-Offset, Upload-Length',
+    },
+  });
+
+  uppy.on('complete', (result) => {
+    console.log('===result', result);
+  });
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
 
@@ -138,110 +161,114 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
   };
 
-  const uploadVideoProps = {
-    customRequest: async (fileDetails) => {
-      try {
-        const response = await apis.videos.uploadVideo(editedVideo.external_id, {
-          size: fileDetails.file.size,
-        });
-        if (isAPISuccess(response.status)) {
-          setFileLists([
-            {
-              name: fileDetails.file.name,
-              status: 'uploading',
-              thumbUrl: coverImageUrl,
-            },
-          ]);
-          upload.current = new tus.Upload(fileDetails.file, {
-            endpoint: response.data.url,
-            resume: true,
-            metadata: {
-              filename: fileDetails.file.name,
-              filetype: fileDetails.file.type,
-            },
-            onProgress: (bytesUploaded, bytesTotal) => {
-              var percent = parseInt((bytesUploaded / bytesTotal) * 100);
-              setFileLists([
-                {
-                  name: fileDetails.file.name,
-                  status: 'uploading',
-                  thumbUrl: coverImageUrl,
-                  percent,
-                },
-              ]);
-            },
-            onSuccess: () => {
-              setFileLists([
-                {
-                  name: fileDetails.file.name,
-                  thumbUrl: coverImageUrl,
-                  status: 'success',
-                },
-              ]);
-              showSuccessModal('Video Published');
-              setTimeout(() => {
-                setFileLists([]);
-                closeModal(true);
-              }, 500);
-            },
-            onError: (err) => {
-              setFileLists([
-                {
-                  name: fileDetails.file.name,
-                  thumbUrl: coverImageUrl,
-                  status: 'error',
-                },
-              ]);
-              console.log('onError', err);
-              showErrorModal(`Failed to upload video`);
-              setTimeout(() => {
-                setFileLists([]);
-              }, 500);
-            },
-          });
-          upload.current.start();
-        }
-      } catch (error) {
-        console.log(error);
-        showErrorModal(`Failed to upload video`);
-      }
-    },
-    listType: 'picture',
-    fileList: fileLists,
-    showUploadList: {
-      showRemoveIcon: fileLists && fileLists.length && fileLists[0].status === 'uploading' ? true : false,
-      removeIcon: isVideoPaused ? (
-        <PlayCircleOutlined
-          className={styles.videoIcon}
-          onClick={() => {
-            // Retrieve a list of uploads that have been previously started for this file.
-            // These uploads will be queried from the URL Storage using the file's fingerprint.
-            upload.current.findPreviousUploads().then((previousUploads) => {
-              var chosenUpload = askToResumeUpload(previousUploads);
-              if (chosenUpload) {
-                upload.current.resumeFromPreviousUpload(chosenUpload);
-              }
-              upload.current.start();
-              setIsVideoPaused(false);
-            });
+  // const uploadVideoProps = {
+  //   customRequest: async (fileDetails) => {
+  //     try {
+  //       const response = await apis.videos.uploadVideo(editedVideo.external_id, {
+  //         size: fileDetails.file.size,
+  //       });
+  //       if (isAPISuccess(response.status)) {
+  //         setFileLists([
+  //           {
+  //             name: fileDetails.file.name,
+  //             status: 'uploading',
+  //             thumbUrl: coverImageUrl,
+  //           },
+  //         ]);
 
-            function askToResumeUpload(previousUploads) {
-              if (previousUploads.length === 0) return null;
-              return previousUploads[previousUploads.length - 1];
-            }
-          }}
-        />
-      ) : (
-        <PauseCircleOutlined
-          className={styles.videoIcon}
-          onClick={() => {
-            upload.current.abort(false);
-            setIsVideoPaused(true);
-          }}
-        />
-      ),
-    },
-  };
+  //       upload.current = new tus.Upload(fileDetails.file, {
+  //         endpoint: response.data.url,
+  //         headers: {
+  //           'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
+  //         },
+  //         resume: true,
+  //         metadata: {
+  //           filename: fileDetails.file.name,
+  //           filetype: fileDetails.file.type,
+  //         },
+  //         onProgress: (bytesUploaded, bytesTotal) => {
+  //           var percent = parseInt((bytesUploaded / bytesTotal) * 100);
+  //           setFileLists([
+  //             {
+  //               name: fileDetails.file.name,
+  //               status: 'uploading',
+  //               thumbUrl: coverImageUrl,
+  //               percent,
+  //             },
+  //           ]);
+  //         },
+  //         onSuccess: () => {
+  //           setFileLists([
+  //             {
+  //               name: fileDetails.file.name,
+  //               thumbUrl: coverImageUrl,
+  //               status: 'success',
+  //             },
+  //           ]);
+  //           showSuccessModal('Video Published');
+  //           setTimeout(() => {
+  //             setFileLists([]);
+  //             closeModal(true);
+  //           }, 500);
+  //         },
+  //         onError: (err) => {
+  //           setFileLists([
+  //             {
+  //               name: fileDetails.file.name,
+  //               thumbUrl: coverImageUrl,
+  //               status: 'error',
+  //             },
+  //           ]);
+  //           console.log('onError', err);
+  //           showErrorModal(`Failed to upload video`);
+  //           setTimeout(() => {
+  //             setFileLists([]);
+  //           }, 500);
+  //         },
+  //       });
+  //       upload.current.start();
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //       showErrorModal(`Failed to upload video`);
+  //     }
+  //   },
+  //   listType: 'picture',
+  //   fileList: fileLists,
+  //   showUploadList: {
+  //     showRemoveIcon: fileLists && fileLists.length && fileLists[0].status === 'uploading' ? true : false,
+  //     removeIcon: isVideoPaused ? (
+  //       <PlayCircleOutlined
+  //         className={styles.videoIcon}
+  //         onClick={() => {
+  //           // Retrieve a list of uploads that have been previously started for this file.
+  //           // These uploads will be queried from the URL Storage using the file's fingerprint.
+  //           upload.current.findPreviousUploads().then((previousUploads) => {
+  //             var chosenUpload = askToResumeUpload(previousUploads);
+  //             if (chosenUpload) {
+  //               upload.current.resumeFromPreviousUpload(chosenUpload);
+  //             }
+  //             upload.current.start();
+  //             setIsVideoPaused(false);
+  //           });
+
+  //           function askToResumeUpload(previousUploads) {
+  //             if (previousUploads.length === 0) return null;
+  //             return previousUploads[previousUploads.length - 1];
+  //           }
+  //         }}
+  //       />
+  //     ) : (
+  //       <PauseCircleOutlined
+  //         className={styles.videoIcon}
+  //         onClick={() => {
+  //           upload.current.abort(false);
+  //           setIsVideoPaused(true);
+  //         }}
+  //       />
+  //     ),
+  //   },
+  // };
 
   return (
     <Modal
@@ -371,11 +398,24 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
         )}
         {formPart === 2 && (
           <div className={styles.videoUpload}>
-            <Upload {...uploadVideoProps} style={{ width: '100% !important' }}>
+            <DragDrop
+              uppy={uppy}
+              locale={{
+                strings: {
+                  // Text to show on the droppable area.
+                  // `%{browse}` is replaced with a link that opens the system file selection dialog.
+                  dropHereOr: 'Drop here or %{browse}',
+                  // Used as the label for the link that opens the system file selection dialog.
+                  browse: 'browse',
+                },
+              }}
+            />
+
+            {/* <Upload {...uploadVideoProps} style={{ width: '100% !important' }}>
               <Button type="dashed" className={styles.uploadVideoBtn} icon={<UploadOutlined />}>
                 Upload Video
               </Button>
-            </Upload>
+            </Upload> */}
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
                 <Button block type="default" onClick={() => closeModal(true)} loading={isSubmitting}>
