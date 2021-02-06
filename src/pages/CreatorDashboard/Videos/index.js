@@ -190,6 +190,7 @@ const Videos = () => {
               <Button
                 className={styles.detailsButton}
                 type="text"
+                disabled={record.video_uid.length ? true : false}
                 onClick={() => showUploadVideoModal(record, 2)}
                 icon={<CloudUploadOutlined />}
               />
@@ -204,7 +205,12 @@ const Videos = () => {
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Session">
-                <Button type="link" className={styles.successBtn} onClick={() => publishVideo(record.external_id)}>
+                <Button
+                  type="link"
+                  disabled={record.video_uid.length ? false : true}
+                  className={styles.successBtn}
+                  onClick={() => publishVideo(record.external_id)}
+                >
                   Show
                 </Button>
               </Tooltip>
@@ -309,6 +315,7 @@ const Videos = () => {
               <Button
                 className={styles.detailsButton}
                 type="text"
+                disabled={video.video_uid.length ? true : false}
                 onClick={() => showUploadVideoModal(video, 2)}
                 icon={<CloudUploadOutlined />}
               />
@@ -321,7 +328,12 @@ const Videos = () => {
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Session">
-                <Button type="link" className={styles.successBtn} onClick={() => publishVideo(video.external_id)}>
+                <Button
+                  type="link"
+                  disabled={video.video_uid.length ? false : true}
+                  className={styles.successBtn}
+                  onClick={() => publishVideo(video.external_id)}
+                >
                   Show
                 </Button>
               </Tooltip>

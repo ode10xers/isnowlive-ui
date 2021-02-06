@@ -57,3 +57,13 @@
   z-index: 999;
   cursor: pointer;
 }
+.uppyDragDrop {
+  button {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    border: 2px dotted;
+    min-height: 80px;
+    cursor: pointer;
+  }
+}
