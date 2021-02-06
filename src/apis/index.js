@@ -92,7 +92,7 @@ export default {
     updateVideo: (videoId, payload) => http.put(`/secure/creator/videos/${videoId}`, payload),
     uploadVideo: (videoId, payload) => http.post(`/secure/creator/videos/${videoId}/upload`, payload),
     // createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
-    // getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
+    getAttendeeVideos: () => http.get('/secure/customer/videos/orders'),
     // getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
     publishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/publish`),
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
