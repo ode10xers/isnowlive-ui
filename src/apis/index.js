@@ -51,8 +51,6 @@ export default {
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
     getCreatorInventoryEarnings: (pageNo, perPage) =>
       http.get(`/secure/creator/payments/earnings/inventories?page_no=${pageNo}&per_page=${perPage}`),
-    getCreatorPassEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
     getEarningsByInventoryId: (inventoryId) =>
       http.get(`/secure/creator/payments/earnings/inventories/id/${inventoryId}`),
     getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
@@ -81,8 +79,13 @@ export default {
     getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
     publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
     unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
+    getCreatorPassEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
   },
   videos: {
+    getEarningsByVideoId: (videoId) => http.get(`/secure/creator/payments/earnings/videos/id/${videoId}`),
+    getCreatorVideosEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/videos?page_no=${pageNo}&per_page=${perPage}`),
     getVideoById: (videoId) => http.get(`/passes/${videoId}`),
     // getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
     // getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
