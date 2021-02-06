@@ -15,6 +15,7 @@ import apis from 'apis';
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
+import VideoPlayer from 'components/VideoPlayer';
 import SessionCards from 'components/SessionCards';
 import DefaultImage from 'components/Icons/DefaultImage';
 
@@ -110,7 +111,7 @@ const VideoDetails = ({ match, history }) => {
     <Loader loading={isLoading} size="large" text="Loading video details">
       <Row gutter={[8, 24]} className={classNames(styles.p50, styles.box)}>
         <Col xs={24} className={styles.showcaseCardContainer}>
-          <VideoCard video={video} buyable={false} hoverable={false} />
+          <VideoCard cover={<VideoPlayer />} video={video} buyable={false} hoverable={false} />
         </Col>
         <Col xs={24}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>

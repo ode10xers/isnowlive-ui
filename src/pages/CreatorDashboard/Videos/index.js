@@ -403,6 +403,7 @@ const Videos = () => {
           )}
         </Col>
       </Row>
+      {/* <VideoPlayer /> */}
     </div>
   );
 };
