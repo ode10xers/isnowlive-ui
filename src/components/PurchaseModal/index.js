@@ -55,8 +55,8 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
           setCurrentUser(user);
         }
 
-        console.log('BAM');
         form.setFieldsValue(user);
+        closeModal();
         createOrder(user.email);
       }
     }
@@ -163,7 +163,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
 
   return (
     <div>
-      <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
+      <Modal visible={visible} centered={true} onCancel={() => closeModal(true)} footer={null}>
         <Loader loading={isLoading}>
           <Form
             form={form}

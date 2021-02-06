@@ -19,13 +19,14 @@ const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noo
       hoverable={hoverable}
       bordered={false}
       footer={null}
-      onClick={() => onCardClick(video)}
       cover={
         <Image
           className={styles.videoThumbnail}
           src={video.thumbnail_url || 'error'}
           alt={video.title}
           fallback={DefaultImage()}
+          onClick={() => onCardClick(video)}
+          preview={false}
         />
       }
     >

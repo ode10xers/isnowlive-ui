@@ -566,11 +566,8 @@ const SessionDetails = ({ match, history }) => {
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = (resetSelectedVideo = true) => {
-    if (resetSelectedVideo) {
-      setSelectedVideo(null);
-    }
-
+  const closePurchaseModal = () => {
+    setSelectedVideo(null);
     setShowPurchaseVideoModal(false);
   };
 
