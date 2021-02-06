@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Col, Image, Typography, Space, Divider, Card, Button, message } from 'antd';
+import React, { useCallback, useState, useEffect } from 'react';
+import { Row, Col, Typography, Space, Image, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -16,8 +16,6 @@ import Share from 'components/Share';
 import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
-import PurchasePassModal from 'components/PurchasePassModal';
-
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
@@ -34,11 +32,8 @@ const VideoDetails = ({ match, history }) => {
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [video, setVideo] = useState([]);
-  const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
 
-  const username = window.location.hostname.split('.')[0];
-
-  const getProfileDetails = useCallback(async () => {
+  const getProfileDetails = useCallback(async (username) => {
     try {
       const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
       if (data) {
@@ -50,15 +45,7 @@ const VideoDetails = ({ match, history }) => {
       message.error('Failed to load profile details');
       setIsLoading(false);
     }
-  }, [username]);
-
-  const showPurchaseModal = () => {
-    setShowPurchaseVideoModal(true);
-  };
-
-  const closePurchaseModal = () => {
-    setShowPurchaseVideoModal(false);
-  };
+  }, []);
 
   const getVideoDetails = useCallback(
     async (videoId) => {
@@ -66,7 +53,12 @@ const VideoDetails = ({ match, history }) => {
         const { data } = await apis.videos.getVideoById(videoId);
 
         if (data) {
-          setVideo({
+          // Hardcoding this, if available from GET video API then we can use that
+          // const username = window.location.hostname.split('.')[0];
+          const dummyUsername = 'ellianto';
+
+          //Dummy Data
+          const videoData = {
             id: 3,
             cover_image: 'https://dkfqbuenrrvge.cloudfront.net/image/msJ9placWNxt8bGA_city01.jpeg',
             thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
@@ -76,16 +68,23 @@ const VideoDetails = ({ match, history }) => {
             price: 0,
             currency: 'USD',
             validity: 24,
-            username: 'sanketkarve',
+            username: dummyUsername,
             published: false,
             // ...data,
             sessions:
               data.sessions.map((session) => ({
                 ...session,
                 key: `${data.id}_${session.session_id}`,
-                username: username,
+                username: dummyUsername,
               })) || [],
-          });
+          };
+
+          setVideo(videoData);
+
+          if (videoData.username && !reservedDomainName.includes(videoData.username)) {
+            getProfileDetails(videoData.username);
+          }
+
           setIsLoading(false);
         }
       } catch (error) {
@@ -93,18 +92,15 @@ const VideoDetails = ({ match, history }) => {
         message.error('Failed to load class video details');
       }
     },
-    [username]
+    [getProfileDetails]
   );
 
   useEffect(() => {
     if (match.params.video_id) {
-      if (username && !reservedDomainName.includes(username)) {
-        getProfileDetails();
-        getVideoDetails(match.params.video_id);
-      }
+      getVideoDetails(match.params.video_id);
     } else {
       setIsLoading(false);
-      message.error('Session details not found.');
+      message.error('Video details not found.');
     }
 
     //eslint-disable-next-line
@@ -112,8 +108,10 @@ const VideoDetails = ({ match, history }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
-      <PurchasePassModal visible={showPurchaseVideoModal} video={video} closeModal={closePurchaseModal} />
-      <Row gutter={[8, 24]}>
+      <Row gutter={[8, 24]} className={classNames(styles.p50, styles.box)}>
+        <Col xs={24} className={styles.showcaseCardContainer}>
+          <VideoCard video={video} buyable={false} hoverable={false} />
+        </Col>
         <Col xs={24}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>
             <Col xs={24} className={styles.profileImageWrapper}>
@@ -188,49 +186,7 @@ const VideoDetails = ({ match, history }) => {
         </Col>
         <Col xs={24}>
           {video && (
-            <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-              <Col xs={24} className={styles.p20}>
-                <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                  <Row gutter={[8, 16]} align="center">
-                    <Col xs={24} md={20}>
-                      <Row gutter={8}>
-                        <Col xs={24}>
-                          <Title className={styles.blueText} level={3}>
-                            {' '}
-                            {video?.title}{' '}
-                          </Title>
-                        </Col>
-                        <Col xs={24}>
-                          <Space size={isMobileDevice ? 'small' : 'middle'}>
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {`Validity ${video?.validity} Hours`}{' '}
-                            </Text>
-                            <Divider type="vertical" />
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {video?.price === 0 ? 'Free video' : ` ${video?.price} ${video?.currency}`}
-                            </Text>
-                          </Space>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col xs={24} md={4}>
-                      <Button block type="primary" onClick={() => showPurchaseModal()}>
-                        Buy Video
-                      </Button>
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-
-              <Col xs={24} className={styles.showcaseCardContainer}>
-                <VideoCard
-                  video={video}
-                  buyable={false}
-                  // onCardClick={redirectToVideoPreview}
-                  // showPurchaseModal={showPurchaseModal}
-                />
-              </Col>
-
+            <Row className={styles.sessionListWrapper}>
               {video.sessions?.length > 0 && (
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
@@ -238,7 +194,7 @@ const VideoDetails = ({ match, history }) => {
                       <Text className={styles.ml20}> Related to these class(es) </Text>
                     </Col>
                     <Col xs={24}>
-                      <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={username} />
+                      <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={video.username} />
                     </Col>
                   </Row>
                 </Col>

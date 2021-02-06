@@ -1,0 +1,51 @@
+@import '../../styles/variables.scss';
+
+.videoCard {
+  .videoThumbnail {
+    object-fit: scale-down;
+  }
+
+  .videoDesc {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+
+  .flexColumn {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: flex-start;
+    justify-content: space-around;
+    height: 100%;
+
+    .flexVerticalRow {
+      padding: 8px;
+      display: block;
+      flex: 0 0 auto;
+      width: 100%;
+
+      &.flexGrow {
+        flex: 1 0 auto;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .videoCard {
+    .flexColumn {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: center;
+      justify-content: space-around;
+
+      .flexVerticalRow {
+        display: block;
+        flex: 0 0 50%;
+        width: auto;
+      }
+    }
+  }
+}

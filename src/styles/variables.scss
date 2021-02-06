@@ -81,6 +81,9 @@ $spacing: (
 .textAlignRight {
   text-align: right;
 }
+.blueText {
+  color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+}
 .headButton {
   margin-top: 10px;
   margin-left: 15px;
