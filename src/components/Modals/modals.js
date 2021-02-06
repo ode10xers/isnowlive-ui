@@ -134,3 +134,7 @@ export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
+
+export const showVideoPurchaseSuccessModal = (video) => {
+  showSuccessModal('Video Purchased', `You have purchased the video ${video.name}`);
+};

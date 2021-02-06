@@ -132,7 +132,7 @@ const PassDetails = ({ match, history }) => {
 
   const createOrder = async (userEmail) => {
     if (!pass) {
-      showErrorModal('Something went wrong', 'Invalid Class Pass ID');
+      showErrorModal('Something went wrong', 'Invalid Class Pass Selected');
       return;
     }
 

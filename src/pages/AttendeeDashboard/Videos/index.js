@@ -22,28 +22,10 @@ const Videos = () => {
     try {
       const { data } = await apis.videos.getAttendeeVideos();
 
-      setActiveVideos(data.active);
-      setExpiredVideos(data.expired);
-
-      // if (data) {
-      //   setVideos(
-      //     data.map((classPass, index) => ({
-      //       index,
-      //       key: classPass.id,
-      //       id: classPass.id,
-      //       name: classPass.name,
-      //       price: classPass.price,
-      //       limited: classPass.limited,
-      //       currency: classPass.currency,
-      //       validity: classPass.validity,
-      //       class_count: classPass.class_count,
-      //       is_published: classPass.is_published,
-      //       sessions: classPass.sessions,
-      //       subscribers: classPass.subscribers.map((subs) => ({ ...subs, currency: classPass.currency })),
-      //       color_code: classPass.color_code,
-      //     }))
-      //   );
-      // }
+      if (data) {
+        setActiveVideos(data.active);
+        setExpiredVideos(data.expired);
+      }
     } catch (error) {
       showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
     }
