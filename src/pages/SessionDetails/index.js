@@ -204,21 +204,9 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const initiatePaymentForOrder = async (orderDetails) => {
+  const initiatePaymentForOrder = async (payload) => {
     setIsLoading(true);
     try {
-      let payload = {
-        order_id: orderDetails.order_id,
-        order_type: selectedPass ? orderType.PASS : orderType.CLASS,
-      };
-
-      if (selectedPass) {
-        payload = {
-          ...payload,
-          inventory_id: parseInt(selectedInventory.inventory_id),
-        };
-      }
-
       const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
       if (isAPISuccess(status) && data) {
@@ -380,7 +368,10 @@ const SessionDetails = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          initiatePaymentForOrder({
+            order_id: data.order_id,
+            order_type: orderType.CLASS,
+          });
         } else {
           showBookingSuccessModal(userEmail, null, false, false, username);
           setIsLoading(false);
@@ -406,7 +397,11 @@ const SessionDetails = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder({ ...data, order_id: data.pass_order_id });
+          initiatePaymentForOrder({
+            order_id: data.pass_order_id,
+            order_type: orderType.PASS,
+            inventory_id: parseInt(selectedInventory.inventory_id),
+          });
         } else {
           // If user (for some reason) buys a free pass (if any exists)
           // we then immediately followUp the Booking Process
@@ -468,7 +463,10 @@ const SessionDetails = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          initiatePaymentForOrder({
+            order_id: data.video_order_id,
+            order_type: orderType.VIDEO,
+          });
         } else {
           setIsLoading(false);
           showVideoPurchaseSuccessModal(selectedVideo);

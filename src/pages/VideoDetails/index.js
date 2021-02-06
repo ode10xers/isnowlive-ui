@@ -9,7 +9,9 @@ import {
 } from '@ant-design/icons';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { loadStripe } from '@stripe/stripe-js';
 
+import config from 'config';
 import apis from 'apis';
 
 import Share from 'components/Share';
@@ -17,13 +19,16 @@ import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import PurchaseModal from 'components/PurchaseModal';
+import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType } from 'utils/helper';
 
 import styles from './style.module.scss';
+
+const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Title, Text } = Typography;
 
@@ -110,7 +115,58 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.video_id]);
 
-  const createOrder = () => console.log('Order Crreate');
+  const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
+    try {
+      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+        order_id: orderDetails.video_order_id,
+        order_type: orderType.VIDEO,
+      });
+
+      if (isAPISuccess(status) && data) {
+        const stripe = await stripePromise;
+
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.payment_gateway_session_id,
+        });
+
+        if (result.error) {
+          message.error('Cannot initiate payment at this time, please try again...');
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
+  };
+
+  const createOrder = async (userEmail) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        video_id: video.external_id,
+      };
+
+      const { status, data } = await apis.videos.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          setIsLoading(false);
+          showVideoPurchaseSuccessModal(video);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
+  };
 
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
