@@ -16,7 +16,7 @@ import Share from 'components/Share';
 import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
-import PurchasePassModal from 'components/PurchasePassModal';
+import PurchaseModal from 'components/PurchaseModal';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
@@ -112,7 +112,6 @@ const VideoDetails = ({ match, history }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
-      <PurchasePassModal visible={showPurchaseVideoModal} video={video} closeModal={closePurchaseModal} />
       <Row gutter={[8, 24]}>
         <Col xs={24}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>

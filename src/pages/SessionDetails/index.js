@@ -15,7 +15,7 @@ import HostDetails from 'components/HostDetails';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import VideoCard from 'components/VideoCard';
-import PurchasePassModal from 'components/PurchasePassModal';
+import PurchaseModal from 'components/PurchaseModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import { isMobileDevice } from 'utils/device';
@@ -548,7 +548,6 @@ const SessionDetails = ({ match, history }) => {
       </Row>
       {sessionVideos.length > 0 && (
         <>
-          <PurchasePassModal visible={showPurchaseVideoModal} video={selectedVideo} closeModal={closePurchaseModal} />
           <Row justify="space-between" className={styles.mt20}>
             <Col xs={24}>
               <div className={styles.box}>
