@@ -83,10 +83,9 @@ export default {
       http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
   },
   videos: {
-    //TODO: Adjust this earning API once it's done
-    getEarningsByVideoId: (videoId) => http.get(`/secure/creator/payments/earnings/passes/id/${videoId}`),
+    getEarningsByVideoId: (videoId) => http.get(`/secure/creator/payments/earnings/videos/id/${videoId}`),
     getCreatorVideosEarnings: (pageNo, perPage) =>
-      http.get(`/secure/creator/payments/earnings/passes?page_no=${pageNo}&per_page=${perPage}`),
+      http.get(`/secure/creator/payments/earnings/videos?page_no=${pageNo}&per_page=${perPage}`),
     getVideoById: (videoId) => http.get(`/passes/${videoId}`),
     // getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
     // getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),

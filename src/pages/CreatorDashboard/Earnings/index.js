@@ -60,6 +60,7 @@ const Earnings = () => {
   const getEarningData = useCallback(async () => {
     try {
       setIsLoading(true);
+      //TODO: Might want to separate them so that one failed call does not effect the other
       let [
         creatorInventoryEarningResponse,
         creatorVideoEarningResponse,
