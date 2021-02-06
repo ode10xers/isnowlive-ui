@@ -65,7 +65,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   uppy.use(Tus, {
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     headers: {
-      'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
+      // 'Access-Control-Allow-Origin': 'https://app.stage.passion.do',
       // 'Access-Control-Allow-Headers':
       //   'Access-Control-Allow-Origin, Upload-Offset, Location, Upload-Length, Tus-Version, Tus-Resumable, Tus-Max-Size, Tus-Extension, Upload-Metadata, Upload-Defer-Length, Upload-Concat, Location, Upload-Offset, Upload-Length',
     },
