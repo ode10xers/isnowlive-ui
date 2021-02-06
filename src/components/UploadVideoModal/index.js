@@ -58,6 +58,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
   let uppy = new Uppy({
     debug: true,
+    logger: Uppy.debugLogger,
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
