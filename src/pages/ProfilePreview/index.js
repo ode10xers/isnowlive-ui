@@ -139,45 +139,25 @@ const ProfilePreview = ({ username = null }) => {
   const getVideosDetails = useCallback(async () => {
     setIsVideosLoading(true);
     try {
-      //TODO: Implement API Here
+      let profileUsername = '';
 
-      setVideos([
-        {
-          title: 'Test Video 1',
-          description:
-            '\u003cp\u003e\u003cspan style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie diam id varius tristique. In felis nisi, lacinia ac urna vitae, pulvinar dapibus mauris. Integer consectetur ultricies arcu, nec elementum leo bibendum a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ultricies arcu ex, vulputate congue ante tempor ut. Phasellus ut risus eu justo egestas lobortis nec at lectus. Pellentesque at orci purus. Nam eleifend lectus ante, vel vulputate enim lobortis id. Morbi ut libero vitae risus porta interdum eu eget nulla. Nam porta efficitur magna, quis elementum elit viverra id. Donec sagittis dapibus felis eu imperdiet. Donec ut urna egestas, venenatis ex vitae, pretium diam. Aenean rutrum justo sit amet commodo scelerisque.\u003c/span\u003e\u003c/p\u003e\n',
-          validity: 24,
-          price: 10,
-          currency: 'SGD',
-          thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
-          external_id: '7a4a977f-4504-4ac6-b22e-be4571c23ce1',
-          is_published: true,
-          video_url: '',
-          video_uid: '',
-          duration: 0,
-          status: '',
-        },
-        {
-          title: 'Test Video 1',
-          description:
-            '\u003cp\u003e\u003cspan style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;"\u003eLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras molestie diam id varius tristique. In felis nisi, lacinia ac urna vitae, pulvinar dapibus mauris. Integer consectetur ultricies arcu, nec elementum leo bibendum a. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ultricies arcu ex, vulputate congue ante tempor ut. Phasellus ut risus eu justo egestas lobortis nec at lectus. Pellentesque at orci purus. Nam eleifend lectus ante, vel vulputate enim lobortis id. Morbi ut libero vitae risus porta interdum eu eget nulla. Nam porta efficitur magna, quis elementum elit viverra id. Donec sagittis dapibus felis eu imperdiet. Donec ut urna egestas, venenatis ex vitae, pretium diam. Aenean rutrum justo sit amet commodo scelerisque.\u003c/span\u003e\u003c/p\u003e\n',
-          validity: 24,
-          price: 10,
-          currency: 'SGD',
-          thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
-          external_id: '7a4a977f-4504-4ac6-b22e-be4571c23ce0',
-          is_published: true,
-          video_url: '',
-          video_uid: '',
-          duration: 0,
-          status: '',
-        },
-      ]);
+      if (username) {
+        profileUsername = username;
+      } else {
+        profileUsername = getLocalUserDetails().username;
+      }
+
+      const { data } = await apis.videos.getVideosByUsername(profileUsername);
+
+      if (data) {
+        setVideos(data);
+        setIsVideosLoading(false);
+      }
     } catch (error) {
-      message.error('Failed to load class pass details');
+      setIsVideosLoading(false);
+      message.error('Failed to load video details');
     }
-    setIsVideosLoading(false);
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
@@ -453,7 +433,7 @@ const ProfilePreview = ({ username = null }) => {
                 </Col>
               </Row>
             </Tabs.TabPane>
-            {passes.length && (
+            {passes.length > 0 && (
               <Tabs.TabPane
                 key="pass"
                 tab={
@@ -472,7 +452,7 @@ const ProfilePreview = ({ username = null }) => {
                 </Row>
               </Tabs.TabPane>
             )}
-            {videos.length && (
+            {videos.length > 0 && (
               <Tabs.TabPane
                 key="video"
                 tab={
