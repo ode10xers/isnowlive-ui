@@ -46,7 +46,7 @@ const Routes = {
     editProfile: '/profile/edit',
     livestream: '/livestream',
     videos: '/videos',
-    videoDetails: '/videos/:video_id',
+    videoDetails: '/videos/:video_id/:video_order_id',
   },
 };
 
