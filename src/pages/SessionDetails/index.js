@@ -557,7 +557,7 @@ const SessionDetails = ({ match, history }) => {
 
   const redirectToVideoPreview = (video) => {
     const baseUrl = generateUrlFromUsername(username || video.username || 'app');
-    window.open(`${baseUrl}/v/${video.id}`);
+    window.open(`${baseUrl}/v/${video.external_id}`);
   };
 
   const openPurchaseModal = (video) => {

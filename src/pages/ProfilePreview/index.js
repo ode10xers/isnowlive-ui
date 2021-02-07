@@ -11,6 +11,7 @@ import {
   ArrowLeftOutlined,
   EditOutlined,
   LinkedinOutlined,
+  PlayCircleOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
@@ -20,6 +21,7 @@ import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
 import ClassPasses from 'components/ClassPasses';
+import PublicVideoList from 'components/PublicVideoList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
@@ -58,8 +60,12 @@ const ProfilePreview = ({ username = null }) => {
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('session');
   const [isListLoading, setIsListLoading] = useState(false);
-  const [isPassesLoading, setIsPassesLoading] = useState(true);
+
   const [passes, setPasses] = useState([]);
+  const [isPassesLoading, setIsPassesLoading] = useState(true);
+
+  const [videos, setVideos] = useState([]);
+  const [isVideosLoading, setIsVideosLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -130,6 +136,29 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  const getVideosDetails = useCallback(async () => {
+    setIsVideosLoading(true);
+    try {
+      let profileUsername = '';
+
+      if (username) {
+        profileUsername = username;
+      } else {
+        profileUsername = getLocalUserDetails().username;
+      }
+
+      const { data } = await apis.videos.getVideosByUsername(profileUsername);
+
+      if (data) {
+        setVideos(data);
+        setIsVideosLoading(false);
+      }
+    } catch (error) {
+      setIsVideosLoading(false);
+      message.error('Failed to load video details');
+    }
+  }, [username]);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnDashboard(true);
@@ -137,19 +166,29 @@ const ProfilePreview = ({ username = null }) => {
     getProfileDetails();
     getSessionDetails('upcoming');
     getPassesDetails();
-  }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails]);
+    getVideosDetails();
+  }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails, getVideosDetails]);
 
   useEffect(() => {
     if (location.state) {
       const sectionToShow = location.state.section;
       let targetElement = document.getElementById('session');
 
+      //TODO: Add condition here and update NavBar as well
       if (sectionToShow === 'session') {
         setSelectedListTab(sectionToShow);
       } else if (sectionToShow === 'pass') {
         if (passes.length) {
           setSelectedListTab(sectionToShow);
           targetElement = document.getElementById('pass');
+        } else {
+          // Fallback to show sessions
+          setSelectedListTab('session');
+        }
+      } else if (sectionToShow === 'video') {
+        if (videos.length) {
+          setSelectedListTab(sectionToShow);
+          targetElement = document.getElementById('video');
         } else {
           // Fallback to show sessions
           setSelectedListTab('session');
@@ -167,7 +206,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, profile]);
+  }, [location.state, passes, videos, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -343,7 +382,6 @@ const ProfilePreview = ({ username = null }) => {
         </Row>
 
         {/* =====TAB SELECT===== */}
-
         <Loader loading={isListLoading} size="large">
           <Tabs
             size="large"
@@ -402,7 +440,7 @@ const ProfilePreview = ({ username = null }) => {
                 </Col>
               </Row>
             </Tabs.TabPane>
-            {passes.length && (
+            {passes.length > 0 && (
               <Tabs.TabPane
                 key="pass"
                 tab={
@@ -413,10 +451,28 @@ const ProfilePreview = ({ username = null }) => {
                 }
               >
                 <Row className={styles.mt20}>
-                  <Col span={24}></Col>
                   <Col span={24}>
                     <Loader loading={isPassesLoading} size="large" text="Loading class passes">
                       <ClassPasses passes={passes} username={username} />
+                    </Loader>
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+            )}
+            {videos.length > 0 && (
+              <Tabs.TabPane
+                key="video"
+                tab={
+                  <div className={styles.largeTabHeader} id="video">
+                    <PlayCircleOutlined />
+                    Videos
+                  </div>
+                }
+              >
+                <Row className={styles.mt20}>
+                  <Col span={24}>
+                    <Loader loading={isVideosLoading} size="large" text="Loading videos">
+                      <PublicVideoList videos={videos} username={username} />
                     </Loader>
                   </Col>
                 </Row>

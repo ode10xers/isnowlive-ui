@@ -1,0 +1,44 @@
+@import '../../styles/variables.scss';
+
+.cleanCard {
+
+  .imageWrapper {
+    position: relative;
+    height: 200px;
+
+    .thumbnailImage {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      height: 200px;
+        
+      img {
+        height: 100%;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+    }
+
+    .playIconWrapper {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+
+      .playIcon {
+        color: map-get($map: $colors, $key: 'White');
+      }
+    }
+  }
+
+  .textWrapper {
+    .titleWrapper {
+      height: 60px;
+    }
+
+    .buttonWrapper {
+      .detailBtn {
+        border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+  }
+}
