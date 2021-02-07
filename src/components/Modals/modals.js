@@ -135,6 +135,21 @@ export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app
   });
 };
 
-export const showVideoPurchaseSuccessModal = (video) => {
-  showSuccessModal('Video Purchased', `You have purchased the video ${video.name}`);
+export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainName) => {
+  Modal.success({
+    title: 'Video Purchase',
+    message: (
+      <>
+        <Paragraph>
+          You have purchased the video <Text strong> {video?.title} </Text>
+        </Paragraph>
+        <Paragraph>
+          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
+  });
 };
