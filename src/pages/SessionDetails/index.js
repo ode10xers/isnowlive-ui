@@ -325,6 +325,7 @@ const SessionDetails = ({ match, history }) => {
       };
 
       buyVideo(payload);
+      setSelectedVideo(null);
     } else if (selectedPass) {
       const usersPass = getUserPurchasedPass(false);
 
@@ -564,8 +565,11 @@ const SessionDetails = ({ match, history }) => {
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = () => {
-    setSelectedVideo(null);
+  const closePurchaseModal = (resetSelectedVideo = false) => {
+    if (resetSelectedVideo) {
+      setSelectedVideo(null);
+    }
+
     setShowPurchaseVideoModal(false);
   };
 

@@ -12,6 +12,8 @@ const { Title } = Typography;
 
 const noop = () => {};
 
+// onCardClick should take a video parameter, since it's usually used to
+// navigate to the specific video page
 const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noop, showPurchaseModal = noop }) => {
   return (
     <Card
@@ -19,13 +21,13 @@ const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noo
       hoverable={hoverable}
       bordered={false}
       footer={null}
+      onClick={() => onCardClick(video)}
       cover={
         <Image
           className={styles.videoThumbnail}
           src={video.thumbnail_url || 'error'}
           alt={video.title}
           fallback={DefaultImage()}
-          onClick={() => onCardClick(video)}
           preview={false}
         />
       }
@@ -57,7 +59,15 @@ const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noo
                 </Title>
               </div>
               <div className={styles.flexVerticalRow}>
-                <Button type="primary" size="large" block onClick={() => showPurchaseModal(video)}>
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showPurchaseModal(video);
+                  }}
+                >
                   Buy
                 </Button>
               </div>
