@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 
-import { Row, Col, Typography, Image, Modal, Card, message } from 'antd';
+import { Row, Col, Typography, Image, Button, message } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
 import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
 import apis from 'apis';
 
-import VideoCard from 'components/VideoCard';
+// import VideoCard from 'components/VideoCard';
 import DefaultImage from 'components/Icons/DefaultImage';
 import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType } from 'utils/helper';
+import { isAPISuccess, orderType, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 const PublicVideoList = ({ username = null, videos }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,10 +28,13 @@ const PublicVideoList = ({ username = null, videos }) => {
   const [showVideoDetailModal, setShowVideoDetailModal] = useState(false);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
 
+  console.log(showVideoDetailModal);
+
   const handleSelectVideo = (video) => {
     if (video) {
       setSelectedVideo(video);
-      setShowVideoDetailModal(true);
+      // setShowVideoDetailModal(true);
+      openPurchaseModal();
     }
   };
 
@@ -48,6 +52,7 @@ const PublicVideoList = ({ username = null, videos }) => {
 
         if (result.error) {
           message.error('Cannot initiate payment at this time, please try again...');
+          hideVideoDetailModal();
         }
       }
     } catch (error) {
@@ -72,8 +77,7 @@ const PublicVideoList = ({ username = null, videos }) => {
         } else {
           setIsLoading(false);
           showVideoPurchaseSuccessModal(selectedVideo);
-          setShowVideoDetailModal(false);
-          setSelectedVideo(null);
+          hideVideoDetailModal();
         }
       }
     } catch (error) {
@@ -98,10 +102,17 @@ const PublicVideoList = ({ username = null, videos }) => {
     setShowPurchaseVideoModal(false);
   };
 
+  const redirectToVideoDetails = (video) => {
+    if (video.external_id) {
+      const baseUrl = generateUrlFromUsername(username || video.username || 'app');
+      window.open(`${baseUrl}/v/${video.external_id}`);
+    }
+  };
+
   return (
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
-      <Modal
+      {/* <Modal
         visible={selectedVideo && showVideoDetailModal}
         onCancel={hideVideoDetailModal}
         centered={true}
@@ -109,63 +120,69 @@ const PublicVideoList = ({ username = null, videos }) => {
         width={720}
       >
         {selectedVideo && (
-          <Loader loading={isLoading} size="large" text="Processing...">
-            <div className={styles.mt20}>
-              <VideoCard buyable={true} hoverable={false} video={selectedVideo} showPurchaseModal={openPurchaseModal} />
-            </div>
-          </Loader>
+          <div className={styles.mt20}>
+            <VideoCard buyable={true} hoverable={false} video={selectedVideo} showPurchaseModal={openPurchaseModal} />
+          </div>
         )}
-      </Modal>
-      <Row justify="start" gutter={[20, 20]}>
-        {videos.map((video) => (
-          <Col xs={24} md={12} xl={8}>
-            <Card
-              hoverable={true}
-              bordered={false}
-              key={video.video_id || video.external_id}
-              className={styles.cleanCard}
-              onClick={() => handleSelectVideo(video)}
-              actions={null}
-              bodyStyle={{ padding: '10px 20px' }}
-              cover={
-                <div className={styles.imageWrapper}>
-                  <div className={styles.thumbnailImage}>
-                    <Image
-                      src={video.thumbnail_url || 'error'}
-                      alt={video.title}
-                      fallback={DefaultImage()}
-                      preview={false}
-                    />
-                  </div>
-                  <div className={styles.playIconWrapper}>
-                    <PlayCircleOutlined className={styles.playIcon} />
-                  </div>
-                </div>
-              }
-            >
-              <Row gutter={[8, 8]} justify="center">
-                <Col span={24} className={styles.textWrapper}>
-                  <Row gutter={8} justify="start">
-                    <Col flex="1 0 auto">
-                      <Title className={styles.textAlignLeft} level={5}>
-                        {video.title}
-                      </Title>
-                      <Text className={styles.blueText} strong>
-                        Validity: {video.validity || 0} hours
-                      </Text>
-                    </Col>
-                    <Col flex="0 0 auto">
-                      <Text>
-                        {video.price} {video.currency.toUpperCase()}
-                      </Text>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      </Modal> */}
+      <Loader loading={isLoading} size="large" text="Processing...">
+        <Row justify="start" gutter={[20, 20]}>
+          {videos.map((video) => (
+            <Col xs={24} md={12} xl={8}>
+              <div
+                key={video.video_id || video.external_id}
+                className={styles.cleanCard}
+                // onClick={() => handleSelectVideo(video)}
+              >
+                <Row gutter={[8, 8]} justify="center">
+                  <Col span={24} className={styles.imageWrapper}>
+                    <div className={styles.thumbnailImage}>
+                      <Image
+                        src={video.thumbnail_url || 'error'}
+                        alt={video.title}
+                        fallback={DefaultImage()}
+                        preview={false}
+                        height={200}
+                      />
+                    </div>
+                    <div className={styles.playIconWrapper}>
+                      <PlayCircleOutlined className={styles.playIcon} />
+                    </div>
+                  </Col>
+                  <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
+                    <Row gutter={8} justify="start">
+                      <Col span={24} className={styles.titleWrapper}>
+                        <Title className={styles.textAlignLeft} level={5}>
+                          {video.title}
+                        </Title>
+                      </Col>
+                      <Col span={24} className={styles.buttonWrapper}>
+                        <Row gutter={16} justify="space-around">
+                          <Col xs={12}>
+                            <Button
+                              className={styles.detailBtn}
+                              block
+                              type="link"
+                              onClick={() => redirectToVideoDetails(video)}
+                            >
+                              Details
+                            </Button>
+                          </Col>
+                          <Col xs={12}>
+                            <Button block type="primary" onClick={() => handleSelectVideo(video)}>
+                              Buy
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+          ))}
+        </Row>
+      </Loader>
     </div>
   );
 };

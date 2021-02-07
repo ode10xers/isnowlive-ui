@@ -269,11 +269,11 @@ const Videos = () => {
           <Col xs={24} md={6}>
             {expandedRowKeys.includes(record.external_id) ? (
               <Button type="link" onClick={() => collapseRow(record.external_id)}>
-                {`${record?.subscribers?.length || 0} Buyers `} <UpOutlined />
+                {`${record?.buyers?.length || 0} Buyers `} <UpOutlined />
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(record.external_id)}>
-                {`${record?.subscribers?.length || 0} Buyers`} <DownOutlined />
+                {`${record?.buyers?.length || 0} Buyers`} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -309,7 +309,7 @@ const Videos = () => {
       <div className={styles.mb20}>
         <Table
           columns={subscriberColumns}
-          data={record.sales}
+          data={record.buyers || []}
           loading={isLoading}
           rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
         />

@@ -382,7 +382,6 @@ const ProfilePreview = ({ username = null }) => {
         </Row>
 
         {/* =====TAB SELECT===== */}
-
         <Loader loading={isListLoading} size="large">
           <Tabs
             size="large"
@@ -473,7 +472,7 @@ const ProfilePreview = ({ username = null }) => {
                 <Row className={styles.mt20}>
                   <Col span={24}>
                     <Loader loading={isVideosLoading} size="large" text="Loading videos">
-                      <PublicVideoList videos={videos} />
+                      <PublicVideoList videos={videos} username={username} />
                     </Loader>
                   </Col>
                 </Row>
