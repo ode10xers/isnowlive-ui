@@ -17,9 +17,9 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
-import { generateUrlFromUsername } from 'utils/helper';
 
 const {
   formatDate: { toLongDateWithDay },

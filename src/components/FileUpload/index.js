@@ -17,7 +17,7 @@ const FileUpload = ({ name, value, onChange, listType, label }) => {
   };
 
   return (
-    <Upload name={name} action={handleAction} url={value} listType={listType}>
+    <Upload name={name} action={handleAction} url={value} listType={listType} fileList={[]}>
       <Button icon={<UploadOutlined />}>{label}</Button>
     </Upload>
   );

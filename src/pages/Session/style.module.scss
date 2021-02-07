@@ -1,5 +1,10 @@
 @import '../../styles/variables.scss';
 
+.filenameButton {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+  font-weight: bold !important;
+}
+
 .imageWrapper {
   position: relative;
   height: 315px;

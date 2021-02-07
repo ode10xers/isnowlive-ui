@@ -29,7 +29,7 @@ const SessionInfo = ({ session }) => {
       {session?.document_url && isValidFile(session?.document_url) && (
         <Col xs={8} md={8}>
           <Text className={styles.text} type="secondary">
-            {!isMobileDevice && 'Session '}Prerequisite
+            {!isMobileDevice && 'Session '}Pre-read file
           </Text>
           <Text className={styles.subText}>
             <Button
@@ -39,7 +39,7 @@ const SessionInfo = ({ session }) => {
               size="middle"
               onClick={() => window.open(session?.document_url)}
             >
-              Download
+              {session?.document_url.split('_').slice(-1)[0] || 'Download'}
             </Button>
           </Text>
         </Col>

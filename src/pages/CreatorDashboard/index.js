@@ -13,6 +13,7 @@ import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
 import SessionEarnings from 'pages/CreatorDashboard/SessionEarnings';
 import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
 import PassEarnings from 'pages/CreatorDashboard/PassEarnings';
+import VideoEarnings from 'pages/CreatorDashboard/VideoEarnings';
 import Videos from 'pages/CreatorDashboard/Videos';
 
 const CreatorDashboard = ({ match }) => {
@@ -29,6 +30,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.paymentAccount} component={PaymentAccount} />
       <Route exact path={match.url + Routes.creatorDashboard.sessionEarnings} component={SessionEarnings} />
       <Route exact path={match.url + Routes.creatorDashboard.passEarnings} component={PassEarnings} />
+      <Route exact path={match.url + Routes.creatorDashboard.videoEarnings} component={VideoEarnings} />
       <Route exact path={match.url + Routes.creatorDashboard.passes} component={ClassPassList} />
       <Route exact path={match.url + Routes.creatorDashboard.videos} component={Videos} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />

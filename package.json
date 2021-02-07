@@ -4,7 +4,11 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.2.2",
+    "@cloudflare/stream-react": "^0.2.0",
     "@stripe/stripe-js": "^1.11.0",
+    "@uppy/core": "^1.16.0",
+    "@uppy/react": "^1.11.2",
+    "@uppy/tus": "^1.8.4",
     "antd": "^4.9.4",
     "antd-img-crop": "^3.12.0",
     "axios": "^0.21.1",
@@ -31,8 +35,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-select-country-list": "^2.2.1",
-    "react-share": "^4.3.1",
-    "tus-js-client": "^2.2.0"
+    "react-share": "^4.3.1"
   },
   "scripts": {
     "start": "react-scripts start",
