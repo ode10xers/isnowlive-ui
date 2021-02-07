@@ -138,7 +138,7 @@ export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app
 export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainName) => {
   Modal.success({
     title: 'Video Purchase',
-    message: (
+    content: (
       <>
         <Paragraph>
           You have purchased the video <Text strong> {video?.title} </Text>
