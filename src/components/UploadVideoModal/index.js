@@ -73,7 +73,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   });
 
   uppy.current.on('complete', (result) => {
-    if (result.successful) {
+    if (result.successful.length) {
       showSuccessModal('Video Published');
     } else {
       showErrorModal(`Failed to upload video`);

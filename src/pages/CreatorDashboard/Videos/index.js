@@ -1,22 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image } from 'antd';
-import { EditOutlined, CloudUploadOutlined, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
+import { EditOutlined, CloudUploadOutlined, DownOutlined, UpOutlined, CopyOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 const {
   formatDate: { toDateAndTime },
 } = dateUtil;
@@ -115,6 +117,49 @@ const Videos = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
+  const copyPageLinkToClipboard = (videoId) => {
+    const username = getLocalUserDetails().username;
+    const pageLink = `${generateUrlFromUsername(username)}/v/${videoId}`;
+
+    // Fallback method if navigator.clipboard is not supported
+    if (!navigator.clipboard) {
+      var textArea = document.createElement('textarea');
+      textArea.value = pageLink;
+
+      // Avoid scrolling to bottom
+      textArea.style.top = '0';
+      textArea.style.left = '0';
+      textArea.style.position = 'fixed';
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      try {
+        var successful = document.execCommand('copy');
+
+        if (successful) {
+          message.success('Page link copied to clipboard!');
+        } else {
+          message.error('Failed to copy link to clipboard');
+        }
+      } catch (err) {
+        message.error('Failed to copy link to clipboard');
+      }
+
+      document.body.removeChild(textArea);
+    } else {
+      navigator.clipboard.writeText(pageLink).then(
+        function () {
+          message.success('Page link copied to clipboard!');
+        },
+        function (err) {
+          message.error('Failed to copy link to clipboard');
+        }
+      );
+    }
+  };
+
   const videosColumns = [
     {
       title: '',
@@ -147,12 +192,7 @@ const Videos = () => {
       dataIndex: 'title',
       key: 'title',
       width: '35%',
-      render: (text, record) => (
-        <>
-          {record.is_published ? null : <EyeInvisibleOutlined />}
-          <Text> {record.title} </Text>
-        </>
-      ),
+      render: (text, record) => <Text> {record.title} </Text>,
     },
     {
       title: 'Validity',
@@ -193,6 +233,16 @@ const Videos = () => {
                 disabled={record.video_uid.length ? true : false}
                 onClick={() => showUploadVideoModal(record, 2)}
                 icon={<CloudUploadOutlined />}
+              />
+            </Tooltip>
+          </Col>
+          <Col xs={24} md={4}>
+            <Tooltip title="Copy Session Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(record.external_id)}
+                icon={<CopyOutlined />}
               />
             </Tooltip>
           </Col>
@@ -320,6 +370,14 @@ const Videos = () => {
                 icon={<CloudUploadOutlined />}
               />
             </Tooltip>,
+            <Tooltip title="Copy Session Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                icon={<CopyOutlined />}
+              />
+            </Tooltip>,
             video.is_published ? (
               <Tooltip title="Hide Session">
                 <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
@@ -382,25 +440,62 @@ const Videos = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading Videos">
-              <Row gutter={[8, 16]}>{videos.map(renderVideoItem)}</Row>
-            </Loader>
-          ) : (
-            <Table
-              sticky={true}
-              columns={videosColumns}
-              data={videos}
-              loading={isLoading}
-              rowKey={(record) => record.external_id}
-              expandable={{
-                expandedRowRender: (record) => renderSubsciberList(record),
-                expandRowByClick: true,
-                expandIconColumnIndex: -1,
-                expandedRowKeys: expandedRowKeys,
-              }}
-            />
-          )}
+          <Collapse>
+            <Panel header={<Title level={5}> Published </Title>} key="Active">
+              {videos.length ? (
+                <>
+                  {isMobileDevice ? (
+                    <Loader loading={isLoading} size="large" text="Loading Videos">
+                      <Row gutter={[8, 16]}>{videos?.filter((video) => video.is_published)?.map(renderVideoItem)}</Row>
+                    </Loader>
+                  ) : (
+                    <Table
+                      sticky={true}
+                      columns={videosColumns}
+                      data={videos?.filter((video) => video.is_published)}
+                      loading={isLoading}
+                      rowKey={(record) => record.external_id}
+                      expandable={{
+                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandRowByClick: true,
+                        expandIconColumnIndex: -1,
+                        expandedRowKeys: expandedRowKeys,
+                      }}
+                    />
+                  )}
+                </>
+              ) : (
+                <Empty description={'No Pubished Videos'} />
+              )}
+            </Panel>
+            <Panel header={<Title level={5}> Unpublised </Title>} key="Expired">
+              {videos.length ? (
+                <>
+                  {isMobileDevice ? (
+                    <Loader loading={isLoading} size="large" text="Loading Videos">
+                      <Row gutter={[8, 16]}>{videos?.filter((video) => !video.is_published)?.map(renderVideoItem)}</Row>
+                    </Loader>
+                  ) : (
+                    <Table
+                      sticky={true}
+                      columns={videosColumns}
+                      data={videos?.filter((video) => !video.is_published)}
+                      loading={isLoading}
+                      rowKey={(record) => record.external_id}
+                      expandable={{
+                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandRowByClick: true,
+                        expandIconColumnIndex: -1,
+                        expandedRowKeys: expandedRowKeys,
+                      }}
+                    />
+                  )}
+                </>
+              ) : (
+                <Empty description={'No UnPublished Videos'} />
+              )}
+            </Panel>
+          </Collapse>
         </Col>
       </Row>
       {/* <VideoPlayer /> */}
