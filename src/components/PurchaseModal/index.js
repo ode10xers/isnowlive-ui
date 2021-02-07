@@ -53,6 +53,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
 
   useEffect(() => {
     if (visible) {
+      document.body.style.overflow = 'hidden';
       const user = getLocalUserDetails();
       if (user) {
         if (!currentUser) {
@@ -63,6 +64,8 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
         closeModal();
         createOrder(user.email);
       }
+    } else {
+      document.body.style.overflow = 'auto';
     }
     //eslint-disable-next-line
   }, [form, currentUser, visible]);
