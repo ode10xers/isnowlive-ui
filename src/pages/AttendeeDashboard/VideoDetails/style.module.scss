@@ -114,3 +114,15 @@
     right: 60px;
   }
 }
+.videoWrapper {
+  position: relative;
+  cursor: pointer;
+}
+.playIcon {
+  position: absolute;
+  top: 45%;
+  left: 45%;
+  color: map-get($colors, $key: 'White') !important;
+  font-size: 40px;
+  z-index: 9999;
+}
