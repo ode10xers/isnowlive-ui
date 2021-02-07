@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
+import { useHistory } from 'react-router-dom';
+import moment from 'moment';
 import { Row, Col, Typography, Empty, Image, Collapse } from 'antd';
-import apis from 'apis';
 
+import apis from 'apis';
+import Routes from 'routes';
 import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
-import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -13,6 +14,7 @@ const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 const Videos = () => {
+  const history = useHistory();
   const [activeVideos, setActiveVideos] = useState([]);
   const [expiredVideos, setExpiredVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,19 +39,24 @@ const Videos = () => {
     //eslint-disable-next-line
   }, []);
 
-  const redirectToVideoPreview = (video) => {
-    if (video.username) {
-      const baseUrl = generateUrlFromUsername(video.username || 'app');
-      window.open(`${baseUrl}/v/${video.id}`);
-    }
-  };
-
   const renderVideoItem = (video) => {
     return (
-      <Col xs={24} md={12} lg={8} className={styles.videoItem} onClick={() => redirectToVideoPreview(video)}>
+      <Col
+        xs={24}
+        md={12}
+        lg={8}
+        className={styles.videoItem}
+        onClick={() =>
+          history.push(
+            Routes.attendeeDashboard.rootPath +
+              Routes.attendeeDashboard.videos +
+              `/${video.video_id}/${video.video_order_id}`
+          )
+        }
+      >
         <Row gutter={[8, 8]}>
           <Col xs={24} md={11}>
-            <Image height={80} className={styles.coverImage} src={video.cover_image} preview={false} />
+            <Image height={80} className={styles.coverImage} src={video.thumbnail_url} preview={false} />
           </Col>
           <Col xs={24} md={1}></Col>
           <Col xs={24} md={12}>
@@ -67,7 +74,7 @@ const Videos = () => {
                 )}
               </Col>
               <Col xs={24}>
-                <Text type="secondary">Validity {video.validity} Hrs</Text>
+                <Text type="secondary">Expire {moment(video.expiry).fromNow()}</Text>
               </Col>
             </Row>
           </Col>

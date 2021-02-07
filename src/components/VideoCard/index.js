@@ -12,9 +12,14 @@ const { Title } = Typography;
 
 const noop = () => {};
 
-// onCardClick should take a video parameter, since it's usually used to
-// navigate to the specific video page
-const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noop, showPurchaseModal = noop }) => {
+const VideoCard = ({
+  cover = null,
+  video,
+  buyable = false,
+  hoverable = true,
+  onCardClick = noop,
+  showPurchaseModal = noop,
+}) => {
   return (
     <Card
       className={styles.videoCard}
@@ -23,13 +28,14 @@ const VideoCard = ({ video, buyable = false, hoverable = true, onCardClick = noo
       footer={null}
       onClick={() => onCardClick(video)}
       cover={
-        <Image
-          className={styles.videoThumbnail}
-          src={video.thumbnail_url || 'error'}
-          alt={video.title}
-          fallback={DefaultImage()}
-          preview={false}
-        />
+        cover || (
+          <Image
+            className={styles.videoThumbnail}
+            src={video.thumbnail_url || 'error'}
+            alt={video.title}
+            fallback={DefaultImage()}
+          />
+        )
       }
     >
       <Row gutter={[16, 16]} justify="space-between">

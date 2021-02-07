@@ -498,6 +498,7 @@ const Videos = () => {
           </Collapse>
         </Col>
       </Row>
+      {/* <VideoPlayer /> */}
     </div>
   );
 };
