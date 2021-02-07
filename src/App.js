@@ -115,10 +115,10 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.passDetails} component={PassDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />

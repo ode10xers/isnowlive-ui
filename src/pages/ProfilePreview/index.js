@@ -185,6 +185,14 @@ const ProfilePreview = ({ username = null }) => {
           // Fallback to show sessions
           setSelectedListTab('session');
         }
+      } else if (sectionToShow === 'video') {
+        if (videos.length) {
+          setSelectedListTab(sectionToShow);
+          targetElement = document.getElementById('video');
+        } else {
+          // Fallback to show sessions
+          setSelectedListTab('session');
+        }
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
         setSelectedListTab('session');
@@ -198,7 +206,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, profile]);
+  }, [location.state, passes, videos, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);

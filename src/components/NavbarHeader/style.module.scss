@@ -1,16 +1,15 @@
 @import '../../styles/variables.scss';
 
 .domainNameWrapper {
-  flex: 1 1 auto;
+  flex: 1 1 30%;
 
   &.dashboard {
-    flex: 0 1 auto;
-    width: 240px;
+    flex: 0 1 240px;
   }
 }
 
 .modeSelectWrapper {
-  flex: 1 1 auto;
+  flex: 1 1 190px;
 }
 
 .creatorSiteName {
@@ -26,7 +25,20 @@
 }
 
 .inlineMenu {
-  flex: 0 0 auto;
+  flex: 0 0 70%;
+
+  &.dashboard {
+    flex: 1 1 300px;
+  }
+}
+
+.menuContainer {
+  margin-left: auto;
+}
+
+.overflowMenuIcon {
+  text-align: right;
+  margin-left: 20px;
 }
 
 .navItem {

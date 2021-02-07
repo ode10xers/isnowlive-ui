@@ -28,6 +28,7 @@ const NavbarHeader = ({ removePadding = false }) => {
   const [authModalState, setAuthModalState] = useState('signIn');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
+  const [shouldShowVideoLink, setShouldShowVideoLink] = useState(false);
 
   const {
     state: { userDetails },
@@ -43,6 +44,18 @@ const NavbarHeader = ({ removePadding = false }) => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to fetch pass for username');
+    }
+  };
+
+  const checkShouldShowVideoLink = async (username) => {
+    try {
+      const { data } = await apis.videos.getVideosByUsername(username);
+
+      if (data) {
+        setShouldShowVideoLink(data.length > 0);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to fetch videos for username');
     }
   };
 
@@ -132,6 +145,7 @@ const NavbarHeader = ({ removePadding = false }) => {
 
     if (username && !reservedDomainName.includes(username)) {
       checkShouldShowPassLink(username);
+      checkShouldShowVideoLink(username);
     }
   }, [username]);
 
@@ -182,8 +196,12 @@ const NavbarHeader = ({ removePadding = false }) => {
                 </span>
               </Col>
             )}
-            <Col className={styles.inlineMenu}>
-              <Menu mode="horizontal" overflowedIndicator={<MenuOutlined size={50} />} className={styles.menuContainer}>
+            <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
+              <Menu
+                mode="horizontal"
+                overflowedIndicator={<MenuOutlined className={styles.overflowMenuIcon} size={50} />}
+                className={styles.menuContainer}
+              >
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
                   Site Home
                 </Menu.Item>
@@ -201,6 +219,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                     onClick={() => redirectToCreatorProfile('pass')}
                   >
                     Passes
+                  </Menu.Item>
+                )}
+                {shouldShowVideoLink && (
+                  <Menu.Item
+                    key="Video"
+                    className={siteLinkActive('video') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('video')}
+                  >
+                    Videos
                   </Menu.Item>
                 )}
                 {/* <Menu.Item key="Videos" onClick={() => redirectToCreatorProfile('video')}> Videos </Menu.Item> */}
@@ -322,6 +349,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                           onClick={() => redirectToCreatorProfile('pass')}
                         >
                           <span className={styles.menuLink}>Passes</span>
+                        </li>
+                      )}
+                      {shouldShowVideoLink && (
+                        <li
+                          key="Creator Videos"
+                          className={siteLinkActive('video') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('video')}
+                        >
+                          <span className={styles.menuLink}>Videos</span>
                         </li>
                       )}
                       {/* <li key="Creator Videos">
