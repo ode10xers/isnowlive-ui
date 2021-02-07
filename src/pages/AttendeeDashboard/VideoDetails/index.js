@@ -120,13 +120,15 @@ const VideoDetails = ({ match }) => {
               ) : (
                 <div className={styles.videoWrapper} onClick={() => playVideo()}>
                   <PlayCircleOutlined className={styles.playIcon} />
-                  <Image
-                    preview={false}
-                    className={styles.videoThumbnail}
-                    src={video.thumbnail_url || 'error'}
-                    alt={video.title}
-                    fallback={DefaultImage()}
-                  />
+                  <div className={styles.imageOverlay}>
+                    <Image
+                      preview={false}
+                      className={styles.videoThumbnail}
+                      src={video.thumbnail_url || 'error'}
+                      alt={video.title}
+                      fallback={DefaultImage()}
+                    />
+                  </div>
                 </div>
               )
             }
