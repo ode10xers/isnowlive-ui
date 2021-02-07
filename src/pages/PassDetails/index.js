@@ -9,31 +9,35 @@ import {
 } from '@ant-design/icons';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { loadStripe } from '@stripe/stripe-js';
 
+import config from 'config';
 import apis from 'apis';
 
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
-import PurchasePassModal from 'components/PurchasePassModal';
+import PurchaseModal from 'components/PurchaseModal';
+
+import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Title, Text } = Typography;
+const stripePromise = loadStripe(config.stripe.secretKey);
 
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
+const { Title, Text } = Typography;
 
 const PassDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
-  const [pass, setPass] = useState([]);
-  const [showPurchasePassModal, setShowPurchasePassModal] = useState(false);
+  const [pass, setPass] = useState(null);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   const username = window.location.hostname.split('.')[0];
 
@@ -51,12 +55,12 @@ const PassDetails = ({ match, history }) => {
     }
   }, [username]);
 
-  const showPurchaseModal = () => {
-    setShowPurchasePassModal(true);
+  const openPurchaseModal = () => {
+    setShowPurchaseModal(true);
   };
 
   const closePurchaseModal = () => {
-    setShowPurchasePassModal(false);
+    setShowPurchaseModal(false);
   };
 
   const getPassDetails = useCallback(
@@ -98,9 +102,66 @@ const PassDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.pass_id]);
 
+  const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
+    try {
+      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+        order_id: orderDetails.pass_order_id,
+        order_type: 'PASS_ORDER',
+      });
+
+      if (isAPISuccess(status) && data) {
+        const stripe = await stripePromise;
+
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.payment_gateway_session_id,
+        });
+
+        if (result.error) {
+          message.error('Cannot initiate payment at this time, please try again...');
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
+  };
+
+  const createOrder = async (userEmail) => {
+    if (!pass) {
+      showErrorModal('Something went wrong', 'Invalid Class Pass Selected');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.passes.createOrderForUser({
+        pass_id: pass.id,
+        price: pass.price,
+        currency: pass.currency,
+      });
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          setIsLoading(false);
+          showBookingSuccessModal(userEmail, pass, false, false, username);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading pass details">
-      <PurchasePassModal visible={showPurchasePassModal} pass={pass} closeModal={closePurchaseModal} />
+      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
       <Row gutter={[8, 24]}>
         <Col xs={24}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>
@@ -209,7 +270,7 @@ const PassDetails = ({ match, history }) => {
                       </Row>
                     </Col>
                     <Col xs={24} md={4}>
-                      <Button block type="primary" onClick={() => showPurchaseModal()}>
+                      <Button block type="primary" onClick={() => openPurchaseModal()}>
                         Buy Pass
                       </Button>
                     </Col>

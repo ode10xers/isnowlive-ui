@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  // TeamOutlined,
-  // UserOutlined,
   TagsOutlined,
   VideoCameraOutlined,
   ToolOutlined,
@@ -51,13 +49,6 @@ export const creatorMenuItems = [
       },
     ],
   },
-  // {
-  //   order: 2,
-  //   key: 'attendees',
-  //   title: 'Attendees',
-  //   mixPanelTag: creator.click.dashboard.attendeeNav,
-  //   icon: <TeamOutlined />,
-  // },
   {
     order: 3,
     key: 'passes',
@@ -98,13 +89,6 @@ export const creatorMenuItems = [
     mixPanelTag: creator.click.dashboard.paymentNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
-  // {
-  //   order: 7,
-  //   key: 'account',
-  //   title: 'Account',
-  //   mixPanelTag: creator.click.dashboard.accountNav,
-  //   icon: <UserOutlined />,
-  // },
 ];
 
 export const attendeeMenuItems = [
@@ -146,11 +130,4 @@ export const attendeeMenuItems = [
     mixPanelTag: attendee.click.dashboard.videos,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos,
   },
-  // {
-  //   order: 7,
-  //   key: 'account',
-  //   title: 'Account',
-  //   mixPanelTag: attendee.click.dashboard.accountNav,
-  //   icon: <UserOutlined />,
-  // },
 ];

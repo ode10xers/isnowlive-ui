@@ -30,18 +30,6 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
         <Text className={styles.textAlignLeft}>{record?.booking_time && toLongDateWithDay(record?.booking_time)}</Text>
       ),
     },
-    // {
-    //   title: 'Total Fee Paid',
-    //   dataIndex: 'total_price',
-    //   key: 'total_price',
-    //   width: '12%',
-    //   render: (text, record, index) =>
-    //     record?.total_price && (
-    //       <Text className={styles.textAlignLeft}>
-    //         {currency} {record?.total_price}
-    //       </Text>
-    //     ),
-    // },
     {
       title: 'Net Price',
       dataIndex: 'net_price',
@@ -56,18 +44,6 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
           </Text>
         ),
     },
-    // {
-    //   title: 'Platform Fees',
-    //   dataIndex: 'platform_fees',
-    //   key: 'platform_fees',
-    //   width: '12%',
-    //   render: (text, record, index) =>
-    //     record?.platform_fees && (
-    //       <Text className={styles.textAlignLeft}>
-    //         {currency} {record?.platform_fees}
-    //       </Text>
-    //     ),
-    // },
     {
       title: 'Status',
       dataIndex: 'status',

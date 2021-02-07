@@ -126,26 +126,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
             </List.Item>
           )}
         />
-        // <Popover
-        //   content={
-        //     <List
-        //       size="small"
-        //       bordered
-        //       dataSource={slotsForDate}
-        //       renderItem={(item) => (
-        //         <List.Item className={styles.slot}>
-        //           {toLocaleTime(item['start_time'])}
-        //           {' - '} {toLocaleTime(item['end_time'])}
-        //         </List.Item>
-        //       )}
-        //     />
-        //   }
-        //   title="Schedules"
-        // >
-        //   <Badge className={styles.badgeLg} size="small" count={slotsForDate?.length} text="Schedules">
-        //     <CarryOutOutlined />
-        //   </Badge>
-        // </Popover>
       );
     } else if (slotsForDate?.length && isMobileDevice) {
       return <Badge className={styles.badge} size="small" count={slotsForDate?.length}></Badge>;

@@ -9,31 +9,34 @@ import {
 } from '@ant-design/icons';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { loadStripe } from '@stripe/stripe-js';
 
+import config from 'config';
 import apis from 'apis';
 
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
-import PurchasePassModal from 'components/PurchasePassModal';
+import PurchaseModal from 'components/PurchaseModal';
+import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Title, Text } = Typography;
+const stripePromise = loadStripe(config.stripe.secretKey);
 
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
+const { Title, Text } = Typography;
 
 const VideoDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
-  const [video, setVideo] = useState([]);
+  const [video, setVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
 
   const username = window.location.hostname.split('.')[0];
@@ -52,7 +55,7 @@ const VideoDetails = ({ match, history }) => {
     }
   }, [username]);
 
-  const showPurchaseModal = () => {
+  const openPurchaseModal = () => {
     setShowPurchaseVideoModal(true);
   };
 
@@ -78,7 +81,6 @@ const VideoDetails = ({ match, history }) => {
             validity: 24,
             username: 'sanketkarve',
             published: false,
-            // ...data,
             sessions:
               data.sessions.map((session) => ({
                 ...session,
@@ -110,9 +112,61 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.video_id]);
 
+  const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
+    try {
+      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+        order_id: orderDetails.video_order_id,
+        order_type: orderType.VIDEO,
+      });
+
+      if (isAPISuccess(status) && data) {
+        const stripe = await stripePromise;
+
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.payment_gateway_session_id,
+        });
+
+        if (result.error) {
+          message.error('Cannot initiate payment at this time, please try again...');
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
+  };
+
+  const createOrder = async (userEmail) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        video_id: video.external_id,
+      };
+
+      const { status, data } = await apis.videos.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          setIsLoading(false);
+          showVideoPurchaseSuccessModal(video);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
-      <PurchasePassModal visible={showPurchaseVideoModal} video={video} closeModal={closePurchaseModal} />
       <Row gutter={[8, 24]}>
         <Col xs={24}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>
@@ -188,62 +242,63 @@ const VideoDetails = ({ match, history }) => {
         </Col>
         <Col xs={24}>
           {video && (
-            <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-              <Col xs={24} className={styles.p20}>
-                <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                  <Row gutter={[8, 16]} align="center">
-                    <Col xs={24} md={20}>
-                      <Row gutter={8}>
-                        <Col xs={24}>
-                          <Title className={styles.blueText} level={3}>
-                            {' '}
-                            {video?.title}{' '}
-                          </Title>
-                        </Col>
-                        <Col xs={24}>
-                          <Space size={isMobileDevice ? 'small' : 'middle'}>
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {`Validity ${video?.validity} Hours`}{' '}
-                            </Text>
-                            <Divider type="vertical" />
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {video?.price === 0 ? 'Free video' : ` ${video?.price} ${video?.currency}`}
-                            </Text>
-                          </Space>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col xs={24} md={4}>
-                      <Button block type="primary" onClick={() => showPurchaseModal()}>
-                        Buy Video
-                      </Button>
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-
-              <Col xs={24} className={styles.showcaseCardContainer}>
-                <VideoCard
-                  video={video}
-                  buyable={false}
-                  // onCardClick={redirectToVideoPreview}
-                  // showPurchaseModal={showPurchaseModal}
-                />
-              </Col>
-
-              {video.sessions?.length > 0 && (
-                <Col xs={24}>
-                  <Row gutter={[8, 8]}>
-                    <Col xs={24}>
-                      <Text className={styles.ml20}> Related to these class(es) </Text>
-                    </Col>
-                    <Col xs={24}>
-                      <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={username} />
-                    </Col>
-                  </Row>
+            <>
+              <PurchaseModal
+                visible={showPurchaseVideoModal}
+                closeModal={closePurchaseModal}
+                createOrder={createOrder}
+              />
+              <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+                <Col xs={24} className={styles.p20}>
+                  <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                    <Row gutter={[8, 16]} align="center">
+                      <Col xs={24} md={20}>
+                        <Row gutter={8}>
+                          <Col xs={24}>
+                            <Title className={styles.blueText} level={3}>
+                              {video?.title}
+                            </Title>
+                          </Col>
+                          <Col xs={24}>
+                            <Space size={isMobileDevice ? 'small' : 'middle'}>
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {`Validity ${video?.validity} Hours`}
+                              </Text>
+                              <Divider type="vertical" />
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {video?.price === 0 ? 'Free video' : ` ${video?.price} ${video?.currency}`}
+                              </Text>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col xs={24} md={4}>
+                        <Button block type="primary" onClick={() => openPurchaseModal()}>
+                          Buy Video
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Card>
                 </Col>
-              )}
-            </Row>
+
+                <Col xs={24} className={styles.showcaseCardContainer}>
+                  <VideoCard video={video} buyable={false} showPurchaseModal={openPurchaseModal} />
+                </Col>
+
+                {video.sessions?.length > 0 && (
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]}>
+                      <Col xs={24}>
+                        <Text className={styles.ml20}> Related to these class(es) </Text>
+                      </Col>
+                      <Col xs={24}>
+                        <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={username} />
+                      </Col>
+                    </Row>
+                  </Col>
+                )}
+              </Row>
+            </>
           )}
         </Col>
       </Row>

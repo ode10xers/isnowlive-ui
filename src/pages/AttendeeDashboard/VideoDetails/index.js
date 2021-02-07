@@ -22,13 +22,11 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
-
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 
 const VideoDetails = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
