@@ -713,7 +713,7 @@ const SessionDetails = ({ match, history }) => {
                     <Row gutter={[8, 20]}>
                       {sessionVideos.length > 0 &&
                         sessionVideos.map((videoDetails) => (
-                          <div key={videoDetails.id}>
+                          <div key={videoDetails.external_id}>
                             <Col xs={24}>
                               <VideoCard
                                 video={videoDetails}
