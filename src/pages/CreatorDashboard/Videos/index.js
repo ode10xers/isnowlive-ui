@@ -282,7 +282,7 @@ const Videos = () => {
     },
   ];
 
-  const subscriberColumns = [
+  const buyerColumns = [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -308,8 +308,8 @@ const Videos = () => {
     return (
       <div className={styles.mb20}>
         <Table
-          columns={subscriberColumns}
-          data={record.buyers || []}
+          columns={buyerColumns}
+          data={record.buyers}
           loading={isLoading}
           rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
         />
@@ -317,17 +317,17 @@ const Videos = () => {
     );
   };
 
-  const renderMobileSubscriberCards = (subscriber) => (
+  const renderMobileBuyerCards = (buyer) => (
     <Card>
       <Row>
         <Col xs={24}>
-          <Title level={5}> {subscriber.name} </Title>
+          <Title level={5}> {buyer.name} </Title>
         </Col>
         <Col xs={24}>
-          <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
+          <Text> Purchased at {toDateAndTime(buyer.date_of_purchase)} </Text>
         </Col>
         <Col xs={24}>
-          <Text> {`${subscriber.price_paid} ${subscriber.currency}`} </Text>
+          <Text> {`${buyer.price_paid} ${buyer.currency}`} </Text>
         </Col>
       </Row>
     </Card>
@@ -408,7 +408,7 @@ const Videos = () => {
         </Card>
         {expandedRowKeys.includes(video.external_id) && (
           <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{video?.sales?.map(renderMobileSubscriberCards)}</div>
+            <div className={styles.mb20}>{video?.buyers?.map(renderMobileBuyerCards)}</div>
           </Row>
         )}
       </Col>

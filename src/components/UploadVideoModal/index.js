@@ -66,9 +66,11 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
   uppy.current.on('file-added', (file) => {
     setuploadingFlie(file);
+    setIsLoading(true);
   });
 
   uppy.current.on('progress', (result) => {
+    setIsLoading(false);
     setVideoUploadPercent(result);
   });
 
@@ -307,7 +309,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
             <Form.Item {...(!isMobileDevice && formTailLayout)}>
               <Row>
                 <Col xs={12}>
-                  <Button block type="default" onClick={() => closeModal(false)} loading={isSubmitting}>
+                  <Button block type="default" onClick={() => closeModal(false)}>
                     Cancel
                   </Button>
                 </Col>
@@ -322,7 +324,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
         )}
         {formPart === 2 && (
           <div className={styles.videoUpload}>
-            <div className={styles.uppyDragDrop}>
+            <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFlie ? 'none' : 'auto' }}>
               <DragDrop
                 uppy={uppy.current}
                 locale={{
@@ -341,7 +343,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
             </div>
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => closeModal(true)} loading={isSubmitting}>
+                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFlie ? true : false}>
                   Cancel
                 </Button>
               </Col>
