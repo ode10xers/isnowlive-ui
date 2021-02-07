@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import moment from 'moment';
-import { Row, Col, Typography, Empty, Image, Collapse } from 'antd';
 
+import { Row, Col, Typography, Empty, Image, Collapse } from 'antd';
 import apis from 'apis';
 import Routes from 'routes';
 import Loader from 'components/Loader';
