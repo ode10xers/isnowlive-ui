@@ -117,7 +117,14 @@
 .videoWrapper {
   position: relative;
   cursor: pointer;
+  background-color: map-get($colors, $key: 'Black');
+  :global {
+    .ant-image {
+      width: 100%;
+    }
+  }
 }
+
 .playIcon {
   position: absolute;
   top: 45%;
@@ -125,4 +132,11 @@
   color: map-get($colors, $key: 'White') !important;
   font-size: 40px;
   z-index: 9999;
+}
+.videoThumbnail {
+  object-fit: scale-down;
+}
+.imageOverlay {
+  background-color: map-get($colors, $key: 'Black') !important;
+  opacity: 0.7;
 }
