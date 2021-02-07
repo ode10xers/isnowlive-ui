@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Image, Button, message } from 'antd';
-import { PlayCircleOutlined } from '@ant-design/icons';
+// import { PlayCircleOutlined } from '@ant-design/icons';
 import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
@@ -145,9 +145,9 @@ const PublicVideoList = ({ username = null, videos }) => {
                         height={200}
                       />
                     </div>
-                    <div className={styles.playIconWrapper}>
+                    {/* <div className={styles.playIconWrapper}>
                       <PlayCircleOutlined className={styles.playIcon} />
-                    </div>
+                    </div> */}
                   </Col>
                   <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
                     <Row gutter={8} justify="start">
