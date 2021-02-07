@@ -150,6 +150,7 @@ export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainNa
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    okText: 'Go To Dashboard',
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
