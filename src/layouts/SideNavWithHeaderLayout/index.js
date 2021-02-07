@@ -5,11 +5,11 @@ import SideNavigation from 'components/SideNavigation';
 import NavbarHeader from 'components/NavbarHeader';
 import DashboardHeader from 'components/DashboardHeader';
 
+import { reservedDomainName } from 'utils/helper';
+
 import styles from './style.module.scss';
 
 const { Content, Sider, Header } = Layout;
-
-const reservedDomainName = ['app', 'localhost'];
 
 const SideNavWithHeaderLayout = ({ children }) => {
   const handleCollapsed = (collapsed) => {

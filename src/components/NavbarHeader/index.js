@@ -10,14 +10,13 @@ import Routes from 'routes';
 import HeaderModal from 'components/HeaderModal';
 
 import { getLocalUserDetails } from 'utils/storage';
-
+import { isAPISuccess, reservedDomainName } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
 
 const { Text, Paragraph } = Typography;
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 
 const NavbarHeader = ({ removePadding = false }) => {
   const history = useHistory();
@@ -37,9 +36,9 @@ const NavbarHeader = ({ removePadding = false }) => {
 
   const checkShouldShowPassLink = async (username) => {
     try {
-      const { data } = await apis.passes.getPassesByUsername(username);
+      const { status, data } = await apis.passes.getPassesByUsername(username);
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setShouldShowPassLink(data.length > 0);
       }
     } catch (error) {
@@ -49,9 +48,9 @@ const NavbarHeader = ({ removePadding = false }) => {
 
   const checkShouldShowVideoLink = async (username) => {
     try {
-      const { data } = await apis.videos.getVideosByUsername(username);
+      const { status, data } = await apis.videos.getVideosByUsername(username);
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setShouldShowVideoLink(data.length > 0);
       }
     } catch (error) {

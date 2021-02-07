@@ -24,15 +24,13 @@ import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Title, Text } = Typography;
-
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 
 const PassDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);

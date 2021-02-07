@@ -23,10 +23,8 @@ const { Title } = Typography;
 const PublicVideoList = ({ username = null, videos }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [showVideoDetailModal, setShowVideoDetailModal] = useState(false);
+  // const [showVideoDetailModal, setShowVideoDetailModal] = useState(false);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
-
-  console.log(showVideoDetailModal);
 
   const handleSelectVideo = (video) => {
     if (video) {
@@ -88,8 +86,9 @@ const PublicVideoList = ({ username = null, videos }) => {
   };
 
   const hideVideoDetailModal = () => {
-    setShowVideoDetailModal(false);
+    // setShowVideoDetailModal(false);
     setSelectedVideo(null);
+    setShowPurchaseVideoModal(false);
   };
 
   const openPurchaseModal = () => {
@@ -111,7 +110,7 @@ const PublicVideoList = ({ username = null, videos }) => {
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
       {/* 
-      !Commenting this as per Rahul's request
+      Commenting this as per Rahul's request
       <Modal
         visible={selectedVideo && showVideoDetailModal}
         onCancel={hideVideoDetailModal}

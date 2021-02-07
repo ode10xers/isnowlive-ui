@@ -24,15 +24,13 @@ import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'component
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, orderType } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Title, Text } = Typography;
-
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 
 const VideoDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
