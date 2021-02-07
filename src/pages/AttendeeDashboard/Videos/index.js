@@ -24,8 +24,10 @@ const Videos = () => {
     try {
       const { data } = await apis.videos.getAttendeeVideos();
 
-      setActiveVideos(data.active);
-      setExpiredVideos(data.expired);
+      if (data) {
+        setActiveVideos(data.active);
+        setExpiredVideos(data.expired);
+      }
     } catch (error) {
       showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
     }

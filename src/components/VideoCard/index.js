@@ -65,7 +65,15 @@ const VideoCard = ({
                 </Title>
               </div>
               <div className={styles.flexVerticalRow}>
-                <Button type="primary" size="large" block onClick={() => showPurchaseModal(video)}>
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    showPurchaseModal(video);
+                  }}
+                >
                   Buy
                 </Button>
               </div>

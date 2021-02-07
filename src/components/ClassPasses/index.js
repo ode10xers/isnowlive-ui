@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
 import classNames from 'classnames';
+import { loadStripe } from '@stripe/stripe-js';
 
-import { Row, Col, Typography, Button, Card, Tag, Space } from 'antd';
+import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
+import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
-import PurchasePassModal from 'components/PurchasePassModal';
+import PurchaseModal from 'components/PurchaseModal';
 
-import { generateUrlFromUsername } from 'utils/helper';
+import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+
+import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+
+import config from 'config';
+import apis from 'apis';
 
 import styles from './style.module.scss';
+
+const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Paragraph } = Typography;
 
@@ -19,18 +28,76 @@ const ClassPasses = ({ username, passes }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [showPurchasePassModal, setShowPurchasePassModal] = useState(false);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
-  const showPurchaseModal = (passId) => {
+  const openPurchaseModal = (passId) => {
     setSelectedPass(passes.filter((pass) => pass.id === passId)[0]);
-    setShowPurchasePassModal(true);
+    setShowPurchaseModal(true);
   };
 
   const closePurchaseModal = () => {
     setSelectedPass(null);
-    setShowPurchasePassModal(false);
+    setShowPurchaseModal(false);
+  };
+
+  const initiatePaymentForOrder = async (orderDetails) => {
+    setIsLoading(true);
+    try {
+      const { data, status } = await apis.payment.createPaymentSessionForOrder({
+        order_id: orderDetails.pass_order_id,
+        order_type: 'PASS_ORDER',
+      });
+
+      if (isAPISuccess(status) && data) {
+        const stripe = await stripePromise;
+
+        const result = await stripe.redirectToCheckout({
+          sessionId: data.payment_gateway_session_id,
+        });
+
+        if (result.error) {
+          message.error('Cannot initiate payment at this time, please try again...');
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
+  };
+
+  const createOrder = async (userEmail) => {
+    if (!selectedPass) {
+      showErrorModal('Something went wrong', 'Invalid Class Pass ID');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.passes.createOrderForUser({
+        pass_id: selectedPass.id,
+        price: selectedPass.price,
+        currency: selectedPass.currency,
+      });
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          setIsLoading(false);
+          showBookingSuccessModal(userEmail, selectedPass, false, false, username);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
   };
 
   const redirectToSessionsPage = (session) => {
@@ -95,7 +162,7 @@ const ClassPasses = ({ username, passes }) => {
       align: 'right',
       render: (text, record) => (
         <Space size="small">
-          <Button type="primary" onClick={() => showPurchaseModal(record.id)}>
+          <Button type="primary" onClick={() => openPurchaseModal(record.id)}>
             Buy Pass
           </Button>
           {expandedRowKeys.includes(record.id) ? (
@@ -139,7 +206,7 @@ const ClassPasses = ({ username, passes }) => {
           className={styles.card}
           title={<Text>{pass.name}</Text>}
           actions={[
-            <Button type="primary" onClick={() => showPurchaseModal(pass.id)}>
+            <Button type="primary" onClick={() => openPurchaseModal(pass.id)}>
               Buy Pass
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
@@ -180,42 +247,44 @@ const ClassPasses = ({ username, passes }) => {
 
   return (
     <div className={styles.box}>
-      <PurchasePassModal visible={showPurchasePassModal} pass={selectedPass} closeModal={closePurchaseModal} />
-      <Row gutter={[16, 16]}>
-        <Col xs={24}>
-          <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
-          <Paragraph>
-            Check out the passes below and the classes included in them. Once you have bought the pass you can use the
-            class credits to pay for classes in 1 click it without needing to touch your wallet again. Class pass is
-            valid from from the date you buy it until the validity period.
-          </Paragraph>
-        </Col>
-        <Col xs={24}>
-          {isMobileDevice ? (
-            passes.length > 0 ? (
-              passes.map(renderPassItem)
+      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+      <Loader loading={isLoading} size="large" text="Loading pass details">
+        <Row gutter={[16, 16]}>
+          <Col xs={24}>
+            <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
+            <Paragraph>
+              Check out the passes below and the classes included in them. Once you have bought the pass you can use the
+              class credits to pay for classes in 1 click it without needing to touch your wallet again. Class pass is
+              valid from from the date you buy it until the validity period.
+            </Paragraph>
+          </Col>
+          <Col xs={24}>
+            {isMobileDevice ? (
+              passes.length > 0 ? (
+                passes.map(renderPassItem)
+              ) : (
+                <div className={styles.textAlignCenter}>
+                  {' '}
+                  <Text disabled> No Passes </Text>{' '}
+                </div>
+              )
             ) : (
-              <div className={styles.textAlignCenter}>
-                {' '}
-                <Text disabled> No Passes </Text>{' '}
-              </div>
-            )
-          ) : (
-            <Table
-              sticky={true}
-              columns={passesColumns}
-              data={passes}
-              rowKey={(record) => record.id}
-              expandable={{
-                expandedRowRender: (record) => renderClassesList(record),
-                expandRowByClick: true,
-                expandIconColumnIndex: -1,
-                expandedRowKeys: expandedRowKeys,
-              }}
-            />
-          )}
-        </Col>
-      </Row>
+              <Table
+                sticky={true}
+                columns={passesColumns}
+                data={passes}
+                rowKey={(record) => record.id}
+                expandable={{
+                  expandedRowRender: (record) => renderClassesList(record),
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedRowKeys,
+                }}
+              />
+            )}
+          </Col>
+        </Row>
+      </Loader>
     </div>
   );
 };

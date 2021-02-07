@@ -68,23 +68,21 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
   const showSlots = (slot) => {
     if (selectedSlot && selectedSlot.inventory_id === slot.inventory_id) {
       return (
-        <>
-          <Col xs={24}>
-            <Button
-              shape="round"
-              type="primary"
-              className={styles.slotBtn}
-              onClick={() => handleSubmit(null)}
-              icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
-            >
-              {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
-            </Button>
-          </Col>
-        </>
+        <Col xs={24} key={slot.inventory_id}>
+          <Button
+            shape="round"
+            type="primary"
+            className={styles.slotBtn}
+            onClick={() => handleSubmit(null)}
+            icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+          >
+            {toLocaleTime(slot.start_time)} - {toLocaleTime(slot.end_time)}
+          </Button>
+        </Col>
       );
     }
     return (
-      <Col xs={24}>
+      <Col xs={24} key={slot.inventory_id}>
         <Button
           shape="round"
           type="secondary"

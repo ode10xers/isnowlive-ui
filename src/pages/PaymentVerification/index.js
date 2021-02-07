@@ -4,7 +4,12 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { message, Row } from 'antd';
 
 import Loader from 'components/Loader';
-import { showBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import {
+  showBookingSuccessModal,
+  showErrorModal,
+  showAlreadyBookedModal,
+  showVideoPurchaseSuccessModal,
+} from 'components/Modals/modals';
 
 import apis from 'apis';
 // import Routes from 'routes';
@@ -90,6 +95,13 @@ const PaymentVerification = () => {
                   false,
                   username
                 );
+              }
+            } else if (order_type === orderType.VIDEO) {
+              const { data } = await apis.videos.getAttendeeVideos();
+
+              if (data) {
+                const purchasedVideo = data.active.find((video) => video.video_order_id === order_id);
+                showVideoPurchaseSuccessModal(userDetails.email, purchasedVideo, username);
               }
             } else {
               showBookingSuccessModal(userDetails.email, null, false, false, username);
