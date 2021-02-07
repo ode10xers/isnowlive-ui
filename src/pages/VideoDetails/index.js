@@ -83,7 +83,6 @@ const VideoDetails = ({ match, history }) => {
             validity: 24,
             username: 'sanketkarve',
             published: false,
-            // ...data,
             sessions:
               data.sessions.map((session) => ({
                 ...session,

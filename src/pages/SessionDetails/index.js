@@ -229,97 +229,10 @@ const SessionDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  // const createOrder = async (userEmail) => {
-  //   setCreateFollowUpOrder(null);
-  //   try {
-  //     // Default payload if user book single class
-  //     let payload = {
-  //       inventory_id: parseInt(selectedInventory.inventory_id),
-  //       user_timezone_offset: new Date().getTimezoneOffset(),
-  //       user_timezone_location: getTimezoneLocation(),
-  //       user_timezone: getCurrentLongTimezone(),
-  //       payment_source: paymentSource.GATEWAY,
-  //     };
-  //     let usersPass = null;
-
-  //     if (selectedPass) {
-  //       // payment_source will be PAYMENT_GATEWAY if payment is required
-  //       // e.g. user buys single class / user buys new pass
-  //       // Booking class after pass is bought will be done in redirection
-
-  //       usersPass = getUserPurchasedPass(false);
-
-  //       if (usersPass) {
-  //         payload = {
-  //           ...payload,
-  //           payment_source: paymentSource.CLASS_PASS,
-  //           source_id: usersPass.pass_order_id,
-  //         };
-  //       } else {
-  //         payload = {
-  //           pass_id: selectedPass.id,
-  //           price: selectedPass.price,
-  //           currency: selectedPass.currency,
-  //         };
-  //       }
-  //     }
-
-  //     const { status, data } = selectedPass && !usersPass ? await buyPass(payload) : await bookClass(payload);
-
-  //     if (isAPISuccess(status) && data) {
-  //       if (data.payment_required) {
-  //         if (selectedPass && !usersPass) {
-  //           initiatePaymentForOrder({ ...data, order_id: data.pass_order_id });
-  //         } else {
-  //           initiatePaymentForOrder(data);
-  //         }
-  //       } else {
-  //         if (selectedPass) {
-  //           if (!usersPass) {
-  //             // If user (for some reason) buys a free pass (if any exists)
-  //             // we then immediately followUp the Booking Process
-  //             const followUpBooking = await bookClass({
-  //               inventory_id: parseInt(selectedInventory.inventory_id),
-  //               user_timezone_offset: new Date().getTimezoneOffset(),
-  //               user_timezone: getCurrentLongTimezone(),
-  //               payment_source: paymentSource.CLASS_PASS,
-  //               source_id: data.pass_order_id,
-  //             });
-
-  //             if (isAPISuccess(followUpBooking.status)) {
-  //               showBookingSuccessModal(userEmail, selectedPass, true, false, username);
-  //               setIsLoading(false);
-  //             }
-  //           } else {
-  //             showBookingSuccessModal(userEmail, selectedPass, true, false, username);
-  //             setIsLoading(false);
-  //           }
-  //         } else {
-  //           showBookingSuccessModal(userEmail, null, false, false, username);
-  //           setIsLoading(false);
-  //         }
-  //       }
-  //     }
-  //   } catch (error) {
-  //     setIsLoading(false);
-  //     message.error(error.response?.data?.message || 'Something went wrong');
-
-  //     if (
-  //       error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
-  //     ) {
-  //       showAlreadyBookedModal(false, username);
-  //     } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-  //       showAlreadyBookedModal(true, username);
-  //     }
-  //   }
-  // };
-
   const handleOrder = (userEmail) => {
     setIsLoading(true);
 
     if (selectedVideo) {
-      console.log(selectedVideo);
-
       const payload = {
         video_id: selectedVideo.external_id,
       };

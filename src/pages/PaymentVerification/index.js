@@ -12,7 +12,6 @@ import {
 } from 'components/Modals/modals';
 
 import apis from 'apis';
-// import Routes from 'routes';
 
 import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
@@ -117,7 +116,6 @@ const PaymentVerification = () => {
     } else {
       setIsLoading(false);
       showErrorModal('Something went wrong');
-      // history.push(Routes.attendeeDashboard.rootPath);
     }
   }, [order_id, transaction_id, order_type, inventory_id, history, userDetails]);
 

@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Image, Button, message } from 'antd';
-// import { PlayCircleOutlined } from '@ant-design/icons';
 import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
 import apis from 'apis';
 
-// import VideoCard from 'components/VideoCard';
 import DefaultImage from 'components/Icons/DefaultImage';
 import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
@@ -112,7 +110,9 @@ const PublicVideoList = ({ username = null, videos }) => {
   return (
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
-      {/* <Modal
+      {/* 
+      !Commenting this as per Rahul's request
+      <Modal
         visible={selectedVideo && showVideoDetailModal}
         onCancel={hideVideoDetailModal}
         centered={true}
@@ -124,16 +124,13 @@ const PublicVideoList = ({ username = null, videos }) => {
             <VideoCard buyable={true} hoverable={false} video={selectedVideo} showPurchaseModal={openPurchaseModal} />
           </div>
         )}
-      </Modal> */}
+      </Modal> 
+      */}
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
           {videos.map((video) => (
             <Col xs={24} md={12} xl={8}>
-              <div
-                key={video.video_id || video.external_id}
-                className={styles.cleanCard}
-                // onClick={() => handleSelectVideo(video)}
-              >
+              <div key={video.video_id || video.external_id} className={styles.cleanCard}>
                 <Row gutter={[8, 8]} justify="center">
                   <Col span={24} className={styles.imageWrapper}>
                     <div className={styles.thumbnailImage}>
@@ -145,9 +142,6 @@ const PublicVideoList = ({ username = null, videos }) => {
                         height={200}
                       />
                     </div>
-                    {/* <div className={styles.playIconWrapper}>
-                      <PlayCircleOutlined className={styles.playIcon} />
-                    </div> */}
                   </Col>
                   <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
                     <Row gutter={8} justify="start">

@@ -230,7 +230,6 @@ const NavbarHeader = ({ removePadding = false }) => {
                     Videos
                   </Menu.Item>
                 )}
-                {/* <Menu.Item key="Videos" onClick={() => redirectToCreatorProfile('video')}> Videos </Menu.Item> */}
                 {localUserDetails ? (
                   <>
                     <Menu.Item
@@ -360,11 +359,6 @@ const NavbarHeader = ({ removePadding = false }) => {
                           <span className={styles.menuLink}>Videos</span>
                         </li>
                       )}
-                      {/* <li key="Creator Videos">
-                        <span className={styles.menuLink} onClick={() => redirectToCreatorProfile('video')}>
-                          {username.toUpperCase()} Videos
-                        </span>
-                      </li> */}
 
                       {localUserDetails && (
                         <>
@@ -390,11 +384,6 @@ const NavbarHeader = ({ removePadding = false }) => {
                           >
                             <span className={styles.menuLink}>My Passes</span>
                           </li>
-                          {/* <li key="Attendee Videos">
-                            <span className={styles.menuLink} onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.videos)}>
-                              My Videos
-                            </span>
-                          </li> */}
                         </>
                       )}
                     </ul>

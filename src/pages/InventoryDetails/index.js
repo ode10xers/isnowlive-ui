@@ -381,13 +381,6 @@ const InventoryDetails = ({ match, history }) => {
     <Loader loading={isLoading} size="large" text="Loading profile">
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24} className={classNames(styles.imageWrapper, styles.mb20)}>
-          {/* <Image
-            preview={false}
-            width={'100%'}
-            className={classNames(styles.coverImage, styles.mb20)}
-            src={session?.session_image_url || 'error'}
-            fallback={DefaultImage()}
-          /> */}
           <img
             className={styles.coverImage}
             src={session?.session_image_url || DefaultImage()}
