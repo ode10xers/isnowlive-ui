@@ -81,7 +81,6 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
       showErrorModal(`Failed to upload video`);
     }
     setTimeout(() => {
-      uppy.current.reset();
       uppy.current = null;
       closeModal(true);
     }, 500);
@@ -125,7 +124,6 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
-      uppy.current.reset();
       uppy.current = null;
     };
   }, [visible, editedVideo, fetchAllClassesForCreator, form]);
