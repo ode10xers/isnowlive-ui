@@ -88,7 +88,13 @@ const Videos = () => {
       const { data } = await apis.videos.getCreatorVideos();
 
       if (data) {
-        setVideos(data);
+        setVideos(
+          data.map((video, index) => ({
+            index,
+            ...data,
+            buyers: video.buyers.map((subs) => ({ ...subs, currency: video.currency })),
+          }))
+        );
       }
     } catch (error) {
       showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
