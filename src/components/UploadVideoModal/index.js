@@ -76,7 +76,9 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     // the Tus Plugin and remove the header, and then trigger the .upload()
     // manually (also set autoProceed in the initial config to false)
     uppy.current.getPlugin('Tus').setOptions({
-      headers: {},
+      endpoint: `${config.server.baseURL}/secure/creator/videos/${editedVideo?.external_id}/upload`,
+      resume: true,
+      retryDelays: null,
     });
 
     setuploadingFlie(file);
