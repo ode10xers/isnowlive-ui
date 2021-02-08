@@ -1,7 +1,6 @@
 @import '../../styles/variables.scss';
 
 .cleanCard {
-
   .imageWrapper {
     position: relative;
     height: 200px;
@@ -16,16 +15,6 @@
         height: 100%;
         object-fit: cover;
         border-radius: 8px;
-      }
-    }
-
-    .playIconWrapper {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-
-      .playIcon {
-        color: map-get($map: $colors, $key: 'White');
       }
     }
   }

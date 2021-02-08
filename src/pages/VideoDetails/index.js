@@ -26,6 +26,8 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess, orderType, reservedDomainName } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './style.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
@@ -33,6 +35,10 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 const { Title, Text } = Typography;
 
 const VideoDetails = ({ match, history }) => {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -63,40 +69,19 @@ const VideoDetails = ({ match, history }) => {
     setShowPurchaseVideoModal(false);
   };
 
-  const getVideoDetails = useCallback(
-    async (videoId) => {
-      try {
-        const { data } = await apis.videos.getVideoById(videoId);
+  const getVideoDetails = useCallback(async (videoId) => {
+    try {
+      const { data } = await apis.videos.getVideoById(videoId);
 
-        if (data) {
-          setVideo({
-            id: 3,
-            cover_image: 'https://dkfqbuenrrvge.cloudfront.net/image/msJ9placWNxt8bGA_city01.jpeg',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/mbzyHe0nLTcCMArD_difpsf3i2n68p22m_op.jpg',
-            title: 'Test Video 3',
-            description:
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ipsum dolor, gravida et blandit et, pellentesque a justo. Aenean id nulla nibh. Mauris euismod erat et quam auctor lobortis. Duis posuere neque a diam sollicitudin consequat. Aliquam sapien metus, lacinia quis pulvinar eget, gravida quis augue. Sed non pretium enim. Morbi ornare dignissim arcu, eget mollis erat tempus at. Proin convallis dui id pellentesque accumsan. Aenean finibus nibh sed dictum ultrices. Maecenas rutrum, odio quis consequat bibendum, urna orci tempor libero, quis pharetra nibh nisi eget massa. Fusce in commodo magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed sed lacus nec mi ullamcorper pretium. 2',
-            price: 0,
-            currency: 'USD',
-            validity: 24,
-            username: 'sanketkarve',
-            published: false,
-            sessions:
-              data.sessions.map((session) => ({
-                ...session,
-                key: `${data.id}_${session.session_id}`,
-                username: username,
-              })) || [],
-          });
-          setIsLoading(false);
-        }
-      } catch (error) {
+      if (data) {
+        setVideo(data);
         setIsLoading(false);
-        message.error('Failed to load class video details');
       }
-    },
-    [username]
-  );
+    } catch (error) {
+      setIsLoading(false);
+      message.error('Failed to load class video details');
+    }
+  }, []);
 
   useEffect(() => {
     if (match.params.video_id) {
@@ -138,7 +123,7 @@ const VideoDetails = ({ match, history }) => {
     }
   };
 
-  const createOrder = async (userEmail) => {
+  const createOrder = async () => {
     setIsLoading(true);
 
     try {
@@ -153,7 +138,7 @@ const VideoDetails = ({ match, history }) => {
           initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(video);
+          showVideoPurchaseSuccessModal(userDetails.email, video, username);
         }
       }
     } catch (error) {
@@ -266,7 +251,9 @@ const VideoDetails = ({ match, history }) => {
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {video?.price === 0 ? 'Free video' : ` ${video?.price} ${video?.currency}`}
+                                {video?.price === 0
+                                  ? 'Free video'
+                                  : ` ${video?.price} ${video?.currency.toUpperCase()}`}
                               </Text>
                             </Space>
                           </Col>
@@ -282,7 +269,7 @@ const VideoDetails = ({ match, history }) => {
                 </Col>
 
                 <Col xs={24} className={styles.showcaseCardContainer}>
-                  <VideoCard video={video} buyable={false} showPurchaseModal={openPurchaseModal} />
+                  <VideoCard video={video} buyable={false} hoverable={false} showPurchaseModal={openPurchaseModal} />
                 </Col>
 
                 {video.sessions?.length > 0 && (

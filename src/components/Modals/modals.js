@@ -135,7 +135,7 @@ export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app
   });
 };
 
-export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainName) => {
+export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainName = 'app') => {
   Modal.success({
     title: 'Video Purchase',
     content: (

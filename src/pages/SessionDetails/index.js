@@ -236,7 +236,7 @@ const SessionDetails = ({ match, history }) => {
         video_id: selectedVideo.external_id,
       };
 
-      buyVideo(payload);
+      buyVideo(payload, userEmail);
       setSelectedVideo(null);
     } else if (selectedPass) {
       const usersPass = getUserPurchasedPass(false);
@@ -370,7 +370,7 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const buyVideo = async (payload) => {
+  const buyVideo = async (payload, userEmail) => {
     try {
       const { status, data } = await apis.videos.createOrderForUser(payload);
 
@@ -382,7 +382,7 @@ const SessionDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(selectedVideo);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
         }
       }
     } catch (error) {
