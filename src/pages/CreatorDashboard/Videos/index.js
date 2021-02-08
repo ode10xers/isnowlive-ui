@@ -243,7 +243,7 @@ const Videos = () => {
             </Tooltip>
           </Col>
           <Col xs={24} md={4}>
-            <Tooltip title="Copy Session Link">
+            <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -254,13 +254,13 @@ const Videos = () => {
           </Col>
           <Col xs={24} md={5}>
             {record.is_published ? (
-              <Tooltip title="Hide Session">
+              <Tooltip title="Hide Video">
                 <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Session">
+              <Tooltip title="Unhide Video">
                 <Button
                   type="link"
                   disabled={record.video_uid.length ? false : true}
@@ -376,7 +376,7 @@ const Videos = () => {
                 icon={<CloudUploadOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Copy Session Link">
+            <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -385,13 +385,13 @@ const Videos = () => {
               />
             </Tooltip>,
             video.is_published ? (
-              <Tooltip title="Hide Session">
+              <Tooltip title="Hide Video">
                 <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Session">
+              <Tooltip title="Unhide Video">
                 <Button
                   type="link"
                   disabled={video.video_uid.length ? false : true}
