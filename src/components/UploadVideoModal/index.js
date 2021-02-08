@@ -5,7 +5,7 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
 
-// import { getAuthCookie } from 'services/authCookie';
+import { getAuthCookie } from 'services/authCookie';
 
 import config from 'config';
 import apis from 'apis';
@@ -57,21 +57,32 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   uppy.current = new Uppy({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
-    autoProceed: true,
+    autoProceed: false,
   });
 
   uppy.current.use(Tus, {
     endpoint: `${config.server.baseURL}/secure/creator/videos/${editedVideo?.external_id}/upload`,
-    // headers: {
-    //   'auth-token': getAuthCookie(),
-    // },
+    headers: {
+      'auth-token': getAuthCookie(),
+    },
     resume: true,
     retryDelays: null,
   });
 
   uppy.current.on('file-added', (file) => {
+    // We need to send the auth-token header on request to Passion endpoint
+    // But we need to intercept and remove the token on the upload request
+    // (the video.upload.net URL). So here we adjust the options of
+    // the Tus Plugin and remove the header, and then trigger the .upload()
+    // manually (also set autoProceed in the initial config to false)
+    uppy.current.getPlugin('Tus').setOptions({
+      headers: {},
+    });
+
     setuploadingFlie(file);
     setIsLoading(true);
+
+    uppy.current.upload();
   });
 
   uppy.current.on('progress', (result) => {

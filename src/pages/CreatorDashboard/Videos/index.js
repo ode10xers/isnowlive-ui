@@ -91,7 +91,7 @@ const Videos = () => {
         setVideos(
           data.map((video, index) => ({
             index,
-            ...data,
+            ...video,
             buyers: video.buyers.map((subs) => ({ ...subs, currency: video.currency })),
           }))
         );
