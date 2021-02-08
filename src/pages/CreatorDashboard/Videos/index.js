@@ -214,7 +214,7 @@ const Videos = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
