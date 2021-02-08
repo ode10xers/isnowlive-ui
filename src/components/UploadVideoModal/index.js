@@ -5,6 +5,8 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
 
+import { getAuthCookie } from './authCookie';
+
 import config from 'config';
 import apis from 'apis';
 import Loader from 'components/Loader';
@@ -58,8 +60,12 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     autoProceed: true,
   });
 
+  //TODO: Adjust Uppy endpoint to send ORIGIN and AUTH TOKEN
   uppy.current.use(Tus, {
-    endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+    endpoint: `${config.server.baseURL}/secure/creator/videos/${editedVideo?.external_id}/upload`,
+    headers: {
+      'auth-token': getAuthCookie(),
+    },
     resume: true,
     retryDelays: null,
   });
