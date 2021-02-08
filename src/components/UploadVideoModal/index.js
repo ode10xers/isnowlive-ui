@@ -5,7 +5,7 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
 
-import { getAuthCookie } from './authCookie';
+import { getAuthCookie } from 'services/authCookie';
 
 import config from 'config';
 import apis from 'apis';
