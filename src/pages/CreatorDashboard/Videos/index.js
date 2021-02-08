@@ -92,7 +92,7 @@ const Videos = () => {
           data.map((video, index) => ({
             index,
             ...video,
-            buyers: video.buyers.map((subs) => ({ ...subs, currency: video.currency })),
+            buyers: video.buyers.map((subs) => ({ ...subs, currency: video.currency.toUpperCase() })),
           }))
         );
       }
@@ -474,7 +474,7 @@ const Videos = () => {
                 <Empty description={'No Pubished Videos'} />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Unpublised </Title>} key="Expired">
+            <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
               {videos.length ? (
                 <>
                   {isMobileDevice ? (

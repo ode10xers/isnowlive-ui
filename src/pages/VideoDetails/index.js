@@ -26,8 +26,6 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess, orderType, reservedDomainName } from 'utils/helper';
 
-import { useGlobalContext } from 'services/globalContext';
-
 import styles from './style.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
@@ -35,10 +33,6 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 const { Title, Text } = Typography;
 
 const VideoDetails = ({ match, history }) => {
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -123,7 +117,7 @@ const VideoDetails = ({ match, history }) => {
     }
   };
 
-  const createOrder = async () => {
+  const createOrder = async (userEmail) => {
     setIsLoading(true);
 
     try {
@@ -138,7 +132,7 @@ const VideoDetails = ({ match, history }) => {
           initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userDetails.email, video, username);
+          showVideoPurchaseSuccessModal(userEmail, video, username);
         }
       }
     } catch (error) {

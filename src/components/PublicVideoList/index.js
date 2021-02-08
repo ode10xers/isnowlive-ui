@@ -14,7 +14,6 @@ import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'component
 
 import { isAPISuccess, orderType, generateUrlFromUsername } from 'utils/helper';
 
-import { useGlobalContext } from 'services/globalContext';
 import styles from './styles.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
@@ -22,10 +21,6 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 const { Title } = Typography;
 
 const PublicVideoList = ({ username = null, videos }) => {
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   // const [showVideoDetailModal, setShowVideoDetailModal] = useState(false);
@@ -62,7 +57,7 @@ const PublicVideoList = ({ username = null, videos }) => {
     setIsLoading(false);
   };
 
-  const createOrder = async () => {
+  const createOrder = async (userEmail) => {
     try {
       const payload = {
         video_id: selectedVideo.external_id,
@@ -77,7 +72,7 @@ const PublicVideoList = ({ username = null, videos }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userDetails.email, selectedVideo, username);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
           hideVideoDetailModal();
         }
       }
@@ -145,7 +140,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                     alt={video.title}
                     fallback={DefaultImage()}
                     preview={false}
-                    height={200}
+                    className={styles.cardImage}
                   />
                 }
               >

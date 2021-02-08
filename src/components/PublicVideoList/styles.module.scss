@@ -1,6 +1,11 @@
 @import '../../styles/variables.scss';
 
 .cleanCard {
+  .cardImage {
+    height: 150px;
+    object-fit: cover;
+  }
+
   .imageWrapper {
     position: relative;
     height: 200px;
@@ -28,6 +33,22 @@
       .detailBtn {
         border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
       }
+    }
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .cleanCard {
+    .cardImage {
+      height: 120px;
+    }
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .cleanCard {
+    .cardImage {
+      height: 200px;
     }
   }
 }

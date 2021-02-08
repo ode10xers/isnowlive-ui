@@ -478,7 +478,7 @@ const Earnings = () => {
       dataIndex: 'total_earned',
       align: 'right',
       width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency}`,
+      render: (text, record) => `${record.total_earned} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
