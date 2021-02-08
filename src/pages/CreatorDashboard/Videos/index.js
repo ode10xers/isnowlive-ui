@@ -236,7 +236,7 @@ const Videos = () => {
               <Button
                 className={styles.detailsButton}
                 type="text"
-                disabled={record.video_uid.length ? true : false}
+                disabled={record.external_id.length ? true : false}
                 onClick={() => showUploadVideoModal(record, 2)}
                 icon={<CloudUploadOutlined />}
               />
