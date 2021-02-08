@@ -458,7 +458,6 @@ const Earnings = () => {
   };
 
   const openVideoDetails = (item) => {
-    console.log(item);
     if (item.video_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
     }

@@ -174,7 +174,6 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
         }
       }
     } catch (error) {
-      console.log(error);
       showErrorModal(`Failed to ${editedVideo ? 'update' : 'create'} video`);
     }
 

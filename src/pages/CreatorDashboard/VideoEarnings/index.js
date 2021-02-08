@@ -31,13 +31,13 @@ const VideoEarnings = ({ match }) => {
   const getEarningData = useCallback(
     async (video_id) => {
       try {
-        const { status, data } = await apis.video.getEarningsByVideoId(video_id);
+        const { status, data } = await apis.videos.getEarningsByVideoId(video_id);
         if (isAPISuccess(status)) {
           setIsLoading(false);
           setEarnings(data);
         }
       } catch (error) {
-        message.error('Unable to fetch the video earning details');
+        message.error(error.response?.data?.message || 'Unable to fetch the video earning details');
         setTimeout(() => {
           history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
         }, 1500);
@@ -102,7 +102,7 @@ const VideoEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.total_price}
+          {record.currency.toUpperCase()} {record.total_price}
         </Text>
       ),
     },
@@ -113,7 +113,7 @@ const VideoEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.platform_fees}
+          {record.currency.toUpperCase()} {record.platform_fees}
         </Text>
       ),
     },
@@ -124,7 +124,7 @@ const VideoEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.net_price}
+          {record.currency.toUpperCase()} {record.net_price}
         </Text>
       ),
     },
