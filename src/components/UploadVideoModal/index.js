@@ -76,15 +76,17 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
-      showSuccessModal('Video Published');
+      showSuccessModal('Video Uploaded');
     } else {
       showErrorModal(`Failed to upload video`);
     }
     setTimeout(() => {
+      uppy.current.reset();
       uppy.current = null;
       closeModal(true);
     }, 500);
   });
+
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
 
@@ -123,6 +125,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
+      uppy.current.reset();
       uppy.current = null;
     };
   }, [visible, editedVideo, fetchAllClassesForCreator, form]);
