@@ -1,5 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Row, Col, Typography, Space, Image, message } from 'antd';
+import { useLocation, useHistory } from 'react-router-dom';
+import { Row, Col, Typography, Space, Image, message, Button } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -12,6 +14,7 @@ import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Share from 'components/Share';
 import Loader from 'components/Loader';
@@ -29,12 +32,17 @@ import styles from './style.module.scss';
 const { Title, Text } = Typography;
 
 const VideoDetails = ({ match }) => {
+  const location = useLocation();
+  const history = useHistory();
+
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [video, setVideo] = useState([]);
   const [videoToken, setVideoToken] = useState(null);
   const [startVideo, setStartVideo] = useState(false);
+
+  const videoOrderDetails = location.state ? location.state.video_order : null;
 
   const getProfileDetails = useCallback(async (username) => {
     try {
@@ -109,12 +117,33 @@ const VideoDetails = ({ match }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading video details">
+      <Row justify="start" className={styles.mb50}>
+        <Col xs={24} md={4}>
+          <Button
+            className={styles.headButton}
+            onClick={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos)}
+            icon={<ArrowLeftOutlined />}
+          >
+            Back to Video List
+          </Button>
+        </Col>
+      </Row>
       <Row gutter={[8, 24]} className={classNames(styles.p50, styles.box)}>
         <Col xs={24} className={styles.showcaseCardContainer}>
           <VideoCard
             cover={
-              startVideo && videoToken ? (
+              startVideo && videoToken && !videoOrderDetails.isExpired ? (
                 <VideoPlayer token={videoToken} />
+              ) : videoOrderDetails.isExpired ? (
+                <div className={classNames(styles.videoWrapper, styles.expired)}>
+                  <Image
+                    preview={false}
+                    className={styles.videoThumbnail}
+                    src={video.thumbnail_url || 'error'}
+                    alt={video.title}
+                    fallback={DefaultImage()}
+                  />
+                </div>
               ) : (
                 <div className={styles.videoWrapper} onClick={() => playVideo()}>
                   <PlayCircleOutlined className={styles.playIcon} />
@@ -133,6 +162,8 @@ const VideoDetails = ({ match }) => {
             video={video}
             buyable={false}
             hoverable={false}
+            showOrderDetails={true}
+            orderDetails={videoOrderDetails}
           />
         </Col>
         <Col xs={24}>

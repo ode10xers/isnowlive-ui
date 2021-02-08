@@ -1,6 +1,8 @@
 @import '../../styles/variables.scss';
 
 .cleanCard {
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+
   .cardImage {
     height: 150px;
     object-fit: cover;
