@@ -119,7 +119,7 @@ function App() {
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.login} component={Login} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
         <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
