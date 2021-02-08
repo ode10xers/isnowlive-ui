@@ -73,14 +73,13 @@ const VideoEarnings = ({ match }) => {
     </div>
   );
 
-  const showVideoName = showVideoLayout('Pass Name', <Title level={3}>{earnings?.name}</Title>);
+  const showVideoName = showVideoLayout('Video Name', <Title level={3}>{earnings?.name}</Title>);
 
   const showVideoEarnings = showVideoLayout(
     'Total Earning',
     <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency} />
   );
 
-  //TODO: Adjust the column fields with the API keys
   let videoColumns = [
     {
       title: 'Attendee Name',
@@ -194,7 +193,7 @@ const VideoEarnings = ({ match }) => {
         </Row>
         <Row className={styles.mt50}>
           <Col xs={24} md={24}>
-            <Title level={5}>Pass Earning Details</Title>
+            <Title level={5}>Video Earning Details</Title>
           </Col>
           <Col xs={24} md={16}>
             {showVideoName}
