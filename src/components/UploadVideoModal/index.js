@@ -17,7 +17,7 @@ import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const videoTypes = {
   FREE: {
@@ -86,7 +86,13 @@ const UploadVideoModal = ({
     if (result.successful.length) {
       showSuccessModal(
         'Video Successfully Uploaded',
-        'We have received your video. It takes us about 10 minutes to process your video. Until then your video is hidden.\n\nCome back after 10 minutes to unhide the video and start selling.'
+        <>
+          <Paragraph>
+            We have received your video. It takes us about 10 minutes to process your video. Until then your video is
+            hidden.
+          </Paragraph>
+          <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+        </>
       );
     } else {
       showErrorModal(`Failed to upload video`);
@@ -120,6 +126,8 @@ const UploadVideoModal = ({
 
   useEffect(() => {
     if (visible) {
+      document.body.style.overflow = 'hidden';
+
       if (editedVideo) {
         form.setFieldsValue({
           ...editedVideo,
@@ -135,6 +143,8 @@ const UploadVideoModal = ({
       }
 
       fetchAllClassesForCreator();
+    } else {
+      document.body.style.overflow = 'auto';
     }
     return () => {
       setCoverImageUrl(null);
@@ -222,7 +232,6 @@ const UploadVideoModal = ({
 
           if (isAPISuccess(status)) {
             message.success('Video upload aborted');
-          } else {
           }
         } catch (error) {
           message.error(error.response?.data?.message || 'Failed to remove uploaded video');

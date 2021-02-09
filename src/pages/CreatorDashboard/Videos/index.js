@@ -399,16 +399,9 @@ const Videos = () => {
       </Row>
     );
 
-    return (
-      <Col xs={24}>
-        <Card
-          className={styles.card}
-          title={
-            <div style={{ paddingTop: 12, borderTop: `6px solid ${video.color_code || '#FFF'}` }}>
-              <Text>{video.title}</Text>
-            </div>
-          }
-          actions={[
+    const actionButtons =
+      video.status === 'UPLOAD_SUCCESS'
+        ? [
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -417,19 +410,13 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            video.status === 'UPLOAD_SUCCESS' ? (
-              <CheckCircleTwoTone twoToneColor="#52c41a" />
-            ) : (
-              <Tooltip title="Upload Video">
-                <Button
-                  className={styles.detailsButton}
-                  type="text"
-                  disabled={video.video_uid.length ? true : false}
-                  onClick={() => showUploadVideoModal(video, 2)}
-                  icon={<CloudUploadOutlined />}
-                />
-              </Tooltip>
-            ),
+            <Tooltip title="Video uploaded">
+              <Button
+                className={classNames(styles.detailsButton, styles.checkIcon)}
+                type="text"
+                icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+              />
+            </Tooltip>,
             <Tooltip title="Clone Video">
               <Button
                 className={styles.detailsButton}
@@ -456,7 +443,7 @@ const Videos = () => {
               <Tooltip title="Unhide Video">
                 <Button
                   type="link"
-                  disabled={video.video_uid.length ? false : true}
+                  disabled={video.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(video.external_id)}
                 >
@@ -469,7 +456,68 @@ const Videos = () => {
             ) : (
               <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
             ),
-          ]}
+          ]
+        : [
+            <Tooltip title="Edit">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showUploadVideoModal(video)}
+                icon={<EditOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title="Upload Video">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                disabled={video.video_uid.length ? true : false}
+                onClick={() => showUploadVideoModal(video, 2)}
+                icon={<CloudUploadOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title="Copy Video Page Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                icon={<CopyOutlined />}
+              />
+            </Tooltip>,
+            video.is_published ? (
+              <Tooltip title="Hide Video">
+                <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
+                  Hide
+                </Button>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Unhide Video">
+                <Button
+                  type="link"
+                  disabled={video.status === 'UPLOAD_SUCCESS' ? false : true}
+                  className={styles.successBtn}
+                  onClick={() => publishVideo(video.external_id)}
+                >
+                  Show
+                </Button>
+              </Tooltip>
+            ),
+            expandedRowKeys.includes(video.external_id) ? (
+              <Button type="link" onClick={() => collapseRow(video.external_id)} icon={<UpOutlined />} />
+            ) : (
+              <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
+            ),
+          ];
+
+    return (
+      <Col xs={24}>
+        <Card
+          className={styles.card}
+          title={
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${video.color_code || '#FFF'}` }}>
+              <Text>{video.title}</Text>
+            </div>
+          }
+          actions={actionButtons}
         >
           {layout('Validity', <Text>{`${video.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video.price} ${video.currency}`}</Text>)}
