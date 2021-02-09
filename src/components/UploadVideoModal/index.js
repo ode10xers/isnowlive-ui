@@ -68,7 +68,7 @@ const UploadVideoModal = ({
 
   uppy.current.use(Tus, {
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
-    resume: true,
+    resume: false,
     retryDelays: null,
   });
 
