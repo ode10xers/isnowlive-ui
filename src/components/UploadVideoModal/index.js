@@ -89,11 +89,10 @@ const UploadVideoModal = ({
       showErrorModal(`Failed to upload video`);
     }
 
-    uppy.current.reset();
-    setVideoUploadPercent(0);
-    setuploadingFlie(null);
-
     setTimeout(() => {
+      setVideoUploadPercent(0);
+      setuploadingFlie(null);
+      uppy.current.reset();
       uppy.current = null;
       closeModal(true);
     }, 500);
@@ -221,6 +220,8 @@ const UploadVideoModal = ({
 
     if (formPart === 2) {
       uppy.current.reset();
+      setVideoUploadPercent(0);
+      setuploadingFlie(null);
     }
 
     closeModal(true);
