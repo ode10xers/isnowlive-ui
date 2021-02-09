@@ -146,7 +146,7 @@ const UploadVideoModal = ({
       }
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, form]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, form, formPart]);
 
   const handleChangeLimitType = (priceType) => {
     const values = form.getFieldsValue();
