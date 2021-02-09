@@ -121,7 +121,7 @@ const VideoDetails = ({ match }) => {
         <Col xs={24} md={4}>
           <Button
             className={styles.headButton}
-            onClick={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos)}
+            onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos)}
             icon={<ArrowLeftOutlined />}
           >
             Back to Video List
