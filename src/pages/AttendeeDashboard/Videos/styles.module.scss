@@ -1,0 +1,14 @@
+@import '../../../styles/variables.scss';
+
+.successBtn {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+}
+.coverImage {
+  border-radius: 8px;
+}
+.videoItem {
+  cursor: pointer;
+}
+.expiryText {
+  font-size: 12px;
+}

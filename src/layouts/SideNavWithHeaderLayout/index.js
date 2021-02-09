@@ -1,8 +1,11 @@
 import React from 'react';
-import { Layout } from 'antd';
+import { Layout, Divider } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
 import NavbarHeader from 'components/NavbarHeader';
+import DashboardHeader from 'components/DashboardHeader';
+
+import { reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -19,16 +22,22 @@ const SideNavWithHeaderLayout = ({ children }) => {
     }
   };
 
+  const username = window.location.hostname.split('.')[0];
+
   return (
     <>
-      <Header className={styles.topHeader}>
-        <NavbarHeader removePadding={true} />
-      </Header>
-      <div className={styles.content}>
-        {/* <div className={styles.desktopHeader}>
-          <DashboardHeader />
-          <Divider className={styles.divider} />
-        </div> */}
+      {!reservedDomainName.includes(username) && (
+        <Header className={styles.topHeader}>
+          <NavbarHeader removePadding={true} />
+        </Header>
+      )}
+      <div className={reservedDomainName.includes(username) ? undefined : styles.content}>
+        {reservedDomainName.includes(username) && (
+          <>
+            <DashboardHeader />
+            <Divider className={styles.divider} />
+          </>
+        )}
         <Layout className={styles.container}>
           <Sider
             className={styles.sideIcon}

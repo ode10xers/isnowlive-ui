@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography } from 'antd';
+import { Row, Col, Image, message, Typography, Tabs } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { loadStripe } from '@stripe/stripe-js';
@@ -14,10 +14,12 @@ import SignInForm from 'components/SignInForm';
 import HostDetails from 'components/HostDetails';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
+import VideoCard from 'components/VideoCard';
+import PurchaseModal from 'components/PurchaseModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType, reservedDomainName } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
@@ -27,13 +29,13 @@ import {
   showErrorModal,
   showBookingSuccessModal,
   showAlreadyBookedModal,
+  showVideoPurchaseSuccessModal,
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
-const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
 const { Title } = Typography;
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -60,10 +62,15 @@ const SessionDetails = ({ match, history }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
-  const [selectedInventory, setSelectedInventory] = useState();
+  const [selectedInventory, setSelectedInventory] = useState(null);
+  const [sessionVideos, setSessionVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
+
+  const username = window.location.hostname.split('.')[0];
 
   const getDetails = useCallback(
-    async (username, session_id) => {
+    async (session_id) => {
       try {
         const sessionDetails = await apis.session.getSessionDetails(session_id);
         const userDetails = await apis.user.getProfileByUsername(username);
@@ -82,13 +89,15 @@ const SessionDetails = ({ match, history }) => {
           .filter((inventory) => inventory.num_participants < sessionDetails.data.max_participants)
           .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
         setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
+
+        setSessionVideos(sessionDetails.data.Videos);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         history.push(Routes.root);
       }
     },
-    [history]
+    [history, username]
   );
 
   const getUsablePassesForUser = async () => {
@@ -127,9 +136,8 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.session_id) {
-      const username = window.location.hostname.split('.')[0];
       if (username && !reservedDomainName.includes(username)) {
-        getDetails(username, match.params.session_id);
+        getDetails(match.params.session_id);
       }
     } else {
       setIsLoading(false);
@@ -153,7 +161,7 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (createFollowUpOrder) {
-      createOrder(createFollowUpOrder);
+      handleOrder(createFollowUpOrder);
     }
 
     //eslint-disable-next-line
@@ -181,7 +189,7 @@ const SessionDetails = ({ match, history }) => {
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
-        createOrder(values.email);
+        handleOrder(values.email);
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
@@ -195,21 +203,9 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const initiatePaymentForOrder = async (orderDetails) => {
+  const initiatePaymentForOrder = async (payload) => {
     setIsLoading(true);
     try {
-      let payload = {
-        order_id: orderDetails.order_id,
-        order_type: selectedPass ? orderType.PASS : orderType.CLASS,
-      };
-
-      if (selectedPass) {
-        payload = {
-          ...payload,
-          inventory_id: parseInt(selectedInventory.inventory_id),
-        };
-      }
-
       const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
       if (isAPISuccess(status) && data) {
@@ -232,75 +228,108 @@ const SessionDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const createOrder = async (userEmail) => {
-    setCreateFollowUpOrder(null);
-    try {
-      // Default payload if user book single class
-      let payload = {
+  const handleOrder = (userEmail) => {
+    setIsLoading(true);
+
+    if (selectedVideo) {
+      const payload = {
+        video_id: selectedVideo.external_id,
+      };
+
+      buyVideo(payload, userEmail);
+      setSelectedVideo(null);
+    } else if (selectedPass) {
+      const usersPass = getUserPurchasedPass(false);
+
+      if (usersPass) {
+        const payload = {
+          inventory_id: parseInt(selectedInventory.inventory_id),
+          user_timezone_offset: new Date().getTimezoneOffset(),
+          user_timezone_location: getTimezoneLocation(),
+          user_timezone: getCurrentLongTimezone(),
+          payment_source: paymentSource.CLASS_PASS,
+          source_id: usersPass.pass_order_id,
+        };
+
+        bookClassUsingPass(payload, userEmail);
+      } else {
+        const payload = {
+          pass_id: selectedPass.id,
+          price: selectedPass.price,
+          currency: selectedPass.currency,
+        };
+
+        buyPassAndBookClass(payload, userEmail);
+      }
+    } else {
+      // Default case, book single class;
+      const payload = {
         inventory_id: parseInt(selectedInventory.inventory_id),
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
         payment_source: paymentSource.GATEWAY,
       };
-      let usersPass = null;
 
-      if (selectedPass) {
-        // payment_source will be PAYMENT_GATEWAY if payment is required
-        // e.g. user buys single class / user buys new pass
-        // Booking class after pass is bought will be done in redirection
+      buySingleClass(payload, userEmail);
+    }
+  };
 
-        usersPass = getUserPurchasedPass(false);
-
-        if (usersPass) {
-          payload = {
-            ...payload,
-            payment_source: paymentSource.CLASS_PASS,
-            source_id: usersPass.pass_order_id,
-          };
-        } else {
-          payload = {
-            pass_id: selectedPass.id,
-            price: selectedPass.price,
-            currency: selectedPass.currency,
-          };
-        }
-      }
-
-      const { status, data } = selectedPass && !usersPass ? await buyPass(payload) : await bookClass(payload);
+  const buySingleClass = async (payload, userEmail) => {
+    try {
+      const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          if (selectedPass && !usersPass) {
-            initiatePaymentForOrder({ ...data, order_id: data.pass_order_id });
-          } else {
-            initiatePaymentForOrder(data);
-          }
+          initiatePaymentForOrder({
+            order_id: data.order_id,
+            order_type: orderType.CLASS,
+          });
         } else {
-          const username = window.location.hostname.split('.')[0];
+          showBookingSuccessModal(userEmail, null, false, false, username);
+          setIsLoading(false);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
 
-          if (selectedPass) {
-            if (!usersPass) {
-              // If user (for some reason) buys a free pass (if any exists)
-              // we then immediately followUp the Booking Process
-              const followUpBooking = await bookClass({
-                inventory_id: parseInt(selectedInventory.inventory_id),
-                user_timezone_offset: new Date().getTimezoneOffset(),
-                user_timezone: getCurrentLongTimezone(),
-                payment_source: paymentSource.CLASS_PASS,
-                source_id: data.pass_order_id,
-              });
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(false, username);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
+  };
 
-              if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true, false, username);
-                setIsLoading(false);
-              }
-            } else {
-              showBookingSuccessModal(userEmail, selectedPass, true, false, username);
-              setIsLoading(false);
-            }
-          } else {
-            showBookingSuccessModal(userEmail, null, false, false, username);
+  const buyPassAndBookClass = async (payload, userEmail) => {
+    try {
+      const { status, data } = await buyPass(payload);
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder({
+            order_id: data.pass_order_id,
+            order_type: orderType.PASS,
+            inventory_id: parseInt(selectedInventory.inventory_id),
+          });
+        } else {
+          // If user (for some reason) buys a free pass (if any exists)
+          // we then immediately followUp the Booking Process
+
+          // Normally wouldn't trigger
+          const followUpBooking = await bookClass({
+            inventory_id: parseInt(selectedInventory.inventory_id),
+            user_timezone_offset: new Date().getTimezoneOffset(),
+            user_timezone: getCurrentLongTimezone(),
+            payment_source: paymentSource.CLASS_PASS,
+            source_id: data.pass_order_id,
+          });
+
+          if (isAPISuccess(followUpBooking.status)) {
+            showBookingSuccessModal(userEmail, selectedPass, true, false, username);
             setIsLoading(false);
           }
         }
@@ -308,13 +337,58 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
-      const username = window.location.hostname.split('.')[0];
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(false, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
+  };
+
+  const bookClassUsingPass = async (payload, userEmail) => {
+    try {
+      const { status, data } = await bookClass(payload);
+
+      if (isAPISuccess(status) && data) {
+        showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(false, username);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(true, username);
+      }
+    }
+  };
+
+  const buyVideo = async (payload, userEmail) => {
+    try {
+      const { status, data } = await apis.videos.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        if (data.payment_required) {
+          initiatePaymentForOrder({
+            order_id: data.video_order_id,
+            order_type: orderType.VIDEO,
+          });
+        } else {
+          setIsLoading(false);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
+        }
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(true, username);
       }
     }
@@ -356,7 +430,7 @@ const SessionDetails = ({ match, history }) => {
       } else if (!getLocalUserDetails()) {
         signupUser(values);
       } else {
-        createOrder(values.email);
+        handleOrder(values.email);
       }
     } catch (error) {
       setIsLoading(false);
@@ -391,6 +465,24 @@ const SessionDetails = ({ match, history }) => {
       getUsablePassesForUser();
       setShouldSetDefaultPass(true);
     }
+  };
+
+  const redirectToVideoPreview = (video) => {
+    const baseUrl = generateUrlFromUsername(username || video.username || 'app');
+    window.open(`${baseUrl}/v/${video.external_id}`);
+  };
+
+  const openPurchaseModal = (video) => {
+    setSelectedVideo(video);
+    setShowPurchaseVideoModal(true);
+  };
+
+  const closePurchaseModal = (resetSelectedVideo = false) => {
+    if (resetSelectedVideo) {
+      setSelectedVideo(null);
+    }
+
+    setShowPurchaseVideoModal(false);
   };
 
   return (
@@ -457,6 +549,8 @@ const SessionDetails = ({ match, history }) => {
         <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
           <HostDetails host={creator} />
         </Col>
+      </Row>
+      <Row justify="space-between" className={styles.mt20} gutter={8}>
         <Col
           xs={24}
           lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
@@ -520,6 +614,34 @@ const SessionDetails = ({ match, history }) => {
           </Col>
         )}
       </Row>
+      {sessionVideos.length > 0 && (
+        <>
+          <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={handleOrder} />
+          <Row justify="space-between" className={styles.mt20}>
+            <Col xs={24}>
+              <div className={styles.box}>
+                <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
+                  <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
+                    <Row gutter={[8, 20]}>
+                      {sessionVideos.length > 0 &&
+                        sessionVideos.map((videoDetails) => (
+                          <Col xs={24} key={videoDetails.external_id}>
+                            <VideoCard
+                              video={videoDetails}
+                              buyable={true}
+                              onCardClick={redirectToVideoPreview}
+                              showPurchaseModal={openPurchaseModal}
+                            />
+                          </Col>
+                        ))}
+                    </Row>
+                  </Tabs.TabPane>
+                </Tabs>
+              </div>
+            </Col>
+          </Row>
+        </>
+      )}
     </Loader>
   );
 };

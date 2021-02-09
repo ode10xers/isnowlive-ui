@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
 
 import apis from 'apis';
@@ -18,17 +18,57 @@ import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLa
 
 import styles from './style.module.scss';
 
-const { Paragraph, Title, Text } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
-const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn }) => {
+// On special cases, closeModal will take a boolean input
+// These cases are for when there are multiple object that
+// can trigger the Modal and we need to 'reset' the value
+// of the object in the parent component (see SessionDetails)
+const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const { logIn } = useGlobalContext();
-  const history = useHistory();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
+  const [currentUser, setCurrentUser] = useState(getLocalUserDetails());
   const [showPasswordField, setShowPasswordField] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+
+  const toggleSignInState = () => {
+    if (showSignIn) {
+      setShowPasswordField(false);
+    } else {
+      form.setFieldsValue({
+        ...form.getFieldsValue(),
+        first_name: '',
+        last_name: '',
+        password: '',
+      });
+    }
+
+    setIncorrectPassword(false);
+    setShowSignIn(!showSignIn);
+  };
+
+  useEffect(() => {
+    if (visible) {
+      document.body.style.overflow = 'hidden';
+      const user = getLocalUserDetails();
+      if (user) {
+        if (!currentUser) {
+          setCurrentUser(user);
+        }
+
+        form.setFieldsValue(user);
+        closeModal();
+        createOrder(user.email);
+      }
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    //eslint-disable-next-line
+  }, [form, currentUser, visible]);
 
   useEffect(() => {
     if (showPasswordField && passwordInput.current) {
@@ -36,21 +76,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     }
   }, [showPasswordField]);
 
-  useEffect(() => {
-    setIncorrectPassword(false);
-  }, [toggleSigningIn]);
-
-  const signinUser = (data) => {
-    http.setAuthToken(data.auth_token);
-    logIn(data, true);
-    message.success('You have logged in');
-    history.push('/attendee/dashboard/sessions/upcoming');
-    window.scrollTo(0, 0);
-    closeModal();
-  };
-
   const signupUser = async (values) => {
-    setIsLoading(true);
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -59,22 +85,24 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
         is_creator: false,
       });
       if (data) {
-        signinUser(data);
+        http.setAuthToken(data.auth_token);
+        logIn(data, true);
+        closeModal();
+        createOrder(values.email);
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setShowPasswordField(true);
+        setCurrentUser(values);
         message.info('Enter password to register session');
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
-    setIsLoading(false);
   };
 
   const onFinish = async (values) => {
-    setIsLoading(true);
-
+    setIncorrectPassword(false);
     try {
       // check if user is login
 
@@ -88,9 +116,11 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
             email: values.email,
             password: values.password,
           });
-
           if (data) {
-            signinUser(data);
+            http.setAuthToken(data.auth_token);
+            logIn(data, true);
+            closeModal();
+            createOrder(values.email);
           }
         } catch (error) {
           if (error.response?.status === 403) {
@@ -102,11 +132,13 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
+      } else {
+        closeModal();
+        createOrder(values.email);
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
-    setIsLoading(false);
   };
 
   const onFinishFailed = ({ errorFields }) => {
@@ -138,7 +170,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
 
   return (
     <div>
-      <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
+      <Modal visible={visible} centered={true} onCancel={() => closeModal(true)} footer={null}>
         <Loader loading={isLoading}>
           <Form
             form={form}
@@ -150,12 +182,12 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
             <Row gutter={[8, 8]}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
-                  <Title level={4}>{`Sign ${signingIn ? 'In' : 'Up'} To Continue`}</Title>
-                  {`Sign ${signingIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
+                  <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
+                  {`Sign ${showSignIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
                 </Paragraph>
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
-                {!signingIn && (
+                {!showSignIn && (
                   <Form.Item label="Name" className={styles.nameInputWrapper}>
                     <Form.Item
                       className={styles.firstNameInput}
@@ -170,9 +202,9 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                   </Form.Item>
                 )}
                 <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                  <Input placeholder="Enter your email" disabled={!signingIn && showPasswordField} />
+                  <Input placeholder="Enter your email" disabled={!showSignIn && showPasswordField} />
                 </Form.Item>
-                {(signingIn || showPasswordField) && (
+                {(showSignIn || showPasswordField) && (
                   <>
                     <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
                       <Input.Password placeholder="Enter your password" />
@@ -184,11 +216,11 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                         </div>
                       </Form.Item>
                     )}
-                    {!signingIn && (
+                    {!showSignIn && (
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.passwordHelpText}>
                           <Text>
-                            You already have an account, but if you haven't set your password, please{' '}
+                            You already have an account, but if you haven't set your password, please
                             <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
                               set a new password
                             </Text>
@@ -198,7 +230,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                     )}
                   </>
                 )}
-                {signingIn && (
+                {showSignIn && (
                   <Form.Item {...purchaseModalCenterLayout}>
                     <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
                       Set a new password
@@ -209,13 +241,13 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
-                    Sign {signingIn ? 'In' : 'Up'}
+                    Sign {showSignIn ? 'In' : 'Up'}
                   </Button>
                 </Form.Item>
                 <Paragraph className={styles.textAlignCenter}>
-                  {signingIn ? "Don't" : 'Already'} have an account?{' '}
-                  <Button className={styles.linkBtn} type="link" onClick={() => toggleSigningIn()}>
-                    Sign {signingIn ? 'Up' : 'In'}
+                  {showSignIn ? "Don't" : 'Already'} have an account?{' '}
+                  <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
+                    Sign {showSignIn ? 'Up' : 'In'}
                   </Button>
                 </Paragraph>
               </Col>
@@ -227,4 +259,4 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   );
 };
 
-export default HeaderModal;
+export default PurchaseModal;
