@@ -153,6 +153,7 @@ const UploadVideoModal = ({
       if (formPart === 2) {
         setVideoUploadPercent(0);
         setuploadingFlie(null);
+        uppy.current.cancelAll();
         uppy.current.reset();
       }
       uppy.current = null;
