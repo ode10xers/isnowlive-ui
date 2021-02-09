@@ -90,7 +90,7 @@ const UploadVideoModal = ({
     }
 
     uppy.current.reset();
-    setuploadingFlie(false);
+    setuploadingFlie(null);
     setVideoUploadPercent(0);
 
     setTimeout(() => {
