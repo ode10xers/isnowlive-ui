@@ -109,7 +109,6 @@ const UploadVideoModal = ({
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
-    uppy.current.close();
     uppy.current = null;
   });
 
@@ -231,6 +230,7 @@ const UploadVideoModal = ({
 
   const cancelUpload = async () => {
     uppy.current.cancelAll();
+    uppy.current.close();
 
     if (editedVideo) {
       try {
