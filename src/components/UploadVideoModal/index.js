@@ -68,7 +68,7 @@ const UploadVideoModal = ({
 
   uppy.current.use(Tus, {
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
-    resume: false,
+    resume: true,
     retryDelays: null,
   });
 
@@ -105,6 +105,12 @@ const UploadVideoModal = ({
       uppy.current = null;
       closeModal(true);
     }, 500);
+  });
+
+  uppy.current.on('cancel-all', () => {
+    console.log('Cancel All is called here');
+    uppy.current.close();
+    uppy.current = null;
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -241,10 +247,7 @@ const UploadVideoModal = ({
     if (formPart === 2) {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.close();
     }
-
-    uppy.current = null;
 
     closeModal(true);
   };
