@@ -286,9 +286,9 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
                 <Form.Item
                   id="validity"
                   name="validity"
-                  label="Validity (hours)"
+                  label="Validity (days)"
                   extra={
-                    <Text className={styles.helpText}>The duration in hours this will be usable after purchase</Text>
+                    <Text className={styles.helpText}>The duration in days this will be usable after purchase</Text>
                   }
                   rules={validationRules.numberValidation('Please Input Validity', 1, false)}
                 >
