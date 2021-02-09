@@ -101,6 +101,7 @@ const UploadVideoModal = ({
     setTimeout(() => {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
+      uppy.current.cancelAll();
       uppy.current.close();
       uppy.current = null;
       closeModal(true);
@@ -109,7 +110,6 @@ const UploadVideoModal = ({
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
-    uppy.current = null;
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -229,6 +229,7 @@ const UploadVideoModal = ({
   };
 
   const cancelUpload = async () => {
+    uppy.current.cancelAll();
     uppy.current.close();
 
     if (editedVideo) {
@@ -243,11 +244,9 @@ const UploadVideoModal = ({
       }
     }
 
-    if (formPart === 2) {
-      setVideoUploadPercent(0);
-      setuploadingFlie(null);
-    }
-
+    setVideoUploadPercent(0);
+    setuploadingFlie(null);
+    uppy.current = null;
     closeModal(true);
   };
 
