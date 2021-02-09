@@ -90,8 +90,8 @@ const UploadVideoModal = ({
     }
 
     uppy.current.reset();
-    setuploadingFlie(null);
     setVideoUploadPercent(0);
+    setuploadingFlie(null);
 
     setTimeout(() => {
       uppy.current = null;
@@ -375,7 +375,7 @@ const UploadVideoModal = ({
                   },
                 }}
               />
-              {videoUploadPercent !== 0 && (
+              {videoUploadPercent !== 0 && uploadingFlie && (
                 <>
                   <Text>{uploadingFlie.name}</Text>
                   <Progress percent={videoUploadPercent} status="active" />
