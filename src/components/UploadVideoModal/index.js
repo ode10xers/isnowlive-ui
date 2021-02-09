@@ -174,7 +174,7 @@ const UploadVideoModal = ({
 
     try {
       let data = {
-        currency: currency,
+        currency: currency.toUpperCase(),
         title: values.title,
         description: values.description,
         price: videoType === videoTypes.FREE.name ? 0 : values.price,
@@ -258,6 +258,7 @@ const UploadVideoModal = ({
       closable={formPart === 1}
       onCancel={() => closeModal(false)}
       width={720}
+      destroyOnClose={true}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
