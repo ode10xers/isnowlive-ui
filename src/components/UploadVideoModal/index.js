@@ -101,7 +101,7 @@ const UploadVideoModal = ({
     setTimeout(() => {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.close();
+      uppy.current.reset();
       uppy.current = null;
       closeModal(true);
     }, 500);
@@ -153,7 +153,7 @@ const UploadVideoModal = ({
       if (formPart === 2) {
         setVideoUploadPercent(0);
         setuploadingFlie(null);
-        uppy.current.close();
+        uppy.current.reset();
       }
       uppy.current = null;
     };
@@ -223,26 +223,24 @@ const UploadVideoModal = ({
   };
 
   const cancelUpload = async () => {
-    if (uploadingFlie) {
-      uppy.current.cancelAll();
+    uppy.current.cancelAll();
 
-      if (editedVideo) {
-        try {
-          const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+    if (editedVideo) {
+      try {
+        const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
 
-          if (isAPISuccess(status)) {
-            message.success('Video upload aborted');
-          }
-        } catch (error) {
-          message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+        if (isAPISuccess(status)) {
+          message.success('Video upload aborted');
         }
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Failed to remove uploaded video');
       }
     }
 
     if (formPart === 2) {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.close();
+      uppy.current.reset();
     }
 
     closeModal(true);
