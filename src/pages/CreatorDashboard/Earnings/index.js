@@ -458,7 +458,6 @@ const Earnings = () => {
   };
 
   const openVideoDetails = (item) => {
-    console.log(item);
     if (item.video_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
     }
@@ -478,7 +477,7 @@ const Earnings = () => {
       dataIndex: 'total_earned',
       align: 'right',
       width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency}`,
+      render: (text, record) => `${record.total_earned} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',

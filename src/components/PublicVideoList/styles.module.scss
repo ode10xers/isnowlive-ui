@@ -1,6 +1,12 @@
 @import '../../styles/variables.scss';
 
 .cleanCard {
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+
+  .cardImage {
+    height: 150px;
+    object-fit: cover;
+  }
 
   .imageWrapper {
     position: relative;
@@ -18,16 +24,6 @@
         border-radius: 8px;
       }
     }
-
-    .playIconWrapper {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-
-      .playIcon {
-        color: map-get($map: $colors, $key: 'White');
-      }
-    }
   }
 
   .textWrapper {
@@ -39,6 +35,22 @@
       .detailBtn {
         border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
       }
+    }
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .cleanCard {
+    .cardImage {
+      height: 120px;
+    }
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .cleanCard {
+    .cardImage {
+      height: 200px;
     }
   }
 }

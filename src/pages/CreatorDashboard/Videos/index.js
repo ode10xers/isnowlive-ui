@@ -88,7 +88,13 @@ const Videos = () => {
       const { data } = await apis.videos.getCreatorVideos();
 
       if (data) {
-        setVideos(data);
+        setVideos(
+          data.map((video, index) => ({
+            index,
+            ...video,
+            buyers: video.buyers.map((subs) => ({ ...subs, currency: video.currency.toUpperCase() })),
+          }))
+        );
       }
     } catch (error) {
       showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
@@ -200,7 +206,7 @@ const Videos = () => {
       key: 'validity',
       align: 'center',
       width: '12%',
-      render: (text, record) => `${text} Hour${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
@@ -208,7 +214,7 @@ const Videos = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
@@ -230,14 +236,14 @@ const Videos = () => {
               <Button
                 className={styles.detailsButton}
                 type="text"
-                disabled={record.video_uid.length ? true : false}
+                disabled={record.external_id.length ? true : false}
                 onClick={() => showUploadVideoModal(record, 2)}
                 icon={<CloudUploadOutlined />}
               />
             </Tooltip>
           </Col>
           <Col xs={24} md={4}>
-            <Tooltip title="Copy Session Link">
+            <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -248,13 +254,13 @@ const Videos = () => {
           </Col>
           <Col xs={24} md={5}>
             {record.is_published ? (
-              <Tooltip title="Hide Session">
+              <Tooltip title="Hide Video">
                 <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Session">
+              <Tooltip title="Unhide Video">
                 <Button
                   type="link"
                   disabled={record.video_uid.length ? false : true}
@@ -370,7 +376,7 @@ const Videos = () => {
                 icon={<CloudUploadOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Copy Session Link">
+            <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -379,13 +385,13 @@ const Videos = () => {
               />
             </Tooltip>,
             video.is_published ? (
-              <Tooltip title="Hide Session">
+              <Tooltip title="Hide Video">
                 <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Session">
+              <Tooltip title="Unhide Video">
                 <Button
                   type="link"
                   disabled={video.video_uid.length ? false : true}
@@ -465,10 +471,10 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Pubished Videos'} />
+                <Empty description={'No Published Videos'} />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Unpublised </Title>} key="Expired">
+            <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
               {videos.length ? (
                 <>
                   {isMobileDevice ? (
@@ -492,7 +498,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No UnPublished Videos'} />
+                <Empty description={'No Unpublished Videos'} />
               )}
             </Panel>
           </Collapse>

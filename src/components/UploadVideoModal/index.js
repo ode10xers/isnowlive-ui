@@ -36,7 +36,7 @@ const formInitialValues = {
   classList: [],
   videoType: videoTypes.FREE.name,
   price: 0,
-  watch_count: 0,
+  watch_limit: 0,
 };
 
 const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVideo = null, updateEditedVideo }) => {
@@ -76,7 +76,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
-      showSuccessModal('Video Published');
+      showSuccessModal('Video Uploaded');
     } else {
       showErrorModal(`Failed to upload video`);
     }
@@ -85,6 +85,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
       closeModal(true);
     }, 500);
   });
+
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
 
@@ -148,7 +149,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
         validity: values.validity,
         session_ids: selectedSessionIds || values.session_ids || [],
         thumbnail_url: coverImageUrl,
-        watch_count: values.watch_count,
+        watch_limit: values.watch_limit,
       };
 
       const response = editedVideo
@@ -174,7 +175,6 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
         }
       }
     } catch (error) {
-      console.log(error);
       showErrorModal(`Failed to ${editedVideo ? 'update' : 'create'} video`);
     }
 
@@ -286,9 +286,9 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
                 <Form.Item
                   id="validity"
                   name="validity"
-                  label="Validity (hours)"
+                  label="Validity (days)"
                   extra={
-                    <Text className={styles.helpText}>The duration in hours this will be usable after purchase</Text>
+                    <Text className={styles.helpText}>The duration in days this will be usable after purchase</Text>
                   }
                   rules={validationRules.numberValidation('Please Input Validity', 1, false)}
                 >
@@ -297,8 +297,8 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
               </Col>
               <Col xs={24}>
                 <Form.Item
-                  id="watch_count"
-                  name="watch_count"
+                  id="watch_limit"
+                  name="watch_limit"
                   label="Watch Count"
                   extra={<Text className={styles.helpText}>Max number of time buyer can watch video</Text>}
                 >

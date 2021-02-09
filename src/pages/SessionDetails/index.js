@@ -236,7 +236,7 @@ const SessionDetails = ({ match, history }) => {
         video_id: selectedVideo.external_id,
       };
 
-      buyVideo(payload);
+      buyVideo(payload, userEmail);
       setSelectedVideo(null);
     } else if (selectedPass) {
       const usersPass = getUserPurchasedPass(false);
@@ -370,7 +370,7 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const buyVideo = async (payload) => {
+  const buyVideo = async (payload, userEmail) => {
     try {
       const { status, data } = await apis.videos.createOrderForUser(payload);
 
@@ -382,7 +382,7 @@ const SessionDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(selectedVideo);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
         }
       }
     } catch (error) {
@@ -625,16 +625,14 @@ const SessionDetails = ({ match, history }) => {
                     <Row gutter={[8, 20]}>
                       {sessionVideos.length > 0 &&
                         sessionVideos.map((videoDetails) => (
-                          <div key={videoDetails.external_id}>
-                            <Col xs={24}>
-                              <VideoCard
-                                video={videoDetails}
-                                buyable={true}
-                                onCardClick={redirectToVideoPreview}
-                                showPurchaseModal={openPurchaseModal}
-                              />
-                            </Col>
-                          </div>
+                          <Col xs={24} key={videoDetails.external_id}>
+                            <VideoCard
+                              video={videoDetails}
+                              buyable={true}
+                              onCardClick={redirectToVideoPreview}
+                              showPurchaseModal={openPurchaseModal}
+                            />
+                          </Col>
                         ))}
                     </Row>
                   </Tabs.TabPane>

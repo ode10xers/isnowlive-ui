@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import moment from 'moment';
 
 import { Row, Col, Typography, Empty, Image, Collapse } from 'antd';
 import apis from 'apis';
@@ -8,10 +7,16 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
+
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+
+const {
+  formatDate: { toLongDateWithDayTime },
+} = dateUtil;
 
 const Videos = () => {
   const history = useHistory();
@@ -39,26 +44,26 @@ const Videos = () => {
     //eslint-disable-next-line
   }, []);
 
-  const renderVideoItem = (video) => {
+  const renderVideoItem = (video, isExpired) => {
     return (
       <Col
         xs={24}
         md={12}
-        lg={8}
         className={styles.videoItem}
         onClick={() =>
+          // Sending the video order data, since it's needed in the UI
           history.push(
             Routes.attendeeDashboard.rootPath +
               Routes.attendeeDashboard.videos +
-              `/${video.video_id}/${video.video_order_id}`
+              `/${video.video_id}/${video.video_order_id}`,
+            { video_order: { ...video, isExpired } }
           )
         }
       >
-        <Row gutter={[8, 8]}>
-          <Col xs={24} md={11}>
+        <Row gutter={[10, 10]}>
+          <Col xs={24} md={12}>
             <Image height={80} className={styles.coverImage} src={video.thumbnail_url} preview={false} />
           </Col>
-          <Col xs={24} md={1}></Col>
           <Col xs={24} md={12}>
             <Row>
               <Col xs={24}>
@@ -69,12 +74,14 @@ const Videos = () => {
                   <Text type="secondary">Free video</Text>
                 ) : (
                   <Text type="secondary">
-                    {video.currency} {video.price}
+                    {video.currency.toUpperCase()} {video.price}
                   </Text>
                 )}
               </Col>
               <Col xs={24}>
-                <Text type="secondary">Expire {moment(video.expiry).fromNow()}</Text>
+                <Text type="secondary" className={styles.expiryText}>
+                  Available Till : {toLongDateWithDayTime(video.expiry)}
+                </Text>
               </Col>
             </Row>
           </Col>
@@ -94,7 +101,7 @@ const Videos = () => {
             <Panel header={<Title level={5}> Active </Title>} key="Active">
               {activeVideos.length ? (
                 <Loader loading={isLoading} size="large" text="Loading Active Videos">
-                  <Row gutter={[8, 16]}>{activeVideos.map(renderVideoItem)}</Row>
+                  <Row gutter={[8, 16]}>{activeVideos.map((video) => renderVideoItem(video, false))}</Row>
                 </Loader>
               ) : (
                 <Empty description={'No Active Videos'} />
@@ -103,7 +110,7 @@ const Videos = () => {
             <Panel header={<Title level={5}> Expired </Title>} key="Expired">
               {expiredVideos.length ? (
                 <Loader loading={isLoading} size="large" text="Loading Expired Videos">
-                  <Row gutter={[8, 16]}>{expiredVideos.map(renderVideoItem)}</Row>
+                  <Row gutter={[8, 16]}>{expiredVideos.map((video) => renderVideoItem(video, true))}</Row>
                 </Loader>
               ) : (
                 <Empty description={'No Expired Videos'} />

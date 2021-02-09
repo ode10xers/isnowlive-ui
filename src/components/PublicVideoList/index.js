@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Image, Button, message } from 'antd';
+import { Row, Col, Typography, Image, Button, Card, message } from 'antd';
 import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
@@ -57,7 +57,7 @@ const PublicVideoList = ({ username = null, videos }) => {
     setIsLoading(false);
   };
 
-  const createOrder = async () => {
+  const createOrder = async (userEmail) => {
     try {
       const payload = {
         video_id: selectedVideo.external_id,
@@ -72,7 +72,7 @@ const PublicVideoList = ({ username = null, videos }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(selectedVideo);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
           hideVideoDetailModal();
         }
       }
@@ -128,10 +128,24 @@ const PublicVideoList = ({ username = null, videos }) => {
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
           {videos.map((video) => (
-            <Col xs={24} md={12} xl={8}>
-              <div key={video.video_id || video.external_id} className={styles.cleanCard}>
+            <Col xs={24} md={12}>
+              <Card
+                key={video.external_id}
+                className={styles.cleanCard}
+                hoverable={true}
+                bodyStyle={{ padding: '10px 20px' }}
+                cover={
+                  <Image
+                    src={video.thumbnail_url || 'error'}
+                    alt={video.title}
+                    fallback={DefaultImage()}
+                    preview={false}
+                    className={styles.cardImage}
+                  />
+                }
+              >
                 <Row gutter={[8, 8]} justify="center">
-                  <Col span={24} className={styles.imageWrapper}>
+                  {/* <Col span={24} className={styles.imageWrapper}>
                     <div className={styles.thumbnailImage}>
                       <Image
                         src={video.thumbnail_url || 'error'}
@@ -141,7 +155,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                         height={200}
                       />
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
                     <Row gutter={8} justify="start">
                       <Col span={24} className={styles.titleWrapper}>
@@ -163,7 +177,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                           </Col>
                           <Col xs={12}>
                             <Button block type="primary" onClick={() => handleSelectVideo(video)}>
-                              Buy
+                              {video.price === 0 ? 'Get' : 'Buy'}
                             </Button>
                           </Col>
                         </Row>
@@ -171,7 +185,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                     </Row>
                   </Col>
                 </Row>
-              </div>
+              </Card>
             </Col>
           ))}
         </Row>

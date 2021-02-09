@@ -174,7 +174,6 @@ const ProfilePreview = ({ username = null }) => {
       const sectionToShow = location.state.section;
       let targetElement = document.getElementById('session');
 
-      //TODO: Add condition here and update NavBar as well
       if (sectionToShow === 'session') {
         setSelectedListTab(sectionToShow);
       } else if (sectionToShow === 'pass') {
