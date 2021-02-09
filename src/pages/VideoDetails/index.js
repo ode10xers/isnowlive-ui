@@ -241,7 +241,7 @@ const VideoDetails = ({ match, history }) => {
                           <Col xs={24}>
                             <Space size={isMobileDevice ? 'small' : 'middle'}>
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {`Validity ${video?.validity} Hours`}
+                                {`Validity ${video?.validity} Days`}
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>

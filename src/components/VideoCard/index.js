@@ -71,7 +71,7 @@ const VideoCard = ({
                 </div>
               ) : (
                 <Title level={5} className={classNames(styles.textAlignLeft, styles.blueText)}>
-                  Validity : {video.validity || 0} hours
+                  Validity : {video?.validity} days
                 </Title>
               )}
             </Col>

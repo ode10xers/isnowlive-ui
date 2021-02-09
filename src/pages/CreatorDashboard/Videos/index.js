@@ -206,7 +206,7 @@ const Videos = () => {
       key: 'validity',
       align: 'center',
       width: '12%',
-      render: (text, record) => `${text} Hour${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
       title: 'Price',
@@ -471,7 +471,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Pubished Videos'} />
+                <Empty description={'No Published Videos'} />
               )}
             </Panel>
             <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
@@ -498,7 +498,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No UnPublished Videos'} />
+                <Empty description={'No Unpublished Videos'} />
               )}
             </Panel>
           </Collapse>

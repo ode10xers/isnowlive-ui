@@ -188,7 +188,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.passwordHelpText}>
                           <Text>
-                            You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                            You already have an account, but if you haven't set your password, please{' '}
                             <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
                               set a new password
                             </Text>
