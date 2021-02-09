@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm, message } from 'antd';
 import {
   EditOutlined,
   CloudUploadOutlined,
@@ -8,6 +8,7 @@ import {
   UpOutlined,
   CopyOutlined,
   ExportOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -193,11 +194,28 @@ const Videos = () => {
     }
   };
 
+  const unlinkVideo = async (video) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.videos.unlinkVideo(video.external_id);
+
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        showSuccessModal('Video has been removed, you can upload another video');
+        getVideosForCreator();
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  };
+
   const videosColumns = [
     {
       title: '',
-      dataIndex: 'thumnail_url',
-      key: 'thumnail_url',
+      dataIndex: 'thumbnail_url',
+      key: 'thumbnail_url',
       align: 'center',
       width: '12%',
       render: (text, record) => {
@@ -259,15 +277,28 @@ const Videos = () => {
             </Tooltip>
           </Col>
           <Col xs={24} md={3}>
-            <Tooltip title="Upload Video">
-              <Button
-                className={styles.detailsButton}
-                type="text"
-                disabled={record.external_id.length ? true : false}
-                onClick={() => showUploadVideoModal(record, 2)}
-                icon={<CloudUploadOutlined />}
-              />
-            </Tooltip>
+            {record.video_uid.length > 0 ? (
+              <Tooltip title="Remove Video">
+                <Popconfirm
+                  title="Are you sure you want to remove this video? You will have to upload another one after this."
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => unlinkVideo(record)}
+                >
+                  <Button danger className={styles.detailsButton} type="text" icon={<DeleteOutlined />} />
+                </Popconfirm>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Upload Video">
+                <Button
+                  className={styles.detailsButton}
+                  type="text"
+                  onClick={() => showUploadVideoModal(record, 2)}
+                  icon={<CloudUploadOutlined />}
+                />
+              </Tooltip>
+            )}
           </Col>
           <Col xs={24} md={3}>
             <Tooltip title="Clone Video">
@@ -404,15 +435,29 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Upload Video">
-              <Button
-                className={styles.detailsButton}
-                type="text"
-                disabled={video.video_uid.length ? true : false}
-                onClick={() => showUploadVideoModal(video, 2)}
-                icon={<CloudUploadOutlined />}
-              />
-            </Tooltip>,
+            video.video_uid.length > 0 ? (
+              <Tooltip title="Remove Video">
+                <Popconfirm
+                  title="Are you sure you want to remove this video? You will have to upload another one after this."
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => unlinkVideo(video)}
+                >
+                  <Button danger className={styles.detailsButton} type="text" icon={<DeleteOutlined />} />
+                </Popconfirm>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Upload Video">
+                <Button
+                  className={styles.detailsButton}
+                  type="text"
+                  disabled={video.video_uid.length ? true : false}
+                  onClick={() => showUploadVideoModal(video, 2)}
+                  icon={<CloudUploadOutlined />}
+                />
+              </Tooltip>
+            ),
             <Tooltip title="Clone Video">
               <Button
                 className={styles.detailsButton}
