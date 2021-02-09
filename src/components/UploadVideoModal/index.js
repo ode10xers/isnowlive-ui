@@ -225,6 +225,7 @@ const UploadVideoModal = ({
 
   const cancelUpload = async () => {
     uppy.current.cancelAll();
+    uppy.current.off('complete', () => console.log('Removing complete event listener on cancel'));
 
     if (editedVideo) {
       try {
