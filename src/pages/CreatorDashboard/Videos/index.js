@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
-import { EditOutlined, CloudUploadOutlined, DownOutlined, UpOutlined, CopyOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  CloudUploadOutlined,
+  DownOutlined,
+  UpOutlined,
+  CopyOutlined,
+  ExportOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -30,6 +37,7 @@ const Videos = () => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [formPart, setFormPart] = useState(1);
+  const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
 
   const showUploadVideoModal = (video = null, screen = 1) => {
     if (video !== null) {
@@ -42,6 +50,7 @@ const Videos = () => {
   const hideUploadVideoModal = (shouldRefresh = false) => {
     setCreateModalVisible(false);
     setSelectedVideo(null);
+    setShouldCloneVideo(false);
     setFormPart(1);
     if (shouldRefresh) {
       getVideosForCreator();
@@ -166,6 +175,24 @@ const Videos = () => {
     }
   };
 
+  const cloneVideo = async (video) => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.videos.cloneVideo(video.external_id);
+
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        console.log(data);
+        setShouldCloneVideo(true);
+        showUploadVideoModal(data);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  };
+
   const videosColumns = [
     {
       title: '',
@@ -197,7 +224,7 @@ const Videos = () => {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      width: '35%',
+      width: '30%',
       render: (text, record) => <Text> {record.title} </Text>,
     },
     {
@@ -214,14 +241,14 @@ const Videos = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
     },
     {
       title: '',
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
-          <Col xs={24} md={4}>
+          <Col xs={24} md={3}>
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -231,7 +258,7 @@ const Videos = () => {
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={4}>
+          <Col xs={24} md={3}>
             <Tooltip title="Upload Video">
               <Button
                 className={styles.detailsButton}
@@ -242,7 +269,17 @@ const Videos = () => {
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={4}>
+          <Col xs={24} md={3}>
+            <Tooltip title="Clone Video">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => cloneVideo(record)}
+                icon={<ExportOutlined />}
+              />
+            </Tooltip>
+          </Col>
+          <Col xs={24} md={3}>
             <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
@@ -430,6 +467,7 @@ const Videos = () => {
         closeModal={hideUploadVideoModal}
         editedVideo={selectedVideo}
         updateEditedVideo={setSelectedVideo}
+        shouldClone={shouldCloneVideo}
       />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={10} lg={14}>
