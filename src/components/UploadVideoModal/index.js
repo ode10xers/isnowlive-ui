@@ -229,7 +229,6 @@ const UploadVideoModal = ({
   };
 
   const cancelUpload = async () => {
-    uppy.current.cancelAll();
     uppy.current.close();
 
     if (editedVideo) {
