@@ -95,7 +95,7 @@ const UploadVideoModal = ({
     setTimeout(() => {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.reset();
+      uppy.current.close();
       uppy.current = null;
       closeModal(true);
     }, 500);
@@ -141,9 +141,9 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
       if (formPart === 2) {
-        uppy.current.reset();
         setVideoUploadPercent(0);
         setuploadingFlie(null);
+        uppy.current.close();
       }
       uppy.current = null;
     };
@@ -228,9 +228,9 @@ const UploadVideoModal = ({
     }
 
     if (formPart === 2) {
-      uppy.current.reset();
       setVideoUploadPercent(0);
       setuploadingFlie(null);
+      uppy.current.close();
     }
 
     closeModal(true);
