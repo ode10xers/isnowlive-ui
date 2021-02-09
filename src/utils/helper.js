@@ -183,6 +183,9 @@ export const paymentSource = {
 export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',
+  VIDEO: 'VIDEO_ORDER',
 };
 
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+export const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];

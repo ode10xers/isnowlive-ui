@@ -95,12 +95,12 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
             </Form.Item>
             <Form.Item {...signInTailLayout}>
               <Row>
-                <Col xs={24} md={6} lg={6}>
+                <Col xs={24} xl={6}>
                   <Button size="large" type="primary" htmlType="submit">
                     Sign In
                   </Button>
                 </Col>
-                <Col xs={24} md={18} lg={18}>
+                <Col xs={24} xl={18}>
                   <Button className={styles.linkBtn} type="link" onClick={() => hideSignInForm()}>
                     Don't have an account? Register Now
                   </Button>

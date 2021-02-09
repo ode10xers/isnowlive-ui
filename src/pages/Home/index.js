@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import Routes from 'routes';
 import ProfilePreview from 'pages/ProfilePreview';
 
-const reservedDomainName = ['app', 'localhost'];
+import { reservedDomainName } from 'utils/helper';
 
 const Home = () => {
   const history = useHistory();

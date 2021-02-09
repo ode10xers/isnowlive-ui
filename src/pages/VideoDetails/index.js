@@ -16,15 +16,15 @@ import apis from 'apis';
 
 import Share from 'components/Share';
 import Loader from 'components/Loader';
+import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import PurchaseModal from 'components/PurchaseModal';
-
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, reservedDomainName } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -32,12 +32,12 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Title, Text } = Typography;
 
-const PassDetails = ({ match, history }) => {
+const VideoDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
-  const [pass, setPass] = useState(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [video, setVideo] = useState(null);
+  const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
 
   const username = window.location.hostname.split('.')[0];
 
@@ -56,43 +56,32 @@ const PassDetails = ({ match, history }) => {
   }, [username]);
 
   const openPurchaseModal = () => {
-    setShowPurchaseModal(true);
+    setShowPurchaseVideoModal(true);
   };
 
   const closePurchaseModal = () => {
-    setShowPurchaseModal(false);
+    setShowPurchaseVideoModal(false);
   };
 
-  const getPassDetails = useCallback(
-    async (passId) => {
-      try {
-        const { data } = await apis.passes.getPassById(passId);
+  const getVideoDetails = useCallback(async (videoId) => {
+    try {
+      const { data } = await apis.videos.getVideoById(videoId);
 
-        if (data) {
-          setPass({
-            ...data,
-            sessions:
-              data.sessions.map((session) => ({
-                ...session,
-                key: `${data.id}_${session.session_id}`,
-                username: username,
-              })) || [],
-          });
-          setIsLoading(false);
-        }
-      } catch (error) {
+      if (data) {
+        setVideo(data);
         setIsLoading(false);
-        message.error('Failed to load class pass details');
       }
-    },
-    [username]
-  );
+    } catch (error) {
+      setIsLoading(false);
+      message.error('Failed to load class video details');
+    }
+  }, []);
 
   useEffect(() => {
-    if (match.params.pass_id) {
+    if (match.params.video_id) {
       if (username && !reservedDomainName.includes(username)) {
         getProfileDetails();
-        getPassDetails(match.params.pass_id);
+        getVideoDetails(match.params.video_id);
       }
     } else {
       setIsLoading(false);
@@ -100,14 +89,14 @@ const PassDetails = ({ match, history }) => {
     }
 
     //eslint-disable-next-line
-  }, [match.params.pass_id]);
+  }, [match.params.video_id]);
 
   const initiatePaymentForOrder = async (orderDetails) => {
     setIsLoading(true);
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.pass_order_id,
-        order_type: 'PASS_ORDER',
+        order_id: orderDetails.video_order_id,
+        order_type: orderType.VIDEO,
       });
 
       if (isAPISuccess(status) && data) {
@@ -129,25 +118,21 @@ const PassDetails = ({ match, history }) => {
   };
 
   const createOrder = async (userEmail) => {
-    if (!pass) {
-      showErrorModal('Something went wrong', 'Invalid Class Pass Selected');
-      return;
-    }
-
     setIsLoading(true);
+
     try {
-      const { status, data } = await apis.passes.createOrderForUser({
-        pass_id: pass.id,
-        price: pass.price,
-        currency: pass.currency,
-      });
+      const payload = {
+        video_id: video.external_id,
+      };
+
+      const { status, data } = await apis.videos.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
           initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
-          showBookingSuccessModal(userEmail, pass, false, false, username);
+          showVideoPurchaseSuccessModal(userEmail, video, username);
         }
       }
     } catch (error) {
@@ -160,8 +145,7 @@ const PassDetails = ({ match, history }) => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading pass details">
-      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+    <Loader loading={isLoading} size="large" text="Loading video details">
       <Row gutter={[8, 24]}>
         <Col xs={24}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>
@@ -236,61 +220,66 @@ const PassDetails = ({ match, history }) => {
           </Row>
         </Col>
         <Col xs={24}>
-          {pass && (
-            <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-              <Col xs={24} className={styles.p20}>
-                <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                  <Row gutter={[8, 16]} align="center">
-                    <Col xs={24} md={20}>
-                      <Row gutter={8}>
-                        <Col xs={24}>
-                          <Title className={styles.blueText} level={3}>
-                            {' '}
-                            {pass?.name}{' '}
-                          </Title>
-                        </Col>
-                        <Col xs={24}>
-                          <Space size={isMobileDevice ? 'small' : 'middle'}>
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {pass && pass?.limited ? `${pass?.class_count} classes` : 'Unlimited Classes'}{' '}
-                            </Text>
-                            <Divider type="vertical" />
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {`${pass?.validity} days`}{' '}
-                            </Text>
-                            <Divider type="vertical" />
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {`${pass?.price} ${pass?.currency}`}{' '}
-                            </Text>
-                          </Space>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col xs={24} md={4}>
-                      <Button block type="primary" onClick={() => openPurchaseModal()}>
-                        Buy Pass
-                      </Button>
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-
-              {pass.sessions?.length > 0 && (
-                <Col xs={24}>
-                  <Row gutter={[8, 8]}>
-                    <Col xs={24}>
-                      <Text className={styles.ml20}> Applicable to below class(es) </Text>
-                    </Col>
-                    <Col xs={24}>
-                      <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
-                    </Col>
-                  </Row>
+          {video && (
+            <>
+              <PurchaseModal
+                visible={showPurchaseVideoModal}
+                closeModal={closePurchaseModal}
+                createOrder={createOrder}
+              />
+              <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+                <Col xs={24} className={styles.p20}>
+                  <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                    <Row gutter={[8, 16]} align="center">
+                      <Col xs={24} md={20}>
+                        <Row gutter={8}>
+                          <Col xs={24}>
+                            <Title className={styles.blueText} level={3}>
+                              {video?.title}
+                            </Title>
+                          </Col>
+                          <Col xs={24}>
+                            <Space size={isMobileDevice ? 'small' : 'middle'}>
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {`Validity ${video?.validity} Days`}
+                              </Text>
+                              <Divider type="vertical" />
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {video?.price === 0
+                                  ? 'Free video'
+                                  : ` ${video?.price} ${video?.currency.toUpperCase()}`}
+                              </Text>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col xs={24} md={4}>
+                        <Button block type="primary" onClick={() => openPurchaseModal()}>
+                          {video?.price === 0 ? 'Get' : 'Buy'} Video
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Card>
                 </Col>
-              )}
-            </Row>
+
+                <Col xs={24} className={styles.showcaseCardContainer}>
+                  <VideoCard video={video} buyable={false} hoverable={false} showPurchaseModal={openPurchaseModal} />
+                </Col>
+
+                {video.sessions?.length > 0 && (
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]}>
+                      <Col xs={24}>
+                        <Text className={styles.ml20}> Related to these class(es) </Text>
+                      </Col>
+                      <Col xs={24}>
+                        <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={username} />
+                      </Col>
+                    </Row>
+                  </Col>
+                )}
+              </Row>
+            </>
           )}
         </Col>
       </Row>
@@ -298,4 +287,4 @@ const PassDetails = ({ match, history }) => {
   );
 };
 
-export default PassDetails;
+export default VideoDetails;

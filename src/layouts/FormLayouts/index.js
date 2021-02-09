@@ -30,17 +30,20 @@ export const formTailLayout = {
 export const sessionRegistrationformLayout = {
   labelCol: {
     xs: { span: 24 },
-    md: { span: 4 },
+    md: { span: 6 },
+    xl: { span: 4 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    md: { span: 20 },
+    md: { span: 18 },
+    xl: { span: 20 },
   },
 };
 export const sessionRegistrationTailLayout = {
   wrapperCol: {
     xs: { span: 24 },
-    md: { offset: 4, span: 20 },
+    md: { offset: 6, span: 18 },
+    xl: { offset: 4, span: 20 },
   },
 };
 export const purchaseModalFormLayout = {
@@ -62,16 +65,19 @@ export const purchaseModalCenterLayout = {
 export const signInFormLayout = {
   labelCol: {
     xs: { span: 24 },
-    md: { span: 4 },
+    md: { span: 6 },
+    xl: { span: 4 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    md: { span: 20 },
+    md: { span: 18 },
+    xl: { span: 20 },
   },
 };
 export const signInTailLayout = {
   wrapperCol: {
     xs: { span: 24 },
-    md: { span: 20, offset: 4 },
+    md: { span: 18, offset: 6 },
+    xl: { span: 20, offset: 4 },
   },
 };

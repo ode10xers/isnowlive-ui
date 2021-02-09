@@ -443,8 +443,6 @@ const Session = ({ match, history }) => {
           moment(inventory.start_time).within(copiedRange)
         );
 
-        console.log(copiedInventories);
-
         Array.from(rangeDiff[0].snapTo('day').by('day')).forEach((extraDay) => {
           if (extraDay.within(oldRange)) {
             return;

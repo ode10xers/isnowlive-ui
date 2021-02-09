@@ -1,0 +1,28 @@
+@import '../../../styles/variables.scss';
+
+.successBtn {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+}
+.card {
+  margin-top: 10px !important;
+  border-radius: 12px !important;
+  border: 1px solid map-get($colors, $key: 'WhiteSmoke1') !important;
+}
+.coverImage {
+  border-radius: 8px;
+}
+.uploadVideoBtn {
+  width: 100%;
+  height: 100px !important;
+}
+.videoDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  padding-right: 10px;
+}
+.thumbnailImage {
+  border-radius: 5px;
+}

@@ -486,7 +486,7 @@ const SessionRegistration = ({
                         Buy pass & book {selectedInventory
                           ? toLongDateWithTime(selectedInventory.start_time)
                           : 'this'}{' '}
-                        class{' '}
+                        class
                       </Title>
                       {isMobileDevice ? (
                         availablePasses.map(renderPassItem)
@@ -518,12 +518,11 @@ const SessionRegistration = ({
             <Row className={styles.mt10}>
               {user && selectedInventory && selectedPass && userPasses.length > 0 && (
                 <Paragraph>
-                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
+                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
                   <Text delete>
-                    {' '}
-                    {classDetails.price} {classDetails.currency}{' '}
+                    {classDetails.price} {classDetails.currency}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass{' '}
+                  <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}
@@ -531,7 +530,7 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={8} md={5}>
+                <Col xs={8} md={8} xl={5}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                     {user ? 'Buy' : 'Register'}
                   </Button>
@@ -539,7 +538,7 @@ const SessionRegistration = ({
                 {!selectedInventory && (
                   <Col xs={24}>
                     <Paragraph>
-                      Please select the date & time for the class you wish to attend{' '}
+                      Please select the date & time for the class you wish to attend
                       {isMobileDevice ? '' : ', in the calendar on the right'}
                     </Paragraph>
                   </Col>
