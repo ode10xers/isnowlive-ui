@@ -30,6 +30,7 @@ import EmailVerification from 'pages/EmailVerification';
 import PaymentVerification from 'pages/PaymentVerification';
 import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
+import VideoDetails from 'pages/VideoDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -111,12 +112,13 @@ function App() {
         <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
         <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
-        <PrivateRoute layout={NavbarLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
-        <PrivateRoute layout={NavbarLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
-        <PrivateRoute layout={NavbarLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+        <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
+        <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
         <RouteWithLayout layout={NavbarLayout} exact path={Routes.login} component={Login} />
         <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
         <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
