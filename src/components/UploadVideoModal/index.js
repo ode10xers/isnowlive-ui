@@ -75,17 +75,14 @@ const UploadVideoModal = ({
   uppy.current.on('file-added', (file) => {
     setuploadingFlie(file);
     setIsLoading(true);
-    console.log('File added');
   });
 
   uppy.current.on('progress', (result) => {
     setIsLoading(false);
     setVideoUploadPercent(result);
-    console.log('Uploading....');
   });
 
   uppy.current.on('complete', (result) => {
-    console.log('Completed');
     if (result.successful.length) {
       showSuccessModal(
         'Video Successfully Uploaded',

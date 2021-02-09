@@ -185,7 +185,6 @@ const Videos = () => {
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
-        console.log(data);
         setShouldCloneVideo(true);
         showUploadVideoModal(data);
       }
