@@ -1,16 +1,16 @@
-var waitListBtn = document.querySelector("[data-waitlist-cta='true']");
-var alternateWaitlistCtas = document.querySelectorAll("[data-waitlist-cta-alternate='true']");
-var emailInput = document.createElement("input");
-var emailValidationMsg = document.createElement('p');
+let waitListBtn = document.querySelector("[data-waitlist-cta='true']");
+let alternateWaitlistCtas = document.querySelectorAll("[data-waitlist-cta-alternate='true']");
+let emailInput = document.createElement('input');
+let emailValidationMsg = document.createElement('p');
 
+let parentContainer = null;
 
 alternateWaitlistCtas.forEach((cta) => {
-  cta.addEventListener('click', function() {
-    var el = waitListBtn.parentElement;
-    el.scrollIntoView({behavior: "smooth"});
+  cta.addEventListener('click', function () {
+    let el = waitListBtn.parentElement;
+    el.scrollIntoView({ behavior: 'smooth' });
   });
-})
-
+});
 
 function addEmailInput() {
   emailInput.setAttribute('type', 'email');
@@ -26,12 +26,12 @@ function addEmailInput() {
 
   emailValidationMsg.style.color = 'red';
 
-  var parentContainer = waitListBtn.parentElement;
+  parentContainer = waitListBtn.parentElement;
   parentContainer.prepend(emailInput);
   parentContainer.insertAdjacentElement('afterend', emailValidationMsg);
 
-  window.addEventListener("scroll", function () {
-    if (window.scrollY > (emailInput.offsetTop - 100)) {
+  window.addEventListener('scroll', function () {
+    if (window.scrollY > emailInput.offsetTop - 100) {
       showEmailInput();
     }
   });
@@ -39,33 +39,33 @@ function addEmailInput() {
 
 function copyToClipboard(element) {
   if (document.selection) {
-    var range = document.body.createTextRange();
+    let range = document.body.createTextRange();
     range.moveToElementText(element);
     range.select().createTextRange();
-    document.execCommand("copy");
+    document.execCommand('copy');
     return true;
   } else if (window.getSelection) {
-    var range = document.createRange();
+    let range = document.createRange();
     range.selectNode(element);
     window.getSelection().addRange(range);
-    document.execCommand("copy");
+    document.execCommand('copy');
     return true;
   }
   return false;
 }
 
 function createSuccessDialog(response) {
-  var successContainer = document.createElement('div');
-  var SC_MSG = document.createElement('p');
+  let successContainer = document.createElement('div');
+  let SC_MSG = document.createElement('p');
 
-  var SC_INFO = document.createElement('p');
-  SC_INFO.innerText = "Want earlier access? Jump ahead 5 spots for every person you refer.";
+  let SC_INFO = document.createElement('p');
+  SC_INFO.innerText = 'Want earlier access? Jump ahead 5 spots for every person you refer.';
 
-  var SC_REF_LINK = document.createElement('a');
+  let SC_REF_LINK = document.createElement('a');
   SC_REF_LINK.href = response.referral_link;
   SC_REF_LINK.innerText = response.referral_link;
 
-  var SC_BTN = document.createElement('button');
+  let SC_BTN = document.createElement('button');
   SC_BTN.textContent = 'Copy Invite Link';
   SC_BTN.classList.add('cta-1-blue', 'w-button');
 
@@ -89,14 +89,14 @@ function createSuccessDialog(response) {
   SC_MSG.style.fontWeight = '700';
 
   SC_BTN.addEventListener('click', function () {
-    var copied = copyToClipboard(SC_REF_LINK);
+    let copied = copyToClipboard(SC_REF_LINK);
     if (copied) {
-      SC_BTN.textContent = 'Copied!!!'
+      SC_BTN.textContent = 'Copied!!!';
     }
   });
 
-  parentContainer.style.display = "none";
-  emailValidationMsg.style.display = "none";
+  parentContainer.style.display = 'none';
+  emailValidationMsg.style.display = 'none';
 }
 
 function showEmailInput() {
@@ -123,29 +123,29 @@ function addHoverEventToEarlyAccessBtn() {
 }
 
 function addClickEventToEarlyAccessBtn() {
-  waitListBtn.addEventListener("click", function () {
+  waitListBtn.addEventListener('click', function () {
     if (emailInput.validity.valid) {
       emailValidationMsg.innerText = '';
 
       fetch('https://www.getwaitlist.com/waitlist', {
         method: 'post',
         headers: {
-          "Content-type": "application/json; charset=UTF-8"
+          'Content-type': 'application/json; charset=UTF-8',
         },
         body: JSON.stringify({
           email: emailInput.value,
           api_key: 'JA5ISW',
           // api_key: 'QADFO7', Testing
-          referral_link: document.URL
-        })
+          referral_link: document.URL,
+        }),
       })
-        .then(res => {
+        .then((res) => {
           return res.json();
         })
-        .then(data => {
+        .then((data) => {
           createSuccessDialog(data);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Request failed', error);
         });
     } else {

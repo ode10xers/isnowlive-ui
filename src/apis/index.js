@@ -94,6 +94,7 @@ export default {
     createVideo: (payload) => http.post(`/secure/creator/videos`, payload),
     updateVideo: (videoId, payload) => http.put(`/secure/creator/videos/${videoId}`, payload),
     uploadVideo: (videoId, payload) => http.post(`/secure/creator/videos/${videoId}/upload`, payload),
+    cloneVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/clone`),
     createOrderForUser: (payload) => http.post('/secure/customer/videos/orders', payload),
     getAttendeeVideos: () => http.get('/secure/customer/videos/orders'),
     getAttendeeVideoToken: (orderId) => http.post(`/secure/customer/videos/orders/${orderId}/token`),

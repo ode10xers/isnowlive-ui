@@ -39,7 +39,15 @@ const formInitialValues = {
   watch_limit: 0,
 };
 
-const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVideo = null, updateEditedVideo }) => {
+const UploadVideoModal = ({
+  formPart,
+  setFormPart,
+  visible,
+  closeModal,
+  editedVideo = null,
+  updateEditedVideo,
+  shouldClone,
+}) => {
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
@@ -167,7 +175,12 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
           }
         } else {
           if (editedVideo.video_uid.length) {
-            showSuccessModal('Video details updated successfuly');
+            if (shouldClone) {
+              showSuccessModal('Video cloned successfully');
+            } else {
+              showSuccessModal('Video details updated successfully');
+            }
+
             closeModal(true);
           } else {
             setFormPart(2);
@@ -193,6 +206,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
       visible={visible}
       footer={null}
       maskClosable={false}
+      closable={formPart === 1}
       onCancel={() => closeModal(false)}
       width={720}
     >
