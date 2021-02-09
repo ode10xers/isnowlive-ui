@@ -136,6 +136,11 @@ const UploadVideoModal = ({
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
+      if (formPart === 2) {
+        uppy.current.reset();
+        setVideoUploadPercent(0);
+        setuploadingFlie(null);
+      }
       uppy.current = null;
     };
   }, [visible, editedVideo, fetchAllClassesForCreator, form]);
@@ -376,9 +381,9 @@ const UploadVideoModal = ({
                   },
                 }}
               />
-              {videoUploadPercent !== 0 && uploadingFlie && (
+              {videoUploadPercent !== 0 && (
                 <>
-                  <Text>{uploadingFlie.name}</Text>
+                  <Text>{uploadingFlie?.name}</Text>
                   <Progress percent={videoUploadPercent} status="active" />
                 </>
               )}
