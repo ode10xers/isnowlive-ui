@@ -5,12 +5,13 @@ import ReactHtmlParser from 'react-html-parser';
 import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
 
 import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const {
   formatDate: { toLongDateWithDayTime },
@@ -28,6 +29,40 @@ const VideoCard = ({
   onCardClick = noop,
   showPurchaseModal = noop,
 }) => {
+  const renderVideoOrderDetails = () => {
+    if (isMobileDevice) {
+      return (
+        <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
+          <Text strong className={styles.blueText}>
+            Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
+          </Text>
+          <Divider className={classNames(styles.divider, styles.horizontal)} />
+          <Text strong className={styles.blueText}>
+            Allowed Watches : {orderDetails.watch_limit}
+          </Text>
+          <Divider className={classNames(styles.divider, styles.horizontal)} />
+          <Text strong className={styles.blueText}>
+            You have watched {orderDetails.num_views} times
+          </Text>
+        </Space>
+      );
+    }
+
+    return (
+      <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
+        <Title level={5} className={styles.blueText}>
+          Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
+        </Title>
+        <Title level={5} className={styles.blueText}>
+          Allowed Watches : {orderDetails.watch_limit}
+        </Title>
+        <Title level={5} className={styles.blueText}>
+          You have watched {orderDetails.num_views} times
+        </Title>
+      </Space>
+    );
+  };
+
   return (
     <Card
       className={styles.videoCard}
@@ -56,19 +91,7 @@ const VideoCard = ({
             </Col>
             <Col xs={24}>
               {showOrderDetails && orderDetails ? (
-                <div className={styles.highlightedBox}>
-                  <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
-                    <Title level={5} className={styles.blueText}>
-                      Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
-                    </Title>
-                    <Title level={5} className={styles.blueText}>
-                      Allowed Watches : {orderDetails.watch_limit}
-                    </Title>
-                    <Title level={5} className={styles.blueText}>
-                      You have watched {orderDetails.num_views} times
-                    </Title>
-                  </Space>
-                </div>
+                <div className={styles.highlightedBox}>{renderVideoOrderDetails()}</div>
               ) : (
                 <Title level={5} className={classNames(styles.textAlignLeft, styles.blueText)}>
                   Validity : {video?.validity} days
