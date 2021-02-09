@@ -25,7 +25,7 @@ import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 const {
   formatDate: { toDateAndTime },
@@ -202,7 +202,7 @@ const Videos = () => {
 
       if (isAPISuccess(status)) {
         setIsLoading(false);
-        showSuccessModal('Video has been removed, you can upload another video');
+        showSuccessModal('Video has been removed', 'you can upload another video');
         getVideosForCreator();
       }
     } catch (error) {
@@ -280,7 +280,12 @@ const Videos = () => {
             {record.video_uid.length > 0 ? (
               <Tooltip title="Remove Video">
                 <Popconfirm
-                  title="Are you sure you want to remove this video? You will have to upload another one after this."
+                  title={
+                    <>
+                      <Paragraph>Are you sure you want to remove this video?</Paragraph>
+                      <Paragraph>You will have to upload another one after this.</Paragraph>
+                    </>
+                  }
                   icon={<DeleteOutlined className={styles.danger} />}
                   okText="Yes"
                   cancelText="No"

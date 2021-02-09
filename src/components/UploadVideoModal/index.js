@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress } from 'antd';
+import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress, message } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
@@ -199,6 +199,24 @@ const UploadVideoModal = ({
     form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
   };
 
+  const cancelUpload = async () => {
+    if (uploadingFlie) {
+      uppy.current.cancelAll();
+
+      if (editedVideo) {
+        const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+
+        if (isAPISuccess(status)) {
+          message.success('Video upload aborted');
+        } else {
+          message.error('Failed to remove uploaded video');
+        }
+      }
+    }
+
+    closeModal(true);
+  };
+
   return (
     <Modal
       title={`${editedVideo ? 'Edit' : 'Upload New'} Video`}
@@ -357,7 +375,7 @@ const UploadVideoModal = ({
             </div>
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFlie ? true : false}>
+                <Button block type="default" onClick={() => cancelUpload()}>
                   Cancel
                 </Button>
               </Col>
