@@ -413,6 +413,14 @@ const Videos = () => {
                 icon={<CloudUploadOutlined />}
               />
             </Tooltip>,
+            <Tooltip title="Clone Video">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => cloneVideo(video)}
+                icon={<ExportOutlined />}
+              />
+            </Tooltip>,
             <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
