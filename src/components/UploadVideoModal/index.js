@@ -139,6 +139,7 @@ const UploadVideoModal = ({
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
+      setVideoType(videoTypes.FREE.name);
       if (formPart === 2) {
         uppy.current.reset();
         setVideoUploadPercent(0);
