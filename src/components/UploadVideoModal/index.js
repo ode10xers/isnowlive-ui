@@ -101,7 +101,7 @@ const UploadVideoModal = ({
     setTimeout(() => {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.reset();
+      uppy.current.close();
       uppy.current = null;
       closeModal(true);
     }, 500);
@@ -154,7 +154,7 @@ const UploadVideoModal = ({
         setVideoUploadPercent(0);
         setuploadingFlie(null);
         uppy.current.cancelAll();
-        uppy.current.reset();
+        uppy.current.close();
       }
       uppy.current = null;
     };
@@ -225,7 +225,6 @@ const UploadVideoModal = ({
 
   const cancelUpload = async () => {
     uppy.current.cancelAll();
-    uppy.current.off('complete', () => console.log('Removing complete event listener on cancel'));
 
     if (editedVideo) {
       try {
@@ -242,8 +241,10 @@ const UploadVideoModal = ({
     if (formPart === 2) {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.reset();
+      uppy.current.close();
     }
+
+    uppy.current = null;
 
     closeModal(true);
   };
@@ -258,7 +259,6 @@ const UploadVideoModal = ({
       closable={formPart === 1}
       onCancel={() => closeModal(false)}
       width={720}
-      destroyOnClose={true}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
