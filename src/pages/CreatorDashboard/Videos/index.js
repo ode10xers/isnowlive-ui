@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
 import {
   EditOutlined,
   CloudUploadOutlined,
@@ -8,7 +9,7 @@ import {
   UpOutlined,
   CopyOutlined,
   ExportOutlined,
-  DeleteOutlined,
+  CheckCircleTwoTone,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -25,7 +26,7 @@ import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { Panel } = Collapse;
 const {
   formatDate: { toDateAndTime },
@@ -194,23 +195,6 @@ const Videos = () => {
     }
   };
 
-  const unlinkVideo = async (video) => {
-    setIsLoading(true);
-
-    try {
-      const { status } = await apis.videos.unlinkVideo(video.external_id);
-
-      if (isAPISuccess(status)) {
-        setIsLoading(false);
-        showSuccessModal('Video has been removed', 'you can upload another video');
-        getVideosForCreator();
-      }
-    } catch (error) {
-      setIsLoading(false);
-      showErrorModal('Something went wrong', error.response?.data?.message);
-    }
-  };
-
   const videosColumns = [
     {
       title: '',
@@ -277,44 +261,38 @@ const Videos = () => {
             </Tooltip>
           </Col>
           <Col xs={24} md={3}>
-            {record.video_uid.length > 0 ? (
-              <Tooltip title="Remove Video">
-                <Popconfirm
-                  title={
-                    <>
-                      <Paragraph>Are you sure you want to remove this video?</Paragraph>
-                      <Paragraph>You will have to upload another one after this.</Paragraph>
-                    </>
-                  }
-                  icon={<DeleteOutlined className={styles.danger} />}
-                  okText="Yes"
-                  cancelText="No"
-                  onConfirm={() => unlinkVideo(record)}
-                >
-                  <Button danger className={styles.detailsButton} type="text" icon={<DeleteOutlined />} />
-                </Popconfirm>
+            {record.status === 'UPLOAD_SUCCESS' ? (
+              <Tooltip title="Video uploaded">
+                <Button
+                  className={classNames(styles.detailsButton, styles.checkIcon)}
+                  type="text"
+                  icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                />
               </Tooltip>
             ) : (
-              <Tooltip title="Upload Video">
+              <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
                 <Button
                   className={styles.detailsButton}
                   type="text"
+                  disabled={record.video_uid.length > 0 ? true : false}
                   onClick={() => showUploadVideoModal(record, 2)}
                   icon={<CloudUploadOutlined />}
                 />
               </Tooltip>
             )}
           </Col>
-          <Col xs={24} md={3}>
-            <Tooltip title="Clone Video">
-              <Button
-                className={styles.detailsButton}
-                type="text"
-                onClick={() => cloneVideo(record)}
-                icon={<ExportOutlined />}
-              />
-            </Tooltip>
-          </Col>
+          {record.status === 'UPLOAD_SUCCESS' && (
+            <Col xs={24} md={3}>
+              <Tooltip title="Clone Video">
+                <Button
+                  type="text"
+                  className={styles.detailsButton}
+                  onClick={() => cloneVideo(record)}
+                  icon={<ExportOutlined />}
+                />
+              </Tooltip>
+            </Col>
+          )}
           <Col xs={24} md={3}>
             <Tooltip title="Copy Video Page Link">
               <Button
@@ -336,7 +314,7 @@ const Videos = () => {
               <Tooltip title="Unhide Video">
                 <Button
                   type="link"
-                  disabled={record.video_uid.length ? false : true}
+                  disabled={record.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(record.external_id)}
                 >
@@ -440,18 +418,8 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            video.video_uid.length > 0 ? (
-              <Tooltip title="Remove Video">
-                <Popconfirm
-                  title="Are you sure you want to remove this video? You will have to upload another one after this."
-                  icon={<DeleteOutlined className={styles.danger} />}
-                  okText="Yes"
-                  cancelText="No"
-                  onConfirm={() => unlinkVideo(video)}
-                >
-                  <Button danger className={styles.detailsButton} type="text" icon={<DeleteOutlined />} />
-                </Popconfirm>
-              </Tooltip>
+            video.status === 'UPLOAD_SUCCESS' ? (
+              <CheckCircleTwoTone twoToneColor="#52c41a" />
             ) : (
               <Tooltip title="Upload Video">
                 <Button

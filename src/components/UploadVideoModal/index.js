@@ -87,7 +87,10 @@ const UploadVideoModal = ({
   uppy.current.on('complete', (result) => {
     console.log('Completed');
     if (result.successful.length) {
-      showSuccessModal('Video Uploaded');
+      showSuccessModal(
+        'Video Successfully Uploaded',
+        'We have received your video. It takes us about 10 minutes to process your video. Until then your video is hidden.\n\nCome back after 10 minutes to unhide the video and start selling.'
+      );
     } else {
       showErrorModal(`Failed to upload video`);
     }
@@ -217,12 +220,15 @@ const UploadVideoModal = ({
       uppy.current.cancelAll();
 
       if (editedVideo) {
-        const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+        try {
+          const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
 
-        if (isAPISuccess(status)) {
-          message.success('Video upload aborted');
-        } else {
-          message.error('Failed to remove uploaded video');
+          if (isAPISuccess(status)) {
+            message.success('Video upload aborted');
+          } else {
+          }
+        } catch (error) {
+          message.error(error.response?.data?.message || 'Failed to remove uploaded video');
         }
       }
     }
