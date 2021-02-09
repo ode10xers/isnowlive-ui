@@ -15,7 +15,7 @@ const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 const {
-  formatDate: { toExpiryTimeFormat },
+  formatDate: { toLongDateWithDayTime },
 } = dateUtil;
 
 const Videos = () => {
@@ -80,7 +80,7 @@ const Videos = () => {
               </Col>
               <Col xs={24}>
                 <Text type="secondary" className={styles.expiryText}>
-                  Available Till : {toExpiryTimeFormat(video.expiry)}
+                  Available Till : {toLongDateWithDayTime(video.expiry)}
                 </Text>
               </Col>
             </Row>

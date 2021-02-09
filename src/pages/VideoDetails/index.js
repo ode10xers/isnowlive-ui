@@ -255,7 +255,7 @@ const VideoDetails = ({ match, history }) => {
                       </Col>
                       <Col xs={24} md={4}>
                         <Button block type="primary" onClick={() => openPurchaseModal()}>
-                          Buy Video
+                          {video?.price === 0 ? 'Get' : 'Buy'} Video
                         </Button>
                       </Col>
                     </Row>

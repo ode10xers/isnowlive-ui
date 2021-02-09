@@ -13,7 +13,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 const { Title } = Typography;
 
 const {
-  formatDate: { toExpiryTimeFormat },
+  formatDate: { toLongDateWithDayTime },
 } = dateUtil;
 
 const noop = () => {};
@@ -59,7 +59,7 @@ const VideoCard = ({
                 <div className={styles.highlightedBox}>
                   <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
                     <Title level={5} className={styles.blueText}>
-                      Available Till : {toExpiryTimeFormat(orderDetails.expiry)}
+                      Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
                     </Title>
                     <Title level={5} className={styles.blueText}>
                       Allowed Watches : {orderDetails.watch_limit}
@@ -98,7 +98,7 @@ const VideoCard = ({
                     showPurchaseModal(video);
                   }}
                 >
-                  Buy
+                  {video.price === 0 ? 'Get' : 'Buy'}
                 </Button>
               </div>
             </div>

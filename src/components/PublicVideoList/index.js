@@ -177,7 +177,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                           </Col>
                           <Col xs={12}>
                             <Button block type="primary" onClick={() => handleSelectVideo(video)}>
-                              Buy
+                              {video.price === 0 ? 'Get' : 'Buy'}
                             </Button>
                           </Col>
                         </Row>

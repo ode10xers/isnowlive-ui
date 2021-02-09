@@ -625,16 +625,14 @@ const SessionDetails = ({ match, history }) => {
                     <Row gutter={[8, 20]}>
                       {sessionVideos.length > 0 &&
                         sessionVideos.map((videoDetails) => (
-                          <div key={videoDetails.external_id}>
-                            <Col xs={24}>
-                              <VideoCard
-                                video={videoDetails}
-                                buyable={true}
-                                onCardClick={redirectToVideoPreview}
-                                showPurchaseModal={openPurchaseModal}
-                              />
-                            </Col>
-                          </div>
+                          <Col xs={24} key={videoDetails.external_id}>
+                            <VideoCard
+                              video={videoDetails}
+                              buyable={true}
+                              onCardClick={redirectToVideoPreview}
+                              showPurchaseModal={openPurchaseModal}
+                            />
+                          </Col>
                         ))}
                     </Row>
                   </Tabs.TabPane>
