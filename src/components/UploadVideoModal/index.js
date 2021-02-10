@@ -85,7 +85,7 @@ const UploadVideoModal = ({
   });
 
   uppy.current.on('complete', (result) => {
-    console.log('Upload Completed');
+    console.log('Upload Completed', result);
 
     if (result.successful.length) {
       showSuccessModal(
