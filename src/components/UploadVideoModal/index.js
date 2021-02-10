@@ -65,6 +65,7 @@ const UploadVideoModal = ({
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
     logger: Uppy.debugLogger,
+    debug: true,
   });
 
   uppy.current.use(Tus, {
