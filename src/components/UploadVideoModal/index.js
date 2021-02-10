@@ -62,6 +62,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     resume: true,
     retryDelays: null,
+    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
   });
 
   uppy.current.on('file-added', (file) => {
