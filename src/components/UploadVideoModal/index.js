@@ -56,12 +56,15 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
+    logger: Uppy.debugLogger,
+    debug: true,
   });
 
   uppy.current.use(Tus, {
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     resume: true,
     retryDelays: null,
+    chunkSize: 50 * 1024 * 1024, // Required a minimum chunk size of 5MB, here we use 50MB.
   });
 
   uppy.current.on('file-added', (file) => {
@@ -75,6 +78,8 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
   });
 
   uppy.current.on('complete', (result) => {
+    console.log('Upload Complete', result);
+
     if (result.successful.length) {
       showSuccessModal('Video Uploaded');
     } else {
