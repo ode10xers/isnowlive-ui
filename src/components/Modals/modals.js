@@ -15,14 +15,14 @@ const { Text, Paragraph } = Typography;
 export const showErrorModal = (title, message = '') => {
   Modal.error({
     title: title || 'Something wrong occured',
-    message: message,
+    content: message,
   });
 };
 
 export const showSuccessModal = (title, message = '') => {
   Modal.success({
     title: title || 'Success',
-    message: message,
+    content: message,
   });
 };
 

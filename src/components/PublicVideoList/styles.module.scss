@@ -26,9 +26,29 @@
     }
   }
 
+  .playIconWrapper {
+    margin-top: -50px;
+
+    .playIcon {
+      color: map-get($map: $colors, $key: 'White');
+      font-size: 20px;
+    }
+  }
+
   .textWrapper {
     .titleWrapper {
-      height: 60px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 15px;
+    }
+
+    .detailsWrapper {
+      @extend .mb20;
+
+      .validityText, .priceText {
+        @extend .blueText;
+      }
     }
 
     .buttonWrapper {
@@ -52,5 +72,17 @@
     .cardImage {
       height: 200px;
     }
+
+    .textWrapper {
+      .titleWrapper {
+        height: 60px;
+        white-space: normal;
+      }
+
+      .detailsWrapper {
+        font-size: 12px;
+      }
+    }
   }
 }
+

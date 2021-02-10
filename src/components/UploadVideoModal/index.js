@@ -17,7 +17,7 @@ import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const videoTypes = {
   FREE: {
@@ -70,7 +70,7 @@ const UploadVideoModal = ({
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     resume: true,
     retryDelays: null,
-    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
+    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 50 MB.
   });
 
   uppy.current.on('file-added', (file) => {
@@ -85,14 +85,30 @@ const UploadVideoModal = ({
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
-      showSuccessModal('Video Uploaded');
+      showSuccessModal(
+        'Video Successfully Uploaded',
+        <>
+          <Paragraph>
+            We have received your video. It takes us about 10 minutes to process your video. Until then your video is
+            hidden.
+          </Paragraph>
+          <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+        </>
+      );
     } else {
       showErrorModal(`Failed to upload video`);
     }
+
     setTimeout(() => {
+      setVideoUploadPercent(0);
+      setuploadingFlie(null);
       uppy.current = null;
       closeModal(true);
     }, 500);
+  });
+
+  uppy.current.on('cancel-all', () => {
+    console.log('Cancel All is called here');
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -114,6 +130,8 @@ const UploadVideoModal = ({
 
   useEffect(() => {
     if (visible) {
+      document.body.style.overflow = 'hidden';
+
       if (editedVideo) {
         form.setFieldsValue({
           ...editedVideo,
@@ -129,13 +147,16 @@ const UploadVideoModal = ({
       }
 
       fetchAllClassesForCreator();
+    } else {
+      document.body.style.overflow = 'auto';
     }
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
+      setVideoType(videoTypes.FREE.name);
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, form]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, form, formPart]);
 
   const handleChangeLimitType = (priceType) => {
     const values = form.getFieldsValue();
@@ -151,7 +172,7 @@ const UploadVideoModal = ({
 
     try {
       let data = {
-        currency: currency,
+        currency: currency.toUpperCase(),
         title: values.title,
         description: values.description,
         price: videoType === videoTypes.FREE.name ? 0 : values.price,
@@ -199,6 +220,30 @@ const UploadVideoModal = ({
     setCoverImageUrl(imageUrl);
     form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
   };
+
+  // Pending this feature
+  // const cancelUpload = async () => {
+  //   uppy.current.pauseAll();
+  //   uppy.current.cancelAll();
+  //   uppy.current.close();
+
+  //   if (editedVideo) {
+  //     try {
+  //       const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+
+  //       if (isAPISuccess(status)) {
+  //         message.success('Video upload aborted');
+  //       }
+  //     } catch (error) {
+  //       message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+  //     }
+  //   }
+
+  //   setVideoUploadPercent(0);
+  //   setuploadingFlie(null);
+  //   uppy.current = null;
+  //   closeModal(true);
+  // };
 
   return (
     <Modal
@@ -351,7 +396,7 @@ const UploadVideoModal = ({
               />
               {videoUploadPercent !== 0 && (
                 <>
-                  <Text>{uploadingFlie.name}</Text>
+                  <Text>{uploadingFlie?.name}</Text>
                   <Progress percent={videoUploadPercent} status="active" />
                 </>
               )}
