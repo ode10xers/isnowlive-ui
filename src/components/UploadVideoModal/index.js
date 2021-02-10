@@ -64,6 +64,7 @@ const UploadVideoModal = ({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
+    logger: Uppy.debugLogger,
   });
 
   uppy.current.use(Tus, {
@@ -156,10 +157,10 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
       if (formPart === 2) {
-        setVideoUploadPercent(0);
-        setuploadingFlie(null);
         uppy.current.cancelAll();
         uppy.current.close();
+        setVideoUploadPercent(0);
+        setuploadingFlie(null);
       }
       uppy.current = null;
     };
@@ -229,6 +230,7 @@ const UploadVideoModal = ({
   };
 
   const cancelUpload = async () => {
+    uppy.current.pauseAll();
     uppy.current.cancelAll();
     uppy.current.close();
 
