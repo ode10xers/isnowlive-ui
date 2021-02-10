@@ -71,6 +71,7 @@ const UploadVideoModal = ({
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     resume: true,
     retryDelays: null,
+    chunkSize: 50 * 1024 * 1024, // 50 MB chunk size
   });
 
   uppy.current.on('file-added', (file) => {
