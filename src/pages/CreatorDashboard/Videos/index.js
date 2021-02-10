@@ -467,7 +467,7 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Upload Video">
+            <Tooltip title={video.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
               <Button
                 className={styles.detailsButton}
                 type="text"
