@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress, message } from 'antd';
+import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
@@ -64,14 +64,13 @@ const UploadVideoModal = ({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
-    debug: true,
   });
 
   uppy.current.use(Tus, {
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     resume: true,
     retryDelays: null,
-    chunkSize: 50 * 1024 * 1024, // 50 MB chunk size
+    chunkSize: 5 * 1024 * 1024,
   });
 
   uppy.current.on('file-added', (file) => {
@@ -85,8 +84,6 @@ const UploadVideoModal = ({
   });
 
   uppy.current.on('complete', (result) => {
-    console.log('Upload Completed', result);
-
     if (result.successful.length) {
       showSuccessModal(
         'Video Successfully Uploaded',
@@ -105,8 +102,6 @@ const UploadVideoModal = ({
     setTimeout(() => {
       setVideoUploadPercent(0);
       setuploadingFlie(null);
-      uppy.current.cancelAll();
-      uppy.current.close();
       uppy.current = null;
       closeModal(true);
     }, 500);
@@ -159,12 +154,6 @@ const UploadVideoModal = ({
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
-      if (formPart === 2) {
-        uppy.current.cancelAll();
-        uppy.current.close();
-        setVideoUploadPercent(0);
-        setuploadingFlie(null);
-      }
       uppy.current = null;
     };
   }, [visible, editedVideo, fetchAllClassesForCreator, form, formPart]);
@@ -232,28 +221,29 @@ const UploadVideoModal = ({
     form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
   };
 
-  const cancelUpload = async () => {
-    uppy.current.pauseAll();
-    uppy.current.cancelAll();
-    uppy.current.close();
+  // Pending this feature
+  // const cancelUpload = async () => {
+  //   uppy.current.pauseAll();
+  //   uppy.current.cancelAll();
+  //   uppy.current.close();
 
-    if (editedVideo) {
-      try {
-        const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+  //   if (editedVideo) {
+  //     try {
+  //       const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
 
-        if (isAPISuccess(status)) {
-          message.success('Video upload aborted');
-        }
-      } catch (error) {
-        message.error(error.response?.data?.message || 'Failed to remove uploaded video');
-      }
-    }
+  //       if (isAPISuccess(status)) {
+  //         message.success('Video upload aborted');
+  //       }
+  //     } catch (error) {
+  //       message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+  //     }
+  //   }
 
-    setVideoUploadPercent(0);
-    setuploadingFlie(null);
-    uppy.current = null;
-    closeModal(true);
-  };
+  //   setVideoUploadPercent(0);
+  //   setuploadingFlie(null);
+  //   uppy.current = null;
+  //   closeModal(true);
+  // };
 
   return (
     <Modal
@@ -265,7 +255,6 @@ const UploadVideoModal = ({
       closable={formPart === 1}
       onCancel={() => closeModal(false)}
       width={720}
-      destroyOnClose={true}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
@@ -414,7 +403,7 @@ const UploadVideoModal = ({
             </div>
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => cancelUpload()}>
+                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFlie ? true : false}>
                   Cancel
                 </Button>
               </Col>
