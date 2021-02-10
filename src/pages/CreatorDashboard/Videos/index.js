@@ -57,6 +57,7 @@ const Videos = () => {
     if (shouldRefresh) {
       getVideosForCreator();
     }
+    document.body.style.overflow = 'auto';
   };
 
   const publishVideo = async (videoId) => {

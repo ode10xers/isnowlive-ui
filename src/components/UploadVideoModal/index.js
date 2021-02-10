@@ -265,6 +265,7 @@ const UploadVideoModal = ({
       closable={formPart === 1}
       onCancel={() => closeModal(false)}
       width={720}
+      destroyOnClose={true}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
