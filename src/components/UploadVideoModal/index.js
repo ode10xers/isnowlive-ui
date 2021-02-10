@@ -64,7 +64,6 @@ const UploadVideoModal = ({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
-    logger: Uppy.debugLogger,
     debug: true,
   });
 
