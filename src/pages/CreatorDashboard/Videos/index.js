@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
-import { EditOutlined, CloudUploadOutlined, DownOutlined, UpOutlined, CopyOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  CloudUploadOutlined,
+  DownOutlined,
+  UpOutlined,
+  CopyOutlined,
+  ExportOutlined,
+  CheckCircleTwoTone,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -30,6 +39,7 @@ const Videos = () => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [formPart, setFormPart] = useState(1);
+  const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
 
   const showUploadVideoModal = (video = null, screen = 1) => {
     if (video !== null) {
@@ -42,10 +52,12 @@ const Videos = () => {
   const hideUploadVideoModal = (shouldRefresh = false) => {
     setCreateModalVisible(false);
     setSelectedVideo(null);
+    setShouldCloneVideo(false);
     setFormPart(1);
     if (shouldRefresh) {
       getVideosForCreator();
     }
+    document.body.style.overflow = 'auto';
   };
 
   const publishVideo = async (videoId) => {
@@ -166,11 +178,28 @@ const Videos = () => {
     }
   };
 
+  const cloneVideo = async (video) => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.videos.cloneVideo(video.external_id);
+
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        setShouldCloneVideo(true);
+        showUploadVideoModal(data);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  };
+
   const videosColumns = [
     {
       title: '',
-      dataIndex: 'thumnail_url',
-      key: 'thumnail_url',
+      dataIndex: 'thumbnail_url',
+      key: 'thumbnail_url',
       align: 'center',
       width: '12%',
       render: (text, record) => {
@@ -197,7 +226,7 @@ const Videos = () => {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      width: '35%',
+      width: '30%',
       render: (text, record) => <Text> {record.title} </Text>,
     },
     {
@@ -214,14 +243,14 @@ const Videos = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
     },
     {
       title: '',
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
-          <Col xs={24} md={4}>
+          <Col xs={24} md={3}>
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -231,18 +260,40 @@ const Videos = () => {
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={4}>
-            <Tooltip title="Upload Video">
-              <Button
-                className={styles.detailsButton}
-                type="text"
-                disabled={record.external_id.length ? true : false}
-                onClick={() => showUploadVideoModal(record, 2)}
-                icon={<CloudUploadOutlined />}
-              />
-            </Tooltip>
+          <Col xs={24} md={3}>
+            {record.status === 'UPLOAD_SUCCESS' ? (
+              <Tooltip title="Video uploaded">
+                <Button
+                  className={classNames(styles.detailsButton, styles.checkIcon)}
+                  type="text"
+                  icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+                <Button
+                  className={styles.detailsButton}
+                  type="text"
+                  disabled={record.video_uid.length > 0 ? true : false}
+                  onClick={() => showUploadVideoModal(record, 2)}
+                  icon={<CloudUploadOutlined />}
+                />
+              </Tooltip>
+            )}
           </Col>
-          <Col xs={24} md={4}>
+          {record.status === 'UPLOAD_SUCCESS' && (
+            <Col xs={24} md={3}>
+              <Tooltip title="Clone Video">
+                <Button
+                  type="text"
+                  className={styles.detailsButton}
+                  onClick={() => cloneVideo(record)}
+                  icon={<ExportOutlined />}
+                />
+              </Tooltip>
+            </Col>
+          )}
+          <Col xs={24} md={3}>
             <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
@@ -263,7 +314,7 @@ const Videos = () => {
               <Tooltip title="Unhide Video">
                 <Button
                   type="link"
-                  disabled={record.video_uid.length ? false : true}
+                  disabled={record.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(record.external_id)}
                 >
@@ -349,16 +400,9 @@ const Videos = () => {
       </Row>
     );
 
-    return (
-      <Col xs={24}>
-        <Card
-          className={styles.card}
-          title={
-            <div style={{ paddingTop: 12, borderTop: `6px solid ${video.color_code || '#FFF'}` }}>
-              <Text>{video.title}</Text>
-            </div>
-          }
-          actions={[
+    const actionButtons =
+      video.status === 'UPLOAD_SUCCESS'
+        ? [
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -367,7 +411,63 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Upload Video">
+            <Tooltip title="Video uploaded">
+              <Button
+                className={classNames(styles.detailsButton, styles.checkIcon)}
+                type="text"
+                icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+              />
+            </Tooltip>,
+            <Tooltip title="Clone Video">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => cloneVideo(video)}
+                icon={<ExportOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title="Copy Video Page Link">
+              <Button
+                type="text"
+                className={styles.detailsButton}
+                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                icon={<CopyOutlined />}
+              />
+            </Tooltip>,
+            video.is_published ? (
+              <Tooltip title="Hide Video">
+                <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
+                  Hide
+                </Button>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Unhide Video">
+                <Button
+                  type="link"
+                  disabled={video.status === 'UPLOAD_SUCCESS' ? false : true}
+                  className={styles.successBtn}
+                  onClick={() => publishVideo(video.external_id)}
+                >
+                  Show
+                </Button>
+              </Tooltip>
+            ),
+            expandedRowKeys.includes(video.external_id) ? (
+              <Button type="link" onClick={() => collapseRow(video.external_id)} icon={<UpOutlined />} />
+            ) : (
+              <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
+            ),
+          ]
+        : [
+            <Tooltip title="Edit">
+              <Button
+                className={styles.detailsButton}
+                type="text"
+                onClick={() => showUploadVideoModal(video)}
+                icon={<EditOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title={video.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -394,7 +494,7 @@ const Videos = () => {
               <Tooltip title="Unhide Video">
                 <Button
                   type="link"
-                  disabled={video.video_uid.length ? false : true}
+                  disabled={video.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(video.external_id)}
                 >
@@ -407,7 +507,18 @@ const Videos = () => {
             ) : (
               <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
             ),
-          ]}
+          ];
+
+    return (
+      <Col xs={24}>
+        <Card
+          className={styles.card}
+          title={
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${video.color_code || '#FFF'}` }}>
+              <Text>{video.title}</Text>
+            </div>
+          }
+          actions={actionButtons}
         >
           {layout('Validity', <Text>{`${video.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video.price} ${video.currency}`}</Text>)}
@@ -430,6 +541,7 @@ const Videos = () => {
         closeModal={hideUploadVideoModal}
         editedVideo={selectedVideo}
         updateEditedVideo={setSelectedVideo}
+        shouldClone={shouldCloneVideo}
       />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={10} lg={14}>

@@ -15,6 +15,12 @@
 
   .divider {
     height: 30px;
+
+    &.horizontal {
+      height: 10px;
+      width: 120px;
+      margin: 10px 0 !important;
+    }
   }
 
   .videoDesc {
@@ -23,6 +29,15 @@
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
+  }
+
+  .orderDetailsWrapper {
+    @extend .textAlignCenter;
+    font-size: 13px;
+
+    .textDivider {
+      width: 100%;
+    }
   }
 
   .flexColumn {

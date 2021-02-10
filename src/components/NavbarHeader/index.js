@@ -383,6 +383,13 @@ const NavbarHeader = ({ removePadding = false }) => {
                           >
                             <span className={styles.menuLink}>My Passes</span>
                           </li>
+                          <li
+                            key="Attendee Videos"
+                            className={isActive('/attendee/dashboard/videos') ? styles.active : undefined}
+                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.videos)}
+                          >
+                            <span className={styles.menuLink}>My Videos</span>
+                          </li>
                         </>
                       )}
                     </ul>

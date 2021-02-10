@@ -7,6 +7,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import config from 'config';
 import apis from 'apis';
 
+import { PlayCircleOutlined } from '@ant-design/icons';
+
 import DefaultImage from 'components/Icons/DefaultImage';
 import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
@@ -18,7 +20,7 @@ import styles from './styles.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
-const { Title } = Typography;
+const { Text } = Typography;
 
 const PublicVideoList = ({ username = null, videos }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +62,7 @@ const PublicVideoList = ({ username = null, videos }) => {
   const createOrder = async (userEmail) => {
     try {
       const payload = {
-        video_id: selectedVideo.external_id,
+        video_id: selectedVideo?.external_id,
       };
 
       const { status, data } = await apis.videos.createOrderForUser(payload);
@@ -100,9 +102,9 @@ const PublicVideoList = ({ username = null, videos }) => {
   };
 
   const redirectToVideoDetails = (video) => {
-    if (video.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video.username || 'app');
-      window.open(`${baseUrl}/v/${video.external_id}`);
+    if (video?.external_id) {
+      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+      window.open(`${baseUrl}/v/${video?.external_id}`);
     }
   };
 
@@ -130,14 +132,15 @@ const PublicVideoList = ({ username = null, videos }) => {
           {videos.map((video) => (
             <Col xs={24} md={12}>
               <Card
-                key={video.external_id}
+                key={video?.external_id}
                 className={styles.cleanCard}
                 hoverable={true}
                 bodyStyle={{ padding: '10px 20px' }}
+                onClick={() => redirectToVideoDetails(video)}
                 cover={
                   <Image
-                    src={video.thumbnail_url || 'error'}
-                    alt={video.title}
+                    src={video?.thumbnail_url || 'error'}
+                    alt={video?.title}
                     fallback={DefaultImage()}
                     preview={false}
                     className={styles.cardImage}
@@ -145,23 +148,29 @@ const PublicVideoList = ({ username = null, videos }) => {
                 }
               >
                 <Row gutter={[8, 8]} justify="center">
-                  {/* <Col span={24} className={styles.imageWrapper}>
-                    <div className={styles.thumbnailImage}>
-                      <Image
-                        src={video.thumbnail_url || 'error'}
-                        alt={video.title}
-                        fallback={DefaultImage()}
-                        preview={false}
-                        height={200}
-                      />
-                    </div>
-                  </Col> */}
+                  <Col span={24} className={styles.playIconWrapper}>
+                    <PlayCircleOutlined className={styles.playIcon} size={40} />
+                  </Col>
                   <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
                     <Row gutter={8} justify="start">
                       <Col span={24} className={styles.titleWrapper}>
-                        <Title className={styles.textAlignLeft} level={5}>
-                          {video.title}
-                        </Title>
+                        <Text strong className={styles.textAlignLeft}>
+                          {video?.title}
+                        </Text>
+                      </Col>
+                      <Col span={24} className={styles.detailsWrapper}>
+                        <Row gutter={16} justify="space-evenly">
+                          <Col span={14} className={styles.textAlignLeft}>
+                            <Text strong className={styles.validityText}>
+                              Viewable for : {video?.validity} days
+                            </Text>
+                          </Col>
+                          <Col span={10} className={styles.textAlignRight}>
+                            <Text strong className={styles.priceText}>
+                              Price : {video?.price === 0 ? 'Free' : `${video?.currency.toUpperCase()} ${video?.price}`}
+                            </Text>
+                          </Col>
+                        </Row>
                       </Col>
                       <Col span={24} className={styles.buttonWrapper}>
                         <Row gutter={16} justify="space-around">
@@ -170,14 +179,24 @@ const PublicVideoList = ({ username = null, videos }) => {
                               className={styles.detailBtn}
                               block
                               type="link"
-                              onClick={() => redirectToVideoDetails(video)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                redirectToVideoDetails(video);
+                              }}
                             >
                               Details
                             </Button>
                           </Col>
                           <Col xs={12}>
-                            <Button block type="primary" onClick={() => handleSelectVideo(video)}>
-                              {video.price === 0 ? 'Get' : 'Buy'}
+                            <Button
+                              block
+                              type="primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSelectVideo(video);
+                              }}
+                            >
+                              {video?.price === 0 ? 'Get' : 'Buy'}
                             </Button>
                           </Col>
                         </Row>

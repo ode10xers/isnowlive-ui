@@ -17,7 +17,7 @@ import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const videoTypes = {
   FREE: {
@@ -39,7 +39,15 @@ const formInitialValues = {
   watch_limit: 0,
 };
 
-const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVideo = null, updateEditedVideo }) => {
+const UploadVideoModal = ({
+  formPart,
+  setFormPart,
+  visible,
+  closeModal,
+  editedVideo = null,
+  updateEditedVideo,
+  shouldClone,
+}) => {
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
@@ -62,7 +70,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
     resume: true,
     retryDelays: null,
-    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
+    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 50 MB.
   });
 
   uppy.current.on('file-added', (file) => {
@@ -77,14 +85,30 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
-      showSuccessModal('Video Uploaded');
+      showSuccessModal(
+        'Video Successfully Uploaded',
+        <>
+          <Paragraph>
+            We have received your video. It takes us about 10 minutes to process your video. Until then your video is
+            hidden.
+          </Paragraph>
+          <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+        </>
+      );
     } else {
       showErrorModal(`Failed to upload video`);
     }
+
     setTimeout(() => {
+      setVideoUploadPercent(0);
+      setuploadingFlie(null);
       uppy.current = null;
       closeModal(true);
     }, 500);
+  });
+
+  uppy.current.on('cancel-all', () => {
+    console.log('Cancel All is called here');
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -106,6 +130,8 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
   useEffect(() => {
     if (visible) {
+      document.body.style.overflow = 'hidden';
+
       if (editedVideo) {
         form.setFieldsValue({
           ...editedVideo,
@@ -121,13 +147,16 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
       }
 
       fetchAllClassesForCreator();
+    } else {
+      document.body.style.overflow = 'auto';
     }
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
+      setVideoType(videoTypes.FREE.name);
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, form]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, form, formPart]);
 
   const handleChangeLimitType = (priceType) => {
     const values = form.getFieldsValue();
@@ -143,7 +172,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
 
     try {
       let data = {
-        currency: currency,
+        currency: currency.toUpperCase(),
         title: values.title,
         description: values.description,
         price: videoType === videoTypes.FREE.name ? 0 : values.price,
@@ -168,7 +197,12 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
           }
         } else {
           if (editedVideo.video_uid.length) {
-            showSuccessModal('Video details updated successfuly');
+            if (shouldClone) {
+              showSuccessModal('Video cloned successfully');
+            } else {
+              showSuccessModal('Video details updated successfully');
+            }
+
             closeModal(true);
           } else {
             setFormPart(2);
@@ -187,6 +221,30 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
     form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
   };
 
+  // Pending this feature
+  // const cancelUpload = async () => {
+  //   uppy.current.pauseAll();
+  //   uppy.current.cancelAll();
+  //   uppy.current.close();
+
+  //   if (editedVideo) {
+  //     try {
+  //       const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+
+  //       if (isAPISuccess(status)) {
+  //         message.success('Video upload aborted');
+  //       }
+  //     } catch (error) {
+  //       message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+  //     }
+  //   }
+
+  //   setVideoUploadPercent(0);
+  //   setuploadingFlie(null);
+  //   uppy.current = null;
+  //   closeModal(true);
+  // };
+
   return (
     <Modal
       title={`${editedVideo ? 'Edit' : 'Upload New'} Video`}
@@ -194,6 +252,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
       visible={visible}
       footer={null}
       maskClosable={false}
+      closable={formPart === 1}
       onCancel={() => closeModal(false)}
       width={720}
     >
@@ -337,7 +396,7 @@ const UploadVideoModal = ({ formPart, setFormPart, visible, closeModal, editedVi
               />
               {videoUploadPercent !== 0 && (
                 <>
-                  <Text>{uploadingFlie.name}</Text>
+                  <Text>{uploadingFlie?.name}</Text>
                   <Progress percent={videoUploadPercent} status="active" />
                 </>
               )}
