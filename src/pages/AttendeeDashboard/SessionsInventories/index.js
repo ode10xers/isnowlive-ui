@@ -58,7 +58,7 @@ const SessionsInventories = ({ match }) => {
             max_participants: i.max_participants,
             username: i.creator_username,
             price: i.price,
-            currency: i.currency || 'SGD',
+            currency: i.currency.toUpperCase() || 'SGD',
             refund_amount: i.refund_amount || 0,
             is_refundable: i.is_refundable || false,
             refund_before_hours: i.refund_before_hours || 24,
@@ -142,7 +142,7 @@ const SessionsInventories = ({ match }) => {
             title={
               <Text>
                 Do you want to refund this session? <br />
-                You will get <strong>{` ${data.currency} ${data.refund_amount} `}</strong>
+                You will get <strong>{` ${data.currency.toUpperCase()} ${data.refund_amount} `}</strong>
                 back.
               </Text>
             }

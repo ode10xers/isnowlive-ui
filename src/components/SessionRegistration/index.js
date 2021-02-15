@@ -99,7 +99,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'right',
       width: '50%',
-      render: (text, record) => `${record.price} ${record.currency}`,
+      render: (text, record) => `${record.price} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -138,7 +138,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'left',
       width: '15%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: 'Class Count',
@@ -272,7 +272,7 @@ const SessionRegistration = ({
         >
           {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>
@@ -520,9 +520,9 @@ const SessionRegistration = ({
                 <Paragraph>
                   Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
                   <Text delete>
-                    {classDetails.price} {classDetails.currency}
+                    {classDetails.price} {classDetails.currency.toUpperCase()}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass
+                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> using your purchased pass
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}

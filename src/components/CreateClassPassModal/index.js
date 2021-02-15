@@ -75,7 +75,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
 
       if (data) {
         setClasses(data.map((session) => ({ value: session.session_id, label: session.name })));
-        setCurrency(data[0].currency);
+        setCurrency(data[0].currency.toUpperCase());
       }
     } catch (error) {
       showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
@@ -96,7 +96,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
           price: editedPass.price,
           color_code: editedPass.color_code || whiteColor,
         });
-        setCurrency(editedPass.currency);
+        setCurrency(editedPass.currency.toUpperCase());
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
         setColorCode(editedPass.color_code || whiteColor);
@@ -139,7 +139,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
       }
 
       let data = {
-        currency: currency,
+        currency: currency.toLowerCase(),
         price: values.price,
         name: values.passName,
         validity: values.validity,

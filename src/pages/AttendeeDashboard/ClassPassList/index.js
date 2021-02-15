@@ -45,7 +45,7 @@ const ClassPassList = () => {
             name: pass.pass_name,
             price: pass.price,
             limited: pass.limited,
-            currency: pass.currency,
+            currency: pass.currency.toUpperCase(),
             validity: pass.validity,
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
@@ -68,7 +68,7 @@ const ClassPassList = () => {
             name: pass.pass_name,
             price: pass.price,
             limited: pass.limited,
-            currency: pass.currency,
+            currency: pass.currency.toUpperCase(),
             validity: pass.validity,
             class_count: pass.class_count,
             classes_remaining: pass.classes_remaining,
@@ -161,7 +161,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '18%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
@@ -242,7 +242,7 @@ const ClassPassList = () => {
             <Text>{pass.limited ? `${pass.classes_remaining}/${pass.class_count} Classes` : 'Unlimited Classes'}</Text>
           )}
           {layout('Expires On', <Text>{toShortDate(pass.expiry)}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {((pass.expired && expandedExpiredRowKeys.includes(pass.pass_order_id)) ||
           expandedActiveRowKeys.includes(pass.pass_order_id)) && (

@@ -185,14 +185,14 @@ const SessionsDetails = ({ match }) => {
               </Col>
               <Col xs={24} md={12}>
                 {layout('Session Attendees', `${session?.num_participants} / ${session?.max_participants}`)}
-                {layout('Session Price', `${session?.price} ${session?.currency} `)}
+                {layout('Session Price', `${session?.price} ${session?.currency.toUpperCase()} `)}
                 {layout(
                   'Session Earning',
                   `${
                     session.participants
                       ? session.participants.reduce((item, participant) => item + (participant.fee_paid || 0), 0)
                       : 0
-                  } ${session?.currency}`
+                  } ${session?.currency.toUpperCase()}`
                 )}
               </Col>
             </>
@@ -297,7 +297,7 @@ const SessionsDetails = ({ match }) => {
           <Col span={24} className={styles.mt20}>
             <ParticipantsList
               participants={session?.participants}
-              currency={session?.currency}
+              currency={session?.currency.toUpperCase()}
               isPast={isPastSession}
             />
           </Col>

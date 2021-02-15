@@ -80,7 +80,7 @@ const ClassPasses = ({ username, passes }) => {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: selectedPass.id,
         price: selectedPass.price,
-        currency: selectedPass.currency,
+        currency: selectedPass.currency.toLowerCase(),
       });
 
       if (isAPISuccess(status) && data) {
@@ -151,7 +151,7 @@ const ClassPasses = ({ username, passes }) => {
       align: 'left',
       sortOrder: 'descend',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: (
@@ -222,7 +222,7 @@ const ClassPasses = ({ username, passes }) => {
         >
           {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>

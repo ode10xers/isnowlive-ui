@@ -139,7 +139,7 @@ const PassDetails = ({ match, history }) => {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: pass.id,
         price: pass.price,
-        currency: pass.currency,
+        currency: pass.currency.toLowerCase(),
       });
 
       if (isAPISuccess(status) && data) {
@@ -252,18 +252,15 @@ const PassDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Space size={isMobileDevice ? 'small' : 'middle'}>
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {pass && pass?.limited ? `${pass?.class_count} classes` : 'Unlimited Classes'}{' '}
+                              {pass && pass?.limited ? `${pass?.class_count} classes` : 'Unlimited Classes'}
                             </Text>
                             <Divider type="vertical" />
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {`${pass?.validity} days`}{' '}
+                              {`${pass?.validity} days`}
                             </Text>
                             <Divider type="vertical" />
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {`${pass?.price} ${pass?.currency}`}{' '}
+                              {`${pass?.price} ${pass?.currency.toUpperCase()}`}
                             </Text>
                           </Space>
                         </Col>

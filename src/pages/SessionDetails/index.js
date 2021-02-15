@@ -256,7 +256,7 @@ const SessionDetails = ({ match, history }) => {
         const payload = {
           pass_id: selectedPass.id,
           price: selectedPass.price,
-          currency: selectedPass.currency,
+          currency: selectedPass.currency.toLowerCase(),
         };
 
         buyPassAndBookClass(payload, userEmail);

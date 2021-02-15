@@ -102,12 +102,12 @@ const ClassPassList = () => {
             name: classPass.name,
             price: classPass.price,
             limited: classPass.limited,
-            currency: classPass.currency,
+            currency: classPass.currency.toUpperCase(),
             validity: classPass.validity,
             class_count: classPass.class_count,
             is_published: classPass.is_published,
             sessions: classPass.sessions,
-            buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency })),
+            buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
             color_code: classPass.color_code,
           }))
         );
@@ -226,7 +226,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
@@ -302,7 +302,7 @@ const ClassPassList = () => {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
-      render: (text, record) => `${record.price_paid} ${record.currency}`,
+      render: (text, record) => `${record.price_paid} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -329,7 +329,7 @@ const ClassPassList = () => {
           <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
         </Col>
         <Col xs={24}>
-          <Text> {`${subscriber.price_paid} ${subscriber.currency}`} </Text>
+          <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
         </Col>
       </Row>
     </Card>
@@ -393,7 +393,7 @@ const ClassPassList = () => {
         >
           {layout('Class Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>
