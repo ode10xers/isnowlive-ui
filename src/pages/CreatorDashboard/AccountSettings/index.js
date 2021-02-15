@@ -1,9 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Tabs } from 'antd';
-import { BellOutlined } from '@ant-design/icons';
+import { BellOutlined, UserOutlined } from '@ant-design/icons';
 
 import NotificationSettings from './NotificationSettings';
+import ProfileSettings from './ProfileSettings';
 
 import styles from './styles.module.scss';
 
@@ -19,9 +20,9 @@ const AccountSettings = () => {
     },
     {
       key: 'profile',
-      icon: null,
+      icon: <UserOutlined />,
       label: 'Profile',
-      content: null,
+      content: <ProfileSettings />,
     },
   ];
 
