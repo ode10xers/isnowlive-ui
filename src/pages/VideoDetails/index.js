@@ -24,7 +24,7 @@ import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'component
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, orderType, reservedDomainName } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType, paymentSource, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -123,6 +123,7 @@ const VideoDetails = ({ match, history }) => {
     try {
       const payload = {
         video_id: video.external_id,
+        payment_source: paymentSource.GATEWAY,
       };
 
       const { status, data } = await apis.videos.createOrderForUser(payload);

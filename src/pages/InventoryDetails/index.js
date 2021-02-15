@@ -238,7 +238,7 @@ const InventoryDetails = ({ match, history }) => {
         if (usersPass) {
           payload = {
             ...payload,
-            payment_source: paymentSource.CLASS_PASS,
+            payment_source: paymentSource.PASS,
             source_id: usersPass.pass_order_id,
           };
         } else {
@@ -270,7 +270,7 @@ const InventoryDetails = ({ match, history }) => {
                 inventory_id: parseInt(match.params.inventory_id),
                 user_timezone_offset: new Date().getTimezoneOffset(),
                 user_timezone: getCurrentLongTimezone(),
-                payment_source: paymentSource.CLASS_PASS,
+                payment_source: paymentSource.PASS,
                 source_id: data.pass_order_id,
               });
 

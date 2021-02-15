@@ -63,7 +63,7 @@ const PaymentVerification = () => {
                     user_timezone_offset: new Date().getTimezoneOffset(),
                     user_timezone_location: getTimezoneLocation(),
                     user_timezone: getCurrentLongTimezone(),
-                    payment_source: paymentSource.CLASS_PASS,
+                    payment_source: paymentSource.PASS,
                     source_id: order_id,
                   });
 

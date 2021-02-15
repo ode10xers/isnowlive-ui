@@ -24,7 +24,7 @@ import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, reservedDomainName } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, reservedDomainName, orderType } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -107,7 +107,7 @@ const PassDetails = ({ match, history }) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.pass_order_id,
-        order_type: 'PASS_ORDER',
+        order_type: orderType.PASS,
       });
 
       if (isAPISuccess(status) && data) {

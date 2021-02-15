@@ -177,7 +177,7 @@ export const StripeAccountStatus = {
 
 export const paymentSource = {
   GATEWAY: 'PAYMENT_GATEWAY',
-  CLASS_PASS: 'PASS',
+  PASS: 'PASS',
 };
 
 export const orderType = {

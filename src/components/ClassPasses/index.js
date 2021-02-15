@@ -13,7 +13,7 @@ import PurchaseModal from 'components/PurchaseModal';
 
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType } from 'utils/helper';
 
 import config from 'config';
 import apis from 'apis';
@@ -48,7 +48,7 @@ const ClassPasses = ({ username, passes }) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.pass_order_id,
-        order_type: 'PASS_ORDER',
+        order_type: orderType.PASS,
       });
 
       if (isAPISuccess(status) && data) {

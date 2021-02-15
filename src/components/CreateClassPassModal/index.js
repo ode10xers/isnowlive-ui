@@ -108,6 +108,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
       console.log(editedPass);
 
       if (editedPass) {
+        //TODO: Adjust the new video id list key here
         form.setFieldsValue({
           passName: editedPass.name,
           classList: editedPass.sessions.map((session) => session.session_id),
@@ -121,8 +122,6 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
         setColorCode(editedPass.color_code || whiteColor);
-        //TODO: Since now there are two list, probably need to make custom validator
-        form.validateFields(['classList']);
       } else {
         form.resetFields();
       }

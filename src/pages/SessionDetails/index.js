@@ -234,6 +234,7 @@ const SessionDetails = ({ match, history }) => {
     if (selectedVideo) {
       const payload = {
         video_id: selectedVideo.external_id,
+        payment_source: paymentSource.GATEWAY,
       };
 
       buyVideo(payload, userEmail);
@@ -247,7 +248,7 @@ const SessionDetails = ({ match, history }) => {
           user_timezone_offset: new Date().getTimezoneOffset(),
           user_timezone_location: getTimezoneLocation(),
           user_timezone: getCurrentLongTimezone(),
-          payment_source: paymentSource.CLASS_PASS,
+          payment_source: paymentSource.PASS,
           source_id: usersPass.pass_order_id,
         };
 
@@ -324,7 +325,7 @@ const SessionDetails = ({ match, history }) => {
             inventory_id: parseInt(selectedInventory.inventory_id),
             user_timezone_offset: new Date().getTimezoneOffset(),
             user_timezone: getCurrentLongTimezone(),
-            payment_source: paymentSource.CLASS_PASS,
+            payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
           });
 

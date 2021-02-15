@@ -14,7 +14,7 @@ import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -63,6 +63,7 @@ const PublicVideoList = ({ username = null, videos }) => {
     try {
       const payload = {
         video_id: selectedVideo?.external_id,
+        payment_source: paymentSource.GATEWAY,
       };
 
       const { status, data } = await apis.videos.createOrderForUser(payload);

@@ -36,7 +36,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       key: 'net_price',
       width: '12%',
       render: (text, record, index) =>
-        record.booking_type === paymentSource.CLASS_PASS ? (
+        record.booking_type === paymentSource.PASS ? (
           'PASS'
         ) : (
           <Text className={styles.textAlignLeft}>
