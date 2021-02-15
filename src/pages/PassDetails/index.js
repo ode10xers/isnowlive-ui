@@ -159,6 +159,7 @@ const PassDetails = ({ match, history }) => {
     }
   };
 
+  //TODO: Adjust new credit keys here
   return (
     <Loader loading={isLoading} size="large" text="Loading pass details">
       <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
@@ -245,14 +246,13 @@ const PassDetails = ({ match, history }) => {
                       <Row gutter={8}>
                         <Col xs={24}>
                           <Title className={styles.blueText} level={3}>
-                            {' '}
-                            {pass?.name}{' '}
+                            {pass?.name}
                           </Title>
                         </Col>
                         <Col xs={24}>
                           <Space size={isMobileDevice ? 'small' : 'middle'}>
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {pass && pass?.limited ? `${pass?.class_count} classes` : 'Unlimited Classes'}
+                              {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
                             </Text>
                             <Divider type="vertical" />
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>

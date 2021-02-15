@@ -129,12 +129,12 @@ const ClassPasses = ({ username, passes }) => {
       width: '35%',
     },
     {
-      title: 'Pass Count',
-      dataIndex: 'class_count',
+      title: 'Credit Count',
+      dataIndex: 'class_count', //TODO: Adjust new credit keys here
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
+      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credit'),
     },
     {
       title: 'Validity',
@@ -200,6 +200,7 @@ const ClassPasses = ({ username, passes }) => {
       </Row>
     );
 
+    //TODO: Adjust new credit keys here
     return (
       <div>
         <Card
@@ -220,7 +221,7 @@ const ClassPasses = ({ username, passes }) => {
             ),
           ]}
         >
-          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
           {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>

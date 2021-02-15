@@ -35,6 +35,7 @@ const ClassPassList = () => {
     try {
       const { data } = await apis.passes.getAttendeePasses();
 
+      //TODO: Adjust new credit keys here
       if (data) {
         setPasses(
           data.active.map((pass, index) => ({
@@ -139,13 +140,13 @@ const ClassPassList = () => {
       width: '35%',
     },
     {
-      title: 'Classes Left',
-      dataIndex: 'class_count',
+      title: 'Credit Left',
+      dataIndex: 'class_count', //TODO: Adjust new credit keys here
       key: 'class_count',
       align: 'right',
       width: '15%',
       render: (text, record) =>
-        record.limited ? `${record.classes_remaining}/${record.class_count} Classes` : 'Unlimited Classes',
+        record.limited ? `${record.classes_remaining}/${record.class_count} Credits` : 'Unlimited Credits',
     },
     {
       title: 'Expires On',
@@ -209,7 +210,7 @@ const ClassPassList = () => {
         <Col span={15}>: {value}</Col>
       </Row>
     );
-
+    //TODO: Adjust new credit keys here
     return (
       <div>
         <Card
@@ -238,8 +239,8 @@ const ClassPassList = () => {
           ]}
         >
           {layout(
-            'Classes Left',
-            <Text>{pass.limited ? `${pass.classes_remaining}/${pass.class_count} Classes` : 'Unlimited Classes'}</Text>
+            'Credits Left',
+            <Text>{pass.limited ? `${pass.classes_remaining}/${pass.class_count} Credits` : 'Unlimited Credits'}</Text>
           )}
           {layout('Expires On', <Text>{toShortDate(pass.expiry)}</Text>)}
           {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}

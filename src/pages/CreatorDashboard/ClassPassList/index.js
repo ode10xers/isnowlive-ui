@@ -104,7 +104,7 @@ const ClassPassList = () => {
             limited: classPass.limited,
             currency: classPass.currency.toUpperCase(),
             validity: classPass.validity,
-            class_count: classPass.class_count,
+            class_count: classPass.class_count, //TODO: Adjust new credit keys here
             is_published: classPass.is_published,
             sessions: classPass.sessions,
             buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
@@ -205,12 +205,12 @@ const ClassPassList = () => {
       },
     },
     {
-      title: 'Pass Count',
-      dataIndex: 'class_count',
+      title: 'Credit Count',
+      dataIndex: 'class_count', //TODO: Adjust new credit keys here
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
+      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credits'),
     },
     {
       title: 'Validity',
@@ -391,7 +391,7 @@ const ClassPassList = () => {
             ),
           ]}
         >
-          {layout('Class Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
           {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>

@@ -112,7 +112,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
           passName: editedPass.name,
           classList: editedPass.sessions.map((session) => session.session_id),
           passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
-          classCount: editedPass.class_count,
+          classCount: editedPass.class_count, //TODO: Adjust new credit keys here
           validity: editedPass.validity,
           price: editedPass.price,
           color_code: editedPass.color_code || whiteColor,
@@ -173,7 +173,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         validity: values.validity,
         session_ids: selectedClasses || values.classList || [],
         video_ids: selectedVideos || values.videoList || [], //TODO: Confirm the format & key for this
-        class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
+        class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000, //TODO: Adjust new credit keys here
         limited: passTypes.LIMITED.name === passType,
         color_code: colorCode || whiteColor,
       };

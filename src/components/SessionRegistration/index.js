@@ -141,16 +141,16 @@ const SessionRegistration = ({
       render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
-      title: 'Class Count',
-      dataIndex: 'class_count',
+      title: 'Credit Count',
+      dataIndex: 'class_count', //TODO: Adjust new credit keys here
       key: 'class_count',
       align: 'right',
       render: (text, record) => {
         const btnText = record.limited
           ? record.user_usable
             ? `${record.classes_remaining}/${record.class_count} remaining `
-            : `${record.class_count} Classes `
-          : 'Unlimited Classes ';
+            : `${record.class_count} Credits `
+          : 'Unlimited Credits ';
 
         return expandedRowKeys.includes(record.id) ? (
           <Button className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
@@ -187,8 +187,8 @@ const SessionRegistration = ({
       align: 'left',
     },
     {
-      title: 'Classes Left',
-      dataIndex: 'classes_remaining',
+      title: 'Credits Left',
+      dataIndex: 'classes_remaining', //TODO: Adjust new credit keys here
       key: 'classes_remaining',
       width: '20%',
       render: (text, record) => `${record.classes_remaining}/${record.class_count}`,
@@ -270,7 +270,7 @@ const SessionRegistration = ({
             ),
           ]}
         >
-          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
           {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
@@ -340,7 +340,7 @@ const SessionRegistration = ({
             ),
           ]}
         >
-          {layout('Classes Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
+          {layout('Credits Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
           {layout('Expiry', <Text>{toShortDate(pass.expiry)}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
