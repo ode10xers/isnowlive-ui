@@ -24,19 +24,22 @@ const NotificationSettings = () => {
       const { status, data } = await apis.user.getCreatorUserPreferences();
 
       if (isAPISuccess(status) && data) {
-        console.log(data);
+        let checkedKeys = [];
+        for (const [key, value] of Object.entries(data)) {
+          if (value) {
+            checkedKeys.push(key.toString());
+          }
+        }
+        setCheckedEmailOptions(checkedKeys);
       }
     } catch (error) {
       showErrorModal('Failed to fetch user preferences', error.response?.data?.message || 'Something went wrong');
     }
 
-    setIsLoading(true);
+    setIsLoading(false);
   }, []);
 
   const saveUserPreferences = async () => {
-    console.log(checkedEmailOptions);
-    return;
-
     setSubmitting(true);
     try {
       const payload = {
