@@ -91,67 +91,10 @@ const VideoDetails = ({ match, history }) => {
   const getAvailablePassesForVideo = useCallback(async (videoId) => {
     console.log('GetAvailablePass');
     try {
-      // TODO:Adjust for this
-      // const { status, data } = await apis.passes.getPassesByVideoId(videoId);
-      const { status, data } = await apis.passes.getPassesByUsername(username);
+      const { status, data } = await apis.passes.getPassesByVideoId(videoId);
 
       if (isAPISuccess(status) && data) {
-        //TODO: Also adjust this according to the response
-        setAvailablePassesForVideo(
-          data.map((tempPass) => ({
-            ...tempPass,
-            videos: [
-              {
-                title: 'My New Video Testing',
-                description: '\u003cp\u003eDesc\u003c/p\u003e\n',
-                validity: 6,
-                price: 10,
-                currency: 'sgd',
-                thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/tIwOqOnsV249Hq8H_sample_image.jpg',
-                sessions: [],
-                external_id: '80c75636-a4d6-4d94-b42d-31262d19a525',
-                is_published: true,
-                video_url: '',
-                video_uid: 'baa0646cc7b77fe217071b3093d25ac3',
-                duration: 489,
-                status: 'UPLOAD_SUCCESS',
-                watch_limit: 6,
-              },
-              {
-                title: 'My New Video Testing',
-                description: '\u003cp\u003eDesc\u003c/p\u003e\n',
-                validity: 6,
-                price: 10,
-                currency: 'sgd',
-                thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/tIwOqOnsV249Hq8H_sample_image.jpg',
-                sessions: [],
-                external_id: '80c75636-a4d6-4d94-b42d-31262d19a526',
-                is_published: true,
-                video_url: '',
-                video_uid: 'baa0646cc7b77fe217071b3093d25ac3',
-                duration: 489,
-                status: 'UPLOAD_SUCCESS',
-                watch_limit: 6,
-              },
-              {
-                title: 'My New Video Testing',
-                description: '\u003cp\u003eDesc\u003c/p\u003e\n',
-                validity: 6,
-                price: 10,
-                currency: 'sgd',
-                thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/tIwOqOnsV249Hq8H_sample_image.jpg',
-                sessions: [],
-                external_id: '80c75636-a4d6-4d94-b42d-31262d19a527',
-                is_published: true,
-                video_url: '',
-                video_uid: 'baa0646cc7b77fe217071b3093d25ac3',
-                duration: 489,
-                status: 'UPLOAD_SUCCESS',
-                watch_limit: 6,
-              },
-            ],
-          }))
-        );
+        setAvailablePassesForVideo(data);
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed fetching available pass for video');
@@ -166,13 +109,10 @@ const VideoDetails = ({ match, history }) => {
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData && video) {
-        // TODO: Adjust for this
-        // const { status, data } = await apis.passes.getAttendeePassesForVideo(video.external_id);
-        const { status, data } = await apis.passes.getPassesByUsername(username);
+        const { status, data } = await apis.passes.getAttendeePassesForVideo(video.external_id);
 
         if (isAPISuccess(status) && data) {
-          //TODO: Also adjust this according to the response
-          setUserPasses(data);
+          setUserPasses(data.active);
         }
       }
     } catch (error) {
