@@ -28,7 +28,8 @@
     .detailsWrapper {
       @extend .mb20;
 
-      .validityText, .priceText {
+      .validityText,
+      .priceText {
         @extend .blueText;
       }
     }
@@ -67,4 +68,3 @@
     }
   }
 }
-

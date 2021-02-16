@@ -12,10 +12,10 @@
   border: 1px solid map-get($map: $colors, $key: 'DarkGray');
   border-radius: 8px;
   padding: 16px !important;
-  
+
   .passVideoThumbnail {
     height: 150px;
-    object-fit:cover;
+    object-fit: cover;
   }
 
   .playIconWrapper {
@@ -87,7 +87,6 @@
   }
 }
 
-
 .cleanCard {
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
 
@@ -116,7 +115,8 @@
     .detailsWrapper {
       @extend .mb20;
 
-      .validityText, .priceText {
+      .validityText,
+      .priceText {
         @extend .blueText;
       }
     }
