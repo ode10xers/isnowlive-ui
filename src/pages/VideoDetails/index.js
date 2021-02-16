@@ -22,7 +22,7 @@ import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import PurchaseModal from 'components/PurchaseModal';
-import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
+import { showAlreadyBookedModal, showErrorModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
@@ -280,9 +280,10 @@ const VideoDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
-      //TODO: Need to check the message sent for already booked videos
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
   };
@@ -313,10 +314,10 @@ const VideoDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-      //TODO: Need to check the message sent for already booked videos
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
   };
@@ -332,9 +333,11 @@ const VideoDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
-      //TODO: Need to check the message sent for already booked videos
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
   };

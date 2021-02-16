@@ -106,9 +106,10 @@ const PaymentVerification = () => {
                     );
                   }
                 } catch (error) {
-                  //TODO: Need to check the message sent for already booked videos
-                  if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+                  if (error.response?.data?.message === 'user already has a confirmed order for this video') {
                     showAlreadyBookedModal(productType.VIDEO, username);
+                  } else {
+                    showErrorModal('Something went wrong', error.response?.data?.message);
                   }
                 }
               } else {

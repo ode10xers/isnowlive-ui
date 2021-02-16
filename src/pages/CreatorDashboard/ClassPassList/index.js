@@ -107,6 +107,7 @@ const ClassPassList = () => {
             class_count: classPass.class_count, //TODO: Adjust new credit keys here
             is_published: classPass.is_published,
             sessions: classPass.sessions,
+            videos: classPass.videos,
             buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
             color_code: classPass.color_code,
           }))

@@ -398,11 +398,10 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-      //TODO: Need to check the message sent for already booked videos
-
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
   };
