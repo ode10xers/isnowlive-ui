@@ -30,7 +30,7 @@ const PaymentVerification = () => {
   const location = useLocation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
-  const { order_id, transaction_id, order_type, inventory_id } = parseQueryString(location.search);
+  const { order_id, transaction_id, order_type, inventory_id, video_id } = parseQueryString(location.search);
 
   useEffect(() => {
     if (order_id && transaction_id) {
@@ -86,6 +86,31 @@ const PaymentVerification = () => {
                     showErrorModal('Something went wrong', error.response?.data?.message);
                   }
                 }
+              } else if (video_id) {
+                try {
+                  // Continue to book the video after Pass Purchase is successful
+                  const followUpGetVideo = await apis.videos.createOrderForUser({
+                    video_id: video_id,
+                    payment_source: paymentSource.PASS,
+                    source_id: order_id,
+                  });
+
+                  if (isAPISuccess(followUpGetVideo.status)) {
+                    console.log(followUpGetVideo.data);
+                    showVideoPurchaseSuccessModal(
+                      userDetails.email,
+                      followUpGetVideo.data,
+                      { ...usersPass, name: usersPass.pass_name },
+                      true,
+                      true
+                    );
+                  }
+                } catch (error) {
+                  //TODO: Need to check the message sent for already booked videos
+                  if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+                    showAlreadyBookedModal(productType.VIDEO, username);
+                  }
+                }
               } else {
                 showBookingSuccessModal(
                   userDetails.email,
@@ -117,7 +142,7 @@ const PaymentVerification = () => {
       setIsLoading(false);
       showErrorModal('Something went wrong');
     }
-  }, [order_id, transaction_id, order_type, inventory_id, history, userDetails]);
+  }, [order_id, transaction_id, order_type, inventory_id, video_id, history, userDetails]);
 
   return (
     <Row justify="center">
