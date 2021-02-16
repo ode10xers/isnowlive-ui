@@ -171,7 +171,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         name: values.passName,
         validity: values.validity,
         session_ids: selectedClasses || values.classList || [],
-        video_ids: selectedVideos || values.videoList || [], //TODO: Confirm the format & key for this
+        video_ids: selectedVideos || values.videoList || [],
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000, //TODO: Adjust new credit keys here
         limited: passTypes.LIMITED.name === passType,
         color_code: colorCode || whiteColor,

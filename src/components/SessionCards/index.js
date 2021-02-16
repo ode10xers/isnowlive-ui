@@ -74,7 +74,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
           {adjustedSessions && adjustedSessions.length > 0 ? (
             <>
               {adjustedSessions.map((session) => (
-                <Col span={24} key={session.key || session.session_id}>
+                <Col span={24} key={session.session_id}>
                   <Card
                     className={styles.sessionCard}
                     bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
@@ -101,9 +101,8 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                         <Col xs={24}>
                           <Row gutter={[4]} justify="space-around">
                             {isoDayOfWeek.map((day, index) => (
-                              <Col xs={3}>
+                              <Col xs={3} key={`${session.session_id}_${day}`}>
                                 <Tag
-                                  key={`${session.session_id}_day`}
                                   className={
                                     session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
                                   }
@@ -144,12 +143,11 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                             </Col>
                             <Col xs={24}>
                               <Row gutter={8}>
-                                <Col xs={18}>
+                                <Col xs={24} xl={18}>
                                   <Row gutter={[8, 4]}>
                                     {isoDayOfWeek.map((day, index) => (
-                                      <Col xs={8} lg={3}>
+                                      <Col xs={8} md={6} xl={3} key={`${session.session_id}_${day}`}>
                                         <Tag
-                                          key={`${session.session_id}_day`}
                                           className={
                                             session.inventory_days.includes(index + 1)
                                               ? styles.tags
@@ -163,7 +161,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                                     ))}
                                   </Row>
                                 </Col>
-                                <Col xs={6}>
+                                <Col xs={24} xl={6}>
                                   <Tag color="cyan" className={styles.tags}>
                                     {session.group ? 'Group Session' : '1-to-1 Session'}
                                   </Tag>

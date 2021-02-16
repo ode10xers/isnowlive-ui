@@ -111,6 +111,7 @@ const PublicVideoList = ({ username = null, videos }) => {
     }
   };
 
+  //TODO: Might want to refactor and make a separate component for this, since it's also used in VideoDetails page
   return (
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
@@ -133,9 +134,8 @@ const PublicVideoList = ({ username = null, videos }) => {
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
           {videos.map((video) => (
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} key={video?.external_id}>
               <Card
-                key={video?.external_id}
                 className={styles.cleanCard}
                 hoverable={true}
                 bodyStyle={{ padding: '10px 20px' }}

@@ -8,6 +8,27 @@
   text-align: right;
 }
 
+.passVideoListContainer {
+  border: 1px solid map-get($map: $colors, $key: 'DarkGray');
+  border-radius: 8px;
+  padding: 16px !important;
+  
+  .passVideoThumbnail {
+    height: 150px;
+    object-fit:cover;
+  }
+
+  .playIconWrapper {
+    margin-top: -15px;
+
+    .playIcon {
+      color: map-get($map: $colors, $key: 'White');
+      font-size: 20px;
+      z-index: 10;
+    }
+  }
+}
+
 .imageWrapper {
   position: relative;
   margin-top: 128px !important;
@@ -66,7 +87,60 @@
   }
 }
 
+
+.cleanCard {
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+
+  .cardImage {
+    height: 150px;
+    object-fit: cover;
+  }
+
+  .playIconWrapper {
+    margin-top: -50px;
+
+    .playIcon {
+      color: map-get($map: $colors, $key: 'White');
+      font-size: 20px;
+    }
+  }
+
+  .textWrapper {
+    .titleWrapper {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 15px;
+    }
+
+    .detailsWrapper {
+      @extend .mb20;
+
+      .validityText, .priceText {
+        @extend .blueText;
+      }
+    }
+  }
+}
+
 @media (max-width: 768px) {
+  .cleanCard {
+    .cardImage {
+      height: 200px;
+    }
+
+    .textWrapper {
+      .titleWrapper {
+        height: 60px;
+        white-space: normal;
+      }
+
+      .detailsWrapper {
+        font-size: 12px;
+      }
+    }
+  }
+
   .profilePreviewContainer {
     margin: 5px;
   }
@@ -111,5 +185,11 @@
 @media (min-width: 768px) and (max-width: 1400px) {
   .imageWrapper {
     margin-bottom: 0px;
+  }
+
+  .cleanCard {
+    .cardImage {
+      height: 120px;
+    }
   }
 }

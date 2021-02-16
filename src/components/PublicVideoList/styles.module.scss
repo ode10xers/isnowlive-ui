@@ -8,24 +8,6 @@
     object-fit: cover;
   }
 
-  .imageWrapper {
-    position: relative;
-    height: 200px;
-
-    .thumbnailImage {
-      position: absolute;
-      bottom: 0px;
-      left: 0px;
-      height: 200px;
-        
-      img {
-        height: 100%;
-        object-fit: cover;
-        border-radius: 8px;
-      }
-    }
-  }
-
   .playIconWrapper {
     margin-top: -50px;
 

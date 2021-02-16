@@ -8,6 +8,7 @@ import {
   LinkedinOutlined,
   UpOutlined,
   DownOutlined,
+  PlayCircleOutlined,
 } from '@ant-design/icons';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
@@ -377,11 +378,19 @@ const VideoDetails = ({ match, history }) => {
     }
   };
 
+  const redirectToVideoDetails = (video) => {
+    if (video?.external_id) {
+      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+      window.open(`${baseUrl}/v/${video?.external_id}`);
+    }
+  };
+
   //TODO: Adjust the new credits key for passes here
+  //TODO: Might want to refactor and make a separate component for this, since it's also used in PublicVideoList Component
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
       <Row gutter={[16, 16]} align="center">
-        <Col xs={24} md={18} lg={20}>
+        <Col xs={24} md={18} xl={20}>
           <Row gutter={8}>
             <Col xs={24}>
               <Row gutter={16}>
@@ -421,7 +430,7 @@ const VideoDetails = ({ match, history }) => {
             </Col>
           </Row>
         </Col>
-        <Col xs={24} md={6} lg={4}>
+        <Col xs={24} md={6} xl={4}>
           <Row gutter={[8, 16]} justify="center">
             <Col xs={12} md={24}>
               <Button block type="primary" onClick={() => openPurchasePassModal(pass)}>
@@ -430,11 +439,16 @@ const VideoDetails = ({ match, history }) => {
             </Col>
             <Col xs={12} md={24}>
               {expandedPassKeys.includes(pass?.id) ? (
-                <Button block type="default" onClick={() => hidePassDetails(pass?.id)} icon={<UpOutlined />}>
+                <Button block type="default" onClick={() => hidePassDetails(pass?.id)} icon={<UpOutlined size={16} />}>
                   Detail
                 </Button>
               ) : (
-                <Button block type="default" onClick={() => showPassDetails(pass?.id)} icon={<DownOutlined />}>
+                <Button
+                  block
+                  type="default"
+                  onClick={() => showPassDetails(pass?.id)}
+                  icon={<DownOutlined size={16} />}
+                >
                   Detail
                 </Button>
               )}
@@ -444,13 +458,51 @@ const VideoDetails = ({ match, history }) => {
         {expandedPassKeys.includes(pass?.id) && (
           <>
             <Col xs={24}>
-              <Text strong> Pass applicable to below videos </Text>
+              <Text strong> Pass applicable to below video(s) </Text>
             </Col>
             <Col xs={24} className={styles.passVideoListContainer}>
               <Row gutter={[16, 16]} justify="start">
                 {pass.videos.map((passVideo) => (
-                  <Col xs={12} md={12} lg={8} key={`${pass.id}_${passVideo.external_id}`}>
-                    <div className={styles.passVideoItemContainer}></div>
+                  <Col xs={24} md={12} key={`${pass.id}_${passVideo.external_id}`}>
+                    <Card
+                      className={styles.cleanCard}
+                      hoverable={true}
+                      bodyStyle={{ padding: '10px 20px' }}
+                      onClick={() => redirectToVideoDetails(video)}
+                      cover={
+                        <Image
+                          src={video?.thumbnail_url || 'error'}
+                          alt={video?.title}
+                          fallback={DefaultImage()}
+                          preview={false}
+                          className={styles.cardImage}
+                        />
+                      }
+                    >
+                      <Row gutter={[8, 8]} justify="center">
+                        <Col span={24} className={styles.playIconWrapper}>
+                          <PlayCircleOutlined className={styles.playIcon} size={40} />
+                        </Col>
+                        <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
+                          <Row gutter={8} justify="start">
+                            <Col span={24} className={styles.titleWrapper}>
+                              <Text strong className={styles.textAlignLeft}>
+                                {video?.title}
+                              </Text>
+                            </Col>
+                            <Col span={24} className={styles.detailsWrapper}>
+                              <Row gutter={16} justify="space-evenly">
+                                <Col span={24} className={styles.textAlignLeft}>
+                                  <Text strong className={styles.validityText}>
+                                    Viewable for : {video?.validity} days
+                                  </Text>
+                                </Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Col>
+                      </Row>
+                    </Card>
                   </Col>
                 ))}
               </Row>
@@ -587,6 +639,12 @@ const VideoDetails = ({ match, history }) => {
 
                 <Col xs={24} className={styles.showcaseCardContainer}>
                   <VideoCard video={video} buyable={false} hoverable={false} />
+                </Col>
+
+                <Col xs={24} className={styles.mt10}>
+                  <Title level={3} className={styles.ml20}>
+                    {getLocalUserDetails() && userPasses.length > 0 ? 'Buy Using Your Pass' : 'Buy Pass'}
+                  </Title>
                 </Col>
 
                 <Col xs={24} className={styles.passListContainer}>
