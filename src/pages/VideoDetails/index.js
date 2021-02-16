@@ -343,8 +343,14 @@ const VideoDetails = ({ match, history }) => {
                 </Col>
                 <Col xs={24} md={6} xl={5} className={styles.passPriceText}>
                   <Title level={5}>
-                    {' '}
-                    {pass?.currency.toUpperCase()} {pass?.price}{' '}
+                    {purchased ? (
+                      <>
+                        {' '}
+                        {pass?.currency.toUpperCase()} 0 <del>{video?.price}</del>{' '}
+                      </>
+                    ) : (
+                      `${pass?.currency.toUpperCase()} ${pass?.price}`
+                    )}
                   </Title>
                 </Col>
               </Row>

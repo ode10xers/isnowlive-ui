@@ -190,7 +190,7 @@ export const showVideoPurchaseSuccessModal = (
           </Paragraph>
           <Paragraph>
             We have <Text strong> used 1 credit </Text>
-            to buy <Text strong> {video?.title} </Text> video video for you.
+            to buy <Text strong> {video?.title} </Text> video for you.
           </Paragraph>
           <Paragraph>
             You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
