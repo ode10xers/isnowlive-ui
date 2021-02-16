@@ -103,7 +103,7 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, []);
 
-  const getUsablePassesForUser = async (videoId) => {
+  const getUsablePassesForUser = async () => {
     console.log('GetUsablePass');
     try {
       const loggedInUserData = getLocalUserDetails();
@@ -153,11 +153,10 @@ const VideoDetails = ({ match, history }) => {
       if (username && !reservedDomainName.includes(username)) {
         getProfileDetails();
         getVideoDetails(match.params.video_id);
+        getAvailablePassesForVideo(match.params.video_id);
 
         if (getLocalUserDetails()) {
           getUsablePassesForUser();
-        } else {
-          getAvailablePassesForVideo(match.params.video_id);
         }
       }
     } else {
