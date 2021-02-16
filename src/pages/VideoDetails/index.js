@@ -89,7 +89,6 @@ const VideoDetails = ({ match, history }) => {
   }, []);
 
   const getAvailablePassesForVideo = useCallback(async (videoId) => {
-    console.log('GetAvailablePass');
     try {
       const { status, data } = await apis.passes.getPassesByVideoId(videoId);
 
@@ -104,7 +103,6 @@ const VideoDetails = ({ match, history }) => {
   }, []);
 
   const getUsablePassesForUser = async () => {
-    console.log('GetUsablePass');
     try {
       const loggedInUserData = getLocalUserDetails();
 
@@ -112,9 +110,7 @@ const VideoDetails = ({ match, history }) => {
         const { status, data } = await apis.passes.getAttendeePassesForVideo(video.external_id);
 
         if (isAPISuccess(status) && data) {
-          // setUserPasses(data.active);
-          //TODO: temporarily set empty for testing other flows
-          setUserPasses([]);
+          setUserPasses(data.active);
         }
       }
     } catch (error) {
@@ -286,7 +282,6 @@ const VideoDetails = ({ match, history }) => {
   const handleOrder = async (userEmail) => {
     setIsLoading(true);
 
-    console.log('Handling Order');
     // After user has logged in from the modal, we try to fetch usable passes first
     if (getLocalUserDetails()) {
       await getUsablePassesForUser();
@@ -345,8 +340,7 @@ const VideoDetails = ({ match, history }) => {
                   <Title level={5}>
                     {purchased ? (
                       <>
-                        {' '}
-                        {pass?.currency.toUpperCase()} 0 <del>{video?.price}</del>{' '}
+                        {pass?.currency.toUpperCase()} 0 <del>{video?.price}</del>
                       </>
                     ) : (
                       `${pass?.currency.toUpperCase()} ${pass?.price}`

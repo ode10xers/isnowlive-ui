@@ -105,8 +105,6 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
 
   useEffect(() => {
     if (visible) {
-      console.log(editedPass);
-
       if (editedPass) {
         form.setFieldsValue({
           passName: editedPass.name,

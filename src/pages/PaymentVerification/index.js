@@ -96,7 +96,6 @@ const PaymentVerification = () => {
                   });
 
                   if (isAPISuccess(followUpGetVideo.status)) {
-                    console.log(followUpGetVideo.data);
                     showVideoPurchaseSuccessModal(
                       userDetails.email,
                       followUpGetVideo.data,
