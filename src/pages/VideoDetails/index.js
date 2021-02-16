@@ -109,7 +109,14 @@ const VideoDetails = ({ match, history }) => {
         const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
 
         if (isAPISuccess(status) && data) {
-          setUserPasses(data.active);
+          setUserPasses(
+            data.active.map((userPass) => ({
+              ...userPass,
+              id: userPass.pass_id,
+              name: userPass.pass_name,
+              sessions: userPass.session,
+            }))
+          );
         }
       }
     } catch (error) {
