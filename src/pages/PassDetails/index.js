@@ -24,7 +24,7 @@ import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, reservedDomainName, orderType } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, reservedDomainName, orderType, productType } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -154,7 +154,7 @@ const PassDetails = ({ match, history }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };

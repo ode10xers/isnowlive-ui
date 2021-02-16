@@ -16,7 +16,7 @@ import apis from 'apis';
 import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
 import { useGlobalContext } from 'services/globalContext';
-import { isAPISuccess, paymentSource, orderType } from 'utils/helper';
+import { isAPISuccess, paymentSource, orderType, productType } from 'utils/helper';
 
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -81,7 +81,7 @@ const PaymentVerification = () => {
                     error.response?.data?.message ===
                     'It seems you have already booked this session, please check your dashboard'
                   ) {
-                    showAlreadyBookedModal(false, username);
+                    showAlreadyBookedModal(productType.CLASS, username);
                   } else {
                     showErrorModal('Something went wrong', error.response?.data?.message);
                   }

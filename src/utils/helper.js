@@ -186,6 +186,13 @@ export const orderType = {
   VIDEO: 'VIDEO_ORDER',
 };
 
+export const productType = {
+  CLASS: 'Session',
+  PASS: 'Pass',
+  VIDEO: 'Video',
+  PRODUCT: 'Product', //As a default
+};
+
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];

@@ -4,6 +4,10 @@
   padding: 10px 30px !important;
 }
 
+.passPriceText {
+  text-align: right;
+}
+
 .imageWrapper {
   position: relative;
   margin-top: 128px !important;
@@ -65,6 +69,9 @@
 @media (max-width: 768px) {
   .profilePreviewContainer {
     margin: 5px;
+  }
+  .passPriceText {
+    text-align: left;
   }
   .videoCard {
     margin: 16px !important;

@@ -19,7 +19,14 @@ import PurchaseModal from 'components/PurchaseModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType, reservedDomainName } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  paymentSource,
+  orderType,
+  productType,
+  reservedDomainName,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
@@ -105,15 +112,18 @@ const SessionDetails = ({ match, history }) => {
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData && session) {
-        const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
-        setUserPasses(
-          data.active.map((userPass) => ({
-            ...userPass,
-            id: userPass.pass_id,
-            name: userPass.pass_name,
-            sessions: userPass.session,
-          }))
-        );
+        const { status, data } = await apis.passes.getAttendeePassesForSession(session.session_id);
+
+        if (isAPISuccess(status) && data) {
+          setUserPasses(
+            data.active.map((userPass) => ({
+              ...userPass,
+              id: userPass.pass_id,
+              name: userPass.pass_name,
+              sessions: userPass.session,
+            }))
+          );
+        }
       }
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
@@ -298,9 +308,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -342,9 +352,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -364,9 +374,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -389,8 +399,10 @@ const SessionDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
+      //TODO: Need to check the message sent for already booked videos
+
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.VIDEO, username);
       }
     }
   };

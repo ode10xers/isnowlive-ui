@@ -13,7 +13,7 @@ import PurchaseModal from 'components/PurchaseModal';
 
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess, orderType } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
 
 import config from 'config';
 import apis from 'apis';
@@ -95,7 +95,7 @@ const ClassPasses = ({ username, passes }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };

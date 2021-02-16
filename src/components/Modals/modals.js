@@ -4,7 +4,7 @@ import { Modal, Typography, Button } from 'antd';
 import apis from 'apis';
 import Routes from 'routes';
 
-import { generateUrl } from 'utils/helper';
+import { generateUrl, productType } from 'utils/helper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
@@ -118,16 +118,37 @@ export const showBookingSuccessModal = (
   });
 };
 
-export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app') => {
+export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectDomainName = 'app') => {
+  let titleText = 'Product already purchased';
+  let contentText = 'purchased this product';
+
+  switch (prodType) {
+    case productType.CLASS:
+      titleText = 'Session already booked';
+      contentText = 'booked this session';
+      break;
+    case productType.PASS:
+      titleText = 'Pass already purchased';
+      contentText = 'purchased this pass';
+      break;
+    case productType.VIDEO:
+      titleText = 'Video already purchased';
+      contentText = 'purchased this video';
+      break;
+    default:
+      titleText = 'Product already purchased';
+      contentText = 'purchased this product';
+      break;
+  }
+
   Modal.warning({
     center: true,
     closable: true,
     maskClosable: false,
-    title: isPass ? 'Pass Already Purchased' : 'Session Already Booked',
+    title: titleText,
     content: (
       <Paragraph>
-        It seems you have already <Text strong> {isPass ? 'purchased this Class Pass' : 'booked this Session'} </Text>,
-        please check your dashboard{' '}
+        It seems you have already <Text strong> {contentText} </Text>, please check your dashboard
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
@@ -135,6 +156,7 @@ export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app
   });
 };
 
+//TODO: Refactor this to show dynamic content based on booked via payment/pass
 export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainName = 'app') => {
   Modal.success({
     center: true,

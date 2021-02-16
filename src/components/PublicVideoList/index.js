@@ -14,7 +14,7 @@ import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource } from 'utils/helper';
+import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource, productType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -82,8 +82,10 @@ const PublicVideoList = ({ username = null, videos }) => {
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
+      //TODO: Need to check the message sent for already booked videos
+
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.VIDEO, username);
       }
     }
   };

@@ -18,7 +18,14 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType, reservedDomainName } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  paymentSource,
+  orderType,
+  productType,
+  reservedDomainName,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
@@ -296,9 +303,9 @@ const InventoryDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };

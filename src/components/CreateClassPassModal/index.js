@@ -108,10 +108,10 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
       console.log(editedPass);
 
       if (editedPass) {
-        //TODO: Adjust the new video id list key here
         form.setFieldsValue({
           passName: editedPass.name,
           classList: editedPass.sessions.map((session) => session.session_id),
+          videoList: editedPass.videos.map((video) => video.external_id),
           passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
           classCount: editedPass.class_count, //TODO: Adjust new credit keys here
           validity: editedPass.validity,
