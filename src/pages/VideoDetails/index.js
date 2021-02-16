@@ -102,12 +102,11 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, []);
 
-  const getUsablePassesForUser = async () => {
+  const getUsablePassesForUser = async (videoId) => {
     try {
       const loggedInUserData = getLocalUserDetails();
-
-      if (loggedInUserData && video) {
-        const { status, data } = await apis.passes.getAttendeePassesForVideo(video.external_id);
+      if (loggedInUserData) {
+        const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
 
         if (isAPISuccess(status) && data) {
           setUserPasses(data.active);
@@ -152,7 +151,7 @@ const VideoDetails = ({ match, history }) => {
         getAvailablePassesForVideo(match.params.video_id);
 
         if (getLocalUserDetails()) {
-          getUsablePassesForUser();
+          getUsablePassesForUser(match.params.video_id);
         }
       }
     } else {
@@ -283,8 +282,8 @@ const VideoDetails = ({ match, history }) => {
     setIsLoading(true);
 
     // After user has logged in from the modal, we try to fetch usable passes first
-    if (getLocalUserDetails()) {
-      await getUsablePassesForUser();
+    if (getLocalUserDetails() && match.params.video_id) {
+      await getUsablePassesForUser(match.params.video_id);
     }
 
     if (selectedPass) {
