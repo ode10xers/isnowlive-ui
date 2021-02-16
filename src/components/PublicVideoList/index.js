@@ -75,7 +75,7 @@ const PublicVideoList = ({ username = null, videos }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
           hideVideoDetailModal();
         }
       }

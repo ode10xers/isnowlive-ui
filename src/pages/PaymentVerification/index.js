@@ -100,7 +100,7 @@ const PaymentVerification = () => {
 
               if (data) {
                 const purchasedVideo = data.active.find((video) => video.video_order_id === order_id);
-                showVideoPurchaseSuccessModal(userDetails.email, purchasedVideo, username);
+                showVideoPurchaseSuccessModal(userDetails.email, purchasedVideo, null, false, true, username);
               }
             } else {
               showBookingSuccessModal(userDetails.email, null, false, false, username);

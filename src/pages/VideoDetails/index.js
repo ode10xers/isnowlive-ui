@@ -274,7 +274,7 @@ const VideoDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, video, username);
+          showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
         }
       }
     } catch (error) {
@@ -306,7 +306,7 @@ const VideoDetails = ({ match, history }) => {
           });
 
           if (isAPISuccess(followUpGetVideo.status)) {
-            showVideoPurchaseSuccessModal(userEmail, video, username);
+            showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
             setIsLoading(false);
           }
         }
@@ -326,7 +326,7 @@ const VideoDetails = ({ match, history }) => {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        showVideoPurchaseSuccessModal(userEmail, video, username);
+        showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
         setIsLoading(false);
       }
     } catch (error) {
