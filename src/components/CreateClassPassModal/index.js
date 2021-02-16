@@ -121,6 +121,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         setCurrency(editedPass.currency.toUpperCase());
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
+        setSelectedVideos(editedPass.videos.map((video) => video.external_id));
         setColorCode(editedPass.color_code || whiteColor);
       } else {
         form.resetFields();
