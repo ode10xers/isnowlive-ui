@@ -125,6 +125,11 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         setColorCode(editedPass.color_code || whiteColor);
       } else {
         form.resetFields();
+        setPassType(passTypes.LIMITED.name);
+        setSelectedClasses([]);
+        setSelectedVideos([]);
+        setColorCode(initialColor);
+        setCurrency('SGD');
       }
 
       fetchAllClassesForCreator();

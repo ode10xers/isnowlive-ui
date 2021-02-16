@@ -112,7 +112,9 @@ const VideoDetails = ({ match, history }) => {
         const { status, data } = await apis.passes.getAttendeePassesForVideo(video.external_id);
 
         if (isAPISuccess(status) && data) {
-          setUserPasses(data.active);
+          // setUserPasses(data.active);
+          //TODO: temporarily set empty for testing other flows
+          setUserPasses([]);
         }
       }
     } catch (error) {
