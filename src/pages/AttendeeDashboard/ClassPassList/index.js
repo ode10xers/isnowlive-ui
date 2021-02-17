@@ -80,7 +80,7 @@ const ClassPassList = () => {
             classes_remaining: pass.classes_remaining,
             expiry: pass.expiry,
             sessions:
-              pass.session?.map((session) => ({
+              pass.sessions?.map((session) => ({
                 ...session,
                 key: `${pass.pass_order_id}_${session.session_id}`,
                 username: pass.creator_username,
