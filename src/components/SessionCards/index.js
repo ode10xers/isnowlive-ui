@@ -115,7 +115,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                           </Row>
                         </Col>
                         <Col xs={24}>
-                          <Tag color="cyan" className={styles.tags}>
+                          <Tag color="cyan" className={styles.sessionTag}>
                             {session.group ? 'Group Session' : '1-to-1 Session'}
                           </Tag>
                         </Col>
@@ -142,28 +142,22 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                               <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
                             </Col>
                             <Col xs={24}>
-                              <Row gutter={8}>
-                                <Col xs={24} xl={18}>
-                                  <Row gutter={[8, 4]}>
-                                    {isoDayOfWeek.map((day, index) => (
-                                      <Col xs={8} md={6} xl={3} key={`${session.session_id}_${day}`}>
-                                        <Tag
-                                          className={
-                                            session.inventory_days.includes(index + 1)
-                                              ? styles.tags
-                                              : styles.tagsDisabled
-                                          }
-                                          color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
-                                        >
-                                          {day}
-                                        </Tag>
-                                      </Col>
-                                    ))}
-                                  </Row>
+                              <Row>
+                                <Col xs={24} lg={21}>
+                                  {isoDayOfWeek.map((day, index) => (
+                                    <Tag
+                                      className={
+                                        session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
+                                      }
+                                      color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
+                                    >
+                                      {day}
+                                    </Tag>
+                                  ))}
                                 </Col>
-                                <Col xs={24} xl={6}>
-                                  <Tag color="cyan" className={styles.tags}>
-                                    {session.group ? 'Group Session' : '1-to-1 Session'}
+                                <Col xs={24} lg={3}>
+                                  <Tag color="cyan" className={styles.sessionTag}>
+                                    {session.group ? 'Group' : '1-on-1'}
                                   </Tag>
                                 </Col>
                               </Row>
