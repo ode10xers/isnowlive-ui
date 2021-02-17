@@ -41,7 +41,7 @@ const SideNavWithHeaderLayout = ({ children }) => {
         )}
         <Layout className={styles.container}>
           <Sider
-            className={classNames(styles.sideIcon, reservedDomainName.includes(username) ? styles.hide : undefined)}
+            className={classNames(styles.sideIcon, reservedDomainName.includes(username) ? undefined : styles.hide)}
             width={250}
             breakpoint="md"
             collapsedWidth="0"
