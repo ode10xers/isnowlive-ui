@@ -8,7 +8,6 @@ import {
   LinkedinOutlined,
   UpOutlined,
   DownOutlined,
-  PlayCircleOutlined,
 } from '@ant-design/icons';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
@@ -21,6 +20,7 @@ import Share from 'components/Share';
 import Loader from 'components/Loader';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 import { showAlreadyBookedModal, showErrorModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
 
@@ -342,13 +342,6 @@ const VideoDetails = ({ match, history }) => {
     }
   };
 
-  const redirectToVideoDetails = (video) => {
-    if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
-      window.open(`${baseUrl}/v/${video?.external_id}`);
-    }
-  };
-
   //TODO: Adjust the new credits key for passes here
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
@@ -425,62 +418,26 @@ const VideoDetails = ({ match, history }) => {
         </Col>
         {expandedPassKeys.includes(pass?.id) && (
           <>
-            <Col xs={24}>
-              <Text strong> Videos purchasable with this pass </Text>
-            </Col>
-            <Col xs={24} className={styles.passVideoListContainer}>
-              <Row gutter={[16, 16]} justify="start">
-                {pass.videos.map((passVideo) => (
-                  <Col xs={24} md={12} key={`${pass.id}_${passVideo.external_id}`}>
-                    <VideoCard
-                      video={passVideo}
-                      buyable={false}
-                      hoverable={true}
-                      onCardClick={() => redirectToVideoDetails(passVideo)}
-                    />
-                    {/* <Card
-                      className={styles.cleanCard}
-                      hoverable={true}  
-                      bodyStyle={{ padding: '10px 20px' }}
-                      onClick={() => redirectToVideoDetails(passVideo)}
-                      cover={
-                        <Image
-                          src={passVideo?.thumbnail_url || 'error'}
-                          alt={passVideo?.title}
-                          fallback={DefaultImage()}
-                          preview={false}
-                          className={styles.cardImage}
-                        />
-                      }
-                    >
-                      <Row gutter={[8, 8]} justify="center">
-                        <Col span={24} className={styles.playIconWrapper}>
-                          <PlayCircleOutlined className={styles.playIcon} size={40} />
-                        </Col>
-                        <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
-                          <Row gutter={8} justify="start">
-                            <Col span={24} className={styles.titleWrapper}>
-                              <Text strong className={styles.textAlignLeft}>
-                                {passVideo?.title}
-                              </Text>
-                            </Col>
-                            <Col span={24} className={styles.detailsWrapper}>
-                              <Row gutter={16} justify="space-evenly">
-                                <Col span={24} className={styles.textAlignLeft}>
-                                  <Text strong className={styles.validityText}>
-                                    Viewable for : {passVideo?.validity} days
-                                  </Text>
-                                </Col>
-                              </Row>
-                            </Col>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </Card> */}
-                  </Col>
-                ))}
-              </Row>
-            </Col>
+            {pass?.sessions?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text strong> Classes purchasable with this pass </Text>
+                </Col>
+                <Col xs={24} className={styles.passClassListContainer}>
+                  <SessionCards username={username} sessions={pass?.sessions} shouldFetchInventories={true} />
+                </Col>
+              </>
+            )}
+            {pass?.videos?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text strong> Videos purchasable with this pass </Text>
+                </Col>
+                <Col xs={24} className={styles.passVideoListContainer}>
+                  <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
+                </Col>
+              </>
+            )}
           </>
         )}
       </Row>
@@ -574,7 +531,7 @@ const VideoDetails = ({ match, history }) => {
                 <Col xs={24} className={styles.showcaseCardContainer}>
                   <VideoCard video={video} buyable={false} hoverable={false} showDetailsBtn={false} showDesc={true} />
                 </Col>
-                {!(getLocalUserDetails() || userPasses.length <= 0) && (
+                {(!getLocalUserDetails() || userPasses.length <= 0) && (
                   <Col xs={24} className={styles.p20}>
                     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
                       <Row gutter={[8, 16]} align="center">
@@ -590,27 +547,21 @@ const VideoDetails = ({ match, history }) => {
                                 <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
                                   {`Validity ${video?.validity} Days`}
                                 </Text>
-                                {userPasses.length <= 0 && (
-                                  <>
-                                    <Divider type="vertical" />
-                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                      {video?.price === 0
-                                        ? 'Free video'
-                                        : ` ${video?.currency.toUpperCase()} ${video?.price}`}
-                                    </Text>
-                                  </>
-                                )}
+                                <Divider type="vertical" />
+                                <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                  {video?.price === 0
+                                    ? 'Free video'
+                                    : ` ${video?.currency.toUpperCase()} ${video?.price}`}
+                                </Text>
                               </Space>
                             </Col>
                           </Row>
                         </Col>
-                        {userPasses.length <= 0 && (
-                          <Col xs={24} md={8}>
-                            <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                              {video?.price === 0 ? 'Get' : 'Buy'} This Video
-                            </Button>
-                          </Col>
-                        )}
+                        <Col xs={24} md={8}>
+                          <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
+                            {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                          </Button>
+                        </Col>
                       </Row>
                     </Card>
                   </Col>
@@ -637,7 +588,7 @@ const VideoDetails = ({ match, history }) => {
                         <Text className={styles.ml20}> Related to these class(es) </Text>
                       </Col>
                       <Col xs={24}>
-                        <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={username} />
+                        <SessionCards username={username} sessions={video.sessions} shouldFetchInventories={true} />
                       </Col>
                     </Row>
                   </Col>

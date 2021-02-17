@@ -97,17 +97,19 @@
 
 @media screen and (max-width: 768px) {
   .videoCard {
-    // .flexColumn {
-    //   display: flex;
-    //   flex-flow: row wrap;
-    //   align-items: center;
-    //   justify-content: space-around;
+    .cardImage {
+      height: 200px;
+    }
 
-    //   .flexVerticalRow {
-    //     display: block;
-    //     flex: 0 0 50%;
-    //     width: auto;
-    //   }
-    // }
+    .textWrapper {
+      .titleWrapper {
+        height: 60px;
+        white-space: normal;
+      }
+
+      .detailsWrapper {
+        font-size: 12px;
+      }
+    }
   }
 }

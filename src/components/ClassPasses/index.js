@@ -9,6 +9,7 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
@@ -179,14 +180,34 @@ const ClassPasses = ({ username, passes }) => {
     },
   ];
 
-  const renderClassesList = (record) => (
+  const renderPassDetails = (record) => (
     <Row>
-      <Col xs={24}>
-        <Text className={styles.ml20}> Applicable to below class(es) </Text>
-      </Col>
-      <Col xs={24}>
-        <SessionCards sessions={record.sessions} />
-      </Col>
+      {record?.sessions?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text strong className={styles.ml20}>
+              {' '}
+              Applicable to below class(es){' '}
+            </Text>
+          </Col>
+          <Col xs={24} className={styles.passDetailsContainer}>
+            <SessionCards sessions={record.sessions} />
+          </Col>
+        </>
+      )}
+      {record?.videos?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text strong className={styles.ml20}>
+              {' '}
+              Videos purchasable with this pass{' '}
+            </Text>
+          </Col>
+          <Col xs={24} className={styles.passDetailsContainer}>
+            <SimpleVideoCardsList username={username} passDetails={record} videos={record.videos} />
+          </Col>
+        </>
+      )}
     </Row>
   );
 
@@ -276,7 +297,7 @@ const ClassPasses = ({ username, passes }) => {
                 data={passes}
                 rowKey={(record) => record.id}
                 expandable={{
-                  expandedRowRender: (record) => renderClassesList(record),
+                  expandedRowRender: (record) => renderPassDetails(record),
                   expandRowByClick: true,
                   expandIconColumnIndex: -1,
                   expandedRowKeys: expandedRowKeys,

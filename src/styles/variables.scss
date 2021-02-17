@@ -63,6 +63,9 @@ $spacing: (
 .pl10 {
   padding-left: map-get($spacing, '10');
 }
+.p20 {
+  padding: map-get($spacing, '20');
+}
 .p50 {
   padding: map-get($spacing, '50');
 }

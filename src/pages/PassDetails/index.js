@@ -17,6 +17,7 @@ import apis from 'apis';
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
@@ -283,6 +284,19 @@ const PassDetails = ({ match, history }) => {
                     </Col>
                     <Col xs={24}>
                       <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
+                    </Col>
+                  </Row>
+                </Col>
+              )}
+
+              {pass.videos?.length > 0 && (
+                <Col xs={24}>
+                  <Row gutter={[8, 8]}>
+                    <Col xs={24}>
+                      <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                    </Col>
+                    <Col xs={24}>
+                      <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
                     </Col>
                   </Row>
                 </Col>
