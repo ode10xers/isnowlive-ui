@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Layout, Divider } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
@@ -40,7 +41,7 @@ const SideNavWithHeaderLayout = ({ children }) => {
         )}
         <Layout className={styles.container}>
           <Sider
-            className={styles.sideIcon}
+            className={classNames(styles.sideIcon, reservedDomainName.includes(username) ? styles.hide : undefined)}
             width={250}
             breakpoint="md"
             collapsedWidth="0"

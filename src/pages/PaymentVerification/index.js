@@ -101,7 +101,8 @@ const PaymentVerification = () => {
                       followUpGetVideo.data,
                       { ...usersPass, name: usersPass.pass_name },
                       true,
-                      true
+                      true,
+                      username
                     );
                   }
                 } catch (error) {

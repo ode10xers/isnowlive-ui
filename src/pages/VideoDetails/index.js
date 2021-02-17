@@ -379,10 +379,10 @@ const VideoDetails = ({ match, history }) => {
           <Row gutter={[8, 16]}>
             <Col xs={24} className={styles.headerWrapper}>
               <Row gutter={16}>
-                <Col xs={24} md={18} xl={19} className={styles.textAlignLeft}>
+                <Col xs={24} md={17} xl={19} className={styles.textAlignLeft}>
                   <Title level={5}> {pass?.name} </Title>
                 </Col>
-                <Col xs={24} md={6} xl={5} className={styles.passPriceText}>
+                <Col xs={24} md={7} xl={5} className={styles.passPriceText}>
                   <Title level={5}>
                     {purchased ? (
                       <>
