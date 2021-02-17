@@ -61,7 +61,7 @@ const ClassPassList = () => {
       const { status } = await apis.passes.publishPass(passId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Class Pass Published');
+        showSuccessModal('Pass Published');
         getPassesForCreator();
       }
     } catch (error) {
@@ -78,7 +78,7 @@ const ClassPassList = () => {
       const { status } = await apis.passes.unpublishPass(passId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Class Pass Unpublished');
+        showSuccessModal('Pass Unpublished');
         getPassesForCreator();
       }
     } catch (error) {
@@ -410,7 +410,7 @@ const ClassPassList = () => {
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={10} lg={14}>
-          <Title level={4}> Class Passes </Title>
+          <Title level={4}> Passes </Title>
         </Col>
         <Col xs={12} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
@@ -424,7 +424,7 @@ const ClassPassList = () => {
         </Col>
         <Col xs={24}>
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading Class Passes">
+            <Loader loading={isLoading} size="large" text="Loading Passes">
               <Row gutter={[8, 16]}>{passes.map(renderPassItem)}</Row>
             </Loader>
           ) : (

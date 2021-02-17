@@ -62,8 +62,17 @@
   margin: 10px 32px !important;
   border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
 
-  .blueText {
-    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  .headerWrapper {
+    min-height: 32px;
+    padding: 8px;
+  }
+
+  .descWrapper {
+    @extend .headerWrapper;
+
+    .blueText {
+      color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+    }
   }
 }
 

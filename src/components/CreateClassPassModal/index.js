@@ -200,7 +200,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
 
   return (
     <Modal
-      title={`${editedPass ? 'Edit' : 'Create New'} Class Pass`}
+      title={`${editedPass ? 'Edit' : 'Create New'} Pass`}
       centered={true}
       visible={visible}
       footer={null}
@@ -208,17 +208,11 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
       width={720}
     >
       <Loader size="large" loading={isLoading}>
-        <Form
-          layout="vertical"
-          name="classPassForm"
-          form={form}
-          onFinish={handleFinish}
-          initialValues={formInitialValues}
-        >
+        <Form layout="vertical" name="PassForm" form={form} onFinish={handleFinish} initialValues={formInitialValues}>
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
-              <Form.Item id="passName" name="passName" label="Class Pass Name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Class Pass Name" maxLength={50} />
+              <Form.Item id="passName" name="passName" label="Pass Name" rules={validationRules.nameValidation}>
+                <Input placeholder="Enter Pass Name" maxLength={50} />
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
@@ -246,7 +240,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               <Form.Item
                 id="passType"
                 name="passType"
-                label="Class Pass Type"
+                label="Pass Type"
                 extra={<Text className={styles.helpText}>Type of usage limit this pass will have</Text>}
               >
                 <Radio.Group
@@ -302,19 +296,21 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                   <Form.Item
                     id="price"
                     name="price"
-                    label="Class Pass Price"
+                    label="Pass Price"
                     rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
                   >
-                    <InputNumber min={0} placeholder="Class Pass Price" className={styles.numericInput} />
+                    <InputNumber min={0} placeholder="Pass Price" className={styles.numericInput} />
                   </Form.Item>
                 </Col>
                 <Col xs={24}>
                   <Form.Item
                     id="classCount"
                     name="classCount"
-                    label="Class Count"
+                    label="Pass Credits"
                     extra={
-                      <Text className={styles.helpText}>The maximum amount of classes bookable with this pass</Text>
+                      <Text className={styles.helpText}>
+                        The maximum amount of live classes and videos bookable with this pass
+                      </Text>
                     }
                     rules={[
                       {
@@ -331,7 +327,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                     <InputNumber
                       disabled={passType === passTypes.UNLIMITED.name}
                       min={1}
-                      placeholder="Amount of Class"
+                      placeholder="Amount of Credits"
                       className={styles.numericInput}
                     />
                   </Form.Item>
@@ -360,7 +356,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
             </Col>
             <Col xs={12} md={6}>
               <Button block type="primary" htmlType="submit" loading={isSubmitting}>
-                {editedPass ? 'Update' : 'Create'} Class Pass
+                {editedPass ? 'Update' : 'Create'} Pass
               </Button>
             </Col>
           </Row>

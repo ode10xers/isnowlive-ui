@@ -26,6 +26,7 @@ const SimpleVideoCardsList = ({ username = null, passDetails, videos }) => {
               buyable={false}
               hoverable={true}
               onCardClick={() => redirectToVideoDetails(passVideo)}
+              showDetailsBtn={false}
             />
           </Col>
         ))}

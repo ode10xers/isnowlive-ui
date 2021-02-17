@@ -375,9 +375,9 @@ const VideoDetails = ({ match, history }) => {
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
       <Row gutter={[16, 16]} align="center">
-        <Col xs={24}>
-          <Row gutter={8}>
-            <Col xs={24}>
+        <Col xs={24} md={16} xl={18}>
+          <Row gutter={[8, 16]}>
+            <Col xs={24} className={styles.headerWrapper}>
               <Row gutter={16}>
                 <Col xs={24} md={18} xl={19} className={styles.textAlignLeft}>
                   <Title level={5}> {pass?.name} </Title>
@@ -420,14 +420,14 @@ const VideoDetails = ({ match, history }) => {
             </Col>
           </Row>
         </Col>
-        <Col xs={24}>
+        <Col xs={24} md={8} xl={6}>
           <Row gutter={[8, 16]} justify="center">
-            <Col xs={12}>
+            <Col xs={12} md={24}>
               <Button block type="primary" onClick={() => openPurchasePassModal(pass)}>
                 {purchased ? 'Buy Video' : 'Buy Pass'}
               </Button>
             </Col>
-            <Col xs={12}>
+            <Col xs={12} md={24}>
               {expandedPassKeys.includes(pass?.id) ? (
                 <Button block type="default" onClick={() => hidePassDetails(pass?.id)} icon={<UpOutlined size={16} />}>
                   Detail
@@ -627,8 +627,8 @@ const VideoDetails = ({ match, history }) => {
                 <Col xs={24} className={styles.mt10}>
                   <Title level={3} className={styles.ml20}>
                     {getLocalUserDetails() && userPasses.length > 0
-                      ? 'Buy Using Your Pass'
-                      : 'Buy a Pass and this Video'}
+                      ? 'Buy using your pass'
+                      : 'Buy a pass and this video'}
                   </Title>
                 </Col>
 

@@ -146,7 +146,7 @@ const ClassPasses = ({ username, passes }) => {
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '10%',
+      width: '12%',
       render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -155,7 +155,7 @@ const ClassPasses = ({ username, passes }) => {
       key: 'price',
       align: 'left',
       sortOrder: 'descend',
-      width: '10%',
+      width: '13%',
       render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
@@ -295,8 +295,7 @@ const ClassPasses = ({ username, passes }) => {
         <Row gutter={[16, 16]}>
           <Col xs={24}>
             <Paragraph>
-              {' '}
-              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.{' '}
+              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.
             </Paragraph>
             <Paragraph>
               Depending on the pass you buy, you can use the credits and book the class or video products made available
