@@ -57,6 +57,7 @@ const VideoDetails = ({ match, history }) => {
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
+  const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
 
   const username = window.location.hostname.split('.')[0];
 
@@ -102,28 +103,33 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, []);
 
-  const getUsablePassesForUser = async (videoId) => {
-    try {
-      const loggedInUserData = getLocalUserDetails();
-      if (loggedInUserData) {
-        const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
+  const getUsablePassesForUser = useCallback(
+    async (videoId) => {
+      try {
+        const loggedInUserData = getLocalUserDetails();
+        if (loggedInUserData) {
+          const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
 
-        if (isAPISuccess(status) && data) {
-          setUserPasses(
-            data.active.map((userPass) => ({
-              ...userPass,
-              id: userPass.pass_id,
-              name: userPass.pass_name,
-              sessions: userPass.session,
-            }))
-          );
+          if (isAPISuccess(status) && data) {
+            //TODO: Hacky workaround, try to get API to do this
+            setUserPasses(
+              data.active.map((userPass) => ({
+                ...userPass,
+                id: userPass.pass_id,
+                name: userPass.pass_name,
+                sessions: userPass.session,
+                videos: availablePassesForVideo.find((pass) => pass.id === userPass.pass_id)?.videos || [],
+              }))
+            );
+          }
         }
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
+        setIsLoading(false);
       }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
-      setIsLoading(false);
-    }
-  };
+    },
+    [availablePassesForVideo]
+  );
 
   const openPurchaseVideoModal = () => {
     setSelectedPass(null);
@@ -168,12 +174,20 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.video_id]);
 
+  useEffect(() => {
+    if (shouldFollowUpGetVideo) {
+      const userDetails = getLocalUserDetails();
+      handleOrder(userDetails.email);
+    }
+    //eslint-disable-next-line
+  }, [userPasses]);
+
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
-  const getUserPurchasedPass = (getDefault = false) => {
+  const getUserPurchasedPass = async (getDefault = false) => {
     if (userPasses.length) {
       if (selectedPass && !getDefault) {
-        return userPasses.filter((userPass) => userPass.id === selectedPass.id);
+        return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
       }
 
       return userPasses[0];
@@ -240,7 +254,7 @@ const VideoDetails = ({ match, history }) => {
           initiatePaymentForOrder({
             order_id: data.pass_order_id,
             order_type: orderType.PASS,
-            video_id: video.external_id, //TODO: Make sure Backend supports this
+            video_id: video.external_id,
           });
         } else {
           const followUpGetVideo = await purchaseVideo({
@@ -258,6 +272,8 @@ const VideoDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        //TODO: Instead of showing this modal, do the buyVideoUsingPass flow
+        // Currently works as an alternative
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
@@ -288,13 +304,18 @@ const VideoDetails = ({ match, history }) => {
   const handleOrder = async (userEmail) => {
     setIsLoading(true);
 
-    // After user has logged in from the modal, we try to fetch usable passes first
-    if (getLocalUserDetails() && match.params.video_id) {
-      await getUsablePassesForUser(match.params.video_id);
+    if (!shouldFollowUpGetVideo) {
+      if (getLocalUserDetails() && userPasses.length <= 0) {
+        setShouldFollowUpGetVideo(true);
+        getUsablePassesForUser(match.params.video_id);
+        return;
+      }
+    } else {
+      setShouldFollowUpGetVideo(false);
     }
 
     if (selectedPass) {
-      const usableUserPass = getUserPurchasedPass(false);
+      const usableUserPass = await getUserPurchasedPass(false);
 
       if (usableUserPass) {
         const payload = {
