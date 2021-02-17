@@ -600,7 +600,7 @@ const VideoDetails = ({ match, history }) => {
                       {userPasses.length <= 0 && (
                         <Col xs={24} md={4}>
                           <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                            {video?.price === 0 ? 'Get' : 'Buy'} Video
+                            {video?.price === 0 ? 'Get' : 'Buy'} This Video
                           </Button>
                         </Col>
                       )}
@@ -614,7 +614,9 @@ const VideoDetails = ({ match, history }) => {
 
                 <Col xs={24} className={styles.mt10}>
                   <Title level={3} className={styles.ml20}>
-                    {getLocalUserDetails() && userPasses.length > 0 ? 'Buy Using Your Pass' : 'Buy Pass'}
+                    {getLocalUserDetails() && userPasses.length > 0
+                      ? 'Buy Using Your Pass'
+                      : 'Buy A Pass and this Video'}
                   </Title>
                 </Col>
 
