@@ -106,8 +106,10 @@ const NotificationSettings = () => {
               </Row>
             </div>
           </Col>
-          <Col span={24}>
-            <Button type="primary" loading={submitting} onClick={saveUserPreferences} className={styles.saveBtn}>
+        </Row>
+        <Row justify="center">
+          <Col xs={24} md={6} lg={4}>
+            <Button block type="primary" loading={submitting} onClick={saveUserPreferences} className={styles.saveBtn}>
               Save Changes
             </Button>
           </Col>
