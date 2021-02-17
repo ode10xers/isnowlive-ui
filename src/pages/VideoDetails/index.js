@@ -272,8 +272,6 @@ const VideoDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        //TODO: Instead of showing this modal, do the buyVideoUsingPass flow
-        // Currently works as an alternative
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
@@ -352,11 +350,10 @@ const VideoDetails = ({ match, history }) => {
   };
 
   //TODO: Adjust the new credits key for passes here
-  //TODO: Might want to refactor and make a separate component for this, since it's also used in PublicVideoList Component
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
       <Row gutter={[16, 16]} align="center">
-        <Col xs={24} md={18} xl={20}>
+        <Col xs={24}>
           <Row gutter={8}>
             <Col xs={24}>
               <Row gutter={16}>
@@ -401,14 +398,14 @@ const VideoDetails = ({ match, history }) => {
             </Col>
           </Row>
         </Col>
-        <Col xs={24} md={6} xl={4}>
+        <Col xs={24}>
           <Row gutter={[8, 16]} justify="center">
-            <Col xs={12} md={24}>
+            <Col xs={12}>
               <Button block type="primary" onClick={() => openPurchasePassModal(pass)}>
                 {purchased ? 'Buy Video' : 'Buy Pass'}
               </Button>
             </Col>
-            <Col xs={12} md={24}>
+            <Col xs={12}>
               {expandedPassKeys.includes(pass?.id) ? (
                 <Button block type="default" onClick={() => hidePassDetails(pass?.id)} icon={<UpOutlined size={16} />}>
                   Detail
@@ -429,21 +426,27 @@ const VideoDetails = ({ match, history }) => {
         {expandedPassKeys.includes(pass?.id) && (
           <>
             <Col xs={24}>
-              <Text strong> Pass applicable to below video(s) </Text>
+              <Text strong> Videos purchasable with this pass </Text>
             </Col>
             <Col xs={24} className={styles.passVideoListContainer}>
               <Row gutter={[16, 16]} justify="start">
                 {pass.videos.map((passVideo) => (
                   <Col xs={24} md={12} key={`${pass.id}_${passVideo.external_id}`}>
-                    <Card
-                      className={styles.cleanCard}
+                    <VideoCard
+                      video={passVideo}
+                      buyable={false}
                       hoverable={true}
+                      onCardClick={() => redirectToVideoDetails(passVideo)}
+                    />
+                    {/* <Card
+                      className={styles.cleanCard}
+                      hoverable={true}  
                       bodyStyle={{ padding: '10px 20px' }}
-                      onClick={() => redirectToVideoDetails(video)}
+                      onClick={() => redirectToVideoDetails(passVideo)}
                       cover={
                         <Image
-                          src={video?.thumbnail_url || 'error'}
-                          alt={video?.title}
+                          src={passVideo?.thumbnail_url || 'error'}
+                          alt={passVideo?.title}
                           fallback={DefaultImage()}
                           preview={false}
                           className={styles.cardImage}
@@ -458,14 +461,14 @@ const VideoDetails = ({ match, history }) => {
                           <Row gutter={8} justify="start">
                             <Col span={24} className={styles.titleWrapper}>
                               <Text strong className={styles.textAlignLeft}>
-                                {video?.title}
+                                {passVideo?.title}
                               </Text>
                             </Col>
                             <Col span={24} className={styles.detailsWrapper}>
                               <Row gutter={16} justify="space-evenly">
                                 <Col span={24} className={styles.textAlignLeft}>
                                   <Text strong className={styles.validityText}>
-                                    Viewable for : {video?.validity} days
+                                    Viewable for : {passVideo?.validity} days
                                   </Text>
                                 </Col>
                               </Row>
@@ -473,7 +476,7 @@ const VideoDetails = ({ match, history }) => {
                           </Row>
                         </Col>
                       </Row>
-                    </Card>
+                    </Card> */}
                   </Col>
                 ))}
               </Row>
@@ -568,55 +571,56 @@ const VideoDetails = ({ match, history }) => {
                 createOrder={handleOrder}
               />
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-                <Col xs={24} className={styles.p20}>
-                  <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                    <Row gutter={[8, 16]} align="center">
-                      <Col xs={24} md={20}>
-                        <Row gutter={8}>
-                          <Col xs={24}>
-                            <Title className={styles.blueText} level={3}>
-                              {video?.title}
-                            </Title>
-                          </Col>
-                          <Col xs={24}>
-                            <Space size={isMobileDevice ? 'small' : 'middle'}>
-                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {`Validity ${video?.validity} Days`}
-                              </Text>
-                              {userPasses.length <= 0 && (
-                                <>
-                                  <Divider type="vertical" />
-                                  <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                    {video?.price === 0
-                                      ? 'Free video'
-                                      : ` ${video?.currency.toUpperCase()} ${video?.price}`}
-                                  </Text>
-                                </>
-                              )}
-                            </Space>
-                          </Col>
-                        </Row>
-                      </Col>
-                      {userPasses.length <= 0 && (
-                        <Col xs={24} md={4}>
-                          <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                            {video?.price === 0 ? 'Get' : 'Buy'} This Video
-                          </Button>
-                        </Col>
-                      )}
-                    </Row>
-                  </Card>
-                </Col>
-
                 <Col xs={24} className={styles.showcaseCardContainer}>
-                  <VideoCard video={video} buyable={false} hoverable={false} />
+                  <VideoCard video={video} buyable={false} hoverable={false} showDetailsBtn={false} showDesc={true} />
                 </Col>
+                {!(getLocalUserDetails() || userPasses.length <= 0) && (
+                  <Col xs={24} className={styles.p20}>
+                    <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                      <Row gutter={[8, 16]} align="center">
+                        <Col xs={24} md={16}>
+                          <Row gutter={8}>
+                            <Col xs={24}>
+                              <Title className={styles.blueText} level={3}>
+                                {video?.title}
+                              </Title>
+                            </Col>
+                            <Col xs={24}>
+                              <Space size={isMobileDevice ? 'small' : 'middle'}>
+                                <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                  {`Validity ${video?.validity} Days`}
+                                </Text>
+                                {userPasses.length <= 0 && (
+                                  <>
+                                    <Divider type="vertical" />
+                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                      {video?.price === 0
+                                        ? 'Free video'
+                                        : ` ${video?.currency.toUpperCase()} ${video?.price}`}
+                                    </Text>
+                                  </>
+                                )}
+                              </Space>
+                            </Col>
+                          </Row>
+                        </Col>
+                        {userPasses.length <= 0 && (
+                          <Col xs={24} md={8}>
+                            <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
+                              {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                            </Button>
+                          </Col>
+                        )}
+                      </Row>
+                    </Card>
+                  </Col>
+                )}
 
                 <Col xs={24} className={styles.mt10}>
                   <Title level={3} className={styles.ml20}>
                     {getLocalUserDetails() && userPasses.length > 0
                       ? 'Buy Using Your Pass'
-                      : 'Buy A Pass and this Video'}
+                      : 'Buy a Pass and this Video'}
                   </Title>
                 </Col>
 

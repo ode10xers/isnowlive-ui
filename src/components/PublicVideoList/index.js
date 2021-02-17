@@ -10,6 +10,7 @@ import apis from 'apis';
 import { PlayCircleOutlined } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
+import VideoCard from 'components/VideoCard';
 import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
@@ -91,7 +92,6 @@ const PublicVideoList = ({ username = null, videos }) => {
   };
 
   const hideVideoDetailModal = () => {
-    // setShowVideoDetailModal(false);
     setSelectedVideo(null);
     setShowPurchaseVideoModal(false);
   };
@@ -111,31 +111,20 @@ const PublicVideoList = ({ username = null, videos }) => {
     }
   };
 
-  //TODO: Might want to refactor and make a separate component for this, since it's also used in VideoDetails page
   return (
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
-      {/* 
-      Commenting this as per Rahul's request
-      <Modal
-        visible={selectedVideo && showVideoDetailModal}
-        onCancel={hideVideoDetailModal}
-        centered={true}
-        footer={null}
-        width={720}
-      >
-        {selectedVideo && (
-          <div className={styles.mt20}>
-            <VideoCard buyable={true} hoverable={false} video={selectedVideo} showPurchaseModal={openPurchaseModal} />
-          </div>
-        )}
-      </Modal> 
-      */}
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
           {videos.map((video) => (
             <Col xs={24} md={12} key={video?.external_id}>
-              <Card
+              <VideoCard
+                video={video}
+                buyable={true}
+                onCardClick={() => redirectToVideoDetails(video)}
+                showPurchaseModal={() => handleSelectVideo(video)}
+              />
+              {/* <Card
                 className={styles.cleanCard}
                 hoverable={true}
                 bodyStyle={{ padding: '10px 20px' }}
@@ -207,7 +196,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                     </Row>
                   </Col>
                 </Row>
-              </Card>
+              </Card> */}
             </Col>
           ))}
         </Row>

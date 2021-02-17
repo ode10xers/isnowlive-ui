@@ -3,9 +3,11 @@ import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
 import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -19,6 +21,10 @@ const {
 
 const noop = () => {};
 
+// This card will be used for 3 purposes
+// 1) Becomes a buyable card so the user can directly buy by clicking this card (buyable = true, also pass showPurchaseModal)
+// 2) Becomes a simple display card where the user cannot buy (buyable = false, can show details button or desc if needed)
+// 3) Used in attendee dashboard as video player and also show order details (showOrderDetails = true and send orderDetails)
 const VideoCard = ({
   cover = null,
   video,
@@ -28,7 +34,18 @@ const VideoCard = ({
   orderDetails = null,
   onCardClick = noop,
   showPurchaseModal = noop,
+  showDesc = false,
+  showDetailsBtn = true,
 }) => {
+  const redirectToVideoDetails = () => {
+    if (video?.external_id) {
+      const username = window.location.hostname.split('.')[0];
+
+      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+      window.open(`${baseUrl}/v/${video?.external_id}`);
+    }
+  };
+
   const renderVideoOrderDetails = () => {
     if (isMobileDevice) {
       return (
@@ -70,6 +87,7 @@ const VideoCard = ({
       bordered={false}
       footer={null}
       onClick={() => onCardClick(video)}
+      bodyStyle={{ padding: '10px 20px' }}
       cover={
         cover || (
           <Image
@@ -81,29 +99,81 @@ const VideoCard = ({
         )
       }
     >
-      <Row gutter={[16, 16]} justify="space-between">
-        <Col xs={24} md={buyable ? 16 : 24} xl={buyable ? 20 : 24}>
-          <Row gutter={[8, 8]} justify="space-around">
-            <Col xs={24}>
-              <Title level={4} className={styles.textAlignLeft}>
+      <Row gutter={[16, 16]} justify="center">
+        {(!showOrderDetails || !orderDetails) && (
+          <Col span={24} className={styles.playIconWrapper}>
+            <PlayCircleOutlined className={styles.playIcon} size={40} />
+          </Col>
+        )}
+        <Col span={24} className={classNames(styles.mt10, styles.textWrapper)}>
+          <Row gutter={[8, 8]} justify="start">
+            <Col xs={24} className={styles.titleWrapper}>
+              <Title level={5} className={styles.textAlignLeft}>
                 {video.title}
               </Title>
             </Col>
-            <Col xs={24}>
+            <Col xs={24} className={styles.detailsWrapper}>
               {showOrderDetails && orderDetails ? (
                 <div className={styles.highlightedBox}>{renderVideoOrderDetails()}</div>
               ) : (
-                <Title level={5} className={classNames(styles.textAlignLeft, styles.blueText)}>
-                  Validity : {video?.validity} days
-                </Title>
+                <Row gutter={16} justify="space-evenly">
+                  <Col span={14} className={styles.textAlignLeft}>
+                    <Text strong className={styles.validityText}>
+                      Viewable for : {video?.validity} days
+                    </Text>
+                  </Col>
+                  <Col span={10} className={styles.textAlignRight}>
+                    <Text strong className={styles.priceText}>
+                      Price : {video?.price === 0 ? 'Free' : `${video?.currency.toUpperCase()} ${video?.price}`}
+                    </Text>
+                  </Col>
+                </Row>
               )}
             </Col>
-            <Col xs={24}>
-              <div className={styles.videoDesc}>{ReactHtmlParser(video.description)}</div>
-            </Col>
+            {showDesc && (
+              <Col xs={24} className={styles.descWrapper}>
+                <div className={styles.videoDesc}>{ReactHtmlParser(video.description)}</div>
+              </Col>
+            )}
+            {!showOrderDetails && (
+              <Col span={24} className={styles.buttonWrapper}>
+                <Row gutter={16} justify="space-around">
+                  {showDetailsBtn && (
+                    <Col xs={12}>
+                      <Button
+                        className={styles.detailBtn}
+                        block
+                        type="link"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          redirectToVideoDetails(video);
+                        }}
+                      >
+                        Details
+                      </Button>
+                    </Col>
+                  )}
+                  {buyable && (
+                    <Col xs={12}>
+                      <Button
+                        block
+                        type="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          showPurchaseModal(video);
+                        }}
+                      >
+                        {video?.price === 0 ? 'Get' : 'Buy'}
+                      </Button>
+                    </Col>
+                  )}
+                </Row>
+              </Col>
+            )}
           </Row>
         </Col>
-        {buyable && (
+
+        {/* {buyable && (
           <Col xs={24} md={8} xl={4}>
             <div className={styles.flexColumn}>
               <div className={classNames(styles.flexVerticalRow, styles.flexGrow)}>
@@ -126,7 +196,7 @@ const VideoCard = ({
               </div>
             </div>
           </Col>
-        )}
+        )} */}
       </Row>
     </Card>
   );
