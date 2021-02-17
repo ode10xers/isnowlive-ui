@@ -68,7 +68,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
   }, []);
 
   return (
-    <div className={styles.box}>
+    <div>
       <Loader loading={isLoading} text="Fetching session informations">
         <Row gutter={[8, 8]}>
           {adjustedSessions && adjustedSessions.length > 0 ? (
