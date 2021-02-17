@@ -294,11 +294,13 @@ const ClassPasses = ({ username, passes }) => {
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>
-            <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
             <Paragraph>
-              Check out the passes below and the classes included in them. Once you have bought the pass you can use the
-              class credits to pay for classes in 1 click it without needing to touch your wallet again. Class pass is
-              valid from from the date you buy it until the validity period.
+              {' '}
+              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.{' '}
+            </Paragraph>
+            <Paragraph>
+              Depending on the pass you buy, you can use the credits and book the class or video products made available
+              in that pass for free. A Pass is valid from the date you buy it until the validity period.
             </Paragraph>
           </Col>
           <Col xs={24}>
