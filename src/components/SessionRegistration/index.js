@@ -99,7 +99,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'right',
       width: '50%',
-      render: (text, record) => `${record.price} ${record.currency}`,
+      render: (text, record) => `${record.price} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -138,19 +138,19 @@ const SessionRegistration = ({
       key: 'price',
       align: 'left',
       width: '15%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
-      title: 'Class Count',
-      dataIndex: 'class_count',
+      title: 'Credit Count',
+      dataIndex: 'class_count', //TODO: Adjust new credit keys here
       key: 'class_count',
       align: 'right',
       render: (text, record) => {
         const btnText = record.limited
           ? record.user_usable
             ? `${record.classes_remaining}/${record.class_count} remaining `
-            : `${record.class_count} Classes `
-          : 'Unlimited Classes ';
+            : `${record.class_count} Credits `
+          : 'Unlimited Credits ';
 
         return expandedRowKeys.includes(record.id) ? (
           <Button className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
@@ -187,8 +187,8 @@ const SessionRegistration = ({
       align: 'left',
     },
     {
-      title: 'Classes Left',
-      dataIndex: 'classes_remaining',
+      title: 'Credits Left',
+      dataIndex: 'classes_remaining', //TODO: Adjust new credit keys here
       key: 'classes_remaining',
       width: '20%',
       render: (text, record) => `${record.classes_remaining}/${record.class_count}`,
@@ -204,24 +204,56 @@ const SessionRegistration = ({
 
   const redirectToSessionsPage = (session) => {
     const baseUrl = generateUrlFromUsername(session.username || window.location.hostname.split('.')[0] || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
+    window.open(`${baseUrl}/s/${session?.session_id}`);
   };
 
-  const renderClassesList = (record) => (
-    <Row>
-      <Col xs={24}>
-        <Text className={styles.ml20}> Applicable to below class(es) </Text>
-      </Col>
-      <Col xs={24}>
-        <div className={classNames(styles.ml20, styles.mt10)}>
-          {record.sessions.map((session) => (
-            <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
-              {' '}
-              {session.name}{' '}
-            </Tag>
-          ))}
-        </div>
-      </Col>
+  const redirectToVideosPage = (video) => {
+    const baseUrl = generateUrlFromUsername(video.username || window.location.hostname.split('.')[0] || 'app');
+    window.open(`${baseUrl}/v/${video?.external_id}`);
+  };
+
+  const renderPassDetails = (record) => (
+    <Row gutter={[8, 8]}>
+      {record.sessions?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+          </Col>
+          <Col xs={24}>
+            <div className={styles.ml20}>
+              {record?.sessions?.map((session) => (
+                <Tag
+                  key={`${record.id}_${session?.session_id}`}
+                  color="blue"
+                  onClick={() => redirectToSessionsPage(session)}
+                >
+                  {session?.name}
+                </Tag>
+              ))}
+            </div>
+          </Col>
+        </>
+      )}
+      {record.videos?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+          </Col>
+          <Col xs={24}>
+            <div className={styles.ml20}>
+              {record?.videos?.map((video) => (
+                <Tag
+                  key={`${record.id}_${video?.external_id}`}
+                  color="volcano"
+                  onClick={() => redirectToVideosPage(video)}
+                >
+                  {video?.title}
+                </Tag>
+              ))}
+            </div>
+          </Col>
+        </>
+      )}
     </Row>
   );
 
@@ -236,7 +268,7 @@ const SessionRegistration = ({
     );
 
     return (
-      <div>
+      <div key={pass.id}>
         <Card
           className={styles.card}
           title={
@@ -270,25 +302,52 @@ const SessionRegistration = ({
             ),
           ]}
         >
-          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>
-            <Col xs={24}>
-              <Text className={styles.ml20}> Applicable to below class(es) </Text>
-            </Col>
-            <Col xs={24}>
-              <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.map((session) => (
-                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
-                    {' '}
-                    {session.name}{' '}
-                  </Tag>
-                ))}
-              </div>
-            </Col>
+          <Row gutter={[8, 8]} className={styles.cardExpansion}>
+            {pass?.sessions?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass?.sessions?.map((session) => (
+                      <Tag
+                        key={`${pass.id}_${session?.session_id}`}
+                        color="blue"
+                        onClick={() => redirectToSessionsPage(session)}
+                      >
+                        {session?.name}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass?.videos?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass?.videos?.map((video) => (
+                      <Tag
+                        key={`${pass.id}_${video?.external_id}`}
+                        color="volcano"
+                        onClick={() => redirectToVideosPage(video)}
+                      >
+                        {video?.title}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
           </Row>
         )}
       </div>
@@ -306,7 +365,7 @@ const SessionRegistration = ({
     );
 
     return (
-      <div>
+      <div key={pass.pass_order_id}>
         <Card
           className={styles.card}
           title={
@@ -340,24 +399,51 @@ const SessionRegistration = ({
             ),
           ]}
         >
-          {layout('Classes Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
+          {layout('Credits Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
           {layout('Expiry', <Text>{toShortDate(pass.expiry)}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>
-            <Col xs={24}>
-              <Text className={styles.ml20}> Applicable to below class(es) </Text>
-            </Col>
-            <Col xs={24}>
-              <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.map((session) => (
-                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
-                    {' '}
-                    {session.name}{' '}
-                  </Tag>
-                ))}
-              </div>
-            </Col>
+          <Row gutter={[8, 8]} className={styles.cardExpansion}>
+            {pass?.sessions?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass?.sessions?.map((session) => (
+                      <Tag
+                        key={`${pass.pass_order_id}_${session?.session_id}`}
+                        color="blue"
+                        onClick={() => redirectToSessionsPage(session)}
+                      >
+                        {session?.name}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass?.videos?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass?.videos?.map((video) => (
+                      <Tag
+                        key={`${pass.pass_order_id}_${video?.external_id}`}
+                        color="volcano"
+                        onClick={() => redirectToVideosPage(video)}
+                      >
+                        {video?.title}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
           </Row>
         )}
       </div>
@@ -497,7 +583,7 @@ const SessionRegistration = ({
                           data={availablePasses}
                           rowKey={(record) => record.id}
                           expandable={{
-                            expandedRowRender: renderClassesList,
+                            expandedRowRender: renderPassDetails,
                             expandIconColumnIndex: -1,
                             expandedRowKeys: expandedRowKeys,
                           }}
@@ -520,9 +606,9 @@ const SessionRegistration = ({
                 <Paragraph>
                   Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
                   <Text delete>
-                    {classDetails.price} {classDetails.currency}
+                    {classDetails.price} {classDetails.currency.toUpperCase()}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency}`} </Text> using your purchased pass
+                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> using your purchased pass
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}

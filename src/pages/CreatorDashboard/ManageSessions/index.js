@@ -184,7 +184,7 @@ const ManageSessions = () => {
       render: (text, record) => (
         <Text>
           {' '}
-          {record.price} {record.currency}{' '}
+          {record.price} {record.currency.toUpperCase()}{' '}
         </Text>
       ),
     },

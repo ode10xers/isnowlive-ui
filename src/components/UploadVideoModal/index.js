@@ -119,7 +119,7 @@ const UploadVideoModal = ({
 
       if (data) {
         setClasses(data.map((session) => ({ value: session.session_id, label: session.name })));
-        setCurrency(data[0].currency || 'SGD');
+        setCurrency(data[0].currency.toUpperCase() || 'SGD');
       }
     } catch (error) {
       showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
@@ -138,7 +138,7 @@ const UploadVideoModal = ({
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType: editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
         });
-        setCurrency(editedVideo.currency || 'SGD');
+        setCurrency(editedVideo.currency.toUpperCase() || 'SGD');
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
@@ -172,7 +172,7 @@ const UploadVideoModal = ({
 
     try {
       let data = {
-        currency: currency.toUpperCase(),
+        currency: currency.toLowerCase(),
         title: values.title,
         description: values.description,
         price: videoType === videoTypes.FREE.name ? 0 : values.price,
@@ -334,7 +334,7 @@ const UploadVideoModal = ({
                   <Form.Item
                     id="price"
                     name="price"
-                    label={`Price (${currency})`}
+                    label={`Price (${currency.toUpperCase()})`}
                     rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
                   >
                     <InputNumber min={0} placeholder="Price" className={styles.numericInput} />

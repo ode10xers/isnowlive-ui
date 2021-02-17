@@ -19,7 +19,14 @@ import PurchaseModal from 'components/PurchaseModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType, reservedDomainName } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  paymentSource,
+  orderType,
+  productType,
+  reservedDomainName,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
@@ -105,15 +112,17 @@ const SessionDetails = ({ match, history }) => {
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData && session) {
-        const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
-        setUserPasses(
-          data.active.map((userPass) => ({
-            ...userPass,
-            id: userPass.pass_id,
-            name: userPass.pass_name,
-            sessions: userPass.session,
-          }))
-        );
+        const { status, data } = await apis.passes.getAttendeePassesForSession(session.session_id);
+
+        if (isAPISuccess(status) && data) {
+          setUserPasses(
+            data.active.map((userPass) => ({
+              ...userPass,
+              id: userPass.pass_id,
+              name: userPass.pass_name,
+            }))
+          );
+        }
       }
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
@@ -234,6 +243,7 @@ const SessionDetails = ({ match, history }) => {
     if (selectedVideo) {
       const payload = {
         video_id: selectedVideo.external_id,
+        payment_source: paymentSource.GATEWAY,
       };
 
       buyVideo(payload, userEmail);
@@ -247,7 +257,7 @@ const SessionDetails = ({ match, history }) => {
           user_timezone_offset: new Date().getTimezoneOffset(),
           user_timezone_location: getTimezoneLocation(),
           user_timezone: getCurrentLongTimezone(),
-          payment_source: paymentSource.CLASS_PASS,
+          payment_source: paymentSource.PASS,
           source_id: usersPass.pass_order_id,
         };
 
@@ -256,7 +266,7 @@ const SessionDetails = ({ match, history }) => {
         const payload = {
           pass_id: selectedPass.id,
           price: selectedPass.price,
-          currency: selectedPass.currency,
+          currency: selectedPass.currency.toLowerCase(),
         };
 
         buyPassAndBookClass(payload, userEmail);
@@ -297,9 +307,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -324,7 +334,7 @@ const SessionDetails = ({ match, history }) => {
             inventory_id: parseInt(selectedInventory.inventory_id),
             user_timezone_offset: new Date().getTimezoneOffset(),
             user_timezone: getCurrentLongTimezone(),
-            payment_source: paymentSource.CLASS_PASS,
+            payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
           });
 
@@ -341,9 +351,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -363,9 +373,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -382,14 +392,15 @@ const SessionDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
         }
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
   };
@@ -614,7 +625,7 @@ const SessionDetails = ({ match, history }) => {
           </Col>
         )}
       </Row>
-      {sessionVideos.length > 0 && (
+      {sessionVideos?.length > 0 && (
         <>
           <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={handleOrder} />
           <Row justify="space-between" className={styles.mt20}>
@@ -623,8 +634,8 @@ const SessionDetails = ({ match, history }) => {
                 <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
                   <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
                     <Row gutter={[8, 20]}>
-                      {sessionVideos.length > 0 &&
-                        sessionVideos.map((videoDetails) => (
+                      {sessionVideos?.length > 0 &&
+                        sessionVideos?.map((videoDetails) => (
                           <Col xs={24} key={videoDetails.external_id}>
                             <VideoCard
                               video={videoDetails}

@@ -23,7 +23,7 @@ const SessionInfo = ({ session }) => {
           Price
         </Text>
         <Text className={styles.subText}>
-          {session?.price || 0} {session?.currency}
+          {session?.price || 0} {session?.currency.toUpperCase()}
         </Text>
       </Col>
       {session?.document_url && isValidFile(session?.document_url) && (

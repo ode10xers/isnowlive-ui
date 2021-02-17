@@ -4,6 +4,20 @@
   padding: 10px 30px !important;
 }
 
+.passPriceText {
+  text-align: right;
+}
+
+.passClassListContainer {
+  border: 1px solid map-get($map: $colors, $key: 'DarkGray');
+  border-radius: 8px;
+}
+
+.passVideoListContainer {
+  @extend .passClassListContainer;
+  padding: 16px !important;
+}
+
 .imageWrapper {
   position: relative;
   margin-top: 128px !important;
@@ -48,8 +62,17 @@
   margin: 10px 32px !important;
   border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
 
-  .blueText {
-    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  .headerWrapper {
+    min-height: 32px;
+    padding: 8px;
+  }
+
+  .descWrapper {
+    @extend .headerWrapper;
+
+    .blueText {
+      color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+    }
   }
 }
 
@@ -62,20 +85,23 @@
   }
 }
 
+
 @media (max-width: 768px) {
+  .showcaseCardContainer {
+    padding: 10px !important;
+  }
   .profilePreviewContainer {
     margin: 5px;
   }
+  .passPriceText {
+    text-align: left;
+  }
   .videoCard {
     margin: 16px !important;
-    // max-height: 100%;
-    // margin: 10px !important;
-    // margin-left: -20px !important;
-    // margin-right: -20px !important;
   }
   .imageWrapper {
     position: relative;
-    max-height: 300px;
+    // max-height: 300px;
     margin-bottom: 20px;
     margin-top: 50px;
   }
@@ -104,5 +130,9 @@
 @media (min-width: 768px) and (max-width: 1400px) {
   .imageWrapper {
     margin-bottom: 0px;
+  }
+
+  .showcaseCardContainer {
+    padding: 10px !important;
   }
 }

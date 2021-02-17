@@ -61,7 +61,7 @@ const ClassPassList = () => {
       const { status } = await apis.passes.publishPass(passId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Class Pass Published');
+        showSuccessModal('Pass Published');
         getPassesForCreator();
       }
     } catch (error) {
@@ -78,7 +78,7 @@ const ClassPassList = () => {
       const { status } = await apis.passes.unpublishPass(passId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Class Pass Unpublished');
+        showSuccessModal('Pass Unpublished');
         getPassesForCreator();
       }
     } catch (error) {
@@ -102,12 +102,13 @@ const ClassPassList = () => {
             name: classPass.name,
             price: classPass.price,
             limited: classPass.limited,
-            currency: classPass.currency,
+            currency: classPass.currency.toUpperCase(),
             validity: classPass.validity,
-            class_count: classPass.class_count,
+            class_count: classPass.class_count, //TODO: Adjust new credit keys here
             is_published: classPass.is_published,
             sessions: classPass.sessions,
-            buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency })),
+            videos: classPass.videos,
+            buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
             color_code: classPass.color_code,
           }))
         );
@@ -205,12 +206,12 @@ const ClassPassList = () => {
       },
     },
     {
-      title: 'Pass Count',
-      dataIndex: 'class_count',
+      title: 'Credit Count',
+      dataIndex: 'class_count', //TODO: Adjust new credit keys here
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
+      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credits'),
     },
     {
       title: 'Validity',
@@ -226,7 +227,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency}`,
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
@@ -302,7 +303,7 @@ const ClassPassList = () => {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
-      render: (text, record) => `${record.price_paid} ${record.currency}`,
+      render: (text, record) => `${record.price_paid} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -329,7 +330,7 @@ const ClassPassList = () => {
           <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
         </Col>
         <Col xs={24}>
-          <Text> {`${subscriber.price_paid} ${subscriber.currency}`} </Text>
+          <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
         </Col>
       </Row>
     </Card>
@@ -391,9 +392,9 @@ const ClassPassList = () => {
             ),
           ]}
         >
-          {layout('Class Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>
@@ -409,7 +410,7 @@ const ClassPassList = () => {
       <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={10} lg={14}>
-          <Title level={4}> Class Passes </Title>
+          <Title level={4}> Passes </Title>
         </Col>
         <Col xs={12} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
@@ -423,7 +424,7 @@ const ClassPassList = () => {
         </Col>
         <Col xs={24}>
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading Class Passes">
+            <Loader loading={isLoading} size="large" text="Loading Passes">
               <Row gutter={[8, 16]}>{passes.map(renderPassItem)}</Row>
             </Loader>
           ) : (

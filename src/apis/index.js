@@ -69,6 +69,7 @@ export default {
   passes: {
     getPassById: (passId) => http.get(`/passes/${passId}`),
     getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
+    getPassesByVideoId: (videoId) => http.get(`/passes?video_id=${videoId}`),
     getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getCreatorPasses: () => http.get(`/secure/creator/passes`),
     getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
@@ -77,6 +78,7 @@ export default {
     createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
     getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
     getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
+    getAttendeePassesForVideo: (videoId) => http.get(`/secure/customer/passes/orders?video_id=${videoId}`),
     publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
     unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
     getCreatorPassEarnings: (pageNo, perPage) =>

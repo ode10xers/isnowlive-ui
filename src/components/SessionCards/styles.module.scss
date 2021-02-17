@@ -21,7 +21,7 @@
   .tags {
     width: 100%;
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .tagsDisabled {
@@ -32,10 +32,10 @@
   .sessionDesc {
     p,
     span {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
     }
-  
+
     height: 72px;
     // overflow-y: auto;
     overflow: hidden;
