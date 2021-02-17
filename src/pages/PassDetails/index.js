@@ -17,6 +17,7 @@ import apis from 'apis';
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
@@ -24,7 +25,7 @@ import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, reservedDomainName } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, reservedDomainName, orderType, productType } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -107,7 +108,7 @@ const PassDetails = ({ match, history }) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.pass_order_id,
-        order_type: 'PASS_ORDER',
+        order_type: orderType.PASS,
       });
 
       if (isAPISuccess(status) && data) {
@@ -139,7 +140,7 @@ const PassDetails = ({ match, history }) => {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: pass.id,
         price: pass.price,
-        currency: pass.currency,
+        currency: pass.currency.toLowerCase(),
       });
 
       if (isAPISuccess(status) && data) {
@@ -154,11 +155,12 @@ const PassDetails = ({ match, history }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
 
+  //TODO: Adjust new credit keys here
   return (
     <Loader loading={isLoading} size="large" text="Loading pass details">
       <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
@@ -241,35 +243,31 @@ const PassDetails = ({ match, history }) => {
               <Col xs={24} className={styles.p20}>
                 <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
                   <Row gutter={[8, 16]} align="center">
-                    <Col xs={24} md={20}>
+                    <Col xs={24} md={18}>
                       <Row gutter={8}>
                         <Col xs={24}>
                           <Title className={styles.blueText} level={3}>
-                            {' '}
-                            {pass?.name}{' '}
+                            {pass?.name}
                           </Title>
                         </Col>
                         <Col xs={24}>
                           <Space size={isMobileDevice ? 'small' : 'middle'}>
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {pass && pass?.limited ? `${pass?.class_count} classes` : 'Unlimited Classes'}{' '}
+                              {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
                             </Text>
                             <Divider type="vertical" />
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {`${pass?.validity} days`}{' '}
+                              {`${pass?.validity} days`}
                             </Text>
                             <Divider type="vertical" />
                             <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {' '}
-                              {`${pass?.price} ${pass?.currency}`}{' '}
+                              {`${pass?.price} ${pass?.currency.toUpperCase()}`}
                             </Text>
                           </Space>
                         </Col>
                       </Row>
                     </Col>
-                    <Col xs={24} md={4}>
+                    <Col xs={24} md={6}>
                       <Button block type="primary" onClick={() => openPurchaseModal()}>
                         Buy Pass
                       </Button>
@@ -286,6 +284,19 @@ const PassDetails = ({ match, history }) => {
                     </Col>
                     <Col xs={24}>
                       <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
+                    </Col>
+                  </Row>
+                </Col>
+              )}
+
+              {pass.videos?.length > 0 && (
+                <Col xs={24}>
+                  <Row gutter={[8, 8]}>
+                    <Col xs={24}>
+                      <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                    </Col>
+                    <Col xs={24}>
+                      <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
                     </Col>
                   </Row>
                 </Col>

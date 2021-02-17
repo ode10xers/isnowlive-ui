@@ -177,13 +177,20 @@ export const StripeAccountStatus = {
 
 export const paymentSource = {
   GATEWAY: 'PAYMENT_GATEWAY',
-  CLASS_PASS: 'PASS',
+  PASS: 'PASS',
 };
 
 export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',
   VIDEO: 'VIDEO_ORDER',
+};
+
+export const productType = {
+  CLASS: 'Session',
+  PASS: 'Pass',
+  VIDEO: 'Video',
+  PRODUCT: 'Product', //As a default
 };
 
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

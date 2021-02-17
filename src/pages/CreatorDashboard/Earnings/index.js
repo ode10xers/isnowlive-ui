@@ -227,7 +227,7 @@ const Earnings = () => {
           <Text className={styles.box1Text}>Available for Payout</Text>
         </Col>
         <Col xs={24} sm={12}>
-          <ShowAmount amount={balance?.available} currency={balance?.currency} />
+          <ShowAmount amount={balance?.available} currency={balance?.currency.toUpperCase()} />
         </Col>
         <Col xs={24} xl={12}>
           {balance === null || balance?.available === 0 ? (
@@ -260,7 +260,7 @@ const Earnings = () => {
           </Text>
         </Col>
         <Col xs={18}>
-          <ShowAmount amount={amount} currency={balance?.currency} />
+          <ShowAmount amount={amount} currency={balance?.currency.toUpperCase()} />
         </Col>
         <Col xs={6}>
           <img src={image} height={40} alt="" />
@@ -331,7 +331,7 @@ const Earnings = () => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.total_earned}
+          {record.currency.toUpperCase()} {record.total_earned}
         </Text>
       ),
     },
@@ -379,7 +379,7 @@ const Earnings = () => {
         {layout(
           'Earnings',
           <Text>
-            {item.currency} {item.total_earned}
+            {item.currency.toUpperCase()} {item.total_earned}
           </Text>
         )}
       </Card>
@@ -406,7 +406,7 @@ const Earnings = () => {
       dataIndex: 'total_earned',
       align: 'right',
       width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency}`,
+      render: (text, record) => `${record.total_earned} ${record.currency.toUpperCase()}`,
     },
     {
       title: '',
@@ -450,7 +450,7 @@ const Earnings = () => {
         {layout(
           'Earnings',
           <Text>
-            {item.currency} {item.total_earned}
+            {item.currency.toUpperCase()} {item.total_earned}
           </Text>
         )}
       </Card>
@@ -521,7 +521,7 @@ const Earnings = () => {
         {layout(
           'Earnings',
           <Text>
-            {item.currency} {item.total_earned}
+            {item.currency.toUpperCase()} {item.total_earned}
           </Text>
         )}
       </Card>

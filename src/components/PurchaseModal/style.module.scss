@@ -35,7 +35,8 @@
 
 @media (max-width: 768px) {
   .nameInputWrapper {
-    .firstNameInput, .lastNameInput {
+    .firstNameInput,
+    .lastNameInput {
       max-width: 100%;
       display: block !important;
       margin-left: 0px !important;
@@ -45,7 +46,7 @@
   .passwordHelpText {
     margin-top: -24px;
     font-size: 12px;
-    
+
     .linkBtn {
       font-size: 12px;
     }

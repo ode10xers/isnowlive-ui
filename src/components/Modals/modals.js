@@ -4,7 +4,7 @@ import { Modal, Typography, Button } from 'antd';
 import apis from 'apis';
 import Routes from 'routes';
 
-import { generateUrl } from 'utils/helper';
+import { generateUrl, productType } from 'utils/helper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
@@ -53,6 +53,7 @@ export const showSetNewPasswordModal = (email) => {
   });
 };
 
+//TODO: Refactor this to be usable for other product types OR split it for each product
 export const showBookingSuccessModal = (
   userEmail,
   userPass = null,
@@ -72,7 +73,7 @@ export const showBookingSuccessModal = (
             You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
           </Paragraph>
           <Paragraph>
-            We have <Text strong> used 1 class credit </Text>
+            We have <Text strong> used 1 credit </Text>
             to book this class for you.
           </Paragraph>
           <Paragraph>
@@ -85,7 +86,7 @@ export const showBookingSuccessModal = (
         //* Book class from previously purchased Class Pass
         <>
           <Paragraph>
-            We have booked this session using 1 class credit from your pass{' '}
+            We have booked this session using 1 credit from your pass
             <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
           </Paragraph>
           <Paragraph>
@@ -101,13 +102,13 @@ export const showBookingSuccessModal = (
         <Paragraph>
           You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
         </Paragraph>
-        <Paragraph>You can see your Class Passes in 1 place on your dashboard.</Paragraph>
+        <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
       </>
     ) : (
       //* Book Class without Class Pass
       <>
         <Paragraph>
-          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -118,16 +119,37 @@ export const showBookingSuccessModal = (
   });
 };
 
-export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app') => {
+export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectDomainName = 'app') => {
+  let titleText = 'Product already purchased';
+  let contentText = 'purchased this product';
+
+  switch (prodType) {
+    case productType.CLASS:
+      titleText = 'Session already booked';
+      contentText = 'booked this session';
+      break;
+    case productType.PASS:
+      titleText = 'Pass already purchased';
+      contentText = 'purchased this pass';
+      break;
+    case productType.VIDEO:
+      titleText = 'Video already purchased';
+      contentText = 'purchased this video';
+      break;
+    default:
+      titleText = 'Product already purchased';
+      contentText = 'purchased this product';
+      break;
+  }
+
   Modal.warning({
     center: true,
     closable: true,
     maskClosable: false,
-    title: isPass ? 'Pass Already Purchased' : 'Session Already Booked',
+    title: titleText,
     content: (
       <Paragraph>
-        It seems you have already <Text strong> {isPass ? 'purchased this Class Pass' : 'booked this Session'} </Text>,
-        please check your dashboard{' '}
+        It seems you have already <Text strong> {contentText} </Text>, please check your dashboard
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
@@ -135,24 +157,71 @@ export const showAlreadyBookedModal = (isPass = false, redirectDomainName = 'app
   });
 };
 
-export const showVideoPurchaseSuccessModal = (userEmail, video, redirectDomainName = 'app') => {
+export const showVideoPurchaseSuccessModal = (
+  userEmail,
+  video,
+  userPass = null,
+  isContinuedFlow = false,
+  userDidPayment = false,
+  redirectDomainName = 'app'
+) => {
+  let title = 'Video Purchased';
+  let modalContent = (
+    <>
+      <Paragraph>
+        You have purchased the video <Text strong> {video?.title} </Text>
+      </Paragraph>
+      <Paragraph>
+        We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+        <Text strong> friends@passion.do. </Text>
+      </Paragraph>
+      <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+    </>
+  );
+
+  if (isContinuedFlow) {
+    title = 'Video Purchased using Pass';
+
+    if (userDidPayment) {
+      modalContent = (
+        <>
+          <Paragraph>
+            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+          </Paragraph>
+          <Paragraph>
+            We have <Text strong> used 1 credit </Text>
+            to buy <Text strong> {video?.title} </Text> video for you.
+          </Paragraph>
+          <Paragraph>
+            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
+            from <Text strong> friends@passion.do. </Text>
+          </Paragraph>
+          <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+        </>
+      );
+    } else {
+      modalContent = (
+        <>
+          <Paragraph>
+            We have bought <Text strong> {video?.title} </Text> video using 1 credit from your pass
+            <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
+          </Paragraph>
+          <Paragraph>
+            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
+            from <Text strong> friends@passion.do. </Text>
+          </Paragraph>
+          <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        </>
+      );
+    }
+  }
+
   Modal.success({
     center: true,
     closable: true,
     maskClosable: false,
-    title: 'Video Purchase',
-    content: (
-      <>
-        <Paragraph>
-          You have purchased the video <Text strong> {video?.title} </Text>
-        </Paragraph>
-        <Paragraph>
-          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
-          <Text strong> friends@passion.do. </Text>
-        </Paragraph>
-        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
-      </>
-    ),
+    title: title,
+    content: modalContent,
     okText: 'Go To Dashboard',
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });

@@ -115,6 +115,7 @@
   }
 }
 .videoWrapper {
+  min-height: 150px;
   position: relative;
   cursor: pointer;
   background-color: map-get($colors, $key: 'Black');
@@ -138,7 +139,8 @@
   z-index: 9999;
 }
 .videoThumbnail {
-  object-fit: scale-down;
+  min-height: 150px;
+  object-fit: cover;
 }
 .imageOverlay {
   background-color: map-get($colors, $key: 'Black') !important;

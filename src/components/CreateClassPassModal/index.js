@@ -30,6 +30,7 @@ const initialColor = generateRandomColor();
 const formInitialValues = {
   passName: '',
   classList: [],
+  videoList: [],
   passType: passTypes.LIMITED.name,
   colorCode: initialColor,
 };
@@ -60,10 +61,12 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [currency, setCurrency] = useState('SGD');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState([]);
+  const [selectedVideos, setSelectedVideos] = useState([]);
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
   const [colorCode, setColorCode] = useState(initialColor);
 
@@ -71,14 +74,32 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
     setIsLoading(true);
 
     try {
-      const { data } = await apis.session.getSession();
+      const { status, data } = await apis.session.getSession();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setClasses(data.map((session) => ({ value: session.session_id, label: session.name })));
-        setCurrency(data[0].currency);
+        setCurrency(data[0].currency.toUpperCase());
       }
     } catch (error) {
       showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchAllVideosForCreator = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.videos.getCreatorVideos();
+
+      if (isAPISuccess(status) && data) {
+        setVideos(
+          data.filter((video) => video.price > 0).map((video) => ({ value: video.external_id, label: video.title }))
+        );
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
     }
 
     setIsLoading(false);
@@ -90,24 +111,31 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         form.setFieldsValue({
           passName: editedPass.name,
           classList: editedPass.sessions.map((session) => session.session_id),
+          videoList: editedPass.videos.filter((video) => video.price > 0).map((video) => video.external_id),
           passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
-          classCount: editedPass.class_count,
+          classCount: editedPass.class_count, //TODO: Adjust new credit keys here
           validity: editedPass.validity,
           price: editedPass.price,
           color_code: editedPass.color_code || whiteColor,
         });
-        setCurrency(editedPass.currency);
+        setCurrency(editedPass.currency.toUpperCase());
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
+        setSelectedVideos(editedPass.videos.filter((video) => video.price > 0).map((video) => video.external_id));
         setColorCode(editedPass.color_code || whiteColor);
-        form.validateFields(['classList']);
       } else {
         form.resetFields();
+        setPassType(passTypes.LIMITED.name);
+        setSelectedClasses([]);
+        setSelectedVideos([]);
+        setColorCode(initialColor);
+        setCurrency('SGD');
       }
 
       fetchAllClassesForCreator();
+      fetchAllVideosForCreator();
     }
-  }, [visible, editedPass, fetchAllClassesForCreator, form]);
+  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, form]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
@@ -126,25 +154,31 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
     setIsSubmitting(true);
 
     try {
-      if (selectedClasses.length <= 0 && values.classList.length <= 0) {
-        showErrorModal('Select Classes', 'Please select some class to include in the pass');
+      const noClassesSelected = selectedClasses.length <= 0 && values.classList.length <= 0;
+      const noVideosSelected = selectedVideos.length <= 0 && values.videoList.length <= 0;
+
+      if (noClassesSelected && noVideosSelected) {
+        showErrorModal('Select Class/Video', 'Please select some class or videos to include in the pass');
         form.setFieldsValue(values);
+        setIsSubmitting(false);
         return;
       }
 
       if (passType !== passTypes.LIMITED.name && passType !== passTypes.UNLIMITED.name) {
         showErrorModal('Select Pass Type', 'Please select a pass type for this pass');
         form.setFieldsValue(values);
+        setIsSubmitting(false);
         return;
       }
 
       let data = {
-        currency: currency,
+        currency: currency.toLowerCase(),
         price: values.price,
         name: values.passName,
         validity: values.validity,
         session_ids: selectedClasses || values.classList || [],
-        class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
+        video_ids: selectedVideos || values.videoList || [],
+        class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000, //TODO: Adjust new credit keys here
         limited: passTypes.LIMITED.name === passType,
         color_code: colorCode || whiteColor,
       };
@@ -166,7 +200,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
 
   return (
     <Modal
-      title={`${editedPass ? 'Edit' : 'Create New'} Class Pass`}
+      title={`${editedPass ? 'Edit' : 'Create New'} Pass`}
       centered={true}
       visible={visible}
       footer={null}
@@ -174,17 +208,11 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
       width={720}
     >
       <Loader size="large" loading={isLoading}>
-        <Form
-          layout="vertical"
-          name="classPassForm"
-          form={form}
-          onFinish={handleFinish}
-          initialValues={formInitialValues}
-        >
+        <Form layout="vertical" name="PassForm" form={form} onFinish={handleFinish} initialValues={formInitialValues}>
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
-              <Form.Item id="passName" name="passName" label="Class Pass Name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Class Pass Name" maxLength={50} />
+              <Form.Item id="passName" name="passName" label="Pass Name" rules={validationRules.nameValidation}>
+                <Input placeholder="Enter Pass Name" maxLength={50} />
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
@@ -193,7 +221,6 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                 name="classList"
                 label="Apply to Class(es)"
                 extra={<Text className={styles.helpText}> The classes that will be bookable using this pass </Text>}
-                rules={validationRules.arrayValidation}
               >
                 <Select
                   showArrow
@@ -213,9 +240,8 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
               <Form.Item
                 id="passType"
                 name="passType"
-                label="Class Pass Type"
+                label="Pass Type"
                 extra={<Text className={styles.helpText}>Type of usage limit this pass will have</Text>}
-                rules={validationRules.requiredValidation}
               >
                 <Radio.Group
                   className="pass-type-radio"
@@ -230,27 +256,20 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item
-                id="classCount"
-                name="classCount"
-                label="Class Count"
-                extra={<Text className={styles.helpText}>The maximum amount of classes bookable with this pass</Text>}
-                rules={[
-                  {
-                    required: true,
-                    validator: (_, value) => {
-                      if (passType === passTypes.LIMITED.name && !value) {
-                        return Promise.reject('Please select the amount of classes');
-                      }
-                      return Promise.resolve();
-                    },
-                  },
-                ]}
+                id="videoList"
+                name="videoList"
+                label="Apply to Video(s)"
+                extra={<Text className={styles.helpText}> The videos that will be bookable using this pass </Text>}
               >
-                <InputNumber
-                  disabled={passType === passTypes.UNLIMITED.name}
-                  min={1}
-                  placeholder="Amount of Class"
-                  className={styles.numericInput}
+                <Select
+                  showArrow
+                  showSearch={false}
+                  placeholder="Select your Video(s)"
+                  mode="multiple"
+                  maxTagCount={2}
+                  options={videos}
+                  value={selectedVideos}
+                  onChange={(val) => setSelectedVideos(val)}
                 />
               </Form.Item>
             </Col>
@@ -277,10 +296,40 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
                   <Form.Item
                     id="price"
                     name="price"
-                    label="Class Pass Price"
+                    label="Pass Price"
                     rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
                   >
-                    <InputNumber min={0} placeholder="Class Pass Price" className={styles.numericInput} />
+                    <InputNumber min={0} placeholder="Pass Price" className={styles.numericInput} />
+                  </Form.Item>
+                </Col>
+                <Col xs={24}>
+                  <Form.Item
+                    id="classCount"
+                    name="classCount"
+                    label="Pass Credits"
+                    extra={
+                      <Text className={styles.helpText}>
+                        The maximum amount of live classes and videos bookable with this pass
+                      </Text>
+                    }
+                    rules={[
+                      {
+                        required: true,
+                        validator: (_, value) => {
+                          if (passType === passTypes.LIMITED.name && !value) {
+                            return Promise.reject('Please select the amount of classes');
+                          }
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
+                  >
+                    <InputNumber
+                      disabled={passType === passTypes.UNLIMITED.name}
+                      min={1}
+                      placeholder="Amount of Credits"
+                      className={styles.numericInput}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -307,7 +356,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
             </Col>
             <Col xs={12} md={6}>
               <Button block type="primary" htmlType="submit" loading={isSubmitting}>
-                {editedPass ? 'Update' : 'Create'} Class Pass
+                {editedPass ? 'Update' : 'Create'} Pass
               </Button>
             </Col>
           </Row>
