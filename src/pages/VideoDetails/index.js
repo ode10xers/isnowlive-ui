@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Col, Image, Typography, Space, Divider, Card, Button, message } from 'antd';
+import { Row, Col, Image, Typography, Space, Divider, Card, Button, Tag, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -361,6 +361,16 @@ const VideoDetails = ({ match, history }) => {
     }
   };
 
+  const redirectToSessionsPage = (session) => {
+    const baseUrl = generateUrlFromUsername(username || 'app');
+    window.open(`${baseUrl}/s/${session.session_id}`);
+  };
+
+  const redirectToVideosPage = (video) => {
+    const baseUrl = generateUrlFromUsername(username || 'app');
+    window.open(`${baseUrl}/v/${video.external_id}`);
+  };
+
   //TODO: Adjust the new credits key for passes here
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
@@ -442,9 +452,23 @@ const VideoDetails = ({ match, history }) => {
                 <Col xs={24}>
                   <Text strong> Sessions bookable with this pass </Text>
                 </Col>
-                <Col xs={24} className={styles.passClassListContainer}>
-                  <SessionCards username={username} sessions={pass?.sessions} shouldFetchInventories={true} />
-                </Col>
+                {isMobileDevice ? (
+                  <Col xs={24}>
+                    {pass?.sessions?.map((session) => (
+                      <Tag
+                        key={`${purchased ? pass?.pass_order_id : pass?.id}_${session?.session_id}`}
+                        color="blue"
+                        onClick={() => redirectToSessionsPage(session)}
+                      >
+                        {session.name}
+                      </Tag>
+                    ))}
+                  </Col>
+                ) : (
+                  <Col xs={24} className={styles.passClassListContainer}>
+                    <SessionCards username={username} sessions={pass?.sessions} shouldFetchInventories={true} />
+                  </Col>
+                )}
               </>
             )}
             {pass?.videos?.length > 0 && (
@@ -452,9 +476,23 @@ const VideoDetails = ({ match, history }) => {
                 <Col xs={24}>
                   <Text strong> Videos purchasable with this pass </Text>
                 </Col>
-                <Col xs={24} className={styles.passVideoListContainer}>
-                  <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
-                </Col>
+                {isMobileDevice ? (
+                  <Col xs={24}>
+                    {pass?.videos?.map((video) => (
+                      <Tag
+                        key={`${purchased ? pass?.pass_order_id : pass?.id}_${video?.external_id}`}
+                        color="volcano"
+                        onClick={() => redirectToVideosPage(video)}
+                      >
+                        {video?.title}
+                      </Tag>
+                    ))}
+                  </Col>
+                ) : (
+                  <Col xs={24} className={styles.passVideoListContainer}>
+                    <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
+                  </Col>
+                )}
               </>
             )}
           </>

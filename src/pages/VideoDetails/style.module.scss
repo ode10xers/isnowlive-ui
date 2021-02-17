@@ -78,7 +78,9 @@
 
 
 @media (max-width: 768px) {
-
+  .showcaseCardContainer {
+    padding: 10px !important;
+  }
   .profilePreviewContainer {
     margin: 5px;
   }
@@ -87,10 +89,6 @@
   }
   .videoCard {
     margin: 16px !important;
-    // max-height: 100%;
-    // margin: 10px !important;
-    // margin-left: -20px !important;
-    // margin-right: -20px !important;
   }
   .imageWrapper {
     position: relative;
@@ -123,5 +121,9 @@
 @media (min-width: 768px) and (max-width: 1400px) {
   .imageWrapper {
     margin-bottom: 0px;
+  }
+
+  .showcaseCardContainer {
+    padding: 10px !important;
   }
 }
