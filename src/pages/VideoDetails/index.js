@@ -22,7 +22,12 @@ import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
-import { showAlreadyBookedModal, showErrorModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
+import {
+  showAlreadyBookedModal,
+  showSuccessModal,
+  showErrorModal,
+  showVideoPurchaseSuccessModal,
+} from 'components/Modals/modals';
 
 import DefaultImage from 'components/Icons/DefaultImage';
 
@@ -42,7 +47,7 @@ import styles from './style.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const {
   formatDate: { toLongDateWithDay },
 } = dateUtil;
@@ -231,7 +236,24 @@ const VideoDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
+
+          // This popup will only show up in very edge cases
+          if (selectedPass) {
+            const modalContent = (
+              <>
+                <Paragraph> You tried to use a pass to book a free video </Paragraph>
+                <Paragraph>
+                  {' '}
+                  To prevent unnecessary payment/credit usage, we got the video for you without using the pass.{' '}
+                </Paragraph>
+                <Paragraph> You can see all your purchases in one place in your dashboard </Paragraph>
+              </>
+            );
+
+            showSuccessModal('Video Purchase Successful', modalContent);
+          } else {
+            showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
+          }
         }
       }
     } catch (error) {
@@ -312,7 +334,9 @@ const VideoDetails = ({ match, history }) => {
       setShouldFollowUpGetVideo(false);
     }
 
-    if (selectedPass) {
+    //Handling edge case, buy free video using pass
+    //We redirect them to the buySingleVideo flow
+    if (selectedPass && video?.price > 0) {
       const usableUserPass = await getUserPurchasedPass(false);
 
       if (usableUserPass) {
