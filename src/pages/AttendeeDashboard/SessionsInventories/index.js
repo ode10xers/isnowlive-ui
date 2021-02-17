@@ -329,7 +329,7 @@ const SessionsInventories = ({ match }) => {
               <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
                 Reschedule
               </Button>
-            )}{' '}
+            )}
           </>,
         ]}
       >

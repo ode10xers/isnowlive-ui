@@ -108,33 +108,27 @@ const VideoDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, []);
 
-  const getUsablePassesForUser = useCallback(
-    async (videoId) => {
-      try {
-        const loggedInUserData = getLocalUserDetails();
-        if (loggedInUserData) {
-          const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
+  const getUsablePassesForUser = useCallback(async (videoId) => {
+    try {
+      const loggedInUserData = getLocalUserDetails();
+      if (loggedInUserData) {
+        const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
 
-          if (isAPISuccess(status) && data) {
-            //TODO: Hacky workaround, try to get API to do this
-            setUserPasses(
-              data.active.map((userPass) => ({
-                ...userPass,
-                id: userPass.pass_id,
-                name: userPass.pass_name,
-                sessions: userPass.session,
-                videos: availablePassesForVideo.find((pass) => pass.id === userPass.pass_id)?.videos || [],
-              }))
-            );
-          }
+        if (isAPISuccess(status) && data) {
+          setUserPasses(
+            data.active.map((userPass) => ({
+              ...userPass,
+              id: userPass.pass_id,
+              name: userPass.pass_name,
+            }))
+          );
         }
-      } catch (error) {
-        message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
-        setIsLoading(false);
       }
-    },
-    [availablePassesForVideo]
-  );
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
+      setIsLoading(false);
+    }
+  }, []);
 
   const openPurchaseVideoModal = () => {
     setSelectedPass(null);
@@ -251,6 +245,7 @@ const VideoDetails = ({ match, history }) => {
             );
 
             showSuccessModal('Video Purchase Successful', modalContent);
+            setSelectedPass(null);
           } else {
             showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
           }
@@ -445,7 +440,7 @@ const VideoDetails = ({ match, history }) => {
             {pass?.sessions?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text strong> Classes purchasable with this pass </Text>
+                  <Text strong> Sessions bookable with this pass </Text>
                 </Col>
                 <Col xs={24} className={styles.passClassListContainer}>
                   <SessionCards username={username} sessions={pass?.sessions} shouldFetchInventories={true} />

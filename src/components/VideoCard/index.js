@@ -41,7 +41,7 @@ const VideoCard = ({
     if (video?.external_id) {
       const username = window.location.hostname.split('.')[0];
 
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+      const baseUrl = generateUrlFromUsername(video?.username || username || 'app');
       window.open(`${baseUrl}/v/${video?.external_id}`);
     }
   };
@@ -172,31 +172,6 @@ const VideoCard = ({
             )}
           </Row>
         </Col>
-
-        {/* {buyable && (
-          <Col xs={24} md={8} xl={4}>
-            <div className={styles.flexColumn}>
-              <div className={classNames(styles.flexVerticalRow, styles.flexGrow)}>
-                <Title level={4} className={classNames(styles.priceText, styles.textAlignCenter)}>
-                  {video.price} {video.currency.toUpperCase()}
-                </Title>
-              </div>
-              <div className={styles.flexVerticalRow}>
-                <Button
-                  type="primary"
-                  size="large"
-                  block
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    showPurchaseModal(video);
-                  }}
-                >
-                  {video.price === 0 ? 'Get' : 'Buy'}
-                </Button>
-              </div>
-            </div>
-          </Col>
-        )} */}
       </Row>
     </Card>
   );

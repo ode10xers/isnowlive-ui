@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
-import classNames from 'classnames';
 import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
@@ -106,6 +105,11 @@ const ClassPasses = ({ username, passes }) => {
     window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
+  const redirectToVideosPage = (video) => {
+    const baseUrl = generateUrlFromUsername(video.username || username || 'app');
+    window.open(`${baseUrl}/v/${video.external_id}`);
+  };
+
   const toggleExpandAll = () => {
     if (expandedRowKeys.length > 0) {
       setExpandedRowKeys([]);
@@ -186,8 +190,7 @@ const ClassPasses = ({ username, passes }) => {
         <>
           <Col xs={24}>
             <Text strong className={styles.ml20}>
-              {' '}
-              Applicable to below class(es){' '}
+              Sessions bookable with this pass
             </Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
@@ -199,8 +202,7 @@ const ClassPasses = ({ username, passes }) => {
         <>
           <Col xs={24}>
             <Text strong className={styles.ml20}>
-              {' '}
-              Videos purchasable with this pass{' '}
+              Videos purchasable with this pass
             </Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
@@ -223,7 +225,7 @@ const ClassPasses = ({ username, passes }) => {
 
     //TODO: Adjust new credit keys here
     return (
-      <div>
+      <div key={pass.id}>
         <Card
           className={styles.card}
           title={<Text>{pass.name}</Text>}
@@ -247,20 +249,39 @@ const ClassPasses = ({ username, passes }) => {
           {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>
-            <Col xs={24}>
-              <Text className={styles.ml20}> Applicable to below class(es) </Text>
-            </Col>
-            <Col xs={24}>
-              <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.map((session) => (
-                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
-                    {' '}
-                    {session.name}{' '}
-                  </Tag>
-                ))}
-              </div>
-            </Col>
+          <Row gutter={[8, 8]} className={styles.cardExpansion}>
+            {pass.sessions?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.sessions?.map((session) => (
+                      <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
+                        {session?.name}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass.videos?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.videos?.map((video) => (
+                      <Tag key={video?.key} color="volcano" onClick={() => redirectToVideosPage(video)}>
+                        {video?.title}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
           </Row>
         )}
       </div>

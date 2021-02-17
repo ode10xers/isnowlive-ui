@@ -243,7 +243,7 @@ const PassDetails = ({ match, history }) => {
               <Col xs={24} className={styles.p20}>
                 <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
                   <Row gutter={[8, 16]} align="center">
-                    <Col xs={24} md={20}>
+                    <Col xs={24} md={18}>
                       <Row gutter={8}>
                         <Col xs={24}>
                           <Title className={styles.blueText} level={3}>
@@ -267,7 +267,7 @@ const PassDetails = ({ match, history }) => {
                         </Col>
                       </Row>
                     </Col>
-                    <Col xs={24} md={4}>
+                    <Col xs={24} md={6}>
                       <Button block type="primary" onClick={() => openPurchaseModal()}>
                         Buy Pass
                       </Button>

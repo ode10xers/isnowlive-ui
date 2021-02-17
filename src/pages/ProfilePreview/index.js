@@ -126,6 +126,12 @@ const ProfilePreview = ({ username = null }) => {
                 key: `${pass.id}_${session.session_id}`,
                 username: profileUsername,
               })) || [],
+            videos:
+              pass.videos?.map((video) => ({
+                ...video,
+                key: `${pass.id}_${video.external_id}`,
+                username: profileUsername,
+              })) || [],
           }))
         );
         setIsPassesLoading(false);

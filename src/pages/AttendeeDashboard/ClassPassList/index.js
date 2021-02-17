@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
 import { Row, Col, Button, Typography, Collapse, Card, Tag } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
@@ -8,6 +7,7 @@ import apis from 'apis';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -52,11 +52,16 @@ const ClassPassList = () => {
             classes_remaining: pass.classes_remaining,
             expiry: pass.expiry,
             sessions:
-              pass.session?.map((session) => ({
+              pass.sessions?.map((session) => ({
                 ...session,
                 key: `${pass.pass_order_id}_${session.session_id}`,
                 username: pass.creator_username,
               })) || [],
+            videos: pass.videos?.map((video) => ({
+              ...video,
+              key: `${pass.pass_order_id}_${video.external_id}`,
+              username: pass.creator_username,
+            })),
             expired: false,
           }))
         );
@@ -80,6 +85,12 @@ const ClassPassList = () => {
                 key: `${pass.pass_order_id}_${session.session_id}`,
                 username: pass.creator_username,
               })) || [],
+            videos:
+              pass.videos?.map((video) => ({
+                ...video,
+                key: `${pass.pass_order_id}_${video.external_id}`,
+                username: pass.creator_username,
+              })) || [],
             expired: true,
           }))
         );
@@ -95,8 +106,13 @@ const ClassPassList = () => {
   }, [getPassesForAttendee]);
 
   const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session.username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
+    const baseUrl = generateUrlFromUsername(session?.username || 'app');
+    window.open(`${baseUrl}/s/${session?.session_id}`);
+  };
+
+  const redirectToVideosPage = (video) => {
+    const baseUrl = generateUrlFromUsername(video?.username || 'app');
+    window.open(`${baseUrl}/v/${video?.external_id}`);
   };
 
   const toggleExpandAllActivePasses = () => {
@@ -190,14 +206,28 @@ const ClassPassList = () => {
     },
   ];
 
-  const renderClassesList = (record) => (
+  const renderPassDetails = (record) => (
     <Row>
-      <Col xs={24}>
-        <Text className={styles.ml20}> Usable for below class(es) </Text>
-      </Col>
-      <Col xs={24}>
-        <SessionCards sessions={record.sessions} />
-      </Col>
+      {record.sessions?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+          </Col>
+          <Col xs={24}>
+            <SessionCards sessions={record.sessions} />
+          </Col>
+        </>
+      )}
+      {record.videos?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+          </Col>
+          <Col xs={24}>
+            <SimpleVideoCardsList passDetails={record} videos={record.videos} />
+          </Col>
+        </>
+      )}
     </Row>
   );
 
@@ -247,20 +277,39 @@ const ClassPassList = () => {
         </Card>
         {((pass.expired && expandedExpiredRowKeys.includes(pass.pass_order_id)) ||
           expandedActiveRowKeys.includes(pass.pass_order_id)) && (
-          <Row className={styles.cardExpansion}>
-            <Col xs={24}>
-              <Text className={styles.ml20}> Applicable to below class(es) </Text>
-            </Col>
-            <Col xs={24}>
-              <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.map((session) => (
-                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
-                    {' '}
-                    {session.name}{' '}
-                  </Tag>
-                ))}
-              </div>
-            </Col>
+          <Row gutter={[8, 8]} className={styles.cardExpansion}>
+            {pass.sessions?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Sessions bookable using this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.sessions?.map((session) => (
+                      <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
+                        {session?.name}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass.videos?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Videos purchasable using this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.videos?.map((video) => (
+                      <Tag key={video?.key} color="volcano" onClick={() => redirectToVideosPage(video)}>
+                        {video?.title}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
           </Row>
         )}
       </div>
@@ -296,7 +345,7 @@ const ClassPassList = () => {
                       loading={isLoading}
                       rowKey={(record) => record.pass_order_id}
                       expandable={{
-                        expandedRowRender: (record) => renderClassesList(record),
+                        expandedRowRender: (record) => renderPassDetails(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
                         expandedRowKeys: expandedActiveRowKeys,
@@ -327,7 +376,7 @@ const ClassPassList = () => {
                       loading={isLoading}
                       rowKey={(record) => record.pass_order_id}
                       expandable={{
-                        expandedRowRender: (record) => renderClassesList(record),
+                        expandedRowRender: (record) => renderPassDetails(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
                         expandedRowKeys: expandedExpiredRowKeys,

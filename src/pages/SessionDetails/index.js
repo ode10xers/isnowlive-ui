@@ -120,7 +120,6 @@ const SessionDetails = ({ match, history }) => {
               ...userPass,
               id: userPass.pass_id,
               name: userPass.pass_name,
-              sessions: userPass.session,
             }))
           );
         }
@@ -626,7 +625,7 @@ const SessionDetails = ({ match, history }) => {
           </Col>
         )}
       </Row>
-      {sessionVideos.length > 0 && (
+      {sessionVideos?.length > 0 && (
         <>
           <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={handleOrder} />
           <Row justify="space-between" className={styles.mt20}>
@@ -635,8 +634,8 @@ const SessionDetails = ({ match, history }) => {
                 <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
                   <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
                     <Row gutter={[8, 20]}>
-                      {sessionVideos.length > 0 &&
-                        sessionVideos.map((videoDetails) => (
+                      {sessionVideos?.length > 0 &&
+                        sessionVideos?.map((videoDetails) => (
                           <Col xs={24} key={videoDetails.external_id}>
                             <VideoCard
                               video={videoDetails}

@@ -8,7 +8,7 @@ import { generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const SimpleVideoCardsList = ({ username, passDetails, videos }) => {
+const SimpleVideoCardsList = ({ username = null, passDetails, videos }) => {
   const redirectToVideoDetails = (video) => {
     if (video?.external_id) {
       const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
