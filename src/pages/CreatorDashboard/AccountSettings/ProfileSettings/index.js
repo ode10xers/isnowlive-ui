@@ -1,15 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Input, Form, Button, Typography } from 'antd';
+import { Row, Col, Button, Typography } from 'antd';
 
-import apis from 'apis';
+// import apis from 'apis';
 
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
 
 const ProfileSettings = () => {
-  const [submitting, setSubmitting] = useState();
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setSubmitting(false);
+    //eslint-disable-next-line
+  }, []);
 
   return (
     <div>
