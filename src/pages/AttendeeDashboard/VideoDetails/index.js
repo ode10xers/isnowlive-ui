@@ -164,6 +164,7 @@ const VideoDetails = ({ match }) => {
             hoverable={false}
             showOrderDetails={true}
             orderDetails={videoOrderDetails}
+            showDesc={true}
           />
         </Col>
         <Col xs={24}>

@@ -506,7 +506,7 @@ const Session = ({ match, history }) => {
       setIsLoading(true);
       const data = {
         price: values.price || 0,
-        currency: values.currency || stripeCurrency || 'SGD',
+        currency: values.currency.toLowerCase() || stripeCurrency || 'SGD',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,

@@ -77,7 +77,7 @@ const VideoEarnings = ({ match }) => {
 
   const showVideoEarnings = showVideoLayout(
     'Total Earning',
-    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency} />
+    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency.toUpperCase()} />
   );
 
   let videoColumns = [
@@ -152,19 +152,19 @@ const VideoEarnings = ({ match }) => {
         {layout(
           'Amount',
           <Text>
-            {item.currency} {item.total_price}
+            {item.currency.toUpperCase()} {item.total_price}
           </Text>
         )}
         {layout(
           'Fees',
           <Text>
-            {item.currency} {item.platform_fees}
+            {item.currency.toUpperCase()} {item.platform_fees}
           </Text>
         )}
         {layout(
           'Net',
           <Text>
-            {item.currency} {item.net_price}
+            {item.currency.toUpperCase()} {item.net_price}
           </Text>
         )}
         {layout('Status', <Text>{getPaymentStatus(item.status)}</Text>)}

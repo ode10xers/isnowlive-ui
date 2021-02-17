@@ -357,7 +357,7 @@ const Videos = () => {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
-      render: (text, record) => `${record.price_paid} ${record.currency}`,
+      render: (text, record) => `${record.price_paid} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -384,7 +384,7 @@ const Videos = () => {
           <Text> Purchased at {toDateAndTime(buyer.date_of_purchase)} </Text>
         </Col>
         <Col xs={24}>
-          <Text> {`${buyer.price_paid} ${buyer.currency}`} </Text>
+          <Text> {`${buyer.price_paid} ${buyer.currency.toUpperCase()}`} </Text>
         </Col>
       </Row>
     </Card>
@@ -521,7 +521,7 @@ const Videos = () => {
           actions={actionButtons}
         >
           {layout('Validity', <Text>{`${video.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${video.price} ${video.currency}`}</Text>)}
+          {layout('Price', <Text>{`${video.price} ${video.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(video.external_id) && (
           <Row className={styles.cardExpansion}>

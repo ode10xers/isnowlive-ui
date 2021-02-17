@@ -82,7 +82,7 @@
 
       &.active {
         border-bottom: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
-        color: map-get($map: $colors, $key: 'DodgerBlue')
+        color: map-get($map: $colors, $key: 'DodgerBlue');
       }
 
       &.divider {
@@ -108,7 +108,7 @@
   }
 
   .inlineMenu {
-    display : none;
+    display: none;
   }
 
   .mobileMenuContainer {
@@ -122,6 +122,6 @@
 
   .navItem {
     margin-left: auto;
-    margin-right: auto;  
+    margin-right: auto;
   }
 }

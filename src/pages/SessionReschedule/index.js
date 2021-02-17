@@ -90,7 +90,7 @@ const SessionReschedule = () => {
           inventory_id: i.inventory_id,
           session_id: i.session_id,
           max_participants: i.max_participants,
-          currency: i.currency || 'SGD',
+          currency: i.currency.toUpperCase() || 'SGD',
         }));
 
         const isNotCurrentInventory = (session) => parseInt(session.inventory_id) !== parseInt(inventory_id);
