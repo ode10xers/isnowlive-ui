@@ -105,7 +105,7 @@ export default {
   courses: {
     getCreatorCourses: () => http.get('/secure/creator/courses'),
     createCourse: (payload) => http.post('/secure/creator/courses', payload),
-    updateCourse: (payload) => http.put('/secure/creator/courses', payload),
+    updateCourse: (courseId, payload) => http.put(`/secure/creator/courses/${courseId}`, payload),
     //TODO: Adjust new APIs
     getCoursesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
   },

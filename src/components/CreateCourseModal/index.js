@@ -13,7 +13,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateRandomColor, scrollToErrorField } from 'utils/helper';
+import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
 
@@ -87,7 +87,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const fetchAllCourseClassForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
-      //TODO: Do we use new API or just filter these
       const { status, data } = await apis.session.getSession();
 
       if (isAPISuccess(status) && data) {
@@ -122,7 +121,29 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   useEffect(() => {
     if (visible) {
       if (editedCourse) {
-        console.log('TODO: Adjust format here');
+        form.setFieldsValue({
+          courseImageUrl: editedCourse.course_image_url || '',
+          courseType:
+            editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name,
+          courseName: editedCourse.name,
+          courseStartDate: moment(editedCourse.start_date),
+          courseEndDate: moment(editedCourse.end_date),
+          selectedCourseClass: editedCourse.session?.session_id,
+          videoList: editedCourse.videos?.map((courseVideo) => courseVideo.external_id),
+          price: editedCourse.price,
+          colorCode: editedCourse.color_code || initialColor || whiteColor,
+        });
+
+        setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
+        setSelectedCourseClass(editedCourse.session?.session_id);
+        setSelectedVideos(editedCourse.videos?.map((courseVideo) => courseVideo.external_id));
+        setColorCode(editedCourse.color_code || initialColor || whiteColor);
+        setCourseStartDate(moment(editedCourse.start_date));
+        setCourseEndDate(moment(editedCourse.end_date));
+        setCourseType(
+          editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name
+        );
+        setCourseImageUrl(editedCourse.course_image_url);
       } else {
         form.resetFields();
         setSelectedCourseClass(null);
@@ -209,10 +230,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     setSubmitting(false);
   };
 
-  const handleFailedFinish = ({ errorFields }) => {
-    scrollToErrorField(errorFields);
-  };
-
   return (
     <Modal
       title={`${editedCourse ? 'Edit' : 'Create New'} Pass`}
@@ -227,7 +244,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
           name="CourseForm"
           form={form}
           onFinish={handleFinish}
-          onFinishFailed={handleFailedFinish}
           initialValues={formInitialValues}
         >
           <Row className={styles.courseRow} gutter={[8, 16]}>

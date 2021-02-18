@@ -2,19 +2,16 @@ import React from 'react';
 
 import { Row, Col, Tooltip, Typography, Button } from 'antd';
 import {
-  DeleteOutlined,
-  EyeInvisibleTwoTone,
-  EyeOutlined,
   CopyOutlined,
   EditTwoTone,
-  VideoCameraAddOutlined,
+  DownOutlined,
+  // UpOutlined,
 } from '@ant-design/icons';
 
 import Table from 'components/Table';
 
 import dateUtil from 'utils/date';
 
-import Icons from 'assets/icons';
 import styles from './styles.module.scss';
 
 const { Text } = Typography;
@@ -23,7 +20,7 @@ const {
   formatDate: { toShortDateWithYear },
 } = dateUtil;
 
-const LiveCourses = ({ liveCourses }) => {
+const LiveCourses = ({ liveCourses, showEditModal }) => {
   const liveCourseColumns = [
     {
       title: 'Course Name',
@@ -44,7 +41,7 @@ const LiveCourses = ({ liveCourses }) => {
       title: 'Duration',
       dataIndex: 'start_time',
       key: 'start_time',
-      width: '180px',
+      width: '170px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {
@@ -57,19 +54,14 @@ const LiveCourses = ({ liveCourses }) => {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '100px',
+      width: '85px',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
     },
     {
       title: 'Actions',
-      width: '180px',
+      width: '250px',
       render: (text, record) => (
         <Row gutter={8} justify="end">
-          <Col xs={4}>
-            <Tooltip title="Delete">
-              <Button danger block type="text" onClick={() => console.log('Clicked')} icon={<DeleteOutlined />} />
-            </Tooltip>
-          </Col>
           <Col xs={4}>
             <Tooltip title="Copy Page Link">
               <Button block type="text" onClick={() => console.log('Clicked')} icon={<CopyOutlined />} />
@@ -80,36 +72,30 @@ const LiveCourses = ({ liveCourses }) => {
               <Button
                 block
                 type="text"
-                onClick={() => console.log('Clicked')}
+                onClick={() => showEditModal(record)}
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>
           </Col>
-          <Col xs={4}>
+          <Col xs={6}>
             {record.is_published ? (
               <Tooltip title="Hide Course">
-                <Button block type="link" onClick={() => console.log('Clicked')} icon={<EyeOutlined />} />
+                <Button danger block type="link" onClick={() => console.log('Clicked')}>
+                  Hide
+                </Button>
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Course">
-                <Button
-                  block
-                  type="text"
-                  onClick={() => console.log('Clicked')}
-                  icon={<EyeInvisibleTwoTone twoToneColor="#888888" />}
-                />
+                <Button block className={styles.successBtn} onClick={() => console.log('Clicked')}>
+                  Show
+                </Button>
               </Tooltip>
             )}
           </Col>
-          <Col xs={4}>
-            <Tooltip title="Add Zoom Meeting Details">
-              <Button block type="link" onClick={() => console.log('Clicked')} icon={<VideoCameraAddOutlined />} />
-            </Tooltip>
-          </Col>
-          <Col xs={4}>
-            <Tooltip title="Show Zoom Meeting Details">
-              <Button block type="link" onClick={() => console.log('Clicked')} icon={<Icons.VideoLink />} />
-            </Tooltip>
+          <Col xs={10}>
+            <Button block type="link" onClick={() => console.log('Clicked')}>
+              {record.buyers?.length} Buyers <DownOutlined />
+            </Button>
           </Col>
         </Row>
       ),

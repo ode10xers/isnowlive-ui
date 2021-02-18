@@ -60,6 +60,11 @@ const Courses = () => {
     }
   };
 
+  const openEditCourseModal = (course) => {
+    setTargetCourse(course);
+    openCreateCourseModal();
+  };
+
   return (
     <div className={styles.box}>
       <CreateCourseModal visible={createModalVisible} closeModal={hideCreateCourseModal} editedCourse={targetCourse} />
@@ -81,7 +86,7 @@ const Courses = () => {
           >
             <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}>
               <Loader loading={isLoading} size="large" text="Fetching Live Courses">
-                <LiveCourses liveCourses={courses} />
+                <LiveCourses liveCourses={courses} showEditModal={openEditCourseModal} />
               </Loader>
             </TabPane>
             {/* <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}></TabPane> */}
