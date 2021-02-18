@@ -14,7 +14,7 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import CreateClassPassModal from 'components/CreateClassPassModal';
+import CreatePassModal from 'components/CreatePassModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -407,7 +407,7 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
-      <CreateClassPassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
+      <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={10} lg={14}>
           <Title level={4}> Passes </Title>

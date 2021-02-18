@@ -102,4 +102,10 @@ export default {
     publishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/publish`),
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
   },
+  courses: {
+    // TODO: Implement the APIs Here
+    getCreatorCourses: () => http.get('/secure/creator/sessions'),
+    createCourse: (payload) => http.post('/secure/creator/courses', payload),
+    updateCourse: (courseId, payload) => http.patch('/secure/creator/courses', payload),
+  },
 };

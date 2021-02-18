@@ -57,7 +57,7 @@ const colorPickerChoices = [
   '#5030fd',
 ];
 
-const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
+const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
@@ -192,7 +192,7 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedPass ? 'update' : 'create'} new pass`);
+      showErrorModal(`Failed to ${editedPass ? 'update' : 'create'} pass`);
     }
 
     setIsSubmitting(false);
@@ -366,4 +366,4 @@ const CreateClassPassModal = ({ visible, closeModal, editedPass = null }) => {
   );
 };
 
-export default CreateClassPassModal;
+export default CreatePassModal;

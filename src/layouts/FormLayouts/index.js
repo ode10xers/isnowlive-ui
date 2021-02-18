@@ -81,3 +81,7 @@ export const signInTailLayout = {
     xl: { span: 20, offset: 4 },
   },
 };
+export const courseModalFormLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};

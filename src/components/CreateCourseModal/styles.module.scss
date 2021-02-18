@@ -1,0 +1,25 @@
+@import '../../styles/variables.scss';
+
+.numericInput {
+  width: 100% !important;
+}
+
+.currencyWrapper {
+  font-size: 16px;
+}
+
+.modalActionRow {
+  margin-top: 10px;
+}
+
+.imageWrapper {
+  position: relative;
+  height: 200px;
+}
+
+.coverImage {
+  & > div {
+    width: 100% !important;
+    height: 200px !important;
+  }
+}

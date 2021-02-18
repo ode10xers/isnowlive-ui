@@ -27,6 +27,7 @@ const formatDate = {
 };
 
 const timeCalculation = {
+  dateIsBeforeDate: (startDate, endDate) => moment(startDate).isBefore(endDate),
   isBeforeDate: (date) => moment().isBefore(moment(date)),
   isSameOrBeforeToday: (date) => moment(date).endOf('day').isSameOrBefore(moment().startOf('day')),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
