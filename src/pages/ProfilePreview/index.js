@@ -12,6 +12,7 @@ import {
   EditOutlined,
   LinkedinOutlined,
   PlayCircleOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
@@ -22,6 +23,7 @@ import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
 import ClassPasses from 'components/ClassPasses';
 import PublicVideoList from 'components/PublicVideoList';
+import PublicLiveCourseList from 'components/PublicLiveCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
@@ -42,6 +44,13 @@ const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
+const productKeys = {
+  SESSION: 'session',
+  PASS: 'pass',
+  VIDEO: 'video',
+  COURSE: 'course',
+};
+
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
   const location = useLocation();
@@ -58,7 +67,8 @@ const ProfilePreview = ({ username = null }) => {
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
-  const [selectedListTab, setSelectedListTab] = useState('session');
+  const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
+  const [selectedCourseTab, setSelectedCourseTab] = useState('liveCourse');
   const [isListLoading, setIsListLoading] = useState(false);
 
   const [passes, setPasses] = useState([]);
@@ -67,10 +77,13 @@ const ProfilePreview = ({ username = null }) => {
   const [videos, setVideos] = useState([]);
   const [isVideosLoading, setIsVideosLoading] = useState(true);
 
+  const [liveCourses, setLiveCourses] = useState([]);
+  const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+
   const getProfileDetails = useCallback(async () => {
     try {
-      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
-      if (data) {
+      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      if (isAPISuccess(status) && data) {
         setProfile(data);
         setCoverImage(data.cover_image_url);
         setProfileImage(data.profile_image_url);
@@ -84,6 +97,8 @@ const ProfilePreview = ({ username = null }) => {
 
   const getSessionDetails = useCallback(
     async (type) => {
+      setIsSessionLoading(true);
+
       try {
         let profileUsername = '';
         if (username) {
@@ -91,8 +106,8 @@ const ProfilePreview = ({ username = null }) => {
         } else {
           profileUsername = getLocalUserDetails().username;
         }
-        const { data } = await apis.user.getSessionsByUsername(profileUsername, type);
-        if (data) {
+        const { status, data } = await apis.user.getSessionsByUsername(profileUsername, type);
+        if (isAPISuccess(status) && data) {
           setSessions(data);
           setIsSessionLoading(false);
         }
@@ -105,6 +120,7 @@ const ProfilePreview = ({ username = null }) => {
   );
 
   const getPassesDetails = useCallback(async () => {
+    setIsPassesLoading(true);
     try {
       let profileUsername = '';
 
@@ -114,9 +130,9 @@ const ProfilePreview = ({ username = null }) => {
         profileUsername = getLocalUserDetails().username;
       }
 
-      const { data } = await apis.passes.getPassesByUsername(profileUsername);
+      const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setPasses(
           data.map((pass) => ({
             ...pass,
@@ -153,15 +169,38 @@ const ProfilePreview = ({ username = null }) => {
         profileUsername = getLocalUserDetails().username;
       }
 
-      const { data } = await apis.videos.getVideosByUsername(profileUsername);
+      const { status, data } = await apis.videos.getVideosByUsername(profileUsername);
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setVideos(data);
         setIsVideosLoading(false);
       }
     } catch (error) {
       setIsVideosLoading(false);
       message.error('Failed to load video details');
+    }
+  }, [username]);
+
+  const getLiveCourseDetails = useCallback(async () => {
+    setIsCoursesLoading(true);
+    try {
+      let profileUsername = '';
+
+      if (username) {
+        profileUsername = username;
+      } else {
+        profileUsername = getLocalUserDetails().username;
+      }
+
+      const { status, data } = await apis.courses.getCoursesByUsername(profileUsername);
+
+      if (isAPISuccess(status) && data) {
+        setLiveCourses(data);
+        setIsCoursesLoading(false);
+      }
+    } catch (error) {
+      setIsCoursesLoading(false);
+      message.error('Failed to load live courses details');
     }
   }, [username]);
 
@@ -173,34 +212,50 @@ const ProfilePreview = ({ username = null }) => {
     getSessionDetails('upcoming');
     getPassesDetails();
     getVideosDetails();
-  }, [history.location.pathname, getProfileDetails, getSessionDetails, getPassesDetails, getVideosDetails]);
+    getLiveCourseDetails();
+  }, [
+    history.location.pathname,
+    getProfileDetails,
+    getSessionDetails,
+    getPassesDetails,
+    getVideosDetails,
+    getLiveCourseDetails,
+  ]);
 
   useEffect(() => {
     if (location.state) {
       const sectionToShow = location.state.section;
-      let targetElement = document.getElementById('session');
+      let targetElement = document.getElementById(productKeys.SESSION);
 
-      if (sectionToShow === 'session') {
+      if (sectionToShow === productKeys.SESSION) {
         setSelectedListTab(sectionToShow);
-      } else if (sectionToShow === 'pass') {
+      } else if (sectionToShow === productKeys.PASS) {
         if (passes.length) {
           setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById('pass');
+          targetElement = document.getElementById(productKeys.PASS);
         } else {
           // Fallback to show sessions
-          setSelectedListTab('session');
+          setSelectedListTab(productKeys.SESSION);
         }
-      } else if (sectionToShow === 'video') {
+      } else if (sectionToShow === productKeys.VIDEO) {
         if (videos.length) {
           setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById('video');
+          targetElement = document.getElementById(productKeys.VIDEO);
         } else {
           // Fallback to show sessions
-          setSelectedListTab('session');
+          setSelectedListTab(productKeys.SESSION);
         }
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
-        setSelectedListTab('session');
+        setSelectedListTab(productKeys.SESSION);
+      } else if (sectionToShow === productKeys.COURSE) {
+        if (liveCourses.length) {
+          setSelectedListTab(sectionToShow);
+          targetElement = document.getElementById(productKeys.COURSE);
+        } else {
+          // Fallback to show sessions
+          setSelectedListTab(productKeys.SESSION);
+        }
       }
 
       if (targetElement) {
@@ -211,7 +266,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, videos, profile]);
+  }, [location.state, passes, videos, liveCourses, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -219,6 +274,8 @@ const ProfilePreview = ({ username = null }) => {
 
     if (key === 'session') {
       handleChangeSessionTab(selectedSessionTab);
+    } else if (key === 'course') {
+      handleChangeCourseTab(selectedCourseTab);
     }
     setIsListLoading(false);
   };
@@ -232,6 +289,14 @@ const ProfilePreview = ({ username = null }) => {
     } else {
       trackSimpleEvent(user.click.profile.pastSessionsTab);
       getSessionDetails('past');
+    }
+  };
+
+  const handleChangeCourseTab = (key) => {
+    setSelectedCourseTab(key);
+
+    if (key === 'liveCourses') {
+      getLiveCourseDetails();
     }
   };
 
@@ -389,7 +454,7 @@ const ProfilePreview = ({ username = null }) => {
             onChange={handleChangeListTab}
           >
             <Tabs.TabPane
-              key="session"
+              key={productKeys.SESSION}
               tab={
                 <div className={styles.largeTabHeader} id="session">
                   <VideoCameraOutlined />
@@ -441,7 +506,7 @@ const ProfilePreview = ({ username = null }) => {
             </Tabs.TabPane>
             {passes.length > 0 && (
               <Tabs.TabPane
-                key="pass"
+                key={productKeys.PASS}
                 tab={
                   <div className={styles.largeTabHeader} id="pass">
                     <TagsOutlined />
@@ -460,7 +525,7 @@ const ProfilePreview = ({ username = null }) => {
             )}
             {videos.length > 0 && (
               <Tabs.TabPane
-                key="video"
+                key={productKeys.VIDEO}
                 tab={
                   <div className={styles.largeTabHeader} id="video">
                     <PlayCircleOutlined />
@@ -475,6 +540,25 @@ const ProfilePreview = ({ username = null }) => {
                     </Loader>
                   </Col>
                 </Row>
+              </Tabs.TabPane>
+            )}
+            {liveCourses.length > 0 && (
+              <Tabs.TabPane
+                key={productKeys.COURSE}
+                tab={
+                  <div className={styles.largeTabHeader} id="course">
+                    <BookOutlined />
+                    Courses
+                  </div>
+                }
+              >
+                <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
+                  <Tabs.TabPane tab={<Text> Live Courses </Text>} key="liveCourses">
+                    <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
+                      <PublicLiveCourseList username={username} liveCourses={liveCourses} />
+                    </Loader>
+                  </Tabs.TabPane>
+                </Tabs>
               </Tabs.TabPane>
             )}
           </Tabs>

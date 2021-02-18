@@ -58,7 +58,6 @@ const formInitialValues = {
   courseType: courseTypes.LIVE.name,
   courseName: '',
   price: 10,
-  selectedCourseClass: [],
   videoList: [],
   colorCode: initialColor,
 };
@@ -77,7 +76,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [currency, setCurrency] = useState('SGD');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [selectedCourseClass, setSelectedCourseClass] = useState([]);
+  const [selectedCourseClass, setSelectedCourseClass] = useState(null);
   const [selectedVideos, setSelectedVideos] = useState([]);
   const [colorCode, setColorCode] = useState(initialColor);
   const [courseStartDate, setCourseStartDate] = useState(null);
@@ -126,7 +125,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         console.log('TODO: Adjust format here');
       } else {
         form.resetFields();
-        setSelectedCourseClass([]);
+        setSelectedCourseClass(null);
         setSelectedVideos([]);
         setColorCode(initialColor);
         setCurrency('SGD');
@@ -184,7 +183,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     try {
       let data = {
         name: values.courseName,
-        session_id: selectedCourseClass[0],
+        session_id: selectedCourseClass,
         price: values.price || 1,
         currency: currency.toLowerCase(),
         color_code: colorCode || values.colorCode || whiteColor,
@@ -317,7 +316,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                 id="selectedCourseClass"
                 name="selectedCourseClass"
                 label="Course Session"
-                rules={validationRules.arrayValidation}
+                rules={validationRules.requiredValidation}
               >
                 <Select
                   showArrow
