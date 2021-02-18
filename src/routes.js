@@ -35,6 +35,7 @@ const Routes = {
     videoEarnings: '/payments/video/:video_id',
     passes: '/passes',
     videos: '/videos',
+    courses: '/courses',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
