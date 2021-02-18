@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { Row, Col, Tabs, Typography, Button } from 'antd';
 
+import Loader from 'components/Loader';
 import CreateCourseModal from 'components/CreateCourseModal';
 import { showErrorModal } from 'components/Modals/modals';
+import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -14,12 +16,14 @@ const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 const Courses = () => {
+  const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('liveClassCourse');
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [targetCourse, setTargetCourse] = useState(null);
 
-  const fetchAllCoursesForCreator = async () => {
+  const fetchAllCoursesForCreator = useCallback(async () => {
+    setIsLoading(true);
     try {
       const { status, data } = await apis.courses.getCreatorCourses();
 
@@ -29,7 +33,14 @@ const Courses = () => {
     } catch (error) {
       showErrorModal('Failed fetching courses', error?.response?.data?.message || 'Something went wrong');
     }
-  };
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (selectedListTab === 'liveClassCourse') {
+      fetchAllCoursesForCreator();
+    }
+  }, [selectedListTab, fetchAllCoursesForCreator]);
 
   const handleChangeListTab = (key) => {
     setSelectedListTab(key);
@@ -68,7 +79,11 @@ const Courses = () => {
             activeKey={selectedListTab}
             onChange={handleChangeListTab}
           >
-            <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}></TabPane>
+            <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}>
+              <Loader loading={isLoading} size="large" text="Fetching Live Courses">
+                <LiveCourses liveCourses={courses} />
+              </Loader>
+            </TabPane>
             {/* <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}></TabPane> */}
           </Tabs>
         </Col>

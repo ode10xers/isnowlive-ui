@@ -126,7 +126,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         console.log('TODO: Adjust format here');
       } else {
         form.resetFields();
-        //TODO: Also reset other states here
         setSelectedCourseClass([]);
         setSelectedVideos([]);
         setColorCode(initialColor);
@@ -193,7 +192,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         video_ids: selectedVideos || values.videoList || [],
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).startOf('day').utc().format(),
-        type: courseTypes.LIVE.name.toLowerCase(), //Currency hardcoding this
+        type: courseTypes.LIVE.name.toLowerCase(), //Currently hardcoding this
       };
 
       const response = editedCourse

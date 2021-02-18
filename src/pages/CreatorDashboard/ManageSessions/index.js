@@ -288,6 +288,7 @@ const ManageSessions = () => {
 
     return (
       <Card
+        key={item.session_id}
         className={styles.card}
         title={
           <div

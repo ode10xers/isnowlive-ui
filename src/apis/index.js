@@ -104,7 +104,7 @@ export default {
   },
   courses: {
     // TODO: Implement the APIs Here
-    getCreatorCourses: () => http.get('/secure/creator/sessions'),
+    getCreatorCourses: () => http.get('/secure/creator/courses'),
     createCourse: (payload) => http.post('/secure/creator/courses', payload),
     updateCourse: (courseId, payload) => http.patch('/secure/creator/courses', payload),
   },

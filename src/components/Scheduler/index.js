@@ -410,7 +410,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
           <Row className={classNames(styles.mt10, styles.mb10)}>
             <Col xs={24} md={{ span: 18, offset: 3 }}>
               {form?.map((slot, index) => (
-                <Row className={styles.m10}>
+                <Row className={styles.m10} key={slot.start_time}>
                   <Col xs={11} md={11}>
                     <Select
                       value={slot.start_time && toShortTimeWithPeriod(slot.start_time)}
@@ -426,7 +426,11 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                             getTimeDiff(item.value, moment(), 'minute') <= 0
                           )
                         ) {
-                          return <Option value={item.value}>{item.label}</Option>;
+                          return (
+                            <Option key={item.value} value={item.value}>
+                              {item.label}
+                            </Option>
+                          );
                         }
                         return null;
                       })}
@@ -450,6 +454,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                         ) {
                           return (
                             <Option
+                              key={item.value}
                               value={item.value}
                               disabled={disableDuplicateEndTime.includes(toShortTimeWithPeriod(item.value))}
                             >
