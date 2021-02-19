@@ -25,11 +25,13 @@ const NotificationSettings = () => {
 
       if (isAPISuccess(status) && data) {
         let checkedKeys = [];
-        for (const [key, value] of Object.entries(data)) {
+
+        Object.entries(data).forEach(([key, value]) => {
           if (value) {
             checkedKeys.push(key.toString());
           }
-        }
+        });
+
         setCheckedEmailOptions(checkedKeys);
       }
     } catch (error) {
@@ -60,9 +62,7 @@ const NotificationSettings = () => {
 
   useEffect(() => {
     getCreatorNotificationPreferences();
-
-    //eslint-disable-next-line
-  }, []);
+  }, [getCreatorNotificationPreferences]);
 
   const generateLabel = (item) => `Send email notifications for ${item}`;
 

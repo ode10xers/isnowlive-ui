@@ -1,13 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 import { Tabs } from 'antd';
-import {
-  BellOutlined,
-  // UserOutlined
-} from '@ant-design/icons';
+import { BellOutlined } from '@ant-design/icons';
 
 import NotificationSettings from './NotificationSettings';
-// import ProfileSettings from './ProfileSettings';
 
 import styles from './styles.module.scss';
 
@@ -20,12 +16,6 @@ const settingItems = [
     label: 'Notifications',
     content: <NotificationSettings />,
   },
-  // {
-  //   key: 'profile',
-  //   icon: <UserOutlined />,
-  //   label: 'Profile',
-  //   content: <ProfileSettings />,
-  // },
 ];
 
 const AccountSettings = () => {
