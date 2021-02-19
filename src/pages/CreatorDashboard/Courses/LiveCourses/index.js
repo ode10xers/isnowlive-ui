@@ -165,7 +165,7 @@ const LiveCourses = ({ liveCourses, showEditModal }) => {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
-      render: (text, record) => `${record.price_paid} ${record.currency?.toUpperCase()}`,
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price_paid}`,
     },
   ];
 
