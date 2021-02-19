@@ -1,0 +1,39 @@
+@import '../../styles/variables.scss';
+
+.liveCourseCard {
+  .courseImageWrapper {
+    .courseImage {
+      border-radius: 5px;
+      object-fit: fill;
+    }
+  }
+
+  .courseInfoWrapper {
+    .courseNameWrapper {
+      height: 44px;
+      font-size: 13px;
+      overflow: hidden;
+    }
+
+    .courseDetailsWrapper {
+      font-size: 13px;
+    }
+
+    .coursePriceWrapper {
+      font-size: 13px;
+    }
+  }
+}
+
+@media screen and (max-width: 992px){
+  .liveCourseCard {
+    .courseInfoWrapper {
+      .courseNameWrapper {
+        font-size: 14px;
+      }
+      .courseDetailsWrapper {
+        font-size: 13px;
+      }
+    }
+  }
+}
