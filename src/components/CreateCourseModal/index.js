@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Radio } from 'antd';
+import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag } from 'antd';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
@@ -55,7 +55,7 @@ const colorPickerChoices = [
 ];
 
 const formInitialValues = {
-  courseType: courseTypes.LIVE.name,
+  // courseType: courseTypes.LIVE.name,
   courseName: '',
   price: 10,
   videoList: [],
@@ -66,8 +66,10 @@ const { Text } = Typography;
 
 const {
   timeCalculation: { dateIsBeforeDate },
+  formatDate: { toLocaleTime, toLongDateWithDay },
 } = dateUtil;
 
+//TODO: There will be a new inventory array, accomodate for this
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [form] = Form.useForm();
 
@@ -81,7 +83,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [colorCode, setColorCode] = useState(initialColor);
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
-  const [courseType, setCourseType] = useState(courseTypes.LIVE.name);
+  // const [courseType, setCourseType] = useState(courseTypes.LIVE.name);
   const [courseImageUrl, setCourseImageUrl] = useState(null);
   const [maxParticipants, setMaxParticipants] = useState(null);
 
@@ -120,8 +122,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
       if (editedCourse) {
         form.setFieldsValue({
           courseImageUrl: editedCourse.course_image_url || '',
-          courseType:
-            editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name,
+          // courseType:
+          //   editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name,
           courseName: editedCourse.name,
           courseStartDate: moment(editedCourse.start_date),
           courseEndDate: moment(editedCourse.end_date),
@@ -138,9 +140,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         setColorCode(editedCourse.color_code || initialColor || whiteColor);
         setCourseStartDate(moment(editedCourse.start_date));
         setCourseEndDate(moment(editedCourse.end_date));
-        setCourseType(
-          editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name
-        );
+        // setCourseType(
+        //   editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name
+        // );
         setCourseImageUrl(editedCourse.course_image_url);
         setMaxParticipants(editedCourse.session?.max_participants);
       } else {
@@ -152,7 +154,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         setCourseStartDate(null);
         setCourseEndDate(null);
         setCourseImageUrl(null);
-        setCourseType(courseTypes.LIVE.name);
+        // setCourseType(courseTypes.LIVE.name);
         setMaxParticipants(null);
       }
     }
@@ -200,9 +202,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: selectedCourseClassMaxParticipants || null });
   };
 
-  const handleChangeCourseType = (value) => {
-    setCourseType(value);
-  };
+  // const handleChangeCourseType = (value) => {
+  //   setCourseType(value);
+  // };
 
   const handleCourseImageUpload = (imageUrl) => {
     setCourseImageUrl(imageUrl);
@@ -244,6 +246,35 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     setSubmitting(false);
   };
 
+  const renderSessionDates = () => {
+    const noInventoryComponent = (
+      <Col xs={24}>
+        <Text type="secondary">No sessions found for this class</Text>
+      </Col>
+    );
+
+    if (!selectedCourseClass) {
+      return noInventoryComponent;
+    }
+
+    const selectedSession = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
+
+    if (!selectedSession || selectedSession.inventory?.length <= 0) {
+      return noInventoryComponent;
+    }
+
+    return selectedSession.inventory.map((sessionInventory) => (
+      <Col xs={24} key={`${selectedCourseClass}_${sessionInventory.inventory_id}`}>
+        <Tag color="magenta">
+          <div className={styles.courseDateTags}>
+            {toLongDateWithDay(sessionInventory.start_time)}, {toLocaleTime(sessionInventory.start_time)} -{' '}
+            {toLocaleTime(sessionInventory.end_time)}
+          </div>
+        </Tag>
+      </Col>
+    ));
+  };
+
   return (
     <Modal
       title={`${editedCourse ? 'Edit' : 'Create New'} Pass`}
@@ -251,6 +282,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
       visible={visible}
       footer={null}
       onCancel={() => closeModal(false)}
+      width={530}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -281,7 +313,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                 </div>
               </Form.Item>
             </Col>
-            <Col xs={24}>
+            {/* <Col xs={24}>
               <Form.Item {...courseModalFormLayout} id="courseType" name="courseType" label="Course Type">
                 <Radio.Group
                   disabled
@@ -293,7 +325,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                   }))}
                 />
               </Form.Item>
-            </Col>
+            </Col> */}
             <Col xs={24}>
               <Form.Item
                 {...courseModalFormLayout}
@@ -367,9 +399,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                 id="maxParticipants"
                 name="maxParticipants"
                 label="Max Participants"
+                extra={
+                  <Text className={styles.helpText}> This is the max participant value in your selected session. </Text>
+                }
+                rules={validationRules.requiredValidation}
               >
                 <InputNumber disabled min={1} placeholder="Max Participants" className={styles.numericInput} />
               </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Row gutter={[8, 4]}>
+                <Col xs={24} md={8} className={styles.courseDatesText}>
+                  Course Class Date & Time :
+                </Col>
+                <Col xs={24} md={16}>
+                  <Row gutter={[8, 4]}>{renderSessionDates()}</Row>
+                </Col>
+              </Row>
             </Col>
             <Col xs={24}>
               <Form.Item {...courseModalFormLayout} id="videoList" name="videoList" label="Course Video(s)">
@@ -400,8 +446,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                   </Col>
                   <Col xs={4} className={styles.textAlignCenter}>
                     <Text strong className={styles.currencyWrapper}>
-                      {' '}
-                      {currency?.toUpperCase()}{' '}
+                      {currency?.toUpperCase()}
                     </Text>
                   </Col>
                 </Row>
@@ -416,6 +461,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                     colors={colorPickerChoices}
                     className={styles.colorPicker}
                     onChangeComplete={handleColorChange}
+                    width={300}
                   />
                 </div>
               </Form.Item>

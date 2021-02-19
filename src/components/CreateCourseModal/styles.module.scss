@@ -17,9 +17,33 @@
   height: 200px;
 }
 
+.colorPickerPreview {
+  border-width: 10px;
+  border-style: solid;
+}
+
+.helpText {
+  @extend .blueText;
+  font-size: 12px;
+}
+
 .coverImage {
   & > div {
     width: 100% !important;
     height: 200px !important;
+  }
+}
+
+.courseDatesText {
+  text-align: right;
+}
+
+.courseDateTags {
+  font-size: 14px;
+}
+
+@media screen and (max-width: 769px){
+  .courseDatesText {
+    text-align: left;
   }
 }

@@ -67,7 +67,7 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
         </Row>
       ) : (
         <Row gutter={[8, 8]}>
-          <Col xs={buyable ? 8 : 12} className={styles.courseImageWrapper}>
+          <Col xs={buyable ? 10 : 14} className={styles.courseImageWrapper}>
             <Image
               preview={false}
               height={116}
@@ -75,15 +75,14 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
             />
           </Col>
-          <Col xs={12} className={styles.courseInfoWrapper}>
+          <Col xs={10} className={styles.courseInfoWrapper}>
             <Row gutter={[8, 4]}>
               <Col xs={24} className={styles.courseNameWrapper}>
                 <Text strong> {course?.name} </Text>
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary">
-                  {' '}
-                  {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}{' '}
+                  {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
                 </Text>
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>

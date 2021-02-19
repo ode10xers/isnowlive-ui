@@ -118,7 +118,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Course">
-                <Button block className={styles.successBtn} onClick={() => publishCourse(record)}>
+                <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
                   Show
                 </Button>
               </Tooltip>
