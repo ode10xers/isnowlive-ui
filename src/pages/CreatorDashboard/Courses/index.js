@@ -4,7 +4,7 @@ import { Row, Col, Tabs, Typography, Button } from 'antd';
 
 import Loader from 'components/Loader';
 import CreateCourseModal from 'components/CreateCourseModal';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
 
 import { isAPISuccess } from 'utils/helper';
@@ -36,11 +36,46 @@ const Courses = () => {
     setIsLoading(false);
   }, []);
 
-  useEffect(() => {
+  const publishCourse = async (course) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.courses.publishCourse(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Course Published');
+        fetchCourseForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
+    }
+    setIsLoading(false);
+  };
+
+  const unpublishCourse = async (course) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.courses.unpublishCourse(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Course Unpublished');
+        fetchCourseForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
+    }
+    setIsLoading(false);
+  };
+
+  const fetchCourseForCreator = () => {
     if (selectedListTab === 'liveClassCourse') {
       fetchAllCoursesForCreator();
     }
-  }, [selectedListTab, fetchAllCoursesForCreator]);
+  };
+
+  useEffect(() => {
+    fetchCourseForCreator();
+    //eslint-disable-next-line
+  }, [selectedListTab]);
 
   const handleChangeListTab = (key) => {
     setSelectedListTab(key);
@@ -86,7 +121,12 @@ const Courses = () => {
           >
             <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}>
               <Loader loading={isLoading} size="large" text="Fetching Live Courses">
-                <LiveCourses liveCourses={courses} showEditModal={openEditCourseModal} />
+                <LiveCourses
+                  liveCourses={courses}
+                  showEditModal={openEditCourseModal}
+                  publishCourse={publishCourse}
+                  unpublishCourse={unpublishCourse}
+                />
               </Loader>
             </TabPane>
             {/* <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}></TabPane> */}

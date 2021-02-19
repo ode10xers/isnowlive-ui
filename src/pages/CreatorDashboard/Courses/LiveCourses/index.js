@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Row, Col, Tooltip, Typography, Button, Card, Empty } from 'antd';
-import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined } from '@ant-design/icons';
+import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
 
@@ -18,18 +18,8 @@ const {
   formatDate: { toShortDateWithYear, toDateAndTime },
 } = dateUtil;
 
-const LiveCourses = ({ liveCourses, showEditModal }) => {
+const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-
-  const publishCourse = (courseId) => {
-    //TODO: Implement API Here
-    console.log('Published ', courseId);
-  };
-
-  const unpublishCourse = (courseId) => {
-    //TODO: Implement API Here
-    console.log('Unpublished', courseId);
-  };
 
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
@@ -66,7 +56,12 @@ const LiveCourses = ({ liveCourses, showEditModal }) => {
               borderLeft: `6px solid ${record.color_code || '#FFF'}`,
             },
           },
-          children: <Text className={styles.textAlignLeft}> {record?.name} </Text>,
+          children: (
+            <>
+              <Text> {record?.name} </Text>
+              {record.is_published ? null : <EyeInvisibleOutlined />}
+            </>
+          ),
         };
       },
     },
@@ -117,13 +112,13 @@ const LiveCourses = ({ liveCourses, showEditModal }) => {
           <Col xs={6}>
             {record.is_published ? (
               <Tooltip title="Hide Course">
-                <Button danger block type="link" onClick={() => unpublishCourse(record.id)}>
+                <Button danger block type="link" onClick={() => unpublishCourse(record)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Course">
-                <Button block className={styles.successBtn} onClick={() => publishCourse(record.id)}>
+                <Button block className={styles.successBtn} onClick={() => publishCourse(record)}>
                   Show
                 </Button>
               </Tooltip>
@@ -235,13 +230,13 @@ const LiveCourses = ({ liveCourses, showEditModal }) => {
             </Tooltip>,
             course.is_published ? (
               <Tooltip title="Hide Course">
-                <Button type="link" danger onClick={() => unpublishCourse(course.id)}>
+                <Button type="link" danger onClick={() => unpublishCourse(course)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
               <Tooltip title="Unhide Course">
-                <Button type="link" className={styles.successBtn} onClick={() => publishCourse(course.id)}>
+                <Button type="link" className={styles.successBtn} onClick={() => publishCourse(course)}>
                   Show
                 </Button>
               </Tooltip>
