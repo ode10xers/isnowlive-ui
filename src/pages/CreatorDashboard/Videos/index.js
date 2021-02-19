@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty } from 'antd';
 import {
   EditOutlined,
   CloudUploadOutlined,
@@ -22,7 +22,7 @@ import dateUtil from 'utils/date';
 import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -135,47 +135,11 @@ const Videos = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
-  const copyPageLinkToClipboard = (videoId) => {
+  const copyVideoPageLink = (videoId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/v/${videoId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   const cloneVideo = async (video) => {
@@ -201,7 +165,7 @@ const Videos = () => {
       dataIndex: 'thumbnail_url',
       key: 'thumbnail_url',
       align: 'center',
-      width: '12%',
+      width: '125px',
       render: (text, record) => {
         return {
           props: {
@@ -234,7 +198,7 @@ const Videos = () => {
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '12%',
+      width: '90px',
       render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -242,7 +206,7 @@ const Videos = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '10%',
+      width: '80px',
       render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
     },
     {
@@ -298,7 +262,7 @@ const Videos = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(record.external_id)}
+                onClick={() => copyVideoPageLink(record.external_id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>
@@ -430,7 +394,7 @@ const Videos = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                onClick={() => copyVideoPageLink(video.external_id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
@@ -480,7 +444,7 @@ const Videos = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                onClick={() => copyVideoPageLink(video.external_id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
@@ -569,6 +533,7 @@ const Videos = () => {
                   ) : (
                     <Table
                       sticky={true}
+                      size="small"
                       columns={videosColumns}
                       data={videos?.filter((video) => video.is_published)}
                       loading={isLoading}
@@ -596,6 +561,7 @@ const Videos = () => {
                   ) : (
                     <Table
                       sticky={true}
+                      size="small"
                       columns={videosColumns}
                       data={videos?.filter((video) => !video.is_published)}
                       loading={isLoading}
@@ -616,7 +582,6 @@ const Videos = () => {
           </Collapse>
         </Col>
       </Row>
-      {/* <VideoPlayer /> */}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -19,7 +19,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
@@ -124,47 +124,11 @@ const ClassPassList = () => {
     //eslint-disable-next-line
   }, []);
 
-  const copyPageLinkToClipboard = (passId) => {
+  const copyPassLink = (passId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/p/${passId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   const toggleExpandAll = () => {
@@ -227,7 +191,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => `${record.currency?.toUpperCase()} ${text}`,
     },
     {
       title: '',
@@ -249,7 +213,7 @@ const ClassPassList = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(record.id)}
+                onClick={() => copyPassLink(record.id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>
@@ -303,7 +267,7 @@ const ClassPassList = () => {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
-      render: (text, record) => `${record.price_paid} ${record.currency.toUpperCase()}`,
+      render: (text, record) => `${record.price_paid} ${record.currency?.toUpperCase()}`,
     },
   ];
 
@@ -368,18 +332,18 @@ const ClassPassList = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(pass.id)}
+                onClick={() => copyPassLink(pass.id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
             pass.is_published ? (
-              <Tooltip title="Hide Session">
+              <Tooltip title="Hide Pass">
                 <Button type="link" danger onClick={() => unpublishPass(pass.id)}>
                   Hide
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Session">
+              <Tooltip title="Unhide Pass">
                 <Button type="link" className={styles.successBtn} onClick={() => publishPass(pass.id)}>
                   Show
                 </Button>
@@ -394,11 +358,11 @@ const ClassPassList = () => {
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{pass.buyers.map(renderMobileSubscriberCards)}</div>
+            <div className={styles.mb20}>{pass.buyers?.map(renderMobileSubscriberCards)}</div>
           </Row>
         )}
       </Col>
@@ -435,7 +399,7 @@ const ClassPassList = () => {
               loading={isLoading}
               rowKey={(record) => record.id}
               expandable={{
-                expandedRowRender: (record) => renderBuyersList(record),
+                expandedRowRender: renderBuyersList,
                 expandRowByClick: true,
                 expandIconColumnIndex: -1,
                 expandedRowKeys: expandedRowKeys,

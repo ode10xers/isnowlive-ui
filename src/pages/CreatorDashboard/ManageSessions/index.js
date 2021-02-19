@@ -17,7 +17,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -111,47 +111,11 @@ const ManageSessions = () => {
     getSessionsList();
   }, [getSessionsList]);
 
-  const copyPageLinkToClipboard = (sessionId) => {
+  const copySessionLink = (sessionId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/s/${sessionId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   let sessionColumns = [
@@ -239,7 +203,7 @@ const ManageSessions = () => {
                 <Button
                   type="text"
                   className={styles.detailsButton}
-                  onClick={() => copyPageLinkToClipboard(record.session_id)}
+                  onClick={() => copySessionLink(record.session_id)}
                   icon={<CopyOutlined />}
                 />
               </Tooltip>
@@ -318,7 +282,7 @@ const ManageSessions = () => {
           <Button
             type="text"
             className={styles.detailsButton}
-            onClick={() => copyPageLinkToClipboard(item.session_id)}
+            onClick={() => copySessionLink(item.session_id)}
             icon={<CopyOutlined />}
           />,
           <>

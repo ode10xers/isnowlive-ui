@@ -202,6 +202,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     setSubmitting(true);
 
     try {
+      //TODO: Adjust for new keys max_participants
       let data = {
         name: values.courseName,
         session_id: selectedCourseClass,
@@ -212,7 +213,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         video_ids: selectedVideos || values.videoList || [],
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).startOf('day').utc().format(),
-        type: courseTypes.LIVE.name.toLowerCase(), //Currently hardcoding this
+        type: courseTypes.LIVE.name.toLowerCase(), //TODO: Remove Hardcoding and adjust when video course is implemented
       };
 
       const response = editedCourse
