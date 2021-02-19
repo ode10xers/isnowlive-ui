@@ -102,7 +102,7 @@ const CourseDetails = ({ match, history }) => {
 
     try {
       const { status, data } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.order_id,
+        order_id: orderDetails.course_order_id,
         order_type: orderType.COURSE,
       });
 
