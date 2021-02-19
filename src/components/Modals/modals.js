@@ -226,3 +226,27 @@ export const showVideoPurchaseSuccessModal = (
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
+
+//TODO: Explore whether or not we can have the course data here
+export const showCourseBookingSuccessModal = (userEmail, redirectDomainName = 'app') => {
+  let title = 'Course booked';
+  let modalContent = (
+    <>
+      <Paragraph>
+        You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+        <Text strong> friends@passion.do. </Text>
+      </Paragraph>
+      <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+    </>
+  );
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: title,
+    content: modalContent,
+    okText: 'Go To Dashboard',
+    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
+  });
+};

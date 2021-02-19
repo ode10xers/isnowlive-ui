@@ -9,6 +9,7 @@ import {
   showErrorModal,
   showAlreadyBookedModal,
   showVideoPurchaseSuccessModal,
+  showCourseBookingSuccessModal,
 } from 'components/Modals/modals';
 
 import apis from 'apis';
@@ -128,6 +129,8 @@ const PaymentVerification = () => {
                 const purchasedVideo = data.active.find((video) => video.video_order_id === order_id);
                 showVideoPurchaseSuccessModal(userDetails.email, purchasedVideo, null, false, true, username);
               }
+            } else if (order_type === orderType.COURSE) {
+              showCourseBookingSuccessModal(userDetails.email, username);
             } else {
               showBookingSuccessModal(userDetails.email, null, false, false, username);
             }

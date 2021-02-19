@@ -20,7 +20,7 @@ import Loader from 'components/Loader';
 import Share from 'components/Share';
 import PurchaseModal from 'components/PurchaseModal';
 import VideoCard from 'components/VideoCard';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showCourseBookingSuccessModal } from 'components/Modals/modals';
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
@@ -145,8 +145,8 @@ const CourseDetails = ({ match, history }) => {
           initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
-          //TODO: Make a new modal for this, or reuse old one
-          console.log(userEmail);
+
+          showCourseBookingSuccessModal(userEmail, username);
         }
       }
     } catch (error) {
