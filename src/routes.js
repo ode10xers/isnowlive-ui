@@ -9,6 +9,8 @@ const Routes = {
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/creator/session',
+  courseSessionDetails: '/cs/:session_id',
+  courseDetails: '/c/:course_id',
   videoDetails: '/v/:video_id',
   passDetails: '/p/:pass_id',
   inventoryDetails: '/e/:inventory_id',

@@ -111,5 +111,6 @@ export default {
     createOrderForUser: (payload) => http.post('/secure/customer/courses/orders', payload),
     publishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/publish`),
     unpublishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/unpublish`),
+    getDetails: (courseId) => http.get(`/courses/${courseId}`),
   },
 };

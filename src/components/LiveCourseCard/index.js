@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col, Image, Card, Typography } from 'antd';
+import { Row, Col, Image, Card, Typography, Button } from 'antd';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -16,7 +16,7 @@ const {
 
 const noop = () => {};
 
-const LiveCourseCard = ({ course, onCardClick = noop }) => {
+const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurchaseModal = noop }) => {
   return (
     <Card className={styles.liveCourseCard} bodyStyle={{ padding: '8px' }} onClick={() => onCardClick(course)}>
       {isMobileDevice ? (
@@ -51,10 +51,23 @@ const LiveCourseCard = ({ course, onCardClick = noop }) => {
               </Col>
             </Row>
           </Col>
+          <Col xs={buyable ? 24 : 0} className={styles.buyButtonWrapper}>
+            <Button
+              block
+              className={styles.buyButton}
+              type="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                showPurchaseModal(course);
+              }}
+            >
+              Buy Course
+            </Button>
+          </Col>
         </Row>
       ) : (
         <Row gutter={[8, 8]}>
-          <Col xs={12} className={styles.courseImageWrapper}>
+          <Col xs={buyable ? 8 : 12} className={styles.courseImageWrapper}>
             <Image
               preview={false}
               height={116}
@@ -78,11 +91,23 @@ const LiveCourseCard = ({ course, onCardClick = noop }) => {
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>
-                  {' '}
-                  {course?.currency?.toUpperCase()} {course?.price}{' '}
+                  {course?.currency?.toUpperCase()} {course?.price}
                 </Text>
               </Col>
             </Row>
+          </Col>
+          <Col xs={buyable ? 4 : 0} className={styles.buyButtonWrapper}>
+            <Button
+              block
+              className={styles.buyButton}
+              type="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                showPurchaseModal(course);
+              }}
+            >
+              Buy Course
+            </Button>
           </Col>
         </Row>
       )}

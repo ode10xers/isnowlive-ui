@@ -44,8 +44,8 @@ const PassDetails = ({ match, history }) => {
 
   const getProfileDetails = useCallback(async () => {
     try {
-      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
-      if (data) {
+      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
         setIsLoading(false);
@@ -67,15 +67,21 @@ const PassDetails = ({ match, history }) => {
   const getPassDetails = useCallback(
     async (passId) => {
       try {
-        const { data } = await apis.passes.getPassById(passId);
+        const { status, data } = await apis.passes.getPassById(passId);
 
-        if (data) {
+        if (isAPISuccess(status) && data) {
           setPass({
             ...data,
             sessions:
-              data.sessions.map((session) => ({
+              data.sessions?.map((session) => ({
                 ...session,
                 key: `${data.id}_${session.session_id}`,
+                username: username,
+              })) || [],
+            videos:
+              data.videos?.map((video) => ({
+                ...video,
+                key: `${data.id}_${video.external_id}`,
                 username: username,
               })) || [],
           });
@@ -153,9 +159,10 @@ const PassDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS, username);
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
   };

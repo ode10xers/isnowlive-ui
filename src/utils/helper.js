@@ -225,12 +225,14 @@ export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',
   VIDEO: 'VIDEO_ORDER',
+  COURSE: 'COURSE_ORDER',
 };
 
 export const productType = {
   CLASS: 'Session',
   PASS: 'Pass',
   VIDEO: 'Video',
+  COURSE: 'Course',
   PRODUCT: 'Product', //As a default
 };
 

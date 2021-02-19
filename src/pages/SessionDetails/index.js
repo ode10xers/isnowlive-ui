@@ -561,96 +561,104 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
       </Row>
-      <Row justify="space-between" className={styles.mt20} gutter={8}>
-        <Col
-          xs={24}
-          lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
-          order={isMobileDevice ? 2 : 1}
-          className={isMobileDevice ? styles.mt20 : styles.mt50}
-        >
-          {showSignInForm ? (
-            <SignInForm
-              user={currentUser}
-              onSetNewPassword={handleSendNewPasswordEmail}
-              hideSignInForm={() => hideSignInForm()}
-              incorrectPassword={incorrectPassword}
-            />
-          ) : (
-            <SessionRegistration
-              user={currentUser}
-              showPasswordField={showPasswordField}
-              incorrectPassword={incorrectPassword}
-              onFinish={onFinish}
-              onSetNewPassword={handleSendNewPasswordEmail}
-              availablePasses={availablePasses}
-              userPasses={userPasses}
-              setSelectedPass={setSelectedPass}
-              selectedPass={selectedPass}
-              classDetails={session}
-              selectedInventory={selectedInventory}
-              logOut={() => {
-                logOut(history, true);
-                setCurrentUser(null);
-                setSelectedPass(null);
-                setUserPasses([]);
-                setShowSignInForm(true);
-                setIncorrectPassword(false);
-              }}
-              showSignInForm={() => {
-                setShowPasswordField(false);
-                setShowSignInForm(true);
-                setIncorrectPassword(false);
-              }}
-            />
-          )}
-        </Col>
-        {!showSignInForm && (
-          <Col
-            xs={24}
-            lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
-            order={isMobileDevice ? 1 : 2}
-            className={isMobileDevice ? styles.mt20 : styles.mt50}
-          >
-            <SessionInventorySelect
-              inventories={
-                session?.inventory.sort((a, b) =>
-                  a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
-                ) || []
-              }
-              selectedSlot={selectedInventory}
-              handleSubmit={(val) => {
-                setSelectedInventory(val);
-              }}
-            />
-          </Col>
-        )}
-      </Row>
-      {sessionVideos?.length > 0 && (
+      {!session?.is_course && (
         <>
-          <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={handleOrder} />
-          <Row justify="space-between" className={styles.mt20}>
-            <Col xs={24}>
-              <div className={styles.box}>
-                <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
-                  <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
-                    <Row gutter={[8, 20]}>
-                      {sessionVideos?.length > 0 &&
-                        sessionVideos?.map((videoDetails) => (
-                          <Col xs={24} key={videoDetails.external_id}>
-                            <VideoCard
-                              video={videoDetails}
-                              buyable={true}
-                              onCardClick={redirectToVideoPreview}
-                              showPurchaseModal={openPurchaseModal}
-                            />
-                          </Col>
-                        ))}
-                    </Row>
-                  </Tabs.TabPane>
-                </Tabs>
-              </div>
+          <Row justify="space-between" className={styles.mt20} gutter={8}>
+            <Col
+              xs={24}
+              lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
+              order={isMobileDevice ? 2 : 1}
+              className={isMobileDevice ? styles.mt20 : styles.mt50}
+            >
+              {showSignInForm ? (
+                <SignInForm
+                  user={currentUser}
+                  onSetNewPassword={handleSendNewPasswordEmail}
+                  hideSignInForm={() => hideSignInForm()}
+                  incorrectPassword={incorrectPassword}
+                />
+              ) : (
+                <SessionRegistration
+                  user={currentUser}
+                  showPasswordField={showPasswordField}
+                  incorrectPassword={incorrectPassword}
+                  onFinish={onFinish}
+                  onSetNewPassword={handleSendNewPasswordEmail}
+                  availablePasses={availablePasses}
+                  userPasses={userPasses}
+                  setSelectedPass={setSelectedPass}
+                  selectedPass={selectedPass}
+                  classDetails={session}
+                  selectedInventory={selectedInventory}
+                  logOut={() => {
+                    logOut(history, true);
+                    setCurrentUser(null);
+                    setSelectedPass(null);
+                    setUserPasses([]);
+                    setShowSignInForm(true);
+                    setIncorrectPassword(false);
+                  }}
+                  showSignInForm={() => {
+                    setShowPasswordField(false);
+                    setShowSignInForm(true);
+                    setIncorrectPassword(false);
+                  }}
+                />
+              )}
             </Col>
+            {!showSignInForm && (
+              <Col
+                xs={24}
+                lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
+                order={isMobileDevice ? 1 : 2}
+                className={isMobileDevice ? styles.mt20 : styles.mt50}
+              >
+                <SessionInventorySelect
+                  inventories={
+                    session?.inventory.sort((a, b) =>
+                      a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
+                    ) || []
+                  }
+                  selectedSlot={selectedInventory}
+                  handleSubmit={(val) => {
+                    setSelectedInventory(val);
+                  }}
+                />
+              </Col>
+            )}
           </Row>
+          {sessionVideos?.length > 0 && (
+            <>
+              <PurchaseModal
+                visible={showPurchaseVideoModal}
+                closeModal={closePurchaseModal}
+                createOrder={handleOrder}
+              />
+              <Row justify="space-between" className={styles.mt20}>
+                <Col xs={24}>
+                  <div className={styles.box}>
+                    <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
+                      <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
+                        <Row gutter={[8, 20]}>
+                          {sessionVideos?.length > 0 &&
+                            sessionVideos?.map((videoDetails) => (
+                              <Col xs={24} key={videoDetails.external_id}>
+                                <VideoCard
+                                  video={videoDetails}
+                                  buyable={true}
+                                  onCardClick={redirectToVideoPreview}
+                                  showPurchaseModal={openPurchaseModal}
+                                />
+                              </Col>
+                            ))}
+                        </Row>
+                      </Tabs.TabPane>
+                    </Tabs>
+                  </div>
+                </Col>
+              </Row>
+            </>
+          )}
         </>
       )}
     </Loader>
