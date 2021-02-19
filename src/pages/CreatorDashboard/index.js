@@ -16,6 +16,7 @@ import PassEarnings from 'pages/CreatorDashboard/PassEarnings';
 import VideoEarnings from 'pages/CreatorDashboard/VideoEarnings';
 import Videos from 'pages/CreatorDashboard/Videos';
 import Courses from 'pages/CreatorDashboard/Courses';
+import AccountSettings from 'pages/CreatorDashboard/AccountSettings';
 
 const CreatorDashboard = ({ match }) => {
   return (
@@ -35,6 +36,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.passes} component={ClassPassList} />
       <Route exact path={match.url + Routes.creatorDashboard.videos} component={Videos} />
       <Route exact path={match.url + Routes.creatorDashboard.courses} component={Courses} />
+      <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>
   );

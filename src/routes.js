@@ -38,6 +38,7 @@ const Routes = {
     passes: '/passes',
     videos: '/videos',
     courses: '/courses',
+    accountSettings: '/settings',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',

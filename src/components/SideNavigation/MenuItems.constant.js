@@ -7,6 +7,7 @@ import {
   GlobalOutlined,
   PlayCircleOutlined,
   BookOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -97,6 +98,14 @@ export const creatorMenuItems = [
     icon: <DollarOutlined />,
     mixPanelTag: creator.click.dashboard.paymentNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
+  },
+  {
+    order: 9,
+    key: 'account_settings',
+    title: 'Settings',
+    icon: <SettingOutlined />,
+    mixPanelTag: creator.click.dashboard.settingsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
   },
 ];
 
