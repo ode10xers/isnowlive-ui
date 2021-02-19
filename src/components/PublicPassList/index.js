@@ -24,7 +24,7 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Paragraph } = Typography;
 
-const ClassPasses = ({ username, passes }) => {
+const PublicPassList = ({ username, passes }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -71,7 +71,7 @@ const ClassPasses = ({ username, passes }) => {
 
   const createOrder = async (userEmail) => {
     if (!selectedPass) {
-      showErrorModal('Something went wrong', 'Invalid Class Pass ID');
+      showErrorModal('Something went wrong', 'Invalid Pass ID');
       return;
     }
 
@@ -333,4 +333,4 @@ const ClassPasses = ({ username, passes }) => {
   );
 };
 
-export default ClassPasses;
+export default PublicPassList;

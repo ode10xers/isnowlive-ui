@@ -67,7 +67,7 @@ export const showBookingSuccessModal = (
     title: 'Registration Successful',
     content: isContinuedFlow ? (
       userDidPayment ? (
-        //* Purchase Class Pass & Immediately Book Class
+        //* Purchase Pass & Immediately Book Class
         <>
           <Paragraph>
             You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
@@ -83,7 +83,7 @@ export const showBookingSuccessModal = (
           <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
         </>
       ) : (
-        //* Book class from previously purchased Class Pass
+        //* Book class from previously purchased Pass
         <>
           <Paragraph>
             We have booked this session using 1 credit from your pass
@@ -97,7 +97,7 @@ export const showBookingSuccessModal = (
         </>
       )
     ) : userPass ? (
-      //* Purchase Individual Class Pass without Booking Class
+      //* Purchase Individual Pass without Booking Class
       <>
         <Paragraph>
           You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
@@ -105,7 +105,7 @@ export const showBookingSuccessModal = (
         <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
       </>
     ) : (
-      //* Book Class without Class Pass
+      //* Book Class without Pass
       <>
         <Paragraph>
           We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from

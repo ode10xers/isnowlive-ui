@@ -21,7 +21,7 @@ import ReactHtmlParser from 'react-html-parser';
 import apis from 'apis';
 import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
-import ClassPasses from 'components/ClassPasses';
+import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
 import PublicLiveCourseList from 'components/PublicLiveCourseList';
 import EMCode from 'components/EMCode';
@@ -154,7 +154,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsPassesLoading(false);
-      message.error('Failed to load class pass details');
+      message.error('Failed to load pass details');
     }
   }, [username]);
 
@@ -516,8 +516,8 @@ const ProfilePreview = ({ username = null }) => {
               >
                 <Row className={styles.mt20}>
                   <Col span={24}>
-                    <Loader loading={isPassesLoading} size="large" text="Loading class passes">
-                      <ClassPasses passes={passes} username={username} />
+                    <Loader loading={isPassesLoading} size="large" text="Loading passes">
+                      <PublicPassList passes={passes} username={username} />
                     </Loader>
                   </Col>
                 </Row>

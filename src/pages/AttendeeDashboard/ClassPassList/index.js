@@ -320,7 +320,7 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <Row gutter={8}>
         <Col xs={24}>
-          <Title level={4}> Class Passes </Title>
+          <Title level={4}> Passes </Title>
         </Col>
         <Col xs={24}>
           <Collapse>
@@ -334,7 +334,7 @@ const ClassPassList = () => {
                 </Col>
                 <Col xs={24}>
                   {isMobileDevice ? (
-                    <Loader loading={isLoading} size="large" text="Loading Active Class Passes">
+                    <Loader loading={isLoading} size="large" text="Loading Active Passes">
                       {passes.map(renderPassItem)}
                     </Loader>
                   ) : (
@@ -365,7 +365,7 @@ const ClassPassList = () => {
                 </Col>
                 <Col xs={24}>
                   {isMobileDevice ? (
-                    <Loader loading={isLoading} size="large" text="Loading Expired Class Passes">
+                    <Loader loading={isLoading} size="large" text="Loading Expired Passes">
                       {expiredPasses.map(renderPassItem)}
                     </Loader>
                   ) : (

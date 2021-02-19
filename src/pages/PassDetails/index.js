@@ -83,7 +83,7 @@ const PassDetails = ({ match, history }) => {
         }
       } catch (error) {
         setIsLoading(false);
-        message.error('Failed to load class pass details');
+        message.error('Failed to load pass details');
       }
     },
     [username]
@@ -131,7 +131,7 @@ const PassDetails = ({ match, history }) => {
 
   const createOrder = async (userEmail) => {
     if (!pass) {
-      showErrorModal('Something went wrong', 'Invalid Class Pass Selected');
+      showErrorModal('Something went wrong', 'Invalid Pass Selected');
       return;
     }
 

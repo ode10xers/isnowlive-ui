@@ -53,7 +53,7 @@ export const creatorMenuItems = [
   {
     order: 3,
     key: 'passes',
-    title: 'Class Pass',
+    title: 'Pass',
     mixPanelTag: creator.click.dashboard.passesNav,
     icon: <TagsOutlined />,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes,

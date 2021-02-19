@@ -589,7 +589,7 @@ const Earnings = () => {
                   </Col>
                 </Row>
               </Panel>
-              <Panel header={<Title level={5}> Class Pass </Title>} key="ClassPass">
+              <Panel header={<Title level={5}> Pass </Title>} key="Pass">
                 <Row className={styles.mt10}>
                   <Col span={24}>
                     {isMobileDevice ? (
@@ -598,7 +598,7 @@ const Earnings = () => {
                           passes.map(renderPassItem)
                         ) : (
                           <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                            Class Pass List
+                            Pass List
                             <Empty />
                           </div>
                         )}
