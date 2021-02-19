@@ -83,6 +83,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [courseEndDate, setCourseEndDate] = useState(null);
   const [courseType, setCourseType] = useState(courseTypes.LIVE.name);
   const [courseImageUrl, setCourseImageUrl] = useState(null);
+  const [maxParticipants, setMaxParticipants] = useState(null);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -90,11 +91,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
       const { status, data } = await apis.session.getSession();
 
       if (isAPISuccess(status) && data) {
-        setCourseClasses(
-          data
-            .filter((session) => session.is_course)
-            .map((session) => ({ value: session.session_id, label: session.name }))
-        );
+        setCourseClasses(data.filter((session) => session.is_course));
       }
     } catch (error) {
       showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
@@ -129,6 +126,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
           courseStartDate: moment(editedCourse.start_date),
           courseEndDate: moment(editedCourse.end_date),
           selectedCourseClass: editedCourse.session?.session_id,
+          maxParticipants: editedCourse.session?.max_participants,
           videoList: editedCourse.videos?.map((courseVideo) => courseVideo.external_id),
           price: editedCourse.price,
           colorCode: editedCourse.color_code || initialColor || whiteColor,
@@ -144,6 +142,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
           editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name
         );
         setCourseImageUrl(editedCourse.course_image_url);
+        setMaxParticipants(editedCourse.session?.max_participants);
       } else {
         form.resetFields();
         setSelectedCourseClass(null);
@@ -154,6 +153,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         setCourseEndDate(null);
         setCourseImageUrl(null);
         setCourseType(courseTypes.LIVE.name);
+        setMaxParticipants(null);
       }
     }
 
@@ -189,6 +189,17 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     return dateIsBeforeDate(currentDate, moment().startOf('day')) || dateIsBeforeDate(currentDate, courseStartDate);
   };
 
+  const handleCourseClassChange = (val) => {
+    console.log(val);
+    setSelectedCourseClass(val);
+
+    const selectedCourseClassMaxParticipants = courseClasses.find((courseClass) => courseClass.session_id === val)
+      ?.max_participants;
+    console.log(selectedCourseClassMaxParticipants);
+    setMaxParticipants(selectedCourseClassMaxParticipants || null);
+    form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: selectedCourseClassMaxParticipants || null });
+  };
+
   const handleChangeCourseType = (value) => {
     setCourseType(value);
   };
@@ -202,10 +213,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     setSubmitting(true);
 
     try {
-      //TODO: Adjust for new keys max_participants
       let data = {
         name: values.courseName,
         session_id: selectedCourseClass,
+        max_participants:
+          maxParticipants ||
+          courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass)?.max_participants,
         price: values.price || 1,
         currency: currency.toLowerCase(),
         color_code: colorCode || values.colorCode || whiteColor,
@@ -339,10 +352,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                   showArrow
                   showSearch={false}
                   placeholder="Select Class"
-                  options={courseClasses}
+                  options={courseClasses?.map((courseClass) => ({
+                    value: courseClass.session_id,
+                    label: courseClass.name,
+                  }))}
                   value={selectedCourseClass}
-                  onChange={(val) => setSelectedCourseClass(val)}
+                  onChange={handleCourseClassChange}
                 />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                {...courseModalFormLayout}
+                id="maxParticipants"
+                name="maxParticipants"
+                label="Max Participants"
+              >
+                <InputNumber disabled min={1} placeholder="Max Participants" className={styles.numericInput} />
               </Form.Item>
             </Col>
             <Col xs={24}>
