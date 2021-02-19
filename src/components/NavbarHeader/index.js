@@ -28,6 +28,7 @@ const NavbarHeader = ({ removePadding = false }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
   const [shouldShowVideoLink, setShouldShowVideoLink] = useState(false);
+  const [shouldShowCourseLink, setShouldShowCourseLink] = useState(false);
 
   const {
     state: { userDetails },
@@ -55,6 +56,18 @@ const NavbarHeader = ({ removePadding = false }) => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to fetch videos for username');
+    }
+  };
+
+  const checkShouldShowCourseLink = async (username) => {
+    try {
+      const { status, data } = await apis.courses.getCoursesByUsername(username);
+
+      if (isAPISuccess(status) && data) {
+        setShouldShowCourseLink(data.length > 0);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to fetch courses for username');
     }
   };
 
@@ -145,6 +158,7 @@ const NavbarHeader = ({ removePadding = false }) => {
     if (username && !reservedDomainName.includes(username)) {
       checkShouldShowPassLink(username);
       checkShouldShowVideoLink(username);
+      checkShouldShowCourseLink(username);
     }
   }, [username]);
 
@@ -227,6 +241,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                     onClick={() => redirectToCreatorProfile('video')}
                   >
                     Videos
+                  </Menu.Item>
+                )}
+                {shouldShowCourseLink && (
+                  <Menu.Item
+                    key="Course"
+                    className={siteLinkActive('course') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('course')}
+                  >
+                    Courses
                   </Menu.Item>
                 )}
                 {localUserDetails ? (
@@ -358,7 +381,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                           <span className={styles.menuLink}>Videos</span>
                         </li>
                       )}
-
+                      {shouldShowCourseLink && (
+                        <li
+                          key="Creator Courses"
+                          className={siteLinkActive('course') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('course')}
+                        >
+                          <span className={styles.menuLink}>Courses</span>
+                        </li>
+                      )}
                       {localUserDetails && (
                         <>
                           <li key="Divider" className={styles.divider} />
