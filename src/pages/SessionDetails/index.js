@@ -571,7 +571,18 @@ const SessionDetails = ({ match, history }) => {
         </Col>
       </Row>
       {session?.is_course ? (
-        course && <ShowcaseCourseCard course={course} username={username} />
+        course && (
+          <div className={classNames(styles.mb50, styles.mt20)}>
+            <Row gutter={[8, 16]}>
+              <Col xs={24}>
+                <Title level={5}> Course related to this session </Title>
+              </Col>
+              <Col xs={24}>
+                <ShowcaseCourseCard course={course} username={username} />
+              </Col>
+            </Row>
+          </div>
+        )
       ) : (
         <>
           <Row justify="space-between" className={styles.mt20} gutter={8}>
