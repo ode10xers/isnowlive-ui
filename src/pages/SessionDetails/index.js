@@ -570,7 +570,7 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
       </Row>
-      {session?.is_course && course ? (
+      {session?.is_course ? (
         <ShowcaseCourseCard course={course} username={username} />
       ) : (
         <>
