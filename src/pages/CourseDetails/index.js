@@ -2,10 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-import { loadStripe } from '@stripe/stripe-js';
 import moment from 'moment';
 
-import { Row, Col, Typography, message, Space, Image, Button, Divider } from 'antd';
+import { Row, Col, Typography, message, Space, Image, Button } from 'antd';
 
 import {
   GlobalOutlined,
@@ -16,7 +15,6 @@ import {
   ArrowLeftOutlined,
 } from '@ant-design/icons';
 
-import config from 'config';
 import apis from 'apis';
 import Routes from 'routes';
 
@@ -24,25 +22,22 @@ import Table from 'components/Table';
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
-import PurchaseModal from 'components/PurchaseModal';
 import VideoCard from 'components/VideoCard';
-import { showErrorModal, showCourseBookingSuccessModal } from 'components/Modals/modals';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { orderType, isAPISuccess, reservedDomainName, generateUrlFromUsername, isValidFile } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
-
 const {
-  timezoneUtils: { getTimezoneLocation, getCurrentLongTimezone },
-  formatDate: { toShortDateWithYear, toLongDateWithLongDay, toLocaleTime },
+  timezoneUtils: { getCurrentLongTimezone },
+  formatDate: { toLongDateWithLongDay, toLocaleTime },
 } = dateUtil;
 
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 const CourseDetails = ({ match, history }) => {
   const location = useLocation();
@@ -50,7 +45,6 @@ const CourseDetails = ({ match, history }) => {
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [course, setCourse] = useState(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [courseSession, setCourseSession] = useState(null);
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
 
@@ -70,19 +64,13 @@ const CourseDetails = ({ match, history }) => {
     }
   }, [username]);
 
-  const openPurchaseModal = () => {
-    setShowPurchaseModal(true);
-  };
-
-  const closePurchaseModal = () => {
-    setShowPurchaseModal(false);
-  };
-
   const getCourseDetails = useCallback(async (courseId) => {
     try {
       const { status, data } = await apis.courses.getDetails(courseId);
 
       if (isAPISuccess(status) && data) {
+        setCourse(data);
+
         if (data.session?.session_id) {
           const sessionData = await apis.session.getSessionDetails(data.session?.session_id);
 
@@ -91,7 +79,6 @@ const CourseDetails = ({ match, history }) => {
           }
         }
 
-        setCourse(data);
         setIsLoading(false);
       }
     } catch (error) {
@@ -116,65 +103,6 @@ const CourseDetails = ({ match, history }) => {
     }
     //eslint-disable-next-line
   }, [match.params.course_id]);
-
-  const initiatePaymentForOrder = async (orderDetails) => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.course_order_id,
-        order_type: orderType.COURSE,
-      });
-
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
-  const createOrder = async (userEmail) => {
-    if (!course) {
-      showErrorModal('Something went wrong', 'Invalid Course Selected');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.courses.createOrderForUser({
-        course_id: course.id,
-        price: course.price,
-        currency: course.currency?.toLowerCase(),
-        timezone_location: getTimezoneLocation(),
-      });
-
-      if (isAPISuccess(status) && data) {
-        if (data.payment_required) {
-          initiatePaymentForOrder(data);
-        } else {
-          setIsLoading(false);
-
-          showCourseBookingSuccessModal(userEmail, username);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-      //TODO: Confirm with BE what will be the error message if already booked
-    }
-  };
 
   const redirectToVideoDetails = (video) => {
     if (video?.external_id) {
@@ -211,7 +139,6 @@ const CourseDetails = ({ match, history }) => {
 
   const mainContent = (
     <Loader size="large" text="Loading course details" loading={isLoading}>
-      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
       <Row gutter={[8, 24]}>
         {isOnAttendeeDashboard && (
           <Col xs={24} className={styles.mb20}>
@@ -299,109 +226,8 @@ const CourseDetails = ({ match, history }) => {
         <Col xs={24}>
           {course && (
             <Row classname={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-              <Col xs={24} className={styles.courseWrapper}>
-                {isMobileDevice ? (
-                  <Row gutter={[8, 4]}>
-                    <Col xs={24} className={styles.courseImageWrapper}>
-                      <Image
-                        preview={false}
-                        height={100}
-                        className={styles.courseImage}
-                        src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
-                      />
-                    </Col>
-                    <Col xs={24} className={styles.courseInfoWrapper}>
-                      <Row gutter={[8, 8]}>
-                        <Col xs={24} className={styles.courseNameWrapper}>
-                          <Text strong> {course?.name} </Text>
-                        </Col>
-                        <Col xs={24} className={styles.courseDetailsWrapper}>
-                          <Text type="secondary">
-                            {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
-                          </Text>
-                        </Col>
-                        <Col xs={24} className={styles.courseDetailsWrapper}>
-                          <Text type="secondary"> {course?.videos?.length} Videos </Text>
-                          <Divider type="vertical" />
-                          <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
-                        </Col>
-                        <Col xs={24} className={styles.coursePriceWrapper}>
-                          <Text strong className={styles.blueText}>
-                            {course?.currency?.toUpperCase()} {course?.price}
-                          </Text>
-                        </Col>
-                      </Row>
-                    </Col>
-                    {!isOnAttendeeDashboard && (
-                      <Col xs={24} className={styles.buyButtonWrapper}>
-                        <Button
-                          block
-                          className={styles.buyButton}
-                          type="primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openPurchaseModal();
-                          }}
-                        >
-                          Buy Course
-                        </Button>
-                      </Col>
-                    )}
-                  </Row>
-                ) : (
-                  <Row gutter={[16, 8]} className={isOnAttendeeDashboard ? styles.dashboardPadding : undefined}>
-                    <Col xs={24} md={isOnAttendeeDashboard ? 12 : 10} xl={10} className={styles.courseImageWrapper}>
-                      <Image
-                        preview={false}
-                        height={130}
-                        className={styles.courseImage}
-                        src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
-                      />
-                    </Col>
-                    <Col
-                      xs={24}
-                      md={isOnAttendeeDashboard ? 12 : 8}
-                      xl={isOnAttendeeDashboard ? 14 : 10}
-                      className={styles.courseInfoWrapper}
-                    >
-                      <Row gutter={[8, 4]}>
-                        <Col xs={24} className={styles.courseNameWrapper}>
-                          <Text strong> {course?.name} </Text>
-                        </Col>
-                        <Col xs={24} className={styles.courseDetailsWrapper}>
-                          <Text type="secondary">
-                            {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
-                          </Text>
-                        </Col>
-                        <Col xs={24} className={styles.courseDetailsWrapper}>
-                          <Text type="secondary"> {course?.videos?.length} Videos </Text>
-                          <Divider type="vertical" />
-                          <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
-                        </Col>
-                        <Col xs={24} className={styles.coursePriceWrapper}>
-                          <Text strong className={styles.blueText}>
-                            {course?.currency?.toUpperCase()} {course?.price}
-                          </Text>
-                        </Col>
-                      </Row>
-                    </Col>
-                    {!isOnAttendeeDashboard && (
-                      <Col xs={24} md={6} xl={4} className={styles.buyButtonWrapper}>
-                        <Button
-                          block
-                          className={styles.buyButton}
-                          type="primary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openPurchaseModal();
-                          }}
-                        >
-                          Buy Course
-                        </Button>
-                      </Col>
-                    )}
-                  </Row>
-                )}
+              <Col xs={24}>
+                <ShowcaseCourseCard course={course} username={username} />
               </Col>
 
               {courseSession && (

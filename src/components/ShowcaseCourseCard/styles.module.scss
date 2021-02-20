@@ -1,0 +1,71 @@
+@import '../../styles/variables.scss';
+
+.showcaseCourseCardWrapper {
+  .dashboardPadding {
+    padding: 10px 30px;
+  }
+
+  .courseImageWrapper {
+    .courseImage {
+      border-radius: 5px;
+      object-fit: fill;
+    }
+  }
+
+  .courseInfoWrapper {
+    .courseNameWrapper {
+      font-size: 18px;
+      height: 58px;
+    }
+
+    .courseDetailsWrapper {
+      font-size: 14px;
+    }
+
+    .coursePriceWrapper {
+      font-size: 16px;
+    }
+  }
+
+  .buyButtonWrapper {
+    align-self: center; 
+  }
+}
+
+@media screen and (max-width: 992px){
+  .showcaseCourseCardWrapper { 
+    .courseInfoWrapper {
+      .courseNameWrapper {
+        font-size: 14px;
+        height: 58px;
+      }
+  
+      .courseDetailsWrapper {
+        font-size: 13px;
+      }
+  
+      .coursePriceWrapper {
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 769px){
+  .showcaseCourseCardWrapper { 
+    .courseInfoWrapper {
+      .courseNameWrapper {
+        font-size: 16px;
+        height: 58px;
+      }
+  
+      .courseDetailsWrapper {
+        font-size: 16px;
+      }
+  
+      .coursePriceWrapper {
+        font-size: 16px;
+      }
+    }
+  }
+}

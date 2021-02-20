@@ -40,6 +40,7 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -52,6 +53,7 @@ const {
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
+  const [course, setCourse] = useState(null);
   const [creator, setCreator] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
@@ -88,6 +90,13 @@ const SessionDetails = ({ match, history }) => {
             (inventory) => inventory.num_participants < sessionDetails.data.max_participants
           ),
         });
+
+        if (sessionDetails.data.is_course) {
+          const courseDetails = await apis.courses.getCoursesBySessionId(session_id);
+
+          setCourse(courseDetails.data[0]);
+        }
+
         setCreator(userDetails.data);
         setAvailablePasses(passes.data);
         setIsLoading(false);
@@ -561,7 +570,9 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
       </Row>
-      {!session?.is_course && (
+      {session?.is_course && course ? (
+        <ShowcaseCourseCard course={course} username={username} />
+      ) : (
         <>
           <Row justify="space-between" className={styles.mt20} gutter={8}>
             <Col
@@ -664,5 +675,6 @@ const SessionDetails = ({ match, history }) => {
     </Loader>
   );
 };
+//TODO: The VideoCards listing can probably be replaced with PublicVideoList to reduce the logic in this page
 
 export default SessionDetails;
