@@ -13,31 +13,28 @@ import ShowAmount from 'components/ShowAmount';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, getPaymentStatus } from 'utils/helper';
 
-import { mixPanelEventTags, trackSimpleEvent } from 'services/integrations/mixpanel';
-
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
   formatDate: { toLongDateWithTime },
 } = dateUtil;
-const { creator } = mixPanelEventTags;
 
-const PassEarnings = ({ match }) => {
+const CourseEarnings = ({ match }) => {
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [earnings, setEarnings] = useState(null);
 
   const getEarningData = useCallback(
-    async (pass_id) => {
+    async (course_id) => {
       try {
-        const { status, data } = await apis.passes.getEarningsByPassId(pass_id);
+        const { status, data } = await apis.courses.getEarningsByCourseId(course_id);
         if (isAPISuccess(status)) {
           setIsLoading(false);
           setEarnings(data);
         }
       } catch (error) {
-        message.error('Unable to fetch the pass earning details');
+        message.error('Unable to fetch the course earning details');
         setTimeout(() => {
           history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
         }, 1500);
@@ -47,22 +44,17 @@ const PassEarnings = ({ match }) => {
   );
 
   useEffect(() => {
-    if (match?.params?.pass_id) {
-      getEarningData(match?.params?.pass_id);
+    if (match?.params?.course_id) {
+      getEarningData(match?.params?.course_id);
     } else {
-      message.error('Unable to find the pass.');
+      message.error('Unable to find the course.');
       setTimeout(() => {
         history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
       }, 1500);
     }
-  }, [getEarningData, history, match.params.pass_id]);
+  }, [getEarningData, history, match.params.course_id]);
 
-  const trackAndNavigate = (destination, eventTag) => {
-    trackSimpleEvent(eventTag);
-    history.push(destination);
-  };
-
-  const showPassLayout = (title, details) => (
+  const showCourseLayout = (title, details) => (
     <div className={styles.box2}>
       <Row>
         <Col xs={24}>
@@ -73,14 +65,14 @@ const PassEarnings = ({ match }) => {
     </div>
   );
 
-  const showPassName = showPassLayout('Pass Name', <Title level={3}>{earnings?.name}</Title>);
+  const showCourseName = showCourseLayout('Course Name', <Title level={3}>{earnings?.name}</Title>);
 
-  const showPassEarnings = showPassLayout(
+  const showCourseEarnings = showCourseLayout(
     'Total Earning',
-    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency.toUpperCase()} />
+    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency?.toUpperCase()} />
   );
 
-  let passColumns = [
+  let courseColumns = [
     {
       title: 'Attendee Name',
       key: 'name',
@@ -101,7 +93,7 @@ const PassEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency.toUpperCase()} {record.total_price}
+          {record.currency?.toUpperCase()} {record.total_price}
         </Text>
       ),
     },
@@ -112,18 +104,18 @@ const PassEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency.toUpperCase()} {record.platform_fees}
+          {record.currency?.toUpperCase()} {record.platform_fees}
         </Text>
       ),
     },
     {
-      title: 'Net',
+      title: 'Net Price',
       dataIndex: 'net_price',
       key: 'net_price',
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency.toUpperCase()} {record.net_price}
+          {record.currency?.toUpperCase()} {record.net_price}
         </Text>
       ),
     },
@@ -136,7 +128,7 @@ const PassEarnings = ({ match }) => {
     },
   ];
 
-  const renderPassItem = (item) => {
+  const renderCourseItem = (item) => {
     const layout = (label, value) => (
       <Row>
         <Col span={9}>
@@ -152,19 +144,19 @@ const PassEarnings = ({ match }) => {
         {layout(
           'Amount',
           <Text>
-            {item.currency.toUpperCase()} {item.total_price}
+            {item.currency?.toUpperCase()} {item.total_price}
           </Text>
         )}
         {layout(
           'Fees',
           <Text>
-            {item.currency.toUpperCase()} {item.platform_fees}
+            {item.currency?.toUpperCase()} {item.platform_fees}
           </Text>
         )}
         {layout(
           'Net',
           <Text>
-            {item.currency.toUpperCase()} {item.net_price}
+            {item.currency?.toUpperCase()} {item.net_price}
           </Text>
         )}
         {layout('Status', <Text>{getPaymentStatus(item.status)}</Text>)}
@@ -179,12 +171,7 @@ const PassEarnings = ({ match }) => {
           <Col xs={24} md={4}>
             <Button
               className={styles.headButton}
-              onClick={() =>
-                trackAndNavigate(
-                  Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
-                  creator.click.payment.backToEarningDashboard
-                )
-              }
+              onClick={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount)}
               icon={<ArrowLeftOutlined />}
             >
               All Earnings
@@ -193,13 +180,13 @@ const PassEarnings = ({ match }) => {
         </Row>
         <Row className={styles.mt50}>
           <Col xs={24} md={24}>
-            <Title level={5}>Pass Earning Details</Title>
+            <Title level={5}>Course Earning Details</Title>
           </Col>
           <Col xs={24} md={16}>
-            {showPassName}
+            {showCourseName}
           </Col>
           <Col xs={24} md={8}>
-            {showPassEarnings}
+            {showCourseEarnings}
           </Col>
         </Row>
         <Row className={styles.mt50}>
@@ -210,7 +197,7 @@ const PassEarnings = ({ match }) => {
             {isMobileDevice ? (
               <>
                 {earnings?.details?.length > 0 ? (
-                  earnings.details.map(renderPassItem)
+                  earnings.details.map(renderCourseItem)
                 ) : (
                   <div className={classNames(styles.textAlignCenter, 'text-empty')}>
                     <Empty />
@@ -218,7 +205,7 @@ const PassEarnings = ({ match }) => {
                 )}
               </>
             ) : (
-              <Table columns={passColumns} data={earnings?.details} loading={isLoading} />
+              <Table columns={courseColumns} data={earnings?.details} loading={isLoading} />
             )}
           </Col>
         </Row>
@@ -227,4 +214,4 @@ const PassEarnings = ({ match }) => {
   );
 };
 
-export default PassEarnings;
+export default CourseEarnings;
