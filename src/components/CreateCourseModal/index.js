@@ -69,7 +69,6 @@ const {
   formatDate: { toLocaleTime, toLongDateWithDay },
 } = dateUtil;
 
-//TODO: There will be a new inventory array, accomodate for this
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [form] = Form.useForm();
 
@@ -163,6 +162,22 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     fetchAllVideosForCreator();
   }, [visible, editedCourse, fetchAllCourseClassForCreator, fetchAllVideosForCreator, form]);
 
+  const filterSessionInventoryInDateRange = (inventories) => {
+    if (!inventories) {
+      return [];
+    }
+
+    if (!courseStartDate || !courseEndDate) {
+      return inventories;
+    }
+
+    return inventories.filter(
+      (inventory) =>
+        moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
+        moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
+    );
+  };
+
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
     form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
@@ -171,7 +186,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const handleStartDateChange = (date) => {
     setCourseStartDate(date);
 
-    if (courseEndDate && dateIsBeforeDate(courseEndDate, date)) {
+    if (!date || (courseEndDate && dateIsBeforeDate(courseEndDate, date))) {
       setCourseEndDate(null);
       form.setFieldsValue({ ...form.getFieldsValue(), courseEndDate: undefined });
     }
@@ -192,14 +207,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   };
 
   const handleCourseClassChange = (val) => {
-    console.log(val);
     setSelectedCourseClass(val);
 
-    const selectedCourseClassMaxParticipants = courseClasses.find((courseClass) => courseClass.session_id === val)
-      ?.max_participants;
-    console.log(selectedCourseClassMaxParticipants);
-    setMaxParticipants(selectedCourseClassMaxParticipants || null);
-    form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: selectedCourseClassMaxParticipants || null });
+    const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === val);
+
+    setMaxParticipants(targetCourseClass?.max_participants || null);
+    form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: targetCourseClass?.max_participants || null });
   };
 
   // const handleChangeCourseType = (value) => {
@@ -214,21 +227,41 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
+    const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
+
+    if (!targetCourseClass) {
+      showErrorModal('Course Session not found', 'The course session you chose is invalid');
+      setSubmitting(false);
+      return;
+    }
+
+    const courseClassInventoriesInDateRange = filterSessionInventoryInDateRange(targetCourseClass?.inventory);
+
+    if (courseClassInventoriesInDateRange.length <= 0) {
+      showErrorModal(
+        'No sessions scheduled',
+        'The course session you selected has no schedules in the duration you choose.'
+      );
+      setSubmitting(false);
+      return;
+    }
+
+    console.log(courseClassInventoriesInDateRange);
+
     try {
       let data = {
         name: values.courseName,
         session_id: selectedCourseClass,
-        max_participants:
-          maxParticipants ||
-          courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass)?.max_participants,
+        max_participants: maxParticipants || targetCourseClass?.max_participants,
         price: values.price || 1,
         currency: currency.toLowerCase(),
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
         video_ids: selectedVideos || values.videoList || [],
         start_date: moment(courseStartDate).startOf('day').utc().format(),
-        end_date: moment(courseEndDate).startOf('day').utc().format(),
-        type: courseTypes.LIVE.name.toLowerCase(), //TODO: Remove Hardcoding and adjust when video course is implemented
+        end_date: moment(courseEndDate).endOf('day').utc().format(),
+        type: courseTypes.LIVE.name.toLowerCase(), //Currently hardcoding this
+        inventory_ids: courseClassInventoriesInDateRange.map((inventory) => inventory.inventory_id) || [],
       };
 
       const response = editedCourse
@@ -263,12 +296,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
       return noInventoryComponent;
     }
 
-    return selectedSession.inventory.map((sessionInventory) => (
+    const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
+
+    if (filteredInventories.length <= 0) {
+      return (
+        <Col xs={24}>
+          <Text type="secondary">Course has no schedules for the duration you choose</Text>
+        </Col>
+      );
+    }
+
+    return filteredInventories.map((sessionInventory) => (
       <Col xs={24} key={`${selectedCourseClass}_${sessionInventory.inventory_id}`}>
-        <Tag color="magenta">
+        <Tag color="volcano">
           <div className={styles.courseDateTags}>
-            {toLongDateWithDay(sessionInventory.start_time)}, {toLocaleTime(sessionInventory.start_time)} -{' '}
-            {toLocaleTime(sessionInventory.end_time)}
+            {`${toLongDateWithDay(sessionInventory.start_time)}, ${toLocaleTime(
+              sessionInventory.start_time
+            )} - ${toLocaleTime(sessionInventory.end_time)}`}
           </div>
         </Tag>
       </Col>
@@ -277,7 +321,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
 
   return (
     <Modal
-      title={`${editedCourse ? 'Edit' : 'Create New'} Pass`}
+      title={`${editedCourse ? 'Edit' : 'Create New'} Course`}
       centered={true}
       visible={visible}
       footer={null}
@@ -413,7 +457,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                   Course Class Date & Time :
                 </Col>
                 <Col xs={24} md={16}>
-                  <Row gutter={[8, 4]}>{renderSessionDates()}</Row>
+                  <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
                 </Col>
               </Row>
             </Col>

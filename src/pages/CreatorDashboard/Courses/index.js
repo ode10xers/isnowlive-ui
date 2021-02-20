@@ -86,7 +86,6 @@ const Courses = () => {
   };
 
   const hideCreateCourseModal = (shouldRefresh = false) => {
-    console.log(courses);
     setCreateModalVisible(false);
     setTargetCourse(null);
 
