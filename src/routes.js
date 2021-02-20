@@ -35,6 +35,7 @@ const Routes = {
     sessionEarnings: '/payments/inventory/:inventory_id',
     passEarnings: '/payments/pass/:pass_id',
     videoEarnings: '/payments/video/:video_id',
+    courseEarnings: '/payments/course/:course_id',
     passes: '/passes',
     videos: '/videos',
     courses: '/courses',

@@ -35,24 +35,34 @@ const { creator } = mixPanelEventTags;
 
 const Earnings = () => {
   const history = useHistory();
-  const [isLoading, setIsLoading] = useState(false);
-  const [sessions, setSessions] = useState([]);
-  const [passes, setPasses] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [balance, setBalance] = useState(null);
-  const [isLoadingPayout, setIsLoadingPayout] = useState(false);
   const {
     state: {
       userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
     },
   } = useGlobalContext();
 
-  const [showMoreVideos, setShowMoreVideos] = useState(false);
-  const [showMorePasses, setShowMorePasses] = useState(false);
-  const [showMoreSession, setShowMoreSession] = useState(false);
-  const [currentSessionPage, setCurrentSessionPage] = useState(1);
-  const [currentPassesPage, setCurrentPassesPage] = useState(1);
-  const [currentVideosPage, setCurrentVideosPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [balance, setBalance] = useState(null);
+  const [isLoadingPayout, setIsLoadingPayout] = useState(false);
+
+  const [earnings, setEarnings] = useState({
+    sessions: [],
+    passes: [],
+    videos: [],
+    courses: [],
+  });
+  const [showMore, setShowMore] = useState({
+    sessions: false,
+    passes: false,
+    videos: false,
+    courses: false,
+  });
+  const [currentPage, setCurrentPage] = useState({
+    sessions: 1,
+    passes: 1,
+    videos: 1,
+    courses: 1,
+  });
   const itemsPerPage = 10;
 
   const [expandedSection, setExpandedSection] = useState([]);
@@ -65,26 +75,37 @@ const Earnings = () => {
         creatorInventoryEarningResponse,
         creatorVideoEarningResponse,
         creatorPassEarningResponse,
+        creatorCourseEarningResponse,
         creatorBalanceResponse,
       ] = await Promise.all([
         apis.session.getCreatorInventoryEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
         apis.videos.getCreatorVideosEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
         apis.passes.getCreatorPassEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
+        apis.courses.getCreatorCourseEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
         apis.session.getCreatorBalance(),
       ]);
       if (
         isAPISuccess(creatorInventoryEarningResponse.status) &&
         isAPISuccess(creatorVideoEarningResponse.status) &&
         isAPISuccess(creatorPassEarningResponse.status) &&
+        isAPISuccess(creatorCourseEarningResponse.status) &&
         isAPISuccess(creatorBalanceResponse.status)
       ) {
         setIsLoading(false);
-        setSessions(creatorInventoryEarningResponse.data.earnings);
-        setShowMoreSession(creatorInventoryEarningResponse.data.next_page || false);
-        setPasses(creatorPassEarningResponse.data.earnings);
-        setShowMorePasses(creatorPassEarningResponse.data.next_page || false);
-        setVideos(creatorVideoEarningResponse.data.earnings);
-        setShowMoreVideos(creatorVideoEarningResponse.data.next_page || false);
+        setEarnings({
+          sessions: creatorInventoryEarningResponse.data.earnings || [],
+          passes: creatorPassEarningResponse.data.earnings || [],
+          videos: creatorVideoEarningResponse.data.earnings || [],
+          courses: creatorCourseEarningResponse.data.earnings || [],
+        });
+
+        setShowMore({
+          sessions: creatorInventoryEarningResponse.data.next_page || false,
+          passes: creatorPassEarningResponse.data.next_page || false,
+          videos: creatorVideoEarningResponse.data.next_page || false,
+          courses: creatorCourseEarningResponse.data.next_page || false,
+        });
+
         setBalance(creatorBalanceResponse.data);
       }
     } catch (error) {
@@ -96,18 +117,31 @@ const Earnings = () => {
     }
   }, []);
 
+  //TODO: Can refactor these to be more general
   const handleShowMoreSession = async () => {
     const eventTag = creator.click.payment.showMoreEarnings;
     try {
       setIsLoading(true);
-      let pageNo = currentSessionPage + 1;
+      let pageNo = currentPage['sessions'] + 1;
       const { status, data } = await apis.session.getCreatorInventoryEarnings(pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
-        setSessions([...sessions, ...data.earnings]);
-        setCurrentSessionPage(pageNo);
-        setShowMoreSession(data.next_page || false);
+
+        setEarnings({
+          ...earnings,
+          sessions: [...earnings.sessions, ...data.earnings],
+        });
+
+        setCurrentPage({
+          ...currentPage,
+          sessions: pageNo,
+        });
+
+        setShowMore({
+          ...showMore,
+          sessions: data.next_page || false,
+        });
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
@@ -120,14 +154,26 @@ const Earnings = () => {
     const eventTag = creator.click.payment.showMoreEarnings;
     try {
       setIsLoading(true);
-      let pageNo = currentPassesPage + 1;
+      let pageNo = currentPage['passes'] + 1;
       const { status, data } = await apis.passes.getCreatorPassEarnings(pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
-        setPasses([...passes, ...data.earnings]);
-        setCurrentPassesPage(pageNo);
-        setShowMorePasses(data.next_page || false);
+
+        setEarnings({
+          ...earnings,
+          passes: [...earnings.passes, ...data.earnings],
+        });
+
+        setCurrentPage({
+          ...currentPage,
+          passes: pageNo,
+        });
+
+        setShowMore({
+          ...showMore,
+          passes: data.next_page || false,
+        });
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
@@ -141,14 +187,26 @@ const Earnings = () => {
 
     try {
       setIsLoading(true);
-      let pageNo = currentVideosPage + 1;
+      let pageNo = currentPage['videos'] + 1;
       const { status, data } = await apis.videos.getCreatorVideosEarnings(pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
-        setVideos([...videos, ...data.earnings]);
-        setCurrentVideosPage(pageNo);
-        setShowMoreVideos(data.next_page || false);
+
+        setEarnings({
+          ...earnings,
+          videos: [...earnings.videos, ...data.earnings],
+        });
+
+        setCurrentPage({
+          ...currentPage,
+          videos: pageNo,
+        });
+
+        setShowMore({
+          ...showMore,
+          videos: data.next_page || false,
+        });
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
@@ -157,17 +215,43 @@ const Earnings = () => {
     }
   };
 
-  const openStripeConnect = (url) => {
-    window.open(url, '_self');
+  const handleShowMoreCourses = async () => {
+    try {
+      setIsLoading(true);
+      let pageNo = currentPage['courses'] + 1;
+      const { status, data } = await apis.courses.getCreatorCourseEarnings(pageNo, itemsPerPage);
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+
+        setEarnings({
+          ...earnings,
+          courses: [...earnings.courses, ...data.earnings],
+        });
+
+        setCurrentPage({
+          ...currentPage,
+          courses: pageNo,
+        });
+
+        setShowMore({
+          ...showMore,
+          courses: data.next_page || false,
+        });
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+      setIsLoading(false);
+    }
   };
 
   const relinkStripe = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data, status } = await apis.payment.stripe.relinkAccount();
-      if (isAPISuccess(status)) {
+
+      if (isAPISuccess(status) && data) {
         setIsLoading(false);
-        openStripeConnect(data.onboarding_url);
+        window.open(data?.onboarding_url, '_self');
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
@@ -305,8 +389,26 @@ const Earnings = () => {
 
   const openSessionDetails = (item) => {
     trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
-    if (item.inventory_id) {
+    if (item?.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/inventory/${item.inventory_id}`);
+    }
+  };
+
+  const openPassDetails = (item) => {
+    if (item?.pass_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/pass/${item.pass_id}`);
+    }
+  };
+
+  const openVideoDetails = (item) => {
+    if (item?.video_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
+    }
+  };
+
+  const openCourseDetails = (item) => {
+    if (item?.course_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/course/${item.course_id}`);
     }
   };
 
@@ -386,12 +488,71 @@ const Earnings = () => {
     );
   };
 
-  const openPassDetails = (item) => {
-    if (item.pass_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/pass/${item.pass_id}`);
-    }
-  };
+  const generateEarningsColumns = (productName = 'Product', redirectToDetailsMethod = () => {}) => [
+    {
+      title: `${productName} Name`,
+      key: 'name',
+      dataIndex: 'name',
+      align: 'left',
+      width: '50%',
+    },
+    {
+      title: 'Total Earned',
+      key: 'total_earned',
+      dataIndex: 'total_earned',
+      align: 'right',
+      width: '40%',
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.total_earned}`,
+    },
+    {
+      title: '',
+      width: '10%',
+      render: (text, record) => (
+        <Row justify="start">
+          <Col>
+            <Button type="link" className={styles.detailsButton} onClick={() => redirectToDetailsMethod(record)}>
+              Details
+            </Button>
+          </Col>
+        </Row>
+      ),
+    },
+  ];
 
+  const renderMobileEarningsItem = (product, redirectToDetailsMethod = () => {}) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Card
+        className={styles.card}
+        title={
+          <div onClick={() => redirectToDetailsMethod(product)}>
+            <Text>{product?.name}</Text>
+          </div>
+        }
+        actions={[
+          <Button type="link" className={styles.detailsButton} onClick={() => redirectToDetailsMethod(product)}>
+            Details
+          </Button>,
+        ]}
+      >
+        {layout(
+          'Earnings',
+          <Text>
+            {product?.currency?.toUpperCase()} {product?.total_earned}
+          </Text>
+        )}
+      </Card>
+    );
+  };
+  /*
   let passColumns = [
     {
       title: 'Pass Name',
@@ -406,7 +567,7 @@ const Earnings = () => {
       dataIndex: 'total_earned',
       align: 'right',
       width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency.toUpperCase()}`,
+      render: (text, record) => `${record.total_earned} ${record.currency?.toUpperCase()}`,
     },
     {
       title: '',
@@ -422,7 +583,6 @@ const Earnings = () => {
       ),
     },
   ];
-
   const renderPassItem = (item) => {
     const layout = (label, value) => (
       <Row>
@@ -457,12 +617,6 @@ const Earnings = () => {
     );
   };
 
-  const openVideoDetails = (item) => {
-    if (item.video_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
-    }
-  };
-
   let videoColumns = [
     {
       title: 'Video Name',
@@ -477,7 +631,7 @@ const Earnings = () => {
       dataIndex: 'total_earned',
       align: 'right',
       width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency.toUpperCase()}`,
+      render: (text, record) => `${record.total_earned} ${record.currency?.toUpperCase()}`,
     },
     {
       title: '',
@@ -527,6 +681,31 @@ const Earnings = () => {
       </Card>
     );
   };
+*/
+
+  const productEarningsItems = [
+    {
+      name: 'Pass',
+      key: 'pass_id',
+      stateKey: 'passes',
+      redirectMethod: openPassDetails,
+      showMoreMethod: handleShowMorePasses,
+    },
+    {
+      name: 'Video',
+      key: 'video_id',
+      stateKey: 'videos',
+      redirectMethod: openVideoDetails,
+      showMoreMethod: handleShowMoreVideos,
+    },
+    {
+      name: 'Course',
+      key: 'course_id',
+      stateKey: 'courses',
+      redirectMethod: openCourseDetails,
+      showMoreMethod: handleShowMoreCourses,
+    },
+  ];
 
   return (
     <Loader loading={isLoading} size="large" text="Loading Earning Details">
@@ -556,13 +735,13 @@ const Earnings = () => {
         <Row className={styles.mt20}>
           <Col xs={24}>
             <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
-              <Panel header={<Title level={5}> Sessions </Title>} key="Sessions">
+              <Panel header={<Title level={5}> Sessions Earnings </Title>} key="Sessions">
                 <Row className={styles.mt10}>
                   <Col span={24}>
                     {isMobileDevice ? (
                       <Loader loading={isLoading} size="large" text="Loading sessions">
-                        {sessions.length > 0 ? (
-                          sessions.map(renderSessionItem)
+                        {earnings['sessions']?.length > 0 ? (
+                          earnings['sessions']?.map(renderSessionItem)
                         ) : (
                           <div className={classNames(styles.textAlignCenter, 'text-empty')}>
                             Sessions List
@@ -571,7 +750,7 @@ const Earnings = () => {
                         )}
                       </Loader>
                     ) : (
-                      <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+                      <Table columns={sessionColumns} data={earnings['sessions']} loading={isLoading} />
                     )}
                   </Col>
                   <Col span={24}>
@@ -579,7 +758,7 @@ const Earnings = () => {
                       <Col>
                         <Button
                           onClick={() => handleShowMoreSession()}
-                          disabled={!showMoreSession}
+                          disabled={!showMore['sessions']}
                           className={styles.ml20}
                         >
                           Show More
@@ -589,6 +768,65 @@ const Earnings = () => {
                   </Col>
                 </Row>
               </Panel>
+              {productEarningsItems?.map((productEarningsItem) => (
+                <Panel
+                  header={<Title level={5}> {productEarningsItem.name} Earnings </Title>}
+                  key={productEarningsItem.name}
+                >
+                  <Row className={styles.mt10}>
+                    <Col span={24}>
+                      {isMobileDevice ? (
+                        <Loader loading={isLoading} size="large" text={`Loading ${productEarningsItem?.name}`}>
+                          {earnings[productEarningsItem?.stateKey]?.length > 0 ? (
+                            earnings[productEarningsItem?.stateKey].map((productEarnings) =>
+                              renderMobileEarningsItem(productEarnings, productEarningsItem?.redirectMethod)
+                            )
+                          ) : (
+                            <div className={classNames(styles.textAlignCenter, 'text-empty')}>
+                              {productEarningsItem?.name} List
+                              <Empty />
+                            </div>
+                          )}
+                        </Loader>
+                      ) : (
+                        <Table
+                          columns={generateEarningsColumns(
+                            productEarningsItem?.name,
+                            productEarningsItem?.redirectMethod
+                          )}
+                          data={earnings[productEarningsItem?.stateKey]}
+                          loading={isLoading}
+                          rowKey={(record) => record[productEarningsItem?.key || 'id']}
+                        />
+                      )}
+                    </Col>
+                    <Col span={24}>
+                      <Row justify="center" className={styles.mt50}>
+                        <Col>
+                          <Button
+                            onClick={() => productEarningsItem?.showMoreMethod()}
+                            disabled={!showMore[productEarningsItem?.stateKey]}
+                            className={styles.ml20}
+                          >
+                            Show More
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Panel>
+              ))}
+            </Collapse>
+          </Col>
+        </Row>
+      </div>
+    </Loader>
+  );
+};
+
+export default Earnings;
+
+/*
               <Panel header={<Title level={5}> Pass </Title>} key="Pass">
                 <Row className={styles.mt10}>
                   <Col span={24}>
@@ -655,12 +893,4 @@ const Earnings = () => {
                   </Col>
                 </Row>
               </Panel>
-            </Collapse>
-          </Col>
-        </Row>
-      </div>
-    </Loader>
-  );
-};
-
-export default Earnings;
+*/

@@ -113,8 +113,9 @@ export default {
     publishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/publish`),
     unpublishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/unpublish`),
     getDetails: (courseId) => http.get(`/courses/${courseId}`),
-
-    //TODO: Adjust implementation of this API
     getAttendeeCourses: () => http.get('/secure/customer/courses/orders'),
+    getEarningsByCourseId: (courseId) => http.get(`/secure/creator/payments/earnings/courses/id/${courseId}`),
+    getCreatorCourseEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/courses?page_no=${pageNo}&per_page${perPage}`),
   },
 };
