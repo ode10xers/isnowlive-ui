@@ -571,7 +571,7 @@ const SessionDetails = ({ match, history }) => {
         </Col>
       </Row>
       {session?.is_course ? (
-        <ShowcaseCourseCard course={course} username={username} />
+        course && <ShowcaseCourseCard course={course} username={username} />
       ) : (
         <>
           <Row justify="space-between" className={styles.mt20} gutter={8}>
