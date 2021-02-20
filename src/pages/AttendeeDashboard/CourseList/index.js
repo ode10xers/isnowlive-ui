@@ -80,7 +80,7 @@ const CourseList = () => {
       title: 'Duration',
       key: 'start_date',
       dataIndex: 'start_date',
-      width: '170px',
+      width: '180px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {
@@ -166,7 +166,12 @@ const CourseList = () => {
                   </Loader>
                 </>
               ) : (
-                <Table columns={courseColumns} data={courseOrders.active} loading={isLoading} />
+                <Table
+                  columns={courseColumns}
+                  data={courseOrders.active}
+                  loading={isLoading}
+                  rowKey={(record) => record.course_order_id}
+                />
               )}
             </Panel>
             <Panel header={<Title level={5}> Expired Courses </Title>} key="Expired">
@@ -184,7 +189,12 @@ const CourseList = () => {
                   </Loader>
                 </>
               ) : (
-                <Table columns={courseColumns} data={courseOrders.expired} loading={isLoading} />
+                <Table
+                  columns={courseColumns}
+                  data={courseOrders.expired}
+                  loading={isLoading}
+                  rowKey={(record) => record.course_order_id}
+                />
               )}
             </Panel>
           </Collapse>

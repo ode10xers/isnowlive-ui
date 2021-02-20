@@ -313,6 +313,7 @@ const SessionsInventories = ({ match }) => {
 
     return (
       <Card
+        key={item.inventory_id}
         title={
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
@@ -397,7 +398,12 @@ const SessionsInventories = ({ match }) => {
               </Loader>
             </>
           ) : (
-            <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+            <Table
+              columns={sessionColumns}
+              data={sessions}
+              loading={isLoading}
+              rowKey={(record) => record.inventory_id}
+            />
           )}
         </>
       )}

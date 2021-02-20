@@ -23,7 +23,7 @@ const AttendeeDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.attendeeDashboard.videoDetails} component={VideoDetails} />
       <Route exact path={match.url + Routes.attendeeDashboard.videos} component={Videos} />
       <Route exact path={match.url + Routes.attendeeDashboard.courses} component={CourseList} />
-      <Route exact path={match.url + Routes.attendeeDashboard.courseDetials} component={CourseDetails} />
+      <Route exact path={match.url + Routes.attendeeDashboard.courseDetails} component={CourseDetails} />
       <Redirect to={match.url + Routes.attendeeDashboard.defaultPath} />
     </Switch>
   );

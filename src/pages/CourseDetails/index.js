@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { loadStripe } from '@stripe/stripe-js';
@@ -42,14 +43,16 @@ const {
 const { Text, Title } = Typography;
 
 const CourseDetails = ({ match, history }) => {
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [course, setCourse] = useState(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [courseSession, setCourseSession] = useState(null);
+  const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
 
-  const username = window.location.hostname.split('.')[0];
+  const username = location.state?.username || window.location.hostname.split('.')[0];
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -96,6 +99,10 @@ const CourseDetails = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
+    if (history.location.pathname.includes('dashboard')) {
+      setIsOnAttendeeDashboard(true);
+    }
+
     if (match.params.course_id) {
       if (username && !reservedDomainName.includes(username)) {
         getProfileDetails();
@@ -199,7 +206,7 @@ const CourseDetails = ({ match, history }) => {
     },
   ];
 
-  return (
+  const mainContent = (
     <Loader size="large" text="Loading course details" loading={isLoading}>
       <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
       <Row gutter={[8, 24]}>
@@ -309,23 +316,25 @@ const CourseDetails = ({ match, history }) => {
                         </Col>
                       </Row>
                     </Col>
-                    <Col xs={24} className={styles.buyButtonWrapper}>
-                      <Button
-                        block
-                        className={styles.buyButton}
-                        type="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openPurchaseModal();
-                        }}
-                      >
-                        Buy Course
-                      </Button>
-                    </Col>
+                    {!isOnAttendeeDashboard && (
+                      <Col xs={24} className={styles.buyButtonWrapper}>
+                        <Button
+                          block
+                          className={styles.buyButton}
+                          type="primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openPurchaseModal();
+                          }}
+                        >
+                          Buy Course
+                        </Button>
+                      </Col>
+                    )}
                   </Row>
                 ) : (
-                  <Row gutter={[16, 8]}>
-                    <Col xs={24} md={8} xl={10} className={styles.courseImageWrapper}>
+                  <Row gutter={[16, 8]} className={isOnAttendeeDashboard ? styles.dashboardPadding : undefined}>
+                    <Col xs={24} md={isOnAttendeeDashboard ? 12 : 10} xl={10} className={styles.courseImageWrapper}>
                       <Image
                         preview={false}
                         height={130}
@@ -333,7 +342,12 @@ const CourseDetails = ({ match, history }) => {
                         src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
                       />
                     </Col>
-                    <Col xs={24} md={10} xl={9} className={styles.courseInfoWrapper}>
+                    <Col
+                      xs={24}
+                      md={isOnAttendeeDashboard ? 12 : 8}
+                      xl={isOnAttendeeDashboard ? 14 : 10}
+                      className={styles.courseInfoWrapper}
+                    >
                       <Row gutter={[8, 4]}>
                         <Col xs={24} className={styles.courseNameWrapper}>
                           <Text strong> {course?.name} </Text>
@@ -353,19 +367,21 @@ const CourseDetails = ({ match, history }) => {
                         </Col>
                       </Row>
                     </Col>
-                    <Col xs={24} md={6} xl={5} className={styles.buyButtonWrapper}>
-                      <Button
-                        block
-                        className={styles.buyButton}
-                        type="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openPurchaseModal();
-                        }}
-                      >
-                        Buy Course
-                      </Button>
-                    </Col>
+                    {!isOnAttendeeDashboard && (
+                      <Col xs={24} md={6} xl={4} className={styles.buyButtonWrapper}>
+                        <Button
+                          block
+                          className={styles.buyButton}
+                          type="primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openPurchaseModal();
+                          }}
+                        >
+                          Buy Course
+                        </Button>
+                      </Col>
+                    )}
                   </Row>
                 )}
               </Col>
@@ -394,8 +410,7 @@ const CourseDetails = ({ match, history }) => {
                   <Row gutter={[8, 8]}>
                     <Col xs={24}>
                       <Title level={3} className={styles.ml20}>
-                        {' '}
-                        Videos included in this course{' '}
+                        Course Videos
                       </Title>
                     </Col>
                     <Col xs={24}>
@@ -421,6 +436,20 @@ const CourseDetails = ({ match, history }) => {
       </Row>
     </Loader>
   );
+
+  if (isOnAttendeeDashboard) {
+    return (
+      <Row>
+        <Col xs={2} md={isMobileDevice ? 4 : 1} lg={1}></Col>
+        <Col xs={20} md={isMobileDevice ? 16 : 22} lg={22}>
+          {mainContent}
+        </Col>
+        <Col xs={2} md={isMobileDevice ? 4 : 1} lg={1}></Col>
+      </Row>
+    );
+  } else {
+    return mainContent;
+  }
 };
 
 export default CourseDetails;
