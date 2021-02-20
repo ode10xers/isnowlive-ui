@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { loadStripe } from '@stripe/stripe-js';
+import moment from 'moment';
 
 import { Row, Col, Typography, message, Space, Image, Button } from 'antd';
 
@@ -16,8 +17,10 @@ import {
 import config from 'config';
 import apis from 'apis';
 
-import Loader from 'components/Loader';
+import Table from 'components/Table';
 import Share from 'components/Share';
+import Loader from 'components/Loader';
+import SessionCards from 'components/SessionCards';
 import PurchaseModal from 'components/PurchaseModal';
 import VideoCard from 'components/VideoCard';
 import { showErrorModal, showCourseBookingSuccessModal } from 'components/Modals/modals';
@@ -33,7 +36,7 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 
 const {
   timezoneUtils: { getTimezoneLocation },
-  formatDate: { toShortDateWithYear },
+  formatDate: { toShortDateWithYear, toLongDateWithLongDay, toLocaleTime },
 } = dateUtil;
 
 const { Text, Title } = Typography;
@@ -44,6 +47,7 @@ const CourseDetails = ({ match, history }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [course, setCourse] = useState(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [courseSession, setCourseSession] = useState(null);
 
   const username = window.location.hostname.split('.')[0];
 
@@ -74,7 +78,14 @@ const CourseDetails = ({ match, history }) => {
       const { status, data } = await apis.courses.getDetails(courseId);
 
       if (isAPISuccess(status) && data) {
-        //TODO: Adjust data format as needed
+        if (data.session?.session_id) {
+          const sessionData = await apis.session.getSessionDetails(data.session?.session_id);
+
+          if (isAPISuccess(sessionData.status) && sessionData.data) {
+            setCourseSession(sessionData.data);
+          }
+        }
+
         setCourse(data);
         setIsLoading(false);
       }
@@ -163,12 +174,30 @@ const CourseDetails = ({ match, history }) => {
     }
   };
 
-  const redirectToCourseSessionDetails = (courseSession) => {
-    if (courseSession?.session_id) {
-      const baseUrl = generateUrlFromUsername(username || courseSession?.username || 'app');
-      window.open(`${baseUrl}/cs/${courseSession?.session_id}`);
-    }
+  const filterInventoryByCourseDate = (inventories) => {
+    return inventories.filter(
+      (inventory) =>
+        moment(inventory.start_time).isSameOrAfter(moment(course.start_date).startOf('day')) &&
+        moment(inventory.end_time).isSameOrBefore(moment(course.end_date).endOf('day'))
+    );
   };
+
+  const sessionSchedulesColumns = [
+    {
+      title: 'Session Date',
+      key: 'start_time',
+      dataIndex: 'start_time',
+      width: '60%',
+      render: (text, record) => toLongDateWithLongDay(record.start_time),
+    },
+    {
+      title: 'Session Date',
+      key: 'end_time',
+      dataIndex: 'end_time',
+      width: '40%',
+      render: (text, record) => `${toLocaleTime(record.start_time)} - ${toLocaleTime(record.end_time)}`,
+    },
+  ];
 
   return (
     <Loader size="large" text="Loading course details" loading={isLoading}>
@@ -267,10 +296,7 @@ const CourseDetails = ({ match, history }) => {
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
                           <Text type="secondary">
-                            {' '}
-                            {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(
-                              course?.end_date
-                            )}`}{' '}
+                            {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
                           </Text>
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
@@ -314,10 +340,7 @@ const CourseDetails = ({ match, history }) => {
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
                           <Text type="secondary">
-                            {' '}
-                            {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(
-                              course?.end_date
-                            )}`}{' '}
+                            {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
                           </Text>
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
@@ -347,31 +370,47 @@ const CourseDetails = ({ match, history }) => {
                 )}
               </Col>
 
-              {course.session?.session_id && (
-                <Col xs={24}>
-                  <Button type="primary" onClick={() => redirectToCourseSessionDetails(course.session)}>
-                    Temporary Link to Course Session
-                  </Button>
-                </Col>
+              {courseSession && (
+                <>
+                  <Col xs={24}>
+                    <SessionCards sessions={[courseSession]} shouldFetchInventories={false} username={username} />
+                  </Col>
+                  <Col xs={24}>
+                    <Title level={3} className={styles.ml20}>
+                      {' '}
+                      Course Schedules{' '}
+                    </Title>
+                    <Table
+                      columns={sessionSchedulesColumns}
+                      data={filterInventoryByCourseDate(courseSession.inventory)}
+                      rowKey={(record) => record.inventory_id}
+                    />
+                  </Col>
+                </>
               )}
 
               {course.videos?.length > 0 && (
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
                     <Col xs={24}>
-                      <Text className={styles.ml20}> Videos included with this course </Text>
+                      <Title level={3} className={styles.ml20}>
+                        {' '}
+                        Videos included in this course{' '}
+                      </Title>
                     </Col>
                     <Col xs={24}>
-                      {course.videos?.map((video) => (
-                        <Col xs={24} md={12} key={video?.external_id}>
-                          <VideoCard
-                            video={video}
-                            buyable={false}
-                            onCardClick={() => redirectToVideoDetails(video)}
-                            showDetailsBtn={false}
-                          />
-                        </Col>
-                      ))}
+                      <Row gutter={[8, 8]}>
+                        {course.videos?.map((video) => (
+                          <Col xs={24} md={12} key={video?.external_id}>
+                            <VideoCard
+                              video={video}
+                              buyable={false}
+                              onCardClick={() => redirectToVideoDetails(video)}
+                              showDetailsBtn={false}
+                            />
+                          </Col>
+                        ))}
+                      </Row>
                     </Col>
                   </Row>
                 </Col>
