@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col, Image, Card, Typography, Button } from 'antd';
+import { Row, Col, Image, Card, Typography, Button, Divider } from 'antd';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -42,11 +42,12 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary"> {course?.videos?.length} Videos </Text>
+                <Divider type="vertical" />
+                <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>
-                  {' '}
-                  {course?.currency?.toUpperCase()} {course?.price}{' '}
+                  {course?.currency?.toUpperCase()} {course?.price}
                 </Text>
               </Col>
             </Row>
@@ -87,6 +88,8 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary"> {course?.videos?.length} Videos </Text>
+                <Divider type="vertical" />
+                <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>

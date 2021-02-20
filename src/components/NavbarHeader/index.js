@@ -421,6 +421,13 @@ const NavbarHeader = ({ removePadding = false }) => {
                           >
                             <span className={styles.menuLink}>My Videos</span>
                           </li>
+                          <li
+                            key="Attendee Courses"
+                            className={isActive('/attendee/dashboard/courses') ? styles.active : undefined}
+                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.courses)}
+                          >
+                            <span className={styles.menuLink}>My Courses</span>
+                          </li>
                         </>
                       )}
                     </ul>

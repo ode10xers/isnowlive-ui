@@ -5,7 +5,7 @@ import ReactHtmlParser from 'react-html-parser';
 import { loadStripe } from '@stripe/stripe-js';
 import moment from 'moment';
 
-import { Row, Col, Typography, message, Space, Image, Button } from 'antd';
+import { Row, Col, Typography, message, Space, Image, Button, Divider } from 'antd';
 
 import {
   GlobalOutlined,
@@ -13,10 +13,12 @@ import {
   InstagramOutlined,
   TwitterOutlined,
   LinkedinOutlined,
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 
 import config from 'config';
 import apis from 'apis';
+import Routes from 'routes';
 
 import Table from 'components/Table';
 import Share from 'components/Share';
@@ -36,7 +38,7 @@ import styles from './styles.module.scss';
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const {
-  timezoneUtils: { getTimezoneLocation },
+  timezoneUtils: { getTimezoneLocation, getCurrentLongTimezone },
   formatDate: { toShortDateWithYear, toLongDateWithLongDay, toLocaleTime },
 } = dateUtil;
 
@@ -198,11 +200,12 @@ const CourseDetails = ({ match, history }) => {
       render: (text, record) => toLongDateWithLongDay(record.start_time),
     },
     {
-      title: 'Session Date',
+      title: 'Session Time',
       key: 'end_time',
       dataIndex: 'end_time',
       width: '40%',
-      render: (text, record) => `${toLocaleTime(record.start_time)} - ${toLocaleTime(record.end_time)}`,
+      render: (text, record) =>
+        `${toLocaleTime(record.start_time)} - ${toLocaleTime(record.end_time)} (${getCurrentLongTimezone()})`,
     },
   ];
 
@@ -210,6 +213,17 @@ const CourseDetails = ({ match, history }) => {
     <Loader size="large" text="Loading course details" loading={isLoading}>
       <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
       <Row gutter={[8, 24]}>
+        {isOnAttendeeDashboard && (
+          <Col xs={24} className={styles.mb20}>
+            <Button
+              onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses)}
+              icon={<ArrowLeftOutlined />}
+            >
+              Back to Course List
+            </Button>
+          </Col>
+        )}
+
         <Col xs={24} className={styles.creatorProfileWrapper}>
           <Row className={styles.imageWrapper} gutter={[8, 8]}>
             <Col xs={24} className={styles.profileImageWrapper}>
@@ -308,6 +322,8 @@ const CourseDetails = ({ match, history }) => {
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
                           <Text type="secondary"> {course?.videos?.length} Videos </Text>
+                          <Divider type="vertical" />
+                          <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
                           <Text strong className={styles.blueText}>
@@ -359,6 +375,8 @@ const CourseDetails = ({ match, history }) => {
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
                           <Text type="secondary"> {course?.videos?.length} Videos </Text>
+                          <Divider type="vertical" />
+                          <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
                           <Text strong className={styles.blueText}>

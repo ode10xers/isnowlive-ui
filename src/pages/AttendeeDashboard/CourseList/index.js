@@ -53,7 +53,7 @@ const CourseList = () => {
       });
     }
   };
-  //TODO: Adjust with response object here
+
   const courseColumns = [
     {
       title: 'Course Name',
@@ -109,16 +109,19 @@ const CourseList = () => {
   const renderCourseItem = (item) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={10}>
+        <Col span={7}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={14}>: {value}</Col>
+        <Col span={17} className={styles.mobileDetailsText}>
+          : {value}
+        </Col>
       </Row>
     );
 
     return (
       <Card
         key={item.course_id}
+        bodyStyle={{ padding: '10px' }}
         title={
           <div onClick={() => redirectToCourseOrderDetails(item)}>
             <Text>{item?.course_name}</Text>
@@ -131,13 +134,17 @@ const CourseList = () => {
         ]}
       >
         <div onClick={() => redirectToCourseOrderDetails(item)}>
-          {layout('Course Name', <Text>{item?.course_name}</Text>)}
-          {layout('Course Session', <Text>{item?.session?.name}</Text>)}
+          {layout('Session', <Text>{item?.session?.name}</Text>)}
           {layout(
             'Duration',
             <Text>{`${toShortDateWithYear(item?.start_date)} - ${toShortDateWithYear(item?.end_date)}`}</Text>
           )}
-          {layout('Price', <Text>{item?.price}</Text>)}
+          {layout(
+            'Price',
+            <Text>
+              {item?.currency?.toUpperCase()} {item?.price}
+            </Text>
+          )}
         </div>
       </Card>
     );
@@ -158,8 +165,8 @@ const CourseList = () => {
                     Click on the card to show course details
                   </Text>
                   <Loader loading={isLoading} size="large" text="Loading courses">
-                    {courseOrders.active.length > 0 ? (
-                      courseOrders.active.map(renderCourseItem)
+                    {courseOrders?.active?.length > 0 ? (
+                      courseOrders?.active?.map(renderCourseItem)
                     ) : (
                       <div className="text-empty"> No course found </div>
                     )}
@@ -168,7 +175,7 @@ const CourseList = () => {
               ) : (
                 <Table
                   columns={courseColumns}
-                  data={courseOrders.active}
+                  data={courseOrders?.active}
                   loading={isLoading}
                   rowKey={(record) => record.course_order_id}
                 />
@@ -181,8 +188,8 @@ const CourseList = () => {
                     Click on the card to show course details
                   </Text>
                   <Loader loading={isLoading} size="large" text="Loading courses">
-                    {courseOrders.expired.length > 0 ? (
-                      courseOrders.expired.map(renderCourseItem)
+                    {courseOrders?.expired?.length > 0 ? (
+                      courseOrders?.expired?.map(renderCourseItem)
                     ) : (
                       <div className="text-empty"> No course found </div>
                     )}
@@ -191,7 +198,7 @@ const CourseList = () => {
               ) : (
                 <Table
                   columns={courseColumns}
-                  data={courseOrders.expired}
+                  data={courseOrders?.expired}
                   loading={isLoading}
                   rowKey={(record) => record.course_order_id}
                 />
