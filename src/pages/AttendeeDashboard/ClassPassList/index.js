@@ -318,7 +318,7 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
-      <Row gutter={8}>
+      <Row gutter={[8, 8]}>
         <Col xs={24}>
           <Title level={4}> Passes </Title>
         </Col>

@@ -102,7 +102,7 @@ export const creatorMenuItems = [
   {
     order: 9,
     key: 'account_settings',
-    title: 'Settings',
+    title: 'Account Settings',
     icon: <SettingOutlined />,
     mixPanelTag: creator.click.dashboard.settingsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
@@ -145,7 +145,15 @@ export const attendeeMenuItems = [
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
-    mixPanelTag: attendee.click.dashboard.videos,
+    mixPanelTag: attendee.click.dashboard.videosNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos,
+  },
+  {
+    order: 5,
+    key: 'courses',
+    title: 'Courses',
+    icon: <BookOutlined />,
+    mixPanelTag: attendee.click.dashboard.coursesNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses,
   },
 ];

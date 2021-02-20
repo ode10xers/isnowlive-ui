@@ -316,31 +316,32 @@ const SessionsInventories = ({ match }) => {
         title={
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
+            {'  '}
             {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
-        actions={[
-          <>
-            {!isPast && (
-              <Button
-                type="text"
-                disabled={!item.join_url}
-                onClick={() => trackAndJoinSession(item)}
-                className={styles.success}
-              >
-                Join
-              </Button>
-            )}
-          </>,
-          <>{!isPast && renderRefundPopup(item)}</>,
-          <>
-            {!isPast && (
-              <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
-                Reschedule
-              </Button>
-            )}
-          </>,
-        ]}
+        actions={
+          isPast
+            ? [
+                <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
+                  Details
+                </Button>,
+              ]
+            : [
+                <Button
+                  type="text"
+                  disabled={!item.join_url}
+                  onClick={() => trackAndJoinSession(item)}
+                  className={styles.success}
+                >
+                  Join
+                </Button>,
+                renderRefundPopup(item),
+                <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
+                  Reschedule
+                </Button>,
+              ]
+        }
       >
         <div onClick={() => openSessionInventoryDetails(item)}>
           {layout('Type', <Text>{item.type}</Text>)}
