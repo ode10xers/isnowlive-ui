@@ -55,7 +55,6 @@ const colorPickerChoices = [
 ];
 
 const formInitialValues = {
-  // courseType: courseTypes.LIVE.name,
   courseName: '',
   price: 10,
   videoList: [],
@@ -82,9 +81,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [colorCode, setColorCode] = useState(initialColor);
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
-  // const [courseType, setCourseType] = useState(courseTypes.LIVE.name);
   const [courseImageUrl, setCourseImageUrl] = useState(null);
-  const [maxParticipants, setMaxParticipants] = useState(null);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -121,8 +118,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
       if (editedCourse) {
         form.setFieldsValue({
           courseImageUrl: editedCourse.course_image_url || '',
-          // courseType:
-          //   editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name,
           courseName: editedCourse.name,
           courseStartDate: moment(editedCourse.start_date),
           courseEndDate: moment(editedCourse.end_date),
@@ -139,11 +134,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         setColorCode(editedCourse.color_code || initialColor || whiteColor);
         setCourseStartDate(moment(editedCourse.start_date));
         setCourseEndDate(moment(editedCourse.end_date));
-        // setCourseType(
-        //   editedCourse.type?.toUpperCase() === courseTypes.LIVE.name ? courseTypes.LIVE.name : courseTypes.VIDEO.name
-        // );
         setCourseImageUrl(editedCourse.course_image_url);
-        setMaxParticipants(editedCourse.session?.max_participants);
       } else {
         form.resetFields();
         setSelectedCourseClass(null);
@@ -153,8 +144,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         setCourseStartDate(null);
         setCourseEndDate(null);
         setCourseImageUrl(null);
-        // setCourseType(courseTypes.LIVE.name);
-        setMaxParticipants(null);
       }
     }
 
@@ -211,13 +200,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
 
     const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === val);
 
-    setMaxParticipants(targetCourseClass?.max_participants || null);
     form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: targetCourseClass?.max_participants || null });
   };
-
-  // const handleChangeCourseType = (value) => {
-  //   setCourseType(value);
-  // };
 
   const handleCourseImageUpload = (imageUrl) => {
     setCourseImageUrl(imageUrl);
@@ -252,7 +236,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
       let data = {
         name: values.courseName,
         session_id: selectedCourseClass,
-        max_participants: maxParticipants || targetCourseClass?.max_participants,
+        max_participants: values.maxParticipants || targetCourseClass?.max_participants,
         price: values.price || 1,
         currency: currency.toLowerCase(),
         color_code: colorCode || values.colorCode || whiteColor,
@@ -260,7 +244,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         video_ids: selectedVideos || values.videoList || [],
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).endOf('day').utc().format(),
-        type: courseTypes.LIVE.name.toLowerCase(), //Currently hardcoding this
+        type: courseTypes.LIVE.name.toLowerCase(),
         inventory_ids: courseClassInventoriesInDateRange.map((inventory) => inventory.inventory_id) || [],
       };
 
@@ -357,19 +341,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                 </div>
               </Form.Item>
             </Col>
-            {/* <Col xs={24}>
-              <Form.Item {...courseModalFormLayout} id="courseType" name="courseType" label="Course Type">
-                <Radio.Group
-                  disabled
-                  onChange={(e) => handleChangeCourseType(e.target.value)}
-                  value={courseType}
-                  options={Object.values(courseTypes).map((cType) => ({
-                    label: cType.label,
-                    value: cType.name,
-                  }))}
-                />
-              </Form.Item>
-            </Col> */}
             <Col xs={24}>
               <Form.Item
                 {...courseModalFormLayout}
@@ -444,11 +415,15 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                 name="maxParticipants"
                 label="Max Participants"
                 extra={
-                  <Text className={styles.helpText}> This is the max participant value in your selected session. </Text>
+                  <Text className={styles.helpText}>
+                    {' '}
+                    This is the max attendee count of the session you selected. You can update the max count here and
+                    we'll update it in the session too.
+                  </Text>
                 }
                 rules={validationRules.requiredValidation}
               >
-                <InputNumber disabled min={1} placeholder="Max Participants" className={styles.numericInput} />
+                <InputNumber min={1} placeholder="Max Participants" className={styles.numericInput} />
               </Form.Item>
             </Col>
             <Col xs={24}>

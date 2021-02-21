@@ -255,6 +255,12 @@ const Session = ({ match, history }) => {
 
   const handleSessionCourseType = (e) => {
     setIsCourseSession(e.target.value === 'course');
+
+    if (e.target.value === 'course') {
+      form.setFieldsValue({ ...form.getFieldsValue(), type: 'Group', max_participants: 2 });
+      setSession({ ...session, max_participants: 2 });
+      setIsSessionTypeGroup(true);
+    }
   };
 
   const handleSessionType = (e) => {
@@ -790,7 +796,9 @@ const Session = ({ match, history }) => {
             >
               <Radio.Group>
                 <Radio value="Group">Group</Radio>
-                <Radio value="1-on-1">Individual (1-on-1)</Radio>
+                <Radio disabled={isCourseSession} value="1-on-1">
+                  Individual (1-on-1)
+                </Radio>
               </Radio.Group>
             </Form.Item>
 
