@@ -228,6 +228,13 @@ export const orderType = {
   COURSE: 'COURSE_ORDER',
 };
 
+//TODO: Confirm with BE what will be the types
+export const courseType = {
+  LIVE: 'live',
+  VIDEO_SEQ: 'video_sequential',
+  VIDEO_NON_SEQ: 'video_non_sequential',
+};
+
 export const productType = {
   CLASS: 'Session',
   PASS: 'Pass',
