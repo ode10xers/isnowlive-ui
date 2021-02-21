@@ -1,11 +1,16 @@
 @import '../../styles/variables.scss';
 
 .showcaseCourseCardWrapper {
-  .dashboardPadding {
+  &.dashboardPadding {
     padding: 10px 30px;
   }
 
+  .showcaseCourseCard {
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.15);
+  }
+
   .courseImageWrapper {
+    height: fit-content;
     .courseImage {
       border-radius: 5px;
       object-fit: fill;

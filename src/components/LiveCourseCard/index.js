@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col, Image, Card, Typography, Button, Divider } from 'antd';
+import { Row, Col, Image, Card, Typography, Button, Tag } from 'antd';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -18,7 +18,7 @@ const noop = () => {};
 
 const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurchaseModal = noop }) => {
   return (
-    <Card className={styles.liveCourseCard} bodyStyle={{ padding: '8px' }} onClick={() => onCardClick(course)}>
+    <Card className={styles.liveCourseCard} bodyStyle={{ padding: '8px 8px 0px' }} onClick={() => onCardClick(course)}>
       {isMobileDevice ? (
         <Row gutter={[8, 4]}>
           <Col xs={24} className={styles.courseImageWrapper}>
@@ -41,9 +41,8 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
                 </Text>
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
-                <Text type="secondary"> {course?.videos?.length} Videos </Text>
-                <Divider type="vertical" />
-                <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
+                {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
+                <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>
@@ -87,9 +86,8 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
                 </Text>
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
-                <Text type="secondary"> {course?.videos?.length} Videos </Text>
-                <Divider type="vertical" />
-                <Text type="secondary"> {course?.inventory_ids?.length} Sessions </Text>
+                {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
+                <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>

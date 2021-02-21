@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Row, Col, Button, Typography, Card, Collapse } from 'antd';
+import { Row, Col, Button, Typography, Card, Collapse, Tag } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -71,10 +71,15 @@ const CourseList = () => {
       },
     },
     {
-      title: 'Course Session',
-      key: 'session',
-      dataIndex: 'session',
-      render: (text, record) => record.session?.name,
+      title: 'Course Details',
+      key: 'inventory_ids',
+      dataIndex: 'inventory_ids',
+      render: (text, record) => (
+        <>
+          {record?.videos?.length > 0 && <Tag color="blue"> {record?.videos?.length} Videos </Tag>}
+          <Tag color="volcano"> {record?.inventory_ids?.length} Sessions </Tag>
+        </>
+      ),
     },
     {
       title: 'Duration',
@@ -134,7 +139,13 @@ const CourseList = () => {
         ]}
       >
         <div onClick={() => redirectToCourseOrderDetails(item)}>
-          {layout('Session', <Text>{item?.session?.name}</Text>)}
+          {layout(
+            'Details',
+            <>
+              {item?.videos?.length > 0 && <Tag color="blue"> {item?.videos?.length} Videos </Tag>}
+              <Tag color="volcano"> {item?.inventory_ids?.length} Sessions </Tag>
+            </>
+          )}
           {layout(
             'Duration',
             <Text>{`${toShortDateWithYear(item?.start_date)} - ${toShortDateWithYear(item?.end_date)}`}</Text>

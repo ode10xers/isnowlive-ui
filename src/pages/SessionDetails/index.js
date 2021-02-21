@@ -488,8 +488,13 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const redirectToVideoPreview = (video) => {
-    const baseUrl = generateUrlFromUsername(username || video.username || 'app');
-    window.open(`${baseUrl}/v/${video.external_id}`);
+    const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+    window.open(`${baseUrl}/v/${video?.external_id}`);
+  };
+
+  const redirectToCourseDetails = (course) => {
+    const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
+    window.open(`${baseUrl}/c/${course?.id}`);
   };
 
   const openPurchaseModal = (video) => {
@@ -575,10 +580,14 @@ const SessionDetails = ({ match, history }) => {
           <div className={classNames(styles.mb50, styles.mt20)}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={5}> Course related to this session </Title>
+                <Title level={5}> This session can only be attended by doing this course </Title>
               </Col>
               <Col xs={24}>
-                <ShowcaseCourseCard course={course} username={username} />
+                <ShowcaseCourseCard
+                  course={course}
+                  onCardClick={() => redirectToCourseDetails(course)}
+                  username={username}
+                />
               </Col>
             </Row>
           </div>
