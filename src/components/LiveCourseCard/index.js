@@ -18,7 +18,12 @@ const noop = () => {};
 
 const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurchaseModal = noop }) => {
   return (
-    <Card className={styles.liveCourseCard} bodyStyle={{ padding: '8px 8px 0px' }} onClick={() => onCardClick(course)}>
+    <Card
+      hoverable={true}
+      className={styles.liveCourseCard}
+      bodyStyle={{ padding: '8px 8px 0px' }}
+      onClick={() => onCardClick(course)}
+    >
       {isMobileDevice ? (
         <Row gutter={[8, 4]}>
           <Col xs={24} className={styles.courseImageWrapper}>

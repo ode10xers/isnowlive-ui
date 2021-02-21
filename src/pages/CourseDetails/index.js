@@ -233,12 +233,16 @@ const CourseDetails = ({ match, history }) => {
               {courseSession && (
                 <>
                   <Col xs={24}>
+                    <Title level={3} className={styles.ml20}>
+                      Course Session
+                    </Title>
+                  </Col>
+                  <Col xs={24}>
                     <SessionCards sessions={[courseSession]} shouldFetchInventories={false} username={username} />
                   </Col>
                   <Col xs={24}>
                     <Title level={3} className={styles.ml20}>
-                      {' '}
-                      Course Schedules{' '}
+                      Course Schedules
                     </Title>
                     <Table
                       columns={sessionSchedulesColumns}

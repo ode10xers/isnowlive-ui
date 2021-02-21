@@ -553,7 +553,7 @@ const ProfilePreview = ({ username = null }) => {
                 }
               >
                 <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                  <Tabs.TabPane tab={<Text> Live Courses </Text>} key="liveCourses">
+                  <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                     <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
                       <PublicLiveCourseList username={username} liveCourses={liveCourses} />
                     </Loader>
