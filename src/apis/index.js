@@ -104,4 +104,19 @@ export default {
     publishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/publish`),
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
   },
+  courses: {
+    getCreatorCourses: () => http.get('/secure/creator/courses'),
+    createCourse: (payload) => http.post('/secure/creator/courses', payload),
+    updateCourse: (courseId, payload) => http.put(`/secure/creator/courses/${courseId}`, payload),
+    getCoursesByUsername: (creatorUsername) => http.get(`/courses?creator_username=${creatorUsername}`),
+    getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
+    createOrderForUser: (payload) => http.post('/secure/customer/courses/orders', payload),
+    publishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/publish`),
+    unpublishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/unpublish`),
+    getDetails: (courseId) => http.get(`/courses/${courseId}`),
+    getAttendeeCourses: () => http.get('/secure/customer/courses/orders'),
+    getEarningsByCourseId: (courseId) => http.get(`/secure/creator/payments/earnings/courses/id/${courseId}`),
+    getCreatorCourseEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/courses?page_no=${pageNo}&per_page${perPage}`),
+  },
 };

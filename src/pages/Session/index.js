@@ -96,6 +96,7 @@ const initialSession = {
   refund_before_hours: 0,
   prerequisites: '',
   color_code: initialColor,
+  is_course: false,
 };
 
 const Session = ({ match, history }) => {
@@ -116,6 +117,7 @@ const Session = ({ match, history }) => {
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [stripeCurrency, setStripeCurrency] = useState(null);
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
+  const [isCourseSession, setIsCourseSession] = useState(false);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -175,6 +177,7 @@ const Session = ({ match, history }) => {
             refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
+            session_course_type: data?.is_course ? 'course' : 'normal',
           });
           setSessionImageUrl(data.session_image_url);
           setSessionDocumentUrl(data.document_url);
@@ -185,6 +188,7 @@ const Session = ({ match, history }) => {
           setRefundBeforeHours(data?.refund_before_hours || 0);
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setColorCode(data?.color_code || whiteColor);
+          setIsCourseSession(data?.is_course || false);
           setIsLoading(false);
           await getCreatorStripeDetails(data);
         }
@@ -223,6 +227,7 @@ const Session = ({ match, history }) => {
         is_refundable: 'Yes',
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
+        session_course_type: 'normal',
       });
       setIsLoading(false);
     }
@@ -246,6 +251,16 @@ const Session = ({ match, history }) => {
       return e;
     }
     return e && e.fileList;
+  };
+
+  const handleSessionCourseType = (e) => {
+    setIsCourseSession(e.target.value === 'course');
+
+    if (e.target.value === 'course') {
+      form.setFieldsValue({ ...form.getFieldsValue(), type: 'Group', max_participants: 2 });
+      setSession({ ...session, max_participants: 2 });
+      setIsSessionTypeGroup(true);
+    }
   };
 
   const handleSessionType = (e) => {
@@ -520,6 +535,7 @@ const Session = ({ match, history }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
+        is_course: isCourseSession,
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
@@ -753,18 +769,36 @@ const Session = ({ match, history }) => {
             <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
           </Form.Item>
 
+          {/* ---- Session Course Type ---- */}
+          <>
+            <Form.Item
+              name="session_course_type"
+              id="session_course_type"
+              label="Session Type"
+              rules={validationRules.requiredValidation}
+              onChange={handleSessionCourseType}
+            >
+              <Radio.Group>
+                <Radio value="normal">Normal Session</Radio>
+                <Radio value="course">Course Session</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </>
+
           {/* ---- Session Type ---- */}
           <>
             <Form.Item
               name="type"
               id="type"
-              label="Session Type"
+              label="Attendee Type"
               rules={validationRules.requiredValidation}
               onChange={handleSessionType}
             >
               <Radio.Group>
-                <Radio value="Group">Group Session</Radio>
-                <Radio value="1-on-1">1-on-1 Session</Radio>
+                <Radio value="Group">Group</Radio>
+                <Radio disabled={isCourseSession} value="1-on-1">
+                  Individual (1-on-1)
+                </Radio>
               </Radio.Group>
             </Form.Item>
 

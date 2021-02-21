@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty, Tooltip } from 'antd';
+import { Row, Col, Typography, Popconfirm, Button, Card, Radio, Empty, Tooltip } from 'antd';
 import {
   DeleteOutlined,
   DownCircleOutlined,
@@ -24,7 +24,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -161,47 +161,11 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
-  const copyPageLinkToClipboard = (inventoryId) => {
+  const copyInventoryLink = (inventoryId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/e/${inventoryId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   const emptyTableCell = {
@@ -330,11 +294,7 @@ const SessionsInventories = ({ match }) => {
             </Col>
             <Col md={24} lg={24} xl={4}>
               <Tooltip title="Copy Event Page Link">
-                <Button
-                  type="text"
-                  onClick={() => copyPageLinkToClipboard(record.inventory_id)}
-                  icon={<CopyOutlined />}
-                />
+                <Button type="text" onClick={() => copyInventoryLink(record.inventory_id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
@@ -448,7 +408,7 @@ const SessionsInventories = ({ match }) => {
         <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
       </Tooltip>,
       <Tooltip title="Copy Event Page Link">
-        <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />
+        <Button type="text" onClick={() => copyInventoryLink(item.inventory_id)} icon={<CopyOutlined />} />
       </Tooltip>,
       isCancelDisabled ? (
         <Tooltip title="Event cannot be cancelled">

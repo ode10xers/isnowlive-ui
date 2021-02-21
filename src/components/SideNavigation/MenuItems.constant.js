@@ -6,6 +6,7 @@ import {
   DollarOutlined,
   GlobalOutlined,
   PlayCircleOutlined,
+  BookOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
@@ -53,8 +54,8 @@ export const creatorMenuItems = [
   {
     order: 3,
     key: 'passes',
-    title: 'Class Pass',
-    mixPanelTag: creator.click.dashboard.packagesNav,
+    title: 'Pass',
+    mixPanelTag: creator.click.dashboard.passesNav,
     icon: <TagsOutlined />,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes,
   },
@@ -63,11 +64,19 @@ export const creatorMenuItems = [
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
-    mixPanelTag: creator.click.dashboard.videos,
+    mixPanelTag: creator.click.dashboard.videosNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
   },
   {
     order: 5,
+    key: 'courses',
+    title: 'Courses',
+    icon: <BookOutlined />,
+    mixPanelTag: creator.click.dashboard.coursesNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses,
+  },
+  {
+    order: 6,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -75,7 +84,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 6,
+    order: 7,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -83,7 +92,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 7,
+    order: 8,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -91,9 +100,9 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 8,
+    order: 9,
     key: 'account_settings',
-    title: 'Settings',
+    title: 'Account Settings',
     icon: <SettingOutlined />,
     mixPanelTag: creator.click.dashboard.settingsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
@@ -136,7 +145,15 @@ export const attendeeMenuItems = [
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
-    mixPanelTag: attendee.click.dashboard.videos,
+    mixPanelTag: attendee.click.dashboard.videosNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos,
+  },
+  {
+    order: 5,
+    key: 'courses',
+    title: 'Courses',
+    icon: <BookOutlined />,
+    mixPanelTag: attendee.click.dashboard.coursesNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses,
   },
 ];

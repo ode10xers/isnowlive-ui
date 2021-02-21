@@ -1,0 +1,55 @@
+@import '../../styles/variables.scss';
+
+.liveCourseCard {
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.15);
+
+  .courseImageWrapper {
+    .courseImage {
+      border-radius: 5px;
+      object-fit: fill;
+    }
+  }
+
+  .courseInfoWrapper {
+    .courseNameWrapper {
+      height: 44px;
+      font-size: 13px;
+      overflow: hidden;
+    }
+
+    .courseDetailsWrapper {
+      font-size: 13px;
+    }
+
+    .coursePriceWrapper {
+      font-size: 13px;
+    }
+  }
+
+  .buyButtonWrapper {
+    align-items: center;
+
+    .buyButton {
+      margin-top: auto;
+    }
+  }
+}
+
+@media screen and (max-width: 992px){
+  .liveCourseCard {
+    .courseInfoWrapper {
+      .courseNameWrapper {
+        font-size: 14px;
+      }
+      .courseDetailsWrapper {
+        font-size: 13px;
+      }
+    }
+
+    .buyButtonWrapper {
+      .buyButton {
+        margin-top: auto;
+      }
+    }
+  }
+}

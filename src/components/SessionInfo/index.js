@@ -18,14 +18,16 @@ const SessionInfo = ({ session }) => {
         </Text>
         <Text className={styles.subText}>{session?.group ? 'Group' : '1-on-1'}</Text>
       </Col>
-      <Col xs={8} md={8}>
-        <Text className={styles.text} type="secondary">
-          Price
-        </Text>
-        <Text className={styles.subText}>
-          {session?.price || 0} {session?.currency.toUpperCase()}
-        </Text>
-      </Col>
+      {!session?.is_course && (
+        <Col xs={8} md={8}>
+          <Text className={styles.text} type="secondary">
+            Price
+          </Text>
+          <Text className={styles.subText}>
+            {session?.price || 0} {session?.currency.toUpperCase()}
+          </Text>
+        </Col>
+      )}
       {session?.document_url && isValidFile(session?.document_url) && (
         <Col xs={8} md={8}>
           <Text className={styles.text} type="secondary">
