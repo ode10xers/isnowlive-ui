@@ -4,7 +4,7 @@ import { Row, Col, Image, Card, Typography, Button, Tag } from 'antd';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isValidFile } from 'utils/helper';
+import { isValidFile, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -16,6 +16,7 @@ const {
 
 const noop = () => {};
 
+//TODO: Since mobile and desktop very similar designs, refactor to be responsive
 const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurchaseModal = noop }) => {
   return (
     <Card
@@ -41,13 +42,16 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary">
-                  {' '}
-                  {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}{' '}
+                  {course?.type === courseType.LIVE
+                    ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
+                    : `Validity: ${course?.validity} days`}
                 </Text>
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
-                <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                {course?.inventory_ids?.length > 0 && (
+                  <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                )}
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>
@@ -87,12 +91,16 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary">
-                  {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
+                  {course?.type === courseType.LIVE
+                    ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
+                    : `Validity: ${course?.validity} days`}
                 </Text>
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
-                <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                {course?.inventory_ids?.length > 0 && (
+                  <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                )}
               </Col>
               <Col xs={24} className={styles.coursePriceWrapper}>
                 <Text strong className={styles.blueText}>

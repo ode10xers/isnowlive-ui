@@ -23,7 +23,7 @@ import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
-import PublicLiveCourseList from 'components/PublicLiveCourseList';
+import PublicCourseList from 'components/PublicCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
@@ -48,7 +48,8 @@ const productKeys = {
   SESSION: 'session',
   PASS: 'pass',
   VIDEO: 'video',
-  COURSE: 'course',
+  LIVE_COURSE: 'live_course',
+  VIDEO_COURSE: 'video_course',
 };
 
 const ProfilePreview = ({ username = null }) => {
@@ -78,6 +79,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isVideosLoading, setIsVideosLoading] = useState(true);
 
   const [liveCourses, setLiveCourses] = useState([]);
+  const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
@@ -181,6 +183,7 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  //TODO: Confirm whether it will be a separate API or not
   const getLiveCourseDetails = useCallback(async () => {
     setIsCoursesLoading(true);
     try {
@@ -248,10 +251,10 @@ const ProfilePreview = ({ username = null }) => {
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
         setSelectedListTab(productKeys.SESSION);
-      } else if (sectionToShow === productKeys.COURSE) {
+      } else if (sectionToShow === 'course') {
         if (liveCourses.length) {
           setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById(productKeys.COURSE);
+          targetElement = document.getElementById('course');
         } else {
           // Fallback to show sessions
           setSelectedListTab(productKeys.SESSION);
@@ -295,6 +298,7 @@ const ProfilePreview = ({ username = null }) => {
   const handleChangeCourseTab = (key) => {
     setSelectedCourseTab(key);
 
+    //TODO: Check if it's a separate API or not
     if (key === 'liveCourses') {
       getLiveCourseDetails();
     }
@@ -542,9 +546,9 @@ const ProfilePreview = ({ username = null }) => {
                 </Row>
               </Tabs.TabPane>
             )}
-            {liveCourses.length > 0 && (
+            {(liveCourses.length > 0 || videoCourses.length > 0) && (
               <Tabs.TabPane
-                key={productKeys.COURSE}
+                key="course"
                 tab={
                   <div className={styles.largeTabHeader} id="course">
                     <BookOutlined />
@@ -553,11 +557,20 @@ const ProfilePreview = ({ username = null }) => {
                 }
               >
                 <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                  <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
-                    <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
-                      <PublicLiveCourseList username={username} liveCourses={liveCourses} />
-                    </Loader>
-                  </Tabs.TabPane>
+                  {liveCourses.length > 0 && (
+                    <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
+                      <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
+                        <PublicCourseList username={username} courses={liveCourses} />
+                      </Loader>
+                    </Tabs.TabPane>
+                  )}
+                  {videoCourses.length > 0 && (
+                    <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
+                      <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
+                        <PublicCourseList username={username} courses={liveCourses} />
+                      </Loader>
+                    </Tabs.TabPane>
+                  )}
                 </Tabs>
               </Tabs.TabPane>
             )}
