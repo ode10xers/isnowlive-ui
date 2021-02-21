@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { message } from 'antd';
 import dateUtil from 'utils/date';
 
 const {
@@ -163,6 +164,46 @@ export const getPaymentStatus = (status) => {
   }
 };
 
+export const copyPageLinkToClipboard = (pageLink) => {
+  // Fallback method if navigator.clipboard is not supported
+  if (!navigator.clipboard) {
+    var textArea = document.createElement('textarea');
+    textArea.value = pageLink;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+
+      if (successful) {
+        message.success('Page link copied to clipboard!');
+      } else {
+        message.error('Failed to copy link to clipboard');
+      }
+    } catch (err) {
+      message.error('Failed to copy link to clipboard');
+    }
+
+    document.body.removeChild(textArea);
+  } else {
+    navigator.clipboard.writeText(pageLink).then(
+      function () {
+        message.success('Page link copied to clipboard!');
+      },
+      function (err) {
+        message.error('Failed to copy link to clipboard');
+      }
+    );
+  }
+};
+
 export const ZoomAuthType = {
   OAUTH: 'OAUTH',
   JWT: 'JWT',
@@ -184,15 +225,17 @@ export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',
   VIDEO: 'VIDEO_ORDER',
+  COURSE: 'COURSE_ORDER',
 };
 
 export const productType = {
   CLASS: 'Session',
   PASS: 'Pass',
   VIDEO: 'Video',
+  COURSE: 'Course',
   PRODUCT: 'Product', //As a default
 };
 
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
+export const reservedDomainName = ['app', ...(process.env.NODE_ENV === 'development' ? ['localhost'] : [])];

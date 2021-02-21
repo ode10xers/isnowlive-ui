@@ -2,7 +2,7 @@
 
 .imageWrapper {
   position: relative;
-  margin-top: 128px !important;
+  margin-top: 96px !important;
   background-color: map-get($map: $colors, $key: 'White1');
 }
 .coverImageWrapper {
@@ -40,14 +40,6 @@
   bottom: 0px;
   right: 100px;
 }
-.passCard {
-  margin: 10px 32px !important;
-  border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
-
-  .blueText {
-    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
-  }
-}
 
 .bio {
   p,
@@ -58,6 +50,16 @@
   }
 }
 
+.passCard {
+  margin: 10px 32px !important;
+  border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
+
+  .blueText {
+    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  }
+}
+
+
 @media (max-width: 768px) {
   .profilePreviewContainer {
     margin: 5px;
@@ -67,9 +69,8 @@
   }
   .imageWrapper {
     position: relative;
-    max-height: 300px;
     margin-bottom: 20px;
-    margin-top: 50px;
+    margin-top: 16px !important;
   }
   .profileImage {
     border-radius: 4px;

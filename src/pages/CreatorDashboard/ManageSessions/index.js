@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, message } from 'antd';
+import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, message, Collapse } from 'antd';
 import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -17,7 +17,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -25,6 +25,7 @@ const {
   formatDate: { toLongDateWithDay },
 } = dateUtil;
 const { Text, Title } = Typography;
+const { Panel } = Collapse;
 const { creator } = mixPanelEventTags;
 
 const ManageSessions = () => {
@@ -111,54 +112,17 @@ const ManageSessions = () => {
     getSessionsList();
   }, [getSessionsList]);
 
-  const copyPageLinkToClipboard = (sessionId) => {
+  const copySessionLink = (sessionId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/s/${sessionId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   let sessionColumns = [
     {
       title: 'Session Name',
       key: 'name',
-      width: '25%',
       render: (text, record) => {
         return {
           props: {
@@ -180,26 +144,20 @@ const ManageSessions = () => {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '10%',
-      render: (text, record) => (
-        <Text>
-          {' '}
-          {record.price} {record.currency.toUpperCase()}{' '}
-        </Text>
-      ),
+      width: '85px',
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '10%',
+      width: '80px',
       render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
     },
     {
       title: 'Session Date',
       dataIndex: 'session_date',
       key: 'session_date',
-      width: '25%',
       render: (text, record) => (
         <>
           {record.recurring ? (
@@ -216,10 +174,12 @@ const ManageSessions = () => {
     },
     {
       title: 'Actions',
+      align: 'right',
+      width: '200px',
       render: (text, record) => {
         return (
-          <Row justify="start" gutter={8}>
-            <Col xs={24} md={4}>
+          <Row justify="end" gutter={8}>
+            <Col xs={24} md={5}>
               <Tooltip title="Edit">
                 <Button
                   className={styles.detailsButton}
@@ -234,17 +194,17 @@ const ManageSessions = () => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={24} md={5}>
               <Tooltip title="Copy Session Link">
                 <Button
                   type="text"
                   className={styles.detailsButton}
-                  onClick={() => copyPageLinkToClipboard(record.session_id)}
+                  onClick={() => copySessionLink(record.session_id)}
                   icon={<CopyOutlined />}
                 />
               </Tooltip>
             </Col>
-            <Col xs={24} md={6}>
+            <Col xs={24} md={8}>
               <Tooltip title={`${record.is_active ? 'Hide' : 'Unhide'} Session`}>
                 {!record.is_active ? (
                   <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
@@ -257,7 +217,7 @@ const ManageSessions = () => {
                 )}
               </Tooltip>
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={24} md={5}>
               <Tooltip title="Delete Session">
                 <Popconfirm
                   title="Do you want to delete session?"
@@ -288,6 +248,7 @@ const ManageSessions = () => {
 
     return (
       <Card
+        key={item.session_id}
         className={styles.card}
         title={
           <div
@@ -317,7 +278,7 @@ const ManageSessions = () => {
           <Button
             type="text"
             className={styles.detailsButton}
-            onClick={() => copyPageLinkToClipboard(item.session_id)}
+            onClick={() => copySessionLink(item.session_id)}
             icon={<CopyOutlined />}
           />,
           <>
@@ -369,13 +330,42 @@ const ManageSessions = () => {
   return (
     <div className={styles.box}>
       <Title level={4}>Manage Sessions</Title>
-      {isMobileDevice ? (
-        <Loader loading={isLoading} size="large" text="Loading sessions">
-          {sessions.length > 0 ? sessions.map(renderSessionItem) : <div className="text-empty">No Sessions </div>}
-        </Loader>
-      ) : (
-        <Table columns={sessionColumns} data={sessions} loading={isLoading} />
-      )}
+      <Collapse>
+        <Panel header={<Title level={5}> Normal Sessions </Title>} key="Normal">
+          {isMobileDevice ? (
+            <Loader loading={isLoading} size="large" text="Loading sessions">
+              {sessions?.filter((session) => !session.is_course).length > 0 ? (
+                sessions?.filter((session) => !session.is_course).map(renderSessionItem)
+              ) : (
+                <div className="text-empty"> No Normal Sessions Found </div>
+              )}
+            </Loader>
+          ) : (
+            <Table
+              columns={sessionColumns}
+              data={sessions?.filter((session) => !session.is_course)}
+              loading={isLoading}
+            />
+          )}
+        </Panel>
+        <Panel header={<Title level={5}> Course Sessions </Title>} key="Course">
+          {isMobileDevice ? (
+            <Loader loading={isLoading} size="large" text="Loading sessions">
+              {sessions?.filter((session) => session.is_course).length > 0 ? (
+                sessions?.filter((session) => session.is_course).map(renderSessionItem)
+              ) : (
+                <div className="text-empty"> No Course Sessions Found </div>
+              )}
+            </Loader>
+          ) : (
+            <Table
+              columns={sessionColumns}
+              data={sessions?.filter((session) => session.is_course)}
+              loading={isLoading}
+            />
+          )}
+        </Panel>
+      </Collapse>
     </div>
   );
 };

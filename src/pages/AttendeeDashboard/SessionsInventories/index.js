@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover, Radio, Empty } from 'antd';
+import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
@@ -41,27 +42,28 @@ const SessionsInventories = ({ match }) => {
         setSessions(
           data.map((i, index) => ({
             index,
-            key: i.session_id,
-            name: i.name,
-            type: i.max_participants > 1 ? 'Group' : '1-on-1',
-            duration: getDuration(i.start_time, i.end_time),
-            days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
+            key: i?.session_id,
+            name: i?.name,
+            type: i?.max_participants > 1 ? 'Group' : '1-on-1',
+            duration: getDuration(i?.start_time, i?.end_time),
+            days: i?.start_time ? toLongDateWithDay(i?.start_time) : null,
             session_date: i?.session_date,
-            time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
+            time: i?.start_time && i?.end_time ? `${toLocaleTime(i?.start_time)} - ${toLocaleTime(i?.end_time)}` : null,
             start_time: i?.start_time,
             end_time: i?.end_time,
-            participants: i.num_participants,
-            join_url: i.join_url,
+            participants: i?.num_participants,
+            join_url: i?.join_url,
             inventory_id: i?.inventory_id,
-            session_id: i.session_id,
-            order_id: i.order_id,
-            max_participants: i.max_participants,
-            username: i.creator_username,
-            price: i.price,
-            currency: i.currency.toUpperCase() || 'SGD',
-            refund_amount: i.refund_amount || 0,
-            is_refundable: i.is_refundable || false,
-            refund_before_hours: i.refund_before_hours || 24,
+            session_id: i?.session_id,
+            order_id: i?.order_id,
+            max_participants: i?.max_participants,
+            username: i?.creator_username,
+            price: i?.price,
+            currency: i?.currency.toUpperCase() || 'SGD',
+            refund_amount: i?.refund_amount || 0,
+            is_refundable: i?.is_refundable || false,
+            refund_before_hours: i?.refund_before_hours || 24,
+            is_course: i?.is_course,
           }))
         );
       }
@@ -217,7 +219,13 @@ const SessionsInventories = ({ match }) => {
       title: 'Session Name',
       key: 'name',
       width: '12%',
-      render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
+      render: (record) => (
+        <>
+          <Text className={styles.textAlignLeft}>{record.name}</Text>
+          {'  '}
+          {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+        </>
+      ),
     },
     {
       title: 'Type',
@@ -305,33 +313,36 @@ const SessionsInventories = ({ match }) => {
 
     return (
       <Card
+        key={item.inventory_id}
         title={
           <div onClick={() => openSessionInventoryDetails(item)}>
             <Text>{item.name}</Text>
+            {'  '}
+            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
-        actions={[
-          <>
-            {!isPast && (
-              <Button
-                type="text"
-                disabled={!item.join_url}
-                onClick={() => trackAndJoinSession(item)}
-                className={styles.success}
-              >
-                Join
-              </Button>
-            )}
-          </>,
-          <>{!isPast && renderRefundPopup(item)}</>,
-          <>
-            {!isPast && (
-              <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
-                Reschedule
-              </Button>
-            )}
-          </>,
-        ]}
+        actions={
+          isPast
+            ? [
+                <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
+                  Details
+                </Button>,
+              ]
+            : [
+                <Button
+                  type="text"
+                  disabled={!item.join_url}
+                  onClick={() => trackAndJoinSession(item)}
+                  className={styles.success}
+                >
+                  Join
+                </Button>,
+                renderRefundPopup(item),
+                <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
+                  Reschedule
+                </Button>,
+              ]
+        }
       >
         <div onClick={() => openSessionInventoryDetails(item)}>
           {layout('Type', <Text>{item.type}</Text>)}
@@ -387,7 +398,12 @@ const SessionsInventories = ({ match }) => {
               </Loader>
             </>
           ) : (
-            <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+            <Table
+              columns={sessionColumns}
+              data={sessions}
+              loading={isLoading}
+              rowKey={(record) => record.inventory_id}
+            />
           )}
         </>
       )}

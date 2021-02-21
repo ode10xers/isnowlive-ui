@@ -47,6 +47,7 @@ const Videos = () => {
   const renderVideoItem = (video, isExpired) => {
     return (
       <Col
+        key={video.video_order_id}
         xs={24}
         md={12}
         className={styles.videoItem}

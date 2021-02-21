@@ -108,7 +108,7 @@ const PublicVideoList = ({ username = null, videos }) => {
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
-          {videos.map((video) => (
+          {videos?.map((video) => (
             <Col xs={24} md={12} key={video?.external_id}>
               <VideoCard
                 video={video}

@@ -20,6 +20,7 @@ const formatDate = {
   toLongDateWithLongDay: (date) => moment(date).format('dddd, D MMMM YYYY'),
   toLongDateWithTime: (date) => moment(date).format('lll'),
   toLongDateWithDayTime: (date) => moment(date).format('llll'),
+  toShortDateWithYear: (date) => moment(date).format(`DD MMM 'YY`),
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
@@ -27,6 +28,7 @@ const formatDate = {
 };
 
 const timeCalculation = {
+  dateIsBeforeDate: (startDate, endDate) => moment(startDate).isBefore(endDate),
   isBeforeDate: (date) => moment().isBefore(moment(date)),
   isSameOrBeforeToday: (date) => moment(date).endOf('day').isSameOrBefore(moment().startOf('day')),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),

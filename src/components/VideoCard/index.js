@@ -135,7 +135,7 @@ const VideoCard = ({
                 <div className={styles.videoDesc}>{ReactHtmlParser(video.description)}</div>
               </Col>
             )}
-            {!showOrderDetails && (
+            {!showOrderDetails && (showDetailsBtn || buyable) && (
               <Col span={24} className={styles.buttonWrapper}>
                 <Row gutter={16} justify="space-around">
                   {showDetailsBtn && (
