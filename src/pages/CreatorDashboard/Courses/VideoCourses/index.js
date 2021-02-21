@@ -15,10 +15,10 @@ import styles from './styles.module.scss';
 const { Text, Title } = Typography;
 
 const {
-  formatDate: { toShortDateWithYear, toDateAndTime },
+  formatDate: { toDateAndTime },
 } = dateUtil;
 
-const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse }) => {
+const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCourse }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const copyCourseLink = (courseId) => {
@@ -32,7 +32,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
     if (expandedRowKeys.length > 0) {
       setExpandedRowKeys([]);
     } else {
-      setExpandedRowKeys(liveCourses?.map((liveCourse) => liveCourse.id));
+      setExpandedRowKeys(videoCourses?.map((videoCourse) => videoCourse.id));
     }
   };
 
@@ -44,7 +44,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
-  const liveCourseColumns = [
+  const videoCourseColumns = [
     {
       title: 'Course Name',
       dataIndex: 'name',
@@ -66,24 +66,16 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       },
     },
     {
-      title: 'Duration',
-      dataIndex: 'start_time',
-      key: 'start_time',
-      width: '170px',
-      render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
+      title: 'Total Videos',
+      width: '100px',
+      render: (text, record) => `${record?.videos?.length} videos`,
     },
     {
-      title: 'Course Session',
-      dataIndex: 'session',
-      key: 'session',
-      render: (text, record) => record.session?.name,
-    },
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
+      title: 'Course Duration',
+      dataIndex: 'validity',
+      key: 'validity', //TODO: Confirm key here
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => `${record?.validity} days`,
     },
     {
       title: (
@@ -206,8 +198,8 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
         <Card
           className={styles.card}
           title={
-            <div style={{ paddingTop: 12, borderTop: `6px solid ${course.color_code || '#FFF'}` }}>
-              <Text>{course.name}</Text>
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${course?.color_code || '#FFF'}` }}>
+              <Text>{course?.name}</Text>
             </div>
           }
           actions={[
@@ -223,7 +215,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyCourseLink(course.id)}
+                onClick={() => copyCourseLink(course?.id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
@@ -247,16 +239,13 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             ),
           ]}
         >
-          {layout(
-            'Duration',
-            <Text> {`${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`} </Text>
-          )}
-          {layout('Session', <Text>{course.session?.name}</Text>)}
-          {layout('Price', <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}
+          {layout('Total Video', <Text>{course.videos?.length} videos</Text>)}
+          {layout('Duration', <Text> {course?.validity} days</Text>)}
+          {layout('Price', <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
         </Card>
-        {expandedRowKeys.includes(course.id) && (
+        {expandedRowKeys.includes(course?.id) && (
           <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{course.buyers?.map(renderMobileSubscriberCards)}</div>
+            <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
           </Row>
         )}
       </Col>
@@ -265,7 +254,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   return (
     <div>
-      {liveCourses?.length > 0 ? (
+      {videoCourses?.length > 0 ? (
         isMobileDevice ? (
           <Row gutter={[8, 16]}>
             <Col xs={24}>
@@ -273,14 +262,14 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
                 {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
               </Button>
             </Col>
-            {liveCourses?.map(renderCourseItem)}
+            {videoCourses?.map(renderCourseItem)}
           </Row>
         ) : (
           <Table
             size="small"
             sticky={true}
-            columns={liveCourseColumns}
-            data={liveCourses}
+            columns={videoCourseColumns}
+            data={videoCourses}
             rowKey={(record) => record.id}
             expandable={{
               expandedRowRender: renderBuyersList,
@@ -297,4 +286,4 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
   );
 };
 
-export default LiveCourses;
+export default VideoCourses;
