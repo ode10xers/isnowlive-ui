@@ -555,10 +555,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   maxTagCount={2}
                   options={videos}
                   value={selectedVideos}
-                  onChange={(val) => {
-                    console.log(val);
-                    setSelectedVideos(val);
-                  }}
+                  onChange={(val) => setSelectedVideos(val)}
                 />
               </Form.Item>
             </Col>
