@@ -175,8 +175,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         toggleSigningIn={toggleAuthModalState}
       />
       <Row>
-        <Col xs={0} md={removePadding ? 0 : 4} xl={removePadding ? 0 : 4}></Col>
-        <Col xs={24} md={removePadding ? 24 : 16} xl={removePadding ? 24 : 16}>
+        <Col xs={24}>
           <Row>
             <Col className={classNames(styles.domainNameWrapper, inDashboard() ? styles.dashboard : undefined)}>
               <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
@@ -466,7 +465,6 @@ const NavbarHeader = ({ removePadding = false }) => {
             </Col>
           </Row>
         </Col>
-        <Col xs={0} md={removePadding ? 0 : 4} xl={removePadding ? 0 : 4}></Col>
       </Row>
     </div>
   );

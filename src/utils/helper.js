@@ -228,6 +228,12 @@ export const orderType = {
   COURSE: 'COURSE_ORDER',
 };
 
+export const courseType = {
+  MIXED: 'MIXED',
+  VIDEO_SEQ: 'VIDEO_SEQUENCE',
+  VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE',
+};
+
 export const productType = {
   CLASS: 'Session',
   PASS: 'Pass',

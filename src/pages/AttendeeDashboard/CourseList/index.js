@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Row, Col, Button, Typography, Card, Collapse } from 'antd';
+import { Row, Col, Button, Typography, Card, Collapse, Tag } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -71,16 +71,21 @@ const CourseList = () => {
       },
     },
     {
-      title: 'Course Session',
-      key: 'inventory_ids',
-      dataIndex: 'inventory_ids',
-      render: (text, record) => record.session?.name,
+      title: 'Course Content',
+      key: 'videos',
+      dataIndex: 'videos',
+      render: (text, record) => (
+        <>
+          {record?.videos?.length > 0 && <Tag color="blue"> {record?.videos?.length} Videos </Tag>}
+          {record?.inventory_ids?.length > 0 && <Tag color="volcano"> {record?.inventory_ids?.length} Sessions </Tag>}
+        </>
+      ),
     },
     {
       title: 'Duration',
       key: 'start_date',
       dataIndex: 'start_date',
-      width: '180px',
+      width: '210px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {
@@ -134,7 +139,13 @@ const CourseList = () => {
         ]}
       >
         <div onClick={() => redirectToCourseOrderDetails(item)}>
-          {layout('Session', <Text>{item?.session?.name}</Text>)}
+          {layout(
+            'Contents',
+            <Text>
+              {item?.videos?.length > 0 && <Tag color="blue"> {item?.videos?.length} Videos </Tag>}
+              {item?.inventory_ids?.length > 0 && <Tag color="volcano"> {item?.inventory_ids?.length} Sessions </Tag>}
+            </Text>
+          )}
           {layout(
             'Duration',
             <Text>{`${toShortDateWithYear(item?.start_date)} - ${toShortDateWithYear(item?.end_date)}`}</Text>
@@ -160,18 +171,18 @@ const CourseList = () => {
           <Collapse>
             <Panel header={<Title level={5}> Active Courses </Title>} key="Active">
               {isMobileDevice ? (
-                <>
-                  <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                    Click on the card to show course details
-                  </Text>
-                  <Loader loading={isLoading} size="large" text="Loading courses">
-                    {courseOrders?.active?.length > 0 ? (
-                      courseOrders?.active?.map(renderCourseItem)
-                    ) : (
-                      <div className="text-empty"> No course found </div>
-                    )}
-                  </Loader>
-                </>
+                <Loader loading={isLoading} size="large" text="Loading courses">
+                  {courseOrders?.active?.length > 0 ? (
+                    <>
+                      <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
+                        Click on the card to show course details
+                      </Text>
+                      {courseOrders?.active?.map(renderCourseItem)}
+                    </>
+                  ) : (
+                    <div className="text-empty"> No course found </div>
+                  )}
+                </Loader>
               ) : (
                 <Table
                   columns={courseColumns}
@@ -183,18 +194,18 @@ const CourseList = () => {
             </Panel>
             <Panel header={<Title level={5}> Expired Courses </Title>} key="Expired">
               {isMobileDevice ? (
-                <>
-                  <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                    Click on the card to show course details
-                  </Text>
-                  <Loader loading={isLoading} size="large" text="Loading courses">
-                    {courseOrders?.expired?.length > 0 ? (
-                      courseOrders?.expired?.map(renderCourseItem)
-                    ) : (
-                      <div className="text-empty"> No course found </div>
-                    )}
-                  </Loader>
-                </>
+                <Loader loading={isLoading} size="large" text="Loading courses">
+                  {courseOrders?.expired?.length > 0 ? (
+                    <>
+                      <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
+                        Click on the card to show course details
+                      </Text>
+                      {courseOrders?.expired?.map(renderCourseItem)}
+                    </>
+                  ) : (
+                    <div className="text-empty"> No course found </div>
+                  )}
+                </Loader>
               ) : (
                 <Table
                   columns={courseColumns}

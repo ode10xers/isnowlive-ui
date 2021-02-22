@@ -23,14 +23,14 @@ import MobileDetect from 'mobile-detect';
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
-import PublicLiveCourseList from 'components/PublicLiveCourseList';
+import PublicCourseList from 'components/PublicCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
 import { isAPISuccess, parseEmbedCode } from 'utils/helper';
 import DefaultImage from 'components/Icons/DefaultImage/index';
 import Share from 'components/Share';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, courseType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
@@ -48,7 +48,8 @@ const productKeys = {
   SESSION: 'session',
   PASS: 'pass',
   VIDEO: 'video',
-  COURSE: 'course',
+  LIVE_COURSE: 'live_course',
+  VIDEO_COURSE: 'video_course',
 };
 
 const ProfilePreview = ({ username = null }) => {
@@ -68,7 +69,6 @@ const ProfilePreview = ({ username = null }) => {
   const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
-  const [selectedCourseTab, setSelectedCourseTab] = useState('liveCourse');
   const [isListLoading, setIsListLoading] = useState(false);
 
   const [passes, setPasses] = useState([]);
@@ -78,6 +78,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isVideosLoading, setIsVideosLoading] = useState(true);
 
   const [liveCourses, setLiveCourses] = useState([]);
+  const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
@@ -181,7 +182,7 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
-  const getLiveCourseDetails = useCallback(async () => {
+  const getCoursesDetails = useCallback(async () => {
     setIsCoursesLoading(true);
     try {
       let profileUsername = '';
@@ -195,12 +196,15 @@ const ProfilePreview = ({ username = null }) => {
       const { status, data } = await apis.courses.getCoursesByUsername(profileUsername);
 
       if (isAPISuccess(status) && data) {
-        setLiveCourses(data);
+        setLiveCourses(data.filter((course) => course.type === courseType.MIXED || course.type === 'live'));
+        setVideoCourses(
+          data.filter((course) => course.type === courseType.VIDEO_NON_SEQ || course.type === courseType.VIDEO_SEQ)
+        );
         setIsCoursesLoading(false);
       }
     } catch (error) {
       setIsCoursesLoading(false);
-      message.error('Failed to load live courses details');
+      message.error('Failed to load courses details');
     }
   }, [username]);
 
@@ -212,14 +216,14 @@ const ProfilePreview = ({ username = null }) => {
     getSessionDetails('upcoming');
     getPassesDetails();
     getVideosDetails();
-    getLiveCourseDetails();
+    getCoursesDetails();
   }, [
     history.location.pathname,
     getProfileDetails,
     getSessionDetails,
     getPassesDetails,
     getVideosDetails,
-    getLiveCourseDetails,
+    getCoursesDetails,
   ]);
 
   useEffect(() => {
@@ -248,10 +252,10 @@ const ProfilePreview = ({ username = null }) => {
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
         setSelectedListTab(productKeys.SESSION);
-      } else if (sectionToShow === productKeys.COURSE) {
-        if (liveCourses.length) {
+      } else if (sectionToShow === 'course') {
+        if (liveCourses.length || videoCourses.length) {
           setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById(productKeys.COURSE);
+          targetElement = document.getElementById('course');
         } else {
           // Fallback to show sessions
           setSelectedListTab(productKeys.SESSION);
@@ -266,7 +270,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, videos, liveCourses, profile]);
+  }, [location.state, passes, videos, liveCourses, videoCourses, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -274,8 +278,6 @@ const ProfilePreview = ({ username = null }) => {
 
     if (key === 'session') {
       handleChangeSessionTab(selectedSessionTab);
-    } else if (key === 'course') {
-      handleChangeCourseTab(selectedCourseTab);
     }
     setIsListLoading(false);
   };
@@ -289,14 +291,6 @@ const ProfilePreview = ({ username = null }) => {
     } else {
       trackSimpleEvent(user.click.profile.pastSessionsTab);
       getSessionDetails('past');
-    }
-  };
-
-  const handleChangeCourseTab = (key) => {
-    setSelectedCourseTab(key);
-
-    if (key === 'liveCourses') {
-      getLiveCourseDetails();
     }
   };
 
@@ -542,9 +536,9 @@ const ProfilePreview = ({ username = null }) => {
                 </Row>
               </Tabs.TabPane>
             )}
-            {liveCourses.length > 0 && (
+            {(liveCourses.length > 0 || videoCourses.length > 0) && (
               <Tabs.TabPane
-                key={productKeys.COURSE}
+                key="course"
                 tab={
                   <div className={styles.largeTabHeader} id="course">
                     <BookOutlined />
@@ -553,11 +547,20 @@ const ProfilePreview = ({ username = null }) => {
                 }
               >
                 <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                  <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
-                    <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
-                      <PublicLiveCourseList username={username} liveCourses={liveCourses} />
-                    </Loader>
-                  </Tabs.TabPane>
+                  {liveCourses.length > 0 && (
+                    <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
+                      <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
+                        <PublicCourseList username={username} courses={liveCourses} />
+                      </Loader>
+                    </Tabs.TabPane>
+                  )}
+                  {videoCourses.length > 0 && (
+                    <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
+                      <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
+                        <PublicCourseList username={username} courses={videoCourses} />
+                      </Loader>
+                    </Tabs.TabPane>
+                  )}
                 </Tabs>
               </Tabs.TabPane>
             )}

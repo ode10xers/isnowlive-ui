@@ -110,6 +110,7 @@ export default {
     updateCourse: (courseId, payload) => http.put(`/secure/creator/courses/${courseId}`, payload),
     getCoursesByUsername: (creatorUsername) => http.get(`/courses?creator_username=${creatorUsername}`),
     getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
+    getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
     createOrderForUser: (payload) => http.post('/secure/customer/courses/orders', payload),
     publishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/publish`),
     unpublishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/unpublish`),
