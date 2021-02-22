@@ -83,8 +83,8 @@ const Courses = () => {
     setSelectedListTab(key);
   };
 
-  const openCreateCourseModal = () => {
-    setIsVideoModal(selectedListTab !== 'liveClassCourse');
+  const openCreateCourseModal = (type = 'mixed') => {
+    setIsVideoModal(type === 'video');
     setCreateModalVisible(true);
   };
 
@@ -100,7 +100,7 @@ const Courses = () => {
 
   const openEditCourseModal = (course) => {
     setTargetCourse(course);
-    setIsVideoModal(course.type !== courseType.LIVE);
+    setIsVideoModal(course.type !== courseType.MIXED);
     openCreateCourseModal();
   };
 
@@ -113,14 +113,14 @@ const Courses = () => {
         isVideoModal={isVideoModal}
       />
       <Row gutter={[8, 8]}>
-        <Col xs={10} lg={16} xl={18}>
+        <Col xs={24}>
           <Title level={3}> Courses </Title>
         </Col>
-        <Col xs={14} lg={8} xl={6}>
+        {/* <Col xs={14} lg={8} xl={6}>
           <Button block size="large" type="primary" onClick={() => openCreateCourseModal()}>
             Create New Course
           </Button>
-        </Col>
+        </Col> */}
         <Col xs={24}>
           <Tabs
             size="large"
@@ -130,24 +130,44 @@ const Courses = () => {
           >
             <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}>
               <Loader loading={isLoading} size="large" text="Fetching Live Courses">
-                <LiveCourses
-                  liveCourses={courses.filter((course) => course.type === courseType.LIVE)}
-                  showEditModal={openEditCourseModal}
-                  publishCourse={publishCourse}
-                  unpublishCourse={unpublishCourse}
-                />
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} md={{ span: 10, offset: 14 }} lg={{ span: 8, offset: 16 }} xl={{ span: 6, offset: 18 }}>
+                    <Button block size="large" type="primary" onClick={() => openCreateCourseModal('mixed')}>
+                      Create Live Course
+                    </Button>
+                  </Col>
+                  <Col xs={24}>
+                    <LiveCourses
+                      liveCourses={courses.filter(
+                        (course) => course.type === courseType.MIXED || course.type === 'live'
+                      )}
+                      showEditModal={openEditCourseModal}
+                      publishCourse={publishCourse}
+                      unpublishCourse={unpublishCourse}
+                    />
+                  </Col>
+                </Row>
               </Loader>
             </TabPane>
             <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}>
               <Loader loading={isLoading} size="large" text="Fetching Video Courses">
-                <VideoCourses
-                  videoCourses={courses.filter(
-                    (course) => course.type === courseType.VIDEO_SEQ || course.type === courseType.VIDEO_NON_SEQ
-                  )}
-                  showEditModal={openEditCourseModal}
-                  publishCourse={publishCourse}
-                  unpublishCourse={unpublishCourse}
-                />
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} md={{ span: 10, offset: 14 }} lg={{ span: 8, offset: 16 }} xl={{ span: 6, offset: 18 }}>
+                    <Button block size="large" type="primary" onClick={() => openCreateCourseModal('video')}>
+                      Create Video Course
+                    </Button>
+                  </Col>
+                  <Col xs={24}>
+                    <VideoCourses
+                      videoCourses={courses.filter(
+                        (course) => course.type === courseType.VIDEO_SEQ || course.type === courseType.VIDEO_NON_SEQ
+                      )}
+                      showEditModal={openEditCourseModal}
+                      publishCourse={publishCourse}
+                      unpublishCourse={unpublishCourse}
+                    />
+                  </Col>
+                </Row>
               </Loader>
             </TabPane>
           </Tabs>

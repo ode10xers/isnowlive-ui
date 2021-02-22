@@ -21,8 +21,8 @@ import styles from './styles.module.scss';
 
 //TODO: Adjust tags here
 const courseTypes = {
-  LIVE: {
-    name: 'LIVE',
+  MIXED: {
+    name: 'MIXED',
     label: 'Live Session Course',
   },
   VIDEO_NON_SEQ: {
@@ -283,7 +283,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
-        type: courseTypes.LIVE.name.toLowerCase(),
+        type: courseTypes.MIXED.name.toLowerCase(),
         price: values.price || 1,
         currency: currency?.toLowerCase(),
         video_ids: selectedVideos || [],

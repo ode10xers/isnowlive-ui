@@ -42,7 +42,7 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary">
-                  {course?.type === courseType.LIVE
+                  {course?.type === courseType.MIXED
                     ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
                     : `Validity: ${course?.validity} days`}
                 </Text>
@@ -91,7 +91,7 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               </Col>
               <Col xs={24} className={styles.courseDetailsWrapper}>
                 <Text type="secondary">
-                  {course?.type === courseType.LIVE
+                  {course?.type === courseType.MIXED
                     ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
                     : `Validity: ${course?.validity} days`}
                 </Text>

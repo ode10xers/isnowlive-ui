@@ -71,7 +71,7 @@ const CourseDetails = ({ match, history }) => {
       if (isAPISuccess(status) && data) {
         setCourse(data);
 
-        if (data.type === courseType.LIVE && data.session?.session_id) {
+        if (data.type === courseType.MIXED && data.session?.session_id) {
           const sessionData = await apis.session.getSessionDetails(data.session?.session_id);
 
           if (isAPISuccess(sessionData.status) && sessionData.data) {

@@ -386,7 +386,6 @@ const VideoDetails = ({ match, history }) => {
     window.open(`${baseUrl}/c/${course?.id}`);
   };
 
-  //TODO: Adjust the new credits key for passes here
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
       <Row gutter={[16, 16]} align="center">
