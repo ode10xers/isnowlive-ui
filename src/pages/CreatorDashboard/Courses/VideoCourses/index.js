@@ -71,11 +71,18 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       render: (text, record) => `${record?.videos?.length} Videos`,
     },
     {
-      title: 'Course Duration',
+      title: 'Duration',
       dataIndex: 'validity',
       key: 'validity',
-      width: '210px',
+      width: '100px',
       render: (text, record) => `${record?.validity} days`,
+    },
+    {
+      title: 'Price',
+      dataIndex: 'price',
+      key: 'price',
+      width: '85px',
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
     },
     {
       title: (
@@ -186,10 +193,10 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
   const renderCourseItem = (course) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={6}>
+        <Col span={10}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={18}>: {value}</Col>
+        <Col span={14}>: {value}</Col>
       </Row>
     );
 
@@ -239,7 +246,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             ),
           ]}
         >
-          {layout('Total Video', <Text>{course.videos?.length} videos</Text>)}
+          {layout('Total Videos', <Text>{course.videos?.length} videos</Text>)}
           {layout('Duration', <Text> {course?.validity} days</Text>)}
           {layout('Price', <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
         </Card>

@@ -95,6 +95,7 @@ const VideoCard = ({
             src={video.thumbnail_url || 'error'}
             alt={video.title}
             fallback={DefaultImage()}
+            preview={false}
           />
         )
       }

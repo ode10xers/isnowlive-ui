@@ -194,10 +194,10 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
   const renderCourseItem = (course) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={6}>
+        <Col span={7}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={18}>: {value}</Col>
+        <Col span={17}>: {value}</Col>
       </Row>
     );
 

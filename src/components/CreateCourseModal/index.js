@@ -13,6 +13,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
+import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
@@ -486,7 +487,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
   return (
     <Modal
-      title={`${editedCourse ? 'Edit' : 'Create New'} Course`}
+      title={`${editedCourse ? 'Edit' : 'Create New'} ${isVideoModal ? 'Video' : 'Live'} Course`}
       centered={true}
       visible={visible}
       footer={null}
@@ -585,7 +586,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     colors={colorPickerChoices}
                     className={styles.colorPicker}
                     onChangeComplete={handleColorChange}
-                    width={300}
+                    width={isMobileDevice ? 290 : 300}
                   />
                 </div>
               </Form.Item>
