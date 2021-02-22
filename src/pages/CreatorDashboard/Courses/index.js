@@ -6,8 +6,9 @@ import Loader from 'components/Loader';
 import CreateCourseModal from 'components/CreateCourseModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
+import VideoCourses from 'pages/CreatorDashboard/Courses/VideoCourses';
 
-import { isAPISuccess } from 'utils/helper';
+import { courseType, isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 import apis from 'apis';
@@ -21,6 +22,7 @@ const Courses = () => {
   const [selectedListTab, setSelectedListTab] = useState('liveClassCourse');
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [targetCourse, setTargetCourse] = useState(null);
+  const [isVideoModal, setIsVideoModal] = useState(false);
 
   const fetchAllCoursesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -43,7 +45,7 @@ const Courses = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Course Published');
-        fetchCourseForCreator();
+        fetchAllCoursesForCreator();
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
@@ -58,7 +60,7 @@ const Courses = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Course Unpublished');
-        fetchCourseForCreator();
+        fetchAllCoursesForCreator();
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
@@ -66,14 +68,8 @@ const Courses = () => {
     setIsLoading(false);
   };
 
-  const fetchCourseForCreator = () => {
-    if (selectedListTab === 'liveClassCourse') {
-      fetchAllCoursesForCreator();
-    }
-  };
-
   useEffect(() => {
-    fetchCourseForCreator();
+    fetchAllCoursesForCreator();
     //eslint-disable-next-line
   }, [selectedListTab]);
 
@@ -81,13 +77,15 @@ const Courses = () => {
     setSelectedListTab(key);
   };
 
-  const openCreateCourseModal = () => {
+  const openCreateCourseModal = (type = 'mixed') => {
+    setIsVideoModal(type === 'video');
     setCreateModalVisible(true);
   };
 
   const hideCreateCourseModal = (shouldRefresh = false) => {
     setCreateModalVisible(false);
     setTargetCourse(null);
+    setIsVideoModal(false);
 
     if (shouldRefresh) {
       fetchAllCoursesForCreator();
@@ -96,20 +94,20 @@ const Courses = () => {
 
   const openEditCourseModal = (course) => {
     setTargetCourse(course);
-    openCreateCourseModal();
+    openCreateCourseModal(course.type === courseType.MIXED ? 'mixed' : 'video');
   };
 
   return (
     <div className={styles.box}>
-      <CreateCourseModal visible={createModalVisible} closeModal={hideCreateCourseModal} editedCourse={targetCourse} />
+      <CreateCourseModal
+        visible={createModalVisible}
+        closeModal={hideCreateCourseModal}
+        editedCourse={targetCourse}
+        isVideoModal={isVideoModal}
+      />
       <Row gutter={[8, 8]}>
-        <Col xs={10} lg={16} xl={18}>
+        <Col xs={24}>
           <Title level={3}> Courses </Title>
-        </Col>
-        <Col xs={14} lg={8} xl={6}>
-          <Button block size="large" type="primary" onClick={() => openCreateCourseModal()}>
-            Create New Course
-          </Button>
         </Col>
         <Col xs={24}>
           <Tabs
@@ -120,15 +118,46 @@ const Courses = () => {
           >
             <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}>
               <Loader loading={isLoading} size="large" text="Fetching Live Courses">
-                <LiveCourses
-                  liveCourses={courses}
-                  showEditModal={openEditCourseModal}
-                  publishCourse={publishCourse}
-                  unpublishCourse={unpublishCourse}
-                />
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} md={{ span: 10, offset: 14 }} lg={{ span: 8, offset: 16 }} xl={{ span: 6, offset: 18 }}>
+                    <Button block size="large" type="primary" onClick={() => openCreateCourseModal('mixed')}>
+                      Create Live Course
+                    </Button>
+                  </Col>
+                  <Col xs={24}>
+                    <LiveCourses
+                      liveCourses={courses.filter(
+                        (course) => course.type === courseType.MIXED || course.type === 'live'
+                      )}
+                      showEditModal={openEditCourseModal}
+                      publishCourse={publishCourse}
+                      unpublishCourse={unpublishCourse}
+                    />
+                  </Col>
+                </Row>
               </Loader>
             </TabPane>
-            {/* <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}></TabPane> */}
+            <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}>
+              <Loader loading={isLoading} size="large" text="Fetching Video Courses">
+                <Row gutter={[8, 8]}>
+                  <Col xs={24} md={{ span: 10, offset: 14 }} lg={{ span: 8, offset: 16 }} xl={{ span: 6, offset: 18 }}>
+                    <Button block size="large" type="primary" onClick={() => openCreateCourseModal('video')}>
+                      Create Video Course
+                    </Button>
+                  </Col>
+                  <Col xs={24}>
+                    <VideoCourses
+                      videoCourses={courses.filter(
+                        (course) => course.type === courseType.VIDEO_SEQ || course.type === courseType.VIDEO_NON_SEQ
+                      )}
+                      showEditModal={openEditCourseModal}
+                      publishCourse={publishCourse}
+                      unpublishCourse={unpublishCourse}
+                    />
+                  </Col>
+                </Row>
+              </Loader>
+            </TabPane>
           </Tabs>
         </Col>
       </Row>

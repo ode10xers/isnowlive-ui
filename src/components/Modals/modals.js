@@ -227,7 +227,6 @@ export const showVideoPurchaseSuccessModal = (
   });
 };
 
-//TODO: Explore whether or not we can have the course data here
 export const showCourseBookingSuccessModal = (userEmail, redirectDomainName = 'app') => {
   let title = 'Course booked';
   let modalContent = (

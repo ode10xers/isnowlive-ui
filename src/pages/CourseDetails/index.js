@@ -28,7 +28,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, generateUrlFromUsername, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -71,7 +71,7 @@ const CourseDetails = ({ match, history }) => {
       if (isAPISuccess(status) && data) {
         setCourse(data);
 
-        if (data.session?.session_id) {
+        if (data.type === courseType.MIXED && data.session?.session_id) {
           const sessionData = await apis.session.getSessionDetails(data.session?.session_id);
 
           if (isAPISuccess(sessionData.status) && sessionData.data) {
@@ -227,7 +227,7 @@ const CourseDetails = ({ match, history }) => {
           {course && (
             <Row classname={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
               <Col xs={24}>
-                <ShowcaseCourseCard course={course} username={username} />
+                <ShowcaseCourseCard courses={[course]} username={username} />
               </Col>
 
               {courseSession && (

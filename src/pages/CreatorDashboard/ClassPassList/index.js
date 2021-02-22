@@ -104,7 +104,7 @@ const ClassPassList = () => {
             limited: classPass.limited,
             currency: classPass.currency.toUpperCase(),
             validity: classPass.validity,
-            class_count: classPass.class_count, //TODO: Adjust new credit keys here
+            class_count: classPass.class_count,
             is_published: classPass.is_published,
             sessions: classPass.sessions,
             videos: classPass.videos,
@@ -171,7 +171,7 @@ const ClassPassList = () => {
     },
     {
       title: 'Credit Count',
-      dataIndex: 'class_count', //TODO: Adjust new credit keys here
+      dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',

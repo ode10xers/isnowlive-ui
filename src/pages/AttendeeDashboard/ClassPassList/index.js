@@ -35,7 +35,6 @@ const ClassPassList = () => {
     try {
       const { data } = await apis.passes.getAttendeePasses();
 
-      //TODO: Adjust new credit keys here
       if (data) {
         setPasses(
           data.active.map((pass, index) => ({
@@ -157,7 +156,7 @@ const ClassPassList = () => {
     },
     {
       title: 'Credit Left',
-      dataIndex: 'class_count', //TODO: Adjust new credit keys here
+      dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',
@@ -240,7 +239,7 @@ const ClassPassList = () => {
         <Col span={15}>: {value}</Col>
       </Row>
     );
-    //TODO: Adjust new credit keys here
+
     return (
       <div>
         <Card

@@ -167,7 +167,6 @@ const PassDetails = ({ match, history }) => {
     }
   };
 
-  //TODO: Adjust new credit keys here
   return (
     <Loader loading={isLoading} size="large" text="Loading pass details">
       <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />

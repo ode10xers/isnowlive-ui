@@ -584,8 +584,8 @@ const SessionDetails = ({ match, history }) => {
               </Col>
               <Col xs={24}>
                 <ShowcaseCourseCard
-                  course={course}
-                  onCardClick={() => redirectToCourseDetails(course)}
+                  courses={[course]}
+                  onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
                   username={username}
                 />
               </Col>
@@ -695,6 +695,5 @@ const SessionDetails = ({ match, history }) => {
     </Loader>
   );
 };
-//TODO: The VideoCards listing can probably be replaced with PublicVideoList to reduce the logic in this page
 
 export default SessionDetails;

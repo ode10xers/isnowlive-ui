@@ -117,7 +117,6 @@ const Earnings = () => {
     }
   }, []);
 
-  //TODO: Can refactor these to be more general
   const handleShowMoreSession = async () => {
     const eventTag = creator.click.payment.showMoreEarnings;
     try {

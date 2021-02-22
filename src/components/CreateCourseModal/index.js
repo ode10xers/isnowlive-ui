@@ -13,6 +13,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
+import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
@@ -20,13 +21,13 @@ import { courseModalFormLayout } from 'layouts/FormLayouts';
 import styles from './styles.module.scss';
 
 const courseTypes = {
-  LIVE: {
-    name: 'LIVE',
+  MIXED: {
+    name: 'MIXED',
     label: 'Live Session Course',
   },
-  VIDEO: {
-    name: 'VIDEO',
-    label: 'Video Course',
+  VIDEO_NON_SEQ: {
+    name: 'VIDEO_NON_SEQUENCE',
+    label: 'Non-Sequential Video Course',
   },
 };
 
@@ -68,7 +69,7 @@ const {
   formatDate: { toLocaleTime, toLongDateWithDay },
 } = dateUtil;
 
-const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
+const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
   const [form] = Form.useForm();
 
   const [courseClasses, setCourseClasses] = useState([]);
@@ -82,6 +83,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
   const [courseImageUrl, setCourseImageUrl] = useState(null);
+  // const [isSequentialVideos, setIsSequentialVideos] = useState(false);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -97,15 +99,19 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     setIsLoading(false);
   }, []);
 
-  const fetchAllVideosForCreator = useCallback(async () => {
+  const fetchAllVideosForCreator = useCallback(async (filterCourseVideos = false) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(
-          data.filter((video) => video.price > 0).map((video) => ({ value: video.external_id, label: video.title }))
-        );
+        let filteredVideos = data;
+
+        if (filterCourseVideos) {
+          filteredVideos = filteredVideos.filter((video) => video.is_course);
+        }
+
+        setVideos(filteredVideos.map((video) => ({ value: video.external_id, label: video.title })));
       }
     } catch (error) {
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
@@ -116,25 +122,45 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   useEffect(() => {
     if (visible) {
       if (editedCourse) {
-        form.setFieldsValue({
-          courseImageUrl: editedCourse.course_image_url || '',
-          courseName: editedCourse.name,
-          courseStartDate: moment(editedCourse.start_date),
-          courseEndDate: moment(editedCourse.end_date),
-          selectedCourseClass: editedCourse.session?.session_id,
-          maxParticipants: editedCourse.session?.max_participants,
-          videoList: editedCourse.videos?.map((courseVideo) => courseVideo.external_id),
-          price: editedCourse.price,
-          colorCode: editedCourse.color_code || initialColor || whiteColor,
-        });
+        if (isVideoModal) {
+          form.setFieldsValue({
+            courseImageUrl: editedCourse?.course_image_url || '',
+            courseName: editedCourse?.name,
+            validity: editedCourse?.validity,
+            // video_type: editedCourse?.course_sequence ? 'sequential' : 'non_sequential',
+            videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
+            price: editedCourse?.price,
+            colorCode: editedCourse?.color_code || initialColor || whiteColor,
+          });
 
-        setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
-        setSelectedCourseClass(editedCourse.session?.session_id);
+          //setIsSequentialVideos(editedCourse.course_sequence || false);
+          setSelectedCourseClass([]);
+          setCourseEndDate(null);
+          setCourseStartDate(null);
+        } else {
+          form.setFieldsValue({
+            courseImageUrl: editedCourse?.course_image_url || '',
+            courseName: editedCourse?.name,
+            courseStartDate: moment(editedCourse?.start_date),
+            courseEndDate: moment(editedCourse?.end_date),
+            selectedCourseClass: editedCourse?.session?.session_id,
+            maxParticipants: editedCourse?.session?.max_participants,
+            videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
+            price: editedCourse?.price,
+            colorCode: editedCourse?.color_code || initialColor || whiteColor,
+          });
+
+          setSelectedCourseClass(editedCourse?.session?.session_id);
+          setCourseStartDate(moment(editedCourse?.start_date));
+          setCourseEndDate(moment(editedCourse?.end_date));
+
+          // setIsSequentialVideos(false);
+        }
+
         setSelectedVideos(editedCourse.videos?.map((courseVideo) => courseVideo.external_id));
-        setColorCode(editedCourse.color_code || initialColor || whiteColor);
-        setCourseStartDate(moment(editedCourse.start_date));
-        setCourseEndDate(moment(editedCourse.end_date));
+        setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
         setCourseImageUrl(editedCourse.course_image_url);
+        setColorCode(editedCourse.color_code || initialColor || whiteColor);
       } else {
         form.resetFields();
         setSelectedCourseClass(null);
@@ -144,12 +170,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
         setCourseStartDate(null);
         setCourseEndDate(null);
         setCourseImageUrl(null);
+        // setIsSequentialVideos(false);
       }
     }
 
     fetchAllCourseClassForCreator();
-    fetchAllVideosForCreator();
-  }, [visible, editedCourse, fetchAllCourseClassForCreator, fetchAllVideosForCreator, form]);
+    fetchAllVideosForCreator(isVideoModal);
+  }, [visible, editedCourse, isVideoModal, fetchAllCourseClassForCreator, fetchAllVideosForCreator, form]);
 
   const filterSessionInventoryInDateRange = (inventories) => {
     if (!inventories) {
@@ -211,49 +238,70 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
-    const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
+    let payload = {};
 
-    if (!targetCourseClass) {
-      showErrorModal('Course Session not found', 'The course session you chose is invalid');
-      setSubmitting(false);
-      return;
-    }
+    if (isVideoModal) {
+      let processedVideosIDs = selectedVideos;
 
-    const courseClassInventoriesInDateRange = filterSessionInventoryInDateRange(targetCourseClass?.inventory);
+      if (processedVideosIDs.length <= 0) {
+        showErrorModal('Course Video Required', 'Please select at least one course video to include in this course');
+        setSubmitting(false);
+        return;
+      }
 
-    if (courseClassInventoriesInDateRange.length <= 0) {
-      showErrorModal(
-        'No sessions scheduled',
-        'The course session you selected has no schedules in the duration you choose.'
-      );
-      setSubmitting(false);
-      return;
-    }
-
-    console.log(courseClassInventoriesInDateRange);
-
-    try {
-      let data = {
+      payload = {
         name: values.courseName,
-        session_id: selectedCourseClass,
-        max_participants: values.maxParticipants || targetCourseClass?.max_participants,
-        price: values.price || 1,
-        currency: currency.toLowerCase(),
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
-        video_ids: selectedVideos || values.videoList || [],
+        type: courseTypes.VIDEO_NON_SEQ.name.toUpperCase(),
+        price: values.price || 1,
+        currency: currency?.toLowerCase(),
+        video_ids: processedVideosIDs,
+        validity: values.validity || 1,
+      };
+    } else {
+      const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
+
+      if (!targetCourseClass) {
+        showErrorModal('Course Session not found', 'The course session you chose is invalid');
+        setSubmitting(false);
+        return;
+      }
+
+      const courseClassInventoriesInDateRange = filterSessionInventoryInDateRange(targetCourseClass?.inventory);
+
+      if (courseClassInventoriesInDateRange.length <= 0) {
+        showErrorModal(
+          'No sessions scheduled',
+          'The course session you selected has no schedules in the duration you choose.'
+        );
+        setSubmitting(false);
+        return;
+      }
+
+      payload = {
+        name: values.courseName,
+        color_code: colorCode || values.colorCode || whiteColor,
+        course_image_url: courseImageUrl || values.courseImageUrl,
+        type: courseTypes.MIXED.name.toUpperCase(),
+        price: values.price || 1,
+        currency: currency?.toLowerCase(),
+        video_ids: selectedVideos || [],
+        session_id: selectedCourseClass,
+        max_participants: values.maxParticipants || targetCourseClass?.max_participants,
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).endOf('day').utc().format(),
-        type: courseTypes.LIVE.name.toLowerCase(),
         inventory_ids: courseClassInventoriesInDateRange.map((inventory) => inventory.inventory_id) || [],
       };
+    }
 
+    try {
       const response = editedCourse
-        ? await apis.courses.updateCourse(editedCourse.id, data)
-        : await apis.courses.createCourse(data);
+        ? await apis.courses.updateCourse(editedCourse.id, payload)
+        : await apis.courses.createCourse(payload);
 
       if (isAPISuccess(response.status)) {
-        showSuccessModal(`${data.name} successfully ${editedCourse ? 'updated' : 'created'}`);
+        showSuccessModal(`${payload.name} successfully ${editedCourse ? 'updated' : 'created'}`);
         closeModal(true);
       }
     } catch (error) {
@@ -303,9 +351,143 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
     ));
   };
 
+  const renderLiveCourseInputs = () => (
+    <>
+      <Col xs={isVideoModal ? 0 : 24}>
+        <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={isVideoModal}>
+          <Row gutter={8}>
+            <Col xs={12}>
+              <Form.Item
+                id="courseStartDate"
+                name="courseStartDate"
+                rules={isVideoModal ? [] : validationRules.requiredValidation}
+                noStyle
+              >
+                <DatePicker
+                  placeholder="Select Start Date"
+                  onChange={handleStartDateChange}
+                  disabledDate={disabledStartDates}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={12}>
+              <Form.Item
+                id="courseEndDate"
+                name="courseEndDate"
+                rules={isVideoModal ? [] : validationRules.requiredValidation}
+                noStyle
+              >
+                <DatePicker
+                  placeholder="Select End Date"
+                  disabled={!Boolean(courseStartDate)}
+                  onChange={handleEndDateChange}
+                  disabledDate={disabledEndDates}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form.Item>
+      </Col>
+      <Col xs={isVideoModal ? 0 : 24}>
+        <Form.Item
+          {...courseModalFormLayout}
+          id="selectedCourseClass"
+          name="selectedCourseClass"
+          label="Course Session"
+          hidden={isVideoModal}
+          rules={isVideoModal ? [] : validationRules.requiredValidation}
+        >
+          <Select
+            showArrow
+            showSearch={false}
+            placeholder="Select Class"
+            options={courseClasses?.map((courseClass) => ({
+              value: courseClass.session_id,
+              label: courseClass.name,
+            }))}
+            value={selectedCourseClass}
+            onChange={handleCourseClassChange}
+          />
+        </Form.Item>
+      </Col>
+      <Col xs={isVideoModal ? 0 : 24}>
+        <Form.Item
+          {...courseModalFormLayout}
+          id="maxParticipants"
+          name="maxParticipants"
+          label="Max Participants"
+          extra={
+            <Text className={styles.helpText}>
+              This is the max attendee count of the session you selected. You can update the max count here and we'll
+              update it in the session too.
+            </Text>
+          }
+          hidden={isVideoModal}
+          rules={isVideoModal ? [] : validationRules.requiredValidation}
+        >
+          <InputNumber min={1} placeholder="Max Participants" className={styles.numericInput} />
+        </Form.Item>
+      </Col>
+      <Col xs={isVideoModal ? 0 : 24}>
+        <Row gutter={[8, 4]}>
+          <Col xs={24} md={8} className={styles.courseDatesText}>
+            Course Class Date & Time :
+          </Col>
+          <Col xs={24} md={16}>
+            <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
+          </Col>
+        </Row>
+      </Col>
+    </>
+  );
+
+  const renderVideoCourseInputs = () => (
+    <>
+      {/*<Col xs={!isVideoModal ? 0 : 24}> 
+        <Form.Item 
+          {...courseModalFormLayout} 
+          id="video_type" 
+          name="video_type" 
+          label="Video Course Type" 
+          hidden={!isVideoModal} 
+          rules={!isVideoModal ? [] : validationRules.requiredValidation}
+          onChange={handleVideoCourseTypeChange}
+        >
+          <Radio.Group>
+            <Radio value="non_sequential">Non-Sequential</Radio>
+            <Radio value="sequential">Sequential</Radio>
+          </Radio.Group>
+        </Form.Item> 
+      </Col> */}
+      <Col xs={!isVideoModal ? 0 : 24}>
+        <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={!isVideoModal}>
+          <Row gutter={8}>
+            <Col xs={20}>
+              <Form.Item
+                id="validity"
+                name="validity"
+                rules={
+                  !isVideoModal
+                    ? []
+                    : validationRules.numberValidation('Please Input Course Duration in days', 1, false)
+                }
+                noStyle
+              >
+                <InputNumber min={1} placeholder="Course Duration" className={styles.numericInput} />
+              </Form.Item>
+            </Col>
+            <Col xs={4} className={styles.textAlignCenter}>
+              <Text className={styles.currencyWrapper}>days</Text>
+            </Col>
+          </Row>
+        </Form.Item>
+      </Col>
+    </>
+  );
+
   return (
     <Modal
-      title={`${editedCourse ? 'Edit' : 'Create New'} Course`}
+      title={`${editedCourse ? 'Edit' : 'Create New'} ${isVideoModal ? 'Video' : 'Live'} Course`}
       centered={true}
       visible={visible}
       footer={null}
@@ -352,92 +534,16 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                 <Input placeholder="Enter Course Name" maxLength={50} />
               </Form.Item>
             </Col>
-            <Col xs={24}>
-              <Form.Item {...courseModalFormLayout} label="Course Duration" required={true}>
-                <Row gutter={8}>
-                  <Col xs={12}>
-                    <Form.Item
-                      id="courseStartDate"
-                      name="courseStartDate"
-                      rules={validationRules.requiredValidation}
-                      noStyle
-                    >
-                      <DatePicker
-                        placeholder="Select Start Date"
-                        onChange={handleStartDateChange}
-                        disabledDate={disabledStartDates}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={12}>
-                    <Form.Item
-                      id="courseEndDate"
-                      name="courseEndDate"
-                      rules={validationRules.requiredValidation}
-                      noStyle
-                    >
-                      <DatePicker
-                        placeholder="Select End Date"
-                        disabled={!Boolean(courseStartDate)}
-                        onChange={handleEndDateChange}
-                        disabledDate={disabledEndDates}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form.Item>
-            </Col>
+            {renderVideoCourseInputs()}
+            {renderLiveCourseInputs()}
             <Col xs={24}>
               <Form.Item
                 {...courseModalFormLayout}
-                id="selectedCourseClass"
-                name="selectedCourseClass"
-                label="Course Session"
-                rules={validationRules.requiredValidation}
+                id="videoList"
+                name="videoList"
+                label="Course Video(s)"
+                rules={isVideoModal ? validationRules.arrayValidation : []}
               >
-                <Select
-                  showArrow
-                  showSearch={false}
-                  placeholder="Select Class"
-                  options={courseClasses?.map((courseClass) => ({
-                    value: courseClass.session_id,
-                    label: courseClass.name,
-                  }))}
-                  value={selectedCourseClass}
-                  onChange={handleCourseClassChange}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24}>
-              <Form.Item
-                {...courseModalFormLayout}
-                id="maxParticipants"
-                name="maxParticipants"
-                label="Max Participants"
-                extra={
-                  <Text className={styles.helpText}>
-                    {' '}
-                    This is the max attendee count of the session you selected. You can update the max count here and
-                    we'll update it in the session too.
-                  </Text>
-                }
-                rules={validationRules.requiredValidation}
-              >
-                <InputNumber min={1} placeholder="Max Participants" className={styles.numericInput} />
-              </Form.Item>
-            </Col>
-            <Col xs={24}>
-              <Row gutter={[8, 4]}>
-                <Col xs={24} md={8} className={styles.courseDatesText}>
-                  Course Class Date & Time :
-                </Col>
-                <Col xs={24} md={16}>
-                  <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
-                </Col>
-              </Row>
-            </Col>
-            <Col xs={24}>
-              <Form.Item {...courseModalFormLayout} id="videoList" name="videoList" label="Course Video(s)">
                 <Select
                   showArrow
                   showSearch={false}
@@ -480,14 +586,14 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null }) => {
                     colors={colorPickerChoices}
                     className={styles.colorPicker}
                     onChangeComplete={handleColorChange}
-                    width={300}
+                    width={isMobileDevice ? 290 : 300}
                   />
                 </div>
               </Form.Item>
             </Col>
           </Row>
           <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
-            <Col xs={12} md={4}>
+            <Col xs={12} md={6}>
               <Button block type="default" onClick={() => closeModal(false)} loading={submitting}>
                 Cancel
               </Button>

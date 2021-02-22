@@ -142,7 +142,7 @@ const SessionRegistration = ({
     },
     {
       title: 'Credit Count',
-      dataIndex: 'class_count', //TODO: Adjust new credit keys here
+      dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       render: (text, record) => {
@@ -188,7 +188,7 @@ const SessionRegistration = ({
     },
     {
       title: 'Credits Left',
-      dataIndex: 'classes_remaining', //TODO: Adjust new credit keys here
+      dataIndex: 'classes_remaining',
       key: 'classes_remaining',
       width: '20%',
       render: (text, record) => `${record.classes_remaining}/${record.class_count}`,
