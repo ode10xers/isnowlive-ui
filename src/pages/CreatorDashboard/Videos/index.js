@@ -10,6 +10,7 @@ import {
   CopyOutlined,
   ExportOutlined,
   CheckCircleTwoTone,
+  BookTwoTone,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -191,7 +192,12 @@ const Videos = () => {
       dataIndex: 'title',
       key: 'title',
       width: '30%',
-      render: (text, record) => <Text> {record.title} </Text>,
+      render: (text, record) => (
+        <>
+          <Text> {record.title} </Text>
+          {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+        </>
+      ),
     },
     {
       title: 'Validity',

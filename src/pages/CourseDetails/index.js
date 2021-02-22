@@ -227,7 +227,7 @@ const CourseDetails = ({ match, history }) => {
           {course && (
             <Row classname={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
               <Col xs={24}>
-                <ShowcaseCourseCard course={course} username={username} />
+                <ShowcaseCourseCard courses={[course]} username={username} />
               </Col>
 
               {courseSession && (

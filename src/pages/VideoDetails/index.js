@@ -58,7 +58,7 @@ const VideoDetails = ({ match, history }) => {
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [video, setVideo] = useState(null);
-  const [course, setCourse] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
   const [availablePassesForVideo, setAvailablePassesForVideo] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
@@ -70,8 +70,8 @@ const VideoDetails = ({ match, history }) => {
 
   const getProfileDetails = useCallback(async () => {
     try {
-      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
-      if (data) {
+      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
         setIsLoading(false);
@@ -84,16 +84,17 @@ const VideoDetails = ({ match, history }) => {
 
   const getVideoDetails = useCallback(async (videoId) => {
     try {
-      const { data } = await apis.videos.getVideoById(videoId);
+      const { status, data } = await apis.videos.getVideoById(videoId);
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setVideo(data);
 
         if (data.is_course) {
-          //TODO: Confirm this API and the 1-to-1 relationship
-          const courseDetails = await apis.courses.getCourseByVideoId(data.external_id);
+          const courseDetails = await apis.courses.getVideoCoursesByVideoId(data.external_id);
 
-          setCourse(courseDetails.data[0]);
+          if (isAPISuccess(courseDetails.status) && courseDetails.data) {
+            setCourses(courseDetails.data);
+          }
         }
 
         setIsLoading(false);
@@ -604,7 +605,7 @@ const VideoDetails = ({ match, history }) => {
                 </Col>
 
                 {video.is_course ? (
-                  course && (
+                  courses?.length > 0 && (
                     <div className={classNames(styles.mb50, styles.mt20)}>
                       <Row gutter={[8, 16]}>
                         <Col xs={24}>
@@ -612,8 +613,8 @@ const VideoDetails = ({ match, history }) => {
                         </Col>
                         <Col xs={24}>
                           <ShowcaseCourseCard
-                            course={course}
-                            onCardClick={() => redirectToCourseDetails(course)}
+                            courses={courses}
+                            onCardClick={(course) => redirectToCourseDetails(course)}
                             username={username}
                           />
                         </Col>

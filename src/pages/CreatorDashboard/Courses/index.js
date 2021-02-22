@@ -100,8 +100,7 @@ const Courses = () => {
 
   const openEditCourseModal = (course) => {
     setTargetCourse(course);
-    setIsVideoModal(course.type !== courseType.MIXED);
-    openCreateCourseModal();
+    openCreateCourseModal(course.type === courseType.MIXED ? 'mixed' : 'video');
   };
 
   return (
@@ -116,11 +115,6 @@ const Courses = () => {
         <Col xs={24}>
           <Title level={3}> Courses </Title>
         </Col>
-        {/* <Col xs={14} lg={8} xl={6}>
-          <Button block size="large" type="primary" onClick={() => openCreateCourseModal()}>
-            Create New Course
-          </Button>
-        </Col> */}
         <Col xs={24}>
           <Tabs
             size="large"

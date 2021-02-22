@@ -584,8 +584,8 @@ const SessionDetails = ({ match, history }) => {
               </Col>
               <Col xs={24}>
                 <ShowcaseCourseCard
-                  course={course}
-                  onCardClick={() => redirectToCourseDetails(course)}
+                  courses={[course]}
+                  onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
                   username={username}
                 />
               </Col>
