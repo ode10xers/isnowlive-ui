@@ -104,7 +104,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        let filteredVideos = data.filter((video) => video.price > 0);
+        let filteredVideos = data;
 
         if (filterCourseVideos) {
           filteredVideos = filteredVideos.filter((video) => video.is_course);
@@ -233,10 +233,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     setCourseImageUrl(imageUrl);
     form.setFieldsValue({ ...form.getFieldValue(), courseImageUrl: imageUrl });
   };
-
-  // const handleVideoCourseTypeChange = (e) => {
-  //   setIsSequentialVideos(e.target.value === 'sequential');
-  // };
 
   const handleFinish = async (values) => {
     setSubmitting(true);
