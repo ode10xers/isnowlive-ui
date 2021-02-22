@@ -3,7 +3,6 @@ import React from 'react';
 import { Row, Col, Image, Card, Typography, Button, Tag } from 'antd';
 
 import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
 import { isValidFile, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
