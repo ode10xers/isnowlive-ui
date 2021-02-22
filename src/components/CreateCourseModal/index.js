@@ -600,7 +600,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             </Col>
           </Row>
           <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
-            <Col xs={12} md={4}>
+            <Col xs={12} md={6}>
               <Button block type="default" onClick={() => closeModal(false)} loading={submitting}>
                 Cancel
               </Button>

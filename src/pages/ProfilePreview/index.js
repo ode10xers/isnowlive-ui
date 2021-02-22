@@ -253,7 +253,7 @@ const ProfilePreview = ({ username = null }) => {
         targetElement = document.getElementById('home');
         setSelectedListTab(productKeys.SESSION);
       } else if (sectionToShow === 'course') {
-        if (liveCourses.length) {
+        if (liveCourses.length || videoCourses.length) {
           setSelectedListTab(sectionToShow);
           targetElement = document.getElementById('course');
         } else {
@@ -270,7 +270,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, videos, liveCourses, profile]);
+  }, [location.state, passes, videos, liveCourses, videoCourses, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
