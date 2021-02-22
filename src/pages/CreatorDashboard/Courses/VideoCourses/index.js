@@ -73,8 +73,8 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     {
       title: 'Course Duration',
       dataIndex: 'validity',
-      key: 'validity', //TODO: Confirm key here
-      width: '120px',
+      key: 'validity',
+      width: '210px',
       render: (text, record) => `${record?.validity} days`,
     },
     {

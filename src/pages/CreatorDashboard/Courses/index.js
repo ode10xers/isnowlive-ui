@@ -45,7 +45,7 @@ const Courses = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Course Published');
-        fetchCourseForCreator();
+        fetchAllCoursesForCreator();
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
@@ -60,7 +60,7 @@ const Courses = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Course Unpublished');
-        fetchCourseForCreator();
+        fetchAllCoursesForCreator();
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
@@ -68,14 +68,8 @@ const Courses = () => {
     setIsLoading(false);
   };
 
-  const fetchCourseForCreator = () => {
-    if (selectedListTab === 'liveClassCourse') {
-      fetchAllCoursesForCreator();
-    }
-  };
-
   useEffect(() => {
-    fetchCourseForCreator();
+    fetchAllCoursesForCreator();
     //eslint-disable-next-line
   }, [selectedListTab]);
 

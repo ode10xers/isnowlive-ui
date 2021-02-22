@@ -695,6 +695,5 @@ const SessionDetails = ({ match, history }) => {
     </Loader>
   );
 };
-//TODO: The VideoCards listing can probably be replaced with PublicVideoList to reduce the logic in this page
 
 export default SessionDetails;

@@ -135,7 +135,7 @@ const PublicPassList = ({ username, passes }) => {
     },
     {
       title: 'Credit Count',
-      dataIndex: 'class_count', //TODO: Adjust new credit keys here
+      dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',

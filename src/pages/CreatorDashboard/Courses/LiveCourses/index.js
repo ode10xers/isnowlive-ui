@@ -69,7 +69,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       title: 'Duration',
       dataIndex: 'start_time',
       key: 'start_time',
-      width: '170px',
+      width: '210px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {

@@ -85,7 +85,7 @@ const CourseList = () => {
       title: 'Duration',
       key: 'start_date',
       dataIndex: 'start_date',
-      width: '180px',
+      width: '210px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {

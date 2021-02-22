@@ -19,7 +19,6 @@ import { courseModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
-//TODO: Adjust tags here
 const courseTypes = {
   MIXED: {
     name: 'MIXED',
