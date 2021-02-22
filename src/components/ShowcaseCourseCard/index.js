@@ -15,7 +15,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isValidFile, isAPISuccess, orderType } from 'utils/helper';
+import { isValidFile, isAPISuccess, orderType, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -141,12 +141,16 @@ const ShowcaseCourseCard = ({ course = null, onCardClick = noop, username = null
                   </Col>
                   <Col xs={24} className={styles.courseDetailsWrapper}>
                     <Text type="secondary">
-                      {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
+                      {course?.type === courseType.MIXED
+                        ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
+                        : `Validity: ${course?.validity} days`}
                     </Text>
                   </Col>
                   <Col xs={24} className={styles.courseDetailsWrapper}>
                     {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
-                    <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                    {course?.inventory_ids?.length > 0 && (
+                      <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                    )}
                   </Col>
                   <Col xs={24} className={styles.coursePriceWrapper}>
                     <Text strong className={styles.blueText}>
@@ -193,12 +197,16 @@ const ShowcaseCourseCard = ({ course = null, onCardClick = noop, username = null
                   </Col>
                   <Col xs={24} className={styles.courseDetailsWrapper}>
                     <Text>
-                      {`${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`}
+                      {course?.type === courseType.MIXED
+                        ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
+                        : `Validity: ${course?.validity} days`}
                     </Text>
                   </Col>
                   <Col xs={24} className={styles.courseDetailsWrapper}>
                     {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
-                    <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                    {course?.inventory_ids?.length > 0 && (
+                      <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                    )}
                   </Col>
                   <Col xs={24} className={styles.coursePriceWrapper}>
                     <Text strong className={styles.blueText}>

@@ -30,7 +30,7 @@ import CalendarView from 'components/CalendarView';
 import { isAPISuccess, parseEmbedCode } from 'utils/helper';
 import DefaultImage from 'components/Icons/DefaultImage/index';
 import Share from 'components/Share';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, courseType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
@@ -69,7 +69,6 @@ const ProfilePreview = ({ username = null }) => {
   const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
-  const [selectedCourseTab, setSelectedCourseTab] = useState('liveCourse');
   const [isListLoading, setIsListLoading] = useState(false);
 
   const [passes, setPasses] = useState([]);
@@ -183,8 +182,7 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
-  //TODO: Confirm whether it will be a separate API or not
-  const getLiveCourseDetails = useCallback(async () => {
+  const getCoursesDetails = useCallback(async () => {
     setIsCoursesLoading(true);
     try {
       let profileUsername = '';
@@ -198,12 +196,15 @@ const ProfilePreview = ({ username = null }) => {
       const { status, data } = await apis.courses.getCoursesByUsername(profileUsername);
 
       if (isAPISuccess(status) && data) {
-        setLiveCourses(data);
+        setLiveCourses(data.filter((course) => course.type === courseType.MIXED || course.type === 'live'));
+        setVideoCourses(
+          data.filter((course) => course.type === courseType.VIDEO_NON_SEQ || course.type === courseType.VIDEO_SEQ)
+        );
         setIsCoursesLoading(false);
       }
     } catch (error) {
       setIsCoursesLoading(false);
-      message.error('Failed to load live courses details');
+      message.error('Failed to load courses details');
     }
   }, [username]);
 
@@ -215,14 +216,14 @@ const ProfilePreview = ({ username = null }) => {
     getSessionDetails('upcoming');
     getPassesDetails();
     getVideosDetails();
-    getLiveCourseDetails();
+    getCoursesDetails();
   }, [
     history.location.pathname,
     getProfileDetails,
     getSessionDetails,
     getPassesDetails,
     getVideosDetails,
-    getLiveCourseDetails,
+    getCoursesDetails,
   ]);
 
   useEffect(() => {
@@ -277,8 +278,6 @@ const ProfilePreview = ({ username = null }) => {
 
     if (key === 'session') {
       handleChangeSessionTab(selectedSessionTab);
-    } else if (key === 'course') {
-      handleChangeCourseTab(selectedCourseTab);
     }
     setIsListLoading(false);
   };
@@ -292,15 +291,6 @@ const ProfilePreview = ({ username = null }) => {
     } else {
       trackSimpleEvent(user.click.profile.pastSessionsTab);
       getSessionDetails('past');
-    }
-  };
-
-  const handleChangeCourseTab = (key) => {
-    setSelectedCourseTab(key);
-
-    //TODO: Check if it's a separate API or not
-    if (key === 'liveCourses') {
-      getLiveCourseDetails();
     }
   };
 
@@ -567,7 +557,7 @@ const ProfilePreview = ({ username = null }) => {
                   {videoCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
-                        <PublicCourseList username={username} courses={liveCourses} />
+                        <PublicCourseList username={username} courses={videoCourses} />
                       </Loader>
                     </Tabs.TabPane>
                   )}
