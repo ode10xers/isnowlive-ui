@@ -124,114 +124,61 @@ const ShowcaseCourseCard = ({ course = null, onCardClick = noop, username = null
           bodyStyle={{ padding: '10px 10px 0px' }}
           onClick={onCardClick}
         >
-          {isMobileDevice ? (
-            <Row gutter={[8, 4]}>
-              <Col xs={24} className={styles.courseImageWrapper}>
-                <Image
-                  preview={false}
-                  height={100}
-                  className={styles.courseImage}
-                  src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
-                />
-              </Col>
-              <Col xs={24} className={styles.courseInfoWrapper}>
-                <Row gutter={[8, 8]}>
-                  <Col xs={24} className={styles.courseNameWrapper}>
-                    <Text strong> {course?.name} </Text>
-                  </Col>
-                  <Col xs={24} className={styles.courseDetailsWrapper}>
-                    <Text type="secondary">
-                      {course?.type === courseType.MIXED
-                        ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
-                        : `Validity: ${course?.validity} days`}
-                    </Text>
-                  </Col>
-                  <Col xs={24} className={styles.courseDetailsWrapper}>
-                    {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
-                    {course?.inventory_ids?.length > 0 && (
-                      <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
-                    )}
-                  </Col>
-                  <Col xs={24} className={styles.coursePriceWrapper}>
-                    <Text strong className={styles.blueText}>
-                      {course?.currency?.toUpperCase()} {course?.price}
-                    </Text>
-                  </Col>
-                </Row>
-              </Col>
-              {!isOnAttendeeDashboard && (
-                <Col xs={24} className={styles.buyButtonWrapper}>
-                  <Button
-                    block
-                    className={styles.buyButton}
-                    type="primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openPurchaseModal();
-                    }}
-                  >
-                    Buy Course
-                  </Button>
+          <Row gutter={[16, 8]}>
+            <Col xs={24} lg={isOnAttendeeDashboard ? 12 : 10} xl={10} className={styles.courseImageWrapper}>
+              <Image
+                preview={false}
+                height={isMobileDevice ? 100 : 130}
+                className={styles.courseImage}
+                src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
+              />
+            </Col>
+            <Col
+              xs={24}
+              lg={isOnAttendeeDashboard ? 12 : 8}
+              xl={isOnAttendeeDashboard ? 14 : 10}
+              className={styles.courseInfoWrapper}
+            >
+              <Row gutter={[8, 4]}>
+                <Col xs={24} className={styles.courseNameWrapper}>
+                  <Text strong> {course?.name} </Text>
                 </Col>
-              )}
-            </Row>
-          ) : (
-            <Row gutter={[16, 8]}>
-              <Col xs={24} md={isOnAttendeeDashboard ? 12 : 10} xl={10} className={styles.courseImageWrapper}>
-                <Image
-                  preview={false}
-                  height={130}
-                  className={styles.courseImage}
-                  src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
-                />
-              </Col>
-              <Col
-                xs={24}
-                md={isOnAttendeeDashboard ? 12 : 8}
-                xl={isOnAttendeeDashboard ? 14 : 10}
-                className={styles.courseInfoWrapper}
-              >
-                <Row gutter={[8, 4]}>
-                  <Col xs={24} className={styles.courseNameWrapper}>
-                    <Text strong> {course?.name} </Text>
-                  </Col>
-                  <Col xs={24} className={styles.courseDetailsWrapper}>
-                    <Text>
-                      {course?.type === courseType.MIXED
-                        ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
-                        : `Validity: ${course?.validity} days`}
-                    </Text>
-                  </Col>
-                  <Col xs={24} className={styles.courseDetailsWrapper}>
-                    {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
-                    {course?.inventory_ids?.length > 0 && (
-                      <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
-                    )}
-                  </Col>
-                  <Col xs={24} className={styles.coursePriceWrapper}>
-                    <Text strong className={styles.blueText}>
-                      {course?.currency?.toUpperCase()} {course?.price}
-                    </Text>
-                  </Col>
-                </Row>
-              </Col>
-              {!isOnAttendeeDashboard && (
-                <Col xs={24} md={6} xl={4} className={styles.buyButtonWrapper}>
-                  <Button
-                    block
-                    className={styles.buyButton}
-                    type="primary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openPurchaseModal();
-                    }}
-                  >
-                    Buy Course
-                  </Button>
+                <Col xs={24} className={styles.courseDetailsWrapper}>
+                  <Text>
+                    {course?.type === courseType.MIXED
+                      ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
+                      : `Validity: ${course?.validity} days`}
+                  </Text>
                 </Col>
-              )}
-            </Row>
-          )}
+                <Col xs={24} className={styles.courseDetailsWrapper}>
+                  {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
+                  {course?.inventory_ids?.length > 0 && (
+                    <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                  )}
+                </Col>
+                <Col xs={24} className={styles.coursePriceWrapper}>
+                  <Text strong className={styles.blueText}>
+                    {course?.currency?.toUpperCase()} {course?.price}
+                  </Text>
+                </Col>
+              </Row>
+            </Col>
+            {!isOnAttendeeDashboard && (
+              <Col xs={24} lg={6} xl={4} className={styles.buyButtonWrapper}>
+                <Button
+                  block
+                  className={styles.buyButton}
+                  type="primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openPurchaseModal();
+                  }}
+                >
+                  Buy Course
+                </Button>
+              </Col>
+            )}
+          </Row>
         </Card>
       </Loader>
     </div>

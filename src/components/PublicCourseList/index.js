@@ -20,7 +20,7 @@ const PublicCourseList = ({ username = null, courses }) => {
     <div className={styles.box}>
       <Row justify="start" gutter={[20, 20]}>
         {courses?.map((course) => (
-          <Col xs={24} lg={12}>
+          <Col xs={24} xl={12}>
             <LiveCourseCard course={course} onCardClick={() => redirectToCourseDetails(course)} />
           </Col>
         ))}
