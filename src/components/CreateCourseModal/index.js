@@ -26,7 +26,7 @@ const courseTypes = {
     label: 'Live Session Course',
   },
   VIDEO_NON_SEQ: {
-    name: 'VIDEO_NON_SEQ',
+    name: 'VIDEO_NON_SEQUENCE',
     label: 'Non-Sequential Video Course',
   },
 };
@@ -99,15 +99,19 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     setIsLoading(false);
   }, []);
 
-  const fetchAllVideosForCreator = useCallback(async () => {
+  const fetchAllVideosForCreator = useCallback(async (filterCourseVideos = false) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(
-          data.filter((video) => video.price > 0).map((video) => ({ value: video.external_id, label: video.title }))
-        );
+        let filteredVideos = data.filter((video) => video.price > 0);
+
+        if (filterCourseVideos) {
+          filteredVideos = filteredVideos.filter((video) => video.is_course);
+        }
+
+        setVideos(filteredVideos.map((video) => ({ value: video.external_id, label: video.title })));
       }
     } catch (error) {
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
@@ -171,7 +175,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     }
 
     fetchAllCourseClassForCreator();
-    fetchAllVideosForCreator();
+    fetchAllVideosForCreator(isVideoModal);
   }, [visible, editedCourse, isVideoModal, fetchAllCourseClassForCreator, fetchAllVideosForCreator, form]);
 
   const filterSessionInventoryInDateRange = (inventories) => {
@@ -244,7 +248,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       let processedVideosIDs = selectedVideos;
 
       if (processedVideosIDs.length <= 0) {
-        showErrorModal('Course Session not found', 'The course session you chose is invalid');
+        showErrorModal('Course Video Required', 'Please select at least one course video to include in this course');
         setSubmitting(false);
         return;
       }
@@ -253,7 +257,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
-        type: courseTypes.VIDEO_NON_SEQ.name.toLowerCase(),
+        type: courseTypes.VIDEO_NON_SEQ.name.toUpperCase(),
         price: values.price || 1,
         currency: currency?.toLowerCase(),
         video_ids: processedVideosIDs,
@@ -283,7 +287,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
-        type: courseTypes.MIXED.name.toLowerCase(),
+        type: courseTypes.MIXED.name.toUpperCase(),
         price: values.price || 1,
         currency: currency?.toLowerCase(),
         video_ids: selectedVideos || [],
