@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Tooltip, Typography, Button, Card, Empty } from 'antd';
+import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
@@ -13,13 +13,15 @@ import { copyPageLinkToClipboard, generateUrlFromUsername } from 'utils/helper';
 import styles from './styles.module.scss';
 
 const { Text, Title } = Typography;
+const { Panel } = Collapse;
 
 const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
 const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCourse }) => {
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
+  const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
 
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
@@ -28,23 +30,45 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     copyPageLinkToClipboard(pageLink);
   };
 
-  const toggleExpandAll = () => {
-    if (expandedRowKeys.length > 0) {
-      setExpandedRowKeys([]);
+  const toggleExpandAllPublished = () => {
+    if (expandedPublishedRowKeys.length > 0) {
+      setExpandedPublishedRowKeys([]);
     } else {
-      setExpandedRowKeys(videoCourses?.map((videoCourse) => videoCourse.id));
+      setExpandedPublishedRowKeys(
+        videoCourses?.filter((videoCourse) => videoCourse.is_published).map((videoCourse) => videoCourse.id)
+      );
     }
   };
 
-  const expandRow = (rowKey) => {
-    const tempExpandedRowsArray = expandedRowKeys;
+  const expandRowPublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedPublishedRowKeys;
     tempExpandedRowsArray.push(rowKey);
-    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+    setExpandedPublishedRowKeys([...new Set(tempExpandedRowsArray)]);
   };
 
-  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
+  const collapseRowPublished = (rowKey) =>
+    setExpandedPublishedRowKeys(expandedPublishedRowKeys.filter((key) => key !== rowKey));
 
-  const videoCourseColumns = [
+  const toggleExpandAllUnpublished = () => {
+    if (expandedUnpublishedRowKeys.length > 0) {
+      setExpandedUnpublishedRowKeys([]);
+    } else {
+      setExpandedUnpublishedRowKeys(
+        videoCourses?.filter((videoCourse) => !videoCourse.is_published).map((videoCourse) => videoCourse.id)
+      );
+    }
+  };
+
+  const expandRowUnpublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedUnpublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedUnpublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRowUnpublished = (rowKey) =>
+    setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
+
+  const generateVideoCourseColumns = (published) => [
     {
       title: 'Course Name',
       dataIndex: 'name',
@@ -85,9 +109,13 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
     },
     {
-      title: (
-        <Button shape="round" type="primary" onClick={() => toggleExpandAll()}>
-          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+      title: published ? (
+        <Button shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
+          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ) : (
+        <Button shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
+          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
         </Button>
       ),
       width: '250px',
@@ -125,12 +153,22 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             )}
           </Col>
           <Col xs={10}>
-            {expandedRowKeys.includes(record.id) ? (
-              <Button block type="link" onClick={() => collapseRow(record.id)}>
+            {record.is_published ? (
+              expandedPublishedRowKeys.includes(record.id) ? (
+                <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
+                  {record.buyers?.length} Buyers <UpOutlined />
+                </Button>
+              ) : (
+                <Button block type="link" onClick={() => expandRowPublished(record.id)}>
+                  {record.buyers?.length} Buyers <DownOutlined />
+                </Button>
+              )
+            ) : expandedUnpublishedRowKeys.includes(record.id) ? (
+              <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
                 {record.buyers?.length} Buyers <UpOutlined />
               </Button>
             ) : (
-              <Button block type="link" onClick={() => expandRow(record.id)}>
+              <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
                 {record.buyers?.length} Buyers <DownOutlined />
               </Button>
             )}
@@ -204,6 +242,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       <Col xs={24}>
         <Card
           className={styles.card}
+          bodyStyle={{ padding: '20px 10px' }}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${course?.color_code || '#FFF'}` }}>
               <Text>{course?.name}</Text>
@@ -239,10 +278,16 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(course.id) ? (
-              <Button type="link" onClick={() => collapseRow(course.id)} icon={<UpOutlined />} />
+            course.is_published ? (
+              expandedPublishedRowKeys.includes(course.id) ? (
+                <Button type="link" onClick={() => collapseRowPublished(course.id)} icon={<UpOutlined />} />
+              ) : (
+                <Button type="link" onClick={() => expandRowPublished(course.id)} icon={<DownOutlined />} />
+              )
+            ) : expandedUnpublishedRowKeys.includes(course.id) ? (
+              <Button type="link" onClick={() => collapseRowUnpublished(course.id)} icon={<UpOutlined />} />
             ) : (
-              <Button type="link" onClick={() => expandRow(course.id)} icon={<DownOutlined />} />
+              <Button type="link" onClick={() => expandRowUnpublished(course.id)} icon={<DownOutlined />} />
             ),
           ]}
         >
@@ -250,11 +295,17 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
           {layout('Duration', <Text> {course?.validity} days</Text>)}
           {layout('Price', <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
         </Card>
-        {expandedRowKeys.includes(course?.id) && (
-          <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
-          </Row>
-        )}
+        {course.is_published
+          ? expandedPublishedRowKeys.includes(course?.id) && (
+              <Row className={styles.cardExpansion}>
+                <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
+              </Row>
+            )
+          : expandedUnpublishedRowKeys.includes(course?.id) && (
+              <Row className={styles.cardExpansion}>
+                <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
+              </Row>
+            )}
       </Col>
     );
   };
@@ -262,30 +313,60 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
   return (
     <div>
       {videoCourses?.length > 0 ? (
-        isMobileDevice ? (
-          <Row gutter={[8, 16]}>
-            <Col xs={24}>
-              <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-                {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-              </Button>
-            </Col>
-            {videoCourses?.map(renderCourseItem)}
-          </Row>
-        ) : (
-          <Table
-            size="small"
-            sticky={true}
-            columns={videoCourseColumns}
-            data={videoCourses}
-            rowKey={(record) => record.id}
-            expandable={{
-              expandedRowRender: renderBuyersList,
-              expandRowByClick: true,
-              expandIconColumnIndex: -1,
-              expandedRowKeys: expandedRowKeys,
-            }}
-          />
-        )
+        <Collapse>
+          <Panel header={<Title level={5}> Published </Title>} key="published">
+            {isMobileDevice ? (
+              <Row gutter={[8, 16]}>
+                <Col xs={24}>
+                  <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
+                    {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  </Button>
+                </Col>
+                {videoCourses?.filter((videoCourse) => videoCourse.is_published).map(renderCourseItem)}
+              </Row>
+            ) : (
+              <Table
+                size="small"
+                sticky={true}
+                columns={generateVideoCourseColumns(true)}
+                data={videoCourses?.filter((videoCourse) => videoCourse.is_published)}
+                rowKey={(record) => record.id}
+                expandable={{
+                  expandedRowRender: renderBuyersList,
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedPublishedRowKeys,
+                }}
+              />
+            )}
+          </Panel>
+          <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+            {isMobileDevice ? (
+              <Row gutter={[8, 16]}>
+                <Col xs={24}>
+                  <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
+                    {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  </Button>
+                </Col>
+                {videoCourses?.filter((videoCourse) => !videoCourse.is_published).map(renderCourseItem)}
+              </Row>
+            ) : (
+              <Table
+                size="small"
+                sticky={true}
+                columns={generateVideoCourseColumns(false)}
+                data={videoCourses?.filter((videoCourse) => !videoCourse.is_published)}
+                rowKey={(record) => record.id}
+                expandable={{
+                  expandedRowRender: renderBuyersList,
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedUnpublishedRowKeys,
+                }}
+              />
+            )}
+          </Panel>
+        </Collapse>
       ) : (
         <Empty description="No Courses found" />
       )}
