@@ -119,6 +119,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorCurrency = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.session.getCreatorBalance();
+
+      if (isAPISuccess(status) && data?.currency) {
+        setCurrency(data.currency.toUpperCase());
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed to fetch creator currency details',
+        error?.response?.data?.message || 'Something went wrong'
+      );
+    }
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     if (visible) {
       if (editedCourse) {
@@ -174,9 +191,22 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       }
     }
 
-    fetchAllCourseClassForCreator();
+    fetchCreatorCurrency();
+
+    if (!isVideoModal) {
+      fetchAllCourseClassForCreator();
+    }
+
     fetchAllVideosForCreator(isVideoModal);
-  }, [visible, editedCourse, isVideoModal, fetchAllCourseClassForCreator, fetchAllVideosForCreator, form]);
+  }, [
+    visible,
+    editedCourse,
+    isVideoModal,
+    fetchAllCourseClassForCreator,
+    fetchAllVideosForCreator,
+    fetchCreatorCurrency,
+    form,
+  ]);
 
   const filterSessionInventoryInDateRange = (inventories) => {
     if (!inventories) {
