@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag } from 'antd';
+import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 

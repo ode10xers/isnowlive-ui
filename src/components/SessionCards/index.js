@@ -3,6 +3,7 @@ import ReactHtmlParser from 'react-html-parser';
 import MobileDetect from 'mobile-detect';
 
 import { Card, Image, Row, Col, Typography, Empty, Tag, message } from 'antd';
+import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -92,7 +93,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                         </Col>
                         <Col xs={24}>
                           <Title ellipsis={{ rows: 1 }} level={5}>
-                            {session.name}
+                            {session.name} {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                           </Title>
                         </Col>
                         <Col xs={24}>
@@ -135,7 +136,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                           <Row>
                             <Col xs={24}>
                               <Title ellipsis={{ rows: 1 }} level={5}>
-                                {session.name}
+                                {session.name} {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                               </Title>
                             </Col>
                             <Col xs={24}>
