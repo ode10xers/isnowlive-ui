@@ -4,6 +4,10 @@
   width: 100% !important;
 }
 
+.datePicker {
+  width: 100%;
+}
+
 .currencyWrapper {
   font-size: 16px;
 }
@@ -20,6 +24,7 @@
 .colorPickerPreview {
   border-width: 10px;
   border-style: solid;
+  width: fit-content;
 }
 
 .helpText {
@@ -31,19 +36,5 @@
   & > div {
     width: 100% !important;
     height: 200px !important;
-  }
-}
-
-.courseDatesText {
-  text-align: right;
-}
-
-.courseDateTags {
-  font-size: 14px;
-}
-
-@media screen and (max-width: 769px){
-  .courseDatesText {
-    text-align: left;
   }
 }

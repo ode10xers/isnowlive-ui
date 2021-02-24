@@ -3,10 +3,12 @@ import classNames from 'classnames';
 import moment from 'moment';
 
 import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag } from 'antd';
+import { BookTwoTone } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
 
+import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
@@ -77,12 +79,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const [currency, setCurrency] = useState('SGD');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [selectedCourseClass, setSelectedCourseClass] = useState(null);
+  const [selectedCourseClass, setSelectedCourseClass] = useState([]);
   const [selectedVideos, setSelectedVideos] = useState([]);
   const [colorCode, setColorCode] = useState(initialColor);
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
   const [courseImageUrl, setCourseImageUrl] = useState(null);
+  const [highestMaxParticipantCourseSession, setHighestMaxParticipantCourseSession] = useState(null);
   // const [isSequentialVideos, setIsSequentialVideos] = useState(false);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
@@ -91,7 +94,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       const { status, data } = await apis.session.getSession();
 
       if (isAPISuccess(status) && data) {
-        setCourseClasses(data.filter((session) => session.is_course));
+        setCourseClasses(data.filter((session) => session.inventory.length > 0));
       }
     } catch (error) {
       showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
@@ -111,7 +114,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           filteredVideos = filteredVideos.filter((video) => video.is_course);
         }
 
-        setVideos(filteredVideos.map((video) => ({ value: video.external_id, label: video.title })));
+        setVideos(filteredVideos);
       }
     } catch (error) {
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
@@ -135,6 +138,17 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     }
     setIsLoading(false);
   }, []);
+
+  const getSelectedCourseClasses = useCallback(
+    (selectedClassIds = []) => {
+      if (courseClasses?.length <= 0 || selectedClassIds?.length <= 0) {
+        return [];
+      }
+
+      return courseClasses.filter((courseClass) => selectedClassIds.includes(courseClass.session_id));
+    },
+    [courseClasses]
+  );
 
   useEffect(() => {
     if (visible) {
@@ -160,14 +174,14 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             courseName: editedCourse?.name,
             courseStartDate: moment(editedCourse?.start_date),
             courseEndDate: moment(editedCourse?.end_date),
-            selectedCourseClass: editedCourse?.session?.session_id,
-            maxParticipants: editedCourse?.session?.max_participants,
+            selectedCourseClass: editedCourse?.sessions?.map((courseSession) => courseSession.session_id),
+            maxParticipants: editedCourse?.max_participants,
             videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
             price: editedCourse?.price,
             colorCode: editedCourse?.color_code || initialColor || whiteColor,
           });
 
-          setSelectedCourseClass(editedCourse?.session?.session_id);
+          setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
           setCourseStartDate(moment(editedCourse?.start_date));
           setCourseEndDate(moment(editedCourse?.end_date));
 
@@ -180,7 +194,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setColorCode(editedCourse.color_code || initialColor || whiteColor);
       } else {
         form.resetFields();
-        setSelectedCourseClass(null);
+        setSelectedCourseClass([]);
         setSelectedVideos([]);
         setColorCode(initialColor);
         setCurrency('SGD');
@@ -208,6 +222,29 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     form,
   ]);
 
+  useEffect(() => {
+    if (selectedCourseClass?.length > 0) {
+      let highestMaxParticipantCourseSession = null;
+      let highestMaxParticipantCount = 0;
+
+      const courseSessionsList = getSelectedCourseClasses(selectedCourseClass).filter(
+        (selectedClass) => selectedClass.is_course
+      );
+
+      if (courseSessionsList.length > 0) {
+        courseSessionsList.forEach((courseSession) => {
+          if (courseSession.max_participants > highestMaxParticipantCount) {
+            highestMaxParticipantCount = courseSession.max_participants;
+            highestMaxParticipantCourseSession = courseSession;
+          }
+        });
+      }
+
+      setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
+      form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
+    }
+  }, [selectedCourseClass, getSelectedCourseClasses, form]);
+
   const filterSessionInventoryInDateRange = (inventories) => {
     if (!inventories) {
       return [];
@@ -222,6 +259,35 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
         moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
     );
+  };
+
+  const generateSessionInventoryArray = () => {
+    const selectedSessions = getSelectedCourseClasses(selectedCourseClass);
+
+    if (selectedSessions?.length <= 0) {
+      return [];
+    }
+
+    let sessionInventoryArr = [];
+
+    selectedSessions.forEach((selectedSession) => {
+      const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
+
+      if (filteredInventories.length > 0) {
+        sessionInventoryArr = [
+          ...sessionInventoryArr,
+          ...filteredInventories.map((inventory) => ({
+            session_id: selectedSession.session_id,
+            inventory_id: inventory.inventory_id,
+            name: selectedSession.name,
+            start_time: inventory.start_time,
+            end_time: inventory.end_time,
+          })),
+        ];
+      }
+    });
+
+    return sessionInventoryArr;
   };
 
   const handleColorChange = (color) => {
@@ -254,10 +320,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
   const handleCourseClassChange = (val) => {
     setSelectedCourseClass(val);
-
-    const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === val);
-
-    form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: targetCourseClass?.max_participants || null });
   };
 
   const handleCourseImageUpload = (imageUrl) => {
@@ -290,21 +352,37 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         validity: values.validity || 1,
       };
     } else {
-      const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
+      // Remove inventory list check
+      // const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
 
-      if (!targetCourseClass) {
-        showErrorModal('Course Session not found', 'The course session you chose is invalid');
-        setSubmitting(false);
-        return;
-      }
+      // if (!targetCourseClass) {
+      //   showErrorModal('Course Session not found', 'The course session you chose is invalid');
+      //   setSubmitting(false);
+      //   return;
+      // }
 
-      const courseClassInventoriesInDateRange = filterSessionInventoryInDateRange(targetCourseClass?.inventory);
+      // const courseClassInventoriesInDateRange = filterSessionInventoryInDateRange(targetCourseClass?.inventory);
 
-      if (courseClassInventoriesInDateRange.length <= 0) {
-        showErrorModal(
-          'No sessions scheduled',
-          'The course session you selected has no schedules in the duration you choose.'
-        );
+      // if (courseClassInventoriesInDateRange.length <= 0) {
+      //   showErrorModal(
+      //     'No sessions scheduled',
+      //     'The course session you selected has no schedules in the duration you choose.'
+      //   );
+      //   setSubmitting(false);
+      //   return;
+      // }
+
+      // This check is to make sure that there is at least 1 inventory of Course Session Included
+      const sessionInventories = generateSessionInventoryArray();
+      const uniqueSessionIdsFromInventories = [
+        ...new Set(sessionInventories.map((sessionInventory) => sessionInventory.session_id)),
+      ];
+      const chosenCourseClasses = getSelectedCourseClasses(uniqueSessionIdsFromInventories).filter(
+        (courseClass) => courseClass.is_course
+      );
+
+      if (!chosenCourseClasses || chosenCourseClasses?.length <= 0) {
+        showErrorModal('Course Session not found', 'Please include at least one course session in your selection');
         setSubmitting(false);
         return;
       }
@@ -317,11 +395,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         price: values.price || 1,
         currency: currency?.toLowerCase(),
         video_ids: selectedVideos || [],
-        session_id: selectedCourseClass,
-        max_participants: values.maxParticipants || targetCourseClass?.max_participants,
+        session_ids: selectedCourseClass,
+        max_participants: values.maxParticipants || highestMaxParticipantCourseSession?.max_participants,
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).endOf('day').utc().format(),
-        inventory_ids: courseClassInventoriesInDateRange.map((inventory) => inventory.inventory_id) || [],
+        inventory_ids: sessionInventories.map((inventory) => inventory.inventory_id) || [],
       };
     }
 
@@ -344,45 +422,117 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const renderSessionDates = () => {
     const noInventoryComponent = (
       <Col xs={24}>
-        <Text type="secondary">No sessions found for this class</Text>
+        <Text type="secondary">No sessions found for the date range</Text>
       </Col>
     );
 
-    if (!selectedCourseClass) {
+    // if (!selectedCourseClass) {
+    //   return noInventoryComponent;
+    // }
+
+    // const selectedSessions = getSelectedCourseClasses();
+
+    // if (!selectedSessions || selectedSessions.length <= 0) {
+    //   return noInventoryComponent;
+    // }
+
+    let tableData = generateSessionInventoryArray();
+
+    if (tableData.length <= 0) {
       return noInventoryComponent;
     }
 
-    const selectedSession = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
+    // selectedSessions.forEach((selectedSession) => {
+    //   const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
 
-    if (!selectedSession || selectedSession.inventory?.length <= 0) {
-      return noInventoryComponent;
-    }
+    //   if (filteredInventories.length > 0) {
+    //     tableData = [
+    //       ...tableData,
+    //       ...filteredInventories.map((inventory) => ({
+    //         key: `${selectedSession.session_id}_${inventory.inventory_id}`,
+    //         name: selectedSession.name,
+    //         start_time: inventory.start_time,
+    //         end_time: inventory.end_time,
+    //       })),
+    //     ];
+    //   }
+    // });
 
-    const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
+    const tableColumns = [
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'name',
+        width: '40%',
+        render: (text, record) => record.name,
+      },
+      {
+        title: 'Date & Time',
+        dataIndex: 'start_date',
+        key: 'start_date',
+        align: 'right',
+        width: '60%',
+        render: (text, record) =>
+          `${toLongDateWithDay(record?.start_time)}, ${toLocaleTime(record?.start_time)} - ${toLocaleTime(
+            record?.end_time
+          )}`,
+      },
+    ];
 
-    if (filteredInventories.length <= 0) {
-      return (
-        <Col xs={24}>
-          <Text type="secondary">Course has no schedules for the duration you choose</Text>
-        </Col>
-      );
-    }
-
-    return filteredInventories.map((sessionInventory) => (
-      <Col xs={24} key={`${selectedCourseClass}_${sessionInventory.inventory_id}`}>
-        <Tag color="volcano">
-          <div className={styles.courseDateTags}>
-            {`${toLongDateWithDay(sessionInventory.start_time)}, ${toLocaleTime(
-              sessionInventory.start_time
-            )} - ${toLocaleTime(sessionInventory.end_time)}`}
-          </div>
-        </Tag>
+    return (
+      <Col xs={24}>
+        <Table
+          columns={tableColumns}
+          data={tableData}
+          rowKey={(record) => `${record.session_id}_${record.inventory_id}`}
+        />
       </Col>
-    ));
+    );
+
+    // return filteredInventories.map((sessionInventory) => (
+    //   <Col xs={24} key={`${selectedCourseClass}_${sessionInventory.inventory_id}`}>
+    //     <Tag color="volcano">
+    //       <div className={styles.courseDateTags}>
+    //         {`${toLongDateWithDay(sessionInventory.start_time)}, ${toLocaleTime(
+    //           sessionInventory.start_time
+    //         )} - ${toLocaleTime(sessionInventory.end_time)}`}
+    //       </div>
+    //     </Tag>
+    //   </Col>
+    // ));
   };
 
   const renderLiveCourseInputs = () => (
     <>
+      <Col xs={isVideoModal ? 0 : 24}>
+        <Form.Item
+          {...courseModalFormLayout}
+          id="selectedCourseClass"
+          name="selectedCourseClass"
+          label="Course Session"
+          hidden={isVideoModal}
+          rules={isVideoModal ? [] : validationRules.arrayValidation}
+        >
+          <Select
+            showArrow
+            showSearch={false}
+            mode="multiple"
+            maxTagCount={2}
+            placeholder="Select Class"
+            options={courseClasses?.map((courseClass) => ({
+              value: courseClass.session_id,
+              label: (
+                <>
+                  {' '}
+                  {courseClass.name} {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                </>
+              ),
+            }))}
+            value={selectedCourseClass}
+            onChange={handleCourseClassChange}
+          />
+        </Form.Item>
+      </Col>
       <Col xs={isVideoModal ? 0 : 24}>
         <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={isVideoModal}>
           <Row gutter={8}>
@@ -397,6 +547,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   placeholder="Select Start Date"
                   onChange={handleStartDateChange}
                   disabledDate={disabledStartDates}
+                  className={styles.datePicker}
                 />
               </Form.Item>
             </Col>
@@ -412,32 +563,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   disabled={!Boolean(courseStartDate)}
                   onChange={handleEndDateChange}
                   disabledDate={disabledEndDates}
+                  className={styles.datePicker}
                 />
               </Form.Item>
             </Col>
           </Row>
-        </Form.Item>
-      </Col>
-      <Col xs={isVideoModal ? 0 : 24}>
-        <Form.Item
-          {...courseModalFormLayout}
-          id="selectedCourseClass"
-          name="selectedCourseClass"
-          label="Course Session"
-          hidden={isVideoModal}
-          rules={isVideoModal ? [] : validationRules.requiredValidation}
-        >
-          <Select
-            showArrow
-            showSearch={false}
-            placeholder="Select Class"
-            options={courseClasses?.map((courseClass) => ({
-              value: courseClass.session_id,
-              label: courseClass.name,
-            }))}
-            value={selectedCourseClass}
-            onChange={handleCourseClassChange}
-          />
         </Form.Item>
       </Col>
       <Col xs={isVideoModal ? 0 : 24}>
@@ -448,22 +578,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           label="Max Participants"
           extra={
             <Text className={styles.helpText}>
-              This is the max attendee count of the session you selected. You can update the max count here and we'll
-              update it in the session too.
+              This is the max attendee count of the{' '}
+              <Text type="danger"> {highestMaxParticipantCourseSession?.name} </Text>
+              session you selected. You can update the max count here and we'll update it in the sessions too.
             </Text>
           }
           hidden={isVideoModal}
           rules={isVideoModal ? [] : validationRules.requiredValidation}
         >
-          <InputNumber min={1} placeholder="Max Participants" className={styles.numericInput} />
+          <InputNumber min={2} placeholder="Max Participants" className={styles.numericInput} />
         </Form.Item>
       </Col>
       <Col xs={isVideoModal ? 0 : 24}>
         <Row gutter={[8, 4]}>
-          <Col xs={24} md={8} className={styles.courseDatesText}>
-            Course Class Date & Time :
+          <Col xs={24} className={styles.courseDatesText}>
+            Course Classes Date & Time :
           </Col>
-          <Col xs={24} md={16}>
+          <Col xs={24}>
             <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
           </Col>
         </Row>
@@ -522,7 +653,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       visible={visible}
       footer={null}
       onCancel={() => closeModal(false)}
-      width={530}
+      width={600}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -580,7 +711,15 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   placeholder="Select Video(s)"
                   mode="multiple"
                   maxTagCount={2}
-                  options={videos}
+                  options={videos?.map((video) => ({
+                    value: video.external_id,
+                    label: (
+                      <>
+                        {' '}
+                        {video.title} {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                      </>
+                    ),
+                  }))}
                   value={selectedVideos}
                   onChange={(val) => setSelectedVideos(val)}
                 />

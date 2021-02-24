@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Tooltip, Typography, Button, Card, Empty } from 'antd';
+import { Row, Col, Tooltip, Typography, Button, Card, Empty, Tag } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
@@ -73,10 +73,15 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {
-      title: 'Course Session',
-      dataIndex: 'session',
-      key: 'session',
-      render: (text, record) => record.session?.name,
+      title: 'Course Content',
+      dataIndex: 'inventory_ids',
+      key: 'inventory_ids',
+      render: (text, record) => (
+        <>
+          <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>
+          <Tag color="blue"> {record.videos?.length} videos </Tag>
+        </>
+      ),
     },
     {
       title: 'Price',
@@ -251,7 +256,13 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             'Duration',
             <Text> {`${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`} </Text>
           )}
-          {layout('Session', <Text>{course.session?.name}</Text>)}
+          {layout(
+            'Course Content',
+            <>
+              <Tag color="volcano">{course.inventory_ids?.length} sessions</Tag>
+              <Tag color="blue">{course.videos?.length} videos</Tag>
+            </>
+          )}
           {layout('Price', <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}
         </Card>
         {expandedRowKeys.includes(course.id) && (
