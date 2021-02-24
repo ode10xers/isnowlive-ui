@@ -150,8 +150,7 @@ const CourseDetails = ({ match, history }) => {
       width: '30%',
       render: (text, record) => (
         <Tag className={styles.courseScheduleName} color={record.color || 'blue'}>
-          {' '}
-          {record.name}{' '}
+          {record.name}
         </Tag>
       ),
     },
@@ -175,10 +174,10 @@ const CourseDetails = ({ match, history }) => {
   const renderMobileCourseSchedules = (schedule) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={6}>
+        <Col span={5}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={18} className={styles.mobileDetailsText}>
+        <Col span={19} className={styles.mobileDetailsText}>
           : {value}
         </Col>
       </Row>
@@ -195,8 +194,15 @@ const CourseDetails = ({ match, history }) => {
           }
         >
           {layout('Date', <Text> {toLongDateWithLongDay(schedule.start_time)} </Text>)}
-          {layout('Time', <Text> {`${toLocaleTime(schedule.start_time)} - ${toLocaleTime(schedule.end_time)}`} </Text>)}
-          {layout('Timezone', <Text> {getCurrentLongTimezone()} </Text>)}
+          {layout(
+            'Time',
+            <Text>
+              {' '}
+              {`${toLocaleTime(schedule.start_time)} - ${toLocaleTime(
+                schedule.end_time
+              )} (${getCurrentLongTimezone()})`}{' '}
+            </Text>
+          )}
         </Card>
       </Col>
     );
