@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Empty, Tag, Collapse } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
@@ -103,8 +103,8 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       width: '175px',
       render: (text, record) => (
         <>
-          <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>
-          <Tag color="blue"> {record.videos?.length} videos </Tag>
+          {record.inventory_ids?.length > 0 && <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>}
+          {record.videos?.length > 0 && <Tag color="blue"> {record.videos?.length} videos </Tag>}
         </>
       ),
     },
@@ -209,7 +209,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   const renderBuyersList = (record) => {
     return (
-      <div className={styles.mb20}>
+      <div className={classNames(styles.mb20, styles.mt20)}>
         <Table
           columns={buyersColumns}
           data={record.buyers}
@@ -220,7 +220,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
   };
 
   const renderMobileSubscriberCards = (subscriber) => (
-    <Card>
+    <Card key={subscriber.date_of_purchase}>
       <Row>
         <Col xs={24}>
           <Title level={5}> {subscriber.name} </Title>
@@ -246,7 +246,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
     );
 
     return (
-      <Col xs={24}>
+      <Col xs={24} key={course.id}>
         <Card
           className={styles.card}
           bodyStyle={{ padding: '20px 10px' }}
@@ -305,8 +305,8 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
           {layout(
             'Content',
             <>
-              <Tag color="volcano">{course.inventory_ids?.length} sessions</Tag>
-              <Tag color="blue">{course.videos?.length} videos</Tag>
+              {course.inventory_ids?.length > 0 && <Tag color="volcano"> {course.inventory_ids?.length} sessions</Tag>}
+              {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
             </>
           )}
           {layout('Price', <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}

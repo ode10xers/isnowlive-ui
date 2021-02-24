@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import moment from 'moment';
 
-import { Row, Col, Typography, message, Space, Image, Button, Card } from 'antd';
+import { Row, Col, Typography, message, Space, Image, Button, Card, Tag } from 'antd';
 
 import {
   GlobalOutlined,
@@ -28,7 +28,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, generateUrlFromUsername, courseType } from 'utils/helper';
+import { isAPISuccess, getRandomTagColor, reservedDomainName, generateUrlFromUsername, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -123,6 +123,8 @@ const CourseDetails = ({ match, history }) => {
 
     if (courseSessions?.length > 0) {
       courseSessions.forEach((courseSession) => {
+        const colorForSession = getRandomTagColor();
+
         tableData = [
           ...tableData,
           ...filterInventoryByCourseDate(courseSession.inventory).map((sessionInventory) => ({
@@ -130,13 +132,14 @@ const CourseDetails = ({ match, history }) => {
             name: courseSession.name,
             start_time: sessionInventory.start_time,
             end_time: sessionInventory.end_time,
+            color: colorForSession,
           })),
         ];
       });
     }
 
     console.log(tableData);
-    return tableData.sort((a, b) => moment(a.start_time) - moment(b.start_time));
+    return tableData;
   };
 
   const sessionSchedulesColumns = [
@@ -145,6 +148,12 @@ const CourseDetails = ({ match, history }) => {
       key: 'name',
       dataIndex: 'name',
       width: '30%',
+      render: (text, record) => (
+        <Tag className={styles.courseScheduleName} color={record.color || 'blue'}>
+          {' '}
+          {record.name}{' '}
+        </Tag>
+      ),
     },
     {
       title: 'Session Date',
@@ -177,7 +186,14 @@ const CourseDetails = ({ match, history }) => {
 
     return (
       <Col xs={24}>
-        <Card bodyStyle={{ padding: '10px' }} title={<Text>{schedule?.name}</Text>}>
+        <Card
+          bodyStyle={{ padding: '10px' }}
+          title={
+            <Tag className={styles.courseScheduleName} color={schedule.color}>
+              {schedule?.name}
+            </Tag>
+          }
+        >
           {layout('Date', <Text> {toLongDateWithLongDay(schedule.start_time)} </Text>)}
           {layout('Time', <Text> {`${toLocaleTime(schedule.start_time)} - ${toLocaleTime(schedule.end_time)}`} </Text>)}
           {layout('Timezone', <Text> {getCurrentLongTimezone()} </Text>)}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
@@ -202,7 +202,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
 
   const renderBuyersList = (record) => {
     return (
-      <div className={styles.mb20}>
+      <div className={classNames(styles.mb20, styles.mt20)}>
         <Table
           columns={buyersColumns}
           data={record.buyers}
@@ -213,7 +213,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
   };
 
   const renderMobileSubscriberCards = (subscriber) => (
-    <Card>
+    <Card key={subscriber.date_of_purchase}>
       <Row>
         <Col xs={24}>
           <Title level={5}> {subscriber.name} </Title>
@@ -239,7 +239,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     );
 
     return (
-      <Col xs={24}>
+      <Col xs={24} key={course.id}>
         <Card
           className={styles.card}
           bodyStyle={{ padding: '20px 10px' }}

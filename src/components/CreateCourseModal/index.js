@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal } from 'antd';
+import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
@@ -16,7 +16,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateRandomColor } from 'utils/helper';
+import { isAPISuccess, generateRandomColor, getRandomTagColor } from 'utils/helper';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
 
@@ -272,6 +272,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
     selectedSessions.forEach((selectedSession) => {
       const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
+      const colorForSession = getRandomTagColor();
 
       if (filteredInventories.length > 0) {
         sessionInventoryArr = [
@@ -282,6 +283,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             name: selectedSession.name,
             start_time: inventory.start_time,
             end_time: inventory.end_time,
+            color: colorForSession,
           })),
         ];
       }
@@ -426,37 +428,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       </Col>
     );
 
-    // if (!selectedCourseClass) {
-    //   return noInventoryComponent;
-    // }
-
-    // const selectedSessions = getSelectedCourseClasses();
-
-    // if (!selectedSessions || selectedSessions.length <= 0) {
-    //   return noInventoryComponent;
-    // }
-
     let tableData = generateSessionInventoryArray();
 
     if (tableData.length <= 0) {
       return noInventoryComponent;
     }
-
-    // selectedSessions.forEach((selectedSession) => {
-    //   const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
-
-    //   if (filteredInventories.length > 0) {
-    //     tableData = [
-    //       ...tableData,
-    //       ...filteredInventories.map((inventory) => ({
-    //         key: `${selectedSession.session_id}_${inventory.inventory_id}`,
-    //         name: selectedSession.name,
-    //         start_time: inventory.start_time,
-    //         end_time: inventory.end_time,
-    //       })),
-    //     ];
-    //   }
-    // });
 
     const tableColumns = [
       {
@@ -464,7 +440,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         dataIndex: 'name',
         key: 'name',
         width: '40%',
-        render: (text, record) => record.name,
+        render: (text, record) => (
+          <Tag className={styles.courseScheduleName} color={record.color || 'blue'}>
+            {' '}
+            {record.name}{' '}
+          </Tag>
+        ),
       },
       {
         title: 'Date & Time',
@@ -488,18 +469,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         />
       </Col>
     );
-
-    // return filteredInventories.map((sessionInventory) => (
-    //   <Col xs={24} key={`${selectedCourseClass}_${sessionInventory.inventory_id}`}>
-    //     <Tag color="volcano">
-    //       <div className={styles.courseDateTags}>
-    //         {`${toLongDateWithDay(sessionInventory.start_time)}, ${toLocaleTime(
-    //           sessionInventory.start_time
-    //         )} - ${toLocaleTime(sessionInventory.end_time)}`}
-    //       </div>
-    //     </Tag>
-    //   </Col>
-    // ));
   };
 
   const renderLiveCourseInputs = () => (
