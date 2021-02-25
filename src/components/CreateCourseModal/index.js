@@ -421,17 +421,20 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         validity: values.validity || 1,
       };
     } else {
-      // This check is to make sure that there is at least 1 inventory of Course Session Included
-      // const sessionInventories = generatedSessionInventoryArray;
+      // This check is to make sure that there is at least 1 course class included in the selection
+      const chosenCourseClasses = getSelectedCourseClasses(selectedCourseClass).filter(
+        (courseClass) => courseClass.is_course
+      );
 
-      // const uniqueSessionIdsFromInventories = [
-      //   ...new Set(sessionInventories.map((sessionInventory) => sessionInventory.session_id)),
-      // ];
-      // const chosenCourseClasses = getSelectedCourseClasses(uniqueSessionIdsFromInventories).filter(
-      //   (courseClass) => courseClass.is_course
-      // );
+      if (!chosenCourseClasses || chosenCourseClasses?.length <= 0) {
+        showErrorModal('Course Class not found', 'Please include at least one course class in your selection');
+        setSubmitting(false);
+        return;
+      }
 
-      if (!selectedInventories || selectedInventories?.length <= 0) {
+      const sessionInventories = selectedInventories;
+
+      if (!sessionInventories || sessionInventories?.length <= 0) {
         showErrorModal('Schedule not found', 'Please select at least one schedule in the table');
         setSubmitting(false);
         return;
@@ -450,7 +453,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).endOf('day').utc().format(),
         // inventory_ids: sessionInventories.map((inventory) => inventory.inventory_id) || [],
-        inventory_ids: selectedInventories,
+        inventory_ids: sessionInventories,
       };
     }
 
