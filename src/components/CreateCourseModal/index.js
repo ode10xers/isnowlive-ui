@@ -64,11 +64,11 @@ const formInitialValues = {
   colorCode: initialColor,
 };
 
-const { Text } = Typography;
+const { Text, Title } = Typography;
 
 const {
   timeCalculation: { dateIsBeforeDate },
-  formatDate: { toLocaleTime, toLongDateWithDay },
+  formatDate: { toLocaleTime, toLocaleDate, toLongDateWithDay, toLongDateWithLongDay },
 } = dateUtil;
 
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
@@ -86,6 +86,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const [courseEndDate, setCourseEndDate] = useState(null);
   const [courseImageUrl, setCourseImageUrl] = useState(null);
   const [highestMaxParticipantCourseSession, setHighestMaxParticipantCourseSession] = useState(null);
+  const [selectedInventories, setSelectedInventories] = useState([]);
   // const [isSequentialVideos, setIsSequentialVideos] = useState(false);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
@@ -192,6 +193,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
         setCourseImageUrl(editedCourse.course_image_url);
         setColorCode(editedCourse.color_code || initialColor || whiteColor);
+
+        form.validateFields();
       } else {
         form.resetFields();
         setSelectedCourseClass([]);
@@ -245,24 +248,21 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     }
   }, [selectedCourseClass, getSelectedCourseClasses, form]);
 
-  const filterSessionInventoryInDateRange = useCallback(
-    (inventories) => {
-      if (!inventories) {
-        return [];
-      }
+  const filterSessionInventoryInDateRange = useCallback((inventories, startDate, endDate) => {
+    if (!inventories) {
+      return [];
+    }
 
-      if (!courseStartDate || !courseEndDate) {
-        return inventories;
-      }
+    if (!startDate || !endDate) {
+      return inventories;
+    }
 
-      return inventories.filter(
-        (inventory) =>
-          moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
-          moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
-      );
-    },
-    [courseEndDate, courseStartDate]
-  );
+    return inventories.filter(
+      (inventory) =>
+        moment(inventory.start_time).isSameOrAfter(moment(startDate).startOf('day')) &&
+        moment(inventory.end_time).isSameOrBefore(moment(endDate).endOf('day'))
+    );
+  }, []);
 
   //Try useMemo so colors don't change as much
   const generatedSessionInventoryArray = useMemo(() => {
@@ -276,7 +276,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     let usedColors = [];
 
     selectedSessions.forEach((selectedSession) => {
-      const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
+      const filteredInventories = filterSessionInventoryInDateRange(
+        selectedSession.inventory,
+        courseStartDate,
+        courseEndDate
+      );
 
       // Temporary logic to prevent same colors showing up
       if (usedColors.length >= tagColors.length) {
@@ -305,8 +309,32 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       }
     });
 
-    return sessionInventoryArr;
-  }, [filterSessionInventoryInDateRange, getSelectedCourseClasses, selectedCourseClass]);
+    // Group By Date
+    let groupedByDateInventories = [];
+
+    sessionInventoryArr.forEach((inventory) => {
+      const foundIndex = groupedByDateInventories.findIndex((val) => val.date === toLocaleDate(inventory.start_time));
+
+      if (foundIndex >= 0) {
+        groupedByDateInventories[foundIndex].children.push(inventory);
+      } else {
+        groupedByDateInventories.push({
+          date: toLocaleDate(inventory.start_time),
+          is_date: true,
+          name: inventory.start_time,
+          children: [inventory],
+        });
+      }
+    });
+
+    return groupedByDateInventories;
+  }, [
+    filterSessionInventoryInDateRange,
+    getSelectedCourseClasses,
+    selectedCourseClass,
+    courseStartDate,
+    courseEndDate,
+  ]);
 
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
@@ -371,16 +399,17 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       };
     } else {
       // This check is to make sure that there is at least 1 inventory of Course Session Included
-      const sessionInventories = generatedSessionInventoryArray;
-      const uniqueSessionIdsFromInventories = [
-        ...new Set(sessionInventories.map((sessionInventory) => sessionInventory.session_id)),
-      ];
-      const chosenCourseClasses = getSelectedCourseClasses(uniqueSessionIdsFromInventories).filter(
-        (courseClass) => courseClass.is_course
-      );
+      // const sessionInventories = generatedSessionInventoryArray;
 
-      if (!chosenCourseClasses || chosenCourseClasses?.length <= 0) {
-        showErrorModal('Course Session not found', 'Please include at least one course session in your selection');
+      // const uniqueSessionIdsFromInventories = [
+      //   ...new Set(sessionInventories.map((sessionInventory) => sessionInventory.session_id)),
+      // ];
+      // const chosenCourseClasses = getSelectedCourseClasses(uniqueSessionIdsFromInventories).filter(
+      //   (courseClass) => courseClass.is_course
+      // );
+
+      if (!selectedInventories || selectedInventories?.length <= 0) {
+        showErrorModal('Schedule not found', 'Please select at least one schedule in the table');
         setSubmitting(false);
         return;
       }
@@ -397,7 +426,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         max_participants: values.maxParticipants || highestMaxParticipantCourseSession?.max_participants,
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).endOf('day').utc().format(),
-        inventory_ids: sessionInventories.map((inventory) => inventory.inventory_id) || [],
+        // inventory_ids: sessionInventories.map((inventory) => inventory.inventory_id) || [],
+        inventory_ids: selectedInventories,
       };
     }
 
@@ -436,12 +466,28 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         dataIndex: 'name',
         key: 'name',
         width: '40%',
-        render: (text, record) => (
-          <Tag className={styles.courseScheduleName} color={record.color || 'blue'}>
-            {' '}
-            {record.name}{' '}
-          </Tag>
-        ),
+        render: (text, record) => {
+          if (record.is_date) {
+            return {
+              props: {
+                colSpan: 2,
+              },
+              children: (
+                <Title level={5} className={styles.textAlignLeft}>
+                  {toLongDateWithLongDay(text)}
+                </Title>
+              ),
+            };
+          } else {
+            return {
+              children: (
+                <Tag className={styles.courseScheduleName} color={record.color || 'blue'}>
+                  {record.name}
+                </Tag>
+              ),
+            };
+          }
+        },
       },
       {
         title: 'Date & Time',
@@ -450,9 +496,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         align: 'right',
         width: '60%',
         render: (text, record) =>
-          `${toLongDateWithDay(record?.start_time)}, ${toLocaleTime(record?.start_time)} - ${toLocaleTime(
-            record?.end_time
-          )}`,
+          record.is_date
+            ? { props: { colSpan: 0, rowSpan: 0 } }
+            : `${toLongDateWithDay(record?.start_time)}, ${toLocaleTime(record?.start_time)} - ${toLocaleTime(
+                record?.end_time
+              )}`,
       },
     ];
 
@@ -461,7 +509,22 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         <Table
           columns={tableColumns}
           data={tableData}
-          rowKey={(record) => `${record.session_id}_${record.inventory_id}`}
+          rowKey={(record) => (record.is_date ? record.date : record.inventory_id)}
+          rowSelection={{
+            selectedRowKeys: selectedInventories,
+            onChange: setSelectedInventories,
+            getCheckboxProps: (record) => ({
+              style: {
+                display: record.is_date ? 'none' : 'inline-block',
+              },
+            }),
+          }}
+          expandable={{
+            defaultExpandAllRows: true,
+            expandedRowKeys: tableData.map((data) => data.date),
+            rowExpandable: (record) => false,
+            expandIconColumnIndex: -1,
+          }}
         />
       </Col>
     );
@@ -557,7 +620,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       <Col xs={isVideoModal ? 0 : 24}>
         <Row gutter={[8, 4]}>
           <Col xs={24} className={styles.courseDatesText}>
-            Course Classes Date & Time :
+            Course Classes Date & Time :{' '}
+            <Text type="danger"> Please select the session checkbox you want to add to this course </Text>
           </Col>
           <Col xs={24}>
             <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
@@ -618,7 +682,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       visible={visible}
       footer={null}
       onCancel={() => closeModal(false)}
-      width={600}
+      width={720}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -680,8 +744,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     value: video.external_id,
                     label: (
                       <>
-                        {' '}
-                        {video.title} {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                        {video.title} {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                       </>
                     ),
                   }))}
@@ -733,7 +796,28 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
               </Button>
             </Col>
             <Col xs={12} md={8}>
-              <Button block type="primary" htmlType="submit" loading={submitting}>
+              <Button
+                block
+                type="primary"
+                htmlType="submit"
+                loading={submitting}
+                disabled={
+                  (!editedCourse &&
+                    !form.isFieldsTouched(
+                      isVideoModal
+                        ? ['courseImageUrl', 'courseName', 'validity', 'videoList', 'price']
+                        : [
+                            'courseImageUrl',
+                            'courseName',
+                            'selectedCourseClass',
+                            'courseStartDate',
+                            'courseEndDate',
+                            'price',
+                          ]
+                    )) ||
+                  form.getFieldsError().filter(({ errors }) => errors.length).length > 0
+                }
+              >
                 {editedCourse ? 'Update' : 'Create'} Course
               </Button>
             </Col>
