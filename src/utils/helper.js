@@ -6,6 +6,8 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
+
 export const generateQueryString = (data) => {
   return Object.entries(data)
     .map(([key, val]) => `${key}=${val}`)
@@ -135,6 +137,8 @@ export const generateUrl = (targetDomain = 'app') => {
 };
 
 export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
 
 export const getDuration = (start_time, end_time) => {
   let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;

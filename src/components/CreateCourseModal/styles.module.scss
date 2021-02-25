@@ -1,7 +1,16 @@
 @import '../../styles/variables.scss';
 
+.dateText {
+  margin-left: -100px;
+  text-align: left;
+}
+
 .numericInput {
   width: 100% !important;
+}
+
+.datePicker {
+  width: 100%;
 }
 
 .currencyWrapper {
@@ -20,6 +29,7 @@
 .colorPickerPreview {
   border-width: 10px;
   border-style: solid;
+  width: fit-content;
 }
 
 .helpText {
@@ -34,16 +44,6 @@
   }
 }
 
-.courseDatesText {
-  text-align: right;
-}
-
-.courseDateTags {
-  font-size: 14px;
-}
-
-@media screen and (max-width: 769px){
-  .courseDatesText {
-    text-align: left;
-  }
+.courseScheduleName {
+  font-size: 13px !important;
 }

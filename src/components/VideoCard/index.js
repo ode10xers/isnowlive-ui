@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 
 import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
-import { PlayCircleOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -110,7 +110,7 @@ const VideoCard = ({
           <Row gutter={[8, 8]} justify="start">
             <Col xs={24} className={styles.titleWrapper}>
               <Title level={5} className={styles.textAlignLeft}>
-                {video.title}
+                {video.title} {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </Title>
             </Col>
             <Col xs={24} className={styles.detailsWrapper}>
