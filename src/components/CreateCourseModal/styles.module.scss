@@ -1,5 +1,10 @@
 @import '../../styles/variables.scss';
 
+.dateText {
+  margin-left: -100px;
+  text-align: left;
+}
+
 .numericInput {
   width: 100% !important;
 }

@@ -488,7 +488,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         title: 'Name',
         dataIndex: 'name',
         key: 'name',
-        width: '40%',
         render: (text, record) => {
           if (record.is_date) {
             return {
@@ -496,7 +495,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 colSpan: 2,
               },
               children: (
-                <Title level={5} className={styles.textAlignLeft}>
+                <Title level={5} className={styles.dateText}>
                   {toLongDateWithLongDay(text)}
                 </Title>
               ),
@@ -517,7 +516,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         dataIndex: 'start_date',
         key: 'start_date',
         align: 'right',
-        width: '60%',
+        width: '300px',
         render: (text, record) =>
           record.is_date
             ? { props: { colSpan: 0, rowSpan: 0 } }
@@ -534,10 +533,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           data={tableData}
           rowKey={(record) => (record.is_date ? record.date : record.inventory_id)}
           rowSelection={{
+            columnWidth: '120px',
             columnTitle: (
               <Checkbox checked={selectedInventories.length > 0} onChange={handleSelectAllCheckboxChanged}>
-                {' '}
-                <Text strong> Select All </Text>{' '}
+                <Text strong className={styles.checkboxText}>
+                  {' '}
+                  Select All{' '}
+                </Text>
               </Checkbox>
             ),
             selectedRowKeys: selectedInventories,
