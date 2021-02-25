@@ -145,13 +145,15 @@ const CourseDetails = ({ match, history }) => {
 
         tableData = [
           ...tableData,
-          ...filterInventoryByCourseDate(courseSession.inventory).map((sessionInventory) => ({
-            key: `${courseSession.session_id}_${sessionInventory.inventory_id}`,
-            name: courseSession.name,
-            start_time: sessionInventory.start_time,
-            end_time: sessionInventory.end_time,
-            color: colorForSession,
-          })),
+          ...filterInventoryByCourseDate(courseSession.inventory)
+            .filter((inventory) => course?.inventory_ids?.includes(inventory.inventory_id))
+            .map((sessionInventory) => ({
+              key: `${courseSession.session_id}_${sessionInventory.inventory_id}`,
+              name: courseSession.name,
+              start_time: sessionInventory.start_time,
+              end_time: sessionInventory.end_time,
+              color: colorForSession,
+            })),
         ];
       });
     }
