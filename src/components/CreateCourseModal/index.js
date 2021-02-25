@@ -151,118 +151,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     [courseClasses]
   );
 
-  const selectAllInventory = () => {
-    const allSelectedInventory = [].concat.apply(
-      [],
-      [
-        ...generatedSessionInventoryArray.map((data) => {
-          return [...data.children.map((inventory) => inventory.inventory_id)];
-        }),
-      ]
-    );
-    setSelectedInventories(allSelectedInventory);
-  };
-
-  const unselectAllInventory = () => setSelectedInventories([]);
-
-  useEffect(() => {
-    if (visible) {
-      if (editedCourse) {
-        if (isVideoModal) {
-          form.setFieldsValue({
-            courseImageUrl: editedCourse?.course_image_url || '',
-            courseName: editedCourse?.name,
-            validity: editedCourse?.validity,
-            // video_type: editedCourse?.course_sequence ? 'sequential' : 'non_sequential',
-            videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
-            price: editedCourse?.price,
-            colorCode: editedCourse?.color_code || initialColor || whiteColor,
-          });
-
-          //setIsSequentialVideos(editedCourse.course_sequence || false);
-          setSelectedCourseClass([]);
-          setCourseEndDate(null);
-          setCourseStartDate(null);
-        } else {
-          form.setFieldsValue({
-            courseImageUrl: editedCourse?.course_image_url || '',
-            courseName: editedCourse?.name,
-            courseStartDate: moment(editedCourse?.start_date),
-            courseEndDate: moment(editedCourse?.end_date),
-            selectedCourseClass: editedCourse?.sessions?.map((courseSession) => courseSession.session_id),
-            maxParticipants: editedCourse?.max_participants,
-            videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
-            price: editedCourse?.price,
-            colorCode: editedCourse?.color_code || initialColor || whiteColor,
-          });
-
-          setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
-          setCourseStartDate(moment(editedCourse?.start_date));
-          setCourseEndDate(moment(editedCourse?.end_date));
-          setSelectedInventories(editedCourse?.inventory_ids);
-
-          // setIsSequentialVideos(false);
-        }
-
-        setSelectedVideos(editedCourse.videos?.map((courseVideo) => courseVideo.external_id));
-        setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
-        setCourseImageUrl(editedCourse.course_image_url);
-        setColorCode(editedCourse.color_code || initialColor || whiteColor);
-
-        form.validateFields();
-      } else {
-        form.resetFields();
-        setSelectedCourseClass([]);
-        setSelectedVideos([]);
-        setColorCode(initialColor);
-        setCurrency('SGD');
-        setCourseStartDate(null);
-        setCourseEndDate(null);
-        setCourseImageUrl(null);
-        // setIsSequentialVideos(false);
-      }
-    }
-
-    fetchCreatorCurrency();
-
-    if (!isVideoModal) {
-      fetchAllCourseClassForCreator();
-    }
-
-    fetchAllVideosForCreator(isVideoModal);
-  }, [
-    visible,
-    editedCourse,
-    isVideoModal,
-    fetchAllCourseClassForCreator,
-    fetchAllVideosForCreator,
-    fetchCreatorCurrency,
-    form,
-  ]);
-
-  useEffect(() => {
-    if (selectedCourseClass?.length > 0) {
-      let highestMaxParticipantCourseSession = null;
-      let highestMaxParticipantCount = 0;
-
-      const courseSessionsList = getSelectedCourseClasses(selectedCourseClass).filter(
-        (selectedClass) => selectedClass.is_course
-      );
-
-      if (courseSessionsList.length > 0) {
-        courseSessionsList.forEach((courseSession) => {
-          if (courseSession.max_participants > highestMaxParticipantCount) {
-            highestMaxParticipantCount = courseSession.max_participants;
-            highestMaxParticipantCourseSession = courseSession;
-          }
-        });
-      }
-
-      setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
-      form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
-    }
-  }, [selectedCourseClass, getSelectedCourseClasses, form]);
-
   const filterSessionInventoryInDateRange = useCallback((inventories, startDate, endDate) => {
     if (!inventories) {
       return [];
@@ -351,6 +239,119 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     courseEndDate,
   ]);
 
+  const getAllInventoryIdInTable = useCallback(
+    () =>
+      [].concat.apply(
+        [],
+        [
+          ...generatedSessionInventoryArray.map((data) => {
+            return [...data.children.map((inventory) => inventory.inventory_id)];
+          }),
+        ]
+      ),
+    [generatedSessionInventoryArray]
+  );
+
+  const selectAllInventory = () => setSelectedInventories(getAllInventoryIdInTable());
+
+  const unselectAllInventory = () => setSelectedInventories([]);
+
+  useEffect(() => {
+    if (visible) {
+      if (editedCourse) {
+        if (isVideoModal) {
+          form.setFieldsValue({
+            courseImageUrl: editedCourse?.course_image_url || '',
+            courseName: editedCourse?.name,
+            validity: editedCourse?.validity,
+            // video_type: editedCourse?.course_sequence ? 'sequential' : 'non_sequential',
+            videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
+            price: editedCourse?.price,
+            colorCode: editedCourse?.color_code || initialColor || whiteColor,
+          });
+
+          //setIsSequentialVideos(editedCourse.course_sequence || false);
+          setSelectedCourseClass([]);
+          setCourseEndDate(null);
+          setCourseStartDate(null);
+        } else {
+          form.setFieldsValue({
+            courseImageUrl: editedCourse?.course_image_url || '',
+            courseName: editedCourse?.name,
+            courseStartDate: moment(editedCourse?.start_date),
+            courseEndDate: moment(editedCourse?.end_date),
+            selectedCourseClass: editedCourse?.sessions?.map((courseSession) => courseSession.session_id),
+            maxParticipants: editedCourse?.max_participants,
+            videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
+            price: editedCourse?.price,
+            colorCode: editedCourse?.color_code || initialColor || whiteColor,
+          });
+
+          setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
+          setCourseStartDate(moment(editedCourse?.start_date));
+          setCourseEndDate(moment(editedCourse?.end_date));
+          setSelectedInventories(editedCourse?.inventory_ids);
+
+          // setIsSequentialVideos(false);
+        }
+
+        setSelectedVideos(editedCourse.videos?.map((courseVideo) => courseVideo.external_id));
+        setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
+        setCourseImageUrl(editedCourse.course_image_url);
+        setColorCode(editedCourse.color_code || initialColor || whiteColor);
+      } else {
+        form.resetFields();
+        setSelectedCourseClass([]);
+        setSelectedVideos([]);
+        setColorCode(initialColor);
+        setCurrency('SGD');
+        setCourseStartDate(null);
+        setCourseEndDate(null);
+        setCourseImageUrl(null);
+        // setIsSequentialVideos(false);
+      }
+    }
+
+    fetchCreatorCurrency();
+
+    if (!isVideoModal) {
+      fetchAllCourseClassForCreator();
+    }
+
+    fetchAllVideosForCreator(isVideoModal);
+  }, [
+    visible,
+    editedCourse,
+    isVideoModal,
+    fetchAllCourseClassForCreator,
+    fetchAllVideosForCreator,
+    fetchCreatorCurrency,
+    form,
+  ]);
+
+  useEffect(() => {
+    if (selectedCourseClass?.length > 0) {
+      let highestMaxParticipantCourseSession = null;
+      let highestMaxParticipantCount = 0;
+
+      const courseSessionsList = getSelectedCourseClasses(selectedCourseClass).filter(
+        (selectedClass) => selectedClass.is_course
+      );
+
+      if (courseSessionsList.length > 0) {
+        courseSessionsList.forEach((courseSession) => {
+          if (courseSession.max_participants > highestMaxParticipantCount) {
+            highestMaxParticipantCount = courseSession.max_participants;
+            highestMaxParticipantCourseSession = courseSession;
+          }
+        });
+      }
+
+      setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
+      form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
+    }
+  }, [selectedCourseClass, getSelectedCourseClasses, form]);
+
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
     form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
@@ -421,18 +422,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         validity: values.validity || 1,
       };
     } else {
-      // This check is to make sure that there is at least 1 course class included in the selection
-      const chosenCourseClasses = getSelectedCourseClasses(selectedCourseClass).filter(
-        (courseClass) => courseClass.is_course
-      );
-
-      if (!chosenCourseClasses || chosenCourseClasses?.length <= 0) {
-        showErrorModal('Course Class not found', 'Please include at least one course class in your selection');
-        setSubmitting(false);
-        return;
-      }
-
-      const sessionInventories = selectedInventories;
+      // This filter is to make sure that only the inventory IDs shown in the table will get sent to BE
+      const allInventoryIds = getAllInventoryIdInTable();
+      const sessionInventories = selectedInventories.filter((inv) => allInventoryIds.includes(inv));
 
       if (!sessionInventories || sessionInventories?.length <= 0) {
         showErrorModal('Schedule not found', 'Please select at least one schedule in the table');
