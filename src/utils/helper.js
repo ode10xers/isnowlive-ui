@@ -6,7 +6,7 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
-const tagColors = ['magenta', 'volcano', 'geekblue', 'purple', 'cyan'];
+export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const generateQueryString = (data) => {
   return Object.entries(data)

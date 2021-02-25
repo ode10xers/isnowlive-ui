@@ -9,6 +9,7 @@ import {
   PlayCircleOutlined,
   VideoCameraAddOutlined,
   InfoCircleOutlined,
+  BookTwoTone,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -79,6 +80,7 @@ const SessionsInventories = ({ match }) => {
           max_participants: i.max_participants,
           color_code: i.color_code,
           is_published: i.is_published,
+          is_course: i.is_course,
         }));
 
         let filterByDateSessions = [];
@@ -220,9 +222,9 @@ const SessionsInventories = ({ match }) => {
             },
             children: (
               <>
-                {' '}
-                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
-                <Text className={styles.textAlignLeft}>{record.name}</Text>{' '}
+                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
+                <Text className={styles.textAlignLeft}>{record.name}</Text>
+                {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </>
             ),
           };
@@ -448,7 +450,9 @@ const SessionsInventories = ({ match }) => {
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
-            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>
+            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
+            <Text>{item.name}</Text>
+            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
       >

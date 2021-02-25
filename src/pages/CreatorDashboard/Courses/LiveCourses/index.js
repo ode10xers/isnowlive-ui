@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Tooltip, Typography, Button, Card, Empty, Tag, Collapse } from 'antd';
+import { Row, Col, Tooltip, Typography, Button, Card, Tag, Collapse } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 import Table from 'components/Table';
@@ -22,6 +22,7 @@ const {
 const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse }) => {
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
+  const [expandedSection, setExpandedSection] = useState([]);
 
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
@@ -328,64 +329,60 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   return (
     <div>
-      {liveCourses?.length > 0 ? (
-        <Collapse>
-          <Panel header={<Title level={5}> Published </Title>} key="published">
-            {isMobileDevice ? (
-              <Row gutter={[8, 16]}>
-                <Col xs={24}>
-                  <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-                    {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                  </Button>
-                </Col>
-                {liveCourses?.filter((liveCourse) => liveCourse.is_published).map(renderCourseItem)}
-              </Row>
-            ) : (
-              <Table
-                size="small"
-                sticky={true}
-                columns={generateLiveCourseColumns(true)}
-                data={liveCourses?.filter((liveCourse) => liveCourse.is_published)}
-                rowKey={(record) => record.id}
-                expandable={{
-                  expandedRowRender: renderBuyersList,
-                  expandRowByClick: true,
-                  expandIconColumnIndex: -1,
-                  expandedRowKeys: expandedPublishedRowKeys,
-                }}
-              />
-            )}
-          </Panel>
-          <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
-            {isMobileDevice ? (
-              <Row gutter={[8, 16]}>
-                <Col xs={24}>
-                  <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-                    {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                  </Button>
-                </Col>
-                {liveCourses?.filter((liveCourse) => !liveCourse.is_published).map(renderCourseItem)}
-              </Row>
-            ) : (
-              <Table
-                size="small"
-                sticky={true}
-                columns={generateLiveCourseColumns(false)}
-                data={liveCourses?.filter((liveCourse) => !liveCourse.is_published)}
-                rowKey={(record) => record.id}
-                expandable={{
-                  expandedRowRender: renderBuyersList,
-                  expandRowByClick: true,
-                  expandIconColumnIndex: -1,
-                  expandedRowKeys: expandedUnpublishedRowKeys,
-                }}
-              />
-            )}
-          </Panel>
-        </Collapse>
-      ) : (
-        <Empty description="No Courses found" />
-      )}
+      <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
+        <Panel header={<Title level={5}> Published </Title>} key="published">
+          {isMobileDevice ? (
+            <Row gutter={[8, 16]}>
+              <Col xs={24}>
+                <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
+                  {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                </Button>
+              </Col>
+              {liveCourses?.filter((liveCourse) => liveCourse.is_published).map(renderCourseItem)}
+            </Row>
+          ) : (
+            <Table
+              size="small"
+              sticky={true}
+              columns={generateLiveCourseColumns(true)}
+              data={liveCourses?.filter((liveCourse) => liveCourse.is_published)}
+              rowKey={(record) => record.id}
+              expandable={{
+                expandedRowRender: renderBuyersList,
+                expandRowByClick: true,
+                expandIconColumnIndex: -1,
+                expandedRowKeys: expandedPublishedRowKeys,
+              }}
+            />
+          )}
+        </Panel>
+        <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+          {isMobileDevice ? (
+            <Row gutter={[8, 16]}>
+              <Col xs={24}>
+                <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
+                  {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                </Button>
+              </Col>
+              {liveCourses?.filter((liveCourse) => !liveCourse.is_published).map(renderCourseItem)}
+            </Row>
+          ) : (
+            <Table
+              size="small"
+              sticky={true}
+              columns={generateLiveCourseColumns(false)}
+              data={liveCourses?.filter((liveCourse) => !liveCourse.is_published)}
+              rowKey={(record) => record.id}
+              expandable={{
+                expandedRowRender: renderBuyersList,
+                expandRowByClick: true,
+                expandIconColumnIndex: -1,
+                expandedRowKeys: expandedUnpublishedRowKeys,
+              }}
+            />
+          )}
+        </Panel>
+      </Collapse>
     </div>
   );
 };

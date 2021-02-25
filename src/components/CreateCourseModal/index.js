@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -16,7 +16,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateRandomColor, getRandomTagColor } from 'utils/helper';
+import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
 
@@ -245,23 +245,27 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     }
   }, [selectedCourseClass, getSelectedCourseClasses, form]);
 
-  const filterSessionInventoryInDateRange = (inventories) => {
-    if (!inventories) {
-      return [];
-    }
+  const filterSessionInventoryInDateRange = useCallback(
+    (inventories) => {
+      if (!inventories) {
+        return [];
+      }
 
-    if (!courseStartDate || !courseEndDate) {
-      return inventories;
-    }
+      if (!courseStartDate || !courseEndDate) {
+        return inventories;
+      }
 
-    return inventories.filter(
-      (inventory) =>
-        moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
-        moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
-    );
-  };
+      return inventories.filter(
+        (inventory) =>
+          moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
+          moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
+      );
+    },
+    [courseEndDate, courseStartDate]
+  );
 
-  const generateSessionInventoryArray = () => {
+  //Try useMemo so colors don't change as much
+  const generatedSessionInventoryArray = useMemo(() => {
     const selectedSessions = getSelectedCourseClasses(selectedCourseClass);
 
     if (selectedSessions?.length <= 0) {
@@ -269,10 +273,22 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     }
 
     let sessionInventoryArr = [];
+    let usedColors = [];
 
     selectedSessions.forEach((selectedSession) => {
       const filteredInventories = filterSessionInventoryInDateRange(selectedSession.inventory);
-      const colorForSession = getRandomTagColor();
+
+      // Temporary logic to prevent same colors showing up
+      if (usedColors.length >= tagColors.length) {
+        usedColors = [];
+      }
+
+      let colorForSession = '';
+      do {
+        colorForSession = getRandomTagColor();
+      } while (usedColors.includes(colorForSession));
+
+      usedColors.push(colorForSession);
 
       if (filteredInventories.length > 0) {
         sessionInventoryArr = [
@@ -290,7 +306,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     });
 
     return sessionInventoryArr;
-  };
+  }, [filterSessionInventoryInDateRange, getSelectedCourseClasses, selectedCourseClass]);
 
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
@@ -354,28 +370,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         validity: values.validity || 1,
       };
     } else {
-      // Remove inventory list check
-      // const targetCourseClass = courseClasses.find((courseClass) => courseClass.session_id === selectedCourseClass);
-
-      // if (!targetCourseClass) {
-      //   showErrorModal('Course Session not found', 'The course session you chose is invalid');
-      //   setSubmitting(false);
-      //   return;
-      // }
-
-      // const courseClassInventoriesInDateRange = filterSessionInventoryInDateRange(targetCourseClass?.inventory);
-
-      // if (courseClassInventoriesInDateRange.length <= 0) {
-      //   showErrorModal(
-      //     'No sessions scheduled',
-      //     'The course session you selected has no schedules in the duration you choose.'
-      //   );
-      //   setSubmitting(false);
-      //   return;
-      // }
-
       // This check is to make sure that there is at least 1 inventory of Course Session Included
-      const sessionInventories = generateSessionInventoryArray();
+      const sessionInventories = generatedSessionInventoryArray;
       const uniqueSessionIdsFromInventories = [
         ...new Set(sessionInventories.map((sessionInventory) => sessionInventory.session_id)),
       ];
@@ -428,7 +424,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       </Col>
     );
 
-    let tableData = generateSessionInventoryArray();
+    let tableData = generatedSessionInventoryArray;
 
     if (tableData.length <= 0) {
       return noInventoryComponent;
@@ -544,7 +540,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           {...courseModalFormLayout}
           id="maxParticipants"
           name="maxParticipants"
-          label="Max Participants"
+          label="Max Course Participants"
           extra={
             <Text className={styles.helpText}>
               This is the max attendee count of the{' '}

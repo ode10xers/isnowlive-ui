@@ -28,7 +28,14 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, getRandomTagColor, reservedDomainName, generateUrlFromUsername, courseType } from 'utils/helper';
+import {
+  isAPISuccess,
+  tagColors,
+  getRandomTagColor,
+  reservedDomainName,
+  generateUrlFromUsername,
+  courseType,
+} from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -120,10 +127,21 @@ const CourseDetails = ({ match, history }) => {
 
   const generateCourseSessionsScheduleList = () => {
     let tableData = [];
+    let usedColors = [];
 
     if (courseSessions?.length > 0) {
       courseSessions.forEach((courseSession) => {
-        const colorForSession = getRandomTagColor();
+        if (usedColors.length >= tagColors.length) {
+          usedColors = [];
+        }
+
+        let colorForSession = '';
+
+        do {
+          colorForSession = getRandomTagColor();
+        } while (usedColors.includes(colorForSession));
+
+        usedColors.push(colorForSession);
 
         tableData = [
           ...tableData,
@@ -138,7 +156,6 @@ const CourseDetails = ({ match, history }) => {
       });
     }
 
-    console.log(tableData);
     return tableData;
   };
 
