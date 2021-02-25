@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag } from 'antd';
+import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag, Checkbox } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
@@ -151,6 +151,20 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     [courseClasses]
   );
 
+  const selectAllInventory = () => {
+    const allSelectedInventory = [].concat.apply(
+      [],
+      [
+        ...generatedSessionInventoryArray.map((data) => {
+          return [...data.children.map((inventory) => inventory.inventory_id)];
+        }),
+      ]
+    );
+    setSelectedInventories(allSelectedInventory);
+  };
+
+  const unselectAllInventory = () => setSelectedInventories([]);
+
   useEffect(() => {
     if (visible) {
       if (editedCourse) {
@@ -185,6 +199,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
           setCourseStartDate(moment(editedCourse?.start_date));
           setCourseEndDate(moment(editedCourse?.end_date));
+          setSelectedInventories(editedCourse?.inventory_ids);
 
           // setIsSequentialVideos(false);
         }
@@ -327,7 +342,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       }
     });
 
-    return groupedByDateInventories;
+    return groupedByDateInventories.sort((a, b) => moment(a.date) - moment(b.date));
   }, [
     filterSessionInventoryInDateRange,
     getSelectedCourseClasses,
@@ -371,6 +386,14 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const handleCourseImageUpload = (imageUrl) => {
     setCourseImageUrl(imageUrl);
     form.setFieldsValue({ ...form.getFieldValue(), courseImageUrl: imageUrl });
+  };
+
+  const handleSelectAllCheckboxChanged = (e) => {
+    if (e.target.checked) {
+      selectAllInventory();
+    } else {
+      unselectAllInventory();
+    }
   };
 
   const handleFinish = async (values) => {
@@ -511,6 +534,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           data={tableData}
           rowKey={(record) => (record.is_date ? record.date : record.inventory_id)}
           rowSelection={{
+            columnTitle: (
+              <Checkbox checked={selectedInventories.length > 0} onChange={handleSelectAllCheckboxChanged}>
+                {' '}
+                <Text strong> Select All </Text>{' '}
+              </Checkbox>
+            ),
             selectedRowKeys: selectedInventories,
             onChange: setSelectedInventories,
             getCheckboxProps: (record) => ({
@@ -691,6 +720,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           form={form}
           onFinish={handleFinish}
           initialValues={formInitialValues}
+          scrollToFirstError={true}
         >
           <Row className={styles.courseRow} gutter={[8, 16]}>
             <Col xs={24}>
@@ -716,7 +746,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             <Col xs={24}>
               <Form.Item
                 {...courseModalFormLayout}
-                id="coursename"
+                id="courseName"
                 name="courseName"
                 label="Course Name"
                 rules={validationRules.nameValidation}
@@ -796,28 +826,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
               </Button>
             </Col>
             <Col xs={12} md={8}>
-              <Button
-                block
-                type="primary"
-                htmlType="submit"
-                loading={submitting}
-                disabled={
-                  (!editedCourse &&
-                    !form.isFieldsTouched(
-                      isVideoModal
-                        ? ['courseImageUrl', 'courseName', 'validity', 'videoList', 'price']
-                        : [
-                            'courseImageUrl',
-                            'courseName',
-                            'selectedCourseClass',
-                            'courseStartDate',
-                            'courseEndDate',
-                            'price',
-                          ]
-                    )) ||
-                  form.getFieldsError().filter(({ errors }) => errors.length).length > 0
-                }
-              >
+              <Button block type="primary" htmlType="submit" loading={submitting}>
                 {editedCourse ? 'Update' : 'Create'} Course
               </Button>
             </Col>
