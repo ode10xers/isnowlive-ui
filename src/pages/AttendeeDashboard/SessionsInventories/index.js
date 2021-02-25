@@ -3,11 +3,14 @@ import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover
 import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
-import dateUtil from 'utils/date';
-import { isMobileDevice } from 'utils/device';
+
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
+import AddToCalendarButton from 'components/AddToCalendarButton';
+
+import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 import { getDuration, generateUrlFromUsername, generateQueryString } from 'utils/helper';
 import {
   mixPanelEventTags,
@@ -218,11 +221,9 @@ const SessionsInventories = ({ match }) => {
     {
       title: 'Session Name',
       key: 'name',
-      width: '12%',
       render: (record) => (
         <>
           <Text className={styles.textAlignLeft}>{record.name}</Text>
-          {'  '}
           {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
         </>
       ),
@@ -231,29 +232,29 @@ const SessionsInventories = ({ match }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '4%',
+      width: '72px',
     },
     {
       title: 'Day',
       key: 'days',
       dataIndex: 'days',
-      width: '12%',
+      width: '150px',
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
-      width: '4%',
+      width: '90px',
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      width: '15%',
+      width: '160px',
     },
     {
       title: 'Actions',
-      width: isPast ? '4%' : '20%',
+      width: isPast ? '56px' : '300px',
       render: (text, record) => {
         return isPast ? (
           <Row justify="start">
@@ -264,10 +265,25 @@ const SessionsInventories = ({ match }) => {
             </Col>
           </Row>
         ) : (
-          <Row justify="start">
+          <Row justify="space-around">
+            {!isPast && (
+              <Col md={24} xl={2}>
+                <AddToCalendarButton
+                  iconOnly={true}
+                  eventData={{
+                    name: record.name,
+                    desc: 'Testing putting some description here',
+                    startTime: record.start_time,
+                    endTime: record.end_time,
+                    url: `${generateUrlFromUsername(record?.username)}/s/${record.session_id}`,
+                  }}
+                />
+              </Col>
+            )}
+
             {!isPast && (
               <>
-                <Col md={24} lg={24} xl={5}>
+                <Col md={24} lg={24} xl={4}>
                   <Button
                     type="text"
                     className={styles.success}
@@ -277,7 +293,7 @@ const SessionsInventories = ({ match }) => {
                     Join
                   </Button>
                 </Col>
-                <Col md={24} lg={24} xl={5}>
+                <Col md={24} lg={24} xl={4}>
                   {renderRefundPopup(record)}
                 </Col>
               </>
@@ -289,7 +305,7 @@ const SessionsInventories = ({ match }) => {
             </Col>
 
             {!isPast && (
-              <Col md={24} lg={24} xl={5}>
+              <Col md={24} lg={24} xl={6}>
                 <Button type="text" className={styles.warning} onClick={() => rescheduleSession(record)}>
                   Reschedule
                 </Button>

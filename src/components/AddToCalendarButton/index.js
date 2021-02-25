@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
-import { Button, Popover, List } from 'antd';
+import { Button, Popover, List, Tooltip } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 
 import { isMobileDevice } from 'utils/device';
@@ -13,8 +13,8 @@ const AddToCalendarButton = ({ type = 'primary', iconOnly = false, eventData }) 
   const saveOrOpenBlobAvailable = window.Blob && window.navigator.msSaveOrOpenBlob;
 
   const eventDetails = {
-    title: '',
-    details: '',
+    title: eventData.name,
+    details: eventData.desc,
     startTime: eventData.startTime,
     endTime: eventData.endTime,
     url: eventData.url,
@@ -120,6 +120,7 @@ const AddToCalendarButton = ({ type = 'primary', iconOnly = false, eventData }) 
   const popoverContent = (
     <List
       split={false}
+      size="small"
       itemLayout="horizontal"
       dataSource={calendarList}
       renderItem={renderCalendarListItem}
@@ -130,10 +131,12 @@ const AddToCalendarButton = ({ type = 'primary', iconOnly = false, eventData }) 
   return (
     <Popover content={popoverContent} trigger="click" title="Add To Calendar">
       {iconOnly ? (
-        <Button type="text" icon={<CalendarOutlined />} />
+        <Tooltip title="Add To Calendar">
+          <Button type="text" icon={<CalendarOutlined />} />
+        </Tooltip>
       ) : (
         <Button block type={type}>
-          Add To Calendar
+          Add To Cal
         </Button>
       )}
     </Popover>
