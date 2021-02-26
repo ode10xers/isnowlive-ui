@@ -1,5 +1,5 @@
 import React from 'react'; //Needed for JSX
-import { Modal, Typography, Button } from 'antd';
+import { Modal, Typography, Button, Row, Col } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -64,6 +64,7 @@ export const showBookingSuccessModal = (
   orderDetails = null
 ) => {
   Modal.success({
+    width: 480,
     closable: true,
     maskClosable: false,
     title: 'Registration Successful',
@@ -118,22 +119,40 @@ export const showBookingSuccessModal = (
             <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
           </>
         )}
-        {(isContinuedFlow || !userPass) && orderDetails && (
-          <div className={styles.mt20}>
-            <AddToCalendarButton
-              type="button"
-              buttonText="Add to My Calendar"
-              eventData={{
-                ...orderDetails,
-                page_url: `${generateUrlFromUsername(orderDetails?.username || orderDetails?.creator_username)}/e/${
-                  orderDetails.inventory_id
-                }`,
-              }}
-            />
-          </div>
-        )}
+        <div classname={styles.mt20}>
+          <Row justify="end" gutter={10}>
+            {(isContinuedFlow || !userPass) && orderDetails && (
+              <Col>
+                <div>
+                  <AddToCalendarButton
+                    type="button"
+                    buttonText="Add to My Calendar"
+                    eventData={{
+                      ...orderDetails,
+                      page_url: `${generateUrlFromUsername(
+                        orderDetails?.username || orderDetails?.creator_username
+                      )}/e/${orderDetails.inventory_id}`,
+                    }}
+                  />
+                </div>
+              </Col>
+            )}
+            <Col>
+              <Button
+                type="primary"
+                block
+                onClick={() =>
+                  (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath)
+                }
+              >
+                Go To Dashboard
+              </Button>
+            </Col>
+          </Row>
+        </div>
       </>
     ),
+    okButtonProps: { style: { display: 'none' } },
     okText: 'Go To Dashboard',
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
