@@ -10,7 +10,7 @@ const {
   timeCalculation: { generateCalendarTimeInfo },
 } = dateUtil;
 
-const AddToCalendarButton = ({ eventData, iconOnly = false }) => {
+const AddToCalendarButton = ({ eventData, iconOnly = false, buttonText = 'Add To Cal' }) => {
   const eventDetails = {
     title: eventData.name,
     description: eventData.page_url,
@@ -20,7 +20,7 @@ const AddToCalendarButton = ({ eventData, iconOnly = false }) => {
 
   const icon = { 'calendar-o': 'left' };
 
-  const buttonIconProps = iconOnly ? { buttonLabel: '', buttonTemplate: icon } : { buttonLabel: 'Add To Cal' };
+  const buttonIconProps = iconOnly ? { buttonLabel: '', buttonTemplate: icon } : { buttonLabel: buttonText };
 
   return (
     <AddToCalendar

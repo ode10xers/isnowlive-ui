@@ -342,13 +342,6 @@ const SessionsInventories = ({ match }) => {
                 </Button>,
               ]
             : [
-                <AddToCalendarButton
-                  iconOnly={true}
-                  eventData={{
-                    ...item,
-                    page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
-                  }}
-                />,
                 <Button
                   type="text"
                   disabled={!item.join_url}
@@ -369,6 +362,16 @@ const SessionsInventories = ({ match }) => {
           {layout('Duration', <Text>{item.duration}</Text>)}
           {layout('Day', <Text>{item.days}</Text>)}
           {layout('Time', <Text>{item.time}</Text>)}
+        </div>
+        <div className={styles.mt20}>
+          <AddToCalendarButton
+            buttonText="Add to My Calendar"
+            iconOnly={false}
+            eventData={{
+              ...item,
+              page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
+            }}
+          />
         </div>
       </Card>
     );
