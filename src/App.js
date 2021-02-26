@@ -32,6 +32,7 @@ import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
 import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
+import CookieConsentPopup from 'components/CookieConsentPopup';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -54,19 +55,23 @@ const PrivateRoute = ({ ...rest }) => {
 
 function App() {
   const {
-    state: { userDetails },
+    state: { userDetails, cookieConsent },
     setUserAuthentication,
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
 
   useEffect(() => {
-    initMixPanel();
-  }, []);
+    if (cookieConsent) {
+      initMixPanel();
+    }
+  }, [cookieConsent]);
 
   useEffect(() => {
-    initializeFreshChat(userDetails);
-  }, [userDetails]);
+    if (cookieConsent) {
+      initializeFreshChat(userDetails);
+    }
+  }, [userDetails, cookieConsent]);
 
   useEffect(() => {
     const getUserDetails = async () => {
@@ -101,44 +106,52 @@ function App() {
   }
 
   return (
-    <Router>
-      <Switch>
-        <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
-        <PrivateRoute
-          layout={SideNavWithHeaderLayout}
-          path={Routes.attendeeDashboard.rootPath}
-          component={AttendeeDashboard}
-        />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
-        <PrivateRoute layout={DefaultLayout} exact path={Routes.stripePaymentSuccess} component={PaymentVerification} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseSessionDetails} component={SessionDetails} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.login} component={Login} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
-        <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
-        <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
-        <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
-        <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-        <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
-        <Route path={Routes.stripeAccountValidate}>
-          <Redirect
-            to={{
-              pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
-              state: { validateAccount: true },
-            }}
+    <>
+      <Router>
+        <Switch>
+          <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
+          <PrivateRoute
+            layout={SideNavWithHeaderLayout}
+            path={Routes.attendeeDashboard.rootPath}
+            component={AttendeeDashboard}
           />
-        </Route>
-      </Switch>
-    </Router>
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+          <PrivateRoute
+            layout={DefaultLayout}
+            exact
+            path={Routes.stripePaymentSuccess}
+            component={PaymentVerification}
+          />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseSessionDetails} component={SessionDetails} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.login} component={Login} />
+          <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
+          <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
+          <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
+          <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
+          <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+          <Route path={Routes.stripeAccountValidate}>
+            <Redirect
+              to={{
+                pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
+                state: { validateAccount: true },
+              }}
+            />
+          </Route>
+        </Switch>
+      </Router>
+      <CookieConsentPopup />
+    </>
   );
 }
 
