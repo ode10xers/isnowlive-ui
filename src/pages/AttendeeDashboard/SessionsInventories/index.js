@@ -269,7 +269,7 @@ const SessionsInventories = ({ match }) => {
             {!isPast && (
               <Col md={24} xl={2}>
                 <AddToCalendarButton
-                  iconOnly={true}
+                  iconOnly={false}
                   eventData={{
                     ...record,
                     page_url: `${generateUrlFromUsername(record?.username)}/e/${record.inventory_id}`,
