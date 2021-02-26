@@ -10,6 +10,12 @@ import styles from './styles.module.scss';
 
 const { Paragraph, Text } = Typography;
 
+const DOMAIN = {
+  development: 'localhost',
+  staging: '.stage.passion.do',
+  production: '.passion.do',
+};
+
 const CookieConsentPopup = () => {
   const { setCookieConsent } = useGlobalContext();
 
@@ -21,6 +27,9 @@ const CookieConsentPopup = () => {
     <CookieConsent
       onAccept={() => setCookieConsent(true)}
       onDecline={redirectToGoogle}
+      extraCookieOptions={{
+        domain: DOMAIN[process.env.NODE_ENV],
+      }}
       location="bottom"
       cookieName="cookieUsageConsent"
       overlay={true}
