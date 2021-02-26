@@ -305,7 +305,7 @@ const SessionDetails = ({ match, history }) => {
             order_type: orderType.CLASS,
           });
         } else {
-          showBookingSuccessModal(userEmail, null, false, false, username);
+          showBookingSuccessModal(userEmail, null, false, false, username, data);
           setIsLoading(false);
         }
       }
@@ -348,7 +348,7 @@ const SessionDetails = ({ match, history }) => {
           });
 
           if (isAPISuccess(followUpBooking.status)) {
-            showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+            showBookingSuccessModal(userEmail, selectedPass, true, false, username, followUpBooking.data);
             setIsLoading(false);
           }
         }
@@ -372,7 +372,7 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+        showBookingSuccessModal(userEmail, selectedPass, true, false, username, data);
         setIsLoading(false);
       }
     } catch (error) {

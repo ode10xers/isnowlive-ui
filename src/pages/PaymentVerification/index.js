@@ -74,7 +74,8 @@ const PaymentVerification = () => {
                       { ...usersPass, name: usersPass.pass_name },
                       true,
                       true,
-                      username
+                      username,
+                      followUpBooking.data
                     );
                   }
                 } catch (error) {
@@ -132,7 +133,13 @@ const PaymentVerification = () => {
             } else if (order_type === orderType.COURSE) {
               showCourseBookingSuccessModal(userDetails.email, username);
             } else {
-              showBookingSuccessModal(userDetails.email, null, false, false, username);
+              const attendeeOrderDetails = await apis.session.getAttendeeUpcomingSession();
+
+              const specificOrder = attendeeOrderDetails.data.find(
+                (customerOrder) => customerOrder.order_id === order_id
+              );
+
+              showBookingSuccessModal(userDetails.email, null, false, false, username, specificOrder);
             }
           }
           setIsLoading(false);

@@ -4,11 +4,12 @@ import { Modal, Typography, Button } from 'antd';
 import apis from 'apis';
 import Routes from 'routes';
 
-import { generateUrl, productType } from 'utils/helper';
+import { generateUrl, productType, generateUrlFromUsername } from 'utils/helper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.modules.scss';
+import AddToCalendarButton from 'components/AddToCalendarButton';
 
 const { Text, Paragraph } = Typography;
 
@@ -59,59 +60,76 @@ export const showBookingSuccessModal = (
   userPass = null,
   isContinuedFlow = false,
   userDidPayment = false,
-  redirectDomainName = 'app'
+  redirectDomainName = 'app',
+  orderDetails = null
 ) => {
   Modal.success({
     closable: true,
     maskClosable: false,
     title: 'Registration Successful',
-    content: isContinuedFlow ? (
-      userDidPayment ? (
-        //* Purchase Pass & Immediately Book Class
-        <>
-          <Paragraph>
-            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-          </Paragraph>
-          <Paragraph>
-            We have <Text strong> used 1 credit </Text>
-            to book this class for you.
-          </Paragraph>
-          <Paragraph>
-            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-            from <Text strong> friends@passion.do. </Text>
-          </Paragraph>
-          <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-        </>
-      ) : (
-        //* Book class from previously purchased Pass
-        <>
-          <Paragraph>
-            We have booked this session using 1 credit from your pass
-            <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
-          </Paragraph>
-          <Paragraph>
-            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-            from <Text strong> friends@passion.do. </Text>
-          </Paragraph>
-          <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-        </>
-      )
-    ) : userPass ? (
-      //* Purchase Individual Pass without Booking Class
+    content: (
       <>
-        <Paragraph>
-          You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-        </Paragraph>
-        <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
-      </>
-    ) : (
-      //* Book Class without Pass
-      <>
-        <Paragraph>
-          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
-          <Text strong> friends@passion.do. </Text>
-        </Paragraph>
-        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {isContinuedFlow ? (
+          userDidPayment ? (
+            //* Purchase Pass & Immediately Book Class
+            <>
+              <Paragraph>
+                You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+              </Paragraph>
+              <Paragraph>
+                We have <Text strong> used 1 credit </Text>
+                to book this class for you.
+              </Paragraph>
+              <Paragraph>
+                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
+                from <Text strong> friends@passion.do. </Text>
+              </Paragraph>
+              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+            </>
+          ) : (
+            //* Book class from previously purchased Pass
+            <>
+              <Paragraph>
+                We have booked this session using 1 credit from your pass
+                <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
+              </Paragraph>
+              <Paragraph>
+                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
+                from <Text strong> friends@passion.do. </Text>
+              </Paragraph>
+              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+            </>
+          )
+        ) : userPass ? (
+          //* Purchase Individual Pass without Booking Class
+          <>
+            <Paragraph>
+              You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+            </Paragraph>
+            <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
+          </>
+        ) : (
+          //* Book Class without Pass
+          <>
+            <Paragraph>
+              We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+              <Text strong> friends@passion.do. </Text>
+            </Paragraph>
+            <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+          </>
+        )}
+        {(isContinuedFlow || !userPass) && orderDetails && (
+          <div className={styles.mt20}>
+            <AddToCalendarButton
+              type="button"
+              buttonText="Add to My Calendar"
+              eventData={{
+                ...orderDetails,
+                page_url: `${generateUrlFromUsername(orderDetails?.username)}/e/${orderDetails.inventory_id}`,
+              }}
+            />
+          </div>
+        )}
       </>
     ),
     okText: 'Go To Dashboard',

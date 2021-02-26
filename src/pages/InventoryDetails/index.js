@@ -282,15 +282,15 @@ const InventoryDetails = ({ match, history }) => {
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+                showBookingSuccessModal(userEmail, selectedPass, true, false, username, followUpBooking.data);
                 setIsLoading(false);
               }
             } else {
-              showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+              showBookingSuccessModal(userEmail, selectedPass, true, false, username, data);
               setIsLoading(false);
             }
           } else {
-            showBookingSuccessModal(userEmail, null, false, false, username);
+            showBookingSuccessModal(userEmail, null, false, false, username, data);
             setIsLoading(false);
           }
         }

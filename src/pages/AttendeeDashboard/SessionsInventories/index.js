@@ -254,7 +254,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Actions',
-      width: isPast ? '56px' : '320px',
+      width: isPast ? '56px' : '350px',
       render: (text, record) => {
         return isPast ? (
           <Row justify="start">
@@ -267,9 +267,9 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="space-around">
             {!isPast && (
-              <Col md={24} xl={2}>
+              <Col md={24} xl={5}>
                 <AddToCalendarButton
-                  iconOnly={false}
+                  buttonText="Add to Cal"
                   eventData={{
                     ...record,
                     page_url: `${generateUrlFromUsername(record?.username)}/e/${record.inventory_id}`,
@@ -365,8 +365,8 @@ const SessionsInventories = ({ match }) => {
         </div>
         <div className={styles.mt20}>
           <AddToCalendarButton
+            type="button"
             buttonText="Add to My Calendar"
-            iconOnly={false}
             eventData={{
               ...item,
               page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,

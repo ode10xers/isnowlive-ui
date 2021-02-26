@@ -51,12 +51,14 @@ const timeCalculation = {
     const endMoment = moment(endDate);
     const timezoneLocation = timezoneUtils.getTimezoneLocation();
 
-    return {
+    const calendarTimeData = {
       startTime: startMoment.format(),
       endTime: endMoment.format(),
       duration: moment.duration(endMoment.diff(startMoment)).asHours(),
       timezone: timezoneLocation,
     };
+
+    return calendarTimeData;
   },
 };
 
