@@ -25,7 +25,6 @@ const CookieConsentPopup = () => {
 
   return (
     <CookieConsent
-      debug={true}
       onAccept={() => setCookieConsent(true)}
       onDecline={redirectToGoogle}
       extraCookieOptions={{
