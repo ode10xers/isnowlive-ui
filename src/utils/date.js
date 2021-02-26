@@ -27,6 +27,15 @@ const formatDate = {
   getISODayOfWeek: (date) => moment(date).isoWeekday(),
 };
 
+const timezoneUtils = {
+  getCurrentLongTimezone: () => {
+    const timeString = new Date().toTimeString();
+    const longTimezone = timeString.substr(timeString.indexOf('('));
+    return longTimezone.substring(1, longTimezone.length - 1);
+  },
+  getTimezoneLocation: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+};
+
 const timeCalculation = {
   dateIsBeforeDate: (startDate, endDate) => moment(startDate).isBefore(endDate),
   isBeforeDate: (date) => moment().isBefore(moment(date)),
@@ -37,15 +46,18 @@ const timeCalculation = {
     moment.rangeFromInterval('day', isPrevious ? -6 : 6, moment(date).endOf('day')).snapTo('day'),
   getRangeDiff: (rangeA, rangeB) =>
     moment.range(rangeB[0], rangeB[1]).snapTo('day').subtract(moment.range(rangeA[0], rangeA[1]).snapTo('day')),
-};
+  generateCalendarTimeInfo: (startDate, endDate) => {
+    const startMoment = moment(startDate);
+    const endMoment = moment(endDate);
+    const timezoneLocation = timezoneUtils.getTimezoneLocation();
 
-const timezoneUtils = {
-  getCurrentLongTimezone: () => {
-    const timeString = new Date().toTimeString();
-    const longTimezone = timeString.substr(timeString.indexOf('('));
-    return longTimezone.substring(1, longTimezone.length - 1);
+    return {
+      startTime: startMoment.format(),
+      endTime: endMoment.format(),
+      duration: moment.duration(endMoment.diff(startMoment)).asHours(),
+      timezone: timezoneLocation,
+    };
   },
-  getTimezoneLocation: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
 };
 
 const dateUtil = {

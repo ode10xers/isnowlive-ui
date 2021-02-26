@@ -254,7 +254,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Actions',
-      width: isPast ? '56px' : '300px',
+      width: isPast ? '56px' : '320px',
       render: (text, record) => {
         return isPast ? (
           <Row justify="start">
@@ -271,11 +271,8 @@ const SessionsInventories = ({ match }) => {
                 <AddToCalendarButton
                   iconOnly={true}
                   eventData={{
-                    name: record.name,
-                    desc: 'Testing putting some description here',
-                    startTime: record.start_time,
-                    endTime: record.end_time,
-                    url: `${generateUrlFromUsername(record?.username)}/s/${record.session_id}`,
+                    ...record,
+                    page_url: `${generateUrlFromUsername(record?.username)}/e/${record.inventory_id}`,
                   }}
                 />
               </Col>
@@ -345,6 +342,13 @@ const SessionsInventories = ({ match }) => {
                 </Button>,
               ]
             : [
+                <AddToCalendarButton
+                  iconOnly={true}
+                  eventData={{
+                    ...item,
+                    page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
+                  }}
+                />,
                 <Button
                   type="text"
                   disabled={!item.join_url}
