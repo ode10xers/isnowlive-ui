@@ -68,9 +68,7 @@ function App() {
   }, [cookieConsent]);
 
   useEffect(() => {
-    if (cookieConsent) {
-      initializeFreshChat(userDetails);
-    }
+    initializeFreshChat(userDetails, cookieConsent || false);
   }, [userDetails, cookieConsent]);
 
   useEffect(() => {

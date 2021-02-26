@@ -1,6 +1,6 @@
 import config from 'config';
 
-function initFreshChatWidget(userData = null) {
+export const initFreshChatWidget = (userData = null) => {
   let freshChatConfig = {
     token: config.freshChat.appToken,
     host: config.freshChat.hostUrl,
@@ -17,22 +17,23 @@ function initFreshChatWidget(userData = null) {
   }
 
   window.fcWidget.init(freshChatConfig);
-}
+};
 
-export const initializeFreshChat = (userData = null) => {
-  console.log('Initializing Fresh Chat');
+export const initializeFreshChat = (userData = null, userAgreed = false) => {
   const freshChatSDK = document.getElementById('freshchat-js-sdk');
 
   if (freshChatSDK) {
-    initFreshChatWidget(userData);
+    if (userAgreed) {
+      initFreshChatWidget(userData);
+    }
   } else {
     let element = document.createElement('script');
     element.id = 'freshchat-js-sdk';
     element.async = !0;
     element.src = `${config.freshChat.hostUrl}/js/widget.js`;
-    element.onload = () => {
-      initFreshChatWidget(userData);
-    };
+    // element.onload = () => {
+    //   initFreshChatWidget(userData);
+    // };
     document.head.appendChild(element);
   }
 };

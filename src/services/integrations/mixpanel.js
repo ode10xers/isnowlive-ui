@@ -133,9 +133,6 @@ const isDevelopment = () => env === 'development' || env === 'staging';
 
 export const initMixPanel = () => {
   if (isDevelopment()) return;
-
-  console.log('Initializing MixPanel');
-
   mixpanel.init(config.mixPanel.projectToken);
 };
 
