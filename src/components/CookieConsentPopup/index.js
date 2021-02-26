@@ -25,6 +25,7 @@ const CookieConsentPopup = () => {
 
   return (
     <CookieConsent
+      debug={true}
       onAccept={() => setCookieConsent(true)}
       onDecline={redirectToGoogle}
       extraCookieOptions={{
@@ -36,8 +37,8 @@ const CookieConsentPopup = () => {
       setDeclineCookie={false}
       flipButtons={true}
       buttonWrapperClasses={styles.btnWrapper}
-      buttonStyle={{ margin: 8 }}
-      buttonClasses="ant-btn ant-btn-primary ant-btn-block"
+      buttonStyle={{ margin: 8, backgroundColor: '#52c41a', color: 'white' }}
+      buttonClasses="ant-btn ant-btn-text ant-btn-block"
       declineButtonStyle={{ margin: 8 }}
       declineButtonClasses="ant-btn ant-btn-danger ant-btn-block"
       disableButtonStyles={true}
