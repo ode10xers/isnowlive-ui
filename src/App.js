@@ -61,9 +61,7 @@ function App() {
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
 
-  useEffect(() => {
-    initializeFreshChat();
-  }, []);
+  useEffect(() => {}, []);
 
   useEffect(() => {
     if (cookieConsent) {
@@ -72,6 +70,8 @@ function App() {
   }, [cookieConsent]);
 
   useEffect(() => {
+    initializeFreshChat(userDetails, cookieConsent);
+
     if (cookieConsent) {
       initFreshChatWidget(userDetails);
     }

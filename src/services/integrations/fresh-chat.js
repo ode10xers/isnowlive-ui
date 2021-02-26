@@ -19,7 +19,7 @@ export const initFreshChatWidget = (userData = null) => {
   window.fcWidget.init(freshChatConfig);
 };
 
-export const initializeFreshChat = () => {
+export const initializeFreshChat = (userDetails = null, userConsent = false) => {
   const freshChatSDK = document.getElementById('freshchat-js-sdk');
 
   if (!freshChatSDK) {
@@ -27,9 +27,11 @@ export const initializeFreshChat = () => {
     element.id = 'freshchat-js-sdk';
     element.async = !0;
     element.src = `${config.freshChat.hostUrl}/js/widget.js`;
-    // element.onload = () => {
-    //   initFreshChatWidget(userData);
-    // };
+    element.onload = () => {
+      if (userConsent) {
+        initFreshChatWidget(userDetails);
+      }
+    };
     document.head.appendChild(element);
   }
 };
