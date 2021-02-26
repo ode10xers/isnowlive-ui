@@ -20,6 +20,7 @@ function initFreshChatWidget(userData = null) {
 }
 
 export const initializeFreshChat = (userData = null) => {
+  console.log('Initializing Fresh Chat');
   const freshChatSDK = document.getElementById('freshchat-js-sdk');
 
   if (freshChatSDK) {

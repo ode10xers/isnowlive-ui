@@ -73,7 +73,7 @@ const GlobalDataProvider = ({ children }) => {
   }
 
   function setCookieConsent(cookieConsent) {
-    dispatch({ type: 'COOKIE_CONSENT', payload: cookieConsent });
+    dispatch({ type: 'SET_COOKIE_CONSENT', payload: cookieConsent });
   }
 
   function logOut(history, dontRedirect = false) {
