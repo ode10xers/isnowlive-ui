@@ -3,6 +3,7 @@ import Routes from 'routes';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
+import { getCookieConsentValue } from 'react-cookie-consent';
 
 const Context = createContext(null);
 
@@ -31,6 +32,11 @@ const reducer = (state, action) => {
         userDetails: null,
         userAuthenticated: false,
       };
+    case 'SET_COOKIE_CONSENT':
+      return {
+        ...state,
+        cookieConsent: action.payload,
+      };
     default:
       return state;
   }
@@ -41,6 +47,7 @@ const GlobalDataProvider = ({ children }) => {
   const initialState = {
     userDetails: getLocalUserDetails(),
     isAuthenticated: false,
+    cookieConsent: Boolean(getCookieConsentValue()),
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -66,6 +73,10 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'SET_USER_AUTHENTICATED', payload: status });
   }
 
+  function setCookieConsent(cookieConsent) {
+    dispatch({ type: 'SET_COOKIE_CONSENT', payload: cookieConsent });
+  }
+
   function logOut(history, dontRedirect = false) {
     if (!dontRedirect) {
       history.push(Routes.login);
@@ -83,6 +94,7 @@ const GlobalDataProvider = ({ children }) => {
     logIn,
     setUserDetails,
     setUserAuthentication,
+    setCookieConsent,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
