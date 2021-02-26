@@ -1,0 +1,15 @@
+@import '../../styles/variables.scss';
+
+// .cookieBtn {
+//   background-color: map-get($map: $colors, $key: 'DodgerBlue');
+//   color: map-get($map: $colors, $key: 'White');
+
+//   &.decline {
+//     background-color: map-get($map: $colors, $key: 'FireBrick');
+//     color: map-get($map: $colors, $key: 'White');
+//   }
+// }
+
+.btnWrapper {
+  padding-right: 30px;
+}
