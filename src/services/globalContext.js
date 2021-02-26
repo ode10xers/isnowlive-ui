@@ -3,6 +3,7 @@ import Routes from 'routes';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
+import { getCookieConsentValue } from 'react-cookie-consent';
 
 const Context = createContext(null);
 
@@ -46,7 +47,7 @@ const GlobalDataProvider = ({ children }) => {
   const initialState = {
     userDetails: getLocalUserDetails(),
     isAuthenticated: false,
-    cookieConsent: null,
+    cookieConsent: getCookieConsentValue(),
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);

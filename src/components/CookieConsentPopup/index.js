@@ -31,7 +31,6 @@ const CookieConsentPopup = () => {
         domain: DOMAIN[process.env.NODE_ENV],
       }}
       location="bottom"
-      cookieName="cookieUsageConsent"
       overlay={true}
       enableDeclineButton={true}
       setDeclineCookie={false}
