@@ -254,7 +254,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Actions',
-      width: isPast ? '56px' : '350px',
+      width: isPast ? '56px' : '360px',
       render: (text, record) => {
         return isPast ? (
           <Row justify="start">
@@ -267,7 +267,7 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="space-around">
             {!isPast && (
-              <Col md={24} xl={5}>
+              <Col md={24} xl={6}>
                 <AddToCalendarButton
                   buttonText="Add to Cal"
                   eventData={{
@@ -295,7 +295,7 @@ const SessionsInventories = ({ match }) => {
                 </Col>
               </>
             )}
-            <Col md={24} lg={24} xl={5}>
+            <Col md={24} lg={24} xl={4}>
               <Button type="link" onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
