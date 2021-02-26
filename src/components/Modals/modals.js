@@ -125,7 +125,9 @@ export const showBookingSuccessModal = (
               buttonText="Add to My Calendar"
               eventData={{
                 ...orderDetails,
-                page_url: `${generateUrlFromUsername(orderDetails?.username)}/e/${orderDetails.inventory_id}`,
+                page_url: `${generateUrlFromUsername(orderDetails?.username || orderDetails?.creator_username)}/e/${
+                  orderDetails.inventory_id
+                }`,
               }}
             />
           </div>
