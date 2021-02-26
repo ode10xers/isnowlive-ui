@@ -222,6 +222,20 @@ const InventoryDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   const createOrder = async (userEmail) => {
     setCreateFollowUpOrder(null);
     try {
@@ -282,15 +296,21 @@ const InventoryDetails = ({ match, history }) => {
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true, false, username, followUpBooking.data);
+                const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
+
+                showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
                 setIsLoading(false);
               }
             } else {
-              showBookingSuccessModal(userEmail, selectedPass, true, false, username, data);
+              const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+              showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
               setIsLoading(false);
             }
           } else {
-            showBookingSuccessModal(userEmail, null, false, false, username, data);
+            const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+            showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
             setIsLoading(false);
           }
         }

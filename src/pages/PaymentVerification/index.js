@@ -33,6 +33,20 @@ const PaymentVerification = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { order_id, transaction_id, order_type, inventory_id, video_id } = parseQueryString(location.search);
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   useEffect(() => {
     if (order_id && transaction_id) {
       const verifyPayment = async () => {
@@ -69,13 +83,15 @@ const PaymentVerification = () => {
                   });
 
                   if (isAPISuccess(followUpBooking.status)) {
+                    const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
+
                     showBookingSuccessModal(
                       userDetails.email,
                       { ...usersPass, name: usersPass.pass_name },
                       true,
                       true,
                       username,
-                      followUpBooking.data
+                      orderDetails
                     );
                   }
                 } catch (error) {
@@ -133,13 +149,9 @@ const PaymentVerification = () => {
             } else if (order_type === orderType.COURSE) {
               showCourseBookingSuccessModal(userDetails.email, username);
             } else {
-              const attendeeOrderDetails = await apis.session.getAttendeeUpcomingSession();
+              const orderDetails = await getAttendeeOrderDetails(order_id);
 
-              const specificOrder = attendeeOrderDetails.data.find(
-                (customerOrder) => customerOrder.order_id === order_id
-              );
-
-              showBookingSuccessModal(userDetails.email, null, false, false, username, specificOrder);
+              showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
             }
           }
           setIsLoading(false);
