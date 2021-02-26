@@ -47,8 +47,10 @@ const GlobalDataProvider = ({ children }) => {
   const initialState = {
     userDetails: getLocalUserDetails(),
     isAuthenticated: false,
-    cookieConsent: getCookieConsentValue(),
+    cookieConsent: Boolean(getCookieConsentValue()),
   };
+
+  console.log(initialState);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 

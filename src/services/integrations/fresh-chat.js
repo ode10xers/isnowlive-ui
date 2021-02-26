@@ -24,6 +24,7 @@ export const initializeFreshChat = (userData = null, userAgreed = false) => {
 
   if (freshChatSDK) {
     if (userAgreed) {
+      console.log('Fresh Chat Initialized');
       initFreshChatWidget(userData);
     }
   } else {
