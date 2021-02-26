@@ -50,8 +50,6 @@ const GlobalDataProvider = ({ children }) => {
     cookieConsent: Boolean(getCookieConsentValue()),
   };
 
-  console.log(initialState);
-
   const [state, dispatch] = useReducer(reducer, initialState);
 
   function logIn(userDetails, rememberUser) {

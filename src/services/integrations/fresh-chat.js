@@ -19,15 +19,10 @@ export const initFreshChatWidget = (userData = null) => {
   window.fcWidget.init(freshChatConfig);
 };
 
-export const initializeFreshChat = (userData = null, userAgreed = false) => {
+export const initializeFreshChat = () => {
   const freshChatSDK = document.getElementById('freshchat-js-sdk');
 
-  if (freshChatSDK) {
-    if (userAgreed) {
-      console.log('Fresh Chat Initialized');
-      initFreshChatWidget(userData);
-    }
-  } else {
+  if (!freshChatSDK) {
     let element = document.createElement('script');
     element.id = 'freshchat-js-sdk';
     element.async = !0;

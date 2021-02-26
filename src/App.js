@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import Routes from 'routes';
 import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
-import { initializeFreshChat } from 'services/integrations/fresh-chat';
+import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
@@ -62,13 +62,19 @@ function App() {
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
 
   useEffect(() => {
+    initializeFreshChat();
+  }, []);
+
+  useEffect(() => {
     if (cookieConsent) {
       initMixPanel();
     }
   }, [cookieConsent]);
 
   useEffect(() => {
-    initializeFreshChat(userDetails, cookieConsent || false);
+    if (cookieConsent) {
+      initFreshChatWidget(userDetails);
+    }
   }, [userDetails, cookieConsent]);
 
   useEffect(() => {
