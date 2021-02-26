@@ -1,8 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-
-import { DownOutlined } from '@ant-design/icons';
-
 import AddToCalendar from 'react-add-to-calendar';
 
 import dateUtil from 'utils/date';
@@ -23,21 +20,16 @@ const AddToCalendarButton = ({ type = 'link', eventData, iconOnly = false, butto
 
   const icon = { 'calendar-o': 'left' };
 
-  const buttonIconProps = iconOnly
-    ? { buttonLabel: '', buttonTemplate: icon }
-    : { buttonLabel: buttonText, buttonTemplate: { textOnly: 'none' } };
+  const buttonIconProps = iconOnly ? { buttonLabel: '', buttonTemplate: icon } : { buttonLabel: buttonText };
 
   return (
-    <div className={type === 'button' ? styles.atcBtnWrapper : undefined}>
-      <AddToCalendar
-        event={eventDetails}
-        {...buttonIconProps}
-        dropdownClass={styles.atcDropdown}
-        buttonWrapperClass={classNames(styles.atcWrapper, type === 'button' ? styles.button : undefined)}
-        rootClass={styles.atc}
-      />
-      {!iconOnly && type === 'button' && <DownOutlined className={styles.downArrow} />}
-    </div>
+    <AddToCalendar
+      event={eventDetails}
+      {...buttonIconProps}
+      dropdownClass={styles.atcDropdown}
+      buttonWrapperClass={classNames(styles.atcWrapper, type === 'button' ? styles.button : undefined)}
+      rootClass={styles.atc}
+    />
   );
 };
 
