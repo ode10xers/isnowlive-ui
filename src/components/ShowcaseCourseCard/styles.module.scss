@@ -33,22 +33,22 @@
   }
 
   .buyButtonWrapper {
-    align-self: center; 
+    align-self: center;
   }
 }
 
-@media screen and (max-width: 992px){
-  .showcaseCourseCardWrapper { 
+@media screen and (max-width: 992px) {
+  .showcaseCourseCardWrapper {
     .courseInfoWrapper {
       .courseNameWrapper {
         font-size: 14px;
         height: 58px;
       }
-  
+
       .courseDetailsWrapper {
         font-size: 13px;
       }
-  
+
       .coursePriceWrapper {
         font-size: 13px;
       }
@@ -56,18 +56,18 @@
   }
 }
 
-@media screen and (max-width: 769px){
-  .showcaseCourseCardWrapper { 
+@media screen and (max-width: 769px) {
+  .showcaseCourseCardWrapper {
     .courseInfoWrapper {
       .courseNameWrapper {
         font-size: 16px;
         height: 58px;
       }
-  
+
       .courseDetailsWrapper {
         font-size: 16px;
       }
-  
+
       .coursePriceWrapper {
         font-size: 16px;
       }

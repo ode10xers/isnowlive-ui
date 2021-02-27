@@ -547,11 +547,11 @@ const SessionDetails = ({ match, history }) => {
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={12}>
+        <Col xs={18}>
           <SessionInfo session={session} />
         </Col>
         {creator && (
-          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
+          <Col xs={6} lg={{ span: 3, offset: 3 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/s/${session.session_id}`}

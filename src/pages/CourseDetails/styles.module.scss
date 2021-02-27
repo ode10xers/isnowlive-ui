@@ -45,18 +45,18 @@
     bottom: 0px;
     right: 100px;
   }
-  
+
   .bio {
     p,
     span {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
       background-color: map-get($map: $colors, $key: 'White1') !important;
     }
   }
 }
 
-@media screen and (max-width: 992px){
+@media screen and (max-width: 992px) {
   .creatorProfileWrapper {
     .imageWrapper {
       margin-bottom: 0px;
@@ -64,7 +64,7 @@
   }
 }
 
-@media screen and (max-width: 769px){
+@media screen and (max-width: 769px) {
   .creatorProfileWrapper {
     .profilePreviewContainer {
       margin: 5px;
