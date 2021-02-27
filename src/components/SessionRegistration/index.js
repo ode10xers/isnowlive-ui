@@ -512,9 +512,13 @@ const SessionRegistration = ({
                     <div className={styles.passwordHelpText}>
                       <Text>
                         You have booked a session with us earlier, but if you haven't set your password, please{' '}
-                        <Text className={styles.linkBtn} onClick={() => onSetNewPassword(form.getFieldsValue().email)}>
+                        <Button
+                          type="link"
+                          className={classNames(styles.setNewPassword, styles.linkBtn)}
+                          onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                        >
                           set a new password
-                        </Text>
+                        </Button>
                       </Text>
                     </div>
                   )}
