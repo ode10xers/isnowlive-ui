@@ -53,9 +53,7 @@ const CookieConsentPopup = () => {
       },
       onCancel: () => {
         // Values from here are taken from default values of react-cookie-consent library
-        // const cookieName = 'CookieConsent';
         const cookieOptions = {
-          // 'CookieConsent' : true,
           expires: 365,
           path: '/',
           domain: DOMAIN[process.env.NODE_ENV],
@@ -64,9 +62,6 @@ const CookieConsentPopup = () => {
         };
 
         Cookies.set('CookieConsent', 'true', cookieOptions);
-        // const cookieString = Object.entries(cookieValues).map(([key, value]) => `${key}=${value}`).join(';');
-        // document.cookie = cookieString;
-
         setCookieConsent(true);
       },
       okText: 'Not use this website',
