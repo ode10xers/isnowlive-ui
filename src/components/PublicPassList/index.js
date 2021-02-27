@@ -223,7 +223,6 @@ const PublicPassList = ({ username, passes }) => {
       </Row>
     );
 
-    //TODO: Adjust new credit keys here
     return (
       <div key={pass.id}>
         <Card

@@ -222,6 +222,20 @@ const InventoryDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   const createOrder = async (userEmail) => {
     setCreateFollowUpOrder(null);
     try {
@@ -282,15 +296,21 @@ const InventoryDetails = ({ match, history }) => {
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+                const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
+
+                showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
                 setIsLoading(false);
               }
             } else {
-              showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+              const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+              showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
               setIsLoading(false);
             }
           } else {
-            showBookingSuccessModal(userEmail, null, false, false, username);
+            const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+            showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
             setIsLoading(false);
           }
         }
@@ -407,11 +427,11 @@ const InventoryDetails = ({ match, history }) => {
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={12}>
+        <Col xs={18}>
           <SessionInfo session={session} />
         </Col>
         {creator && (
-          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
+          <Col xs={8} lg={{ span: 3, offset: 9 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}

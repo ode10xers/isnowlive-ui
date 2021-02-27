@@ -87,6 +87,9 @@ $spacing: (
 .blueText {
   color: map-get($map: $colors, $key: 'DodgerBlue') !important;
 }
+.whiteText {
+  color: map-get($map: $colors, $key: 'White') !important;
+}
 .headButton {
   margin-top: 10px;
   margin-left: 15px;
