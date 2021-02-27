@@ -18,6 +18,7 @@ import VideoCard from 'components/VideoCard';
 import PurchaseModal from 'components/PurchaseModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
+import HelmetWrapper from 'components/HelmetWrapper';
 import { isMobileDevice } from 'utils/device';
 import {
   generateUrlFromUsername,
@@ -532,6 +533,13 @@ const SessionDetails = ({ match, history }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
+      {session && creator && (
+        <HelmetWrapper
+          title={`${creator?.first_name} ${creator?.last_name} | ${session?.name}`}
+          description="Test some text here"
+          imageUrl={session?.session_image_url}
+        />
+      )}
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24}>
           <Image
