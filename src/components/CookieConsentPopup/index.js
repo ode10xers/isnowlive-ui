@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { Modal, Typography } from 'antd';
 
@@ -43,15 +44,15 @@ const CookieConsentPopup = () => {
           <Paragraph>You can also choose not to use this website and we will take you to Google's homepage</Paragraph>
         </>
       ),
-      cancelText: 'I Accept',
-      cancelButtonProps: {
+      okText: 'I Accept',
+      okButtonProps: {
         type: 'text',
         style: {
           backgroundColor: '#52c41a',
           color: 'white',
         },
       },
-      onCancel: () => {
+      onOk: () => {
         // Values from here are taken from default values of react-cookie-consent library
         const cookieOptions = {
           expires: 365,
@@ -64,15 +65,15 @@ const CookieConsentPopup = () => {
         Cookies.set('CookieConsent', 'true', cookieOptions);
         setCookieConsent(true);
       },
-      okText: 'Not use this website',
-      okButtonProps: {
+      cancelText: 'Not use this website',
+      cancelButtonProps: {
         type: 'text',
         style: {
           backgroundColor: '#FF4D4F',
           color: 'white',
         },
       },
-      onOk: () => (window.location.href = 'https://www.google.com'),
+      onCancel: () => (window.location.href = 'https://www.google.com'),
     });
   };
 
@@ -94,7 +95,9 @@ const CookieConsentPopup = () => {
       buttonStyle={{ margin: 8, backgroundColor: '#52c41a', color: 'white', fontWeight: 600 }}
       buttonClasses={`ant-btn ant-btn-text ${isMobileDevice ? styles.mobileBtn : 'ant-btn-block'}`}
       declineButtonStyle={{ margin: 8, fontWeight: 600 }}
-      declineButtonClasses={`ant-btn ant-btn-danger ${isMobileDevice ? styles.mobileBtn : 'ant-btn-block'}`}
+      declineButtonClasses={`ant-btn ant-btn-danger ${
+        isMobileDevice ? classNames(styles.mobileBtn, styles.decline) : 'ant-btn-block'
+      }`}
       disableButtonStyles={true}
     >
       <Paragraph className={styles.whiteText}>

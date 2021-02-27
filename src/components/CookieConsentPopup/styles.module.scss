@@ -15,7 +15,11 @@
     display: flex;
 
     .mobileBtn {
-      flex: 1 1 50%
+      flex: 1 1 50%;
+
+      &.decline {
+        order: -1;
+      }
     }
   }
 }
