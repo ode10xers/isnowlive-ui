@@ -418,7 +418,7 @@ const VideoDetails = ({ match, history }) => {
                   </Text>
                   <Divider type="vertical" />
                   <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                    Expires on : {toLongDateWithDay(pass?.expiry)}
+                    Pass is valid till : {toLongDateWithDay(pass?.expiry)}
                   </Text>
                 </Space>
               ) : (

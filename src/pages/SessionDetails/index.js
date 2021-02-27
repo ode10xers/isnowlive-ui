@@ -246,6 +246,20 @@ const SessionDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   const handleOrder = (userEmail) => {
     setIsLoading(true);
 
@@ -305,7 +319,9 @@ const SessionDetails = ({ match, history }) => {
             order_type: orderType.CLASS,
           });
         } else {
-          showBookingSuccessModal(userEmail, null, false, false, username);
+          const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+          showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
           setIsLoading(false);
         }
       }
@@ -348,7 +364,9 @@ const SessionDetails = ({ match, history }) => {
           });
 
           if (isAPISuccess(followUpBooking.status)) {
-            showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+            const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
+
+            showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
             setIsLoading(false);
           }
         }
@@ -372,7 +390,9 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+        const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+        showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
         setIsLoading(false);
       }
     } catch (error) {
