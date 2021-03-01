@@ -33,6 +33,8 @@ const courseTypes = {
   },
 };
 
+const initialColor = generateRandomColor();
+
 const whiteColor = '#ffffff';
 
 const colorPickerChoices = [
@@ -69,8 +71,6 @@ const {
 } = dateUtil;
 
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
-  const initialColor = generateRandomColor();
-
   const [form] = Form.useForm();
 
   const [courseClasses, setCourseClasses] = useState([]);
@@ -320,7 +320,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
     fetchAllVideosForCreator(isVideoModal);
   }, [
-    initialColor,
     visible,
     editedCourse,
     isVideoModal,
