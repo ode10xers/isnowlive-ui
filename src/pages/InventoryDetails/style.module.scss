@@ -18,12 +18,13 @@
     height: 100%;
     bottom: 0;
     left: 0;
+    padding: 8px 0;
 
     .soldOutImage {
       object-fit: fill;
-      position: absolute;
-      left: 33%;
-      top: 15%;
+      margin-left: 25%;
+      height: inherit;
+      width: auto;
     }
   }
 }
