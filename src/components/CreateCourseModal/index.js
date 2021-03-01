@@ -33,8 +33,6 @@ const courseTypes = {
   },
 };
 
-const initialColor = generateRandomColor();
-
 const whiteColor = '#ffffff';
 
 const colorPickerChoices = [
@@ -61,7 +59,6 @@ const formInitialValues = {
   courseName: '',
   price: 10,
   videoList: [],
-  colorCode: initialColor,
 };
 
 const { Text, Title } = Typography;
@@ -72,6 +69,8 @@ const {
 } = dateUtil;
 
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
+  const initialColor = generateRandomColor();
+
   const [form] = Form.useForm();
 
   const [courseClasses, setCourseClasses] = useState([]);
@@ -308,6 +307,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setCourseStartDate(null);
         setCourseEndDate(null);
         setCourseImageUrl(null);
+        setHighestMaxParticipantCourseSession(null);
         // setIsSequentialVideos(false);
       }
     }
@@ -320,6 +320,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
     fetchAllVideosForCreator(isVideoModal);
   }, [
+    initialColor,
     visible,
     editedCourse,
     isVideoModal,
@@ -330,10 +331,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   ]);
 
   useEffect(() => {
-    if (selectedCourseClass?.length > 0) {
-      let highestMaxParticipantCourseSession = null;
-      let highestMaxParticipantCount = 0;
+    let highestMaxParticipantCourseSession = null;
+    let highestMaxParticipantCount = 0;
 
+    if (selectedCourseClass?.length > 0) {
       const courseSessionsList = getSelectedCourseClasses(selectedCourseClass).filter(
         (selectedClass) => selectedClass.is_course
       );
@@ -346,10 +347,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           }
         });
       }
-
-      setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
-      form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
     }
+
+    setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
+    form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
   }, [selectedCourseClass, getSelectedCourseClasses, form]);
 
   const handleColorChange = (color) => {
@@ -444,7 +445,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         max_participants: values.maxParticipants || highestMaxParticipantCourseSession?.max_participants,
         start_date: moment(courseStartDate).startOf('day').utc().format(),
         end_date: moment(courseEndDate).endOf('day').utc().format(),
-        // inventory_ids: sessionInventories.map((inventory) => inventory.inventory_id) || [],
         inventory_ids: sessionInventories,
       };
     }
@@ -577,8 +577,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
               value: courseClass.session_id,
               label: (
                 <>
-                  {' '}
-                  {courseClass.name} {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}{' '}
+                  {courseClass.name} {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                 </>
               ),
             }))}
@@ -638,9 +637,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             </Text>
           }
           hidden={isVideoModal}
-          rules={isVideoModal ? [] : validationRules.requiredValidation}
+          rules={
+            isVideoModal
+              ? []
+              : validationRules.numberValidation('Please Input Max Participants Value (min. 2)', 2, true, 100)
+          }
         >
-          <InputNumber min={2} placeholder="Max Participants" className={styles.numericInput} />
+          <InputNumber min={0} placeholder="Max Participants" className={styles.numericInput} />
         </Form.Item>
       </Col>
       <Col xs={isVideoModal ? 0 : 24}>
