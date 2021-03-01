@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Button, Typography, Collapse, Empty } from 'antd';
+import { Row, Col, Button, Typography, List } from 'antd';
 
-import Loader from 'components/Loader';
-import Table from 'components/Table';
-
-import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
-import styles from './styles.module.scss';
+import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
+import SubscriptionCards from 'components/SubscriptionCards';
 import { showErrorModal } from 'components/Modals/modals';
 
-const { Title } = Typography;
-const { Panel } = Collapse;
+import styles from './styles.module.scss';
+
+const { Title, Text } = Typography;
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,63 +21,172 @@ const Subscriptions = () => {
     try {
       //TODO: Implement API here later
       const { status, data } = {
-        status: 200,
-        data: [], //TODO: Mock data as required ehre
+        status: 200, //TODO: Mock data as required here
+        data: [
+          {
+            id: 1337,
+            name: 'Mock Tier Just very long name here to tes',
+            price: 90,
+            currency: 'SGD',
+            base_credits: 75,
+            product_applicable: ['session', 'video'],
+            included_session_type: 'PUBLIC',
+            included_video_type: 'MEMBER',
+            include_course: true,
+            included_course_type: 'MIXED',
+            base_course_credits: 3,
+          },
+        ],
       };
+
+      let mappedSubscriptionData = [];
 
       if (isAPISuccess(status) && data) {
         //TODO: Re map data as required here
-        setSubscriptions(data);
+        mappedSubscriptionData = data.map((subs, idx) => ({ ...subs, idx }));
       }
+
+      if (mappedSubscriptionData.length < 3) {
+        mappedSubscriptionData.push({
+          idx: mappedSubscriptionData.length,
+          id: 0,
+          isButton: false,
+        });
+      }
+
+      setSubscriptions(mappedSubscriptionData);
     } catch (error) {
       showErrorModal('Failed to fetch subscriptions', error?.response?.data?.message || 'Something wrong happened');
     }
   }, []);
 
-  const showSubscriptionModal = () => {
-    console.log('Subs Modal');
-  };
-
   useEffect(() => {
     getCreatorSubscriptions();
   }, [getCreatorSubscriptions]);
 
-  const subscriptionColumns = [];
+  useEffect(() => {
+    console.log(subscriptions);
+  }, [subscriptions]);
+
+  const setColumnState = (targetIdx, state) => {
+    // Clone the array
+    const currSubscriptionData = subscriptions.map((subs) => subs);
+
+    switch (state) {
+      case 'EMPTY':
+        currSubscriptionData[targetIdx]['isButton'] = true;
+        currSubscriptionData[targetIdx]['editing'] = false;
+        setSubscriptions(currSubscriptionData);
+        break;
+      case 'CREATE':
+        currSubscriptionData[targetIdx]['isButton'] = false;
+        currSubscriptionData[targetIdx]['editing'] = false;
+        setSubscriptions(currSubscriptionData);
+        break;
+      case 'SAVED':
+        currSubscriptionData[targetIdx]['isButton'] = false;
+        currSubscriptionData[targetIdx]['editing'] = false;
+        // TODO: Should we also set here?
+        // setSubscriptions(currSubscriptionData);
+        break;
+      case 'EDIT':
+        currSubscriptionData[targetIdx]['isButton'] = false;
+        currSubscriptionData[targetIdx]['editing'] = true;
+        // setSubscriptions(currSubscriptionData);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const subscriptionFields = [
+    {
+      label: 'Subscription Tier Name',
+      className: undefined,
+    },
+    {
+      label: 'Monthly Subscription Price',
+      className: undefined,
+    },
+    {
+      label: 'Session or Video Credits/Month',
+      className: undefined,
+    },
+    {
+      label: 'Applicable to',
+      className: undefined,
+    },
+    {
+      label: 'Included Session Type',
+      className: undefined,
+    },
+    {
+      label: 'Included Video Type',
+      className: undefined,
+    },
+    {
+      label: 'Include Courses',
+      className: undefined,
+    },
+    {
+      label: 'Included Course Type',
+      className: undefined,
+    },
+    {
+      label: 'Course Credits/Month',
+      className: undefined,
+    },
+  ];
+
+  const renderSubscriptionFields = (item) => (
+    <List.Item className={item.className}>
+      <Text strong> {item.label} </Text>
+    </List.Item>
+  );
+
+  const renderSubscriptionList = (subs) => (
+    <List.Item>
+      {subs.isButton ? (
+        <Button block type="primary" onClick={() => setColumnState(subs.idx, 'CREATE')}>
+          Add new Subscription Tier
+        </Button>
+      ) : subs.id ? (
+        subs.editing ? (
+          <div> Edit (modified create) card here </div>
+        ) : (
+          <SubscriptionCards
+            subscription={subs}
+            editSubscription={() => setColumnState(subs.idx, 'EDIT')}
+            deleteSubscription={() => console.log('Delete')}
+          />
+        )
+      ) : (
+        <div> Create Card here </div>
+      )}
+    </List.Item>
+  );
 
   return (
     <div className={styles.box}>
       <Row gutter={[8, 24]}>
-        <Col xs={24} md={14} xl={18}>
-          <Title level={4}> Subscriptions </Title>
-        </Col>
-        <Col xs={24} md={10} xl={6}>
-          <Button block type="primary" onClick={() => showSubscriptionModal()}>
-            Create New Subscription
-          </Button>
+        <Col xs={24}>
+          <Title level={4}> Monthly Subscriptions </Title>
         </Col>
         <Col xs={24}>
-          <Collapse>
-            <Panel header={<Title level={5}> Published </Title>} key="Published">
-              {isMobileDevice ? (
-                subscriptions.length ? (
-                  <Loader loading={isLoading} size="large" text="Loading subscriptions">
-                    <Row gutter={[8, 16]}>Mobile Cards here</Row>
-                  </Loader>
-                ) : (
-                  <Empty description="No Published Subscriptions" />
-                )
-              ) : (
-                <Table
-                  sticky={true}
-                  size="small"
-                  columns={subscriptionColumns}
-                  data={subscriptions}
-                  loading={isLoading}
-                  rowKey={(record) => record.key || record.id}
-                />
-              )}
-            </Panel>
-          </Collapse>
+          <Row gutter={10} justify="start">
+            <Col xs={7}>
+              <List
+                itemLayout="vertical"
+                size="large"
+                dataSource={subscriptionFields}
+                renderItem={renderSubscriptionFields}
+              />
+            </Col>
+            <Col xs={17}>
+              <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
+            </Col>
+          </Row>
         </Col>
       </Row>
     </div>
