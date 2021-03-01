@@ -1,5 +1,11 @@
 @import '../../styles/variables.scss';
 
+.greenBtn {
+  background: map-get($map: $colors, $key: 'KellyGreen') !important;
+  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
 .domainNameWrapper {
   flex: 1 1 30%;
 
@@ -9,7 +15,7 @@
 }
 
 .modeSelectWrapper {
-  flex: 1 1 190px;
+  flex: 0 1 200px;
 }
 
 .creatorSiteName {
@@ -28,7 +34,7 @@
   flex: 0 0 70%;
 
   &.dashboard {
-    flex: 1 1 300px;
+    flex: 1 1 320px;
   }
 }
 
@@ -60,6 +66,11 @@
 .mobileMenuContainer {
   flex: 1 0 auto;
   display: none;
+
+  .externalButtonWrapper {
+    align-self: right;
+    margin-right: 32px;
+  }
 }
 
 .mobileMenuModal {
