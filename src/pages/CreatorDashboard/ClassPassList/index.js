@@ -29,6 +29,7 @@ const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
+//TODO: Refactor this for overall same experience across all products
 const ClassPassList = () => {
   const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);

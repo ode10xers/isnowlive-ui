@@ -8,6 +8,7 @@ import {
   PlayCircleOutlined,
   BookOutlined,
   SettingOutlined,
+  ScheduleOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -77,6 +78,14 @@ export const creatorMenuItems = [
   },
   {
     order: 6,
+    key: 'subscriptions',
+    title: 'Subscriptions',
+    icon: <ScheduleOutlined />,
+    mixPanelTag: creator.click.dashboard.coursesNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
+  },
+  {
+    order: 7,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -84,7 +93,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 7,
+    order: 8,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -92,7 +101,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 8,
+    order: 9,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -100,7 +109,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 9,
+    order: 10,
     key: 'account_settings',
     title: 'Account Settings',
     icon: <SettingOutlined />,

@@ -33,6 +33,7 @@ const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
+//TODO: Refactor this for overall same experience across all products
 const Videos = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -530,7 +531,7 @@ const Videos = () => {
         </Col>
         <Col xs={24}>
           <Collapse>
-            <Panel header={<Title level={5}> Published </Title>} key="Active">
+            <Panel header={<Title level={5}> Published </Title>} key="Published">
               {videos.length ? (
                 <>
                   {isMobileDevice ? (
@@ -555,10 +556,10 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Published Videos'} />
+                <Empty description="No Published Videos" />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
+            <Panel header={<Title level={5}> Unpublished </Title>} key="Unpublished">
               {videos.length ? (
                 <>
                   {isMobileDevice ? (
@@ -585,7 +586,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Unpublished Videos'} />
+                <Empty description="No Unpublished Videos" />
               )}
             </Panel>
           </Collapse>
