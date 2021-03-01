@@ -3,8 +3,9 @@ import { Helmet } from 'react-helmet';
 
 const HelmetWrapper = ({
   title = 'Do Your Passion | Turn your passion into your income',
-  imageUrl = null,
   description = 'Do Your Passion | Turn your passion into your income',
+  siteUrl = null,
+  imageUrl = null,
 }) => {
   console.log('HERE');
 
@@ -12,6 +13,7 @@ const HelmetWrapper = ({
     <Helmet>
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
+      <meta property="og:url" content={siteUrl || window.location.href} />
       {imageUrl && <meta property="og:image" content={imageUrl} />}
       {imageUrl && <meta property="og:image:secure_url" content={imageUrl} />}
     </Helmet>
