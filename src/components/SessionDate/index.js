@@ -1,14 +1,13 @@
 import React from 'react';
 import { Divider, Typography } from 'antd';
 
-import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
-  formatDate: { toLocaleTime, toShortMonth, toDate, toDayOfWeek, toShortDayOfWeek },
+  formatDate: { toLocaleTime, toShortMonth, toDate, toShortDayOfWeek },
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
 
@@ -16,15 +15,12 @@ const SessionDate = ({ schedule }) => {
   return (
     <div className={styles.box}>
       <div className={styles.date}>{toDate(schedule?.start_time)}</div>
-      <Title className={styles.month} level={isMobileDevice ? 5 : 3}>
+      <Title className={styles.month} level={4}>
         {toShortMonth(schedule?.start_time)}
       </Title>
       <Divider className={styles.divider} type="vertical" />
-      <Title className={styles.shortday} level={5}>
+      <Title className={styles.shortday} level={4}>
         {toShortDayOfWeek(schedule?.start_time)}
-      </Title>
-      <Title className={styles.longday} level={3}>
-        {toDayOfWeek(schedule?.start_time)}
       </Title>
       <div className={styles.container}>
         <Text className={styles.time}>

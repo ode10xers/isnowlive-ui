@@ -431,7 +431,7 @@ const InventoryDetails = ({ match, history }) => {
           <SessionInfo session={session} />
         </Col>
         {creator && (
-          <Col xs={8} lg={{ span: 3, offset: 9 }}>
+          <Col xs={6} lg={{ span: 3, offset: 3 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}

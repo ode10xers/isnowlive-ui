@@ -542,7 +542,7 @@ const SessionDetails = ({ match, history }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={24} lg={13}>
+        <Col xs={24}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
       </Row>

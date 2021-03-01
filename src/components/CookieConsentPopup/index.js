@@ -13,13 +13,18 @@ import styles from './styles.module.scss';
 const { Paragraph, Text } = Typography;
 
 const DOMAIN = {
-  development: 'localhost',
+  development: '.localhost',
   staging: '.stage.passion.do',
   production: '.passion.do',
 };
 
 const CookieConsentPopup = () => {
   const { setCookieConsent } = useGlobalContext();
+
+  // Since for some reason the cookies are not settable in dev environment, disable on dev
+  if (window.location.hostname.split('.').includes('localhost')) {
+    return null;
+  }
 
   const handleDecline = () => {
     Modal.confirm({
