@@ -296,9 +296,18 @@ const NavbarHeader = ({ removePadding = false }) => {
                 <Col>
                   <span className={styles.externalButtonWrapper}>
                     {localUserDetails ? (
-                      <Button onClick={() => redirectToAttendeeDashboard()}>My Dashboard</Button>
+                      inDashboard() ? (
+                        <Button className={styles.orangeBtn} onClick={() => redirectToCreatorProfile('home')}>
+                          {' '}
+                          Site Home{' '}
+                        </Button>
+                      ) : (
+                        <Button className={styles.greenBtn} onClick={() => redirectToAttendeeDashboard()}>
+                          My Dashboard
+                        </Button>
+                      )
                     ) : (
-                      <Button type="primary" className={styles.greenBtn} onClick={() => showSignInModal()}>
+                      <Button className={styles.lightRedBtn} type="primary" onClick={() => showSignInModal()}>
                         Sign In
                       </Button>
                     )}
