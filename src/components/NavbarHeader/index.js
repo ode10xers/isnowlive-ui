@@ -278,7 +278,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                 ) : (
                   <>
                     <Menu.Item key="SignIn">
-                      <Button block type="default" className={styles.greenBtn} onClick={() => showSignInModal()}>
+                      <Button block type="primary" className={styles.lightRedBtn} onClick={() => showSignInModal()}>
                         Sign In
                       </Button>
                     </Menu.Item>
@@ -298,8 +298,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                     {localUserDetails ? (
                       inDashboard() ? (
                         <Button className={styles.orangeBtn} onClick={() => redirectToCreatorProfile('home')}>
-                          {' '}
-                          Site Home{' '}
+                          Site Home
                         </Button>
                       ) : (
                         <Button className={styles.greenBtn} onClick={() => redirectToAttendeeDashboard()}>
@@ -477,7 +476,12 @@ const NavbarHeader = ({ removePadding = false }) => {
                       ) : (
                         <>
                           <Col xs={12}>
-                            <Button block type="primary" className={styles.greenBtn} onClick={() => showSignInModal()}>
+                            <Button
+                              block
+                              type="primary"
+                              className={styles.lightRedBtn}
+                              onClick={() => showSignInModal()}
+                            >
                               Sign In
                             </Button>
                           </Col>
