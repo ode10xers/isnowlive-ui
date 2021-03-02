@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 
-import { Row, Col, Form, Card, List, Button, Select, Input, InputNumber, Typography } from 'antd';
+import { Row, Col, Form, Card, List, Button, Input, InputNumber, Typography, Checkbox } from 'antd';
 
 import apis from 'apis';
 
@@ -10,16 +11,41 @@ import { showErrorModal } from 'components/Modals/modals';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 
-import { subscriptionModalFormLayout } from 'layouts/FormLayouts';
+// import { subscriptionModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
-const formInitialValues = {};
+const formInitialValues = {
+  price: 10,
+  subscriptionCredits: 5,
+  courseCredits: 1,
+};
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
-//TODO: Refactor this to be a card
-const CreateSubscriptionCard = ({ cancelChanges, editedSubscription = null }) => {
+const includedProductsList = [
+  {
+    label: 'Sessions',
+    value: 'session',
+  },
+  {
+    label: 'Videos',
+    value: 'video',
+  },
+];
+
+const productAccessOptions = [
+  {
+    value: 'public',
+    label: 'Public',
+  },
+  {
+    value: 'membership',
+    label: 'Members',
+  },
+];
+
+const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription = null }) => {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -50,114 +76,197 @@ const CreateSubscriptionCard = ({ cancelChanges, editedSubscription = null }) =>
     fetchCreatorCurrency();
   }, [fetchCreatorCurrency]);
 
+  const onIncludedProductsChange = (values) => {
+    setIsSessionIncluded(values.includes('session'));
+    setIsVideoIncluded(values.includes('video'));
+
+    let updatedFormValues = null;
+
+    if (!values.includes('session')) {
+      updatedFormValues = {
+        ...updatedFormValues,
+        includedSessions: [],
+      };
+    }
+
+    if (!values.includes('video')) {
+      updatedFormValues = {
+        ...updatedFormValues,
+        includedVideos: [],
+      };
+    }
+
+    if (updatedFormValues) {
+      form.setFieldsValue({ ...form.getFieldsValue(), ...updatedFormValues });
+    }
+  };
+
+  const onShouldIncludeCourseChange = (e) => {
+    const shouldIncludeCourse = e.target.checked;
+
+    setIsCourseIncluded(shouldIncludeCourse);
+
+    if (!shouldIncludeCourse) {
+      form.setFieldsValue({
+        ...form.getFieldValue(),
+        includedCourses: [],
+        courseCredits: 0,
+      });
+    }
+  };
+
   const handleFinish = async (values) => {
     setIsSubmitting(true);
     console.log(values);
+
+    const response = {
+      id: 2021,
+      name: values.subscriptionName,
+      price: values.price,
+      currency: currency,
+      base_credits: values.subscriptionCredits,
+      product_applicable: values.includedProducts,
+      included_session_type: 'PUBLIC',
+      included_video_type: 'MEMBERSHIP',
+      include_course: false,
+    };
+
+    saveChanges(response);
     setIsSubmitting(false);
   };
 
-  const generateProductTypeOptions = (type) => [
-    {
-      value: 'public',
-      label: `Public ${type}`,
-    },
-    {
-      value: 'member',
-      label: `Members Only ${type}`,
-    },
-  ];
-
-  const productInclusionSelection = [
-    {
-      key: 'Session',
-      name: 'Sessions',
-      formName: 'includedSessions',
-    },
-    {
-      key: 'Video',
-      name: 'Videos',
-      formName: 'includedVideos',
-    },
-    {
-      key: 'Course',
-      name: 'Courses',
-      formName: 'includedCourse',
-    },
-  ];
-
   return (
-    <Card
-      headStyle={{ textAlign: 'center' }}
-      title={<Text strong> {editedSubscription ? 'Edit' : 'Create'} Subscription </Text>}
-      bodyStyle={{ padding: '0px 10px' }}
-      actions={[
-        <Button type="default" onClick={() => cancelChanges()} loading={isLoading}>
-          Cancel
-        </Button>,
-        <Button type="primary" className={styles.saveBtn} htmlType="submit" loading={isLoading}>
-          Save
-        </Button>,
-      ]}
+    <Form
+      layout="horizontal"
+      name="SubscriptionForm"
+      form={form}
+      onFinish={handleFinish}
+      initialValues={formInitialValues}
+      scrollToFirstError={true}
     >
-      <Loader size="large" loading={isLoading}>
-        <Form
-          layout="horizontal"
-          name="SubscriptionForm"
-          form={form}
-          onFinish={handleFinish}
-          initialValues={formInitialValues}
-          scrollToFirstError={true}
+      <Loader size="large" loading={isLoading || submitting}>
+        <Card
+          headStyle={{ textAlign: 'center', padding: '0px 10px' }}
+          title={
+            <Form.Item
+              className={styles.compactFormItem}
+              id="subscriptionName"
+              name="subscriptionName"
+              rules={validationRules.nameValidation}
+            >
+              <Input placeholder="Enter Subscription Name" maxLength={50} />
+            </Form.Item>
+          }
+          bodyStyle={{ padding: '0px 10px' }}
+          actions={[
+            <Button type="default" onClick={() => cancelChanges()} loading={submitting}>
+              Cancel
+            </Button>,
+            <Button type="primary" className={styles.saveBtn} htmlType="submit" loading={submitting}>
+              Save
+            </Button>,
+          ]}
         >
-          <List size="large" itemLayout="vertical">
+          <List itemLayout="vertical">
             <List.Item>
-              <Form.Item
-                {...subscriptionModalFormLayout}
-                id="subscriptionName"
-                name="subscriptionName"
-                rules={validationRules.nameValidation}
-              >
-                <Input placeholder="Enter Subscription Name" maxLength={50} />
-              </Form.Item>
-            </List.Item>
-            <List.Item>
-              <Form.Item {...subscriptionModalFormLayout} required={true}>
+              <Form.Item className={styles.compactFormItem}>
                 <Row gutter={8}>
-                  <Col xs={20}>
+                  <Col xs={16}>
                     <Form.Item
                       id="price"
                       name="price"
                       rules={validationRules.numberValidation('Please Input Subscription Price', 1, false)}
                       noStyle
                     >
-                      <InputNumber min={1} placeholder="Subscription Price" className={styles.numericInput} />
+                      <InputNumber min={1} placeholder="Enter Price" className={styles.numericInput} />
                     </Form.Item>
                   </Col>
-                  <Col xs={4} className={styles.textAlignCenter}>
+                  <Col xs={8} className={styles.textAlignCenter}>
                     <Text strong className={styles.currencyWrapper}>
                       {currency?.toUpperCase()}
                     </Text>
-                  </Col>
-                  <Col xs={24}>
-                    <Paragraph className={styles.blueText}>
-                      This will be the price charged to the customer{' '}
-                      <Text className={styles.blueText} strong>
-                        {' '}
-                        every 30 days{' '}
-                      </Text>{' '}
-                      if they choose to buy this subscription.
-                    </Paragraph>
                   </Col>
                 </Row>
               </Form.Item>
             </List.Item>
             <List.Item>
               <Form.Item
-                {...subscriptionModalFormLayout}
+                className={styles.compactFormItem}
                 id="subscriptionCredits"
                 name="subscriptionCredits"
                 rules={validationRules.numberValidation('Please Input Base Credits/Month', 1, false)}
               >
                 <InputNumber min={1} placeholder="Credits/Month" className={styles.numericInput} />
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={styles.compactFormItem}
+                id="includedProducts"
+                name="includedProducts"
+                rules={validationRules.arrayValidation}
+              >
+                <Checkbox.Group options={includedProductsList} onChange={onIncludedProductsChange} />
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isSessionIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedSessions"
+                name="includedSessions"
+                rules={isSessionIncluded ? validationRules.arrayValidation : undefined}
+              >
+                <Checkbox.Group disabled={!isSessionIncluded} options={productAccessOptions} />
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isVideoIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedVideos"
+                name="includedVideos"
+                rules={isVideoIncluded ? validationRules.arrayValidation : undefined}
+              >
+                <Checkbox.Group disabled={!isVideoIncluded} options={productAccessOptions} />
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Row justify="center" align="center">
+                <Col>
+                  <Form.Item className={styles.compactFormItem} id="shouldIncludeCourse" name="shouldIncludeCourse">
+                    <Checkbox defaultChecked={false} onChange={onShouldIncludeCourseChange}>
+                      Include Courses
+                    </Checkbox>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedCourses"
+                name="includedCourses"
+                rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
+              >
+                <Checkbox.Group disabled={!isCourseIncluded} options={productAccessOptions} />
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="courseCredits"
+                name="courseCredits"
+                rules={
+                  isCourseIncluded
+                    ? validationRules.numberValidation('Please input course credits', 1, false)
+                    : undefined
+                }
+              >
+                <InputNumber
+                  disabled={!isCourseIncluded}
+                  min={1}
+                  placeholder="Course Credits/Month"
+                  className={styles.numericInput}
+                />
               </Form.Item>
             </List.Item>
           </List>
@@ -243,9 +352,9 @@ const CreateSubscriptionCard = ({ cancelChanges, editedSubscription = null }) =>
               </Button>
             </Col>
           </Row> */}
-        </Form>
+        </Card>
       </Loader>
-    </Card>
+    </Form>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Card, List, Space } from 'antd';
+import { Row, Col, Typography, Button, Card, List } from 'antd';
 
 import { CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
 
@@ -16,7 +16,7 @@ const SubscriptionCards = ({ subscription, editSubscription, deleteSubscription 
   const renderIncludedProductType = (type) => (
     <Row gutter={8}>
       <Col xs={12}>{renderTickOrCross(type === 'MIXED' || type === 'PUBLIC')} Public</Col>
-      <Col xs={12}>{renderTickOrCross(type === 'MIXED' || type === 'MEMBER')} Member</Col>
+      <Col xs={12}>{renderTickOrCross(type === 'MIXED' || type === 'MEMBERSHIP')} Member</Col>
     </Row>
   );
 
@@ -56,7 +56,7 @@ const SubscriptionCards = ({ subscription, editSubscription, deleteSubscription 
           <Col xs={4}>{renderTickOrCross(subscription.include_course)}</Col>
         </Row>
       ),
-      className: undefined,
+      className: subscription.include_course ? undefined : styles.disabled,
     },
     {
       label: subscription.include_course ? renderIncludedProductType(subscription.included_course_type) : 'None',
@@ -69,14 +69,18 @@ const SubscriptionCards = ({ subscription, editSubscription, deleteSubscription 
   ];
 
   const renderCardData = (item) => (
-    <List.Item className={classNames(styles.textAlignCenter, item.className)}>{item.label}</List.Item>
+    <List.Item className={classNames(styles.cardListItem, item.className)}>{item.label}</List.Item>
   );
 
   return (
     <Card
       hoverable={true}
       headStyle={{ textAlign: 'center' }}
-      title={<Text strong> {subscription.name} </Text>}
+      title={
+        <div className={styles.subscriptionNameWrapper}>
+          <Text strong> {subscription.name} </Text>
+        </div>
+      }
       bodyStyle={{ padding: '0px 10px' }}
       actions={[
         <Button type="primary" danger onClick={() => deleteSubscription(subscription.id)}>
@@ -87,7 +91,7 @@ const SubscriptionCards = ({ subscription, editSubscription, deleteSubscription 
         </Button>,
       ]}
     >
-      <List itemLayout="vertical" size="large" dataSource={cardData} renderItem={renderCardData} rowKey="label" />
+      <List size="large" itemLayout="vertical" dataSource={cardData} renderItem={renderCardData} rowKey="label" />
     </Card>
   );
 };

@@ -1,5 +1,15 @@
 @import '../../styles/variables.scss';
 
+.cardListItem {
+  text-align: center;
+  padding: 17px 10px !important;
+}
+
 .disabled {
-  
+  opacity: 0.4;
+  background-color: map-get($colors, 'Silver');
+}
+
+.subscriptionNameWrapper {
+  min-height: 32px;
 }

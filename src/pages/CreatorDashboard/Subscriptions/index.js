@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 
 import { Row, Col, Button, Typography, List } from 'antd';
 
@@ -31,10 +32,21 @@ const Subscriptions = () => {
             base_credits: 75,
             product_applicable: ['session', 'video'],
             included_session_type: 'PUBLIC',
-            included_video_type: 'MEMBER',
+            included_video_type: 'MEMBERSHIP',
             include_course: true,
             included_course_type: 'MIXED',
             base_course_credits: 3,
+          },
+          {
+            id: 1338,
+            name: 'Second Short Tier',
+            price: 15,
+            currency: 'SGD',
+            base_credits: 75,
+            product_applicable: ['session'],
+            included_session_type: 'PUBLIC',
+            included_video_type: 'MEMBERSHIP',
+            include_course: false,
           },
         ],
       };
@@ -68,7 +80,7 @@ const Subscriptions = () => {
     console.log(subscriptions);
   }, [subscriptions]);
 
-  const setColumnState = (targetIdx, state) => {
+  const setColumnState = (targetIdx, state, data = null) => {
     // Clone the array
     const currSubscriptionData = subscriptions.map((subs) => subs);
 
@@ -84,10 +96,11 @@ const Subscriptions = () => {
         setSubscriptions(currSubscriptionData);
         break;
       case 'SAVED':
+        currSubscriptionData[targetIdx] = data;
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = false;
-        // TODO: Should we also set here?
-        // setSubscriptions(currSubscriptionData);
+
+        setSubscriptions(currSubscriptionData);
         break;
       case 'EDIT':
         currSubscriptionData[targetIdx]['isButton'] = false;
@@ -103,7 +116,7 @@ const Subscriptions = () => {
   const subscriptionFields = [
     {
       label: 'Subscription Tier Name',
-      className: undefined,
+      className: styles.subscriptionNameField,
     },
     {
       label: 'Monthly Subscription Price',
@@ -140,7 +153,7 @@ const Subscriptions = () => {
   ];
 
   const renderSubscriptionFields = (item) => (
-    <List.Item className={item.className}>
+    <List.Item className={classNames(item.className, styles.fieldsListItem)}>
       <Text strong> {item.label} </Text>
     </List.Item>
   );
@@ -162,14 +175,17 @@ const Subscriptions = () => {
           />
         )
       ) : (
-        <div> Create Card here </div>
+        <CreateSubscriptionCard
+          cancelChanges={() => setColumnState(subs.idx, 'EMPTY')}
+          saveChanges={(data) => setColumnState(subs.idx, 'SAVED', data)}
+        />
       )}
     </List.Item>
   );
 
   return (
     <div className={styles.box}>
-      <Row gutter={[8, 24]}>
+      <Row gutter={[8, 10]}>
         <Col xs={24}>
           <Title level={4}> Monthly Subscriptions </Title>
         </Col>
