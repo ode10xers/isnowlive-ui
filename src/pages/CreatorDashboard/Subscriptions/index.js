@@ -87,14 +87,16 @@ const Subscriptions = () => {
     const currSubscriptionData = subscriptions.map((subs) => subs).filter((subs) => subs.idx !== data.idx);
 
     if (currSubscriptionData.length < 3) {
-      const buttonData = currSubscriptionData.find((subs) => subs.id === 0);
+      const buttonIndex = currSubscriptionData.findIndex((subs) => subs.id === 0);
 
-      if (!buttonData) {
+      if (buttonIndex < 0) {
         currSubscriptionData.push({
           idx: currSubscriptionData.length,
           id: 0,
           isButton: true,
         });
+      } else {
+        currSubscriptionData[buttonIndex].idx = currSubscriptionData.length;
       }
     }
 
