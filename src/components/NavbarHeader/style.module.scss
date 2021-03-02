@@ -1,5 +1,17 @@
 @import '../../styles/variables.scss';
 
+.lightRedBtn {
+  background: map-get($map: $colors, $key: 'Razzmatazz') !important;
+  border-color: map-get($map: $colors, $key: 'Razzmatazz') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
+.orangeBtn {
+  background: map-get($map: $colors, $key: 'Pumpkin') !important;
+  border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
 .greenBtn {
   background: map-get($map: $colors, $key: 'KellyGreen') !important;
   border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
