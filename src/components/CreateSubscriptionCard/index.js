@@ -73,8 +73,29 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
   }, []);
 
   useEffect(() => {
+    if (editedSubscription) {
+      //TODO: Adjust with API Format here
+      form.setFieldsValue({
+        subscriptionName: editedSubscription?.name,
+        price: editedSubscription?.price,
+        subscriptionCredits: editedSubscription?.base_credits,
+        includedProducts: editedSubscription?.product_applicable,
+        shouldIncludeCourse: editedSubscription?.include_course,
+      });
+
+      setCurrency(editedSubscription?.currency || 'SGD');
+      setIsSessionIncluded(false);
+      setIsVideoIncluded(false);
+      setIsCourseIncluded(false);
+    } else {
+      form.resetFields();
+      setIsSessionIncluded(false);
+      setIsVideoIncluded(false);
+      setIsCourseIncluded(false);
+    }
+
     fetchCreatorCurrency();
-  }, [fetchCreatorCurrency]);
+  }, [fetchCreatorCurrency, form, editedSubscription]);
 
   const onIncludedProductsChange = (values) => {
     setIsSessionIncluded(values.includes('session'));
@@ -135,6 +156,14 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
     setIsSubmitting(false);
   };
 
+  const handleCancelChange = () => {
+    if (editedSubscription) {
+      saveChanges(editedSubscription);
+    } else {
+      cancelChanges();
+    }
+  };
+
   return (
     <Form
       layout="horizontal"
@@ -159,7 +188,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
           }
           bodyStyle={{ padding: '0px 10px' }}
           actions={[
-            <Button type="default" onClick={() => cancelChanges()} loading={submitting}>
+            <Button type="default" onClick={handleCancelChange} loading={submitting}>
               Cancel
             </Button>,
             <Button type="primary" className={styles.saveBtn} htmlType="submit" loading={submitting}>
@@ -190,13 +219,24 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
               </Form.Item>
             </List.Item>
             <List.Item>
-              <Form.Item
-                className={styles.compactFormItem}
-                id="subscriptionCredits"
-                name="subscriptionCredits"
-                rules={validationRules.numberValidation('Please Input Base Credits/Month', 1, false)}
-              >
-                <InputNumber min={1} placeholder="Credits/Month" className={styles.numericInput} />
+              <Form.Item className={styles.compactFormItem}>
+                <Row gutter={8}>
+                  <Col xs={10}>
+                    <Form.Item
+                      id="subscriptionCredits"
+                      name="subscriptionCredits"
+                      rules={validationRules.numberValidation('Please Input Base Credits/Month', 1, false)}
+                      noStyle
+                    >
+                      <InputNumber min={1} placeholder="Enter Credits" className={styles.numericInput} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={14} className={styles.textAlignCenter}>
+                    <Text strong className={styles.currencyWrapper}>
+                      Credits/Month
+                    </Text>
+                  </Col>
+                </Row>
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -232,10 +272,13 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
             <List.Item>
               <Row justify="center" align="center">
                 <Col>
-                  <Form.Item className={styles.compactFormItem} id="shouldIncludeCourse" name="shouldIncludeCourse">
-                    <Checkbox defaultChecked={false} onChange={onShouldIncludeCourseChange}>
-                      Include Courses
-                    </Checkbox>
+                  <Form.Item
+                    className={styles.compactFormItem}
+                    id="shouldIncludeCourse"
+                    name="shouldIncludeCourse"
+                    valuePropName="checked"
+                  >
+                    <Checkbox onChange={onShouldIncludeCourseChange}>Include Courses</Checkbox>
                   </Form.Item>
                 </Col>
               </Row>

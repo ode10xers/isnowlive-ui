@@ -1,21 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, List } from 'antd';
+import { Row, Col, Button, Typography, List, Modal } from 'antd';
 
 import { isAPISuccess } from 'utils/helper';
 
+import Loader from 'components/Loader';
 import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
 import SubscriptionCards from 'components/SubscriptionCards';
 import { showErrorModal } from 'components/Modals/modals';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [subscriptions, setSubscriptions] = useState([]);
+  const [targetSubscription, setTargetSubscription] = useState(null);
 
   const getCreatorSubscriptions = useCallback(() => {
     setIsLoading(true);
@@ -59,26 +61,66 @@ const Subscriptions = () => {
       }
 
       if (mappedSubscriptionData.length < 3) {
-        mappedSubscriptionData.push({
-          idx: mappedSubscriptionData.length,
-          id: 0,
-          isButton: false,
-        });
+        const buttonData = mappedSubscriptionData.find((subs) => subs.id === 0);
+
+        if (!buttonData) {
+          mappedSubscriptionData.push({
+            idx: mappedSubscriptionData.length,
+            id: 0,
+            isButton: true,
+          });
+        }
       }
 
       setSubscriptions(mappedSubscriptionData);
     } catch (error) {
       showErrorModal('Failed to fetch subscriptions', error?.response?.data?.message || 'Something wrong happened');
     }
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
     getCreatorSubscriptions();
   }, [getCreatorSubscriptions]);
 
-  useEffect(() => {
-    console.log(subscriptions);
-  }, [subscriptions]);
+  const deleteSubscription = (data) => {
+    const currSubscriptionData = subscriptions.map((subs) => subs).filter((subs) => subs.idx !== data.idx);
+
+    if (currSubscriptionData.length < 3) {
+      const buttonData = currSubscriptionData.find((subs) => subs.id === 0);
+
+      if (!buttonData) {
+        currSubscriptionData.push({
+          idx: currSubscriptionData.length,
+          id: 0,
+          isButton: true,
+        });
+      }
+    }
+
+    setSubscriptions(currSubscriptionData);
+  };
+
+  const handleDelete = (data) => {
+    Modal.confirm({
+      title: 'Confirm Delete',
+      content: (
+        <Paragraph>
+          Are you sure you want to delete <Text strong> {data.name} </Text> subscription tier?
+        </Paragraph>
+      ),
+      centered: true,
+      closable: true,
+      maskClosable: true,
+      okText: 'Yes, Delete',
+      okButtonProps: {
+        danger: true,
+      },
+      onOk: () => {
+        deleteSubscription(data);
+      },
+    });
+  };
 
   const setColumnState = (targetIdx, state, data = null) => {
     // Clone the array
@@ -88,29 +130,32 @@ const Subscriptions = () => {
       case 'EMPTY':
         currSubscriptionData[targetIdx]['isButton'] = true;
         currSubscriptionData[targetIdx]['editing'] = false;
-        setSubscriptions(currSubscriptionData);
         break;
       case 'CREATE':
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = false;
-        setSubscriptions(currSubscriptionData);
+        setTargetSubscription(null);
         break;
       case 'SAVED':
         currSubscriptionData[targetIdx] = data;
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = false;
-
-        setSubscriptions(currSubscriptionData);
         break;
       case 'EDIT':
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = true;
-        // setSubscriptions(currSubscriptionData);
+
+        if (data) {
+          console.log('Editing');
+          setTargetSubscription(data);
+        }
         break;
 
       default:
-        break;
+        return;
     }
+
+    setSubscriptions(currSubscriptionData);
   };
 
   const subscriptionFields = [
@@ -164,20 +209,17 @@ const Subscriptions = () => {
         <Button block type="primary" onClick={() => setColumnState(subs.idx, 'CREATE')}>
           Add new Subscription Tier
         </Button>
-      ) : subs.id ? (
-        subs.editing ? (
-          <div> Edit (modified create) card here </div>
-        ) : (
-          <SubscriptionCards
-            subscription={subs}
-            editSubscription={() => setColumnState(subs.idx, 'EDIT')}
-            deleteSubscription={() => console.log('Delete')}
-          />
-        )
-      ) : (
+      ) : !subs.id || subs.editing ? (
         <CreateSubscriptionCard
           cancelChanges={() => setColumnState(subs.idx, 'EMPTY')}
           saveChanges={(data) => setColumnState(subs.idx, 'SAVED', data)}
+          editedSubscription={targetSubscription}
+        />
+      ) : (
+        <SubscriptionCards
+          subscription={subs}
+          editSubscription={() => setColumnState(subs.idx, 'EDIT', subs)}
+          deleteSubscription={() => handleDelete(subs)}
         />
       )}
     </List.Item>
@@ -190,19 +232,21 @@ const Subscriptions = () => {
           <Title level={4}> Monthly Subscriptions </Title>
         </Col>
         <Col xs={24}>
-          <Row gutter={10} justify="start">
-            <Col xs={7}>
-              <List
-                itemLayout="vertical"
-                size="large"
-                dataSource={subscriptionFields}
-                renderItem={renderSubscriptionFields}
-              />
-            </Col>
-            <Col xs={17}>
-              <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
-            </Col>
-          </Row>
+          <Loader size="large" loading={isLoading} text="Fetching subscriptions...">
+            <Row gutter={10} justify="start">
+              <Col xs={7}>
+                <List
+                  itemLayout="vertical"
+                  size="large"
+                  dataSource={subscriptionFields}
+                  renderItem={renderSubscriptionFields}
+                />
+              </Col>
+              <Col xs={17}>
+                <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
+              </Col>
+            </Row>
+          </Loader>
         </Col>
       </Row>
     </div>
