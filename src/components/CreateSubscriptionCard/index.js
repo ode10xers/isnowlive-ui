@@ -199,7 +199,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
           <List itemLayout="vertical">
             <List.Item>
               <Form.Item className={styles.compactFormItem}>
-                <Row gutter={8}>
+                <Row gutter={4}>
                   <Col xs={16}>
                     <Form.Item
                       id="price"
@@ -210,17 +210,15 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                       <InputNumber min={1} placeholder="Enter Price" className={styles.numericInput} />
                     </Form.Item>
                   </Col>
-                  <Col xs={8} className={styles.textAlignCenter}>
-                    <Text strong className={styles.currencyWrapper}>
-                      {currency?.toUpperCase()}
-                    </Text>
+                  <Col xs={8} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
+                    <Text strong>{currency?.toUpperCase()}</Text>
                   </Col>
                 </Row>
               </Form.Item>
             </List.Item>
             <List.Item>
               <Form.Item className={styles.compactFormItem}>
-                <Row gutter={8}>
+                <Row gutter={4}>
                   <Col xs={10}>
                     <Form.Item
                       id="subscriptionCredits"
@@ -231,10 +229,8 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                       <InputNumber min={1} placeholder="Enter Credits" className={styles.numericInput} />
                     </Form.Item>
                   </Col>
-                  <Col xs={14} className={styles.textAlignCenter}>
-                    <Text strong className={styles.currencyWrapper}>
-                      Credits/Month
-                    </Text>
+                  <Col xs={14} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
+                    <Text strong>Credits/Month</Text>
                   </Col>
                 </Row>
               </Form.Item>
@@ -294,23 +290,30 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
               </Form.Item>
             </List.Item>
             <List.Item>
-              <Form.Item
-                className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
-                id="courseCredits"
-                name="courseCredits"
-                rules={
-                  isCourseIncluded
-                    ? validationRules.numberValidation('Please input course credits', 1, false)
-                    : undefined
-                }
-              >
-                <InputNumber
-                  disabled={!isCourseIncluded}
-                  min={1}
-                  placeholder="Course Credits/Month"
-                  className={styles.numericInput}
-                />
-              </Form.Item>
+              <Row gutter={4}>
+                <Col xs={10}>
+                  <Form.Item
+                    className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                    id="courseCredits"
+                    name="courseCredits"
+                    rules={
+                      isCourseIncluded
+                        ? validationRules.numberValidation('Please input course credits', 1, false)
+                        : undefined
+                    }
+                  >
+                    <InputNumber
+                      disabled={!isCourseIncluded}
+                      min={1}
+                      placeholder="Course Credits/Month"
+                      className={styles.numericInput}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={14} className={classNames(styles.helpTextWrapper, styles.textAlignCenter)}>
+                  <Text strong>Credits/Month</Text>
+                </Col>
+              </Row>
             </List.Item>
           </List>
           {/* <Row className={styles.subsRow} gutter={[8, 16]}>

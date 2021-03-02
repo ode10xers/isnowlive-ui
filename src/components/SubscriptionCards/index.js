@@ -9,7 +9,7 @@ import styles from './styles.module.scss';
 
 const { Text } = Typography;
 
-const SubscriptionCards = ({ subscription, editSubscription, deleteSubscription }) => {
+const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubscription }) => {
   const renderTickOrCross = (isTrue) =>
     isTrue ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#bb2124" />;
 
@@ -83,10 +83,10 @@ const SubscriptionCards = ({ subscription, editSubscription, deleteSubscription 
       }
       bodyStyle={{ padding: '0px 10px' }}
       actions={[
-        <Button type="primary" danger onClick={() => deleteSubscription(subscription.id)}>
+        <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.id)}>
           Delete
         </Button>,
-        <Button type="primary" onClick={() => editSubscription(subscription.id)}>
+        <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.id)}>
           Edit
         </Button>,
       ]}

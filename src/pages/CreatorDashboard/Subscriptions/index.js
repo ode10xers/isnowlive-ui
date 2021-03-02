@@ -16,6 +16,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
   const [targetSubscription, setTargetSubscription] = useState(null);
 
@@ -84,7 +85,9 @@ const Subscriptions = () => {
   }, [getCreatorSubscriptions]);
 
   const deleteSubscription = (data) => {
-    const currSubscriptionData = subscriptions.map((subs) => subs).filter((subs) => subs.idx !== data.idx);
+    const currSubscriptionData = subscriptions
+      .filter((subs) => subs.idx !== data.idx)
+      .map((subs, idx) => ({ ...subs, idx }));
 
     if (currSubscriptionData.length < 3) {
       const buttonIndex = currSubscriptionData.findIndex((subs) => subs.id === 0);
@@ -96,9 +99,11 @@ const Subscriptions = () => {
           isButton: true,
         });
       } else {
-        currSubscriptionData[buttonIndex].idx = currSubscriptionData.length;
+        currSubscriptionData[buttonIndex]['idx'] = currSubscriptionData.length - 1;
       }
     }
+
+    console.log(currSubscriptionData);
 
     setSubscriptions(currSubscriptionData);
   };
@@ -132,23 +137,26 @@ const Subscriptions = () => {
       case 'EMPTY':
         currSubscriptionData[targetIdx]['isButton'] = true;
         currSubscriptionData[targetIdx]['editing'] = false;
+        setIsEditing(false);
         break;
       case 'CREATE':
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = false;
+        setIsEditing(true);
         setTargetSubscription(null);
         break;
       case 'SAVED':
-        currSubscriptionData[targetIdx] = data;
+        currSubscriptionData[targetIdx] = { ...data, idx: targetIdx };
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = false;
+        setIsEditing(false);
         break;
       case 'EDIT':
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = true;
 
         if (data) {
-          console.log('Editing');
+          setIsEditing(true);
           setTargetSubscription(data);
         }
         break;
@@ -208,7 +216,7 @@ const Subscriptions = () => {
   const renderSubscriptionList = (subs) => (
     <List.Item>
       {subs.isButton ? (
-        <Button block type="primary" onClick={() => setColumnState(subs.idx, 'CREATE')}>
+        <Button block type="primary" onClick={() => setColumnState(subs.idx, 'CREATE')} disabled={isEditing}>
           Add new Subscription Tier
         </Button>
       ) : !subs.id || subs.editing ? (
@@ -220,6 +228,7 @@ const Subscriptions = () => {
       ) : (
         <SubscriptionCards
           subscription={subs}
+          editing={isEditing}
           editSubscription={() => setColumnState(subs.idx, 'EDIT', subs)}
           deleteSubscription={() => handleDelete(subs)}
         />
