@@ -101,6 +101,11 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
     }
   }, [form, editedCoupon, visible, fetchCreatorProducts]);
 
+  const handleSelectedProductTypesChanged = (values) => {
+    //TODO: Also filter out the selectedProducts when this changes
+    setSelectedProductTypes(values);
+  };
+
   const handleFinish = async (values) => {
     setSubmitting(true);
     console.log(values);
@@ -181,7 +186,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                     label: key.charAt(0).toUpperCase() + key.slice(1),
                   }))}
                   value={selectedProductTypes}
-                  onChange={(val) => setSelectedProductTypes(val)}
+                  onChange={handleSelectedProductTypesChanged}
                 />
               </Form.Item>
             </Col>
