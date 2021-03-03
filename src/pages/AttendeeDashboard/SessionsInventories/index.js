@@ -28,6 +28,8 @@ const {
 const { Text, Title } = Typography;
 const { attendee } = mixPanelEventTags;
 
+const whiteColor = '#FFF';
+
 const SessionsInventories = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -68,6 +70,7 @@ const SessionsInventories = ({ match }) => {
           is_refundable: i?.is_refundable || false,
           refund_before_hours: i?.refund_before_hours || 24,
           is_course: i?.is_course,
+          color_code: i?.color_code || whiteColor,
         }));
 
         let filterByDateSessions = [];
@@ -282,12 +285,19 @@ const SessionsInventories = ({ match }) => {
             ),
           };
         } else {
-          return (
-            <>
-              <Text className={styles.sessionNameWrapper}>{record.name}</Text>
-              {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
-            </>
-          );
+          return {
+            props: {
+              style: {
+                borderLeft: `6px solid ${record.color_code || whiteColor}`,
+              },
+            },
+            children: (
+              <>
+                <Text className={styles.sessionNameWrapper}>{record.name}</Text>{' '}
+                {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              </>
+            ),
+          };
         }
       },
     },
