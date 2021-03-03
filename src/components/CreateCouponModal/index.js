@@ -246,7 +246,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 Cancel
               </Button>
             </Col>
-            <Col xs={12} md={6}>
+            <Col xs={12} md={10}>
               <Button block type="primary" loading={submitting} htmlType="submit">
                 {editedCoupon ? 'Edit' : 'Create'} Discount Code
               </Button>
