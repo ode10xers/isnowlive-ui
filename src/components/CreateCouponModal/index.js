@@ -5,7 +5,7 @@ import { Row, Col, Modal, Button, Form, Input, InputNumber, Select, Typography, 
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-// import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
@@ -23,19 +23,13 @@ const formInitialValues = {
 // Just add the products here as necessary
 const creatorProductInfo = [
   {
-    key: 'courses',
+    key: 'COURSE',
     name: 'Courses',
     apiMethod: apis.courses.getCreatorCourses,
   },
-  {
-    key: 'passes',
-    name: 'Passes',
-    apiMethod: apis.passes.getCreatorPasses,
-  },
 ];
 
-// Adding passes here for testing and demo purpose
-
+// ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
 const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const [form] = Form.useForm();
 
@@ -47,8 +41,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   // For products that have different keys for names/id
   const getProductId = (productType, productData) => {
     switch (productType) {
-      case 'passes':
-      case 'courses':
+      case 'course':
         return productData['id'];
       default:
         break;
@@ -59,8 +52,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
 
   const getProductName = (productType, productData) => {
     switch (productType) {
-      case 'passes':
-      case 'courses':
+      case 'course':
         return productData['name'];
       default:
         break;
@@ -79,7 +71,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         const { status, data } = await product.apiMethod();
 
         if (isAPISuccess(status) && data) {
-          productInfo[product.key] = data;
+          productInfo[product.key.toLowerCase()] = data;
         }
       } catch (error) {
         message.error(error?.response?.data?.message || `Failed to fetch ${product.name}`);
@@ -93,6 +85,14 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   useEffect(() => {
     if (visible) {
       if (editedCoupon) {
+        form.setFieldsValue({
+          discountCode: editedCoupon.code,
+          discountPercent: editedCoupon.value,
+          selectedProductTypes: editedCoupon.product_type.toLowerCase(),
+          selectedProducts: editedCoupon.product_ids,
+        });
+
+        setSelectedProductTypes(editedCoupon.product_type.toLowerCase());
       } else {
         form.resetFields();
       }
@@ -102,13 +102,33 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   }, [form, editedCoupon, visible, fetchCreatorProducts]);
 
   const handleSelectedProductTypesChanged = (values) => {
-    //TODO: Also filter out the selectedProducts when this changes
     setSelectedProductTypes(values);
+    form.setFieldsValue({ ...form.getFieldsValue(), selectedProducts: [] });
   };
 
   const handleFinish = async (values) => {
     setSubmitting(true);
-    console.log(values);
+
+    try {
+      const payload = {
+        code: values.discountCode,
+        value: values.discountPercent,
+        product_type: selectedProductTypes.toUpperCase() || values.selectedProductTypes.toUpperCase(),
+        product_ids: values.selectedProducts,
+      };
+
+      const { status } = editedCoupon
+        ? await apis.coupons.updateCoupon(editedCoupon.external_id, payload)
+        : await apis.coupons.createCoupon(payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal(`Discount Code ${editedCoupon ? 'Updated' : 'Created'}`);
+        closeModal(true);
+      }
+    } catch (error) {
+      showErrorModal(`Failed to ${editedCoupon ? 'edit' : 'create'} discount code`, error?.response?.data?.message);
+    }
+
     setSubmitting(false);
   };
 
@@ -170,16 +190,15 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
             <Col xs={24}>
               <Form.Item
                 {...couponModalFormLayout}
-                id="selectedProductType"
-                name="selectedProductType"
+                id="selectedProductTypes"
+                name="selectedProductTypes"
                 label="Applicable Product Types"
-                rules={validationRules.arrayValidation}
+                rules={validationRules.requiredValidation}
               >
                 <Select
                   showArrow
                   showSearch={false}
                   placeholder="Select product type(s)"
-                  mode="multiple"
                   maxTagCount={2}
                   options={Object.entries(products).map(([key, val]) => ({
                     value: key,
@@ -203,14 +222,15 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                   showSearch
                   placeholder="Select the products applicable with this code"
                   mode="multiple"
-                  maxTagCount={3}
+                  maxTagCount={2}
+                  onChange={(val) => console.log(val)}
                 >
                   {Object.entries(products)
-                    .filter(([key, value]) => selectedProductTypes.includes(key))
+                    .filter(([key, value]) => selectedProductTypes.includes(key.toLowerCase()))
                     .map(([key, value]) => (
                       <Select.OptGroup label={`${key.charAt(0).toUpperCase()}${key.slice(1)}`} key={key}>
                         {value?.map((product) => (
-                          <Select.Option value={`${key}_${getProductId(key, product)}`}>
+                          <Select.Option key={product.id} value={getProductId(key, product)}>
                             {getProductName(key, product)}
                           </Select.Option>
                         ))}

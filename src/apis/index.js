@@ -120,4 +120,11 @@ export default {
     getCreatorCourseEarnings: (pageNo, perPage) =>
       http.get(`/secure/creator/payments/earnings/courses?page_no=${pageNo}&per_page${perPage}`),
   },
+  coupons: {
+    createCoupon: (payload) => http.post('/secure/creator/coupons', payload),
+    updateCoupon: (couponId, payload) => http.put(`/secure/creator/coupons/${couponId}`, payload),
+    publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
+    unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
+    getCreatorCoupons: () => http.get('/secure/creator/coupons'),
+  },
 };
