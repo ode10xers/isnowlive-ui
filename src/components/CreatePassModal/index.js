@@ -208,7 +208,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       width={720}
     >
       <Loader size="large" loading={isLoading}>
-        <Form layout="vertical" name="PassForm" form={form} onFinish={handleFinish} initialValues={formInitialValues}>
+        <Form
+          layout="vertical"
+          name="PassForm"
+          form={form}
+          onFinish={handleFinish}
+          initialValues={formInitialValues}
+          scrollToFirstError={true}
+        >
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
               <Form.Item id="passName" name="passName" label="Pass Name" rules={validationRules.nameValidation}>

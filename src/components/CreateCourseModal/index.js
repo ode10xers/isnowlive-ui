@@ -678,7 +678,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         </Form.Item> 
       </Col> */}
       <Col xs={!isVideoModal ? 0 : 24}>
-        <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={!isVideoModal}>
+        <Form.Item
+          {...courseModalFormLayout}
+          label="Course Duration"
+          required={true}
+          hidden={!isVideoModal}
+          scrollToFirstError={true}
+        >
           <Row gutter={8}>
             <Col xs={20}>
               <Form.Item
