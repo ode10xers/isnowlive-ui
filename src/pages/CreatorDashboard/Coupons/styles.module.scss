@@ -1,1 +1,5 @@
 @import '../../../styles/variables.scss';
+
+.greenBtn {
+  color: map-get($map: $colors, $key: 'KellyGreen') !important;
+}

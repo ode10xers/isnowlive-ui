@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popconfirm, Popover, List } from 'antd';
-import { EditTwoTone, EyeTwoTone, EyeInvisibleTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popconfirm, Popover, List, Card } from 'antd';
+import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -15,7 +15,7 @@ import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Panel } = Collapse;
 //TODO: Add Expand All Later when needed
 const Coupons = () => {
@@ -153,19 +153,15 @@ const Coupons = () => {
             <Col xs={8}>
               {record.is_published ? (
                 <Tooltip title="Hide Discount Code">
-                  <Button
-                    type="text"
-                    icon={<EyeInvisibleTwoTone twoToneColor="#df0c69" />}
-                    onClick={() => unpublishCoupon(record.external_id)}
-                  />
+                  <Button danger type="link" onClick={() => unpublishCoupon(record.external_id)}>
+                    Hide
+                  </Button>
                 </Tooltip>
               ) : (
                 <Tooltip title="Unhide Discount Code">
-                  <Button
-                    type="text"
-                    icon={<EyeTwoTone twoToneColor="#52c41a" />}
-                    onClick={() => publishCoupon(record.external_id)}
-                  />
+                  <Button type="link" className={styles.greenBtn} onClick={() => publishCoupon(record.external_id)}>
+                    Show
+                  </Button>
                 </Tooltip>
               )}
             </Col>
@@ -188,7 +184,83 @@ const Coupons = () => {
     },
   ];
 
-  const renderCouponItem = (coupon) => {};
+  const renderCouponItem = (coupon) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={15}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={9}>: {value}</Col>
+      </Row>
+    );
+
+    const productKey = coupon.product_type.toLowerCase();
+    const productName = `${productKey.charAt(0).toUpperCase()}${productKey.slice(1)}`;
+    const productListBtn = (
+      <Popover
+        trigger="click"
+        title={`${productName} List`}
+        content={
+          <List size="small" dataSource={coupon.products} renderItem={(item) => <List.Item> {item.name} </List.Item>} />
+        }
+      >
+        <Button type="default" className={styles.productButton}>
+          {coupon.products?.length || 0} {productName}
+        </Button>
+      </Popover>
+    );
+
+    return (
+      <Col xs={24} key={coupon.external_id}>
+        <Card
+          title={<Title level={5}> {coupon.code} </Title>}
+          bodyStyle={{ padding: '24px 24px 0 24px' }}
+          actions={[
+            <Tooltip title="Edit Discount Code">
+              <Button type="link" icon={<EditTwoTone />} onClick={() => editCoupon(coupon)} />
+            </Tooltip>,
+            coupon.is_published ? (
+              <Tooltip title="Hide Discount Code">
+                <Button danger type="link" onClick={() => unpublishCoupon(coupon.external_id)}>
+                  Hide
+                </Button>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Unhide Discount Code">
+                <Button type="link" className={styles.greenBtn} onClick={() => publishCoupon(coupon.external_id)}>
+                  Show
+                </Button>
+              </Tooltip>
+            ),
+            <Tooltip title="Delete Discount Code">
+              <Popconfirm
+                title="Do you want to delete this code?"
+                icon={<DeleteTwoTone twoToneColor="#FF4D4F" />}
+                okText="Yes, delete code"
+                cancelText="No"
+                onConfirm={() => console.log('Deleted')}
+              >
+                <Button danger type="text" icon={<DeleteTwoTone twoToneColor="#FF4D4F" />} />
+              </Popconfirm>
+            </Tooltip>,
+          ]}
+        >
+          {layout('Discount Value', `${coupon.value} %`)}
+          <Row gutter={[8, 16]}>
+            <Col xs={18}>
+              {' '}
+              <Text strong>Applicable Products</Text> :{' '}
+            </Col>
+            <Col xs={24}>
+              <Row gutter={[8, 8]} justify="center">
+                <Col xs={12}>{productListBtn}</Col>
+              </Row>
+            </Col>
+          </Row>
+        </Card>
+      </Col>
+    );
+  };
 
   return (
     <div className={styles.box}>

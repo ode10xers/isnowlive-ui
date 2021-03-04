@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 
 import apis from 'apis';
-
-import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -26,9 +24,20 @@ const PaymentPopup = () => {
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [couponErrorText, setCouponErrorText] = useState(null);
+  const [couponApplied, setCouponApplied] = useState(false);
 
   const { itemList, productId } = paymentPopupData || { itemList: [], productId: null };
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
+
+  useEffect(() => {
+    if (!paymentPopupVisible) {
+      setCouponCode('');
+      setCouponApplied(false);
+      setCouponErrorText(null);
+      setDiscountedPrice(null);
+      setIsApplyingCoupon(false);
+    }
+  }, [paymentPopupVisible]);
 
   const handleCouponCodeChange = (e) => {
     if (couponErrorText) {
@@ -36,10 +45,13 @@ const PaymentPopup = () => {
     }
 
     setCouponCode(e.target.value.toLowerCase());
+    setCouponApplied(false);
   };
 
   const handleInitiatePayment = () => {
-    paymentPopupCallback(userDetails.email, couponCode);
+    const appliedCouponCode = couponApplied ? couponCode : '';
+
+    paymentPopupCallback(userDetails.email, appliedCouponCode);
     closePaymentPopup();
   };
 
@@ -49,7 +61,7 @@ const PaymentPopup = () => {
     try {
       //TODO: Readjust for other products whenever necessary
       const payload = {
-        coupon_code: couponCode || value,
+        coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
         course_id: productId,
       };
 
@@ -57,9 +69,9 @@ const PaymentPopup = () => {
 
       if (isAPISuccess(status) && data) {
         setDiscountedPrice(data.discounted_amount);
+        setCouponApplied(true);
       }
     } catch (error) {
-      showErrorModal('Invalid Coupon Entered');
       setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
     }
     setIsApplyingCoupon(false);
@@ -68,6 +80,8 @@ const PaymentPopup = () => {
   const closePaymentPopup = () => {
     setCouponCode('');
     setDiscountedPrice(null);
+    setCouponApplied(false);
+
     hidePaymentPopup();
   };
 
@@ -128,6 +142,7 @@ const PaymentPopup = () => {
           <Row justify="start">
             <Col xs={24}>
               <Input.Search
+                value={couponCode}
                 disabled={isApplyingCoupon}
                 loading={isApplyingCoupon}
                 enterButton={
@@ -157,7 +172,7 @@ const PaymentPopup = () => {
                 onClick={handleInitiatePayment}
                 disabled={itemList?.length <= 0}
               >
-                Make Payment
+                Pay Now
               </Button>
             </Col>
           </Row>
