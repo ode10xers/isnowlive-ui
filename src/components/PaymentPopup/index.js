@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 
-// import apis from 'apis';
+import apis from 'apis';
 
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -18,7 +18,7 @@ const { Text, Title } = Typography;
 
 const PaymentPopup = () => {
   const {
-    state: { userDetails, paymentPopupVisible, paymentPopupData, paymentPopupCallback },
+    state: { userDetails, paymentPopupVisible, paymentPopupCallback, paymentPopupData },
     hidePaymentPopup,
   } = useGlobalContext();
 
@@ -27,43 +27,36 @@ const PaymentPopup = () => {
   const [discountedPrice, setDiscountedPrice] = useState(null);
   const [couponErrorText, setCouponErrorText] = useState(null);
 
-  const totalPrice = paymentPopupData?.reduce((acc, product) => acc + product.price, 0);
+  const { itemList, productId } = paymentPopupData || { itemList: [], productId: null };
+  const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
 
   const handleCouponCodeChange = (e) => {
     if (couponErrorText) {
       setCouponErrorText(null);
     }
 
-    setCouponCode(e.target.value);
+    setCouponCode(e.target.value.toLowerCase());
   };
 
   const handleInitiatePayment = () => {
-    //TODO: Adjust with API Implementation
     paymentPopupCallback(userDetails.email, couponCode);
     closePaymentPopup();
   };
 
-  const applyCouponCode = (value) => {
+  const applyCouponCode = async (value) => {
     setIsApplyingCoupon(true);
 
     try {
-      //TODO: Adjust with API Implementation
-
-      // const payload = {
-      //   code: couponCode,
-      //   price: totalPrice,
-      // };
-
-      // const { status, data } = await apis.coupons.applyCoupon(payload);
-      const { status, data } = {
-        status: 200,
-        data: {
-          discountedPrice: Number(totalPrice) * 0.5,
-        },
+      //TODO: Readjust for other products whenever necessary
+      const payload = {
+        coupon_code: couponCode || value,
+        course_id: productId,
       };
 
+      const { status, data } = await apis.coupons.validateCourseCoupon(payload);
+
       if (isAPISuccess(status) && data) {
-        setDiscountedPrice(data.discountedPrice);
+        setDiscountedPrice(data.discounted_amount);
       }
     } catch (error) {
       showErrorModal('Invalid Coupon Entered');
@@ -86,13 +79,13 @@ const PaymentPopup = () => {
       centered={true}
       footer={null}
       title={<Title level={4}> Confirm your purchase </Title>}
-      onCancel={() => hidePaymentPopup()}
+      onCancel={() => closePaymentPopup()}
     >
       <Row gutter={[8, 32]} justify="center">
         <Col xs={24}>
           <List
             rowKey={(record) => record.name}
-            dataSource={paymentPopupData || []}
+            dataSource={itemList || []}
             renderItem={(item) => (
               <List.Item
                 actions={[
@@ -116,14 +109,14 @@ const PaymentPopup = () => {
               <Text strong>Total payable amount</Text>
             </Col>
             <Col xs={10} className={styles.paymentTotalText}>
-              {paymentPopupData && paymentPopupData.length > 0 && (
+              {itemList && itemList.length > 0 && (
                 <>
                   <Text className={discountedPrice !== null ? styles.discounted : undefined}>
-                    {paymentPopupData[0].currency?.toUpperCase()} {totalPrice}
+                    {itemList[0].currency?.toUpperCase()} {totalPrice}
                   </Text>{' '}
                   {discountedPrice !== null && (
                     <Text>
-                      {paymentPopupData[0].currency?.toUpperCase()} {discountedPrice}
+                      {itemList[0].currency?.toUpperCase()} {discountedPrice}
                     </Text>
                   )}
                 </>
@@ -162,7 +155,7 @@ const PaymentPopup = () => {
                 className={styles.greenBtn}
                 type="primary"
                 onClick={handleInitiatePayment}
-                disabled={paymentPopupData?.length <= 0}
+                disabled={itemList?.length <= 0}
               >
                 Make Payment
               </Button>

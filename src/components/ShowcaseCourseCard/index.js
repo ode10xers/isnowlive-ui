@@ -105,14 +105,17 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       desc.push(`${selectedCourse.videos.length} Videos`);
     }
 
-    const paymentPopupData = [
-      {
-        name: selectedCourse.name,
-        description: desc.join(', '),
-        currency: selectedCourse.currency,
-        price: selectedCourse.price,
-      },
-    ];
+    const paymentPopupData = {
+      productId: selectedCourse.id,
+      itemList: [
+        {
+          name: selectedCourse.name,
+          description: desc.join(', '),
+          currency: selectedCourse.currency,
+          price: selectedCourse.price,
+        },
+      ],
+    };
 
     showPaymentPopup(paymentPopupData, createOrder);
   };
