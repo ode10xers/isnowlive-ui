@@ -46,6 +46,7 @@ const PaymentPopup = () => {
 
     setCouponCode(e.target.value.toLowerCase());
     setCouponApplied(false);
+    setDiscountedPrice(null);
   };
 
   const handleInitiatePayment = () => {
