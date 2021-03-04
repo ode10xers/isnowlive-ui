@@ -126,7 +126,14 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedCoupon ? 'edit' : 'create'} discount code`, error?.response?.data?.message);
+      if (error?.response?.status === 500 && error?.response?.data?.message === 'a coupon like this already exists') {
+        showErrorModal(
+          'Duplicate Discount Code',
+          'A coupon with the same discount code already exists! Please use a different discount code'
+        );
+      } else {
+        showErrorModal(`Failed to ${editedCoupon ? 'edit' : 'create'} discount code`, error?.response?.data?.message);
+      }
     }
 
     setSubmitting(false);

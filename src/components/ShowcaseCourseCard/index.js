@@ -17,6 +17,8 @@ import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { isValidFile, isAPISuccess, orderType, courseType } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
@@ -32,6 +34,9 @@ const noop = () => {};
 //TODO: Compare to LiveCourseCard, if similar then refactor
 const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = null }) => {
   const history = useHistory();
+
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +88,35 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     }
   };
 
-  const createOrder = async (userEmail) => {
+  const showConfirmPaymentPopup = () => {
+    if (!selectedCourse) {
+      showErrorModal('Something went wrong', 'Invalid Course Selected');
+      return;
+    }
+
+    let desc = [];
+
+    if (selectedCourse.inventory_ids?.length > 0) {
+      desc.push(`${selectedCourse.inventory_ids.length} Sessions`);
+    }
+
+    if (selectedCourse.videos?.length > 0) {
+      desc.push(`${selectedCourse.videos.length} Videos`);
+    }
+
+    const paymentPopupData = [
+      {
+        name: selectedCourse.name,
+        description: <Text className={styles.blueText}> {desc.join(',')} </Text>,
+        currency: selectedCourse.currency,
+        price: selectedCourse.price,
+      },
+    ];
+
+    showPaymentPopup(paymentPopupData, createOrder);
+  };
+
+  const createOrder = async (userEmail, couponCode = '') => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
       return;
@@ -97,6 +130,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         price: selectedCourse.price,
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
+        coupon_code: couponCode,
       });
 
       if (isAPISuccess(status) && data) {
@@ -111,7 +145,14 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {
+        showErrorModal(
+          'Discount Code Not Applicable',
+          'The discount code you entered is not applicable this product. Please try again with a different discount code'
+        );
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
     }
   };
 
@@ -122,7 +163,11 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         styles.showcaseCourseCardWrapper
       )}
     >
-      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+      <PurchaseModal
+        visible={showPurchaseModal}
+        closeModal={closePurchaseModal}
+        createOrder={showConfirmPaymentPopup}
+      />
       <Loader loading={isLoading} text="Processing payment" size="large">
         <Row gutter={[8, 10]}>
           {courses?.length > 0 &&
