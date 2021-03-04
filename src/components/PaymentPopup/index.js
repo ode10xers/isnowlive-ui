@@ -50,7 +50,10 @@ const PaymentPopup = () => {
                   </Text>,
                 ]}
               >
-                <List.Item.Meta title={item?.name} description={item?.description} />
+                <List.Item.Meta
+                  title={item?.name}
+                  description={<Text className={styles.blueText}>{item?.description}</Text>}
+                />
               </List.Item>
             )}
           />

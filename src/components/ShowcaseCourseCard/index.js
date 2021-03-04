@@ -107,7 +107,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     const paymentPopupData = [
       {
         name: selectedCourse.name,
-        description: <Text className={styles.blueText}> {desc.join(',')} </Text>,
+        description: desc.join(','),
         currency: selectedCourse.currency,
         price: selectedCourse.price,
       },
