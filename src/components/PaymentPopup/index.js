@@ -69,10 +69,12 @@ const PaymentPopup = () => {
 
       if (isAPISuccess(status) && data) {
         setDiscountedPrice(data.discounted_amount);
+        setCouponErrorText(<Text type="success"> Coupon Applied! </Text>);
         setCouponApplied(true);
       }
     } catch (error) {
       setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
+      setCouponApplied(false);
     }
     setIsApplyingCoupon(false);
   };
