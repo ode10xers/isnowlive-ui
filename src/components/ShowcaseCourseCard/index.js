@@ -88,6 +88,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     }
   };
 
+  //TODO: Adjust with API changes here
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
@@ -107,7 +108,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     const paymentPopupData = [
       {
         name: selectedCourse.name,
-        description: desc.join(','),
+        description: desc.join(', '),
         currency: selectedCourse.currency,
         price: selectedCourse.price,
       },
