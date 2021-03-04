@@ -131,7 +131,7 @@ const PaymentPopup = () => {
                 disabled={isApplyingCoupon}
                 loading={isApplyingCoupon}
                 enterButton={
-                  <Button block type="default">
+                  <Button block type="primary" disabled={couponCode === ''}>
                     {' '}
                     Apply{' '}
                   </Button>
