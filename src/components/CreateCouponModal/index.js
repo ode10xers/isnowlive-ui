@@ -230,7 +230,6 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                   placeholder="Select the products applicable with this code"
                   mode="multiple"
                   maxTagCount={2}
-                  onChange={(val) => console.log(val)}
                 >
                   {Object.entries(products)
                     .filter(([key, value]) => selectedProductTypes.includes(key.toLowerCase()))

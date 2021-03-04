@@ -19,12 +19,10 @@ const PaymentPopup = () => {
   const [couponCode, setCouponCode] = useState('');
 
   const handleCouponCodeChange = (e) => {
-    console.log(e.target.value);
     setCouponCode(e.target.value);
   };
 
   const handleInitiatePayment = () => {
-    console.log(couponCode);
     paymentPopupCallback(userDetails.email, couponCode);
     hidePaymentPopup();
   };
