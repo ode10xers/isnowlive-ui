@@ -98,9 +98,9 @@ const Videos = () => {
   const getVideosForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await apis.videos.getCreatorVideos();
+      const { status, data } = await apis.videos.getCreatorVideos();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setVideos(
           data.map((video, index) => ({
             index,
@@ -555,7 +555,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Published Videos'} />
+                <Empty description="No Published Videos" />
               )}
             </Panel>
             <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
@@ -585,7 +585,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Unpublished Videos'} />
+                <Empty description="No Unpublished Videos" />
               )}
             </Panel>
           </Collapse>

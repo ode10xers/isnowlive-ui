@@ -39,6 +39,7 @@ const Routes = {
     passes: '/passes',
     videos: '/videos',
     courses: '/courses',
+    coupons: '/coupons',
     accountSettings: '/settings',
   },
   attendeeDashboard: {

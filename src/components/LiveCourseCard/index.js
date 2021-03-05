@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Row, Col, Image, Card, Typography, Button, Tag } from 'antd';
+import { Row, Col, Image, Card, Typography, Tag } from 'antd';
 
 import dateUtil from 'utils/date';
 import { isValidFile, courseType } from 'utils/helper';
@@ -57,7 +57,7 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
             </Col>
           </Row>
         </Col>
-        <Col xs={24} md={buyable ? 4 : 0} className={styles.buyButtonWrapper}>
+        {/* <Col xs={24} md={buyable ? 4 : 0} className={styles.buyButtonWrapper}>
           <Button
             block
             className={styles.buyButton}
@@ -69,7 +69,7 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
           >
             Buy
           </Button>
-        </Col>
+        </Col> */}
       </Row>
     </Card>
   );
