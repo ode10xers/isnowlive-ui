@@ -316,7 +316,6 @@ const UploadVideoModal = ({
                     placeholder="Select your Class(es)"
                     mode="multiple"
                     maxTagCount={2}
-                    // options={classes}
                     value={selectedSessionIds}
                     onChange={(val) => setSelectedSessionIds(val)}
                     optionLabelProp="label"
