@@ -572,17 +572,69 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             mode="multiple"
             maxTagCount={2}
             placeholder="Select Class"
-            options={courseClasses?.map((courseClass) => ({
-              value: courseClass.session_id,
-              label: (
-                <>
-                  {courseClass.name} {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
-                </>
-              ),
-            }))}
             value={selectedCourseClass}
             onChange={handleCourseClassChange}
-          />
+            optionLabelProp="label"
+          >
+            <Select.OptGroup
+              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+              key="Published"
+            >
+              {courseClasses
+                ?.filter((courseClass) => courseClass.is_active)
+                .map((courseClass) => (
+                  <Select.Option
+                    value={courseClass.session_id}
+                    key={courseClass.session_id}
+                    label={
+                      <>
+                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
+                      </>
+                    }
+                  >
+                    <Row gutter={[8, 8]}>
+                      <Col xs={17} className={styles.productName}>
+                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
+                      </Col>
+                      <Col xs={7} className={styles.textAlignRight}>
+                        <Text strong>
+                          {courseClass.currency?.toUpperCase()} {courseClass.price}
+                        </Text>
+                      </Col>
+                    </Row>
+                  </Select.Option>
+                ))}
+            </Select.OptGroup>
+            <Select.OptGroup
+              label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+              key="Unpublished"
+            >
+              {courseClasses
+                ?.filter((courseClass) => !courseClass.is_active)
+                .map((courseClass) => (
+                  <Select.Option
+                    value={courseClass.session_id}
+                    key={courseClass.session_id}
+                    label={
+                      <>
+                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
+                      </>
+                    }
+                  >
+                    <Row gutter={[8, 8]}>
+                      <Col xs={17} className={styles.productName}>
+                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
+                      </Col>
+                      <Col xs={7} className={styles.textAlignRight}>
+                        <Text strong>
+                          {courseClass.currency?.toUpperCase()} {courseClass.price}
+                        </Text>
+                      </Col>
+                    </Row>
+                  </Select.Option>
+                ))}
+            </Select.OptGroup>
+          </Select>
         </Form.Item>
       </Col>
       <Col xs={isVideoModal ? 0 : 24}>
@@ -775,17 +827,70 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   placeholder="Select Video(s)"
                   mode="multiple"
                   maxTagCount={2}
-                  options={videos?.map((video) => ({
-                    value: video.external_id,
-                    label: (
-                      <>
-                        {video.title} {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
-                      </>
-                    ),
-                  }))}
                   value={selectedVideos}
                   onChange={(val) => setSelectedVideos(val)}
-                />
+                  optionLabelProp="label"
+                >
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                    key="Published"
+                  >
+                    {videos
+                      ?.filter((video) => video.is_published)
+                      .map((video) => (
+                        <Select.Option
+                          value={video.external_id}
+                          key={video.external_id}
+                          label={
+                            <>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              <Text strong>
+                                {video.currency?.toUpperCase()} {video.price}
+                              </Text>
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    key="Unpublished"
+                  >
+                    {videos
+                      ?.filter((video) => !video.is_published)
+                      .map((video) => (
+                        <Select.Option
+                          value={video.external_id}
+                          key={video.external_id}
+                          label={
+                            <>
+                              {' '}
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              <Text strong>
+                                {video.currency?.toUpperCase()} {video.price}
+                              </Text>
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                  </Select.OptGroup>
+                </Select>
               </Form.Item>
             </Col>
             <Col xs={24}>
