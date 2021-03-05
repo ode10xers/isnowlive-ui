@@ -370,7 +370,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
                     key="Published Sessions"
                   >
                     {videos
