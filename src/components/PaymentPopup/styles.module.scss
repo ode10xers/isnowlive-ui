@@ -19,6 +19,8 @@
   text-align: right;
 
   .discounted {
-    text-decoration: solid line-through map-get($map: $colors, $key: 'Razzmatazz') 2px;
+    del {
+      text-decoration: solid line-through map-get($map: $colors, $key: 'Razzmatazz') 2px;
+    }
   }
 }

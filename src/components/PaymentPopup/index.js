@@ -126,18 +126,22 @@ const PaymentPopup = () => {
               <Text strong>Total payable amount</Text>
             </Col>
             <Col xs={10} className={styles.paymentTotalText}>
-              {itemList && itemList.length > 0 && (
-                <>
-                  <Text className={discountedPrice !== null ? styles.discounted : undefined}>
-                    {itemList[0].currency?.toUpperCase()} {totalPrice}
-                  </Text>{' '}
-                  {discountedPrice !== null && (
+              {itemList &&
+                itemList.length > 0 &&
+                (discountedPrice !== null ? (
+                  <>
+                    <Text delete className={styles.discounted}>
+                      {itemList[0].currency?.toUpperCase()} {totalPrice}
+                    </Text>{' '}
                     <Text>
                       {itemList[0].currency?.toUpperCase()} {discountedPrice}
                     </Text>
-                  )}
-                </>
-              )}
+                  </>
+                ) : (
+                  <Text>
+                    {itemList[0].currency?.toUpperCase()} {totalPrice}
+                  </Text>
+                ))}
             </Col>
           </Row>
         </Col>
