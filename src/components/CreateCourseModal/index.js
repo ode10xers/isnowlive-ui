@@ -604,6 +604,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     </Row>
                   </Select.Option>
                 ))}
+              {courseClasses?.filter((courseClass) => courseClass.is_active).length <= 0 && (
+                <Text disabled> No published sessions </Text>
+              )}
             </Select.OptGroup>
             <Select.OptGroup
               label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
@@ -633,6 +636,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     </Row>
                   </Select.Option>
                 ))}
+              {courseClasses?.filter((courseClass) => !courseClass.is_active).length <= 0 && (
+                <Text disabled> No unpublished sessions </Text>
+              )}
             </Select.OptGroup>
           </Select>
         </Form.Item>
@@ -859,6 +865,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                           </Row>
                         </Select.Option>
                       ))}
+                    {videos?.filter((video) => video.is_published).length <= 0 && (
+                      <Text disabled> No published video </Text>
+                    )}
                   </Select.OptGroup>
                   <Select.OptGroup
                     label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
@@ -889,6 +898,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                           </Row>
                         </Select.Option>
                       ))}
+                    {videos?.filter((video) => !video.is_published).length <= 0 && (
+                      <Text disabled> No unpublished video </Text>
+                    )}
                   </Select.OptGroup>
                 </Select>
               </Form.Item>
