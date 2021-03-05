@@ -33,6 +33,7 @@ import PassDetails from 'pages/PassDetails';
 import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
 import CookieConsentPopup from 'components/CookieConsentPopup';
+import PaymentPopup from 'components/PaymentPopup';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -111,6 +112,7 @@ function App() {
 
   return (
     <>
+      <PaymentPopup />
       <Router>
         <Switch>
           <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />

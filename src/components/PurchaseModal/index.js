@@ -24,6 +24,8 @@ const { Text, Paragraph, Title } = Typography;
 // These cases are for when there are multiple object that
 // can trigger the Modal and we need to 'reset' the value
 // of the object in the parent component (see SessionDetails)
+
+//TODO: Refactor this to use PaymentPopup as an intermediate flow
 const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const { logIn } = useGlobalContext();
   const [form] = Form.useForm();

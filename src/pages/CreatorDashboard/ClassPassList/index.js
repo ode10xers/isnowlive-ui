@@ -312,7 +312,7 @@ const ClassPassList = () => {
     );
 
     return (
-      <Col xs={24}>
+      <Col xs={24} key={pass.id}>
         <Card
           className={styles.card}
           title={

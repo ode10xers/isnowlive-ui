@@ -18,6 +18,7 @@ import CourseEarnings from 'pages/CreatorDashboard/CourseEarnings';
 import Videos from 'pages/CreatorDashboard/Videos';
 import Courses from 'pages/CreatorDashboard/Courses';
 import Subscriptions from 'pages/CreatorDashboard/Subscriptions';
+import Coupons from 'pages/CreatorDashboard/Coupons';
 import AccountSettings from 'pages/CreatorDashboard/AccountSettings';
 
 //TODO: Might want to refactor earning details page to be single component
@@ -41,6 +42,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.videos} component={Videos} />
       <Route exact path={match.url + Routes.creatorDashboard.courses} component={Courses} />
       <Route exact path={match.url + Routes.creatorDashboard.subscriptions} component={Subscriptions} />
+      <Route exact path={match.url + Routes.creatorDashboard.coupons} component={Coupons} />
       <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>

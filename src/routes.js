@@ -40,6 +40,7 @@ const Routes = {
     videos: '/videos',
     courses: '/courses',
     subscriptions: '/subscriptions',
+    coupons: '/coupons',
     accountSettings: '/settings',
   },
   attendeeDashboard: {

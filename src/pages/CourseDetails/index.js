@@ -203,7 +203,7 @@ const CourseDetails = ({ match, history }) => {
     );
 
     return (
-      <Col xs={24}>
+      <Col xs={24} key={schedule.key}>
         <Card
           bodyStyle={{ padding: '10px' }}
           title={
@@ -348,7 +348,7 @@ const CourseDetails = ({ match, history }) => {
                       <Table
                         columns={sessionSchedulesColumns}
                         data={generateCourseSessionsScheduleList()}
-                        rowKey={(record) => record.inventory_id}
+                        rowKey={(record) => record.key}
                       />
                     )}
                   </Col>

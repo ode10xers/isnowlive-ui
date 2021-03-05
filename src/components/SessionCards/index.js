@@ -147,6 +147,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                                 <Col xs={24} lg={21}>
                                   {isoDayOfWeek.map((day, index) => (
                                     <Tag
+                                      key={`${session.session_id}_${day}`}
                                       className={
                                         session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
                                       }

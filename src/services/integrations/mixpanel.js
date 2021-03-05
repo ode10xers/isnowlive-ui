@@ -14,6 +14,7 @@ export const mixPanelEventTags = {
         videosNav: '(Creator) Videos Nav Clicked',
         coursesNav: '(Creator) Courses Nav Clicked',
         subscriptionsNav: '(Creator) Subscription Nav Clicked',
+        couponsNav: '(Creator) Coupons Nav Clicked',
         livestreamNav: '(Creator) LiveStream Nav Clicked',
         profileNav: '(Creator) Public Page Nav Clicked',
         paymentNav: '(Creator) Get Paid Nav Clicked',

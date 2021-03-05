@@ -31,6 +31,16 @@ const validationRules = {
       },
     ];
   },
+  discountCodeValidation: [
+    {
+      required: true,
+      message: 'Please input a discount code',
+    },
+    {
+      pattern: new RegExp('^[a-zA-Z0-9]*$'),
+      message: 'Discount code should only contain letters or numbers',
+    },
+  ],
 };
 
 export default validationRules;

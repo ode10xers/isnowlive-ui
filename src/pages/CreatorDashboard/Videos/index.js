@@ -99,9 +99,9 @@ const Videos = () => {
   const getVideosForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await apis.videos.getCreatorVideos();
+      const { status, data } = await apis.videos.getCreatorVideos();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setVideos(
           data.map((video, index) => ({
             index,

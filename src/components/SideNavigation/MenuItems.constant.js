@@ -9,6 +9,7 @@ import {
   BookOutlined,
   SettingOutlined,
   ScheduleOutlined,
+  PercentageOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -86,6 +87,14 @@ export const creatorMenuItems = [
   },
   {
     order: 7,
+    key: 'coupons',
+    title: 'Coupons',
+    icon: <PercentageOutlined />,
+    mixPanelTag: creator.click.dashboard.couponsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.coupons,
+  },
+  {
+    order: 8,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -93,7 +102,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 8,
+    order: 9,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -101,7 +110,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 9,
+    order: 10,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -109,7 +118,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 10,
+    order: 11,
     key: 'account_settings',
     title: 'Account Settings',
     icon: <SettingOutlined />,

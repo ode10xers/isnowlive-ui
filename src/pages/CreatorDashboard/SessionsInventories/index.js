@@ -222,8 +222,8 @@ const SessionsInventories = ({ match }) => {
             },
             children: (
               <>
-                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
-                <Text className={styles.textAlignLeft}>{record.name}</Text>
+                <Text className={styles.sessionNameWrapper}>{record.name}</Text>{' '}
+                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
                 {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </>
             ),
