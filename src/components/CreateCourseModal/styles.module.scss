@@ -7,12 +7,6 @@
   text-overflow: ellipsis;
 }
 
-.optionSeparatorText {
-  color: map-get($map: $colors, $key: 'NavyBlue') !important;
-  font-size: 15px;
-  font-weight: 600;
-}
-
 .dateText {
   margin-left: -100px;
   text-align: left;

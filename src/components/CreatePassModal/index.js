@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
 
+import { BookTwoTone } from '@ant-design/icons';
+
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -77,7 +79,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       const { status, data } = await apis.session.getSession();
 
       if (isAPISuccess(status) && data) {
-        setClasses(data.map((session) => ({ value: session.session_id, label: session.name })));
+        setClasses(data);
         setCurrency(data[0].currency.toUpperCase());
       }
     } catch (error) {
@@ -94,9 +96,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(
-          data.filter((video) => video.price > 0).map((video) => ({ value: video.external_id, label: video.title }))
-        );
+        setVideos(data.filter((video) => video.price > 0));
       }
     } catch (error) {
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
@@ -235,10 +235,65 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   placeholder="Select your Class(es)"
                   mode="multiple"
                   maxTagCount={2}
-                  options={classes}
                   value={selectedClasses}
                   onChange={(val) => setSelectedClasses(val)}
-                />
+                  optionLabelProp="label"
+                >
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Sessions"
+                  >
+                    {classes
+                      ?.filter((session) => session.is_active)
+                      .map((session) => (
+                        <Select.Option
+                          value={session.session_id}
+                          key={session.session_id}
+                          label={
+                            <>
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {session.currency?.toUpperCase()} {session.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    key="Published Sessions"
+                  >
+                    {classes
+                      ?.filter((session) => !session.is_active)
+                      .map((session) => (
+                        <Select.Option
+                          value={session.session_id}
+                          key={session.session_id}
+                          label={
+                            <>
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {session.currency?.toUpperCase()} {session.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                  </Select.OptGroup>
+                </Select>
               </Form.Item>
             </Col>
           </Row>
@@ -274,10 +329,65 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   placeholder="Select your Video(s)"
                   mode="multiple"
                   maxTagCount={2}
-                  options={videos}
                   value={selectedVideos}
                   onChange={(val) => setSelectedVideos(val)}
-                />
+                  optionLabelProp="label"
+                >
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Sessions"
+                  >
+                    {videos
+                      ?.filter((video) => video.is_published)
+                      .map((video) => (
+                        <Select.Option
+                          value={video.external_id}
+                          key={video.external_id}
+                          label={
+                            <>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {video.currency?.toUpperCase()} {video.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Sessions"
+                  >
+                    {videos
+                      ?.filter((video) => !video.is_published)
+                      .map((video) => (
+                        <Select.Option
+                          value={video.external_id}
+                          key={video.external_id}
+                          label={
+                            <>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {video.currency?.toUpperCase()} {video.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                  </Select.OptGroup>
+                </Select>
               </Form.Item>
             </Col>
           </Row>

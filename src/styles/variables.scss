@@ -90,6 +90,11 @@ $spacing: (
 .whiteText {
   color: map-get($map: $colors, $key: 'White') !important;
 }
+.optionSeparatorText {
+  color: map-get($map: $colors, $key: 'NavyBlue') !important;
+  font-size: 15px;
+  font-weight: 600;
+}
 .headButton {
   margin-top: 10px;
   margin-left: 15px;

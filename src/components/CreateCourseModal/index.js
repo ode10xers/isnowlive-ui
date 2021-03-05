@@ -578,7 +578,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           >
             <Select.OptGroup
               label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-              key="Published"
+              key="Published Session"
             >
               {courseClasses
                 ?.filter((courseClass) => courseClass.is_active)
@@ -607,7 +607,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             </Select.OptGroup>
             <Select.OptGroup
               label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
-              key="Unpublished"
+              key="Unpublished Sessions"
             >
               {courseClasses
                 ?.filter((courseClass) => !courseClass.is_active)
@@ -833,7 +833,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 >
                   <Select.OptGroup
                     label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                    key="Published"
+                    key="Published Videos"
                   >
                     {videos
                       ?.filter((video) => video.is_published)
@@ -862,7 +862,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   </Select.OptGroup>
                   <Select.OptGroup
                     label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
-                    key="Unpublished"
+                    key="Unpublished Videos"
                   >
                     {videos
                       ?.filter((video) => !video.is_published)
