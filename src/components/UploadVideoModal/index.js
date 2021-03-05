@@ -5,6 +5,8 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
 
+import { BookTwoTone } from '@ant-design/icons';
+
 import config from 'config';
 import apis from 'apis';
 import Loader from 'components/Loader';
@@ -120,7 +122,7 @@ const UploadVideoModal = ({
       const { data } = await apis.session.getSession();
 
       if (data) {
-        setClasses(data.map((session) => ({ value: session.session_id, label: session.name })));
+        setClasses(data);
         setCurrency(data[0].currency.toUpperCase() || 'SGD');
       }
     } catch (error) {
@@ -314,10 +316,76 @@ const UploadVideoModal = ({
                     placeholder="Select your Class(es)"
                     mode="multiple"
                     maxTagCount={2}
-                    options={classes}
+                    // options={classes}
                     value={selectedSessionIds}
                     onChange={(val) => setSelectedSessionIds(val)}
-                  />
+                    optionLabelProp="label"
+                  >
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                      key="Published Sessions"
+                    >
+                      {classes
+                        ?.filter((session) => session.is_active)
+                        .map((session) => (
+                          <Select.Option
+                            value={session.session_id}
+                            key={session.session_id}
+                            label={
+                              <>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                <Text strong>
+                                  {session.currency?.toUpperCase()} {session.price}
+                                </Text>
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {classes?.filter((session) => session.is_active).length <= 0 && (
+                        <Text disabled> No published sessions </Text>
+                      )}
+                    </Select.OptGroup>
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                      key="Unpublished Sessions"
+                    >
+                      {classes
+                        ?.filter((session) => !session.is_active)
+                        .map((session) => (
+                          <Select.Option
+                            value={session.session_id}
+                            key={session.session_id}
+                            label={
+                              <>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                <Text strong>
+                                  {session.currency?.toUpperCase()} {session.price}
+                                </Text>
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {classes?.filter((session) => !session.is_active).length <= 0 && (
+                        <Text disabled> No unpublished sessions </Text>
+                      )}
+                    </Select.OptGroup>
+                  </Select>
                 </Form.Item>
               </Col>
               <Col xs={24}>
