@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, List, Modal } from 'antd';
+import { Row, Col, Button, Typography, List, Modal, message } from 'antd';
+
+import apis from 'apis';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -19,11 +21,15 @@ const Subscriptions = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
   const [targetSubscription, setTargetSubscription] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [courses, setCourses] = useState([]);
 
   const getCreatorSubscriptions = useCallback(() => {
     setIsLoading(true);
     try {
       //TODO: Implement API here later
+      // const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 3);
       const { status, data } = {
         status: 200, //TODO: Mock data as required here
         data: [
@@ -80,9 +86,42 @@ const Subscriptions = () => {
     setIsLoading(false);
   }, []);
 
+  const getCreatorProducts = useCallback(async () => {
+    try {
+      const { status, data } = await apis.session.getSession();
+
+      if (isAPISuccess(status) && data) {
+        setSessions(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load sessions');
+    }
+
+    try {
+      const { status, data } = await apis.videos.getCreatorVideos();
+
+      if (isAPISuccess(status) && data) {
+        setVideos(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load videos');
+    }
+
+    try {
+      const { status, data } = await apis.courses.getCreatorCourses();
+
+      if (isAPISuccess(status) && data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load courses');
+    }
+  }, []);
+
   useEffect(() => {
+    getCreatorProducts();
     getCreatorSubscriptions();
-  }, [getCreatorSubscriptions]);
+  }, [getCreatorSubscriptions, getCreatorProducts]);
 
   const deleteSubscription = (data) => {
     const currSubscriptionData = subscriptions
@@ -190,7 +229,15 @@ const Subscriptions = () => {
       className: undefined,
     },
     {
+      label: 'Included Sessions',
+      className: undefined,
+    },
+    {
       label: 'Included Video Type',
+      className: undefined,
+    },
+    {
+      label: 'Included Videos',
       className: undefined,
     },
     {
@@ -198,11 +245,15 @@ const Subscriptions = () => {
       className: undefined,
     },
     {
+      label: 'Course Credits/Month',
+      className: undefined,
+    },
+    {
       label: 'Included Course Type',
       className: undefined,
     },
     {
-      label: 'Course Credits/Month',
+      label: 'Included Courses',
       className: undefined,
     },
   ];
@@ -221,6 +272,9 @@ const Subscriptions = () => {
         </Button>
       ) : !subs.id || subs.editing ? (
         <CreateSubscriptionCard
+          sessions={sessions}
+          videos={videos}
+          courses={courses}
           cancelChanges={() => setColumnState(subs.idx, 'EMPTY')}
           saveChanges={(data) => setColumnState(subs.idx, 'SAVED', data)}
           editedSubscription={targetSubscription}

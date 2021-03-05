@@ -128,4 +128,13 @@ export default {
     getCreatorCoupons: () => http.get('/secure/creator/coupons'),
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
   },
+  subscriptions: {
+    createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
+    updateSubscription: (subscriptionId, payload) =>
+      http.patch(`/secure/creator/subscription/${subscriptionId}`, payload),
+    getCreatorSubscriptions: (pageNo, perPage = 3) =>
+      http.get(`/secure/creator/subscription?page=${pageNo}&per_page=${perPage}`),
+    getSubscriptionDetails: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}`),
+    deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),
+  },
 };

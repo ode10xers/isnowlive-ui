@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Form, Card, List, Button, Input, InputNumber, Typography, Checkbox } from 'antd';
+import { Row, Col, Form, Card, List, Button, Input, InputNumber, Typography, Checkbox, Select } from 'antd';
+import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -26,26 +27,33 @@ const { Text } = Typography;
 const includedProductsList = [
   {
     label: 'Sessions',
-    value: 'session',
+    value: 'SESSION',
   },
   {
     label: 'Videos',
-    value: 'video',
+    value: 'VIDEO',
   },
 ];
 
 const productAccessOptions = [
   {
-    value: 'public',
+    value: 'PUBLIC',
     label: 'Public',
   },
   {
-    value: 'membership',
+    value: 'MEMBERSHIP',
     label: 'Members',
   },
 ];
 
-const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription = null }) => {
+const CreateSubscriptionCard = ({
+  sessions = [],
+  videos = [],
+  courses = [],
+  cancelChanges,
+  saveChanges,
+  editedSubscription = null,
+}) => {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +62,9 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
   const [isVideoIncluded, setIsVideoIncluded] = useState(false);
   const [isCourseIncluded, setIsCourseIncluded] = useState(false);
   const [currency, setCurrency] = useState('SGD');
+  const [selectedSessions, setSelectedSessions] = useState([]);
+  const [selectedVideos, setSelectedVideos] = useState([]);
+  const [selectedCourses, setSelectedCourses] = useState([]);
 
   const fetchCreatorCurrency = useCallback(async () => {
     setIsLoading(true);
@@ -98,21 +109,23 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
   }, [fetchCreatorCurrency, form, editedSubscription]);
 
   const onIncludedProductsChange = (values) => {
-    setIsSessionIncluded(values.includes('session'));
-    setIsVideoIncluded(values.includes('video'));
+    setIsSessionIncluded(values.includes('SESSION'));
+    setIsVideoIncluded(values.includes('VIDEO'));
 
     let updatedFormValues = null;
 
-    if (!values.includes('session')) {
+    if (!values.includes('SESSION')) {
       updatedFormValues = {
         ...updatedFormValues,
+        includedSessionsType: [],
         includedSessions: [],
       };
     }
 
-    if (!values.includes('video')) {
+    if (!values.includes('VIDEO')) {
       updatedFormValues = {
         ...updatedFormValues,
+        includedVideosType: [],
         includedVideos: [],
       };
     }
@@ -138,21 +151,62 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
 
   const handleFinish = async (values) => {
     setIsSubmitting(true);
-    console.log(values);
 
-    const response = {
-      id: 2021,
-      name: values.subscriptionName,
-      price: values.price,
-      currency: currency,
-      base_credits: values.subscriptionCredits,
-      product_applicable: values.includedProducts,
-      included_session_type: 'PUBLIC',
-      included_video_type: 'MEMBERSHIP',
-      include_course: false,
-    };
+    // const response = {
+    //   id: 2021,
+    //   name: values.subscriptionName,
+    //   price: values.price,
+    //   currency: currency,
+    //   base_credits: values.subscriptionCredits,
+    //   product_applicable: values.includedProducts,
+    //   included_session_type: 'PUBLIC',
+    //   included_video_type: 'MEMBERSHIP',
+    //   include_course: false,
+    // };
+    // saveChanges(response);
 
-    saveChanges(response);
+    let productsData = {};
+
+    values.includedProducts.forEach((product) => {
+      productsData[product] = {
+        access_types: product === 'SESSION' ? values.includedSessionsType : values.includedVideosType,
+        credits: values.subscriptionCredits,
+        product_ids: product === 'SESSION' ? selectedSessions : selectedVideos,
+      };
+    });
+
+    if (values.shouldIncludeCourse) {
+      productsData['COURSE'] = {
+        access_types: values.includedCoursesType,
+        credits: values.courseCredits,
+        product_ids: selectedCourses,
+      };
+    }
+
+    try {
+      let payload = {
+        name: values.subscriptionName,
+        price: values.price,
+        currency: currency,
+        validity: 30,
+        products: productsData,
+      };
+
+      console.log(payload);
+
+      //TODO: Check the response and adjust accordingly
+      // const { status, data } = await apis.subscriptions.createSubscription(payload);
+
+      // if (isAPISuccess(status) && data) {
+      //   console.log(data);
+      // }
+    } catch (error) {
+      showErrorModal(
+        `Failed to ${editedSubscription ? 'update' : 'create'} subscription`,
+        error?.response?.data?.message || 'Something went wrong'
+      );
+    }
+
     setIsSubmitting(false);
   };
 
@@ -248,11 +302,103 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
             <List.Item>
               <Form.Item
                 className={classNames(!isSessionIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedSessionsType"
+                name="includedSessionsType"
+                rules={isSessionIncluded ? validationRules.arrayValidation : undefined}
+              >
+                <Checkbox.Group disabled={!isSessionIncluded} options={productAccessOptions} />
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isSessionIncluded ? styles.disabled : undefined, styles.compactFormItem)}
                 id="includedSessions"
                 name="includedSessions"
                 rules={isSessionIncluded ? validationRules.arrayValidation : undefined}
               >
-                <Checkbox.Group disabled={!isSessionIncluded} options={productAccessOptions} />
+                <Select
+                  showArrow
+                  showSearch={false}
+                  placeholder="Select included sessions"
+                  mode="multiple"
+                  maxTagCount={2}
+                  value={selectedSessions}
+                  onChange={(val) => setSelectedSessions(val)}
+                  optionLabelProp="label"
+                >
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Sessions"
+                  >
+                    {sessions
+                      ?.filter((session) => session.is_active)
+                      .map((session) => (
+                        <Select.Option
+                          value={session.external_id}
+                          key={session.external_id}
+                          label={
+                            <>
+                              {' '}
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {session.currency?.toUpperCase()} {session.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                    {sessions?.filter((session) => session.is_active).length <= 0 && (
+                      <Text disabled> No published sessions </Text>
+                    )}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    key="Unpublished Sessions"
+                  >
+                    {sessions
+                      ?.filter((session) => !session.is_active)
+                      .map((session) => (
+                        <Select.Option
+                          value={session.external_id}
+                          key={session.external_id}
+                          label={
+                            <>
+                              {' '}
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {session.currency?.toUpperCase()} {session.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                    {sessions?.filter((session) => !session.is_active).length <= 0 && (
+                      <Text disabled> No unpublished sessions </Text>
+                    )}
+                  </Select.OptGroup>
+                </Select>
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isVideoIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedVideosType"
+                name="includedVideosType"
+                rules={isVideoIncluded ? validationRules.arrayValidation : undefined}
+              >
+                <Checkbox.Group disabled={!isVideoIncluded} options={productAccessOptions} />
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -262,7 +408,79 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                 name="includedVideos"
                 rules={isVideoIncluded ? validationRules.arrayValidation : undefined}
               >
-                <Checkbox.Group disabled={!isVideoIncluded} options={productAccessOptions} />
+                <Select
+                  showArrow
+                  showSearch={false}
+                  placeholder="Select included videos"
+                  mode="multiple"
+                  maxTagCount={2}
+                  value={selectedVideos}
+                  onChange={(val) => setSelectedVideos(val)}
+                  optionLabelProp="label"
+                >
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Videos"
+                  >
+                    {videos
+                      ?.filter((video) => video.is_published)
+                      .map((video) => (
+                        <Select.Option
+                          value={video.external_id}
+                          key={video.external_id}
+                          label={
+                            <>
+                              {' '}
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {video.currency?.toUpperCase()} {video.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                    {videos?.filter((video) => video.is_published).length <= 0 && (
+                      <Text disabled> No published video </Text>
+                    )}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    key="Unpublished Videos"
+                  >
+                    {videos
+                      ?.filter((video) => !video.is_published)
+                      .map((video) => (
+                        <Select.Option
+                          value={video.external_id}
+                          key={video.external_id}
+                          label={
+                            <>
+                              {' '}
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
+                            </>
+                          }
+                        >
+                          <Row gutter={[8, 8]}>
+                            <Col xs={17} className={styles.productName}>
+                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                            </Col>
+                            <Col xs={7} className={styles.textAlignRight}>
+                              {video.currency?.toUpperCase()} {video.price}
+                            </Col>
+                          </Row>
+                        </Select.Option>
+                      ))}
+                    {videos?.filter((video) => !video.is_published).length <= 0 && (
+                      <Text disabled> No unpublished video </Text>
+                    )}
+                  </Select.OptGroup>
+                </Select>
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -278,16 +496,6 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                   </Form.Item>
                 </Col>
               </Row>
-            </List.Item>
-            <List.Item>
-              <Form.Item
-                className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
-                id="includedCourses"
-                name="includedCourses"
-                rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
-              >
-                <Checkbox.Group disabled={!isCourseIncluded} options={productAccessOptions} />
-              </Form.Item>
             </List.Item>
             <List.Item>
               <Row gutter={4}>
@@ -315,89 +523,67 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                 </Col>
               </Row>
             </List.Item>
-          </List>
-          {/* <Row className={styles.subsRow} gutter={[8, 16]}>
-            <Col xs={24}>
+            <List.Item>
               <Form.Item
-                {...subscriptionModalFormLayout}
-                id="subscriptionName"
-                name="subscriptionName"
-                label="Subscription Name"
-                rules={validationRules.nameValidation}
+                className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedCoursesType"
+                name="includedCoursesType"
+                rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
               >
-                <Input placeholder="Enter Subscription Name" maxLength={50} />
+                <Checkbox.Group disabled={!isCourseIncluded} options={productAccessOptions} />
               </Form.Item>
-            </Col>
-            <Col xs={24}>
-              <Form.Item {...subscriptionModalFormLayout} label="Subscription Price" required={true}>
-                <Row gutter={8}>
-                  <Col xs={20}>
-                    <Form.Item
-                      id="price"
-                      name="price"
-                      rules={validationRules.numberValidation('Please Input Subscription Price', 1, false)}
-                      noStyle
-                    >
-                      <InputNumber min={1} placeholder="Subscription Price" className={styles.numericInput} />
-                    </Form.Item>
-                  </Col>
-                  <Col xs={4} className={styles.textAlignCenter}>
-                    <Text strong className={styles.currencyWrapper}>
-                      {currency?.toUpperCase()}
-                    </Text>
-                  </Col>
-                  <Col xs={24}>
-                    <Paragraph className={styles.blueText}>
-                      This will be the price charged to the customer <Text className={styles.blueText} strong> every 30 days </Text> if they
-                      choose to buy this subscription.
-                    </Paragraph>
-                  </Col>
-                </Row>
-              </Form.Item>
-            </Col>
-            <Col xs={24}>
-              <Form.Item 
-                {...subscriptionModalFormLayout}
-                id="subscriptionCredits"
-                name="subscriptionCredits"
-                label="Subscription Credits/Month"
-                rules={validationRules.numberValidation('Please Input Base Credits/Month', 1, false)}
+            </List.Item>
+            <List.Item>
+              <Form.Item
+                className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
+                id="includedCourses"
+                name="includedCourses"
+                rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
               >
-                <InputNumber min={1} placeholder="Credits/Month" className={styles.numericInput} />
-              </Form.Item>
-            </Col>
-            {productInclusionSelection.map((productType) => (
-              <Col xs={24}>
-                <Form.Item
-                  {...subscriptionModalFormLayout}
-                  id={productType.formName}
-                  name={productType.formName}
-                  label={`Included ${productType.key} Type(s)`}
+                <Select
+                  showArrow
+                  showSearch={false}
+                  placeholder="Select included courses"
+                  mode="multiple"
+                  maxTagCount={2}
+                  value={selectedCourses}
+                  onChange={(val) => setSelectedCourses(val)}
+                  optionLabelProp="label"
                 >
-                  <Select 
-                    showArrow
-                    showSearch={false}
-                    mode="multiple"
-                    maxTagCount={2}
-                    options={generateProductTypeOptions(productType.name)}
-                    placeholder={`Select ${productType.key} Type(s)`}
-                  />
-                </Form.Item>
-              </Col>
-            ))}
-          </Row> */}
-          {/* <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
-            <Col xs={12} md={6}>
-              <Button block type="default" onClick={() => closeModal(false)} loading={submitting}>
-                Cancel
-              </Button>
-            </Col>
-            <Col xs={12} md={8}>
-              <Button block type="primary" htmlType="submit" loading={submitting}>
-                {editedSubscription ? 'Update' : 'Create'} Subscription
-              </Button>
-            </Col>
-          </Row> */}
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    key="Published Courses"
+                  >
+                    {courses
+                      ?.filter((course) => course.is_published)
+                      .map((course) => (
+                        <Select.Option value={course.id} key={course.id} label={course.name}>
+                          {course.name}
+                        </Select.Option>
+                      ))}
+                    {courses?.filter((course) => course.is_published).length <= 0 && (
+                      <Text disabled> No published courses </Text>
+                    )}
+                  </Select.OptGroup>
+                  <Select.OptGroup
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    key="Unpublished Courses"
+                  >
+                    {courses
+                      ?.filter((course) => !course.is_published)
+                      .map((course) => (
+                        <Select.Option value={course.id} key={course.id} label={course.name}>
+                          {course.name}
+                        </Select.Option>
+                      ))}
+                    {courses?.filter((course) => !course.is_published).length <= 0 && (
+                      <Text disabled> No unpublished courses </Text>
+                    )}
+                  </Select.OptGroup>
+                </Select>
+              </Form.Item>
+            </List.Item>
+          </List>
         </Card>
       </Loader>
     </Form>
