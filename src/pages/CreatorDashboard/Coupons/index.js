@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popconfirm, Popover, List, Card } from 'antd';
-import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popover, List, Card } from 'antd';
+import { EditTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -165,19 +165,6 @@ const Coupons = () => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={8}>
-              <Tooltip title="Delete Discount Code">
-                <Popconfirm
-                  title="Do you want to delete this code?"
-                  icon={<DeleteTwoTone twoToneColor="#FF4D4F" />}
-                  okText="Yes, delete code"
-                  cancelText="No"
-                  onConfirm={() => console.log('Deleted')}
-                >
-                  <Button danger type="text" icon={<DeleteTwoTone twoToneColor="#FF4D4F" />} />
-                </Popconfirm>
-              </Tooltip>
-            </Col>
           </Row>
         );
       },
@@ -232,17 +219,6 @@ const Coupons = () => {
                 </Button>
               </Tooltip>
             ),
-            <Tooltip title="Delete Discount Code">
-              <Popconfirm
-                title="Do you want to delete this code?"
-                icon={<DeleteTwoTone twoToneColor="#FF4D4F" />}
-                okText="Yes, delete code"
-                cancelText="No"
-                onConfirm={() => console.log('Deleted')}
-              >
-                <Button danger type="text" icon={<DeleteTwoTone twoToneColor="#FF4D4F" />} />
-              </Popconfirm>
-            </Tooltip>,
           ]}
         >
           {layout('Discount Value', `${coupon.value} %`)}
