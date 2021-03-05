@@ -271,7 +271,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   </Select.OptGroup>
                   <Select.OptGroup
                     label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
-                    key="Published Sessions"
+                    key="Unpublished Sessions"
                   >
                     {classes
                       ?.filter((session) => !session.is_active)
@@ -341,7 +341,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                 >
                   <Select.OptGroup
                     label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
-                    key="Published Sessions"
+                    key="Published Videos"
                   >
                     {videos
                       ?.filter((video) => video.is_published)
@@ -370,8 +370,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
-                    key="Published Sessions"
+                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    key="Unpublished Videos"
                   >
                     {videos
                       ?.filter((video) => !video.is_published)
