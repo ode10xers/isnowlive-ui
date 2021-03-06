@@ -16,7 +16,7 @@ import ImageUpload from 'components/ImageUpload';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, productAccessOptions } from 'utils/helper';
 
 import styles from './styles.module.scss';
 const { Text, Paragraph } = Typography;
@@ -39,6 +39,7 @@ const formInitialValues = {
   videoType: videoTypes.FREE.name,
   price: 0,
   watch_limit: 0,
+  video_access_type: 'PUBLIC',
   video_course_type: 'normal',
 };
 
@@ -141,6 +142,7 @@ const UploadVideoModal = ({
           ...editedVideo,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType: editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
+          video_access_type: editedVideo.access,
           video_course_type: editedVideo.is_course ? 'course' : 'normal',
         });
         setCurrency(editedVideo.currency.toUpperCase() || 'SGD');
@@ -188,6 +190,7 @@ const UploadVideoModal = ({
         thumbnail_url: coverImageUrl,
         watch_limit: values.watch_limit,
         is_course: isCourseVideo,
+        access: values.video_access_type,
       };
 
       const response = editedVideo
@@ -385,6 +388,22 @@ const UploadVideoModal = ({
                       )}
                     </Select.OptGroup>
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item
+                  id="video_access_type"
+                  name="video_access_type"
+                  label="Access Type"
+                  rules={validationRules.requiredValidation}
+                >
+                  <Radio.Group>
+                    {productAccessOptions.map((productAccess) => (
+                      <Radio value={productAccess.value} key={productAccess.value}>
+                        {productAccess.label}
+                      </Radio>
+                    ))}
+                  </Radio.Group>
                 </Form.Item>
               </Col>
               <Col xs={24}>
