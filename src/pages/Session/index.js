@@ -38,6 +38,7 @@ import {
   isAPISuccess,
   scrollToErrorField,
   generateRandomColor,
+  productAccessOptions,
 } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -178,6 +179,7 @@ const Session = ({ match, history }) => {
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
+            session_access_type: data?.access,
           });
           setSessionImageUrl(data.session_image_url);
           setSessionDocumentUrl(data.document_url);
@@ -228,6 +230,7 @@ const Session = ({ match, history }) => {
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
         session_course_type: 'normal',
+        session_access_type: 'PUBLIC',
       });
       setIsLoading(false);
     }
@@ -536,6 +539,7 @@ const Session = ({ match, history }) => {
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
         is_course: isCourseSession,
+        access: values.session_access_type,
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
@@ -781,6 +785,25 @@ const Session = ({ match, history }) => {
               <Radio.Group>
                 <Radio value="normal">Normal Session</Radio>
                 <Radio value="course">Course Session</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </>
+
+          {/* ---- Session Access Type ---- */}
+          <>
+            <Form.Item
+              name="session_access_type"
+              id="session_access_type"
+              label="Access Type"
+              rules={validationRules.requiredValidation}
+            >
+              <Radio.Group>
+                {productAccessOptions.map((productAccess) => (
+                  <Radio value={productAccess.value} key={productAccess.key}>
+                    {' '}
+                    {productAccess.label}{' '}
+                  </Radio>
+                ))}
               </Radio.Group>
             </Form.Item>
           </>
