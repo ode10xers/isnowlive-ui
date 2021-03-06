@@ -1,9 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Card, List } from 'antd';
+import { Row, Col, Typography, Button, Card, List, Popover } from 'antd';
 
-import { CloseCircleTwoTone, CheckCircleTwoTone } from '@ant-design/icons';
+import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone } from '@ant-design/icons';
 
 import styles from './styles.module.scss';
 
@@ -13,11 +13,34 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
   const renderTickOrCross = (isTrue) =>
     isTrue ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#bb2124" />;
 
-  const renderIncludedProductType = (type) => (
+  const renderIncludedProductType = (accessTypes) => (
     <Row gutter={8}>
-      <Col xs={12}>{renderTickOrCross(type === 'MIXED' || type === 'PUBLIC')} Public</Col>
-      <Col xs={12}>{renderTickOrCross(type === 'MIXED' || type === 'MEMBERSHIP')} Member</Col>
+      <Col xs={12}>{renderTickOrCross(accessTypes.includes('PUBLIC'))} Public </Col>
+      <Col xs={12}>{renderTickOrCross(accessTypes.includes('MEMBERSHIP'))} Members </Col>
     </Row>
+  );
+
+  const renderProductListButton = (productName, productList, productNameKey = 'name') => (
+    <Popover
+      trigger="click"
+      title={`${productName} List`}
+      content={
+        <List
+          size="small"
+          dataSource={productList}
+          renderItem={(item) => (
+            <List.Item>
+              {' '}
+              {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {item[productNameKey]}{' '}
+            </List.Item>
+          )}
+        />
+      }
+    >
+      <Button block ghost type="primary">
+        {productList.length || 0} {productName}
+      </Button>
+    </Popover>
   );
 
   const cardData = [
@@ -26,45 +49,69 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
       className: undefined,
     },
     {
-      label: `${subscription.base_credits} Credits/Month`,
+      label: `${
+        subscription.products['SESSION']
+          ? subscription.products['SESSION'].credits
+          : subscription.products['VIDEO'].credits
+      } Credits/Month`,
       className: undefined,
     },
     {
       label: (
         <Row gutter={8}>
-          <Col xs={12}>{renderTickOrCross(subscription.product_applicable?.includes('session'))} Session</Col>
-          <Col xs={12}>{renderTickOrCross(subscription.product_applicable?.includes('video'))} Videos</Col>
+          <Col xs={12}>{renderTickOrCross(subscription.products['SESSION'])} Session</Col>
+          <Col xs={12}>{renderTickOrCross(subscription.products['VIDEO'])} Videos</Col>
         </Row>
       ),
       className: undefined,
     },
     {
-      label: subscription.product_applicable?.includes('session')
-        ? renderIncludedProductType(subscription.included_session_type)
+      label: subscription.products['SESSION']
+        ? renderIncludedProductType(subscription.products['SESSION'].access_types)
         : 'None',
-      className: subscription.product_applicable?.includes('session') ? undefined : styles.disabled,
+      className: subscription.products['SESSION'] ? undefined : styles.disabled,
     },
     {
-      label: subscription.product_applicable?.includes('video')
-        ? renderIncludedProductType(subscription.included_video_type)
+      label: subscription.products['SESSION']
+        ? renderProductListButton('Sessions', subscription.products['SESSION'].items, 'name')
         : 'None',
-      className: subscription.product_applicable?.includes('video') ? undefined : styles.disabled,
+      className: subscription.products['SESSION'] ? styles.buttonContainer : styles.disabled,
+    },
+    {
+      label: subscription.products['VIDEO']
+        ? renderIncludedProductType(subscription.products['VIDEO'].access_types)
+        : 'None',
+      className: subscription.products['VIDEO'] ? undefined : styles.disabled,
+    },
+    {
+      label: subscription.products['VIDEO']
+        ? renderProductListButton('Videos', subscription.products['VIDEO'].items, 'title')
+        : 'None',
+      className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
     },
     {
       label: (
         <Row gutter={8} justify="center">
-          <Col xs={4}>{renderTickOrCross(subscription.include_course)}</Col>
+          <Col xs={4}>{renderTickOrCross(subscription.products['COURSE'])}</Col>
         </Row>
       ),
-      className: subscription.include_course ? undefined : styles.disabled,
+      className: subscription.products['COURSE'] ? undefined : styles.disabled,
     },
     {
-      label: subscription.include_course ? renderIncludedProductType(subscription.included_course_type) : 'None',
-      className: subscription.include_course ? undefined : styles.disabled,
+      label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/Month` : 'None',
+      className: subscription.products['COURSE'] ? undefined : styles.disabled,
     },
     {
-      label: subscription.include_course ? `${subscription.base_course_credits} Credits/Month` : 'None',
-      className: subscription.include_course ? undefined : styles.disabled,
+      label: subscription.products['COURSE']
+        ? renderIncludedProductType(subscription.products['COURSE'].access_types)
+        : 'None',
+      className: subscription.products['COURSE'] ? undefined : styles.disabled,
+    },
+    {
+      label: subscription.products['COURSE']
+        ? renderProductListButton('Courses', subscription.products['COURSE'].items, 'name')
+        : 'None',
+      className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
     },
   ];
 
@@ -83,10 +130,10 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
       }
       bodyStyle={{ padding: '0px 10px' }}
       actions={[
-        <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.id)}>
+        <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.external_id)}>
           Delete
         </Button>,
-        <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.id)}>
+        <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.external_id)}>
           Edit
         </Button>,
       ]}

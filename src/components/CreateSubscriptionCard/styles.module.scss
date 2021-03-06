@@ -1,5 +1,12 @@
 @import '../../styles/variables.scss';
 
+.productName {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .modalActionRow {
   margin-top: 10px;
 }

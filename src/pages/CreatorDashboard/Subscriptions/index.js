@@ -10,7 +10,7 @@ import { isAPISuccess } from 'utils/helper';
 import Loader from 'components/Loader';
 import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
 import SubscriptionCards from 'components/SubscriptionCards';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import styles from './styles.module.scss';
 
@@ -25,55 +25,63 @@ const Subscriptions = () => {
   const [videos, setVideos] = useState([]);
   const [courses, setCourses] = useState([]);
 
-  const getCreatorSubscriptions = useCallback(() => {
+  const mapProductItems = (subscription) => {
+    if (!subscription.external_id) {
+      return subscription;
+    }
+
+    let mappedProductData = subscription.products;
+
+    Object.entries(subscription.products).forEach(([key, val]) => {
+      let items = [];
+      switch (key) {
+        case 'SESSION':
+          items = sessions.filter((session) => val.product_ids.includes(session.external_id));
+          break;
+        case 'VIDEO':
+          items = videos.filter((video) => val.product_ids.includes(video.external_id));
+          break;
+        case 'COURSE':
+          items = courses.filter((course) => val.product_ids.includes(course.id));
+          break;
+        default:
+          break;
+      }
+
+      mappedProductData[key] = {
+        ...val,
+        items: items,
+      };
+    });
+
+    return {
+      ...subscription,
+      products: mappedProductData,
+    };
+  };
+
+  const getCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
     try {
       //TODO: Implement API here later
-      // const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 3);
-      const { status, data } = {
-        status: 200, //TODO: Mock data as required here
-        data: [
-          {
-            id: 1337,
-            name: 'Mock Tier Just very long name here to tes',
-            price: 90,
-            currency: 'SGD',
-            base_credits: 75,
-            product_applicable: ['session', 'video'],
-            included_session_type: 'PUBLIC',
-            included_video_type: 'MEMBERSHIP',
-            include_course: true,
-            included_course_type: 'MIXED',
-            base_course_credits: 3,
-          },
-          {
-            id: 1338,
-            name: 'Second Short Tier',
-            price: 15,
-            currency: 'SGD',
-            base_credits: 75,
-            product_applicable: ['session'],
-            included_session_type: 'PUBLIC',
-            included_video_type: 'MEMBERSHIP',
-            include_course: false,
-          },
-        ],
-      };
+      const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 3);
 
       let mappedSubscriptionData = [];
 
-      if (isAPISuccess(status) && data) {
+      if (isAPISuccess(status) && data.Data) {
         //TODO: Re map data as required here
-        mappedSubscriptionData = data.map((subs, idx) => ({ ...subs, idx }));
+        mappedSubscriptionData = data.Data.map((subscription, idx) => ({ ...subscription, idx })).sort(
+          (a, b) => a.price - b.price
+        );
       }
 
       if (mappedSubscriptionData.length < 3) {
-        const buttonData = mappedSubscriptionData.find((subs) => subs.id === 0);
+        const buttonData = mappedSubscriptionData.find((subscription) => subscription.external_id === null);
 
         if (!buttonData) {
           mappedSubscriptionData.push({
             idx: mappedSubscriptionData.length,
-            id: 0,
+            external_id: null,
             isButton: true,
           });
         }
@@ -119,32 +127,30 @@ const Subscriptions = () => {
   }, []);
 
   useEffect(() => {
+    // const fetchSubscriptionDetails = async () => {
+    //   await getCreatorProducts();
+    //   await getCreatorSubscriptions();
+    // };
+    // fetchSubscriptionDetails();
+    //eslint-disable-next-line
+
     getCreatorProducts();
     getCreatorSubscriptions();
-  }, [getCreatorSubscriptions, getCreatorProducts]);
+  }, [getCreatorProducts, getCreatorSubscriptions]);
 
-  const deleteSubscription = (data) => {
-    const currSubscriptionData = subscriptions
-      .filter((subs) => subs.idx !== data.idx)
-      .map((subs, idx) => ({ ...subs, idx }));
+  const deleteSubscription = async (subscription) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.subscriptions.deleteSubscription(subscription.external_id);
 
-    if (currSubscriptionData.length < 3) {
-      const buttonIndex = currSubscriptionData.findIndex((subs) => subs.id === 0);
-
-      if (buttonIndex < 0) {
-        currSubscriptionData.push({
-          idx: currSubscriptionData.length,
-          id: 0,
-          isButton: true,
-        });
-      } else {
-        currSubscriptionData[buttonIndex]['idx'] = currSubscriptionData.length - 1;
+      if (isAPISuccess(status)) {
+        showSuccessModal(`${subscription.name} removed successfully`);
+        getCreatorSubscriptions();
       }
+    } catch (error) {
+      showErrorModal('Failed to remove subsription', error?.response?.data?.message || 'Something wrong happened');
     }
-
-    console.log(currSubscriptionData);
-
-    setSubscriptions(currSubscriptionData);
+    setIsLoading(true);
   };
 
   const handleDelete = (data) => {
@@ -168,9 +174,9 @@ const Subscriptions = () => {
     });
   };
 
-  const setColumnState = (targetIdx, state, data = null) => {
+  const setColumnState = async (targetIdx, state, data = null) => {
     // Clone the array
-    const currSubscriptionData = subscriptions.map((subs) => subs);
+    const currSubscriptionData = subscriptions.map((subscription) => subscription);
 
     switch (state) {
       case 'EMPTY':
@@ -185,11 +191,9 @@ const Subscriptions = () => {
         setTargetSubscription(null);
         break;
       case 'SAVED':
-        currSubscriptionData[targetIdx] = { ...data, idx: targetIdx };
-        currSubscriptionData[targetIdx]['isButton'] = false;
-        currSubscriptionData[targetIdx]['editing'] = false;
+        await getCreatorSubscriptions();
         setIsEditing(false);
-        break;
+        return;
       case 'EDIT':
         currSubscriptionData[targetIdx]['isButton'] = false;
         currSubscriptionData[targetIdx]['editing'] = true;
@@ -241,7 +245,7 @@ const Subscriptions = () => {
       className: undefined,
     },
     {
-      label: 'Include Courses',
+      label: 'Course Included?',
       className: undefined,
     },
     {
@@ -264,27 +268,27 @@ const Subscriptions = () => {
     </List.Item>
   );
 
-  const renderSubscriptionList = (subs) => (
+  const renderSubscriptionList = (subscription) => (
     <List.Item>
-      {subs.isButton ? (
-        <Button block type="primary" onClick={() => setColumnState(subs.idx, 'CREATE')} disabled={isEditing}>
+      {subscription.isButton ? (
+        <Button block type="primary" onClick={() => setColumnState(subscription.idx, 'CREATE')} disabled={isEditing}>
           Add new Subscription Tier
         </Button>
-      ) : !subs.id || subs.editing ? (
+      ) : !subscription.external_id || subscription.editing ? (
         <CreateSubscriptionCard
           sessions={sessions}
           videos={videos}
           courses={courses}
-          cancelChanges={() => setColumnState(subs.idx, 'EMPTY')}
-          saveChanges={(data) => setColumnState(subs.idx, 'SAVED', data)}
+          cancelChanges={() => setColumnState(subscription.idx, 'EMPTY')}
+          saveChanges={() => setColumnState(subscription.idx, 'SAVED')}
           editedSubscription={targetSubscription}
         />
       ) : (
         <SubscriptionCards
-          subscription={subs}
+          subscription={subscription}
           editing={isEditing}
-          editSubscription={() => setColumnState(subs.idx, 'EDIT', subs)}
-          deleteSubscription={() => handleDelete(subs)}
+          editSubscription={() => setColumnState(subscription.idx, 'EDIT', subscription)}
+          deleteSubscription={() => handleDelete(subscription)}
         />
       )}
     </List.Item>
@@ -308,7 +312,11 @@ const Subscriptions = () => {
                 />
               </Col>
               <Col xs={17}>
-                <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
+                <List
+                  grid={{ gutter: 8, column: 3 }}
+                  dataSource={subscriptions?.map(mapProductItems)}
+                  renderItem={renderSubscriptionList}
+                />
               </Col>
             </Row>
           </Loader>

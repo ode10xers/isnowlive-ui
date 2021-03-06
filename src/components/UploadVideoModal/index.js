@@ -37,8 +37,7 @@ const formInitialValues = {
   description: '',
   classList: [],
   videoType: videoTypes.FREE.name,
-  price: 0,
-  watch_limit: 0,
+  price: 10,
   video_access_type: 'PUBLIC',
   video_course_type: 'normal',
 };
@@ -445,7 +444,7 @@ const UploadVideoModal = ({
                     id="price"
                     name="price"
                     label={`Price (${currency.toUpperCase()})`}
-                    rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
+                    rules={validationRules.numberValidation('Please Input Video Price', 1, false)}
                   >
                     <InputNumber min={0} placeholder="Price" className={styles.numericInput} />
                   </Form.Item>
@@ -471,6 +470,7 @@ const UploadVideoModal = ({
                   name="watch_limit"
                   label="Watch Count"
                   extra={<Text className={styles.helpText}>Max number of time buyer can watch video</Text>}
+                  rules={validationRules.numberValidation('Please Input Watch Count', 1, false)}
                 >
                   <InputNumber min={1} placeholder="Watch Count" className={styles.numericInput} />
                 </Form.Item>

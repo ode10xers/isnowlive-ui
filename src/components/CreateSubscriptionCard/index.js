@@ -7,19 +7,28 @@ import { BookTwoTone } from '@ant-design/icons';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, productAccessOptions } from 'utils/helper';
 
 // import { subscriptionModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
 const formInitialValues = {
+  subscriptionName: '',
   price: 10,
   subscriptionCredits: 5,
+  includedProducts: [],
+  includedSessionsType: [],
+  includedSessions: [],
+  includedVideosType: [],
+  includedVideos: [],
+  shouldIncludeCourse: false,
   courseCredits: 1,
+  includedCoursesType: [],
+  includedCourses: [],
 };
 
 const { Text } = Typography;
@@ -32,17 +41,6 @@ const includedProductsList = [
   {
     label: 'Videos',
     value: 'VIDEO',
-  },
-];
-
-const productAccessOptions = [
-  {
-    value: 'PUBLIC',
-    label: 'Public',
-  },
-  {
-    value: 'MEMBERSHIP',
-    label: 'Members',
   },
 ];
 
@@ -65,6 +63,9 @@ const CreateSubscriptionCard = ({
   const [selectedSessions, setSelectedSessions] = useState([]);
   const [selectedVideos, setSelectedVideos] = useState([]);
   const [selectedCourses, setSelectedCourses] = useState([]);
+  const [includedSessionsType, setIncludedSessionsType] = useState([]);
+  const [includedVideosType, setIncludedVideosType] = useState([]);
+  const [includedCoursesType, setIncludedCoursesType] = useState([]);
 
   const fetchCreatorCurrency = useCallback(async () => {
     setIsLoading(true);
@@ -85,24 +86,66 @@ const CreateSubscriptionCard = ({
 
   useEffect(() => {
     if (editedSubscription) {
-      //TODO: Adjust with API Format here
-      form.setFieldsValue({
+      const formData = {
         subscriptionName: editedSubscription?.name,
         price: editedSubscription?.price,
-        subscriptionCredits: editedSubscription?.base_credits,
-        includedProducts: editedSubscription?.product_applicable,
-        shouldIncludeCourse: editedSubscription?.include_course,
-      });
+        subscriptionCredits: editedSubscription?.products['SESSION']
+          ? editedSubscription?.products['SESSION'].credits
+          : editedSubscription?.products['VIDEO'].credits,
+        includedProducts: Object.entries(editedSubscription?.products).map(([key, val]) => key),
+        includedSessionsType: editedSubscription?.products['SESSION']
+          ? editedSubscription?.products['SESSION'].access_types
+          : [],
+        includedSessions: editedSubscription?.products['SESSION']
+          ? editedSubscription?.products['SESSION'].product_ids
+          : [],
+        includedVideosType: editedSubscription?.products['VIDEO']
+          ? editedSubscription?.products['VIDEO'].access_types
+          : [],
+        includedVideos: editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].product_ids : [],
+        shouldIncludeCourse: editedSubscription?.products['COURSE'] ? true : false,
+        courseCredits: editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].credits : 1,
+        includedCoursesType: editedSubscription?.products['COURSE']
+          ? editedSubscription?.products['COURSE'].access_types
+          : [],
+        includedCourses: editedSubscription?.products['COURSE']
+          ? editedSubscription?.products['COURSE'].product_ids
+          : [],
+      };
+
+      form.setFieldsValue(formData);
 
       setCurrency(editedSubscription?.currency || 'SGD');
-      setIsSessionIncluded(false);
-      setIsVideoIncluded(false);
-      setIsCourseIncluded(false);
+      setIsSessionIncluded(editedSubscription?.products['SESSION'] ? true : false);
+      setIsVideoIncluded(editedSubscription?.products['VIDEO'] ? true : false);
+      setIsCourseIncluded(editedSubscription?.products['COURSE'] ? true : false);
+      setSelectedSessions(
+        editedSubscription?.products['SESSION'] ? editedSubscription?.products['SESSION'].product_ids : []
+      );
+      setSelectedVideos(editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].product_ids : []);
+      setSelectedCourses(
+        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].product_ids : []
+      );
+      setIncludedSessionsType(
+        editedSubscription?.products['SESSION'] ? editedSubscription?.products['SESSION'].access_types : []
+      );
+      setIncludedVideosType(
+        editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].access_types : []
+      );
+      setIncludedCoursesType(
+        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].access_types : []
+      );
     } else {
       form.resetFields();
       setIsSessionIncluded(false);
       setIsVideoIncluded(false);
       setIsCourseIncluded(false);
+      setSelectedSessions([]);
+      setSelectedVideos([]);
+      setSelectedCourses([]);
+      setIncludedSessionsType([]);
+      setIncludedVideosType([]);
+      setIncludedCoursesType([]);
     }
 
     fetchCreatorCurrency();
@@ -115,6 +158,7 @@ const CreateSubscriptionCard = ({
     let updatedFormValues = null;
 
     if (!values.includes('SESSION')) {
+      setIncludedSessionsType([]);
       updatedFormValues = {
         ...updatedFormValues,
         includedSessionsType: [],
@@ -123,6 +167,7 @@ const CreateSubscriptionCard = ({
     }
 
     if (!values.includes('VIDEO')) {
+      setIncludedVideosType([]);
       updatedFormValues = {
         ...updatedFormValues,
         includedVideosType: [],
@@ -141,6 +186,7 @@ const CreateSubscriptionCard = ({
     setIsCourseIncluded(shouldIncludeCourse);
 
     if (!shouldIncludeCourse) {
+      setIncludedCoursesType([]);
       form.setFieldsValue({
         ...form.getFieldValue(),
         includedCourses: [],
@@ -151,19 +197,6 @@ const CreateSubscriptionCard = ({
 
   const handleFinish = async (values) => {
     setIsSubmitting(true);
-
-    // const response = {
-    //   id: 2021,
-    //   name: values.subscriptionName,
-    //   price: values.price,
-    //   currency: currency,
-    //   base_credits: values.subscriptionCredits,
-    //   product_applicable: values.includedProducts,
-    //   included_session_type: 'PUBLIC',
-    //   included_video_type: 'MEMBERSHIP',
-    //   include_course: false,
-    // };
-    // saveChanges(response);
 
     let productsData = {};
 
@@ -194,12 +227,14 @@ const CreateSubscriptionCard = ({
 
       console.log(payload);
 
-      //TODO: Check the response and adjust accordingly
-      // const { status, data } = await apis.subscriptions.createSubscription(payload);
+      const { status, data } = editedSubscription?.external_id
+        ? await apis.subscriptions.updateSubscription(editedSubscription?.external_id, payload)
+        : await apis.subscriptions.createSubscription(payload);
 
-      // if (isAPISuccess(status) && data) {
-      //   console.log(data);
-      // }
+      if (isAPISuccess(status) && data) {
+        showSuccessModal(`Subscription ${editedSubscription ? 'updated' : 'created'} successfully`);
+        saveChanges();
+      }
     } catch (error) {
       showErrorModal(
         `Failed to ${editedSubscription ? 'update' : 'create'} subscription`,
@@ -216,6 +251,36 @@ const CreateSubscriptionCard = ({
     } else {
       cancelChanges();
     }
+  };
+
+  const handleIncludedSessionsTypeChange = (values) => {
+    const currSelectedSessions = sessions.filter((session) => selectedSessions.includes(session.external_id));
+    const filteredSelectedSessions = currSelectedSessions
+      .filter((session) => values.includes(session.access))
+      .map((session) => session.external_id);
+    form.setFieldsValue({ ...form.getFieldsValue(), includedSessions: filteredSelectedSessions });
+    setSelectedSessions(filteredSelectedSessions);
+    setIncludedSessionsType(values);
+  };
+
+  const handleIncludedVideosTypeChange = (values) => {
+    const currSelectedVideos = videos.filter((video) => selectedVideos.includes(videos.external_id));
+    const filteredSelectedVideos = currSelectedVideos
+      .filter((video) => values.includes(video.access))
+      .map((video) => video.external_id);
+    form.setFieldsValue({ ...form.getFieldValue(), includedVideos: filteredSelectedVideos });
+    setSelectedVideos(filteredSelectedVideos);
+    setIncludedVideosType(values);
+  };
+
+  const handleIncludedCoursesTypeChange = (values) => {
+    const currSelectedCourses = courses.filter((course) => selectedCourses.includes(course.id));
+    const filteredSelectedCourses = currSelectedCourses
+      .filter((course) => values.includes(course.access))
+      .map((course) => course.id);
+    form.setFieldsValue({ ...form.getFieldsValue(), includedCourses: filteredSelectedCourses });
+    setSelectedCourses(filteredSelectedCourses);
+    setIncludedCoursesType(values);
   };
 
   return (
@@ -305,8 +370,13 @@ const CreateSubscriptionCard = ({
                 id="includedSessionsType"
                 name="includedSessionsType"
                 rules={isSessionIncluded ? validationRules.arrayValidation : undefined}
+                value={includedSessionsType}
               >
-                <Checkbox.Group disabled={!isSessionIncluded} options={productAccessOptions} />
+                <Checkbox.Group
+                  disabled={!isSessionIncluded}
+                  options={productAccessOptions}
+                  onChange={handleIncludedSessionsTypeChange}
+                />
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -321,73 +391,79 @@ const CreateSubscriptionCard = ({
                   showSearch={false}
                   placeholder="Select included sessions"
                   mode="multiple"
-                  maxTagCount={2}
+                  maxTagCount="responsive"
+                  dropdownMatchSelectWidth={false}
                   value={selectedSessions}
+                  disabled={!isSessionIncluded}
                   onChange={(val) => setSelectedSessions(val)}
                   optionLabelProp="label"
                 >
-                  <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
-                    key="Published Sessions"
-                  >
-                    {sessions
-                      ?.filter((session) => session.is_active)
-                      .map((session) => (
-                        <Select.Option
-                          value={session.external_id}
-                          key={session.external_id}
-                          label={
-                            <>
-                              {' '}
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}{' '}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {session.currency?.toUpperCase()} {session.price}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
-                    {sessions?.filter((session) => session.is_active).length <= 0 && (
-                      <Text disabled> No published sessions </Text>
-                    )}
-                  </Select.OptGroup>
-                  <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
-                    key="Unpublished Sessions"
-                  >
-                    {sessions
-                      ?.filter((session) => !session.is_active)
-                      .map((session) => (
-                        <Select.Option
-                          value={session.external_id}
-                          key={session.external_id}
-                          label={
-                            <>
-                              {' '}
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}{' '}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {session.currency?.toUpperCase()} {session.price}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
-                    {sessions?.filter((session) => !session.is_active).length <= 0 && (
-                      <Text disabled> No unpublished sessions </Text>
-                    )}
-                  </Select.OptGroup>
+                  {includedSessionsType.includes('PUBLIC') && (
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Public sessions </Text>}
+                      key="Public Sessions"
+                    >
+                      {sessions
+                        ?.filter((session) => session.access === 'PUBLIC')
+                        .map((session) => (
+                          <Select.Option
+                            value={session.external_id}
+                            key={session.external_id}
+                            label={
+                              <>
+                                {' '}
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}{' '}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                {session.currency?.toUpperCase()} {session.price}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {sessions?.filter((session) => session.access === 'PUBLIC').length <= 0 && (
+                        <Text disabled> No public sessions </Text>
+                      )}
+                    </Select.OptGroup>
+                  )}
+                  {includedSessionsType.includes('MEMBERSHIP') && (
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Members only sessions </Text>}
+                      key="Members Sessions"
+                    >
+                      {sessions
+                        ?.filter((session) => session.access === 'MEMBERSHIP')
+                        .map((session) => (
+                          <Select.Option
+                            value={session.external_id}
+                            key={session.external_id}
+                            label={
+                              <>
+                                {' '}
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}{' '}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                {session.currency?.toUpperCase()} {session.price}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {sessions?.filter((session) => session.access === 'MEMBERSHIP').length <= 0 && (
+                        <Text disabled> No members only sessions </Text>
+                      )}
+                    </Select.OptGroup>
+                  )}
                 </Select>
               </Form.Item>
             </List.Item>
@@ -397,8 +473,13 @@ const CreateSubscriptionCard = ({
                 id="includedVideosType"
                 name="includedVideosType"
                 rules={isVideoIncluded ? validationRules.arrayValidation : undefined}
+                value={includedVideosType}
               >
-                <Checkbox.Group disabled={!isVideoIncluded} options={productAccessOptions} />
+                <Checkbox.Group
+                  disabled={!isVideoIncluded}
+                  options={productAccessOptions}
+                  onChange={handleIncludedVideosTypeChange}
+                />
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -411,75 +492,81 @@ const CreateSubscriptionCard = ({
                 <Select
                   showArrow
                   showSearch={false}
+                  disabled={!isVideoIncluded}
                   placeholder="Select included videos"
                   mode="multiple"
-                  maxTagCount={2}
+                  maxTagCount="responsive"
+                  dropdownMatchSelectWidth={false}
                   value={selectedVideos}
                   onChange={(val) => setSelectedVideos(val)}
                   optionLabelProp="label"
                 >
-                  <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
-                    key="Published Videos"
-                  >
-                    {videos
-                      ?.filter((video) => video.is_published)
-                      .map((video) => (
-                        <Select.Option
-                          value={video.external_id}
-                          key={video.external_id}
-                          label={
-                            <>
-                              {' '}
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {video.currency?.toUpperCase()} {video.price}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
-                    {videos?.filter((video) => video.is_published).length <= 0 && (
-                      <Text disabled> No published video </Text>
-                    )}
-                  </Select.OptGroup>
-                  <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
-                    key="Unpublished Videos"
-                  >
-                    {videos
-                      ?.filter((video) => !video.is_published)
-                      .map((video) => (
-                        <Select.Option
-                          value={video.external_id}
-                          key={video.external_id}
-                          label={
-                            <>
-                              {' '}
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
-                            </>
-                          }
-                        >
-                          <Row gutter={[8, 8]}>
-                            <Col xs={17} className={styles.productName}>
-                              {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                            </Col>
-                            <Col xs={7} className={styles.textAlignRight}>
-                              {video.currency?.toUpperCase()} {video.price}
-                            </Col>
-                          </Row>
-                        </Select.Option>
-                      ))}
-                    {videos?.filter((video) => !video.is_published).length <= 0 && (
-                      <Text disabled> No unpublished video </Text>
-                    )}
-                  </Select.OptGroup>
+                  {includedVideosType.includes('PUBLIC') && (
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Public videos </Text>}
+                      key="Public Videos"
+                    >
+                      {videos
+                        ?.filter((video) => video.access === 'PUBLIC')
+                        .map((video) => (
+                          <Select.Option
+                            value={video.external_id}
+                            key={video.external_id}
+                            label={
+                              <>
+                                {' '}
+                                {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                {video.currency?.toUpperCase()} {video.price}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {videos?.filter((video) => video.access === 'PUBLIC').length <= 0 && (
+                        <Text disabled> No public video </Text>
+                      )}
+                    </Select.OptGroup>
+                  )}
+                  {includedVideosType.includes('MEMBERSHIP') && (
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Members only videos </Text>}
+                      key="Members Videos"
+                    >
+                      {videos
+                        ?.filter((video) => video.access === 'MEMBERSHIP')
+                        .map((video) => (
+                          <Select.Option
+                            value={video.external_id}
+                            key={video.external_id}
+                            label={
+                              <>
+                                {' '}
+                                {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                {video.currency?.toUpperCase()} {video.price}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {videos?.filter((video) => video.access === 'MEMBERSHIP').length <= 0 && (
+                        <Text disabled> No members only videos </Text>
+                      )}
+                    </Select.OptGroup>
+                  )}
                 </Select>
               </Form.Item>
             </List.Item>
@@ -529,8 +616,13 @@ const CreateSubscriptionCard = ({
                 id="includedCoursesType"
                 name="includedCoursesType"
                 rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
+                value={includedCoursesType}
               >
-                <Checkbox.Group disabled={!isCourseIncluded} options={productAccessOptions} />
+                <Checkbox.Group
+                  disabled={!isCourseIncluded}
+                  options={productAccessOptions}
+                  onChange={handleIncludedCoursesTypeChange}
+                />
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -543,43 +635,63 @@ const CreateSubscriptionCard = ({
                 <Select
                   showArrow
                   showSearch={false}
+                  disabled={!isCourseIncluded}
                   placeholder="Select included courses"
                   mode="multiple"
-                  maxTagCount={2}
+                  maxTagCount="responsive"
+                  dropdownMatchSelectWidth={false}
                   value={selectedCourses}
                   onChange={(val) => setSelectedCourses(val)}
                   optionLabelProp="label"
                 >
-                  <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
-                    key="Published Courses"
-                  >
-                    {courses
-                      ?.filter((course) => course.is_published)
-                      .map((course) => (
-                        <Select.Option value={course.id} key={course.id} label={course.name}>
-                          {course.name}
-                        </Select.Option>
-                      ))}
-                    {courses?.filter((course) => course.is_published).length <= 0 && (
-                      <Text disabled> No published courses </Text>
-                    )}
-                  </Select.OptGroup>
-                  <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
-                    key="Unpublished Courses"
-                  >
-                    {courses
-                      ?.filter((course) => !course.is_published)
-                      .map((course) => (
-                        <Select.Option value={course.id} key={course.id} label={course.name}>
-                          {course.name}
-                        </Select.Option>
-                      ))}
-                    {courses?.filter((course) => !course.is_published).length <= 0 && (
-                      <Text disabled> No unpublished courses </Text>
-                    )}
-                  </Select.OptGroup>
+                  {includedCoursesType.includes('PUBLIC') && (
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Public courses </Text>}
+                      key="Public Courses"
+                    >
+                      {courses
+                        ?.filter((course) => course.access === 'PUBLIC')
+                        .map((course) => (
+                          <Select.Option value={course.id} key={course.id} label={course.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {course.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                {course.currency?.toUpperCase()} {course.price}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {courses?.filter((course) => course.access === 'PUBLIC').length <= 0 && (
+                        <Text disabled> No public courses </Text>
+                      )}
+                    </Select.OptGroup>
+                  )}
+                  {includedCoursesType.includes('MEMBERSHIP') && (
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Members only courses </Text>}
+                      key="Members Courses"
+                    >
+                      {courses
+                        ?.filter((course) => course.access === 'MEMBERSHIP')
+                        .map((course) => (
+                          <Select.Option value={course.id} key={course.id} label={course.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {course.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                {course.currency?.toUpperCase()} {course.price}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {courses?.filter((course) => course.access === 'MEMBERSHIP').length <= 0 && (
+                        <Text disabled> No members only courses </Text>
+                      )}
+                    </Select.OptGroup>
+                  )}
                 </Select>
               </Form.Item>
             </List.Item>
