@@ -2,7 +2,7 @@ let waitListBtn = document.querySelector("[data-waitlist-cta='true']");
 let alternateWaitlistCtas = document.querySelectorAll("[data-waitlist-cta-alternate='true']");
 let emailInput = document.createElement('input');
 let emailValidationMsg = document.createElement('p');
-let waitListLoader = document.createElement('div')
+let waitListLoader = document.createElement('div');
 waitListLoader.classList.add('waitlist-loader');
 
 let parentContainer = null;
@@ -16,7 +16,7 @@ alternateWaitlistCtas.forEach((cta) => {
 
     window.scrollTo({
       top: offsetPosition,
-      behavior: "smooth"
+      behavior: 'smooth',
     });
 
     setTimeout(() => {

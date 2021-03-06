@@ -2,12 +2,23 @@ let swipeTextEl = document.querySelector("[data-swipe-text='true']");
 let swipeTextArtistsEl = document.querySelector("[data-swipe-text-artists='true']");
 
 const swipeTextArray = ['events', 'Session', 'Classes', 'Workshop', 'Tutorial', 'Stream', 'Shows', 'Consultation'];
-const artistsArray = ['creators', 'Entrepreneurs', 'Tutors', 'Trainers', 'Chefs', 'Artists', 'Experts', 'Yoga Instructor', 'Musicians', 'Solopreneurs'];
+const artistsArray = [
+  'creators',
+  'Entrepreneurs',
+  'Tutors',
+  'Trainers',
+  'Chefs',
+  'Artists',
+  'Experts',
+  'Yoga Instructor',
+  'Musicians',
+  'Solopreneurs',
+];
 
 const counter = {
   swipeTextEl: 1,
-  swipeTextArtistsEl: 1
-}
+  swipeTextArtistsEl: 1,
+};
 
 function swipeText(element, textArray, interval, counterName) {
   setInterval(() => {
