@@ -2,7 +2,21 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag, Checkbox } from 'antd';
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Typography,
+  DatePicker,
+  Modal,
+  Tag,
+  Checkbox,
+  Radio,
+} from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
@@ -16,7 +30,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
+import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors, productAccessOptions } from 'utils/helper';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
 
@@ -61,6 +75,7 @@ const formInitialValues = {
   courseName: '',
   price: 10,
   videoList: [],
+  courseAccessType: 'PUBLIC',
 };
 
 const { Text, Title } = Typography;
@@ -284,6 +299,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
             price: editedCourse?.price,
             colorCode: editedCourse?.color_code || initialColor || whiteColor,
+            courseAccessType: editedCourse?.access,
           });
 
           setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
@@ -415,6 +431,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
+        access: values.courseAccessType,
         type: courseTypes.VIDEO_NON_SEQ.name.toUpperCase(),
         price: values.price || 1,
         currency: currency?.toLowerCase(),
@@ -436,6 +453,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
+        access: values.courseAccessType,
         type: courseTypes.MIXED.name.toUpperCase(),
         price: values.price || 1,
         currency: currency?.toLowerCase(),
@@ -815,6 +833,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 rules={validationRules.nameValidation}
               >
                 <Input placeholder="Enter Course Name" maxLength={50} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                {...courseModalFormLayout}
+                id="courseAccessType"
+                name="courseAccessType"
+                label="Access Type"
+                rules={validationRules.requiredValidation}
+              >
+                <Radio.Group>
+                  {productAccessOptions.map((productAccess) => (
+                    <Radio value={productAccess.value} key={productAccess.value}>
+                      {productAccess.label}
+                    </Radio>
+                  ))}
+                </Radio.Group>
               </Form.Item>
             </Col>
             {renderVideoCourseInputs()}
