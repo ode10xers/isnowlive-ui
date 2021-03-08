@@ -33,6 +33,13 @@ const {
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 
+const showMoreAPIs = {
+  sessions: apis.session.getCreatorInventoryEarnings,
+  passes: apis.passes.getCreatorPassEarnings,
+  videos: apis.videos.getCreatorVideosEarnings,
+  courses: apis.courses.getCreatorCourseEarnings,
+};
+
 const Earnings = () => {
   const history = useHistory();
   const {
@@ -117,127 +124,34 @@ const Earnings = () => {
     }
   }, []);
 
-  const handleShowMoreSession = async () => {
+  const handleShowMore = async (productName) => {
     const eventTag = creator.click.payment.showMoreEarnings;
+
     try {
       setIsLoading(true);
-      let pageNo = currentPage['sessions'] + 1;
-      const { status, data } = await apis.session.getCreatorInventoryEarnings(pageNo, itemsPerPage);
+      let pageNo = currentPage[productName] + 1;
+      const { status, data } = await showMoreAPIs[productName](pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
 
         setEarnings({
           ...earnings,
-          sessions: [...earnings.sessions, ...data.earnings],
+          [productName]: [...earnings[productName], ...data.earnings],
         });
 
         setCurrentPage({
           ...currentPage,
-          sessions: pageNo,
+          [productName]: pageNo,
         });
 
         setShowMore({
           ...showMore,
-          sessions: data.next_page || false,
+          [productName]: data.next_page || false,
         });
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
-    }
-  };
-
-  const handleShowMorePasses = async () => {
-    const eventTag = creator.click.payment.showMoreEarnings;
-    try {
-      setIsLoading(true);
-      let pageNo = currentPage['passes'] + 1;
-      const { status, data } = await apis.passes.getCreatorPassEarnings(pageNo, itemsPerPage);
-      if (isAPISuccess(status)) {
-        trackSuccessEvent(eventTag);
-        setIsLoading(false);
-
-        setEarnings({
-          ...earnings,
-          passes: [...earnings.passes, ...data.earnings],
-        });
-
-        setCurrentPage({
-          ...currentPage,
-          passes: pageNo,
-        });
-
-        setShowMore({
-          ...showMore,
-          passes: data.next_page || false,
-        });
-      }
-    } catch (error) {
-      trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
-    }
-  };
-
-  const handleShowMoreVideos = async () => {
-    const eventTag = creator.click.payment.showMoreEarnings;
-
-    try {
-      setIsLoading(true);
-      let pageNo = currentPage['videos'] + 1;
-      const { status, data } = await apis.videos.getCreatorVideosEarnings(pageNo, itemsPerPage);
-      if (isAPISuccess(status)) {
-        trackSuccessEvent(eventTag);
-        setIsLoading(false);
-
-        setEarnings({
-          ...earnings,
-          videos: [...earnings.videos, ...data.earnings],
-        });
-
-        setCurrentPage({
-          ...currentPage,
-          videos: pageNo,
-        });
-
-        setShowMore({
-          ...showMore,
-          videos: data.next_page || false,
-        });
-      }
-    } catch (error) {
-      trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
-    }
-  };
-
-  const handleShowMoreCourses = async () => {
-    try {
-      setIsLoading(true);
-      let pageNo = currentPage['courses'] + 1;
-      const { status, data } = await apis.courses.getCreatorCourseEarnings(pageNo, itemsPerPage);
-      if (isAPISuccess(status)) {
-        setIsLoading(false);
-
-        setEarnings({
-          ...earnings,
-          courses: [...earnings.courses, ...data.earnings],
-        });
-
-        setCurrentPage({
-          ...currentPage,
-          courses: pageNo,
-        });
-
-        setShowMore({
-          ...showMore,
-          courses: data.next_page || false,
-        });
-      }
-    } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -551,136 +465,6 @@ const Earnings = () => {
       </Card>
     );
   };
-  /*
-  let passColumns = [
-    {
-      title: 'Pass Name',
-      key: 'name',
-      dataIndex: 'name',
-      align: 'left',
-      width: '50%',
-    },
-    {
-      title: 'Total Earned',
-      key: 'total_earned',
-      dataIndex: 'total_earned',
-      align: 'right',
-      width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency?.toUpperCase()}`,
-    },
-    {
-      title: '',
-      width: '10%',
-      render: (text, record) => (
-        <Row justify="start">
-          <Col>
-            <Button type="link" className={styles.detailsButton} onClick={() => openPassDetails(record)}>
-              Details
-            </Button>
-          </Col>
-        </Row>
-      ),
-    },
-  ];
-  const renderPassItem = (item) => {
-    const layout = (label, value) => (
-      <Row>
-        <Col span={9}>
-          <Text strong>{label}</Text>
-        </Col>
-        <Col span={15}>: {value}</Col>
-      </Row>
-    );
-
-    return (
-      <Card
-        className={styles.card}
-        title={
-          <div onClick={() => openPassDetails(item)}>
-            <Text>{item.name}</Text>
-          </div>
-        }
-        actions={[
-          <Button type="link" className={styles.detailsButton} onClick={() => openPassDetails(item)}>
-            Details
-          </Button>,
-        ]}
-      >
-        {layout(
-          'Earnings',
-          <Text>
-            {item.currency.toUpperCase()} {item.total_earned}
-          </Text>
-        )}
-      </Card>
-    );
-  };
-
-  let videoColumns = [
-    {
-      title: 'Video Name',
-      key: 'name',
-      dataIndex: 'name',
-      align: 'left',
-      width: '50%',
-    },
-    {
-      title: 'Total Earned',
-      key: 'total_earned',
-      dataIndex: 'total_earned',
-      align: 'right',
-      width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency?.toUpperCase()}`,
-    },
-    {
-      title: '',
-      width: '10%',
-      render: (text, record) => (
-        <Row justify="start">
-          <Col>
-            <Button type="link" className={styles.detailsButton} onClick={() => openVideoDetails(record)}>
-              Details
-            </Button>
-          </Col>
-        </Row>
-      ),
-    },
-  ];
-
-  const renderVideoItem = (item) => {
-    const layout = (label, value) => (
-      <Row>
-        <Col span={9}>
-          <Text strong>{label}</Text>
-        </Col>
-        <Col span={15}>: {value}</Col>
-      </Row>
-    );
-
-    return (
-      <Card
-        className={styles.card}
-        title={
-          <div onClick={() => openVideoDetails(item)}>
-            <Text>{item.name}</Text>
-          </div>
-        }
-        actions={[
-          <Button type="link" className={styles.detailsButton} onClick={() => openVideoDetails(item)}>
-            Details
-          </Button>,
-        ]}
-      >
-        {layout(
-          'Earnings',
-          <Text>
-            {item.currency.toUpperCase()} {item.total_earned}
-          </Text>
-        )}
-      </Card>
-    );
-  };
-*/
 
   const productEarningsItems = [
     {
@@ -688,21 +472,21 @@ const Earnings = () => {
       key: 'pass_id',
       stateKey: 'passes',
       redirectMethod: openPassDetails,
-      showMoreMethod: handleShowMorePasses,
+      showMoreMethod: () => handleShowMore('passes'),
     },
     {
       name: 'Video',
       key: 'video_id',
       stateKey: 'videos',
       redirectMethod: openVideoDetails,
-      showMoreMethod: handleShowMoreVideos,
+      showMoreMethod: () => handleShowMore('videos'),
     },
     {
       name: 'Course',
       key: 'course_id',
       stateKey: 'courses',
       redirectMethod: openCourseDetails,
-      showMoreMethod: handleShowMoreCourses,
+      showMoreMethod: () => handleShowMore('courses'),
     },
   ];
 
@@ -756,7 +540,7 @@ const Earnings = () => {
                     <Row justify="center" className={styles.mt50}>
                       <Col>
                         <Button
-                          onClick={() => handleShowMoreSession()}
+                          onClick={() => handleShowMore('sessions')}
                           disabled={!showMore['sessions']}
                           className={styles.ml20}
                         >
