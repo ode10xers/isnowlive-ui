@@ -9,3 +9,11 @@
   background-color: map-get($map: $colors, $key: 'White');
   padding: 8px;
 }
+
+.passDetailsContainer {
+  border: 1px solid map-get($map: $colors, $key: 'DarkGray');
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 16px;
+  padding: 10px;
+}

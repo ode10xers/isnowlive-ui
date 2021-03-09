@@ -14,8 +14,13 @@ import SessionEarnings from 'pages/CreatorDashboard/SessionEarnings';
 import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
 import PassEarnings from 'pages/CreatorDashboard/PassEarnings';
 import VideoEarnings from 'pages/CreatorDashboard/VideoEarnings';
+import CourseEarnings from 'pages/CreatorDashboard/CourseEarnings';
 import Videos from 'pages/CreatorDashboard/Videos';
+import Courses from 'pages/CreatorDashboard/Courses';
+import Coupons from 'pages/CreatorDashboard/Coupons';
+import AccountSettings from 'pages/CreatorDashboard/AccountSettings';
 
+//TODO: Might want to refactor earning details page to be single component
 const CreatorDashboard = ({ match }) => {
   return (
     <Switch>
@@ -31,8 +36,12 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.sessionEarnings} component={SessionEarnings} />
       <Route exact path={match.url + Routes.creatorDashboard.passEarnings} component={PassEarnings} />
       <Route exact path={match.url + Routes.creatorDashboard.videoEarnings} component={VideoEarnings} />
+      <Route exact path={match.url + Routes.creatorDashboard.courseEarnings} component={CourseEarnings} />
       <Route exact path={match.url + Routes.creatorDashboard.passes} component={ClassPassList} />
       <Route exact path={match.url + Routes.creatorDashboard.videos} component={Videos} />
+      <Route exact path={match.url + Routes.creatorDashboard.courses} component={Courses} />
+      <Route exact path={match.url + Routes.creatorDashboard.coupons} component={Coupons} />
+      <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>
   );

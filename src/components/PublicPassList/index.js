@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
-import classNames from 'classnames';
 import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
@@ -9,11 +8,12 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
+import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
 
 import config from 'config';
 import apis from 'apis';
@@ -24,7 +24,7 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Paragraph } = Typography;
 
-const ClassPasses = ({ username, passes }) => {
+const PublicPassList = ({ username, passes }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -48,7 +48,7 @@ const ClassPasses = ({ username, passes }) => {
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder({
         order_id: orderDetails.pass_order_id,
-        order_type: 'PASS_ORDER',
+        order_type: orderType.PASS,
       });
 
       if (isAPISuccess(status) && data) {
@@ -71,7 +71,7 @@ const ClassPasses = ({ username, passes }) => {
 
   const createOrder = async (userEmail) => {
     if (!selectedPass) {
-      showErrorModal('Something went wrong', 'Invalid Class Pass ID');
+      showErrorModal('Something went wrong', 'Invalid Pass ID');
       return;
     }
 
@@ -80,7 +80,7 @@ const ClassPasses = ({ username, passes }) => {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: selectedPass.id,
         price: selectedPass.price,
-        currency: selectedPass.currency,
+        currency: selectedPass.currency.toLowerCase(),
       });
 
       if (isAPISuccess(status) && data) {
@@ -95,7 +95,7 @@ const ClassPasses = ({ username, passes }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -103,6 +103,11 @@ const ClassPasses = ({ username, passes }) => {
   const redirectToSessionsPage = (session) => {
     const baseUrl = generateUrlFromUsername(session.username || username || 'app');
     window.open(`${baseUrl}/s/${session.session_id}`);
+  };
+
+  const redirectToVideosPage = (video) => {
+    const baseUrl = generateUrlFromUsername(video.username || username || 'app');
+    window.open(`${baseUrl}/v/${video.external_id}`);
   };
 
   const toggleExpandAll = () => {
@@ -129,19 +134,19 @@ const ClassPasses = ({ username, passes }) => {
       width: '35%',
     },
     {
-      title: 'Pass Count',
+      title: 'Credit Count',
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Classes` : 'Unlimited Classes'),
+      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credit'),
     },
     {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '10%',
+      width: '12%',
       render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -150,8 +155,8 @@ const ClassPasses = ({ username, passes }) => {
       key: 'price',
       align: 'left',
       sortOrder: 'descend',
-      width: '10%',
-      render: (text, record) => `${text} ${record.currency}`,
+      width: '13%',
+      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
       title: (
@@ -179,14 +184,32 @@ const ClassPasses = ({ username, passes }) => {
     },
   ];
 
-  const renderClassesList = (record) => (
+  const renderPassDetails = (record) => (
     <Row>
-      <Col xs={24}>
-        <Text className={styles.ml20}> Applicable to below class(es) </Text>
-      </Col>
-      <Col xs={24}>
-        <SessionCards sessions={record.sessions} />
-      </Col>
+      {record?.sessions?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text strong className={styles.ml20}>
+              Sessions bookable with this pass
+            </Text>
+          </Col>
+          <Col xs={24} className={styles.passDetailsContainer}>
+            <SessionCards sessions={record.sessions} />
+          </Col>
+        </>
+      )}
+      {record?.videos?.length > 0 && (
+        <>
+          <Col xs={24}>
+            <Text strong className={styles.ml20}>
+              Videos purchasable with this pass
+            </Text>
+          </Col>
+          <Col xs={24} className={styles.passDetailsContainer}>
+            <SimpleVideoCardsList username={username} passDetails={record} videos={record.videos} />
+          </Col>
+        </>
+      )}
     </Row>
   );
 
@@ -201,7 +224,7 @@ const ClassPasses = ({ username, passes }) => {
     );
 
     return (
-      <div>
+      <div key={pass.id}>
         <Card
           className={styles.card}
           title={<Text>{pass.name}</Text>}
@@ -220,25 +243,44 @@ const ClassPasses = ({ username, passes }) => {
             ),
           ]}
         >
-          {layout('Pass Count', <Text>{pass.limited ? `${pass.class_count} Classes` : 'Unlimited Classes'}</Text>)}
+          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency}`}</Text>)}
+          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>
-            <Col xs={24}>
-              <Text className={styles.ml20}> Applicable to below class(es) </Text>
-            </Col>
-            <Col xs={24}>
-              <div className={classNames(styles.ml20, styles.mt10)}>
-                {pass.sessions.map((session) => (
-                  <Tag color="blue" onClick={() => redirectToSessionsPage(session)}>
-                    {' '}
-                    {session.name}{' '}
-                  </Tag>
-                ))}
-              </div>
-            </Col>
+          <Row gutter={[8, 8]} className={styles.cardExpansion}>
+            {pass.sessions?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.sessions?.map((session) => (
+                      <Tag key={session?.key} color="blue" onClick={() => redirectToSessionsPage(session)}>
+                        {session?.name}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
+            {pass.videos?.length > 0 && (
+              <>
+                <Col xs={24}>
+                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.ml20}>
+                    {pass.videos?.map((video) => (
+                      <Tag key={video?.key} color="volcano" onClick={() => redirectToVideosPage(video)}>
+                        {video?.title}
+                      </Tag>
+                    ))}
+                  </div>
+                </Col>
+              </>
+            )}
           </Row>
         )}
       </div>
@@ -251,11 +293,12 @@ const ClassPasses = ({ username, passes }) => {
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>
-            <Paragraph>Passes are an easy way to frequently book the classes you love attending.</Paragraph>
             <Paragraph>
-              Check out the passes below and the classes included in them. Once you have bought the pass you can use the
-              class credits to pay for classes in 1 click it without needing to touch your wallet again. Class pass is
-              valid from from the date you buy it until the validity period.
+              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.
+            </Paragraph>
+            <Paragraph>
+              Depending on the pass you buy, you can use the credits and book the class or video products made available
+              in that pass for free. A Pass is valid from the date you buy it until the validity period.
             </Paragraph>
           </Col>
           <Col xs={24}>
@@ -275,7 +318,7 @@ const ClassPasses = ({ username, passes }) => {
                 data={passes}
                 rowKey={(record) => record.id}
                 expandable={{
-                  expandedRowRender: (record) => renderClassesList(record),
+                  expandedRowRender: (record) => renderPassDetails(record),
                   expandRowByClick: true,
                   expandIconColumnIndex: -1,
                   expandedRowKeys: expandedRowKeys,
@@ -289,4 +332,4 @@ const ClassPasses = ({ username, passes }) => {
   );
 };
 
-export default ClassPasses;
+export default PublicPassList;

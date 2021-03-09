@@ -2,7 +2,7 @@
 
 .imageWrapper {
   position: relative;
-  margin-top: 128px !important;
+  margin-top: 96px !important;
   background-color: map-get($map: $colors, $key: 'White1');
 }
 .coverImageWrapper {
@@ -15,7 +15,7 @@
   border-radius: 8px;
   max-height: 300px;
 }
-.profileImageWrapper{
+.profileImageWrapper {
   max-height: 80px;
 }
 .profileImage {
@@ -40,20 +40,22 @@
   bottom: 0px;
   right: 100px;
 }
+
+.bio {
+  p,
+  span {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    background-color: map-get($map: $colors, $key: 'White1') !important;
+  }
+}
+
 .passCard {
   margin: 10px 32px !important;
   border: 2px dashed map-get($map: $colors, $key: 'DodgerBlue') !important;
 
   .blueText {
     color: map-get($map: $colors, $key: 'DodgerBlue') !important;
-  }
-}
-
-.bio {
-  p, span {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: map-get($map: $colors, $key: 'White1') !important;
   }
 }
 
@@ -66,9 +68,8 @@
   }
   .imageWrapper {
     position: relative;
-    max-height: 300px;
     margin-bottom: 20px;
-    margin-top: 50px;
+    margin-top: 16px !important;
   }
   .profileImage {
     border-radius: 4px;

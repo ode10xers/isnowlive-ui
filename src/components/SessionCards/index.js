@@ -3,6 +3,7 @@ import ReactHtmlParser from 'react-html-parser';
 import MobileDetect from 'mobile-detect';
 
 import { Card, Image, Row, Col, Typography, Empty, Tag, message } from 'antd';
+import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -68,13 +69,13 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
   }, []);
 
   return (
-    <div className={styles.box}>
+    <div>
       <Loader loading={isLoading} text="Fetching session informations">
         <Row gutter={[8, 8]}>
           {adjustedSessions && adjustedSessions.length > 0 ? (
             <>
               {adjustedSessions.map((session) => (
-                <Col span={24} key={session.key || session.session_id}>
+                <Col span={24} key={session.session_id}>
                   <Card
                     className={styles.sessionCard}
                     bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
@@ -92,7 +93,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                         </Col>
                         <Col xs={24}>
                           <Title ellipsis={{ rows: 1 }} level={5}>
-                            {session.name}
+                            {session.name} {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                           </Title>
                         </Col>
                         <Col xs={24}>
@@ -101,9 +102,8 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                         <Col xs={24}>
                           <Row gutter={[4]} justify="space-around">
                             {isoDayOfWeek.map((day, index) => (
-                              <Col xs={3}>
+                              <Col xs={3} key={`${session.session_id}_${day}`}>
                                 <Tag
-                                  key={`${session.session_id}_day`}
                                   className={
                                     session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
                                   }
@@ -116,7 +116,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                           </Row>
                         </Col>
                         <Col xs={24}>
-                          <Tag color="cyan" className={styles.tags}>
+                          <Tag color="cyan" className={styles.sessionTag}>
                             {session.group ? 'Group Session' : '1-to-1 Session'}
                           </Tag>
                         </Col>
@@ -136,36 +136,30 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                           <Row>
                             <Col xs={24}>
                               <Title ellipsis={{ rows: 1 }} level={5}>
-                                {session.name}
+                                {session.name} {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
                               </Title>
                             </Col>
                             <Col xs={24}>
                               <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
                             </Col>
                             <Col xs={24}>
-                              <Row gutter={8}>
-                                <Col xs={18}>
-                                  <Row gutter={[8, 4]}>
-                                    {isoDayOfWeek.map((day, index) => (
-                                      <Col xs={8} lg={3}>
-                                        <Tag
-                                          key={`${session.session_id}_day`}
-                                          className={
-                                            session.inventory_days.includes(index + 1)
-                                              ? styles.tags
-                                              : styles.tagsDisabled
-                                          }
-                                          color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
-                                        >
-                                          {day}
-                                        </Tag>
-                                      </Col>
-                                    ))}
-                                  </Row>
+                              <Row>
+                                <Col xs={24} lg={21}>
+                                  {isoDayOfWeek.map((day, index) => (
+                                    <Tag
+                                      key={`${session.session_id}_${day}`}
+                                      className={
+                                        session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
+                                      }
+                                      color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
+                                    >
+                                      {day}
+                                    </Tag>
+                                  ))}
                                 </Col>
-                                <Col xs={6}>
-                                  <Tag color="cyan" className={styles.tags}>
-                                    {session.group ? 'Group Session' : '1-to-1 Session'}
+                                <Col xs={24} lg={3}>
+                                  <Tag color="cyan" className={styles.sessionTag}>
+                                    {session.group ? 'Group' : '1-on-1'}
                                   </Tag>
                                 </Col>
                               </Row>

@@ -3,6 +3,7 @@ import Routes from 'routes';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
+import { getCookieConsentValue } from 'react-cookie-consent';
 
 const Context = createContext(null);
 
@@ -31,6 +32,24 @@ const reducer = (state, action) => {
         userDetails: null,
         userAuthenticated: false,
       };
+    case 'SET_COOKIE_CONSENT':
+      return {
+        ...state,
+        cookieConsent: action.payload,
+      };
+    case 'SHOW_PAYMENT_POPUP':
+      return {
+        ...state,
+        paymentPopupVisible: true,
+        ...action.payload,
+      };
+    case 'HIDE_PAYMENT_POPUP':
+      return {
+        ...state,
+        paymentPopupVisible: false,
+        paymentPopupData: null,
+        paymentPopupCallback: () => {},
+      };
     default:
       return state;
   }
@@ -41,6 +60,10 @@ const GlobalDataProvider = ({ children }) => {
   const initialState = {
     userDetails: getLocalUserDetails(),
     isAuthenticated: false,
+    cookieConsent: Boolean(getCookieConsentValue()),
+    paymentPopupVisible: false,
+    paymentPopupData: null,
+    paymentPopupCallback: () => {},
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -66,6 +89,18 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'SET_USER_AUTHENTICATED', payload: status });
   }
 
+  function setCookieConsent(cookieConsent) {
+    dispatch({ type: 'SET_COOKIE_CONSENT', payload: cookieConsent });
+  }
+
+  function showPaymentPopup(paymentPopupData, paymentPopupCallback) {
+    dispatch({ type: 'SHOW_PAYMENT_POPUP', payload: { paymentPopupData, paymentPopupCallback } });
+  }
+
+  function hidePaymentPopup() {
+    dispatch({ type: 'HIDE_PAYMENT_POPUP' });
+  }
+
   function logOut(history, dontRedirect = false) {
     if (!dontRedirect) {
       history.push(Routes.login);
@@ -83,6 +118,9 @@ const GlobalDataProvider = ({ children }) => {
     logIn,
     setUserDetails,
     setUserAuthentication,
+    setCookieConsent,
+    showPaymentPopup,
+    hidePaymentPopup,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

@@ -1,0 +1,40 @@
+@import '../../styles/variables.scss';
+
+.atc {
+  width: fit-content;
+  display: inline-block;
+
+  .atcWrapper {
+    margin-top: 4px;
+
+    &.button {
+      border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+      color: map-get($map: $colors, $key: 'DodgerBlue');
+      padding: 4px 8px;
+      margin-top: 0px;
+    }
+  }
+
+  .atcDropdown {
+    margin-top: 5px;
+    min-width: 150px;
+    z-index: 10;
+    position: absolute;
+    background: #fff;
+    border: 1px solid darkgrey;
+    padding: 5px 10px;
+
+    ul {
+      padding-left: 0px;
+      margin-bottom: 0px;
+      list-style-type: none;
+      li {
+        margin: 10px 0px;
+
+        i {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}

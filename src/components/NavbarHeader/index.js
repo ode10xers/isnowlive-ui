@@ -9,6 +9,7 @@ import Routes from 'routes';
 
 import HeaderModal from 'components/HeaderModal';
 
+import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess, reservedDomainName } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
@@ -28,6 +29,7 @@ const NavbarHeader = ({ removePadding = false }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
   const [shouldShowVideoLink, setShouldShowVideoLink] = useState(false);
+  const [shouldShowCourseLink, setShouldShowCourseLink] = useState(false);
 
   const {
     state: { userDetails },
@@ -55,6 +57,18 @@ const NavbarHeader = ({ removePadding = false }) => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to fetch videos for username');
+    }
+  };
+
+  const checkShouldShowCourseLink = async (username) => {
+    try {
+      const { status, data } = await apis.courses.getCoursesByUsername(username);
+
+      if (isAPISuccess(status) && data) {
+        setShouldShowCourseLink(data.length > 0);
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to fetch courses for username');
     }
   };
 
@@ -145,6 +159,7 @@ const NavbarHeader = ({ removePadding = false }) => {
     if (username && !reservedDomainName.includes(username)) {
       checkShouldShowPassLink(username);
       checkShouldShowVideoLink(username);
+      checkShouldShowCourseLink(username);
     }
   }, [username]);
 
@@ -161,10 +176,14 @@ const NavbarHeader = ({ removePadding = false }) => {
         toggleSigningIn={toggleAuthModalState}
       />
       <Row>
-        <Col xs={0} md={removePadding ? 0 : 4} xl={removePadding ? 0 : 4}></Col>
-        <Col xs={24} md={removePadding ? 24 : 16} xl={removePadding ? 24 : 16}>
+        <Col xs={24}>
           <Row>
-            <Col className={classNames(styles.domainNameWrapper, inDashboard() ? styles.dashboard : undefined)}>
+            <Col
+              className={classNames(
+                styles.domainNameWrapper,
+                inDashboard() && !isMobileDevice ? styles.dashboard : undefined
+              )}
+            >
               <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
                 {username.toUpperCase()}
               </span>
@@ -229,6 +248,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                     Videos
                   </Menu.Item>
                 )}
+                {shouldShowCourseLink && (
+                  <Menu.Item
+                    key="Course"
+                    className={siteLinkActive('course') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('course')}
+                  >
+                    Courses
+                  </Menu.Item>
+                )}
                 {localUserDetails ? (
                   <>
                     <Menu.Item
@@ -250,7 +278,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                 ) : (
                   <>
                     <Menu.Item key="SignIn">
-                      <Button block type="default" onClick={() => showSignInModal()}>
+                      <Button block type="primary" className={styles.lightRedBtn} onClick={() => showSignInModal()}>
                         Sign In
                       </Button>
                     </Menu.Item>
@@ -264,9 +292,32 @@ const NavbarHeader = ({ removePadding = false }) => {
               </Menu>
             </Col>
             <Col className={styles.mobileMenuContainer}>
-              <span className={styles.mobileMenu}>
-                <MenuOutlined size={50} onClick={() => setShowMobileMenu(true)} />
-              </span>
+              <Row gutter={8} justify="end">
+                <Col>
+                  <span className={styles.externalButtonWrapper}>
+                    {localUserDetails ? (
+                      inDashboard() ? (
+                        <Button className={styles.orangeBtn} onClick={() => redirectToCreatorProfile('home')}>
+                          Site Home
+                        </Button>
+                      ) : (
+                        <Button className={styles.greenBtn} onClick={() => redirectToAttendeeDashboard()}>
+                          My Dashboard
+                        </Button>
+                      )
+                    ) : (
+                      <Button className={styles.lightRedBtn} type="primary" onClick={() => showSignInModal()}>
+                        Sign In
+                      </Button>
+                    )}
+                  </span>
+                </Col>
+                <Col>
+                  <span className={styles.mobileMenu}>
+                    <MenuOutlined style={{ fontSize: 20 }} onClick={() => setShowMobileMenu(true)} />
+                  </span>
+                </Col>
+              </Row>
               <Modal
                 style={{ top: 0, margin: 0, maxWidth: '100vw' }}
                 className={styles.mobileMenuModal}
@@ -358,7 +409,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                           <span className={styles.menuLink}>Videos</span>
                         </li>
                       )}
-
+                      {shouldShowCourseLink && (
+                        <li
+                          key="Creator Courses"
+                          className={siteLinkActive('course') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('course')}
+                        >
+                          <span className={styles.menuLink}>Courses</span>
+                        </li>
+                      )}
                       {localUserDetails && (
                         <>
                           <li key="Divider" className={styles.divider} />
@@ -390,6 +449,13 @@ const NavbarHeader = ({ removePadding = false }) => {
                           >
                             <span className={styles.menuLink}>My Videos</span>
                           </li>
+                          <li
+                            key="Attendee Courses"
+                            className={isActive('/attendee/dashboard/courses') ? styles.active : undefined}
+                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.courses)}
+                          >
+                            <span className={styles.menuLink}>My Courses</span>
+                          </li>
                         </>
                       )}
                     </ul>
@@ -410,7 +476,12 @@ const NavbarHeader = ({ removePadding = false }) => {
                       ) : (
                         <>
                           <Col xs={12}>
-                            <Button block type="primary" onClick={() => showSignInModal()}>
+                            <Button
+                              block
+                              type="primary"
+                              className={styles.lightRedBtn}
+                              onClick={() => showSignInModal()}
+                            >
                               Sign In
                             </Button>
                           </Col>
@@ -428,7 +499,6 @@ const NavbarHeader = ({ removePadding = false }) => {
             </Col>
           </Row>
         </Col>
-        <Col xs={0} md={removePadding ? 0 : 4} xl={removePadding ? 0 : 4}></Col>
       </Row>
     </div>
   );

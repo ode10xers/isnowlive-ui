@@ -33,141 +33,130 @@ const {
 } = dateUtil;
 const { creator } = mixPanelEventTags;
 
+const getEarningsAPIs = {
+  sessions: apis.session.getCreatorInventoryEarnings,
+  passes: apis.passes.getCreatorPassEarnings,
+  videos: apis.videos.getCreatorVideosEarnings,
+  courses: apis.courses.getCreatorCourseEarnings,
+};
+
 const Earnings = () => {
   const history = useHistory();
-  const [isLoading, setIsLoading] = useState(false);
-  const [sessions, setSessions] = useState([]);
-  const [passes, setPasses] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [balance, setBalance] = useState(null);
-  const [isLoadingPayout, setIsLoadingPayout] = useState(false);
   const {
     state: {
       userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
     },
   } = useGlobalContext();
 
-  const [showMoreVideos, setShowMoreVideos] = useState(false);
-  const [showMorePasses, setShowMorePasses] = useState(false);
-  const [showMoreSession, setShowMoreSession] = useState(false);
-  const [currentSessionPage, setCurrentSessionPage] = useState(1);
-  const [currentPassesPage, setCurrentPassesPage] = useState(1);
-  const [currentVideosPage, setCurrentVideosPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [balance, setBalance] = useState(null);
+  const [isLoadingPayout, setIsLoadingPayout] = useState(false);
+
+  const [earnings, setEarnings] = useState({
+    sessions: [],
+    passes: [],
+    videos: [],
+    courses: [],
+  });
+  const [showMore, setShowMore] = useState({
+    sessions: false,
+    passes: false,
+    videos: false,
+    courses: false,
+  });
+  const [currentPage, setCurrentPage] = useState({
+    sessions: 1,
+    passes: 1,
+    videos: 1,
+    courses: 1,
+  });
   const itemsPerPage = 10;
 
   const [expandedSection, setExpandedSection] = useState([]);
 
-  const getEarningData = useCallback(async () => {
+  const getCreatorBalance = useCallback(async () => {
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
-      //TODO: Might want to separate them so that one failed call does not effect the other
-      let [
-        creatorInventoryEarningResponse,
-        creatorVideoEarningResponse,
-        creatorPassEarningResponse,
-        creatorBalanceResponse,
-      ] = await Promise.all([
-        apis.session.getCreatorInventoryEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
-        apis.videos.getCreatorVideosEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
-        apis.passes.getCreatorPassEarnings(1, itemsPerPage), // did not add currentPage to remove the dependency else it will endup in infinite loop
-        apis.session.getCreatorBalance(),
-      ]);
-      if (
-        isAPISuccess(creatorInventoryEarningResponse.status) &&
-        isAPISuccess(creatorVideoEarningResponse.status) &&
-        isAPISuccess(creatorPassEarningResponse.status) &&
-        isAPISuccess(creatorBalanceResponse.status)
-      ) {
-        setIsLoading(false);
-        setSessions(creatorInventoryEarningResponse.data.earnings);
-        setShowMoreSession(creatorInventoryEarningResponse.data.next_page || false);
-        setPasses(creatorPassEarningResponse.data.earnings);
-        setShowMorePasses(creatorPassEarningResponse.data.next_page || false);
-        setVideos(creatorVideoEarningResponse.data.earnings);
-        setShowMoreVideos(creatorVideoEarningResponse.data.next_page || false);
-        setBalance(creatorBalanceResponse.data);
+      const { status, data } = await apis.session.getCreatorBalance();
+
+      if (isAPISuccess(status) && data) {
+        setBalance(data);
       }
     } catch (error) {
-      if (error.response?.status !== 404) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
-      }
-
-      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong.');
     }
+
+    setIsLoading(false);
   }, []);
 
-  const handleShowMoreSession = async () => {
+  const getCreatorEarnings = useCallback(() => {
+    setIsLoading(true);
+
+    Object.entries(getEarningsAPIs).map(async ([key, getEarningAPI]) => {
+      try {
+        const { status, data } = await getEarningAPI(1, itemsPerPage);
+
+        if (isAPISuccess(status) && data) {
+          setEarnings((currEarningsData) => ({
+            ...currEarningsData,
+            [key]: data.earnings || [],
+          }));
+
+          setShowMore((currShowMoreData) => ({
+            ...currShowMoreData,
+            [key]: data.next_page || false,
+          }));
+        }
+      } catch (error) {
+        message.error(error.response?.data?.message || `Something went wrong when fetching ${key} earning info`);
+      }
+    });
+
+    setIsLoading(false);
+  }, []);
+
+  const handleShowMore = async (productName) => {
     const eventTag = creator.click.payment.showMoreEarnings;
+
     try {
       setIsLoading(true);
-      let pageNo = currentSessionPage + 1;
-      const { status, data } = await apis.session.getCreatorInventoryEarnings(pageNo, itemsPerPage);
+      let pageNo = currentPage[productName] + 1;
+      const { status, data } = await getEarningsAPIs[productName](pageNo, itemsPerPage);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
         setIsLoading(false);
-        setSessions([...sessions, ...data.earnings]);
-        setCurrentSessionPage(pageNo);
-        setShowMoreSession(data.next_page || false);
+
+        setEarnings({
+          ...earnings,
+          [productName]: [...earnings[productName], ...data.earnings],
+        });
+
+        setCurrentPage({
+          ...currentPage,
+          [productName]: pageNo,
+        });
+
+        setShowMore({
+          ...showMore,
+          [productName]: data.next_page || false,
+        });
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
-  };
-
-  const handleShowMorePasses = async () => {
-    const eventTag = creator.click.payment.showMoreEarnings;
-    try {
-      setIsLoading(true);
-      let pageNo = currentPassesPage + 1;
-      const { status, data } = await apis.passes.getCreatorPassEarnings(pageNo, itemsPerPage);
-      if (isAPISuccess(status)) {
-        trackSuccessEvent(eventTag);
-        setIsLoading(false);
-        setPasses([...passes, ...data.earnings]);
-        setCurrentPassesPage(pageNo);
-        setShowMorePasses(data.next_page || false);
-      }
-    } catch (error) {
-      trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
-    }
-  };
-
-  const handleShowMoreVideos = async () => {
-    const eventTag = creator.click.payment.showMoreEarnings;
-
-    try {
-      setIsLoading(true);
-      let pageNo = currentVideosPage + 1;
-      const { status, data } = await apis.videos.getCreatorVideosEarnings(pageNo, itemsPerPage);
-      if (isAPISuccess(status)) {
-        trackSuccessEvent(eventTag);
-        setIsLoading(false);
-        setVideos([...videos, ...data.earnings]);
-        setCurrentVideosPage(pageNo);
-        setShowMoreVideos(data.next_page || false);
-      }
-    } catch (error) {
-      trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
-    }
-  };
-
-  const openStripeConnect = (url) => {
-    window.open(url, '_self');
   };
 
   const relinkStripe = useCallback(async () => {
     try {
       setIsLoading(true);
       const { data, status } = await apis.payment.stripe.relinkAccount();
-      if (isAPISuccess(status)) {
+
+      if (isAPISuccess(status) && data) {
         setIsLoading(false);
-        openStripeConnect(data.onboarding_url);
+        window.open(data?.onboarding_url, '_self');
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong.');
@@ -201,8 +190,9 @@ const Earnings = () => {
   };
 
   useEffect(() => {
-    getEarningData();
-  }, [getEarningData]);
+    getCreatorBalance();
+    getCreatorEarnings();
+  }, [getCreatorBalance, getCreatorEarnings]);
 
   const confirmPayout = async () => {
     const eventTag = creator.click.payment.requestPayout;
@@ -227,7 +217,7 @@ const Earnings = () => {
           <Text className={styles.box1Text}>Available for Payout</Text>
         </Col>
         <Col xs={24} sm={12}>
-          <ShowAmount amount={balance?.available} currency={balance?.currency} />
+          <ShowAmount amount={balance?.available} currency={balance?.currency.toUpperCase()} />
         </Col>
         <Col xs={24} xl={12}>
           {balance === null || balance?.available === 0 ? (
@@ -260,7 +250,7 @@ const Earnings = () => {
           </Text>
         </Col>
         <Col xs={18}>
-          <ShowAmount amount={amount} currency={balance?.currency} />
+          <ShowAmount amount={amount} currency={balance?.currency.toUpperCase()} />
         </Col>
         <Col xs={6}>
           <img src={image} height={40} alt="" />
@@ -305,8 +295,26 @@ const Earnings = () => {
 
   const openSessionDetails = (item) => {
     trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
-    if (item.inventory_id) {
+    if (item?.inventory_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/inventory/${item.inventory_id}`);
+    }
+  };
+
+  const openPassDetails = (item) => {
+    if (item?.pass_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/pass/${item.pass_id}`);
+    }
+  };
+
+  const openVideoDetails = (item) => {
+    if (item?.video_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
+    }
+  };
+
+  const openCourseDetails = (item) => {
+    if (item?.course_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/course/${item.course_id}`);
     }
   };
 
@@ -331,7 +339,7 @@ const Earnings = () => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.total_earned}
+          {record.currency.toUpperCase()} {record.total_earned}
         </Text>
       ),
     },
@@ -379,22 +387,16 @@ const Earnings = () => {
         {layout(
           'Earnings',
           <Text>
-            {item.currency} {item.total_earned}
+            {item.currency.toUpperCase()} {item.total_earned}
           </Text>
         )}
       </Card>
     );
   };
 
-  const openPassDetails = (item) => {
-    if (item.pass_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/pass/${item.pass_id}`);
-    }
-  };
-
-  let passColumns = [
+  const generateEarningsColumns = (productName = 'Product', redirectToDetailsMethod = () => {}) => [
     {
-      title: 'Pass Name',
+      title: `${productName} Name`,
       key: 'name',
       dataIndex: 'name',
       align: 'left',
@@ -406,7 +408,7 @@ const Earnings = () => {
       dataIndex: 'total_earned',
       align: 'right',
       width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency}`,
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.total_earned}`,
     },
     {
       title: '',
@@ -414,7 +416,7 @@ const Earnings = () => {
       render: (text, record) => (
         <Row justify="start">
           <Col>
-            <Button type="link" className={styles.detailsButton} onClick={() => openPassDetails(record)}>
+            <Button type="link" className={styles.detailsButton} onClick={() => redirectToDetailsMethod(record)}>
               Details
             </Button>
           </Col>
@@ -423,7 +425,7 @@ const Earnings = () => {
     },
   ];
 
-  const renderPassItem = (item) => {
+  const renderMobileEarningsItem = (product, redirectToDetailsMethod = () => {}) => {
     const layout = (label, value) => (
       <Row>
         <Col span={9}>
@@ -437,12 +439,12 @@ const Earnings = () => {
       <Card
         className={styles.card}
         title={
-          <div onClick={() => openPassDetails(item)}>
-            <Text>{item.name}</Text>
+          <div onClick={() => redirectToDetailsMethod(product)}>
+            <Text>{product?.name}</Text>
           </div>
         }
         actions={[
-          <Button type="link" className={styles.detailsButton} onClick={() => openPassDetails(item)}>
+          <Button type="link" className={styles.detailsButton} onClick={() => redirectToDetailsMethod(product)}>
             Details
           </Button>,
         ]}
@@ -450,83 +452,36 @@ const Earnings = () => {
         {layout(
           'Earnings',
           <Text>
-            {item.currency} {item.total_earned}
+            {product?.currency?.toUpperCase()} {product?.total_earned}
           </Text>
         )}
       </Card>
     );
   };
 
-  const openVideoDetails = (item) => {
-    if (item.video_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/video/${item.video_id}`);
-    }
-  };
-
-  let videoColumns = [
+  const productEarningsItems = [
     {
-      title: 'Video Name',
-      key: 'name',
-      dataIndex: 'name',
-      align: 'left',
-      width: '50%',
+      name: 'Pass',
+      key: 'pass_id',
+      stateKey: 'passes',
+      redirectMethod: openPassDetails,
+      showMoreMethod: () => handleShowMore('passes'),
     },
     {
-      title: 'Total Earned',
-      key: 'total_earned',
-      dataIndex: 'total_earned',
-      align: 'right',
-      width: '40%',
-      render: (text, record) => `${record.total_earned} ${record.currency.toUpperCase()}`,
+      name: 'Video',
+      key: 'video_id',
+      stateKey: 'videos',
+      redirectMethod: openVideoDetails,
+      showMoreMethod: () => handleShowMore('videos'),
     },
     {
-      title: '',
-      width: '10%',
-      render: (text, record) => (
-        <Row justify="start">
-          <Col>
-            <Button type="link" className={styles.detailsButton} onClick={() => openVideoDetails(record)}>
-              Details
-            </Button>
-          </Col>
-        </Row>
-      ),
+      name: 'Course',
+      key: 'course_id',
+      stateKey: 'courses',
+      redirectMethod: openCourseDetails,
+      showMoreMethod: () => handleShowMore('courses'),
     },
   ];
-
-  const renderVideoItem = (item) => {
-    const layout = (label, value) => (
-      <Row>
-        <Col span={9}>
-          <Text strong>{label}</Text>
-        </Col>
-        <Col span={15}>: {value}</Col>
-      </Row>
-    );
-
-    return (
-      <Card
-        className={styles.card}
-        title={
-          <div onClick={() => openVideoDetails(item)}>
-            <Text>{item.name}</Text>
-          </div>
-        }
-        actions={[
-          <Button type="link" className={styles.detailsButton} onClick={() => openVideoDetails(item)}>
-            Details
-          </Button>,
-        ]}
-      >
-        {layout(
-          'Earnings',
-          <Text>
-            {item.currency} {item.total_earned}
-          </Text>
-        )}
-      </Card>
-    );
-  };
 
   return (
     <Loader loading={isLoading} size="large" text="Loading Earning Details">
@@ -556,13 +511,13 @@ const Earnings = () => {
         <Row className={styles.mt20}>
           <Col xs={24}>
             <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
-              <Panel header={<Title level={5}> Sessions </Title>} key="Sessions">
+              <Panel header={<Title level={5}> Sessions Earnings </Title>} key="Sessions">
                 <Row className={styles.mt10}>
                   <Col span={24}>
                     {isMobileDevice ? (
                       <Loader loading={isLoading} size="large" text="Loading sessions">
-                        {sessions.length > 0 ? (
-                          sessions.map(renderSessionItem)
+                        {earnings['sessions']?.length > 0 ? (
+                          earnings['sessions']?.map(renderSessionItem)
                         ) : (
                           <div className={classNames(styles.textAlignCenter, 'text-empty')}>
                             Sessions List
@@ -571,15 +526,15 @@ const Earnings = () => {
                         )}
                       </Loader>
                     ) : (
-                      <Table columns={sessionColumns} data={sessions} loading={isLoading} />
+                      <Table columns={sessionColumns} data={earnings['sessions']} loading={isLoading} />
                     )}
                   </Col>
                   <Col span={24}>
                     <Row justify="center" className={styles.mt50}>
                       <Col>
                         <Button
-                          onClick={() => handleShowMoreSession()}
-                          disabled={!showMoreSession}
+                          onClick={() => handleShowMore('sessions')}
+                          disabled={!showMore['sessions']}
                           className={styles.ml20}
                         >
                           Show More
@@ -589,72 +544,54 @@ const Earnings = () => {
                   </Col>
                 </Row>
               </Panel>
-              <Panel header={<Title level={5}> Class Pass </Title>} key="ClassPass">
-                <Row className={styles.mt10}>
-                  <Col span={24}>
-                    {isMobileDevice ? (
-                      <Loader loading={isLoading} size="large" text="Loading passes">
-                        {passes.length > 0 ? (
-                          passes.map(renderPassItem)
-                        ) : (
-                          <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                            Class Pass List
-                            <Empty />
-                          </div>
-                        )}
-                      </Loader>
-                    ) : (
-                      <Table columns={passColumns} data={passes} loading={isLoading} />
-                    )}
-                  </Col>
-                  <Col span={24}>
-                    <Row justify="center" className={styles.mt50}>
-                      <Col>
-                        <Button
-                          onClick={() => handleShowMorePasses()}
-                          disabled={!showMorePasses}
-                          className={styles.ml20}
-                        >
-                          Show More
-                        </Button>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </Panel>
-              <Panel header={<Title level={5}> Videos </Title>} key="Videos">
-                <Row className={styles.mt10}>
-                  <Col span={24}>
-                    {isMobileDevice ? (
-                      <Loader loading={isLoading} size="large" text="Loading videos">
-                        {videos.length > 0 ? (
-                          videos.map(renderVideoItem)
-                        ) : (
-                          <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                            Videos List
-                            <Empty />
-                          </div>
-                        )}
-                      </Loader>
-                    ) : (
-                      <Table columns={videoColumns} data={videos} loading={isLoading} />
-                    )}
-                  </Col>
-                  <Col span={24}>
-                    <Row justify="center" className={styles.mt50}>
-                      <Col>
-                        <Button
-                          onClick={() => handleShowMoreVideos()}
-                          disabled={!showMoreVideos}
-                          className={styles.ml20}
-                        >
-                          Show More
-                        </Button>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </Panel>
+              {productEarningsItems?.map((productEarningsItem) => (
+                <Panel
+                  header={<Title level={5}> {productEarningsItem.name} Earnings </Title>}
+                  key={productEarningsItem.name}
+                >
+                  <Row className={styles.mt10}>
+                    <Col span={24}>
+                      {isMobileDevice ? (
+                        <Loader loading={isLoading} size="large" text={`Loading ${productEarningsItem?.name}`}>
+                          {earnings[productEarningsItem?.stateKey]?.length > 0 ? (
+                            earnings[productEarningsItem?.stateKey].map((productEarnings) =>
+                              renderMobileEarningsItem(productEarnings, productEarningsItem?.redirectMethod)
+                            )
+                          ) : (
+                            <div className={classNames(styles.textAlignCenter, 'text-empty')}>
+                              {productEarningsItem?.name} List
+                              <Empty />
+                            </div>
+                          )}
+                        </Loader>
+                      ) : (
+                        <Table
+                          columns={generateEarningsColumns(
+                            productEarningsItem?.name,
+                            productEarningsItem?.redirectMethod
+                          )}
+                          data={earnings[productEarningsItem?.stateKey]}
+                          loading={isLoading}
+                          rowKey={(record) => record[productEarningsItem?.key || 'id']}
+                        />
+                      )}
+                    </Col>
+                    <Col span={24}>
+                      <Row justify="center" className={styles.mt50}>
+                        <Col>
+                          <Button
+                            onClick={() => productEarningsItem?.showMoreMethod()}
+                            disabled={!showMore[productEarningsItem?.stateKey]}
+                            className={styles.ml20}
+                          >
+                            Show More
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Panel>
+              ))}
             </Collapse>
           </Col>
         </Row>

@@ -5,6 +5,8 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
 
+import { BookTwoTone } from '@ant-design/icons';
+
 import config from 'config';
 import apis from 'apis';
 import Loader from 'components/Loader';
@@ -37,6 +39,7 @@ const formInitialValues = {
   videoType: videoTypes.FREE.name,
   price: 0,
   watch_limit: 0,
+  video_course_type: 'normal',
 };
 
 const UploadVideoModal = ({
@@ -59,6 +62,7 @@ const UploadVideoModal = ({
   const [coverImageUrl, setCoverImageUrl] = useState(null);
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
   const [uploadingFlie, setuploadingFlie] = useState(null);
+  const [isCourseVideo, setIsCourseVideo] = useState(false);
   const uppy = useRef(null);
   uppy.current = new Uppy({
     meta: { type: 'avatar' },
@@ -118,8 +122,8 @@ const UploadVideoModal = ({
       const { data } = await apis.session.getSession();
 
       if (data) {
-        setClasses(data.map((session) => ({ value: session.session_id, label: session.name })));
-        setCurrency(data[0].currency || 'SGD');
+        setClasses(data);
+        setCurrency(data[0].currency.toUpperCase() || 'SGD');
       }
     } catch (error) {
       showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
@@ -137,11 +141,13 @@ const UploadVideoModal = ({
           ...editedVideo,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType: editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
+          video_course_type: editedVideo.is_course ? 'course' : 'normal',
         });
-        setCurrency(editedVideo.currency || 'SGD');
+        setCurrency(editedVideo.currency.toUpperCase() || 'SGD');
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
+        setIsCourseVideo(editedVideo.is_course || false);
       } else {
         form.resetFields();
       }
@@ -154,6 +160,7 @@ const UploadVideoModal = ({
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
+      setIsCourseVideo(false);
       uppy.current = null;
     };
   }, [visible, editedVideo, fetchAllClassesForCreator, form, formPart]);
@@ -172,7 +179,7 @@ const UploadVideoModal = ({
 
     try {
       let data = {
-        currency: currency.toUpperCase(),
+        currency: currency.toLowerCase(),
         title: values.title,
         description: values.description,
         price: videoType === videoTypes.FREE.name ? 0 : values.price,
@@ -180,6 +187,7 @@ const UploadVideoModal = ({
         session_ids: selectedSessionIds || values.session_ids || [],
         thumbnail_url: coverImageUrl,
         watch_limit: values.watch_limit,
+        is_course: isCourseVideo,
       };
 
       const response = editedVideo
@@ -219,6 +227,10 @@ const UploadVideoModal = ({
   const onCoverImageUpload = (imageUrl) => {
     setCoverImageUrl(imageUrl);
     form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
+  };
+
+  const onCourseTypeChange = (e) => {
+    setIsCourseVideo(e.target.value === 'course');
   };
 
   // Pending this feature
@@ -304,17 +316,96 @@ const UploadVideoModal = ({
                     placeholder="Select your Class(es)"
                     mode="multiple"
                     maxTagCount={2}
-                    options={classes}
                     value={selectedSessionIds}
                     onChange={(val) => setSelectedSessionIds(val)}
-                  />
+                    optionLabelProp="label"
+                  >
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                      key="Published Sessions"
+                    >
+                      {classes
+                        ?.filter((session) => session.is_active)
+                        .map((session) => (
+                          <Select.Option
+                            value={session.session_id}
+                            key={session.session_id}
+                            label={
+                              <>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                <Text strong>
+                                  {session.currency?.toUpperCase()} {session.price}
+                                </Text>
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {classes?.filter((session) => session.is_active).length <= 0 && (
+                        <Text disabled> No published sessions </Text>
+                      )}
+                    </Select.OptGroup>
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                      key="Unpublished Sessions"
+                    >
+                      {classes
+                        ?.filter((session) => !session.is_active)
+                        .map((session) => (
+                          <Select.Option
+                            value={session.session_id}
+                            key={session.session_id}
+                            label={
+                              <>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </>
+                            }
+                          >
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17} className={styles.productName}>
+                                {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
+                              </Col>
+                              <Col xs={7} className={styles.textAlignRight}>
+                                <Text strong>
+                                  {session.currency?.toUpperCase()} {session.price}
+                                </Text>
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {classes?.filter((session) => !session.is_active).length <= 0 && (
+                        <Text disabled> No unpublished sessions </Text>
+                      )}
+                    </Select.OptGroup>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item
+                  id="video_course_type"
+                  name="video_course_type"
+                  label="Video Course Type"
+                  rules={validationRules.requiredValidation}
+                  onChange={onCourseTypeChange}
+                >
+                  <Radio.Group className="video-type-radio">
+                    <Radio value="normal"> Normal Video </Radio>
+                    <Radio value="course"> Course Video </Radio>
+                  </Radio.Group>
                 </Form.Item>
               </Col>
               <Col xs={24}>
                 <Form.Item
                   id="videoType"
                   name="videoType"
-                  label="Video Type"
+                  label="Video Pricing"
                   rules={validationRules.requiredValidation}
                 >
                   <Radio.Group
@@ -334,7 +425,7 @@ const UploadVideoModal = ({
                   <Form.Item
                     id="price"
                     name="price"
-                    label={`Price (${currency})`}
+                    label={`Price (${currency.toUpperCase()})`}
                     rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
                   >
                     <InputNumber min={0} placeholder="Price" className={styles.numericInput} />

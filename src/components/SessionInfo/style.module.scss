@@ -7,4 +7,14 @@
 }
 .downloadButton {
   padding: 0px !important;
+
+  span {
+    &[role='img'] {
+      vertical-align: top;
+      margin-top: 4px;
+    }
+
+    white-space: break-spaces;
+    text-align: start;
+  }
 }

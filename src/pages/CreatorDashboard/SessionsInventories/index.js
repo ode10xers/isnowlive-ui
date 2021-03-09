@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Typography, Popconfirm, Button, Card, message, Radio, Empty, Tooltip } from 'antd';
+import { Row, Col, Typography, Popconfirm, Button, Card, Radio, Empty, Tooltip } from 'antd';
 import {
   DeleteOutlined,
   DownCircleOutlined,
@@ -9,6 +9,7 @@ import {
   PlayCircleOutlined,
   VideoCameraAddOutlined,
   InfoCircleOutlined,
+  BookTwoTone,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -24,7 +25,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -79,6 +80,7 @@ const SessionsInventories = ({ match }) => {
           max_participants: i.max_participants,
           color_code: i.color_code,
           is_published: i.is_published,
+          is_course: i.is_course,
         }));
 
         let filterByDateSessions = [];
@@ -161,47 +163,11 @@ const SessionsInventories = ({ match }) => {
     }
   };
 
-  const copyPageLinkToClipboard = (inventoryId) => {
+  const copyInventoryLink = (inventoryId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/e/${inventoryId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   const emptyTableCell = {
@@ -256,9 +222,9 @@ const SessionsInventories = ({ match }) => {
             },
             children: (
               <>
-                {' '}
+                <Text className={styles.sessionNameWrapper}>{record.name}</Text>{' '}
                 {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
-                <Text className={styles.textAlignLeft}>{record.name}</Text>{' '}
+                {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </>
             ),
           };
@@ -330,11 +296,7 @@ const SessionsInventories = ({ match }) => {
             </Col>
             <Col md={24} lg={24} xl={4}>
               <Tooltip title="Copy Event Page Link">
-                <Button
-                  type="text"
-                  onClick={() => copyPageLinkToClipboard(record.inventory_id)}
-                  icon={<CopyOutlined />}
-                />
+                <Button type="text" onClick={() => copyInventoryLink(record.inventory_id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
@@ -448,7 +410,7 @@ const SessionsInventories = ({ match }) => {
         <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
       </Tooltip>,
       <Tooltip title="Copy Event Page Link">
-        <Button type="text" onClick={() => copyPageLinkToClipboard(item.inventory_id)} icon={<CopyOutlined />} />
+        <Button type="text" onClick={() => copyInventoryLink(item.inventory_id)} icon={<CopyOutlined />} />
       </Tooltip>,
       isCancelDisabled ? (
         <Tooltip title="Event cannot be cancelled">
@@ -488,7 +450,9 @@ const SessionsInventories = ({ match }) => {
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
-            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>
+            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
+            <Text>{item.name}</Text>
+            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
       >

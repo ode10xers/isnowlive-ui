@@ -6,6 +6,9 @@ import {
   DollarOutlined,
   GlobalOutlined,
   PlayCircleOutlined,
+  BookOutlined,
+  SettingOutlined,
+  PercentageOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -52,8 +55,8 @@ export const creatorMenuItems = [
   {
     order: 3,
     key: 'passes',
-    title: 'Class Pass',
-    mixPanelTag: creator.click.dashboard.packagesNav,
+    title: 'Pass',
+    mixPanelTag: creator.click.dashboard.passesNav,
     icon: <TagsOutlined />,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes,
   },
@@ -62,11 +65,27 @@ export const creatorMenuItems = [
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
-    mixPanelTag: creator.click.dashboard.videos,
+    mixPanelTag: creator.click.dashboard.videosNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
   },
   {
     order: 5,
+    key: 'courses',
+    title: 'Courses',
+    icon: <BookOutlined />,
+    mixPanelTag: creator.click.dashboard.coursesNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses,
+  },
+  {
+    order: 6,
+    key: 'coupons',
+    title: 'Coupons',
+    icon: <PercentageOutlined />,
+    mixPanelTag: creator.click.dashboard.couponsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.coupons,
+  },
+  {
+    order: 7,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -74,7 +93,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 6,
+    order: 8,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -82,12 +101,20 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 7,
+    order: 9,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
     mixPanelTag: creator.click.dashboard.paymentNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
+  },
+  {
+    order: 10,
+    key: 'account_settings',
+    title: 'Account Settings',
+    icon: <SettingOutlined />,
+    mixPanelTag: creator.click.dashboard.settingsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
   },
 ];
 
@@ -127,7 +154,15 @@ export const attendeeMenuItems = [
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
-    mixPanelTag: attendee.click.dashboard.videos,
+    mixPanelTag: attendee.click.dashboard.videosNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos,
+  },
+  {
+    order: 5,
+    key: 'courses',
+    title: 'Courses',
+    icon: <BookOutlined />,
+    mixPanelTag: attendee.click.dashboard.coursesNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses,
   },
 ];

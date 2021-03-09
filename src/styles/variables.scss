@@ -63,6 +63,9 @@ $spacing: (
 .pl10 {
   padding-left: map-get($spacing, '10');
 }
+.p20 {
+  padding: map-get($spacing, '20');
+}
 .p50 {
   padding: map-get($spacing, '50');
 }
@@ -83,6 +86,14 @@ $spacing: (
 }
 .blueText {
   color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+}
+.whiteText {
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+.optionSeparatorText {
+  color: map-get($map: $colors, $key: 'Razzmatazz') !important;
+  font-size: 15px;
+  font-weight: 600;
 }
 .headButton {
   margin-top: 10px;

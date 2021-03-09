@@ -1,9 +1,12 @@
 import moment from 'moment';
+import { message } from 'antd';
 import dateUtil from 'utils/date';
 
 const {
   formatDate: { getTimeDiff },
 } = dateUtil;
+
+export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const generateQueryString = (data) => {
   return Object.entries(data)
@@ -135,6 +138,8 @@ export const generateUrl = (targetDomain = 'app') => {
 
 export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
+export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
+
 export const getDuration = (start_time, end_time) => {
   let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration >= 60) {
@@ -163,6 +168,46 @@ export const getPaymentStatus = (status) => {
   }
 };
 
+export const copyPageLinkToClipboard = (pageLink) => {
+  // Fallback method if navigator.clipboard is not supported
+  if (!navigator.clipboard) {
+    var textArea = document.createElement('textarea');
+    textArea.value = pageLink;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+
+      if (successful) {
+        message.success('Page link copied to clipboard!');
+      } else {
+        message.error('Failed to copy link to clipboard');
+      }
+    } catch (err) {
+      message.error('Failed to copy link to clipboard');
+    }
+
+    document.body.removeChild(textArea);
+  } else {
+    navigator.clipboard.writeText(pageLink).then(
+      function () {
+        message.success('Page link copied to clipboard!');
+      },
+      function (err) {
+        message.error('Failed to copy link to clipboard');
+      }
+    );
+  }
+};
+
 export const ZoomAuthType = {
   OAUTH: 'OAUTH',
   JWT: 'JWT',
@@ -177,15 +222,30 @@ export const StripeAccountStatus = {
 
 export const paymentSource = {
   GATEWAY: 'PAYMENT_GATEWAY',
-  CLASS_PASS: 'PASS',
+  PASS: 'PASS',
 };
 
 export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',
   VIDEO: 'VIDEO_ORDER',
+  COURSE: 'COURSE_ORDER',
+};
+
+export const courseType = {
+  MIXED: 'MIXED',
+  VIDEO_SEQ: 'VIDEO_SEQUENCE',
+  VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE',
+};
+
+export const productType = {
+  CLASS: 'Session',
+  PASS: 'Pass',
+  VIDEO: 'Video',
+  COURSE: 'Course',
+  PRODUCT: 'Product', //As a default
 };
 
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export const reservedDomainName = ['app', ...(process.env.NODE_ENV !== 'development' ? ['localhost'] : [])];
+export const reservedDomainName = ['app', ...(process.env.NODE_ENV === 'development' ? ['localhost'] : [])];

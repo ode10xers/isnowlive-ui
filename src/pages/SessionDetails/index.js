@@ -19,7 +19,14 @@ import PurchaseModal from 'components/PurchaseModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType, reservedDomainName } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  paymentSource,
+  orderType,
+  productType,
+  reservedDomainName,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
@@ -33,6 +40,7 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -45,6 +53,7 @@ const {
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
+  const [course, setCourse] = useState(null);
   const [creator, setCreator] = useState(null);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
@@ -81,6 +90,13 @@ const SessionDetails = ({ match, history }) => {
             (inventory) => inventory.num_participants < sessionDetails.data.max_participants
           ),
         });
+
+        if (sessionDetails.data.is_course) {
+          const courseDetails = await apis.courses.getCoursesBySessionId(session_id);
+
+          setCourse(courseDetails.data[0]);
+        }
+
         setCreator(userDetails.data);
         setAvailablePasses(passes.data);
         setIsLoading(false);
@@ -105,15 +121,17 @@ const SessionDetails = ({ match, history }) => {
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData && session) {
-        const { data } = await apis.passes.getAttendeePassesForSession(session.session_id);
-        setUserPasses(
-          data.active.map((userPass) => ({
-            ...userPass,
-            id: userPass.pass_id,
-            name: userPass.pass_name,
-            sessions: userPass.session,
-          }))
-        );
+        const { status, data } = await apis.passes.getAttendeePassesForSession(session.session_id);
+
+        if (isAPISuccess(status) && data) {
+          setUserPasses(
+            data.active.map((userPass) => ({
+              ...userPass,
+              id: userPass.pass_id,
+              name: userPass.pass_name,
+            }))
+          );
+        }
       }
     } catch (error) {
       showErrorModal('Something went wrong', error.response?.data?.message);
@@ -228,12 +246,27 @@ const SessionDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   const handleOrder = (userEmail) => {
     setIsLoading(true);
 
     if (selectedVideo) {
       const payload = {
         video_id: selectedVideo.external_id,
+        payment_source: paymentSource.GATEWAY,
       };
 
       buyVideo(payload, userEmail);
@@ -247,7 +280,7 @@ const SessionDetails = ({ match, history }) => {
           user_timezone_offset: new Date().getTimezoneOffset(),
           user_timezone_location: getTimezoneLocation(),
           user_timezone: getCurrentLongTimezone(),
-          payment_source: paymentSource.CLASS_PASS,
+          payment_source: paymentSource.PASS,
           source_id: usersPass.pass_order_id,
         };
 
@@ -256,7 +289,7 @@ const SessionDetails = ({ match, history }) => {
         const payload = {
           pass_id: selectedPass.id,
           price: selectedPass.price,
-          currency: selectedPass.currency,
+          currency: selectedPass.currency.toLowerCase(),
         };
 
         buyPassAndBookClass(payload, userEmail);
@@ -286,7 +319,9 @@ const SessionDetails = ({ match, history }) => {
             order_type: orderType.CLASS,
           });
         } else {
-          showBookingSuccessModal(userEmail, null, false, false, username);
+          const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+          showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
           setIsLoading(false);
         }
       }
@@ -297,9 +332,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -324,12 +359,14 @@ const SessionDetails = ({ match, history }) => {
             inventory_id: parseInt(selectedInventory.inventory_id),
             user_timezone_offset: new Date().getTimezoneOffset(),
             user_timezone: getCurrentLongTimezone(),
-            payment_source: paymentSource.CLASS_PASS,
+            payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
           });
 
           if (isAPISuccess(followUpBooking.status)) {
-            showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+            const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
+
+            showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
             setIsLoading(false);
           }
         }
@@ -341,9 +378,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -353,7 +390,9 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+        const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+        showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
         setIsLoading(false);
       }
     } catch (error) {
@@ -363,9 +402,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -382,14 +421,15 @@ const SessionDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, selectedVideo, username);
+          showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
         }
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
   };
@@ -468,8 +508,13 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const redirectToVideoPreview = (video) => {
-    const baseUrl = generateUrlFromUsername(username || video.username || 'app');
-    window.open(`${baseUrl}/v/${video.external_id}`);
+    const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+    window.open(`${baseUrl}/v/${video?.external_id}`);
+  };
+
+  const redirectToCourseDetails = (course) => {
+    const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
+    window.open(`${baseUrl}/c/${course?.id}`);
   };
 
   const openPurchaseModal = (video) => {
@@ -497,16 +542,16 @@ const SessionDetails = ({ match, history }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={24} lg={13}>
+        <Col xs={24}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={12}>
+        <Col xs={18}>
           <SessionInfo session={session} />
         </Col>
         {creator && (
-          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
+          <Col xs={6} lg={{ span: 3, offset: 3 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/s/${session.session_id}`}
@@ -550,96 +595,121 @@ const SessionDetails = ({ match, history }) => {
           <HostDetails host={creator} />
         </Col>
       </Row>
-      <Row justify="space-between" className={styles.mt20} gutter={8}>
-        <Col
-          xs={24}
-          lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
-          order={isMobileDevice ? 2 : 1}
-          className={isMobileDevice ? styles.mt20 : styles.mt50}
-        >
-          {showSignInForm ? (
-            <SignInForm
-              user={currentUser}
-              onSetNewPassword={handleSendNewPasswordEmail}
-              hideSignInForm={() => hideSignInForm()}
-              incorrectPassword={incorrectPassword}
-            />
-          ) : (
-            <SessionRegistration
-              user={currentUser}
-              showPasswordField={showPasswordField}
-              incorrectPassword={incorrectPassword}
-              onFinish={onFinish}
-              onSetNewPassword={handleSendNewPasswordEmail}
-              availablePasses={availablePasses}
-              userPasses={userPasses}
-              setSelectedPass={setSelectedPass}
-              selectedPass={selectedPass}
-              classDetails={session}
-              selectedInventory={selectedInventory}
-              logOut={() => {
-                logOut(history, true);
-                setCurrentUser(null);
-                setSelectedPass(null);
-                setUserPasses([]);
-                setShowSignInForm(true);
-                setIncorrectPassword(false);
-              }}
-              showSignInForm={() => {
-                setShowPasswordField(false);
-                setShowSignInForm(true);
-                setIncorrectPassword(false);
-              }}
-            />
-          )}
-        </Col>
-        {!showSignInForm && (
-          <Col
-            xs={24}
-            lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
-            order={isMobileDevice ? 1 : 2}
-            className={isMobileDevice ? styles.mt20 : styles.mt50}
-          >
-            <SessionInventorySelect
-              inventories={
-                session?.inventory.sort((a, b) =>
-                  a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
-                ) || []
-              }
-              selectedSlot={selectedInventory}
-              handleSubmit={(val) => {
-                setSelectedInventory(val);
-              }}
-            />
-          </Col>
-        )}
-      </Row>
-      {sessionVideos.length > 0 && (
+      {session?.is_course ? (
+        course && (
+          <div className={classNames(styles.mb50, styles.mt20)}>
+            <Row gutter={[8, 16]}>
+              <Col xs={24}>
+                <Title level={5}> This session can only be attended by doing this course </Title>
+              </Col>
+              <Col xs={24}>
+                <ShowcaseCourseCard
+                  courses={[course]}
+                  onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                  username={username}
+                />
+              </Col>
+            </Row>
+          </div>
+        )
+      ) : (
         <>
-          <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={handleOrder} />
-          <Row justify="space-between" className={styles.mt20}>
-            <Col xs={24}>
-              <div className={styles.box}>
-                <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
-                  <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
-                    <Row gutter={[8, 20]}>
-                      {sessionVideos.length > 0 &&
-                        sessionVideos.map((videoDetails) => (
-                          <Col xs={24} key={videoDetails.external_id}>
-                            <VideoCard
-                              video={videoDetails}
-                              buyable={true}
-                              onCardClick={redirectToVideoPreview}
-                              showPurchaseModal={openPurchaseModal}
-                            />
-                          </Col>
-                        ))}
-                    </Row>
-                  </Tabs.TabPane>
-                </Tabs>
-              </div>
+          <Row justify="space-between" className={styles.mt20} gutter={8}>
+            <Col
+              xs={24}
+              lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
+              order={isMobileDevice ? 2 : 1}
+              className={isMobileDevice ? styles.mt20 : styles.mt50}
+            >
+              {showSignInForm ? (
+                <SignInForm
+                  user={currentUser}
+                  onSetNewPassword={handleSendNewPasswordEmail}
+                  hideSignInForm={() => hideSignInForm()}
+                  incorrectPassword={incorrectPassword}
+                />
+              ) : (
+                <SessionRegistration
+                  user={currentUser}
+                  showPasswordField={showPasswordField}
+                  incorrectPassword={incorrectPassword}
+                  onFinish={onFinish}
+                  onSetNewPassword={handleSendNewPasswordEmail}
+                  availablePasses={availablePasses}
+                  userPasses={userPasses}
+                  setSelectedPass={setSelectedPass}
+                  selectedPass={selectedPass}
+                  classDetails={session}
+                  selectedInventory={selectedInventory}
+                  logOut={() => {
+                    logOut(history, true);
+                    setCurrentUser(null);
+                    setSelectedPass(null);
+                    setUserPasses([]);
+                    setShowSignInForm(true);
+                    setIncorrectPassword(false);
+                  }}
+                  showSignInForm={() => {
+                    setShowPasswordField(false);
+                    setShowSignInForm(true);
+                    setIncorrectPassword(false);
+                  }}
+                />
+              )}
             </Col>
+            {!showSignInForm && (
+              <Col
+                xs={24}
+                lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
+                order={isMobileDevice ? 1 : 2}
+                className={isMobileDevice ? styles.mt20 : styles.mt50}
+              >
+                <SessionInventorySelect
+                  inventories={
+                    session?.inventory.sort((a, b) =>
+                      a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
+                    ) || []
+                  }
+                  selectedSlot={selectedInventory}
+                  handleSubmit={(val) => {
+                    setSelectedInventory(val);
+                  }}
+                />
+              </Col>
+            )}
           </Row>
+          {sessionVideos?.length > 0 && (
+            <>
+              <PurchaseModal
+                visible={showPurchaseVideoModal}
+                closeModal={closePurchaseModal}
+                createOrder={handleOrder}
+              />
+              <Row justify="space-between" className={styles.mt20}>
+                <Col xs={24}>
+                  <div className={styles.box}>
+                    <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
+                      <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
+                        <Row gutter={[8, 20]}>
+                          {sessionVideos?.length > 0 &&
+                            sessionVideos?.map((videoDetails) => (
+                              <Col xs={24} key={videoDetails.external_id}>
+                                <VideoCard
+                                  video={videoDetails}
+                                  buyable={true}
+                                  onCardClick={redirectToVideoPreview}
+                                  showPurchaseModal={openPurchaseModal}
+                                />
+                              </Col>
+                            ))}
+                        </Row>
+                      </Tabs.TabPane>
+                    </Tabs>
+                  </div>
+                </Col>
+              </Row>
+            </>
+          )}
         </>
       )}
     </Loader>

@@ -20,21 +20,11 @@ const formatDate = {
   toLongDateWithLongDay: (date) => moment(date).format('dddd, D MMMM YYYY'),
   toLongDateWithTime: (date) => moment(date).format('lll'),
   toLongDateWithDayTime: (date) => moment(date).format('llll'),
+  toShortDateWithYear: (date) => moment(date).format(`DD MMM 'YY`),
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
   getISODayOfWeek: (date) => moment(date).isoWeekday(),
-};
-
-const timeCalculation = {
-  isBeforeDate: (date) => moment().isBefore(moment(date)),
-  isSameOrBeforeToday: (date) => moment(date).endOf('day').isSameOrBefore(moment().startOf('day')),
-  isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
-  createRange: (startTime, endTime) => moment.range(startTime, endTime).snapTo('day'),
-  createWeekRange: (date, isPrevious) =>
-    moment.rangeFromInterval('day', isPrevious ? -6 : 6, moment(date).endOf('day')).snapTo('day'),
-  getRangeDiff: (rangeA, rangeB) =>
-    moment.range(rangeB[0], rangeB[1]).snapTo('day').subtract(moment.range(rangeA[0], rangeA[1]).snapTo('day')),
 };
 
 const timezoneUtils = {
@@ -44,6 +34,32 @@ const timezoneUtils = {
     return longTimezone.substring(1, longTimezone.length - 1);
   },
   getTimezoneLocation: () => Intl.DateTimeFormat().resolvedOptions().timeZone,
+};
+
+const timeCalculation = {
+  dateIsBeforeDate: (startDate, endDate) => moment(startDate).isBefore(endDate),
+  isBeforeDate: (date) => moment().isBefore(moment(date)),
+  isSameOrBeforeToday: (date) => moment(date).endOf('day').isSameOrBefore(moment().startOf('day')),
+  isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
+  createRange: (startTime, endTime) => moment.range(startTime, endTime).snapTo('day'),
+  createWeekRange: (date, isPrevious) =>
+    moment.rangeFromInterval('day', isPrevious ? -6 : 6, moment(date).endOf('day')).snapTo('day'),
+  getRangeDiff: (rangeA, rangeB) =>
+    moment.range(rangeB[0], rangeB[1]).snapTo('day').subtract(moment.range(rangeA[0], rangeA[1]).snapTo('day')),
+  generateCalendarTimeInfo: (startDate, endDate) => {
+    const startMoment = moment(startDate);
+    const endMoment = moment(endDate);
+    const timezoneLocation = timezoneUtils.getTimezoneLocation();
+
+    const calendarTimeData = {
+      startTime: startMoment.format(),
+      endTime: endMoment.format(),
+      duration: moment.duration(endMoment.diff(startMoment)).asHours(),
+      timezone: timezoneLocation,
+    };
+
+    return calendarTimeData;
+  },
 };
 
 const dateUtil = {

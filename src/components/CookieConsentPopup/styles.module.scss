@@ -1,0 +1,25 @@
+@import '../../styles/variables.scss';
+
+.btnWrapper {
+  padding-right: 30px;
+}
+
+.cookieUsageList {
+  font-weight: 600;
+}
+
+@media screen and (max-width: 769px) {
+  .btnWrapper {
+    padding-right: 0px;
+    width: 100%;
+    display: flex;
+
+    .mobileBtn {
+      flex: 1 1 50%;
+
+      &.decline {
+        order: -1;
+      }
+    }
+  }
+}

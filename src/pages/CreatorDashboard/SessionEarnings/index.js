@@ -82,7 +82,7 @@ const SessionEarnings = ({ match }) => {
 
   const showSessionEarning = showSessionLayout(
     'Total Earning',
-    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency} />
+    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency.toUpperCase()} />
   );
 
   let sessionColumns = [
@@ -106,7 +106,7 @@ const SessionEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.total_price}
+          {record.currency.toUpperCase()} {record.total_price}
         </Text>
       ),
     },
@@ -117,7 +117,7 @@ const SessionEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.platform_fees}
+          {record.currency.toUpperCase()} {record.platform_fees}
         </Text>
       ),
     },
@@ -128,7 +128,7 @@ const SessionEarnings = ({ match }) => {
       width: '5%',
       render: (text, record) => (
         <Text>
-          {record.currency} {record.net_price}
+          {record.currency.toUpperCase()} {record.net_price}
         </Text>
       ),
     },
@@ -157,19 +157,19 @@ const SessionEarnings = ({ match }) => {
         {layout(
           'Amount',
           <Text>
-            {item.currency} {item.total_price}
+            {item.currency.toUpperCase()} {item.total_price}
           </Text>
         )}
         {layout(
           'Fees',
           <Text>
-            {item.currency} {item.platform_fees}
+            {item.currency.toUpperCase()} {item.platform_fees}
           </Text>
         )}
         {layout(
           'Net',
           <Text>
-            {item.currency} {item.net_price}
+            {item.currency.toUpperCase()} {item.net_price}
           </Text>
         )}
         {layout('Status', <Text>{getPaymentStatus(item.status)}</Text>)}

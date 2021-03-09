@@ -8,7 +8,7 @@ const { Text } = Typography;
 const ShowAmount = ({ amount, currency }) => {
   return (
     <>
-      <Text className={styles.currency}>{currency || 'USD'} </Text>
+      <Text className={styles.currency}>{currency?.toUpperCase() || 'USD'} </Text>
       <Text className={styles.amount}>{parseInt(amount || 0)}</Text>
       <Text className={styles.currency}>
         .

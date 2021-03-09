@@ -47,6 +47,10 @@
   padding: 0px !important;
   cursor: pointer;
   color: map-get($colors, 'DodgerBlue') !important;
+
+  &.setNewPassword {
+    font-size: 15px !important;
+  }
 }
 
 .roundBtn {
@@ -57,7 +61,7 @@
   border-radius: 7px;
   border: solid 1px map-get($colors, 'NightRider');
 }
-.roundBtn:hover{
+.roundBtn:hover {
   border: solid 1px map-get($colors, 'DodgerBlue');
 }
 
@@ -71,7 +75,7 @@
   .passwordHelpText {
     margin-top: -24px;
     font-size: 12px;
-    
+
     .linkBtn {
       font-size: 12px;
     }

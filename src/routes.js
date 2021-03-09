@@ -9,6 +9,8 @@ const Routes = {
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   session: '/creator/session',
+  courseSessionDetails: '/cs/:session_id',
+  courseDetails: '/c/:course_id',
   videoDetails: '/v/:video_id',
   passDetails: '/p/:pass_id',
   inventoryDetails: '/e/:inventory_id',
@@ -33,8 +35,12 @@ const Routes = {
     sessionEarnings: '/payments/inventory/:inventory_id',
     passEarnings: '/payments/pass/:pass_id',
     videoEarnings: '/payments/video/:video_id',
+    courseEarnings: '/payments/course/:course_id',
     passes: '/passes',
     videos: '/videos',
+    courses: '/courses',
+    coupons: '/coupons',
+    accountSettings: '/settings',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
@@ -47,6 +53,8 @@ const Routes = {
     livestream: '/livestream',
     videos: '/videos',
     videoDetails: '/videos/:video_id/:video_order_id',
+    courses: '/courses',
+    courseDetails: '/course/:course_id',
   },
 };
 

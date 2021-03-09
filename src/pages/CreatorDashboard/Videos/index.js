@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, message } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty } from 'antd';
 import {
   EditOutlined,
   CloudUploadOutlined,
@@ -10,6 +10,7 @@ import {
   CopyOutlined,
   ExportOutlined,
   CheckCircleTwoTone,
+  BookTwoTone,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -22,7 +23,7 @@ import dateUtil from 'utils/date';
 import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -97,9 +98,9 @@ const Videos = () => {
   const getVideosForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await apis.videos.getCreatorVideos();
+      const { status, data } = await apis.videos.getCreatorVideos();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setVideos(
           data.map((video, index) => ({
             index,
@@ -135,47 +136,11 @@ const Videos = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
-  const copyPageLinkToClipboard = (videoId) => {
+  const copyVideoPageLink = (videoId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/v/${videoId}`;
 
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = pageLink;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success('Page link copied to clipboard!');
-        } else {
-          message.error('Failed to copy link to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy link to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(pageLink).then(
-        function () {
-          message.success('Page link copied to clipboard!');
-        },
-        function (err) {
-          message.error('Failed to copy link to clipboard');
-        }
-      );
-    }
+    copyPageLinkToClipboard(pageLink);
   };
 
   const cloneVideo = async (video) => {
@@ -201,7 +166,7 @@ const Videos = () => {
       dataIndex: 'thumbnail_url',
       key: 'thumbnail_url',
       align: 'center',
-      width: '12%',
+      width: '125px',
       render: (text, record) => {
         return {
           props: {
@@ -227,14 +192,19 @@ const Videos = () => {
       dataIndex: 'title',
       key: 'title',
       width: '30%',
-      render: (text, record) => <Text> {record.title} </Text>,
+      render: (text, record) => (
+        <>
+          <Text> {record.title} </Text>
+          {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+        </>
+      ),
     },
     {
       title: 'Validity',
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '12%',
+      width: '90px',
       render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -242,7 +212,7 @@ const Videos = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '10%',
+      width: '80px',
       render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
     },
     {
@@ -298,7 +268,7 @@ const Videos = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(record.external_id)}
+                onClick={() => copyVideoPageLink(record.external_id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>
@@ -357,7 +327,7 @@ const Videos = () => {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
-      render: (text, record) => `${record.price_paid} ${record.currency}`,
+      render: (text, record) => `${record.price_paid} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -378,13 +348,13 @@ const Videos = () => {
     <Card>
       <Row>
         <Col xs={24}>
-          <Title level={5}> {buyer.name} </Title>
+          <Title level={5}> {buyer?.name} </Title>
         </Col>
         <Col xs={24}>
-          <Text> Purchased at {toDateAndTime(buyer.date_of_purchase)} </Text>
+          <Text> Purchased at {toDateAndTime(buyer?.date_of_purchase)} </Text>
         </Col>
         <Col xs={24}>
-          <Text> {`${buyer.price_paid} ${buyer.currency}`} </Text>
+          <Text> {`${buyer?.price_paid} ${buyer?.currency?.toUpperCase()}`} </Text>
         </Col>
       </Row>
     </Card>
@@ -401,7 +371,7 @@ const Videos = () => {
     );
 
     const actionButtons =
-      video.status === 'UPLOAD_SUCCESS'
+      video?.status === 'UPLOAD_SUCCESS'
         ? [
             <Tooltip title="Edit">
               <Button
@@ -430,13 +400,13 @@ const Videos = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                onClick={() => copyVideoPageLink(video?.external_id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
-            video.is_published ? (
+            video?.is_published ? (
               <Tooltip title="Hide Video">
-                <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
+                <Button type="link" danger onClick={() => unpublishVideo(video?.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
@@ -444,18 +414,18 @@ const Videos = () => {
               <Tooltip title="Unhide Video">
                 <Button
                   type="link"
-                  disabled={video.status === 'UPLOAD_SUCCESS' ? false : true}
+                  disabled={video?.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
-                  onClick={() => publishVideo(video.external_id)}
+                  onClick={() => publishVideo(video?.external_id)}
                 >
                   Show
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(video.external_id)} icon={<UpOutlined />} />
+            expandedRowKeys.includes(video?.external_id) ? (
+              <Button type="link" onClick={() => collapseRow(video?.external_id)} icon={<UpOutlined />} />
             ) : (
-              <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
+              <Button type="link" onClick={() => expandRow(video?.external_id)} icon={<DownOutlined />} />
             ),
           ]
         : [
@@ -467,11 +437,11 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title={video.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+            <Tooltip title={video?.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
               <Button
                 className={styles.detailsButton}
                 type="text"
-                disabled={video.video_uid.length ? true : false}
+                disabled={video?.video_uid.length ? true : false}
                 onClick={() => showUploadVideoModal(video, 2)}
                 icon={<CloudUploadOutlined />}
               />
@@ -480,13 +450,13 @@ const Videos = () => {
               <Button
                 type="text"
                 className={styles.detailsButton}
-                onClick={() => copyPageLinkToClipboard(video.external_id)}
+                onClick={() => copyVideoPageLink(video?.external_id)}
                 icon={<CopyOutlined />}
               />
             </Tooltip>,
-            video.is_published ? (
+            video?.is_published ? (
               <Tooltip title="Hide Video">
-                <Button type="link" danger onClick={() => unpublishVideo(video.external_id)}>
+                <Button type="link" danger onClick={() => unpublishVideo(video?.external_id)}>
                   Hide
                 </Button>
               </Tooltip>
@@ -494,18 +464,18 @@ const Videos = () => {
               <Tooltip title="Unhide Video">
                 <Button
                   type="link"
-                  disabled={video.status === 'UPLOAD_SUCCESS' ? false : true}
+                  disabled={video?.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
-                  onClick={() => publishVideo(video.external_id)}
+                  onClick={() => publishVideo(video?.external_id)}
                 >
                   Show
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(video.external_id)} icon={<UpOutlined />} />
+            expandedRowKeys.includes(video?.external_id) ? (
+              <Button type="link" onClick={() => collapseRow(video?.external_id)} icon={<UpOutlined />} />
             ) : (
-              <Button type="link" onClick={() => expandRow(video.external_id)} icon={<DownOutlined />} />
+              <Button type="link" onClick={() => expandRow(video?.external_id)} icon={<DownOutlined />} />
             ),
           ];
 
@@ -514,16 +484,17 @@ const Videos = () => {
         <Card
           className={styles.card}
           title={
-            <div style={{ paddingTop: 12, borderTop: `6px solid ${video.color_code || '#FFF'}` }}>
-              <Text>{video.title}</Text>
+            <div style={{ paddingTop: 12, borderTop: `6px solid ${video?.color_code || '#FFF'}` }}>
+              <Text>{video?.title}</Text>
+              {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
             </div>
           }
           actions={actionButtons}
         >
-          {layout('Validity', <Text>{`${video.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${video.price} ${video.currency}`}</Text>)}
+          {layout('Validity', <Text>{`${video?.validity} days`}</Text>)}
+          {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
         </Card>
-        {expandedRowKeys.includes(video.external_id) && (
+        {expandedRowKeys.includes(video?.external_id) && (
           <Row className={styles.cardExpansion}>
             <div className={styles.mb20}>{video?.buyers?.map(renderMobileBuyerCards)}</div>
           </Row>
@@ -564,13 +535,14 @@ const Videos = () => {
                 <>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Videos">
-                      <Row gutter={[8, 16]}>{videos?.filter((video) => video.is_published)?.map(renderVideoItem)}</Row>
+                      <Row gutter={[8, 16]}>{videos?.filter((video) => video?.is_published)?.map(renderVideoItem)}</Row>
                     </Loader>
                   ) : (
                     <Table
                       sticky={true}
+                      size="small"
                       columns={videosColumns}
-                      data={videos?.filter((video) => video.is_published)}
+                      data={videos?.filter((video) => video?.is_published)}
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
@@ -583,7 +555,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Published Videos'} />
+                <Empty description="No Published Videos" />
               )}
             </Panel>
             <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
@@ -591,13 +563,16 @@ const Videos = () => {
                 <>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Videos">
-                      <Row gutter={[8, 16]}>{videos?.filter((video) => !video.is_published)?.map(renderVideoItem)}</Row>
+                      <Row gutter={[8, 16]}>
+                        {videos?.filter((video) => !video?.is_published)?.map(renderVideoItem)}
+                      </Row>
                     </Loader>
                   ) : (
                     <Table
                       sticky={true}
+                      size="small"
                       columns={videosColumns}
-                      data={videos?.filter((video) => !video.is_published)}
+                      data={videos?.filter((video) => !video?.is_published)}
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
@@ -610,13 +585,12 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description={'No Unpublished Videos'} />
+                <Empty description="No Unpublished Videos" />
               )}
             </Panel>
           </Collapse>
         </Col>
       </Row>
-      {/* <VideoPlayer /> */}
     </div>
   );
 };

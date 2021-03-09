@@ -10,10 +10,14 @@ export const mixPanelEventTags = {
         manageSessions: '(Creator) Manage Sessions Clicked',
         createSession: '(Creator) Create Session Clicked',
         attendeeNav: '(Creator) Attendee Nav Clicked',
-        passesNav: '(Creator) Class Passes Nav Clicked',
+        passesNav: '(Creator) Passes Nav Clicked',
+        videosNav: '(Creator) Videos Nav Clicked',
+        coursesNav: '(Creator) Courses Nav Clicked',
+        couponsNav: '(Creator) Coupons Nav Clicked',
         livestreamNav: '(Creator) LiveStream Nav Clicked',
         profileNav: '(Creator) Public Page Nav Clicked',
         paymentNav: '(Creator) Get Paid Nav Clicked',
+        settingsNav: '(Creator) Settings Nav Clicked',
         accountNav: '(Creator) Account Nav Clicked',
       },
       sessions: {
@@ -85,9 +89,11 @@ export const mixPanelEventTags = {
       dashboard: {
         upcomingSession: '(Attendee) Upcoming Sessions Clicked',
         pastSessions: '(Attendee) Past Sessions Clicked',
-        passesNav: '(Attendee) Class Passes Nav Clicked',
+        passesNav: '(Attendee) Passes Nav Clicked',
         accountNav: '(Attendee) Account Nav Clicked',
         becomeHost: '(Attendee) Become Host Clicked',
+        videosNav: '(Attendee) Videos Nav Clicked',
+        coursesNav: '(Attendee) Courses Nav Clicked',
       },
       sessions: {
         pastSessionDetails: '(Attendee) Past Session Details Clicked',

@@ -18,7 +18,14 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, paymentSource, orderType, reservedDomainName } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  paymentSource,
+  orderType,
+  productType,
+  reservedDomainName,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
@@ -215,6 +222,20 @@ const InventoryDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   const createOrder = async (userEmail) => {
     setCreateFollowUpOrder(null);
     try {
@@ -238,14 +259,14 @@ const InventoryDetails = ({ match, history }) => {
         if (usersPass) {
           payload = {
             ...payload,
-            payment_source: paymentSource.CLASS_PASS,
+            payment_source: paymentSource.PASS,
             source_id: usersPass.pass_order_id,
           };
         } else {
           payload = {
             pass_id: selectedPass.id,
             price: selectedPass.price,
-            currency: selectedPass.currency,
+            currency: selectedPass.currency.toLowerCase(),
           };
         }
       }
@@ -270,20 +291,26 @@ const InventoryDetails = ({ match, history }) => {
                 inventory_id: parseInt(match.params.inventory_id),
                 user_timezone_offset: new Date().getTimezoneOffset(),
                 user_timezone: getCurrentLongTimezone(),
-                payment_source: paymentSource.CLASS_PASS,
+                payment_source: paymentSource.PASS,
                 source_id: data.pass_order_id,
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+                const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
+
+                showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
                 setIsLoading(false);
               }
             } else {
-              showBookingSuccessModal(userEmail, selectedPass, true, false, username);
+              const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+              showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
               setIsLoading(false);
             }
           } else {
-            showBookingSuccessModal(userEmail, null, false, false, username);
+            const orderDetails = await getAttendeeOrderDetails(data.order_id);
+
+            showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
             setIsLoading(false);
           }
         }
@@ -296,9 +323,9 @@ const InventoryDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(false, username);
+        showAlreadyBookedModal(productType.CLASS, username);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(true, username);
+        showAlreadyBookedModal(productType.PASS, username);
       }
     }
   };
@@ -400,11 +427,11 @@ const InventoryDetails = ({ match, history }) => {
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
-        <Col xs={12}>
+        <Col xs={18}>
           <SessionInfo session={session} />
         </Col>
         {creator && (
-          <Col xs={{ span: 5, offset: 4 }} lg={{ span: 3, offset: 9 }}>
+          <Col xs={6} lg={{ span: 3, offset: 3 }}>
             <Share
               label="Share"
               shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}

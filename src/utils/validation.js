@@ -15,7 +15,8 @@ const validationRules = {
       type: 'array',
       required: true,
       message: 'Please select at least one item',
-      validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
+      min: 1,
+      // validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
     },
   ],
   numberValidation: (message, min = 0, maxLimited = true, max = 10000) => {
@@ -30,6 +31,16 @@ const validationRules = {
       },
     ];
   },
+  discountCodeValidation: [
+    {
+      required: true,
+      message: 'Please input a discount code',
+    },
+    {
+      pattern: new RegExp('^[a-zA-Z0-9]*$'),
+      message: 'Discount code should only contain letters or numbers',
+    },
+  ],
 };
 
 export default validationRules;

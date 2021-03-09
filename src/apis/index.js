@@ -21,6 +21,8 @@ export default {
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     convertUserToCreator: () => http.post('/secure/user/convert'),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
+    setCreatorUserPreferences: (payload) => http.patch('/secure/user/preferences', payload),
+    getCreatorUserPreferences: () => http.get('/secure/user/preferences'),
   },
   payment: {
     stripe: {
@@ -69,6 +71,7 @@ export default {
   passes: {
     getPassById: (passId) => http.get(`/passes/${passId}`),
     getPassesBySessionId: (sessionId) => http.get(`/passes?session_id=${sessionId}`),
+    getPassesByVideoId: (videoId) => http.get(`/passes?video_id=${videoId}`),
     getPassesByUsername: (creatorUsername) => http.get(`/passes?creator_username=${creatorUsername}`),
     getCreatorPasses: () => http.get(`/secure/creator/passes`),
     getEarningsByPassId: (passId) => http.get(`/secure/creator/payments/earnings/passes/id/${passId}`),
@@ -77,6 +80,7 @@ export default {
     createOrderForUser: (payload) => http.post('/secure/customer/passes/orders', payload),
     getAttendeePasses: () => http.get('/secure/customer/passes/orders'),
     getAttendeePassesForSession: (sessionId) => http.get(`/secure/customer/passes/orders?session_id=${sessionId}`),
+    getAttendeePassesForVideo: (videoId) => http.get(`/secure/customer/passes/orders?video_id=${videoId}`),
     publishPass: (passId) => http.post(`/secure/creator/passes/${passId}/publish`),
     unpublishPass: (passId) => http.post(`/secure/creator/passes/${passId}/unpublish`),
     getCreatorPassEarnings: (pageNo, perPage) =>
@@ -99,5 +103,29 @@ export default {
     getAttendeeVideoToken: (orderId) => http.post(`/secure/customer/videos/orders/${orderId}/token`),
     publishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/publish`),
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),
+  },
+  courses: {
+    getCreatorCourses: () => http.get('/secure/creator/courses'),
+    createCourse: (payload) => http.post('/secure/creator/courses', payload),
+    updateCourse: (courseId, payload) => http.put(`/secure/creator/courses/${courseId}`, payload),
+    getCoursesByUsername: (creatorUsername) => http.get(`/courses?creator_username=${creatorUsername}`),
+    getCoursesBySessionId: (sessionId) => http.get(`/courses?session_id=${sessionId}`),
+    getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
+    createOrderForUser: (payload) => http.post('/secure/customer/courses/orders', payload),
+    publishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/publish`),
+    unpublishCourse: (courseId) => http.post(`/secure/creator/courses/${courseId}/unpublish`),
+    getDetails: (courseId) => http.get(`/courses/${courseId}`),
+    getAttendeeCourses: () => http.get('/secure/customer/courses/orders'),
+    getEarningsByCourseId: (courseId) => http.get(`/secure/creator/payments/earnings/courses/id/${courseId}`),
+    getCreatorCourseEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/courses?page_no=${pageNo}&per_page${perPage}`),
+  },
+  coupons: {
+    createCoupon: (payload) => http.post('/secure/creator/coupons', payload),
+    updateCoupon: (couponId, payload) => http.put(`/secure/creator/coupons/${couponId}`, payload),
+    publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
+    unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
+    getCreatorCoupons: () => http.get('/secure/creator/coupons'),
+    validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
   },
 };
