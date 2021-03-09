@@ -405,7 +405,6 @@ const Session = ({ match, history }) => {
         ),
         onOk: () => handleRecurringDatesRange(value, true),
         onCancel: () => handleRecurringDatesRange(value, false),
-        afterClose: () => handleRecurringDatesRange(value, false),
       });
     } else {
       handleRecurringDatesRange(value, false);
@@ -467,23 +466,23 @@ const Session = ({ match, history }) => {
           }
 
           copiedInventories.forEach((inventory) => {
-            const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
             const invStartMoment = moment(inventory.start_time);
 
             // Skip creating it if the newly copied inventory will exist in the past
-            if (
-              extraDay.isSameOrBefore(moment(), 'day') &&
-              moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).isSameOrBefore(
-                moment(),
-                'minute'
-              )
-            ) {
-              console.log('Past inventory will be created, skipping...');
-              console.log([...createdDate, invStartMoment.hour(), invStartMoment.minute()]);
-              return;
-            }
-
             if (extraDay.day() === invStartMoment.day()) {
+              const createdDate = [extraDay.year(), extraDay.month(), extraDay.date()];
+              if (
+                extraDay.isSameOrBefore(moment(), 'day') &&
+                moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).isSameOrBefore(
+                  moment(),
+                  'minute'
+                )
+              ) {
+                console.log('Past inventory will be created, skipping...');
+                console.log(moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format());
+                return;
+              }
+
               const invEndMoment = moment(inventory.end_time);
 
               const start_time = moment([...createdDate, invStartMoment.hour(), invStartMoment.minute()]).format();
