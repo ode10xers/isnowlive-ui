@@ -34,18 +34,21 @@ const Subscriptions = () => {
 
     Object.entries(subscription.products).forEach(([key, val]) => {
       let items = [];
-      switch (key) {
-        case 'SESSION':
-          items = sessions.filter((session) => val.product_ids.includes(session.external_id));
-          break;
-        case 'VIDEO':
-          items = videos.filter((video) => val.product_ids.includes(video.external_id));
-          break;
-        case 'COURSE':
-          items = courses.filter((course) => val.product_ids.includes(course.id));
-          break;
-        default:
-          break;
+
+      if (val.product_ids?.length > 0) {
+        switch (key) {
+          case 'SESSION':
+            items = sessions.filter((session) => val.product_ids?.includes(session.external_id));
+            break;
+          case 'VIDEO':
+            items = videos.filter((video) => val.product_ids?.includes(video.external_id));
+            break;
+          case 'COURSE':
+            items = courses.filter((course) => val.product_ids?.includes(course.id));
+            break;
+          default:
+            break;
+        }
       }
 
       mappedProductData[key] = {
@@ -63,13 +66,11 @@ const Subscriptions = () => {
   const getCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
     try {
-      //TODO: Implement API here later
       const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 3);
 
       let mappedSubscriptionData = [];
 
       if (isAPISuccess(status) && data.Data) {
-        //TODO: Re map data as required here
         mappedSubscriptionData = data.Data.map((subscription, idx) => ({ ...subscription, idx })).sort(
           (a, b) => a.price - b.price
         );

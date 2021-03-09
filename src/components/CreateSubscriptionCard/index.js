@@ -117,22 +117,24 @@ const CreateSubscriptionCard = ({
           : editedSubscription?.products['VIDEO'].credits,
         includedProducts: Object.entries(editedSubscription?.products).map(([key, val]) => key),
         includedSessionsType: editedSubscription?.products['SESSION']
-          ? editedSubscription?.products['SESSION'].access_types
+          ? editedSubscription?.products['SESSION'].access_types || []
           : [],
         includedSessions: editedSubscription?.products['SESSION']
-          ? editedSubscription?.products['SESSION'].product_ids
+          ? editedSubscription?.products['SESSION'].product_ids || []
           : [],
         includedVideosType: editedSubscription?.products['VIDEO']
-          ? editedSubscription?.products['VIDEO'].access_types
+          ? editedSubscription?.products['VIDEO'].access_types || []
           : [],
-        includedVideos: editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].product_ids : [],
+        includedVideos: editedSubscription?.products['VIDEO']
+          ? editedSubscription?.products['VIDEO'].product_ids || []
+          : [],
         shouldIncludeCourse: editedSubscription?.products['COURSE'] ? true : false,
         courseCredits: editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].credits : 1,
         includedCoursesType: editedSubscription?.products['COURSE']
-          ? editedSubscription?.products['COURSE'].access_types
+          ? editedSubscription?.products['COURSE'].access_types || []
           : [],
         includedCourses: editedSubscription?.products['COURSE']
-          ? editedSubscription?.products['COURSE'].product_ids
+          ? editedSubscription?.products['COURSE'].product_ids || []
           : [],
         colorCode: editedSubscription?.color_code || initialColor,
       };
@@ -145,20 +147,22 @@ const CreateSubscriptionCard = ({
       setIsVideoIncluded(editedSubscription?.products['VIDEO'] ? true : false);
       setIsCourseIncluded(editedSubscription?.products['COURSE'] ? true : false);
       setSelectedSessions(
-        editedSubscription?.products['SESSION'] ? editedSubscription?.products['SESSION'].product_ids : []
+        editedSubscription?.products['SESSION'] ? editedSubscription?.products['SESSION'].product_ids || [] : []
       );
-      setSelectedVideos(editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].product_ids : []);
+      setSelectedVideos(
+        editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].product_ids || [] : []
+      );
       setSelectedCourses(
-        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].product_ids : []
+        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].product_ids || [] : []
       );
       setIncludedSessionsType(
-        editedSubscription?.products['SESSION'] ? editedSubscription?.products['SESSION'].access_types : []
+        editedSubscription?.products['SESSION'] ? editedSubscription?.products['SESSION'].access_types || [] : []
       );
       setIncludedVideosType(
-        editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].access_types : []
+        editedSubscription?.products['VIDEO'] ? editedSubscription?.products['VIDEO'].access_types || [] : []
       );
       setIncludedCoursesType(
-        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].access_types : []
+        editedSubscription?.products['COURSE'] ? editedSubscription?.products['COURSE'].access_types || [] : []
       );
     } else {
       form.resetFields();

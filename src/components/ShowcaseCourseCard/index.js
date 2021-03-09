@@ -88,7 +88,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     }
   };
 
-  //TODO: Adjust with API changes here
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
