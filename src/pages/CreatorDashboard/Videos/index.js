@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm } from 'antd';
 import {
   EditOutlined,
   CloudUploadOutlined,
@@ -11,6 +11,7 @@ import {
   ExportOutlined,
   CheckCircleTwoTone,
   BookTwoTone,
+  DeleteOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -62,40 +63,6 @@ const Videos = () => {
     document.body.style.overflow = 'auto';
   };
 
-  const publishVideo = async (videoId) => {
-    setIsLoading(true);
-
-    try {
-      const { status } = await apis.videos.publishVideo(videoId);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Video Published');
-        getVideosForCreator();
-      }
-    } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
-    }
-
-    setIsLoading(false);
-  };
-
-  const unpublishVideo = async (videoId) => {
-    setIsLoading(true);
-
-    try {
-      const { status } = await apis.videos.unpublishVideo(videoId);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Video Unpublished');
-        getVideosForCreator();
-      }
-    } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
-    }
-
-    setIsLoading(false);
-  };
-
   const getVideosForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -137,6 +104,40 @@ const Videos = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
+  const publishVideo = async (videoId) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.videos.publishVideo(videoId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Video Published');
+        getVideosForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message);
+    }
+
+    setIsLoading(false);
+  };
+
+  const unpublishVideo = async (videoId) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.videos.unpublishVideo(videoId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Video Unpublished');
+        getVideosForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message);
+    }
+
+    setIsLoading(false);
+  };
+
   const copyVideoPageLink = (videoId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/v/${videoId}`;
@@ -159,6 +160,23 @@ const Videos = () => {
       setIsLoading(false);
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
+  };
+
+  const deleteVideo = async (videoId) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.videos.deleteVideo(videoId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Video has been deleted');
+        getVideosForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Failed to delete video', error?.response?.data?.message || 'Something wrong happened');
+    }
+
+    setIsLoading(false);
   };
 
   const videosColumns = [
@@ -221,7 +239,7 @@ const Videos = () => {
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
-          <Col xs={24} md={3}>
+          <Col xs={24} md={2}>
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -231,7 +249,7 @@ const Videos = () => {
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={3}>
+          <Col xs={24} md={2}>
             {record.status === 'UPLOAD_SUCCESS' ? (
               <Tooltip title="Video uploaded">
                 <Button
@@ -253,18 +271,33 @@ const Videos = () => {
             )}
           </Col>
           {record.status === 'UPLOAD_SUCCESS' && (
-            <Col xs={24} md={3}>
-              <Tooltip title="Clone Video">
-                <Button
-                  type="text"
-                  className={styles.detailsButton}
-                  onClick={() => cloneVideo(record)}
-                  icon={<ExportOutlined />}
-                />
-              </Tooltip>
-            </Col>
+            <>
+              <Col xs={24} md={2}>
+                <Tooltip title="Clone Video">
+                  <Button
+                    type="text"
+                    className={styles.detailsButton}
+                    onClick={() => cloneVideo(record)}
+                    icon={<ExportOutlined />}
+                  />
+                </Tooltip>
+              </Col>
+              <Col xs={24} md={2}>
+                <Popconfirm
+                  title="Do you want to delete session?"
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => deleteVideo(record.external_id)}
+                >
+                  <Tooltip title="Delete Video">
+                    <Button danger type="text" icon={<DeleteOutlined />} />
+                  </Tooltip>
+                </Popconfirm>
+              </Col>
+            </>
           )}
-          <Col xs={24} md={3}>
+          <Col xs={24} md={2}>
             <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
@@ -274,7 +307,7 @@ const Videos = () => {
               />
             </Tooltip>
           </Col>
-          <Col xs={24} md={5}>
+          <Col xs={24} md={6}>
             {record.is_published ? (
               <Tooltip title="Hide Video">
                 <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
@@ -297,11 +330,11 @@ const Videos = () => {
           <Col xs={24} md={6}>
             {expandedRowKeys.includes(record.external_id) ? (
               <Button type="link" onClick={() => collapseRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyers `} <UpOutlined />
+                {`${record?.buyers?.length || 0} Buyer `} <UpOutlined />
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyers`} <DownOutlined />
+                {`${record?.buyers?.length || 0} Buyer`} <DownOutlined />
               </Button>
             )}
           </Col>
