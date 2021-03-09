@@ -4,17 +4,21 @@ import classNames from 'classnames';
 import { Row, Col, Form, Card, List, Button, Input, InputNumber, Typography, Checkbox, Select } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 
+import { TwitterPicker } from 'react-color';
+
 import apis from 'apis';
 
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, productAccessOptions } from 'utils/helper';
+import { isAPISuccess, productAccessOptions, generateRandomColor } from 'utils/helper';
 
 // import { subscriptionModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+
+const initialColor = generateRandomColor();
 
 const formInitialValues = {
   subscriptionName: '',
@@ -29,7 +33,24 @@ const formInitialValues = {
   courseCredits: 1,
   includedCoursesType: [],
   includedCourses: [],
+  colorCode: initialColor,
 };
+
+const whiteColor = '#ffffff';
+
+const colorPickerChoices = [
+  '#f44336',
+  '#e91e63',
+  '#673ab7',
+  '#1890ff',
+  '#4caf50',
+  '#ffc107',
+  '#607d8b',
+  '#9ae2b6',
+  '#f379b2',
+  '#34727c',
+  '#5030fd',
+];
 
 const { Text } = Typography;
 
@@ -44,6 +65,7 @@ const includedProductsList = [
   },
 ];
 
+//TODO: Confirm the key and format for color_code
 const CreateSubscriptionCard = ({
   sessions = [],
   videos = [],
@@ -66,6 +88,7 @@ const CreateSubscriptionCard = ({
   const [includedSessionsType, setIncludedSessionsType] = useState([]);
   const [includedVideosType, setIncludedVideosType] = useState([]);
   const [includedCoursesType, setIncludedCoursesType] = useState([]);
+  const [colorCode, setColorCode] = useState(initialColor);
 
   const fetchCreatorCurrency = useCallback(async () => {
     setIsLoading(true);
@@ -111,10 +134,12 @@ const CreateSubscriptionCard = ({
         includedCourses: editedSubscription?.products['COURSE']
           ? editedSubscription?.products['COURSE'].product_ids
           : [],
+        colorCode: editedSubscription?.color_code || initialColor,
       };
 
       form.setFieldsValue(formData);
 
+      setColorCode(editedSubscription?.color_code || initialColor);
       setCurrency(editedSubscription?.currency || 'SGD');
       setIsSessionIncluded(editedSubscription?.products['SESSION'] ? true : false);
       setIsVideoIncluded(editedSubscription?.products['VIDEO'] ? true : false);
@@ -146,6 +171,7 @@ const CreateSubscriptionCard = ({
       setIncludedSessionsType([]);
       setIncludedVideosType([]);
       setIncludedCoursesType([]);
+      setColorCode(initialColor);
     }
 
     fetchCreatorCurrency();
@@ -199,56 +225,6 @@ const CreateSubscriptionCard = ({
     }
   };
 
-  const handleFinish = async (values) => {
-    setIsSubmitting(true);
-
-    let productsData = {};
-
-    values.includedProducts.forEach((product) => {
-      productsData[product] = {
-        access_types: product === 'SESSION' ? values.includedSessionsType : values.includedVideosType,
-        credits: values.subscriptionCredits,
-        product_ids: product === 'SESSION' ? selectedSessions : selectedVideos,
-      };
-    });
-
-    if (values.shouldIncludeCourse) {
-      productsData['COURSE'] = {
-        access_types: values.includedCoursesType,
-        credits: values.courseCredits,
-        product_ids: selectedCourses,
-      };
-    }
-
-    try {
-      let payload = {
-        name: values.subscriptionName,
-        price: values.price,
-        currency: currency,
-        validity: 30,
-        products: productsData,
-      };
-
-      console.log(payload);
-
-      const { status, data } = editedSubscription?.external_id
-        ? await apis.subscriptions.updateSubscription(editedSubscription?.external_id, payload)
-        : await apis.subscriptions.createSubscription(payload);
-
-      if (isAPISuccess(status) && data) {
-        showSuccessModal(`Subscription ${editedSubscription ? 'updated' : 'created'} successfully`);
-        saveChanges();
-      }
-    } catch (error) {
-      showErrorModal(
-        `Failed to ${editedSubscription ? 'update' : 'create'} subscription`,
-        error?.response?.data?.message || 'Something went wrong'
-      );
-    }
-
-    setIsSubmitting(false);
-  };
-
   const handleCancelChange = () => {
     if (editedSubscription) {
       saveChanges(editedSubscription);
@@ -287,6 +263,60 @@ const CreateSubscriptionCard = ({
     setIncludedCoursesType(values);
   };
 
+  const handleColorChange = (color) => {
+    setColorCode(color.hex || whiteColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), colorCode: color.hex || whiteColor });
+  };
+
+  const handleFinish = async (values) => {
+    setIsSubmitting(true);
+
+    let productsData = {};
+
+    values.includedProducts.forEach((product) => {
+      productsData[product] = {
+        access_types: product === 'SESSION' ? values.includedSessionsType : values.includedVideosType,
+        credits: values.subscriptionCredits,
+        product_ids: product === 'SESSION' ? selectedSessions : selectedVideos,
+      };
+    });
+
+    if (values.shouldIncludeCourse) {
+      productsData['COURSE'] = {
+        access_types: values.includedCoursesType,
+        credits: values.courseCredits,
+        product_ids: selectedCourses,
+      };
+    }
+
+    try {
+      let payload = {
+        name: values.subscriptionName,
+        price: values.price,
+        currency: currency,
+        validity: 30,
+        color_code: values.colorCode || colorCode || whiteColor,
+        products: productsData,
+      };
+
+      const { status, data } = editedSubscription?.external_id
+        ? await apis.subscriptions.updateSubscription(editedSubscription?.external_id, payload)
+        : await apis.subscriptions.createSubscription(payload);
+
+      if (isAPISuccess(status) && data) {
+        showSuccessModal(`Subscription ${editedSubscription ? 'updated' : 'created'} successfully`);
+        saveChanges();
+      }
+    } catch (error) {
+      showErrorModal(
+        `Failed to ${editedSubscription ? 'update' : 'create'} subscription`,
+        error?.response?.data?.message || 'Something went wrong'
+      );
+    }
+
+    setIsSubmitting(false);
+  };
+
   return (
     <Form
       layout="horizontal"
@@ -298,7 +328,8 @@ const CreateSubscriptionCard = ({
     >
       <Loader size="large" loading={isLoading || submitting}>
         <Card
-          headStyle={{ textAlign: 'center', padding: '0px 10px' }}
+          style={{ border: `2px solid ${colorCode || whiteColor}` }}
+          headStyle={{ textAlign: 'center', padding: '0px 10px', borderBottom: `2px solid ${colorCode || whiteColor}` }}
           title={
             <Form.Item
               className={styles.compactFormItem}
@@ -705,6 +736,17 @@ const CreateSubscriptionCard = ({
                     </Select.OptGroup>
                   )}
                 </Select>
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item className={styles.compactFormItem} id="colorCode" name="colorCode">
+                <TwitterPicker
+                  className={styles.colorPicker}
+                  color={colorCode}
+                  onChangeComplete={handleColorChange}
+                  triangle="hide"
+                  colors={colorPickerChoices}
+                />
               </Form.Item>
             </List.Item>
           </List>
