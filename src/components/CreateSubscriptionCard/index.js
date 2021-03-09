@@ -159,6 +159,7 @@ const CreateSubscriptionCard = ({
 
     if (!values.includes('SESSION')) {
       setIncludedSessionsType([]);
+      setSelectedSessions([]);
       updatedFormValues = {
         ...updatedFormValues,
         includedSessionsType: [],
@@ -168,6 +169,7 @@ const CreateSubscriptionCard = ({
 
     if (!values.includes('VIDEO')) {
       setIncludedVideosType([]);
+      setSelectedSessions([]);
       updatedFormValues = {
         ...updatedFormValues,
         includedVideosType: [],
@@ -187,10 +189,12 @@ const CreateSubscriptionCard = ({
 
     if (!shouldIncludeCourse) {
       setIncludedCoursesType([]);
+      setSelectedCourses([]);
       form.setFieldsValue({
         ...form.getFieldValue(),
+        includedCoursesType: [],
         includedCourses: [],
-        courseCredits: 0,
+        courseCredits: 1,
       });
     }
   };
@@ -384,17 +388,21 @@ const CreateSubscriptionCard = ({
                 className={classNames(!isSessionIncluded ? styles.disabled : undefined, styles.compactFormItem)}
                 id="includedSessions"
                 name="includedSessions"
-                rules={isSessionIncluded ? validationRules.arrayValidation : undefined}
+                rules={
+                  isSessionIncluded && includedSessionsType.length > 0 ? validationRules.arrayValidation : undefined
+                }
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  placeholder="Select included sessions"
+                  placeholder={
+                    includedSessionsType.length <= 0 ? 'Please select a session type first' : 'Select included sessions'
+                  }
                   mode="multiple"
                   maxTagCount="responsive"
                   dropdownMatchSelectWidth={false}
                   value={selectedSessions}
-                  disabled={!isSessionIncluded}
+                  disabled={!isSessionIncluded || includedSessionsType.length <= 0}
                   onChange={(val) => setSelectedSessions(val)}
                   optionLabelProp="label"
                 >
@@ -487,13 +495,15 @@ const CreateSubscriptionCard = ({
                 className={classNames(!isVideoIncluded ? styles.disabled : undefined, styles.compactFormItem)}
                 id="includedVideos"
                 name="includedVideos"
-                rules={isVideoIncluded ? validationRules.arrayValidation : undefined}
+                rules={isVideoIncluded && includedVideosType.length > 0 ? validationRules.arrayValidation : undefined}
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  disabled={!isVideoIncluded}
-                  placeholder="Select included videos"
+                  disabled={!isVideoIncluded || includedVideosType.length <= 0}
+                  placeholder={
+                    includedVideosType.length <= 0 ? 'Please select a video type first' : 'Select included videos'
+                  }
                   mode="multiple"
                   maxTagCount="responsive"
                   dropdownMatchSelectWidth={false}
@@ -630,13 +640,15 @@ const CreateSubscriptionCard = ({
                 className={classNames(!isCourseIncluded ? styles.disabled : undefined, styles.compactFormItem)}
                 id="includedCourses"
                 name="includedCourses"
-                rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
+                rules={isCourseIncluded && includedCoursesType.length > 0 ? validationRules.arrayValidation : undefined}
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  disabled={!isCourseIncluded}
-                  placeholder="Select included courses"
+                  disabled={!isCourseIncluded || includedCoursesType.length <= 0}
+                  placeholder={
+                    includedCoursesType.length <= 0 ? 'Please select a course type first' : 'Select included courses'
+                  }
                   mode="multiple"
                   maxTagCount="responsive"
                   dropdownMatchSelectWidth={false}
