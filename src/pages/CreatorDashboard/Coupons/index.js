@@ -14,6 +14,7 @@ import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import classNames from 'classnames';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -179,23 +180,22 @@ const Coupons = () => {
     },
     {
       title: published ? (
-        <Button shape="round" type="primary" onCLick={() => toggleExpandAllPublished()}>
+        <Button shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
           {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
         </Button>
       ) : (
-        <Button shape="round" type="primary" onCLick={() => toggleExpandAllUnpublished()}>
+        <Button shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
           {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
         </Button>
       ),
       align: 'right',
-      width: '180px',
+      width: '220px',
       render: (text, record) => {
-        // TODO: Adjust the buyers/users key here
-        const buyersText = `${record.buyers || 0} Users`;
+        const redemptionText = `${record.redemption?.length || 0} Users`;
 
         return (
           <Row gutter={[8, 8]} justify="end">
-            <Col xs={8}>
+            <Col xs={4}>
               <Tooltip title="Edit Discount Code">
                 <Button type="link" icon={<EditTwoTone />} onClick={() => editCoupon(record)} />
               </Tooltip>
@@ -215,24 +215,24 @@ const Coupons = () => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={8}>
+            <Col xs={12}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.external_id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.external_id)}>
-                    {buyersText} <UpOutlined />
+                    {redemptionText} <UpOutlined />
                   </Button>
                 ) : (
                   <Button block type="link" onClick={() => expandRowPublished(record.external_id)}>
-                    {buyersText} <DownOutlined />
+                    {redemptionText} <DownOutlined />
                   </Button>
                 )
               ) : expandedUnpublishedRowKeys.includes(record.external_id) ? (
                 <Button block type="link" onClick={() => collapseRowUnpublished(record.external_id)}>
-                  {buyersText} <UpOutlined />
+                  {redemptionText} <UpOutlined />
                 </Button>
               ) : (
                 <Button block type="link" onClick={() => expandRowUnpublished(record.external_id)}>
-                  {buyersText} <DownOutlined />
+                  {redemptionText} <DownOutlined />
                 </Button>
               )}
             </Col>
@@ -242,10 +242,32 @@ const Coupons = () => {
     },
   ];
 
-  //TODO: Adjust the data format of buyers/users
-  const buyersColumns = [];
+  const redemptionColumns = [
+    {
+      title: 'User Name',
+      dataIndex: 'customer_name',
+      key: 'customer_name',
+    },
+    {
+      title: 'Discount Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record) => `${record.currency?.toUpperCase()} ${record.amount}`,
+    },
+    // {
+    //   title: '',
+    //   dataIndex: '',
+    //   key: '',
+    // },
+  ];
 
-  const renderBuyersList = () => {};
+  const renderRedemptionList = (record) => {
+    return (
+      <div className={classNames(styles.mb20, styles.mt20)}>
+        <Table columns={redemptionColumns} data={record.redemption} rowKey={(record) => record.order_id} />
+      </div>
+    );
+  };
 
   const renderMobileCouponItem = (coupon) => {
     const layout = (label, value) => (
@@ -277,7 +299,7 @@ const Coupons = () => {
       <Col xs={24} key={coupon.external_id}>
         <Card
           title={<Title level={5}> {coupon.code} </Title>}
-          bodyStyle={{ padding: '24px 24px 0 24px' }}
+          bodyStyle={{ padding: '24px 24px 10px 24px' }}
           actions={[
             <Tooltip title="Edit Discount Code">
               <Button type="link" icon={<EditTwoTone />} onClick={() => editCoupon(coupon)} />
@@ -295,6 +317,17 @@ const Coupons = () => {
                 </Button>
               </Tooltip>
             ),
+            coupon.is_published ? (
+              expandedPublishedRowKeys.includes(coupon.external_id) ? (
+                <Button type="link" onClick={() => collapseRowPublished(coupon.external_id)} icon={<UpOutlined />} />
+              ) : (
+                <Button type="link" onClick={() => expandRowPublished(coupon.external_id)} icon={<DownOutlined />} />
+              )
+            ) : expandedUnpublishedRowKeys.includes(coupon.external_id) ? (
+              <Button type="link" onClick={() => collapseRowUnpublished(coupon.external_id)} icon={<UpOutlined />} />
+            ) : (
+              <Button type="link" onClick={() => expandRowUnpublished(coupon.external_id)} icon={<DownOutlined />} />
+            ),
           ]}
         >
           {layout('Discount Value', `${coupon.value} %`)}
@@ -310,11 +343,35 @@ const Coupons = () => {
             </Col>
           </Row>
         </Card>
+        {coupon.is_published
+          ? expandedPublishedRowKeys.includes(coupon.external_id) && (
+              <Row className={styles.cardExpansion}>{coupon.redemption?.map(renderMobileRedemptionList)}</Row>
+            )
+          : expandedUnpublishedRowKeys.includes(coupon.external_id) && (
+              <Row className={styles.cardExpansion}>{coupon.redemption?.map(renderMobileRedemptionList)}</Row>
+            )}
       </Col>
     );
   };
 
-  const renderMobileBuyersList = () => {};
+  const renderMobileRedemptionList = (item) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={13}>
+          <Text strong> {label} </Text>
+        </Col>
+        <Col span={11}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Col xs={24} key={item.order_id}>
+        <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {item.customer_name} </Title>}>
+          {layout('Discount Amount', `${item.currency?.toUpperCase()} ${item.amount}`)}
+        </Card>
+      </Col>
+    );
+  };
 
   return (
     <div className={styles.box}>
@@ -339,6 +396,11 @@ const Coupons = () => {
                 isMobileDevice ? (
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
+                      <Col xs={24}>
+                        <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
+                          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                        </Button>
+                      </Col>
                       {coupons?.filter((coupon) => coupon?.is_published).map(renderMobileCouponItem)}
                     </Row>
                   </Loader>
@@ -351,7 +413,7 @@ const Coupons = () => {
                     loading={isLoading}
                     rowKey={(record) => record.external_id}
                     expandable={{
-                      expandedRowRender: renderBuyersList,
+                      expandedRowRender: renderRedemptionList,
                       expandRowByClick: true,
                       expandIconColumnIndex: -1,
                       expandedRowKeys: expandedPublishedRowKeys,
@@ -367,6 +429,11 @@ const Coupons = () => {
                 isMobileDevice ? (
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
+                      <Col xs={24}>
+                        <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
+                          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                        </Button>
+                      </Col>
                       {coupons?.filter((coupon) => !coupon?.is_published).map(renderMobileCouponItem)}
                     </Row>
                   </Loader>
@@ -379,7 +446,7 @@ const Coupons = () => {
                     loading={isLoading}
                     rowKey={(record) => record.external_id}
                     expandable={{
-                      expandedRowRender: renderBuyersList,
+                      expandedRowRender: renderRedemptionList,
                       expandRowByClick: true,
                       expandIconColumnIndex: -1,
                       expandedRowKeys: expandedUnpublishedRowKeys,

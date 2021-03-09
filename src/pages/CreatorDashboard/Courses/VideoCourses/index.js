@@ -230,15 +230,13 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     );
 
     return (
-      <Card
-        key={subscriber.date_of_purchase}
-        bodyStyle={{ padding: '20px 10px' }}
-        title={<Title level={5}> {subscriber.name} </Title>}
-      >
-        {layout('Buy Date', toDateAndTime(subscriber.date_of_purchase))}
-        {layout('Price', <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>)}
-        {layout('Discount Code', <Text strong> {subscriber.discount?.code || 'No Discount'} </Text>)}
-      </Card>
+      <Col xs={24} key={`${subscriber.name}_${subscriber.date_of_purchase}`}>
+        <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {subscriber.name} </Title>}>
+          {layout('Buy Date', toDateAndTime(subscriber.date_of_purchase))}
+          {layout('Price', <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>)}
+          {layout('Discount Code', <Text strong> {subscriber.discount?.code || 'No Discount'} </Text>)}
+        </Card>
+      </Col>
     );
   };
 
@@ -311,14 +309,10 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course?.id) && (
-              <Row className={styles.cardExpansion}>
-                <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
-              </Row>
+              <Row className={styles.cardExpansion}>{course?.buyers?.map(renderMobileSubscriberCards)}</Row>
             )
           : expandedUnpublishedRowKeys.includes(course?.id) && (
-              <Row className={styles.cardExpansion}>
-                <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
-              </Row>
+              <Row className={styles.cardExpansion}>{course?.buyers?.map(renderMobileSubscriberCards)}</Row>
             )}
       </Col>
     );

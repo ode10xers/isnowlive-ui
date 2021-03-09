@@ -285,19 +285,21 @@ const ClassPassList = () => {
   };
 
   const renderMobileSubscriberCards = (subscriber) => (
-    <Card>
-      <Row>
-        <Col xs={24}>
-          <Title level={5}> {subscriber.name} </Title>
-        </Col>
-        <Col xs={24}>
-          <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
-        </Col>
-        <Col xs={24}>
-          <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
-        </Col>
-      </Row>
-    </Card>
+    <Col xs={24} key={`${subscriber.name}_${subscriber.date_of_purchase}`}>
+      <Card>
+        <Row>
+          <Col xs={24}>
+            <Title level={5}> {subscriber.name} </Title>
+          </Col>
+          <Col xs={24}>
+            <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
+          </Col>
+          <Col xs={24}>
+            <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
+          </Col>
+        </Row>
+      </Card>
+    </Col>
   );
 
   const renderPassItem = (pass) => {
@@ -361,9 +363,7 @@ const ClassPassList = () => {
           {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{pass.buyers?.map(renderMobileSubscriberCards)}</div>
-          </Row>
+          <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>
         )}
       </Col>
     );
