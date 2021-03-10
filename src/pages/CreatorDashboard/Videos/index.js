@@ -378,19 +378,21 @@ const Videos = () => {
   };
 
   const renderMobileBuyerCards = (buyer) => (
-    <Card>
-      <Row>
-        <Col xs={24}>
-          <Title level={5}> {buyer?.name} </Title>
-        </Col>
-        <Col xs={24}>
-          <Text> Purchased at {toDateAndTime(buyer?.date_of_purchase)} </Text>
-        </Col>
-        <Col xs={24}>
-          <Text> {`${buyer?.price_paid} ${buyer?.currency?.toUpperCase()}`} </Text>
-        </Col>
-      </Row>
-    </Card>
+    <Col xs={24} key={`${buyer.name}_${buyer.date_of_purchase}`}>
+      <Card>
+        <Row>
+          <Col xs={24}>
+            <Title level={5}> {buyer?.name} </Title>
+          </Col>
+          <Col xs={24}>
+            <Text> Purchased at {toDateAndTime(buyer?.date_of_purchase)} </Text>
+          </Col>
+          <Col xs={24}>
+            <Text> {`${buyer?.price_paid} ${buyer?.currency?.toUpperCase()}`} </Text>
+          </Col>
+        </Row>
+      </Card>
+    </Col>
   );
 
   const renderVideoItem = (video) => {
@@ -513,7 +515,7 @@ const Videos = () => {
           ];
 
     return (
-      <Col xs={24}>
+      <Col xs={24} key={video.external_id}>
         <Card
           className={styles.card}
           title={
@@ -528,9 +530,7 @@ const Videos = () => {
           {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(video?.external_id) && (
-          <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{video?.buyers?.map(renderMobileBuyerCards)}</div>
-          </Row>
+          <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
         )}
       </Col>
     );
