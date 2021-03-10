@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import ImageBlobReduce from 'image-blob-reduce';
+// import ImageBlobReduce from 'image-blob-reduce';
 
 import apis from 'apis';
 
