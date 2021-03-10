@@ -13,6 +13,7 @@ import {
   LinkedinOutlined,
   PlayCircleOutlined,
   BookOutlined,
+  ScheduleOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
@@ -24,6 +25,7 @@ import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
 import PublicCourseList from 'components/PublicCourseList';
+import CreatorSubscriptions from 'components/CreatorSubscriptions';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
@@ -60,16 +62,17 @@ const ProfilePreview = ({ username = null }) => {
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [selectedSessionTab, setSelectedSessionTab] = useState(0);
-  const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
-  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);
+
+  const [sessions, setSessions] = useState([]);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const [passes, setPasses] = useState([]);
   const [isPassesLoading, setIsPassesLoading] = useState(true);
@@ -80,6 +83,9 @@ const ProfilePreview = ({ username = null }) => {
   const [liveCourses, setLiveCourses] = useState([]);
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [isSubscriptionsLoading, setIsSubscriptionsLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -208,6 +214,100 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  const getSubscriptionDetails = useCallback(() => {
+    setIsSubscriptionsLoading(true);
+
+    try {
+      let profileUsername = '';
+
+      if (username) {
+        profileUsername = username;
+      } else {
+        profileUsername = getLocalUserDetails().username;
+      }
+
+      console.log(profileUsername);
+
+      //TODO: Implement API Here later
+      const { status, data } = {
+        status: 200,
+        data: [
+          {
+            currency: 'SGD',
+            external_id: 'yaba-daba-doo',
+            is_published: true,
+            name: 'Mock Subs',
+            price: 20,
+            validity: 30,
+            color_code: '#ff0000',
+            products: {
+              SESSION: {
+                access_types: ['PUBLIC'],
+                credits: 15,
+                product_ids: ['abcd', 'defg'],
+              },
+            },
+          },
+          {
+            currency: 'SGD',
+            external_id: 'doo-bee-doo-bee-doo-baa',
+            is_published: true,
+            name: 'Mock Subs but Better',
+            price: 20,
+            validity: 30,
+            color_code: '#00ff00',
+            products: {
+              SESSION: {
+                access_types: ['PUBLIC', 'MEMBERSHIP'],
+                credits: 15,
+                product_ids: ['abcd', 'defg'],
+              },
+              VIDEO: {
+                access_types: ['PUBLIC', 'MEMBERSHIP'],
+                credits: 15,
+                product_ids: ['abcd', 'defg'],
+              },
+            },
+          },
+          {
+            currency: 'SGD',
+            external_id: 'scooby-dooby-doo',
+            is_published: true,
+            name: 'Even Better Mock Subs',
+            price: 20,
+            validity: 30,
+            color_code: '#0000ff',
+            products: {
+              SESSION: {
+                access_types: ['PUBLIC', 'MEMBERSHIP'],
+                credits: 20,
+                product_ids: ['abcd', 'defg'],
+              },
+              VIDEO: {
+                access_types: ['PUBLIC', 'MEMBERSHIP'],
+                credits: 20,
+                product_ids: ['abcd', 'defg'],
+              },
+              COURSE: {
+                access_types: ['PUBLIC', 'MEMBERSHIP'],
+                credits: 10,
+                product_ids: ['abcd', 'defg'],
+              },
+            },
+          },
+        ],
+      };
+
+      if (isAPISuccess(status) && data) {
+        setSubscriptions(data);
+        setIsSubscriptionsLoading(false);
+      }
+    } catch (error) {
+      setIsSubscriptionsLoading(false);
+      console.error('Failed to load subscription details');
+    }
+  }, [username]);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnDashboard(true);
@@ -217,6 +317,7 @@ const ProfilePreview = ({ username = null }) => {
     getPassesDetails();
     getVideosDetails();
     getCoursesDetails();
+    getSubscriptionDetails();
   }, [
     history.location.pathname,
     getProfileDetails,
@@ -224,6 +325,7 @@ const ProfilePreview = ({ username = null }) => {
     getPassesDetails,
     getVideosDetails,
     getCoursesDetails,
+    getSubscriptionDetails,
   ]);
 
   useEffect(() => {
@@ -231,6 +333,7 @@ const ProfilePreview = ({ username = null }) => {
       const sectionToShow = location.state.section;
       let targetElement = document.getElementById(productKeys.SESSION);
 
+      //TODO: Add handler for navbar navigation to subscription section
       if (sectionToShow === productKeys.SESSION) {
         setSelectedListTab(sectionToShow);
       } else if (sectionToShow === productKeys.PASS) {
@@ -562,6 +665,25 @@ const ProfilePreview = ({ username = null }) => {
                     </Tabs.TabPane>
                   )}
                 </Tabs>
+              </Tabs.TabPane>
+            )}
+            {subscriptions.length > 0 && (
+              <Tabs.TabPane
+                key={productKeys.SUBSCRIPTION}
+                tab={
+                  <div className={styles.largeTabHeader} id="subscription">
+                    <ScheduleOutlined />
+                    Subscription
+                  </div>
+                }
+              >
+                <Row className={styles.mt20}>
+                  <Col span={24}>
+                    <Loader loading={isSubscriptionsLoading} size="large" text="Loading subscriptions">
+                      <CreatorSubscriptions subscriptions={subscriptions} />
+                    </Loader>
+                  </Col>
+                </Row>
               </Tabs.TabPane>
             )}
           </Tabs>

@@ -8,6 +8,7 @@ import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone } from '@ant-design
 import styles from './styles.module.scss';
 
 const { Text } = Typography;
+const whiteColor = '#ffffff';
 
 const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubscription }) => {
   const renderTickOrCross = (isTrue) =>
@@ -122,7 +123,8 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
   return (
     <Card
       hoverable={true}
-      headStyle={{ textAlign: 'center' }}
+      style={{ border: `2px solid ${subscription.color_code || whiteColor}` }}
+      headStyle={{ textAlign: 'center', borderBottom: `2px solid ${subscription.color_code || whiteColor}` }}
       title={
         <div className={styles.subscriptionNameWrapper}>
           <Text strong> {subscription.name} </Text>

@@ -1,0 +1,28 @@
+@import '../../styles/variables.scss';
+
+.subscriptionPriceWrapper {
+  font-size: 12px;
+
+  .subscriptionPriceText {
+    font-size: 16px;
+    font-weight: 400;
+  }
+}
+
+.includedProductsWrapper {
+  min-height: 200px !important;
+
+  .baseCreditsText {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .includedProductsList {
+    font-size: 14px;
+  }
+}
+
+.includedCoursesWrapper {
+  @extend .includedProductsWrapper;
+  min-height: 150px !important;
+}
