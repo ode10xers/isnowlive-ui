@@ -222,7 +222,7 @@ const CourseDetails = ({ match, history }) => {
     <Loader size="large" text="Loading course details" loading={isLoading}>
       <Row gutter={[8, 24]}>
         {isOnAttendeeDashboard && (
-          <Col xs={24} className={styles.mb20}>
+          <Col xs={24} className={classNames(styles.mb20, styles.mt20)}>
             <Button
               onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses)}
               icon={<ArrowLeftOutlined />}
@@ -312,11 +312,11 @@ const CourseDetails = ({ match, history }) => {
   if (isOnAttendeeDashboard) {
     return (
       <Row>
-        <Col xs={2} md={isMobileDevice ? 4 : 1} lg={1}></Col>
-        <Col xs={20} md={isMobileDevice ? 16 : 22} lg={22}>
+        <Col xs={2} lg={1}></Col>
+        <Col xs={20} lg={22}>
           {mainContent}
         </Col>
-        <Col xs={2} md={isMobileDevice ? 4 : 1} lg={1}></Col>
+        <Col xs={2} lg={1}></Col>
       </Row>
     );
   } else {
