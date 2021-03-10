@@ -158,79 +158,81 @@ const PassDetails = ({ match, history }) => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading pass details">
-      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
-      <Row gutter={[8, 24]}>
-        <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
-        <Col xs={24}>
-          {pass && (
-            <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-              <Col xs={24} className={styles.p20}>
-                <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                  <Row gutter={[8, 16]} align="center">
-                    <Col xs={24} md={18}>
-                      <Row gutter={8}>
-                        <Col xs={24}>
-                          <Title className={styles.blueText} level={3}>
-                            {pass?.name}
-                          </Title>
-                        </Col>
-                        <Col xs={24}>
-                          <Space size={isMobileDevice ? 'small' : 'middle'}>
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
-                            </Text>
-                            <Divider type="vertical" />
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {`${pass?.validity} days`}
-                            </Text>
-                            <Divider type="vertical" />
-                            <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                              {`${pass?.price} ${pass?.currency.toUpperCase()}`}
-                            </Text>
-                          </Space>
-                        </Col>
-                      </Row>
-                    </Col>
-                    <Col xs={24} md={6}>
-                      <Button block type="primary" onClick={() => openPurchaseModal()}>
-                        Buy Pass
-                      </Button>
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-
-              {pass.sessions?.length > 0 && (
-                <Col xs={24}>
-                  <Row gutter={[8, 8]}>
-                    <Col xs={24}>
-                      <Text className={styles.ml20}> Applicable to below class(es) </Text>
-                    </Col>
-                    <Col xs={24}>
-                      <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
-                    </Col>
-                  </Row>
+    <div className={styles.mt50}>
+      <Loader loading={isLoading} size="large" text="Loading pass details">
+        <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+        <Row gutter={[8, 24]}>
+          <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
+          <Col xs={24}>
+            {pass && (
+              <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+                <Col xs={24} className={styles.p20}>
+                  <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                    <Row gutter={[8, 16]} align="center">
+                      <Col xs={24} md={18}>
+                        <Row gutter={8}>
+                          <Col xs={24}>
+                            <Title className={styles.blueText} level={3}>
+                              {pass?.name}
+                            </Title>
+                          </Col>
+                          <Col xs={24}>
+                            <Space size={isMobileDevice ? 'small' : 'middle'}>
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
+                              </Text>
+                              <Divider type="vertical" />
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {`${pass?.validity} days`}
+                              </Text>
+                              <Divider type="vertical" />
+                              <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                {`${pass?.price} ${pass?.currency.toUpperCase()}`}
+                              </Text>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col xs={24} md={6}>
+                        <Button block type="primary" onClick={() => openPurchaseModal()}>
+                          Buy Pass
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Card>
                 </Col>
-              )}
 
-              {pass.videos?.length > 0 && (
-                <Col xs={24}>
-                  <Row gutter={[8, 8]}>
-                    <Col xs={24}>
-                      <Text className={styles.ml20}> Videos purchasable with this pass </Text>
-                    </Col>
-                    <Col xs={24}>
-                      <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
-                    </Col>
-                  </Row>
-                </Col>
-              )}
-            </Row>
-          )}
-        </Col>
-      </Row>
-    </Loader>
+                {pass.sessions?.length > 0 && (
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]}>
+                      <Col xs={24}>
+                        <Text className={styles.ml20}> Applicable to below class(es) </Text>
+                      </Col>
+                      <Col xs={24}>
+                        <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
+                      </Col>
+                    </Row>
+                  </Col>
+                )}
+
+                {pass.videos?.length > 0 && (
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]}>
+                      <Col xs={24}>
+                        <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                      </Col>
+                      <Col xs={24}>
+                        <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
+                      </Col>
+                    </Row>
+                  </Col>
+                )}
+              </Row>
+            )}
+          </Col>
+        </Row>
+      </Loader>
+    </div>
   );
 };
 

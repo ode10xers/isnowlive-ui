@@ -3,7 +3,7 @@
 //TODO: Remove duplicate classes from pages that uses this component
 .imageWrapper {
   position: relative;
-  margin: 64px 16px;
+  margin: 32px 16px !important;
   padding-bottom: 20px;
   background-color: map-get($map: $colors, $key: 'White1');
 
