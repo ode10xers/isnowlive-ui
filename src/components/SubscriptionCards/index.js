@@ -43,17 +43,17 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
     </Popover>
   );
 
+  const getBaseCreditsCount = () => {
+    return (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+  };
+
   const cardData = [
     {
       label: `${subscription.currency?.toUpperCase()} ${subscription.price}`,
       className: undefined,
     },
     {
-      label: `${
-        subscription.products['SESSION']
-          ? subscription.products['SESSION'].credits
-          : subscription.products['VIDEO'].credits
-      } Credits/Month`,
+      label: `${getBaseCreditsCount()} Credits/Month`,
       className: undefined,
     },
     {

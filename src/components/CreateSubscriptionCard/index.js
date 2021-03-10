@@ -14,8 +14,6 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import validationRules from 'utils/validation';
 import { isAPISuccess, productAccessOptions, generateRandomColor } from 'utils/helper';
 
-// import { subscriptionModalFormLayout } from 'layouts/FormLayouts';
-
 import styles from './styles.module.scss';
 
 const initialColor = generateRandomColor();
@@ -280,7 +278,9 @@ const CreateSubscriptionCard = ({
     values.includedProducts.forEach((product) => {
       productsData[product] = {
         access_types: product === 'SESSION' ? values.includedSessionsType : values.includedVideosType,
-        credits: values.subscriptionCredits,
+        credits:
+          Math.floor(values.subscriptionCredits / values.includedProducts.length) +
+          (product === 'SESSION' ? values.subscriptionCredits % values.includedProducts.length : 0),
         product_ids: product === 'SESSION' ? selectedSessions : selectedVideos,
       };
     });
