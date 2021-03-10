@@ -1,30 +1,21 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
-import ReactHtmlParser from 'react-html-parser';
 import moment from 'moment';
 
-import { Row, Col, Typography, message, Space, Image, Button, Card, Tag } from 'antd';
+import { Row, Col, Typography, message, Button, Card, Tag } from 'antd';
 
-import {
-  GlobalOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  TwitterOutlined,
-  LinkedinOutlined,
-  ArrowLeftOutlined,
-} from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Table from 'components/Table';
-import Share from 'components/Share';
+import CreatorProfile from 'components/CreatorProfile';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import VideoCard from 'components/VideoCard';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
-import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -242,76 +233,7 @@ const CourseDetails = ({ match, history }) => {
         )}
 
         <Col xs={24} className={styles.creatorProfileWrapper}>
-          <Row className={styles.imageWrapper} gutter={[8, 8]}>
-            <Col xs={24} className={styles.profileImageWrapper}>
-              <div className={styles.profileImage}>
-                <Image
-                  preview={false}
-                  width={'100%'}
-                  src={profileImage ? profileImage : 'error'}
-                  fallback={DefaultImage()}
-                />
-                <div className={styles.userName}>
-                  <Title level={isMobileDevice ? 4 : 2}>
-                    {profile?.first_name} {profile?.last_name}
-                  </Title>
-                </div>
-                <div className={styles.shareButton}>
-                  <Share
-                    label="Share"
-                    shareUrl={generateUrlFromUsername(profile.username)}
-                    title={`${profile.first_name} ${profile.last_name}`}
-                  />
-                </div>
-              </div>
-            </Col>
-            <Col xs={24} md={{ span: 22, offset: 1 }}>
-              <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
-            </Col>
-            <Col xs={24} md={{ span: 22, offset: 1 }}>
-              {profile?.profile?.social_media_links && (
-                <Space size={'middle'}>
-                  {profile.profile.social_media_links.website && (
-                    <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
-                      <GlobalOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.facebook_link && (
-                    <a
-                      href={profile.profile.social_media_links.facebook_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FacebookOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.twitter_link && (
-                    <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
-                      <TwitterOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.instagram_link && (
-                    <a
-                      href={profile.profile.social_media_links.instagram_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <InstagramOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.linkedin_link && (
-                    <a
-                      href={profile.profile.social_media_links.linkedin_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <LinkedinOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                </Space>
-              )}
-            </Col>
-          </Row>
+          {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
         </Col>
         <Col xs={24}>
           {course && (

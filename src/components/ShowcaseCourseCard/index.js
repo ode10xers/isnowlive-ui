@@ -182,7 +182,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
                   hoverable={true}
                   bordered={true}
                   footer={null}
-                  bodyStyle={{ padding: '10px 10px 0px' }}
+                  bodyStyle={{ padding: '10px' }}
                   onClick={() => onCardClick(course)}
                 >
                   <Row gutter={[16, 8]}>

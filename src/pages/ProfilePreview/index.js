@@ -1,25 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message, Radio, Empty } from 'antd';
+import { Typography, Button, Row, Col, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
   TagsOutlined,
   VideoCameraOutlined,
   GlobalOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  TwitterOutlined,
   ArrowLeftOutlined,
   EditOutlined,
-  LinkedinOutlined,
   PlayCircleOutlined,
   BookOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
-import ReactHtmlParser from 'react-html-parser';
+import MobileDetect from 'mobile-detect';
 
 import apis from 'apis';
-import MobileDetect from 'mobile-detect';
+
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
@@ -27,10 +23,9 @@ import PublicCourseList from 'components/PublicCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import { isAPISuccess, parseEmbedCode } from 'utils/helper';
-import DefaultImage from 'components/Icons/DefaultImage/index';
-import Share from 'components/Share';
-import { generateUrlFromUsername, courseType } from 'utils/helper';
+import CreatorProfile from 'components/CreatorProfile';
+
+import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
@@ -371,73 +366,7 @@ const ProfilePreview = ({ username = null }) => {
 
       <div className={isOnDashboard ? styles.profilePreviewContainer : undefined}>
         {/* ======INTRO========= */}
-        <div className={styles.imageWrapper} id="home">
-          <div className={styles.coverImageWrapper}>
-            <Image
-              preview={false}
-              width={coverImage ? '100%' : 200}
-              className={styles.coverImage}
-              src={coverImage ? coverImage : 'error'}
-              fallback={DefaultImage()}
-            />
-          </div>
-          <div className={styles.profileImage}>
-            <Image
-              preview={false}
-              width={'100%'}
-              src={profileImage ? profileImage : 'error'}
-              fallback={DefaultImage()}
-            />
-            <div className={styles.userName}>
-              <Title level={isMobileDevice ? 4 : 2}>
-                {profile?.first_name} {profile?.last_name}
-              </Title>
-            </div>
-            <div className={styles.shareButton}>
-              <Share
-                label="Share"
-                shareUrl={generateUrlFromUsername(profile.username)}
-                title={`${profile.first_name} ${profile.last_name}`}
-              />
-            </div>
-          </div>
-        </div>
-        <Row justify="space-between" align="middle">
-          <Col xs={24} md={{ span: 22, offset: 1 }}>
-            <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
-          </Col>
-          <Col xs={24} md={{ span: 22, offset: 1 }}>
-            {profile?.profile?.social_media_links && (
-              <Space size={'middle'}>
-                {profile.profile.social_media_links.website && (
-                  <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
-                    <GlobalOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.facebook_link && (
-                  <a href={profile.profile.social_media_links.facebook_link} target="_blank" rel="noopener noreferrer">
-                    <FacebookOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.twitter_link && (
-                  <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
-                    <TwitterOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.instagram_link && (
-                  <a href={profile.profile.social_media_links.instagram_link} target="_blank" rel="noopener noreferrer">
-                    <InstagramOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.linkedin_link && (
-                  <a href={profile.profile.social_media_links.linkedin_link} target="_blank" rel="noopener noreferrer">
-                    <LinkedinOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-              </Space>
-            )}
-          </Col>
-        </Row>
+        <CreatorProfile profile={profile} profileImage={profileImage} showCoverImage={true} coverImage={coverImage} />
 
         {/* =====TAB SELECT===== */}
         <Loader loading={isListLoading} size="large">
@@ -571,7 +500,7 @@ const ProfilePreview = ({ username = null }) => {
         {profile && profile?.profile?.testimonials ? (
           <Row className={styles.mt50}>
             <Col span={24}>
-              <Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Title>
+              <Title level={isMobileDevice ? 4 : 2}>What people are saying</Title>
             </Col>
             <Col span={24}>
               <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>

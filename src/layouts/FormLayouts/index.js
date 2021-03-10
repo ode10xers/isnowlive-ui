@@ -1,11 +1,11 @@
 export const profileFormItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 5 },
+    lg: { span: 8 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    sm: { span: 12 },
+    lg: { span: 16 },
   },
 };
 export const profileFormTailLayout = {
@@ -17,11 +17,13 @@ export const profileTestimonialTailLayout = {
 export const formLayout = {
   labelCol: {
     xs: { span: 24 },
-    md: { span: 6 },
+    md: { span: 10 },
+    xl: { span: 6 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    md: { span: 18 },
+    md: { span: 14 },
+    xl: { span: 18 },
   },
 };
 export const formTailLayout = {

@@ -3,8 +3,8 @@ const validationRules = {
   publicUrlValidation: [
     { required: true, message: 'Please input public URL' },
     {
-      pattern: new RegExp('^[a-zA-Z]*$'),
-      message: 'field does not accept numbers and special characters',
+      pattern: new RegExp('^[a-z]*$'),
+      message: 'Public URL can only contain lowercase letters',
     },
   ],
   emailValidation: [{ type: 'email', required: true, message: 'Please input your email' }],
