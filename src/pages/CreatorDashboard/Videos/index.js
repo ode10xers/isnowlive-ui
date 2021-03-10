@@ -515,7 +515,7 @@ const Videos = () => {
         shouldClone={shouldCloneVideo}
       />
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={10} lg={14}>
+        <Col xs={12} md={8} lg={14}>
           <Title level={4}> Videos </Title>
         </Col>
         <Col xs={12} md={6} lg={4}>
@@ -523,7 +523,7 @@ const Videos = () => {
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={24} md={8} lg={6}>
+        <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showUploadVideoModal()} icon={<CloudUploadOutlined />}>
             Upload New Video
           </Button>

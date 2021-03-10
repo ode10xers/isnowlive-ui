@@ -34,7 +34,7 @@ import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpa
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
-const { user, creator } = mixPanelEventTags;
+const { creator } = mixPanelEventTags;
 const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
@@ -53,7 +53,6 @@ const ProfilePreview = ({ username = null }) => {
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [selectedSessionTab, setSelectedSessionTab] = useState(0);
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
@@ -276,23 +275,23 @@ const ProfilePreview = ({ username = null }) => {
     setIsListLoading(true);
     setSelectedListTab(key);
 
-    if (key === 'session') {
-      handleChangeSessionTab(selectedSessionTab);
-    }
+    // if (key === 'session') {
+    //   handleChangeSessionTab(selectedSessionTab);
+    // }
     setIsListLoading(false);
   };
 
-  const handleChangeSessionTab = (key) => {
-    setIsSessionLoading(true);
-    setSelectedSessionTab(key);
-    if (parseInt(key) === 0) {
-      trackSimpleEvent(user.click.profile.upcomingSessionsTab);
-      getSessionDetails('upcoming');
-    } else {
-      trackSimpleEvent(user.click.profile.pastSessionsTab);
-      getSessionDetails('past');
-    }
-  };
+  // const handleChangeSessionTab = (key) => {
+  //   setIsSessionLoading(true);
+  //   setSelectedSessionTab(key);
+  //   if (parseInt(key) === 0) {
+  //     trackSimpleEvent(user.click.profile.upcomingSessionsTab);
+  //     getSessionDetails('upcoming');
+  //   } else {
+  //     trackSimpleEvent(user.click.profile.pastSessionsTab);
+  //     getSessionDetails('past');
+  //   }
+  // };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
     trackSimpleEvent(eventTag);
@@ -420,7 +419,7 @@ const ProfilePreview = ({ username = null }) => {
                         )}
                       </Loader>
                     ) : (
-                      <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
+                      <Tabs defaultActiveKey={0}>
                         {['Upcoming Sessions'].map((item, index) => (
                           <Tabs.TabPane tab={item} key={index}>
                             <Loader loading={isSessionLoading} size="large" text="Loading sessions">
@@ -482,7 +481,11 @@ const ProfilePreview = ({ username = null }) => {
                   </div>
                 }
               >
-                <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
+                <Tabs
+                  defaultActiveKey={
+                    liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''
+                  }
+                >
                   {liveCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading live courses">

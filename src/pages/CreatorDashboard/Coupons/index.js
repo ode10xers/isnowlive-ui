@@ -246,10 +246,10 @@ const Coupons = () => {
         closeModal={hideCreateCouponModal}
       />
       <Row gutter={[8, 8]}>
-        <Col xs={12} md={16} lg={18}>
+        <Col xs={12} md={14} lg={18}>
           <Title level={4}> Coupons </Title>
         </Col>
-        <Col xs={24} md={8} lg={6}>
+        <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showCreateCouponModal()}>
             Create New Coupon
           </Button>

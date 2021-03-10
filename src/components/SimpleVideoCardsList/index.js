@@ -20,7 +20,7 @@ const SimpleVideoCardsList = ({ username = null, passDetails, videos }) => {
     <div className={styles.videoListContainer}>
       <Row gutter={[16, 16]} justify="start">
         {videos.map((passVideo) => (
-          <Col xs={24} md={12} key={`${passDetails?.id || passDetails?.pass_id || ''}_${passVideo.external_id}`}>
+          <Col xs={24} lg={12} key={`${passDetails?.id || passDetails?.pass_id || ''}_${passVideo.external_id}`}>
             <VideoCard
               video={passVideo}
               buyable={false}

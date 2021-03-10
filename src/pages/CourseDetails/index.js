@@ -289,7 +289,7 @@ const CourseDetails = ({ match, history }) => {
                       <Col xs={24}>
                         <Row gutter={[8, 8]}>
                           {course.videos?.map((video) => (
-                            <Col xs={24} md={12} key={video?.external_id}>
+                            <Col xs={24} lg={12} key={video?.external_id}>
                               <VideoCard
                                 video={video}
                                 buyable={false}
