@@ -183,20 +183,27 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      width: '30%',
     },
     {
       title: 'Date of Purchase',
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
-      width: '30%',
+      width: '170px',
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
       title: 'Net Price',
       dataIndex: 'price_paid',
       key: 'price_paid',
+      width: '100px',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.price_paid}`,
+    },
+    {
+      title: 'Discount Code',
+      dataIndex: 'discount',
+      key: 'discount',
+      width: '180px',
+      render: (text, record) => record.discount?.code || 'No Discount',
     },
   ];
 
@@ -212,21 +219,26 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     );
   };
 
-  const renderMobileSubscriberCards = (subscriber) => (
-    <Card key={subscriber.date_of_purchase}>
+  const renderMobileSubscriberCards = (subscriber) => {
+    const layout = (label, value) => (
       <Row>
-        <Col xs={24}>
-          <Title level={5}> {subscriber.name} </Title>
+        <Col span={8}>
+          <Text strong>{label}</Text>
         </Col>
-        <Col xs={24}>
-          <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
-        </Col>
-        <Col xs={24}>
-          <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
-        </Col>
+        <Col span={16}>: {value}</Col>
       </Row>
-    </Card>
-  );
+    );
+
+    return (
+      <Col xs={24} key={`${subscriber.name}_${subscriber.date_of_purchase}`}>
+        <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {subscriber.name} </Title>}>
+          {layout('Buy Date', toDateAndTime(subscriber.date_of_purchase))}
+          {layout('Price', <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>)}
+          {layout('Discount Code', <Text strong> {subscriber.discount?.code || 'No Discount'} </Text>)}
+        </Card>
+      </Col>
+    );
+  };
 
   const renderCourseItem = (course) => {
     const layout = (label, value) => (
@@ -297,14 +309,10 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course?.id) && (
-              <Row className={styles.cardExpansion}>
-                <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
-              </Row>
+              <Row className={styles.cardExpansion}>{course?.buyers?.map(renderMobileSubscriberCards)}</Row>
             )
           : expandedUnpublishedRowKeys.includes(course?.id) && (
-              <Row className={styles.cardExpansion}>
-                <div className={styles.mb20}>{course?.buyers?.map(renderMobileSubscriberCards)}</div>
-              </Row>
+              <Row className={styles.cardExpansion}>{course?.buyers?.map(renderMobileSubscriberCards)}</Row>
             )}
       </Col>
     );
