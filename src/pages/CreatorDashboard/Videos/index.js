@@ -283,7 +283,7 @@ const Videos = () => {
               </Col>
               <Col xs={24} md={2}>
                 <Popconfirm
-                  title="Do you want to delete session?"
+                  title="Do you want to delete video?"
                   icon={<DeleteOutlined className={styles.danger} />}
                   okText="Yes"
                   cancelText="No"
