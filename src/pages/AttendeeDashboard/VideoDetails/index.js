@@ -74,10 +74,16 @@ const VideoDetails = ({ match }) => {
         }
       } catch (error) {
         setIsLoading(false);
-        message.error('Failed to load video details');
+        if (error?.response?.status !== 404) {
+          message.error('Failed to load video details');
+        } else {
+          if (videoOrderDetails) {
+            getProfileDetails(videoOrderDetails?.creator_username);
+          }
+        }
       }
     },
-    [getProfileDetails]
+    [getProfileDetails, videoOrderDetails]
   );
 
   const getVideoToken = async (videoOrderId) => {
@@ -139,8 +145,8 @@ const VideoDetails = ({ match }) => {
                   <Image
                     preview={false}
                     className={styles.videoThumbnail}
-                    src={video.thumbnail_url || 'error'}
-                    alt={video.title}
+                    src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                    alt={video?.title || videoOrderDetails?.title}
                     fallback={DefaultImage()}
                   />
                 </div>
@@ -151,8 +157,8 @@ const VideoDetails = ({ match }) => {
                     <Image
                       preview={false}
                       className={styles.videoThumbnail}
-                      src={video.thumbnail_url || 'error'}
-                      alt={video.title}
+                      src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                      alt={video?.title || videoOrderDetails?.title}
                       fallback={DefaultImage()}
                     />
                   </div>
@@ -168,83 +174,93 @@ const VideoDetails = ({ match }) => {
           />
         </Col>
         <Col xs={24}>
-          <Row className={styles.imageWrapper} gutter={[8, 8]}>
-            <Col xs={24} className={styles.profileImageWrapper}>
-              <div className={styles.profileImage}>
-                <Image preview={false} width={'100%'} src={profileImage || 'error'} fallback={DefaultImage()} />
-                <div className={styles.userName}>
-                  <Title level={isMobileDevice ? 4 : 2}>
-                    {profile?.first_name} {profile?.last_name}
-                  </Title>
+          {profile && (
+            <Row className={styles.imageWrapper} gutter={[8, 8]}>
+              <Col xs={24} className={styles.profileImageWrapper}>
+                <div className={styles.profileImage}>
+                  <Image preview={false} width={'100%'} src={profileImage || 'error'} fallback={DefaultImage()} />
+                  <div className={styles.userName}>
+                    <Title level={isMobileDevice ? 4 : 2}>
+                      {profile?.first_name} {profile?.last_name}
+                    </Title>
+                  </div>
+                  <div className={styles.shareButton}>
+                    <Share
+                      label="Share"
+                      shareUrl={generateUrlFromUsername(profile.username)}
+                      title={`${profile.first_name} ${profile.last_name}`}
+                    />
+                  </div>
                 </div>
-                <div className={styles.shareButton}>
-                  <Share
-                    label="Share"
-                    shareUrl={generateUrlFromUsername(profile.username)}
-                    title={`${profile.first_name} ${profile.last_name}`}
-                  />
-                </div>
-              </div>
-            </Col>
-            <Col xs={24} md={{ span: 22, offset: 1 }}>
-              <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
-            </Col>
-            <Col xs={24} md={{ span: 22, offset: 1 }}>
-              {profile?.profile?.social_media_links && (
-                <Space size={'middle'}>
-                  {profile.profile.social_media_links.website && (
-                    <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
-                      <GlobalOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.facebook_link && (
-                    <a
-                      href={profile.profile.social_media_links.facebook_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FacebookOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.twitter_link && (
-                    <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
-                      <TwitterOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.instagram_link && (
-                    <a
-                      href={profile.profile.social_media_links.instagram_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <InstagramOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                  {profile.profile.social_media_links.linkedin_link && (
-                    <a
-                      href={profile.profile.social_media_links.linkedin_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <LinkedinOutlined className={styles.socialIcon} />
-                    </a>
-                  )}
-                </Space>
-              )}
-            </Col>
-          </Row>
+              </Col>
+              <Col xs={24} md={{ span: 22, offset: 1 }}>
+                <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
+              </Col>
+              <Col xs={24} md={{ span: 22, offset: 1 }}>
+                {profile?.profile?.social_media_links && (
+                  <Space size={'middle'}>
+                    {profile.profile.social_media_links.website && (
+                      <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
+                        <GlobalOutlined className={styles.socialIcon} />
+                      </a>
+                    )}
+                    {profile.profile.social_media_links.facebook_link && (
+                      <a
+                        href={profile.profile.social_media_links.facebook_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FacebookOutlined className={styles.socialIcon} />
+                      </a>
+                    )}
+                    {profile.profile.social_media_links.twitter_link && (
+                      <a
+                        href={profile.profile.social_media_links.twitter_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <TwitterOutlined className={styles.socialIcon} />
+                      </a>
+                    )}
+                    {profile.profile.social_media_links.instagram_link && (
+                      <a
+                        href={profile.profile.social_media_links.instagram_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <InstagramOutlined className={styles.socialIcon} />
+                      </a>
+                    )}
+                    {profile.profile.social_media_links.linkedin_link && (
+                      <a
+                        href={profile.profile.social_media_links.linkedin_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <LinkedinOutlined className={styles.socialIcon} />
+                      </a>
+                    )}
+                  </Space>
+                )}
+              </Col>
+            </Row>
+          )}
         </Col>
         <Col xs={24}>
           {video && (
             <Row className={styles.sessionListWrapper}>
-              {video.sessions?.length > 0 && (
+              {video?.sessions?.length > 0 && (
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
                     <Col xs={24}>
                       <Text className={styles.ml20}> Related to these class(es) </Text>
                     </Col>
                     <Col xs={24}>
-                      <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={video.username} />
+                      <SessionCards
+                        sessions={video?.sessions}
+                        shouldFetchInventories={true}
+                        username={video?.username}
+                      />
                     </Col>
                   </Row>
                 </Col>

@@ -92,8 +92,8 @@ const VideoCard = ({
         cover || (
           <Image
             className={styles.videoThumbnail}
-            src={video.thumbnail_url || 'error'}
-            alt={video.title}
+            src={video?.thumbnail_url || orderDetails?.thumbnail_url || 'error'}
+            alt={video?.title || orderDetails?.title}
             fallback={DefaultImage()}
             preview={false}
           />
@@ -110,7 +110,7 @@ const VideoCard = ({
           <Row gutter={[8, 8]} justify="start">
             <Col xs={24} className={styles.titleWrapper}>
               <Title level={5} className={styles.textAlignLeft}>
-                {video.title} {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+                {video?.title || orderDetails?.title} {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
               </Title>
             </Col>
             <Col xs={24} className={styles.detailsWrapper}>
@@ -133,7 +133,9 @@ const VideoCard = ({
             </Col>
             {showDesc && (
               <Col xs={24} className={styles.descWrapper}>
-                <div className={styles.videoDesc}>{ReactHtmlParser(video.description)}</div>
+                <div className={styles.videoDesc}>
+                  {ReactHtmlParser(video?.description || orderDetails?.description)}
+                </div>
               </Col>
             )}
             {!showOrderDetails && (showDetailsBtn || buyable) && (
