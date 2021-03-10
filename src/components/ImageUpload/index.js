@@ -23,7 +23,7 @@ const ImageUpload = ({
 
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    console.table(file);
+    console.log(file);
     const isValidFileSize = file.size / 1024 / 1024 < 2;
     if (!isJpgOrPng) {
       message.error('You can only upload JPG/PNG file!');
@@ -39,7 +39,7 @@ const ImageUpload = ({
       const formData = new FormData();
       // const reducer = ImageBlobReduce();
       // const reducedImageFile = await reducer.toBlob(fileData.file, { max: 600 });
-      console.table(fileData.file);
+      console.log(fileData.file);
       // formData.append('file', new File([reducedImageFile], fileData.file.name, { lastModified: new Date() }));
       formData.append('file', fileData.file);
       const { data } = await apis.user.uploadImage(formData);
