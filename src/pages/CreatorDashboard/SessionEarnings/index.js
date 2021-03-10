@@ -73,11 +73,14 @@ const SessionEarnings = ({ match }) => {
     </div>
   );
 
-  const showSessionName = showSessionLayout('Session Name', <Title level={3}>{earnings?.name}</Title>);
+  const showSessionName = showSessionLayout(
+    'Session Name',
+    <Title level={isMobileDevice ? 5 : 3}>{earnings?.name}</Title>
+  );
 
   const showSessionDate = showSessionLayout(
     'Session Day and Date',
-    <Title level={3}>{toLongDateWithDay(earnings?.session_date)}</Title>
+    <Title level={isMobileDevice ? 5 : 3}>{toLongDateWithDay(earnings?.session_date)}</Title>
   );
 
   const showSessionEarning = showSessionLayout(

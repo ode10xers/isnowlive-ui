@@ -65,7 +65,10 @@ const CourseEarnings = ({ match }) => {
     </div>
   );
 
-  const showCourseName = showCourseLayout('Course Name', <Title level={3}>{earnings?.name}</Title>);
+  const showCourseName = showCourseLayout(
+    'Course Name',
+    <Title level={isMobileDevice ? 5 : 3}>{earnings?.name}</Title>
+  );
 
   const showCourseEarnings = showCourseLayout(
     'Total Earning',
