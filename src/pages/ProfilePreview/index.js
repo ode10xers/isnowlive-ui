@@ -43,8 +43,7 @@ const productKeys = {
   SESSION: 'session',
   PASS: 'pass',
   VIDEO: 'video',
-  LIVE_COURSE: 'live_course',
-  VIDEO_COURSE: 'video_course',
+  COURSE: 'course',
 };
 
 const ProfilePreview = ({ username = null }) => {
@@ -109,7 +108,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       } catch (error) {
         setIsSessionLoading(false);
-        message.error('Failed to load user session details');
+        console.error('Failed to load user session details');
       }
     },
     [username]
@@ -150,7 +149,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsPassesLoading(false);
-      message.error('Failed to load pass details');
+      console.error('Failed to load pass details');
     }
   }, [username]);
 
@@ -173,7 +172,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsVideosLoading(false);
-      message.error('Failed to load video details');
+      console.error('Failed to load video details');
     }
   }, [username]);
 
@@ -199,7 +198,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsCoursesLoading(false);
-      message.error('Failed to load courses details');
+      console.error('Failed to load courses details');
     }
   }, [username]);
 
@@ -221,40 +220,43 @@ const ProfilePreview = ({ username = null }) => {
     getCoursesDetails,
   ]);
 
+  const getDefaultTabToShow = useCallback(() => {
+    let targetListTab = '';
+    if (sessions.length) {
+      targetListTab = productKeys.SESSION;
+    } else if (passes.length) {
+      targetListTab = productKeys.PASS;
+    } else if (videos.length) {
+      targetListTab = productKeys.VIDEO;
+    } else if (liveCourses.length || videoCourses.length) {
+      targetListTab = productKeys.COURSE;
+    }
+
+    return targetListTab;
+  }, [sessions, passes, videos, liveCourses, videoCourses]);
+
   useEffect(() => {
+    let targetListTab = getDefaultTabToShow();
+
     if (location.state) {
       const sectionToShow = location.state.section;
-      let targetElement = document.getElementById(productKeys.SESSION);
+      let targetElement = document.getElementById('home');
 
-      if (sectionToShow === productKeys.SESSION) {
-        setSelectedListTab(sectionToShow);
-      } else if (sectionToShow === productKeys.PASS) {
-        if (passes.length) {
-          setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById(productKeys.PASS);
-        } else {
-          // Fallback to show sessions
-          setSelectedListTab(productKeys.SESSION);
-        }
-      } else if (sectionToShow === productKeys.VIDEO) {
-        if (videos.length) {
-          setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById(productKeys.VIDEO);
-        } else {
-          // Fallback to show sessions
-          setSelectedListTab(productKeys.SESSION);
-        }
+      if (sectionToShow === productKeys.SESSION && sessions.length > 0) {
+        targetListTab = productKeys.SESSION;
+        targetElement = document.getElementById(productKeys.SESSION);
+      } else if (sectionToShow === productKeys.PASS && passes.length > 0) {
+        targetListTab = productKeys.PASS;
+        targetElement = document.getElementById(productKeys.PASS);
+      } else if (sectionToShow === productKeys.VIDEO && videos.length > 0) {
+        targetListTab = productKeys.VIDEO;
+        targetElement = document.getElementById(productKeys.VIDEO);
+      } else if (sectionToShow === productKeys.COURSE && (liveCourses.length > 0 || videoCourses.length > 0)) {
+        targetListTab = productKeys.COURSE;
+        targetElement = document.getElementById(productKeys.COURSE);
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
-        setSelectedListTab(productKeys.SESSION);
-      } else if (sectionToShow === 'course') {
-        if (liveCourses.length || videoCourses.length) {
-          setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById('course');
-        } else {
-          // Fallback to show sessions
-          setSelectedListTab(productKeys.SESSION);
-        }
+        targetListTab = getDefaultTabToShow();
       }
 
       if (targetElement) {
@@ -265,7 +267,10 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, videos, liveCourses, videoCourses, profile]);
+
+    setSelectedListTab(targetListTab);
+    //eslint-disable-next-line
+  }, [location.state, sessions, passes, videos, liveCourses, videoCourses, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -372,61 +377,63 @@ const ProfilePreview = ({ username = null }) => {
         <Loader loading={isListLoading} size="large">
           <Tabs
             size="large"
-            defaultActiveKey={selectedListTab}
+            defaultActiveKey={getDefaultTabToShow()}
             activeKey={selectedListTab}
             onChange={handleChangeListTab}
           >
-            <Tabs.TabPane
-              key={productKeys.SESSION}
-              tab={
-                <div className={styles.largeTabHeader} id="session">
-                  <VideoCameraOutlined />
-                  Sessions
-                </div>
-              }
-            >
-              {/* =====SESSION======== */}
-              <Row className={styles.mt20}>
-                <Col span={24}>
-                  <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
-                  <Text type="primary" strong>
-                    All event times shown below are in your local time zone ({getCurrentLongTimezone()})
-                  </Text>
-                </Col>
-                <Col span={24} className={styles.mt10}>
-                  <Radio.Group value={view} onChange={handleViewChange}>
-                    <Radio.Button value="list">List View</Radio.Button>
-                    <Radio.Button value="calendar">Calendar View</Radio.Button>
-                  </Radio.Group>
-                </Col>
-                <Col span={24}>
-                  {view === 'calendar' ? (
-                    <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                      {calendarSession.length > 0 ? (
-                        <CalendarView
-                          inventories={calendarSession}
-                          onSelectInventory={redirectToSessionsPage}
-                          onViewChange={onViewChange}
-                          calendarView={calendarView}
-                        />
-                      ) : (
-                        <Empty />
-                      )}
-                    </Loader>
-                  ) : (
-                    <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                      {['Upcoming Sessions'].map((item, index) => (
-                        <Tabs.TabPane tab={item} key={index}>
-                          <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                            <Sessions username={username} sessions={sessions} />
-                          </Loader>
-                        </Tabs.TabPane>
-                      ))}
-                    </Tabs>
-                  )}
-                </Col>
-              </Row>
-            </Tabs.TabPane>
+            {sessions.length > 0 && (
+              <Tabs.TabPane
+                key={productKeys.SESSION}
+                tab={
+                  <div className={styles.largeTabHeader} id="session">
+                    <VideoCameraOutlined />
+                    Sessions
+                  </div>
+                }
+              >
+                {/* =====SESSION======== */}
+                <Row className={styles.mt20}>
+                  <Col span={24}>
+                    <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
+                    <Text type="primary" strong>
+                      All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+                    </Text>
+                  </Col>
+                  <Col span={24} className={styles.mt10}>
+                    <Radio.Group value={view} onChange={handleViewChange}>
+                      <Radio.Button value="list">List View</Radio.Button>
+                      <Radio.Button value="calendar">Calendar View</Radio.Button>
+                    </Radio.Group>
+                  </Col>
+                  <Col span={24}>
+                    {view === 'calendar' ? (
+                      <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                        {calendarSession.length > 0 ? (
+                          <CalendarView
+                            inventories={calendarSession}
+                            onSelectInventory={redirectToSessionsPage}
+                            onViewChange={onViewChange}
+                            calendarView={calendarView}
+                          />
+                        ) : (
+                          <Empty />
+                        )}
+                      </Loader>
+                    ) : (
+                      <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
+                        {['Upcoming Sessions'].map((item, index) => (
+                          <Tabs.TabPane tab={item} key={index}>
+                            <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                              <Sessions username={username} sessions={sessions} />
+                            </Loader>
+                          </Tabs.TabPane>
+                        ))}
+                      </Tabs>
+                    )}
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+            )}
             {passes.length > 0 && (
               <Tabs.TabPane
                 key={productKeys.PASS}

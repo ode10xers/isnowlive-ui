@@ -219,94 +219,96 @@ const CourseDetails = ({ match, history }) => {
   };
 
   const mainContent = (
-    <Loader size="large" text="Loading course details" loading={isLoading}>
-      <Row gutter={[8, 24]}>
-        {isOnAttendeeDashboard && (
-          <Col xs={24} className={classNames(styles.mb20, styles.mt20)}>
-            <Button
-              onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses)}
-              icon={<ArrowLeftOutlined />}
-            >
-              Back to Course List
-            </Button>
+    <div className={styles.mt50}>
+      <Loader size="large" text="Loading course details" loading={isLoading}>
+        <Row gutter={[8, 24]}>
+          {isOnAttendeeDashboard && (
+            <Col xs={24} className={classNames(styles.mb20, styles.mt20)}>
+              <Button
+                onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses)}
+                icon={<ArrowLeftOutlined />}
+              >
+                Back to Course List
+              </Button>
+            </Col>
+          )}
+
+          <Col xs={24} className={styles.creatorProfileWrapper}>
+            {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
           </Col>
-        )}
-
-        <Col xs={24} className={styles.creatorProfileWrapper}>
-          {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
-        </Col>
-        <Col xs={24}>
-          {course && (
-            <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-              <Col xs={24}>
-                <Title level={3} className={styles.ml20}>
-                  {' '}
-                  Course Details{' '}
-                </Title>
-              </Col>
-              <Col xs={24}>
-                <ShowcaseCourseCard courses={[course]} username={username} />
-              </Col>
-
-              {courseSessions?.length > 0 && (
-                <>
-                  <Col xs={24}>
-                    <Title level={3} className={styles.ml20}>
-                      Sessions Included
-                    </Title>
-                  </Col>
-                  <Col xs={24}>
-                    <SessionCards sessions={courseSessions} shouldFetchInventories={false} username={username} />
-                  </Col>
-                  <Col xs={24}>
-                    <Title level={3} className={styles.ml20}>
-                      Course Schedules
-                    </Title>
-                    {isMobileDevice ? (
-                      <Row gutter={[8, 10]}>
-                        {generateCourseSessionsScheduleList().map(renderMobileCourseSchedules)}
-                      </Row>
-                    ) : (
-                      <Table
-                        columns={sessionSchedulesColumns}
-                        data={generateCourseSessionsScheduleList()}
-                        rowKey={(record) => record.key}
-                      />
-                    )}
-                  </Col>
-                </>
-              )}
-
-              {course.videos?.length > 0 && (
+          <Col xs={24}>
+            {course && (
+              <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
                 <Col xs={24}>
-                  <Row gutter={[8, 8]}>
+                  <Title level={3} className={styles.ml20}>
+                    {' '}
+                    Course Details{' '}
+                  </Title>
+                </Col>
+                <Col xs={24}>
+                  <ShowcaseCourseCard courses={[course]} username={username} />
+                </Col>
+
+                {courseSessions?.length > 0 && (
+                  <>
                     <Col xs={24}>
                       <Title level={3} className={styles.ml20}>
-                        Videos Included
+                        Sessions Included
                       </Title>
                     </Col>
                     <Col xs={24}>
-                      <Row gutter={[8, 8]}>
-                        {course.videos?.map((video) => (
-                          <Col xs={24} md={12} key={video?.external_id}>
-                            <VideoCard
-                              video={video}
-                              buyable={false}
-                              onCardClick={() => redirectToVideoDetails(video)}
-                              showDetailsBtn={false}
-                            />
-                          </Col>
-                        ))}
-                      </Row>
+                      <SessionCards sessions={courseSessions} shouldFetchInventories={false} username={username} />
                     </Col>
-                  </Row>
-                </Col>
-              )}
-            </Row>
-          )}
-        </Col>
-      </Row>
-    </Loader>
+                    <Col xs={24}>
+                      <Title level={3} className={styles.ml20}>
+                        Course Schedules
+                      </Title>
+                      {isMobileDevice ? (
+                        <Row gutter={[8, 10]}>
+                          {generateCourseSessionsScheduleList().map(renderMobileCourseSchedules)}
+                        </Row>
+                      ) : (
+                        <Table
+                          columns={sessionSchedulesColumns}
+                          data={generateCourseSessionsScheduleList()}
+                          rowKey={(record) => record.key}
+                        />
+                      )}
+                    </Col>
+                  </>
+                )}
+
+                {course.videos?.length > 0 && (
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]}>
+                      <Col xs={24}>
+                        <Title level={3} className={styles.ml20}>
+                          Videos Included
+                        </Title>
+                      </Col>
+                      <Col xs={24}>
+                        <Row gutter={[8, 8]}>
+                          {course.videos?.map((video) => (
+                            <Col xs={24} md={12} key={video?.external_id}>
+                              <VideoCard
+                                video={video}
+                                buyable={false}
+                                onCardClick={() => redirectToVideoDetails(video)}
+                                showDetailsBtn={false}
+                              />
+                            </Col>
+                          ))}
+                        </Row>
+                      </Col>
+                    </Row>
+                  </Col>
+                )}
+              </Row>
+            )}
+          </Col>
+        </Row>
+      </Loader>
+    </div>
   );
 
   if (isOnAttendeeDashboard) {

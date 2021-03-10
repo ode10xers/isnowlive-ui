@@ -3,7 +3,7 @@
 //TODO: Remove duplicate classes from pages that uses this component
 .imageWrapper {
   position: relative;
-  margin: 108px 64px 16px;
+  margin: 64px 16px;
   padding-bottom: 20px;
   background-color: map-get($map: $colors, $key: 'White1');
 
@@ -92,10 +92,18 @@
         }
         .shareButton {
           position: absolute;
-          bottom: 15px;
+          bottom: -20px;
           right: 36px;
         }
       }
+    }
+
+    .bio {
+      padding: 0 10px;
+    }
+
+    .socialIcon {
+      margin-left: 10px;
     }
   }
 }

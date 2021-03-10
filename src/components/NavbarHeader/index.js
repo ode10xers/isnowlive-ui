@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Row, Col, Menu, Button, Typography, Modal, message } from 'antd';
+import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
 import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -44,7 +44,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         setShouldShowPassLink(data.length > 0);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to fetch pass for username');
+      console.error(error.response?.data?.message || 'Failed to fetch pass for username');
     }
   };
 
@@ -56,7 +56,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         setShouldShowVideoLink(data.length > 0);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to fetch videos for username');
+      console.error(error.response?.data?.message || 'Failed to fetch videos for username');
     }
   };
 
@@ -68,7 +68,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         setShouldShowCourseLink(data.length > 0);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to fetch courses for username');
+      console.error(error.response?.data?.message || 'Failed to fetch courses for username');
     }
   };
 
