@@ -22,7 +22,7 @@ import config from 'config';
 import styles from './style.module.scss';
 import parseQueryString from 'utils/parseQueryString';
 
-const { Title } = Typography;
+const { Title, Link } = Typography;
 const { creator } = mixPanelEventTags;
 
 const LiveStream = () => {
@@ -132,10 +132,12 @@ const LiveStream = () => {
   return (
     <>
       {isOnboarding && <OnboardSteps current={1} />}
-      <Space size="middle">
+      <Space size="small" direction="vertical" className={styles.mb20}>
         <Typography>
           <Title>Setup Livestream</Title>
         </Typography>
+
+        {isOnboarding && <Link href={Routes.session}>Do it later</Link>}
       </Space>
 
       <Section>
