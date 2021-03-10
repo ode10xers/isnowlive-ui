@@ -23,15 +23,15 @@
 .logout {
   margin-left: 100px;
 }
-@media (max-width: 768px) {
-  .navItemWrapper {
+
+@media (max-width: 767px) {
+  .logoWrapper {
     text-align: center;
   }
-  .headerContainer {
-    height: 90px;
-    padding: 5px;
-  }
-  .logoWrapper {
+}
+
+@media (max-width: 767px) {
+  .navItemWrapper {
     text-align: center;
   }
   .logout {
