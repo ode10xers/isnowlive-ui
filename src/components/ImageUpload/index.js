@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+//TODO: run npm uninstall if want to deploy before this is fixed
 // import ImageBlobReduce from 'image-blob-reduce';
 
 import apis from 'apis';
