@@ -37,19 +37,6 @@
   position: absolute !important;
   top: -10px;
   right: -5px;
-  z-index: 1;
-  > .ant-badge-count {
-    background: map-get($colors, $key: 'KellyGreen') !important;
-  }
-}
-.badgeLg {
-  margin-top: 10px !important;
-  padding-right: 5px !important;
-  :global {
-    .ant-badge-count {
-      background: map-get($colors, $key: 'KellyGreen') !important;
-    }
-  }
 }
 .titlePrefix {
   display: inline;

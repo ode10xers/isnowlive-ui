@@ -129,7 +129,7 @@ const Login = ({ history }) => {
         </Form>
 
         <Row>
-          <Col xs={24} md={{ span: 18, offset: 6 }}>
+          <Col {...formTailLayout.wrapperCol}>
             <a href onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
               Set a new password
             </a>
@@ -158,7 +158,7 @@ const Login = ({ history }) => {
         </Form>
 
         <Row>
-          <Col xs={24} md={{ span: 18, offset: 6 }}>
+          <Col {...formTailLayout.wrapperCol}>
             <a href onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
               Login with password
             </a>
@@ -169,8 +169,8 @@ const Login = ({ history }) => {
   }
 
   return (
-    <Row align="middle" className={styles.mt50}>
-      <Col xs={24} md={{ span: 12, offset: 6 }}>
+    <Row align="middle" justify="center" className={styles.mt50}>
+      <Col xs={24} md={18} lg={12}>
         {view}
       </Col>
     </Row>

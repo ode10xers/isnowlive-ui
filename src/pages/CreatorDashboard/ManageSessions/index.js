@@ -304,7 +304,6 @@ const ManageSessions = () => {
         ]}
       >
         {layout('Type', <Text>{item.group ? 'Group Session' : '1-to-1 Session'}</Text>)}
-        {layout('Duration', <Text>{item.duration}</Text>)}
         {layout(
           'Date',
           <>

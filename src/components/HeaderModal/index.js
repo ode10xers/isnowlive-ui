@@ -44,7 +44,9 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     http.setAuthToken(data.auth_token);
     logIn(data, true);
     message.success('You have logged in');
-    history.push('/attendee/dashboard/sessions/upcoming');
+
+    const user_type = data.is_creator ? 'creator' : 'attendee';
+    history.push(`/${user_type}/dashboard/sessions/upcoming`);
     window.scrollTo(0, 0);
     closeModal();
   };

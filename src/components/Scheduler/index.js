@@ -44,7 +44,11 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
       setDate(moment(sortedSessionSlots[0].start_time));
     } else {
       if (recurring && recurringDatesRange && recurringDatesRange.length) {
-        setDate(moment(recurringDatesRange[0]));
+        if (isBeforeDate(recurringDatesRange[0])) {
+          setDate(moment(recurringDatesRange[0]));
+        } else {
+          setDate(moment());
+        }
       } else {
         setDate(moment(selectedDate));
       }
@@ -128,7 +132,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         />
       );
     } else if (slotsForDate?.length && isMobileDevice) {
-      return <Badge className={styles.badge} size="small" count={slotsForDate?.length}></Badge>;
+      const badgeColors = {
+        backgroundColor: moment(calendarDate).endOf('day') < moment().startOf('day') ? '#eeeeee' : '#096dd9',
+        color: moment(calendarDate).endOf('day') < moment().startOf('day') ? '#888888' : '#ffffff',
+      };
+
+      return <Badge className={styles.badge} style={badgeColors} size="small" count={slotsForDate?.length} />;
     } else {
       return null;
     }
@@ -289,6 +298,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
 
   const handleDisableDate = (currentDate) => {
     if (recurring) {
+      if (moment(currentDate).endOf('day') < moment().startOf('day')) {
+        return true;
+      }
+
       const startDate = recurringDatesRange ? moment(recurringDatesRange[0]).startOf('day') : moment().startOf('day');
       const endDate = recurringDatesRange ? moment(recurringDatesRange[1]).endOf('day') : moment().endOf('day');
       // check if current date is in between recuring dates range

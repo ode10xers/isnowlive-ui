@@ -49,7 +49,7 @@ const Videos = () => {
       <Col
         key={video.video_order_id}
         xs={24}
-        md={12}
+        lg={12}
         className={styles.videoItem}
         onClick={() =>
           // Sending the video order data, since it's needed in the UI
