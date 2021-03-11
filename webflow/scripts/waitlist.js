@@ -2,13 +2,26 @@ let waitListBtn = document.querySelector("[data-waitlist-cta='true']");
 let alternateWaitlistCtas = document.querySelectorAll("[data-waitlist-cta-alternate='true']");
 let emailInput = document.createElement('input');
 let emailValidationMsg = document.createElement('p');
+let waitListLoader = document.createElement('div');
+waitListLoader.classList.add('waitlist-loader');
 
 let parentContainer = null;
 
 alternateWaitlistCtas.forEach((cta) => {
   cta.addEventListener('click', function () {
     let el = waitListBtn.parentElement;
-    el.scrollIntoView({ behavior: 'smooth' });
+    var headerOffset = 10;
+    var elementPosition = el.getBoundingClientRect().top;
+    var offsetPosition = elementPosition - headerOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth',
+    });
+
+    setTimeout(() => {
+      emailInput.focus();
+    }, 1000);
   });
 });
 
@@ -99,6 +112,22 @@ function createSuccessDialog(response) {
   emailValidationMsg.style.display = 'none';
 }
 
+function addWaitListLoader() {
+  parentContainer = waitListBtn.parentElement;
+  waitListLoader.style.display = 'none';
+  parentContainer.insertAdjacentElement('afterend', waitListLoader);
+}
+
+function showWaitlistLoader() {
+  parentContainer.style.display = 'none';
+  emailValidationMsg.style.display = 'none';
+  waitListLoader.style.display = 'block';
+}
+
+function hideWaitlistLoader() {
+  waitListLoader.style.display = 'none';
+}
+
 function showEmailInput() {
   emailInput.style.height = '41px';
   emailInput.style.marginTop = '11px';
@@ -127,6 +156,8 @@ function addClickEventToEarlyAccessBtn() {
     if (emailInput.validity.valid) {
       emailValidationMsg.innerText = '';
 
+      showWaitlistLoader();
+
       fetch('https://www.getwaitlist.com/waitlist', {
         method: 'post',
         headers: {
@@ -143,6 +174,7 @@ function addClickEventToEarlyAccessBtn() {
           return res.json();
         })
         .then((data) => {
+          hideWaitlistLoader();
           createSuccessDialog(data);
         })
         .catch((error) => {
@@ -158,4 +190,5 @@ if (waitListBtn) {
   addEmailInput();
   addHoverEventToEarlyAccessBtn();
   addClickEventToEarlyAccessBtn();
+  addWaitListLoader();
 }
