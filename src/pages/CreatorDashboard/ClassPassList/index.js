@@ -285,19 +285,21 @@ const ClassPassList = () => {
   };
 
   const renderMobileSubscriberCards = (subscriber) => (
-    <Card>
-      <Row>
-        <Col xs={24}>
-          <Title level={5}> {subscriber.name} </Title>
-        </Col>
-        <Col xs={24}>
-          <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
-        </Col>
-        <Col xs={24}>
-          <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
-        </Col>
-      </Row>
-    </Card>
+    <Col xs={24} key={`${subscriber.name}_${subscriber.date_of_purchase}`}>
+      <Card>
+        <Row>
+          <Col xs={24}>
+            <Title level={5}> {subscriber.name} </Title>
+          </Col>
+          <Col xs={24}>
+            <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
+          </Col>
+          <Col xs={24}>
+            <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
+          </Col>
+        </Row>
+      </Card>
+    </Col>
   );
 
   const renderPassItem = (pass) => {
@@ -361,9 +363,7 @@ const ClassPassList = () => {
           {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>
-            <div className={styles.mb20}>{pass.buyers?.map(renderMobileSubscriberCards)}</div>
-          </Row>
+          <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>
         )}
       </Col>
     );
@@ -373,7 +373,7 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={10} lg={14}>
+        <Col xs={12} md={8} lg={14}>
           <Title level={4}> Passes </Title>
         </Col>
         <Col xs={12} md={6} lg={4}>
@@ -381,7 +381,7 @@ const ClassPassList = () => {
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>
-        <Col xs={24} md={8} lg={6}>
+        <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
             Create New Pass
           </Button>

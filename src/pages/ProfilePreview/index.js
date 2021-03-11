@@ -1,25 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Image, Typography, Button, Row, Col, Space, Tabs, Card, message, Radio, Empty } from 'antd';
+import { Typography, Button, Row, Col, Tabs, Card, message, Radio, Empty } from 'antd';
 import {
   TagsOutlined,
   VideoCameraOutlined,
   GlobalOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  TwitterOutlined,
   ArrowLeftOutlined,
   EditOutlined,
-  LinkedinOutlined,
   PlayCircleOutlined,
   BookOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
-import ReactHtmlParser from 'react-html-parser';
+import MobileDetect from 'mobile-detect';
 
 import apis from 'apis';
-import MobileDetect from 'mobile-detect';
+
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
@@ -27,10 +23,9 @@ import PublicCourseList from 'components/PublicCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import { isAPISuccess, parseEmbedCode } from 'utils/helper';
-import DefaultImage from 'components/Icons/DefaultImage/index';
-import Share from 'components/Share';
-import { generateUrlFromUsername, courseType } from 'utils/helper';
+import CreatorProfile from 'components/CreatorProfile';
+
+import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 
@@ -39,7 +34,7 @@ import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpa
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
-const { user, creator } = mixPanelEventTags;
+const { creator } = mixPanelEventTags;
 const {
   timezoneUtils: { getCurrentLongTimezone },
 } = dateUtil;
@@ -48,8 +43,7 @@ const productKeys = {
   SESSION: 'session',
   PASS: 'pass',
   VIDEO: 'video',
-  LIVE_COURSE: 'live_course',
-  VIDEO_COURSE: 'video_course',
+  COURSE: 'course',
 };
 
 const ProfilePreview = ({ username = null }) => {
@@ -59,7 +53,6 @@ const ProfilePreview = ({ username = null }) => {
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [selectedSessionTab, setSelectedSessionTab] = useState(0);
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
@@ -114,7 +107,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       } catch (error) {
         setIsSessionLoading(false);
-        message.error('Failed to load user session details');
+        console.error('Failed to load user session details');
       }
     },
     [username]
@@ -155,7 +148,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsPassesLoading(false);
-      message.error('Failed to load pass details');
+      console.error('Failed to load pass details');
     }
   }, [username]);
 
@@ -178,7 +171,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsVideosLoading(false);
-      message.error('Failed to load video details');
+      console.error('Failed to load video details');
     }
   }, [username]);
 
@@ -204,7 +197,7 @@ const ProfilePreview = ({ username = null }) => {
       }
     } catch (error) {
       setIsCoursesLoading(false);
-      message.error('Failed to load courses details');
+      console.error('Failed to load courses details');
     }
   }, [username]);
 
@@ -226,40 +219,43 @@ const ProfilePreview = ({ username = null }) => {
     getCoursesDetails,
   ]);
 
+  const getDefaultTabToShow = useCallback(() => {
+    let targetListTab = '';
+    if (sessions.length) {
+      targetListTab = productKeys.SESSION;
+    } else if (passes.length) {
+      targetListTab = productKeys.PASS;
+    } else if (videos.length) {
+      targetListTab = productKeys.VIDEO;
+    } else if (liveCourses.length || videoCourses.length) {
+      targetListTab = productKeys.COURSE;
+    }
+
+    return targetListTab;
+  }, [sessions, passes, videos, liveCourses, videoCourses]);
+
   useEffect(() => {
+    let targetListTab = getDefaultTabToShow();
+
     if (location.state) {
       const sectionToShow = location.state.section;
-      let targetElement = document.getElementById(productKeys.SESSION);
+      let targetElement = document.getElementById('home');
 
-      if (sectionToShow === productKeys.SESSION) {
-        setSelectedListTab(sectionToShow);
-      } else if (sectionToShow === productKeys.PASS) {
-        if (passes.length) {
-          setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById(productKeys.PASS);
-        } else {
-          // Fallback to show sessions
-          setSelectedListTab(productKeys.SESSION);
-        }
-      } else if (sectionToShow === productKeys.VIDEO) {
-        if (videos.length) {
-          setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById(productKeys.VIDEO);
-        } else {
-          // Fallback to show sessions
-          setSelectedListTab(productKeys.SESSION);
-        }
+      if (sectionToShow === productKeys.SESSION && sessions.length > 0) {
+        targetListTab = productKeys.SESSION;
+        targetElement = document.getElementById(productKeys.SESSION);
+      } else if (sectionToShow === productKeys.PASS && passes.length > 0) {
+        targetListTab = productKeys.PASS;
+        targetElement = document.getElementById(productKeys.PASS);
+      } else if (sectionToShow === productKeys.VIDEO && videos.length > 0) {
+        targetListTab = productKeys.VIDEO;
+        targetElement = document.getElementById(productKeys.VIDEO);
+      } else if (sectionToShow === productKeys.COURSE && (liveCourses.length > 0 || videoCourses.length > 0)) {
+        targetListTab = productKeys.COURSE;
+        targetElement = document.getElementById(productKeys.COURSE);
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
-        setSelectedListTab(productKeys.SESSION);
-      } else if (sectionToShow === 'course') {
-        if (liveCourses.length || videoCourses.length) {
-          setSelectedListTab(sectionToShow);
-          targetElement = document.getElementById('course');
-        } else {
-          // Fallback to show sessions
-          setSelectedListTab(productKeys.SESSION);
-        }
+        targetListTab = getDefaultTabToShow();
       }
 
       if (targetElement) {
@@ -270,29 +266,32 @@ const ProfilePreview = ({ username = null }) => {
         }
       }
     }
-  }, [location.state, passes, videos, liveCourses, videoCourses, profile]);
+
+    setSelectedListTab(targetListTab);
+    //eslint-disable-next-line
+  }, [location.state, sessions, passes, videos, liveCourses, videoCourses, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
     setSelectedListTab(key);
 
-    if (key === 'session') {
-      handleChangeSessionTab(selectedSessionTab);
-    }
+    // if (key === 'session') {
+    //   handleChangeSessionTab(selectedSessionTab);
+    // }
     setIsListLoading(false);
   };
 
-  const handleChangeSessionTab = (key) => {
-    setIsSessionLoading(true);
-    setSelectedSessionTab(key);
-    if (parseInt(key) === 0) {
-      trackSimpleEvent(user.click.profile.upcomingSessionsTab);
-      getSessionDetails('upcoming');
-    } else {
-      trackSimpleEvent(user.click.profile.pastSessionsTab);
-      getSessionDetails('past');
-    }
-  };
+  // const handleChangeSessionTab = (key) => {
+  //   setIsSessionLoading(true);
+  //   setSelectedSessionTab(key);
+  //   if (parseInt(key) === 0) {
+  //     trackSimpleEvent(user.click.profile.upcomingSessionsTab);
+  //     getSessionDetails('upcoming');
+  //   } else {
+  //     trackSimpleEvent(user.click.profile.pastSessionsTab);
+  //     getSessionDetails('past');
+  //   }
+  // };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
     trackSimpleEvent(eventTag);
@@ -371,133 +370,69 @@ const ProfilePreview = ({ username = null }) => {
 
       <div className={isOnDashboard ? styles.profilePreviewContainer : undefined}>
         {/* ======INTRO========= */}
-        <div className={styles.imageWrapper} id="home">
-          <div className={styles.coverImageWrapper}>
-            <Image
-              preview={false}
-              width={coverImage ? '100%' : 200}
-              className={styles.coverImage}
-              src={coverImage ? coverImage : 'error'}
-              fallback={DefaultImage()}
-            />
-          </div>
-          <div className={styles.profileImage}>
-            <Image
-              preview={false}
-              width={'100%'}
-              src={profileImage ? profileImage : 'error'}
-              fallback={DefaultImage()}
-            />
-            <div className={styles.userName}>
-              <Title level={isMobileDevice ? 4 : 2}>
-                {profile?.first_name} {profile?.last_name}
-              </Title>
-            </div>
-            <div className={styles.shareButton}>
-              <Share
-                label="Share"
-                shareUrl={generateUrlFromUsername(profile.username)}
-                title={`${profile.first_name} ${profile.last_name}`}
-              />
-            </div>
-          </div>
-        </div>
-        <Row justify="space-between" align="middle">
-          <Col xs={24} md={{ span: 22, offset: 1 }}>
-            <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
-          </Col>
-          <Col xs={24} md={{ span: 22, offset: 1 }}>
-            {profile?.profile?.social_media_links && (
-              <Space size={'middle'}>
-                {profile.profile.social_media_links.website && (
-                  <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
-                    <GlobalOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.facebook_link && (
-                  <a href={profile.profile.social_media_links.facebook_link} target="_blank" rel="noopener noreferrer">
-                    <FacebookOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.twitter_link && (
-                  <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
-                    <TwitterOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.instagram_link && (
-                  <a href={profile.profile.social_media_links.instagram_link} target="_blank" rel="noopener noreferrer">
-                    <InstagramOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.linkedin_link && (
-                  <a href={profile.profile.social_media_links.linkedin_link} target="_blank" rel="noopener noreferrer">
-                    <LinkedinOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-              </Space>
-            )}
-          </Col>
-        </Row>
+        <CreatorProfile profile={profile} profileImage={profileImage} showCoverImage={true} coverImage={coverImage} />
 
         {/* =====TAB SELECT===== */}
         <Loader loading={isListLoading} size="large">
           <Tabs
             size="large"
-            defaultActiveKey={selectedListTab}
+            defaultActiveKey={getDefaultTabToShow()}
             activeKey={selectedListTab}
             onChange={handleChangeListTab}
           >
-            <Tabs.TabPane
-              key={productKeys.SESSION}
-              tab={
-                <div className={styles.largeTabHeader} id="session">
-                  <VideoCameraOutlined />
-                  Sessions
-                </div>
-              }
-            >
-              {/* =====SESSION======== */}
-              <Row className={styles.mt20}>
-                <Col span={24}>
-                  <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
-                  <Text type="primary" strong>
-                    All event times shown below are in your local time zone ({getCurrentLongTimezone()})
-                  </Text>
-                </Col>
-                <Col span={24} className={styles.mt10}>
-                  <Radio.Group value={view} onChange={handleViewChange}>
-                    <Radio.Button value="list">List View</Radio.Button>
-                    <Radio.Button value="calendar">Calendar View</Radio.Button>
-                  </Radio.Group>
-                </Col>
-                <Col span={24}>
-                  {view === 'calendar' ? (
-                    <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                      {calendarSession.length > 0 ? (
-                        <CalendarView
-                          inventories={calendarSession}
-                          onSelectInventory={redirectToSessionsPage}
-                          onViewChange={onViewChange}
-                          calendarView={calendarView}
-                        />
-                      ) : (
-                        <Empty />
-                      )}
-                    </Loader>
-                  ) : (
-                    <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
-                      {['Upcoming Sessions'].map((item, index) => (
-                        <Tabs.TabPane tab={item} key={index}>
-                          <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                            <Sessions username={username} sessions={sessions} />
-                          </Loader>
-                        </Tabs.TabPane>
-                      ))}
-                    </Tabs>
-                  )}
-                </Col>
-              </Row>
-            </Tabs.TabPane>
+            {sessions.length > 0 && (
+              <Tabs.TabPane
+                key={productKeys.SESSION}
+                tab={
+                  <div className={styles.largeTabHeader} id="session">
+                    <VideoCameraOutlined />
+                    Sessions
+                  </div>
+                }
+              >
+                {/* =====SESSION======== */}
+                <Row className={styles.mt20}>
+                  <Col span={24}>
+                    <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
+                    <Text type="primary" strong>
+                      All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+                    </Text>
+                  </Col>
+                  <Col span={24} className={styles.mt10}>
+                    <Radio.Group value={view} onChange={handleViewChange}>
+                      <Radio.Button value="list">List View</Radio.Button>
+                      <Radio.Button value="calendar">Calendar View</Radio.Button>
+                    </Radio.Group>
+                  </Col>
+                  <Col span={24}>
+                    {view === 'calendar' ? (
+                      <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                        {calendarSession.length > 0 ? (
+                          <CalendarView
+                            inventories={calendarSession}
+                            onSelectInventory={redirectToSessionsPage}
+                            onViewChange={onViewChange}
+                            calendarView={calendarView}
+                          />
+                        ) : (
+                          <Empty />
+                        )}
+                      </Loader>
+                    ) : (
+                      <Tabs defaultActiveKey={0}>
+                        {['Upcoming Sessions'].map((item, index) => (
+                          <Tabs.TabPane tab={item} key={index}>
+                            <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                              <Sessions username={username} sessions={sessions} />
+                            </Loader>
+                          </Tabs.TabPane>
+                        ))}
+                      </Tabs>
+                    )}
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+            )}
             {passes.length > 0 && (
               <Tabs.TabPane
                 key={productKeys.PASS}
@@ -546,7 +481,11 @@ const ProfilePreview = ({ username = null }) => {
                   </div>
                 }
               >
-                <Tabs defaultActiveKey={selectedSessionTab} onChange={handleChangeSessionTab}>
+                <Tabs
+                  defaultActiveKey={
+                    liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''
+                  }
+                >
                   {liveCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
@@ -571,7 +510,7 @@ const ProfilePreview = ({ username = null }) => {
         {profile && profile?.profile?.testimonials ? (
           <Row className={styles.mt50}>
             <Col span={24}>
-              <Title level={isMobileDevice ? 4 : 2}>What attendees are saying</Title>
+              <Title level={isMobileDevice ? 4 : 2}>What people are saying</Title>
             </Col>
             <Col span={24}>
               <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>

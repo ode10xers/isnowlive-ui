@@ -117,10 +117,10 @@ const SessionsDetails = ({ match }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading session details">
-      <Row justify="start" className={classNames(styles.mt20, styles.mb20)}>
+      <Row gutter={8} justify="start" className={classNames(styles.mt20, styles.mb20)}>
         {isPastSession ? (
           <>
-            <Col xs={24} md={4}>
+            <Col xs={24} md={10} lg={8}>
               <Button
                 className={styles.headButton}
                 onClick={() =>
@@ -137,7 +137,7 @@ const SessionsDetails = ({ match }) => {
           </>
         ) : (
           <>
-            <Col xs={24} md={4}>
+            <Col xs={24} md={10} lg={7} xl={5}>
               <Button
                 className={styles.headButton}
                 onClick={() =>
@@ -151,7 +151,7 @@ const SessionsDetails = ({ match }) => {
                 Upcoming Sessions
               </Button>
             </Col>
-            <Col xs={24} md={3}>
+            <Col xs={24} md={7} lg={5} xl={4}>
               <Button
                 className={styles.headButton}
                 icon={<GlobalOutlined />}
@@ -160,7 +160,7 @@ const SessionsDetails = ({ match }) => {
                 Public Page
               </Button>
             </Col>
-            <Col xs={24} md={4}>
+            <Col xs={24} md={7} lg={5} xl={4}>
               <div className={styles.headButton}>
                 <Share label="Share Session" title={session?.name} shareUrl={publicUrl} />
               </div>
@@ -201,75 +201,85 @@ const SessionsDetails = ({ match }) => {
               <Col span={24}>
                 <Title>{session?.name}</Title>
               </Col>
-              <Col xs={24} md={18}>
+              <Col xs={24} lg={18}>
                 <SessionDate schedule={session} />
                 <div className={styles.mt20}>
                   <SessionInfo session={session} />
                 </div>
               </Col>
-              <Col xs={24} md={4}>
-                <Button
-                  size="large"
-                  block
-                  type="primary"
-                  className={styles.actionButton}
-                  icon={<VideoCameraOutlined />}
-                  disabled={!session?.start_url}
-                  onClick={() =>
-                    trackAndNavigate(session?.start_url, creator.click.sessions.details.startSession, true)
-                  }
-                >
-                  Start Session
-                </Button>
-                <Button
-                  size="large"
-                  block
-                  className={classNames(styles.actionButton, styles.editButton)}
-                  icon={<EditOutlined />}
-                  onClick={() =>
-                    trackAndNavigate(
-                      `${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`,
-                      creator.click.sessions.details.editSession,
-                      false,
-                      {
-                        beginning: session.beginning,
-                        expiry: session.expiry,
+              <Col xs={24} lg={6}>
+                <Row gutter={[8, 8]}>
+                  <Col xs={12} lg={24}>
+                    <Button
+                      size="large"
+                      block
+                      type="primary"
+                      className={styles.actionButton}
+                      icon={<VideoCameraOutlined />}
+                      disabled={!session?.start_url}
+                      onClick={() =>
+                        trackAndNavigate(session?.start_url, creator.click.sessions.details.startSession, true)
                       }
-                    )
-                  }
-                >
-                  Edit Session
-                </Button>
-                <Button
-                  size="large"
-                  block
-                  className={classNames(styles.actionButton, styles.emailButton)}
-                  icon={<MailOutlined />}
-                  onClick={() => {
-                    trackSimpleEvent(creator.click.sessions.details.sendEmail);
-                  }}
-                >
-                  Send Email
-                </Button>
-                <Popconfirm
-                  title="Do you want to cancel session?"
-                  icon={<DeleteOutlined className={styles.danger} />}
-                  okText="Yes"
-                  cancelText="No"
-                  disabled={isDisabled}
-                  onConfirm={() => deleteInventory(session?.inventory_id)}
-                >
-                  <Button
-                    size="large"
-                    block
-                    type="primary"
-                    danger
-                    className={styles.actionButton}
-                    icon={<CloseCircleOutlined />}
-                  >
-                    Cancel Session
-                  </Button>
-                </Popconfirm>
+                    >
+                      Start Session
+                    </Button>
+                  </Col>
+                  <Col xs={12} lg={24}>
+                    <Button
+                      size="large"
+                      block
+                      className={classNames(styles.actionButton, styles.editButton)}
+                      icon={<EditOutlined />}
+                      onClick={() =>
+                        trackAndNavigate(
+                          `${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`,
+                          creator.click.sessions.details.editSession,
+                          false,
+                          {
+                            beginning: session.beginning,
+                            expiry: session.expiry,
+                          }
+                        )
+                      }
+                    >
+                      Edit Session
+                    </Button>
+                  </Col>
+                  <Col xs={12} lg={24}>
+                    <Button
+                      size="large"
+                      block
+                      className={classNames(styles.actionButton, styles.emailButton)}
+                      icon={<MailOutlined />}
+                      onClick={() => {
+                        trackSimpleEvent(creator.click.sessions.details.sendEmail);
+                      }}
+                    >
+                      Send Email
+                    </Button>
+                  </Col>
+                  <Col xs={12} lg={24}>
+                    <Popconfirm
+                      title="Do you want to cancel session?"
+                      icon={<DeleteOutlined className={styles.danger} />}
+                      okText="Yes"
+                      cancelText="No"
+                      disabled={isDisabled}
+                      onConfirm={() => deleteInventory(session?.inventory_id)}
+                    >
+                      <Button
+                        size="large"
+                        block
+                        type="primary"
+                        danger
+                        className={styles.actionButton}
+                        icon={<CloseCircleOutlined />}
+                      >
+                        Cancel Session
+                      </Button>
+                    </Popconfirm>
+                  </Col>
+                </Row>
               </Col>
 
               <Col xs={24} md={18} className={styles.mt20}>

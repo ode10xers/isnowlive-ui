@@ -1,15 +1,18 @@
 export const profileFormItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 5 },
+    lg: { span: 8 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    sm: { span: 12 },
+    lg: { span: 16 },
   },
 };
 export const profileFormTailLayout = {
-  wrapperCol: { offset: 5, span: 19 },
+  wrapperCol: {
+    xs: { span: 24 },
+    lg: { offset: 8, span: 16 },
+  },
 };
 export const profileTestimonialTailLayout = {
   wrapperCol: { offset: 0, span: 24 },
@@ -17,15 +20,21 @@ export const profileTestimonialTailLayout = {
 export const formLayout = {
   labelCol: {
     xs: { span: 24 },
-    md: { span: 6 },
+    md: { span: 10 },
+    xl: { span: 6 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    md: { span: 18 },
+    md: { span: 14 },
+    xl: { span: 18 },
   },
 };
 export const formTailLayout = {
-  wrapperCol: { span: 12, offset: 6 },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 14, offset: 10 },
+    xl: { span: 18, offset: 6 },
+  },
 };
 export const sessionRegistrationformLayout = {
   labelCol: {

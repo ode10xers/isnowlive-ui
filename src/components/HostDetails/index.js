@@ -67,22 +67,22 @@ const HostDetails = ({ host }) => {
         <Col xs={24} md={24} className={styles.mt10}>
           <Space size={'middle'}>
             {host?.profile?.social_media_links.website && (
-              <a href={host.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
+              <a href={`//${host.profile.social_media_links.website}`} target="_blank" rel="noopener noreferrer">
                 <GlobalOutlined className={styles.socialIcon} />
               </a>
             )}
             {host?.profile?.social_media_links.facebook_link && (
-              <a href={host.profile.social_media_links.facebook_link} target="_blank" rel="noopener noreferrer">
+              <a href={`${host.profile.social_media_links.facebook_link}`} target="_blank" rel="noopener noreferrer">
                 <FacebookOutlined className={styles.socialIcon} />
               </a>
             )}
             {host?.profile?.social_media_links.twitter_link && (
-              <a href={host.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
+              <a href={`${host.profile.social_media_links.twitter_link}`} target="_blank" rel="noopener noreferrer">
                 <TwitterOutlined className={styles.socialIcon} />
               </a>
             )}
             {host?.profile?.social_media_links.instagram_link && (
-              <a href={host.profile.social_media_links.instagram_link} target="_blank" rel="noopener noreferrer">
+              <a href={`${host.profile.social_media_links.instagram_link}`} target="_blank" rel="noopener noreferrer">
                 <InstagramOutlined className={styles.socialIcon} />
               </a>
             )}

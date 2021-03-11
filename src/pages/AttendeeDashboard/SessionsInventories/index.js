@@ -272,6 +272,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Session Name',
       dataIndex: 'name',
       key: 'name',
+      width: '150px',
       render: (text, record) => {
         if (record.is_date) {
           return {
@@ -331,7 +332,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Actions',
-      width: isPast ? '56px' : '360px',
+      // width: isPast ? '56px' : '360px',
       render: (text, record) => {
         if (record.is_date) {
           return emptyTableCell;
@@ -554,7 +555,7 @@ const SessionsInventories = ({ match }) => {
                     )}
                   </Loader>
                 </>
-              ) : (
+              ) : filteredByDateSession.length > 0 ? (
                 <Table
                   sticky={true}
                   columns={dateColumns}
@@ -576,6 +577,8 @@ const SessionsInventories = ({ match }) => {
                     },
                   }}
                 />
+              ) : (
+                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
               )}
             </>
           )}

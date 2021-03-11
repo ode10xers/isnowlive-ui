@@ -126,12 +126,12 @@ const Profile = () => {
   };
 
   const handlePublicUrlChange = async (e) => {
-    let regex = new RegExp('^[a-zA-Z]*$');
+    let regex = new RegExp('^[a-z]*$');
     if (regex.test(e.target.value)) {
       try {
         setIsLoadingUsernameCheck(true);
         const { data } = await apis.user.validUsernameCheck({
-          username: e.target.value,
+          username: e.target.value?.toLowerCase(),
         });
         if (data) {
           setIsPublicUrlAvaiable(true);
@@ -191,7 +191,14 @@ const Profile = () => {
         </Typography>
       </Space>
 
-      <Form form={form} {...profileFormItemLayout} onFinish={onFinish} onFinishFailed={onFinishFailed}>
+      <Form
+        form={form}
+        {...profileFormItemLayout}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+        labelAlign={isMobileDevice ? 'left' : 'right'}
+        scrollToFirstError={true}
+      >
         {/* ========PRIMARY INFO======== */}
         <Section>
           <Title level={4}>1. Primary Information</Title>
