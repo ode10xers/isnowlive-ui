@@ -56,6 +56,7 @@ const Routes = {
     videoDetails: '/videos/:video_id/:video_order_id',
     courses: '/courses',
     courseDetails: '/course/:course_id',
+    subscriptions: '/subscriptions',
   },
 };
 
