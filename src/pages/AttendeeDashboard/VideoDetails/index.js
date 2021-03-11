@@ -64,10 +64,16 @@ const VideoDetails = ({ match }) => {
         }
       } catch (error) {
         setIsLoading(false);
-        message.error('Failed to load video details');
+        if (error?.response?.status !== 404) {
+          message.error('Failed to load video details');
+        } else {
+          if (videoOrderDetails) {
+            getProfileDetails(videoOrderDetails?.creator_username);
+          }
+        }
       }
     },
-    [getProfileDetails]
+    [getProfileDetails, videoOrderDetails]
   );
 
   const getVideoToken = async (videoOrderId) => {
@@ -129,8 +135,8 @@ const VideoDetails = ({ match }) => {
                   <Image
                     preview={false}
                     className={styles.videoThumbnail}
-                    src={video.thumbnail_url || 'error'}
-                    alt={video.title}
+                    src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                    alt={video?.title || videoOrderDetails?.title}
                     fallback={DefaultImage()}
                   />
                 </div>
@@ -141,8 +147,8 @@ const VideoDetails = ({ match }) => {
                     <Image
                       preview={false}
                       className={styles.videoThumbnail}
-                      src={video.thumbnail_url || 'error'}
-                      alt={video.title}
+                      src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                      alt={video?.title || videoOrderDetails?.title}
                       fallback={DefaultImage()}
                     />
                   </div>
@@ -161,14 +167,18 @@ const VideoDetails = ({ match }) => {
         <Col xs={24}>
           {video && (
             <Row className={styles.sessionListWrapper}>
-              {video.sessions?.length > 0 && (
+              {video?.sessions?.length > 0 && (
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
                     <Col xs={24}>
                       <Text className={styles.ml20}> Related to these class(es) </Text>
                     </Col>
                     <Col xs={24}>
-                      <SessionCards sessions={video.sessions} shouldFetchInventories={true} username={video.username} />
+                      <SessionCards
+                        sessions={video?.sessions}
+                        shouldFetchInventories={true}
+                        username={video?.username}
+                      />
                     </Col>
                   </Row>
                 </Col>
