@@ -20,20 +20,20 @@
 
   .profileImageWrapper {
     max-height: 80px;
-  
+
     .profileImage {
       position: relative;
       border-radius: 4px;
       bottom: 80px;
       left: 50px;
       width: 100%;
-  
+
       img {
         border: 2px solid map-get($colors, $key: 'White');
         max-width: 120px;
         border-radius: 4px;
       }
-  
+
       .userName {
         position: absolute;
         bottom: -15px;
@@ -46,12 +46,12 @@
       }
     }
   }
-  
+
   .bio {
     p,
     span {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
       background-color: map-get($map: $colors, $key: 'White1') !important;
     }
   }
@@ -107,4 +107,3 @@
     }
   }
 }
-
