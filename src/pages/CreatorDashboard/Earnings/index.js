@@ -487,24 +487,24 @@ const Earnings = () => {
     <Loader loading={isLoading} size="large" text="Loading Earning Details">
       <div className={styles.box}>
         <Row>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={8}>
             <Title level={2}>Your Earnings</Title>
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={8}>
             {stripePaymentDashboard}
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={8}>
             {availabeForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={8}>
             {totalAmountEarned}
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={8}>
             {paidOut}
           </Col>
-          <Col xs={24} md={8}>
+          <Col xs={24} lg={8}>
             {inProcess}
           </Col>
         </Row>

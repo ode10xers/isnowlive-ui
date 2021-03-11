@@ -27,7 +27,7 @@ const OnboardSteps = ({ current }) => {
 
   return (
     <Steps
-      className={!isMobileDevice ? styles.stepsLarge : null}
+      className={styles.stepsLarge}
       size={isMobileDevice ? 'small' : 'default'}
       labelPlacement="horizontal"
       current={current}

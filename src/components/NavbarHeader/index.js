@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Row, Col, Menu, Button, Typography, Modal, message } from 'antd';
+import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
 import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -44,7 +44,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         setShouldShowPassLink(data.length > 0);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to fetch pass for username');
+      console.error(error.response?.data?.message || 'Failed to fetch pass for username');
     }
   };
 
@@ -56,7 +56,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         setShouldShowVideoLink(data.length > 0);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to fetch videos for username');
+      console.error(error.response?.data?.message || 'Failed to fetch videos for username');
     }
   };
 
@@ -68,7 +68,7 @@ const NavbarHeader = ({ removePadding = false }) => {
         setShouldShowCourseLink(data.length > 0);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to fetch courses for username');
+      console.error(error.response?.data?.message || 'Failed to fetch courses for username');
     }
   };
 
@@ -140,9 +140,14 @@ const NavbarHeader = ({ removePadding = false }) => {
     history.push(`${Routes.root}`, { section: section || 'home' });
   };
 
-  const redirectToAttendeeDashboard = (subPage = Routes.attendeeDashboard.defaultPath) => {
+  const redirectToDashboard = (subPage = null) => {
     setShowMobileMenu(false);
-    history.push(`${Routes.attendeeDashboard.rootPath}${subPage}`);
+    if (subPage) {
+      history.push(`${Routes.attendeeDashboard.rootPath}${subPage}`);
+    } else {
+      const user_type = getLocalUserDetails().is_creator ? 'creatorDashboard' : 'attendeeDashboard';
+      history.push(`${Routes[user_type].rootPath}${Routes[user_type].defaultPath}`);
+    }
   };
 
   useEffect(() => {
@@ -262,7 +267,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                     <Menu.Item
                       key="Dashboard"
                       className={isActive('/attendee/dashboard') ? 'ant-menu-item-active' : undefined}
-                      onClick={() => redirectToAttendeeDashboard()}
+                      onClick={() => redirectToDashboard()}
                     >
                       My Dashboard
                     </Menu.Item>
@@ -301,7 +306,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                           Site Home
                         </Button>
                       ) : (
-                        <Button className={styles.greenBtn} onClick={() => redirectToAttendeeDashboard()}>
+                        <Button className={styles.greenBtn} onClick={() => redirectToDashboard()}>
                           My Dashboard
                         </Button>
                       )
@@ -424,35 +429,35 @@ const NavbarHeader = ({ removePadding = false }) => {
                           <li
                             key="Attendee Upcoming Sessions"
                             className={isActive('/attendee/dashboard/sessions/upcoming') ? styles.active : undefined}
-                            onClick={() => redirectToAttendeeDashboard('/sessions/upcoming')}
+                            onClick={() => redirectToDashboard('/sessions/upcoming')}
                           >
                             <span className={styles.menuLink}>My Upcoming Sessions</span>
                           </li>
                           <li
                             key="Attendee Past Sessions"
                             className={isActive('/attendee/dashboard/sessions/past') ? styles.active : undefined}
-                            onClick={() => redirectToAttendeeDashboard('/sessions/past')}
+                            onClick={() => redirectToDashboard('/sessions/past')}
                           >
                             <span className={styles.menuLink}>My Past Sessions</span>
                           </li>
                           <li
                             key="Attendee Passes"
                             className={isActive('/attendee/dashboard/passes') ? styles.active : undefined}
-                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.passes)}
+                            onClick={() => redirectToDashboard('/passes')}
                           >
                             <span className={styles.menuLink}>My Passes</span>
                           </li>
                           <li
                             key="Attendee Videos"
                             className={isActive('/attendee/dashboard/videos') ? styles.active : undefined}
-                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.videos)}
+                            onClick={() => redirectToDashboard('/videos')}
                           >
                             <span className={styles.menuLink}>My Videos</span>
                           </li>
                           <li
                             key="Attendee Courses"
                             className={isActive('/attendee/dashboard/courses') ? styles.active : undefined}
-                            onClick={() => redirectToAttendeeDashboard(Routes.attendeeDashboard.courses)}
+                            onClick={() => redirectToDashboard('/courses')}
                           >
                             <span className={styles.menuLink}>My Courses</span>
                           </li>

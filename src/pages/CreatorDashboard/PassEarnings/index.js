@@ -73,7 +73,7 @@ const PassEarnings = ({ match }) => {
     </div>
   );
 
-  const showPassName = showPassLayout('Pass Name', <Title level={3}>{earnings?.name}</Title>);
+  const showPassName = showPassLayout('Pass Name', <Title level={isMobileDevice ? 5 : 3}>{earnings?.name}</Title>);
 
   const showPassEarnings = showPassLayout(
     'Total Earning',
