@@ -223,7 +223,7 @@ const CourseDetails = ({ match, history }) => {
       <Loader size="large" text="Loading course details" loading={isLoading}>
         <Row gutter={[8, 24]}>
           {isOnAttendeeDashboard && (
-            <Col xs={24} className={classNames(styles.mb20, styles.mt20)}>
+            <Col xs={24} className={classNames(styles.mb50, styles.mt20)}>
               <Button
                 onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses)}
                 icon={<ArrowLeftOutlined />}
