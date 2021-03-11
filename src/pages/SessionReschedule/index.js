@@ -1,24 +1,14 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Row, Col, Typography, Button, Image, Space, Popconfirm, Card, Modal, message } from 'antd';
-import {
-  GlobalOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  TwitterOutlined,
-  LinkedinOutlined,
-  UpCircleOutlined,
-  DownCircleOutlined,
-} from '@ant-design/icons';
-import ReactHtmlParser from 'react-html-parser';
+import { Row, Col, Typography, Button, Popconfirm, Card, Modal, message } from 'antd';
+import { UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import Share from 'components/Share';
-import DefaultImage from 'components/Icons/DefaultImage';
+import CreatorProfile from 'components/CreatorProfile';
 
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
@@ -312,73 +302,7 @@ const SessionReschedule = () => {
   return (
     <Loader loading={isLoading} size="large" text="Loading available sessions">
       <div>
-        <div className={styles.imageWrapper}>
-          <div className={styles.coverImageWrapper}>
-            <Image
-              preview={false}
-              width={coverImage ? '100%' : 200}
-              className={styles.coverImage}
-              src={coverImage ? coverImage : 'error'}
-              fallback={DefaultImage()}
-            />
-          </div>
-          <div className={styles.profileImage}>
-            <Image
-              preview={false}
-              width={'100%'}
-              src={profileImage ? profileImage : 'error'}
-              fallback={DefaultImage()}
-            />
-            <div className={styles.userName}>
-              <Title level={isMobileDevice ? 4 : 2}>
-                {profile?.first_name} {profile?.last_name}
-              </Title>
-            </div>
-            <div className={styles.shareButton}>
-              <Share
-                label="Share"
-                shareUrl={generateUrlFromUsername(profile.username)}
-                title={`${profile.first_name} ${profile.last_name}`}
-              />
-            </div>
-          </div>
-        </div>
-        <Row justify="space-between" align="middle">
-          <Col xs={24} md={{ span: 22, offset: 1 }}>
-            <Text type="secondary">{ReactHtmlParser(profile?.profile?.bio)}</Text>
-          </Col>
-          <Col xs={24} md={{ span: 22, offset: 1 }}>
-            {profile?.profile?.social_media_links && (
-              <Space size={'middle'}>
-                {profile.profile.social_media_links.website && (
-                  <a href={profile.profile.social_media_links.website} target="_blank" rel="noopener noreferrer">
-                    <GlobalOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.facebook_link && (
-                  <a href={profile.profile.social_media_links.facebook_link} target="_blank" rel="noopener noreferrer">
-                    <FacebookOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.twitter_link && (
-                  <a href={profile.profile.social_media_links.twitter_link} target="_blank" rel="noopener noreferrer">
-                    <TwitterOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.instagram_link && (
-                  <a href={profile.profile.social_media_links.instagram_link} target="_blank" rel="noopener noreferrer">
-                    <InstagramOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-                {profile.profile.social_media_links.linkedin_link && (
-                  <a href={profile.profile.social_media_links.linkedin_link} target="_blank" rel="noopener noreferrer">
-                    <LinkedinOutlined className={styles.socialIcon} />
-                  </a>
-                )}
-              </Space>
-            )}
-          </Col>
-        </Row>
+        <CreatorProfile profile={profile} profileImage={profileImage} showCoverImage={true} coverImage={coverImage} />
       </div>
 
       <Row className={styles.mt50}>

@@ -41,6 +41,14 @@ export const showSetNewPasswordModal = (email) => {
         <Paragraph>
           We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
         </Paragraph>
+        <Paragraph type="danger">
+          If you can't find it, please search for{' '}
+          <Text type="danger" strong>
+            {' '}
+            friends@passion.do{' '}
+          </Text>{' '}
+          in your email app or in the spam folder.
+        </Paragraph>
         <Paragraph>
           <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
             Didn't get it? Send again.

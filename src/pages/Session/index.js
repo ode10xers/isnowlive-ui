@@ -680,6 +680,7 @@ const Session = ({ match, history }) => {
         {...profileFormItemLayout}
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
+        labelAlign={isMobileDevice ? 'left' : 'right'}
       >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
@@ -709,7 +710,7 @@ const Session = ({ match, history }) => {
 
           <Form.Item
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label="Session Description"
+            label={<Text> Session Description </Text>}
             name="description"
             id="description"
             rules={validationRules.requiredValidation}
@@ -827,7 +828,7 @@ const Session = ({ match, history }) => {
             <Form.Item
               {...(!isMobileDevice && profileFormTailLayout)}
               name="max_participants"
-              help="Maximum 100 supported"
+              extra="Maximum 100 supported"
               rules={validationRules.requiredValidation}
               hidden={!isSessionTypeGroup}
             >
@@ -864,7 +865,7 @@ const Session = ({ match, history }) => {
                 <Form.Item
                   {...(!isMobileDevice && profileFormTailLayout)}
                   name="price"
-                  help="Set your price"
+                  extra="Set your price"
                   rules={validationRules.requiredValidation}
                 >
                   <InputNumber min={1} placeholder="Amount" />
@@ -892,7 +893,7 @@ const Session = ({ match, history }) => {
                   {...(!isMobileDevice && profileFormItemLayout)}
                   label="Cancellable Before"
                   name="refund_before_hours"
-                  help="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
+                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
                   rules={validationRules.requiredValidation}
                   onChange={handleRefundBeforeHoursChange}
                 >

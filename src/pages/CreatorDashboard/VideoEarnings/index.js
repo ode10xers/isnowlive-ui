@@ -73,7 +73,7 @@ const VideoEarnings = ({ match }) => {
     </div>
   );
 
-  const showVideoName = showVideoLayout('Video Name', <Title level={3}>{earnings?.name}</Title>);
+  const showVideoName = showVideoLayout('Video Name', <Title level={isMobileDevice ? 5 : 3}>{earnings?.name}</Title>);
 
   const showVideoEarnings = showVideoLayout(
     'Total Earning',
