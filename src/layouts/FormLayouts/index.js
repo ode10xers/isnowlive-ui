@@ -9,7 +9,10 @@ export const profileFormItemLayout = {
   },
 };
 export const profileFormTailLayout = {
-  wrapperCol: { offset: 5, span: 19 },
+  wrapperCol: {
+    xs: { span: 24 },
+    lg: { offset: 8, span: 16 },
+  },
 };
 export const profileTestimonialTailLayout = {
   wrapperCol: { offset: 0, span: 24 },
@@ -27,7 +30,11 @@ export const formLayout = {
   },
 };
 export const formTailLayout = {
-  wrapperCol: { span: 12, offset: 6 },
+  wrapperCol: {
+    xs: { span: 24 },
+    md: { span: 14, offset: 10 },
+    xl: { span: 18, offset: 6 },
+  },
 };
 export const sessionRegistrationformLayout = {
   labelCol: {

@@ -163,7 +163,9 @@ const VideoDetails = ({ match }) => {
             showDesc={true}
           />
         </Col>
-        <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
+        <Col xs={24} className={styles.mt50}>
+          {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
+        </Col>
         <Col xs={24}>
           {video && (
             <Row className={styles.sessionListWrapper}>

@@ -259,22 +259,24 @@ const CourseDetails = ({ match, history }) => {
                     <Col xs={24}>
                       <SessionCards sessions={courseSessions} shouldFetchInventories={false} username={username} />
                     </Col>
-                    <Col xs={24}>
-                      <Title level={3} className={styles.ml20}>
-                        Course Schedules
-                      </Title>
-                      {isMobileDevice ? (
-                        <Row gutter={[8, 10]}>
-                          {generateCourseSessionsScheduleList().map(renderMobileCourseSchedules)}
-                        </Row>
-                      ) : (
-                        <Table
-                          columns={sessionSchedulesColumns}
-                          data={generateCourseSessionsScheduleList()}
-                          rowKey={(record) => record.key}
-                        />
-                      )}
-                    </Col>
+                    {course?.inventory_ids?.length > 0 && (
+                      <Col xs={24}>
+                        <Title level={3} className={styles.ml20}>
+                          Course Schedules
+                        </Title>
+                        {isMobileDevice ? (
+                          <Row gutter={[8, 10]}>
+                            {generateCourseSessionsScheduleList().map(renderMobileCourseSchedules)}
+                          </Row>
+                        ) : (
+                          <Table
+                            columns={sessionSchedulesColumns}
+                            data={generateCourseSessionsScheduleList()}
+                            rowKey={(record) => record.key}
+                          />
+                        )}
+                      </Col>
+                    )}
                   </>
                 )}
 

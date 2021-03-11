@@ -554,7 +554,7 @@ const SessionsInventories = ({ match }) => {
                     )}
                   </Loader>
                 </>
-              ) : (
+              ) : filteredByDateSession.length > 0 ? (
                 <Table
                   sticky={true}
                   columns={dateColumns}
@@ -576,6 +576,8 @@ const SessionsInventories = ({ match }) => {
                     },
                   }}
                 />
+              ) : (
+                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
               )}
             </>
           )}
