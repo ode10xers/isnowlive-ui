@@ -22,6 +22,7 @@ import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
+import { pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Item } = Form;
 const { Password } = Input;
@@ -60,6 +61,7 @@ const Login = ({ history }) => {
       setIsLoading(true);
       const { data } = await apis.user.login(values);
       if (data) {
+        pushToDataLayer('Demo Login', { email: values.email });
         http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
         identifyUserInMixPanel(data);
