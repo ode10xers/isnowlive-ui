@@ -56,9 +56,11 @@ const VideoDetails = ({ match }) => {
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [username, setUsername] = useState(null);
 
-  const getProfileDetails = useCallback(async (username) => {
+  const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
-      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
       if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
