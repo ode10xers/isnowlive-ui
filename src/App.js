@@ -7,6 +7,7 @@ import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
+import parseQueryString from 'utils/parseQueryString';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -34,6 +35,7 @@ import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
 import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
+import EmbeddablePage from 'pages/EmbeddablePage';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -61,6 +63,8 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
+  const location = window.location;
+  const { isWidget } = parseQueryString(location.search);
 
   useEffect(() => {}, []);
 
@@ -79,32 +83,38 @@ function App() {
   }, [userDetails, cookieConsent]);
 
   useEffect(() => {
-    const getUserDetails = async () => {
-      try {
-        const { data, status } = await apis.user.getProfile();
-        if (isAPISuccess(status) && data) {
-          setUserAuthentication(true);
-          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
-          setTimeout(() => {
-            setIsReadyToLoad(true);
-          }, 100);
+    if (!isWidget) {
+      const getUserDetails = async () => {
+        try {
+          const { data, status } = await apis.user.getProfile();
+          if (isAPISuccess(status) && data) {
+            setUserAuthentication(true);
+            setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+            setTimeout(() => {
+              setIsReadyToLoad(true);
+            }, 100);
+          }
+        } catch (error) {
+          setUserAuthentication(false);
+          setUserDetails(null);
+          setIsReadyToLoad(true);
         }
-      } catch (error) {
+      };
+      const authToken = getAuthCookie();
+      if (authToken && authToken !== '') {
+        getUserDetails();
+      } else {
         setUserAuthentication(false);
         setUserDetails(null);
         setIsReadyToLoad(true);
       }
-    };
-    const authToken = getAuthCookie();
-    if (authToken && authToken !== '') {
-      getUserDetails();
-    } else {
-      setUserAuthentication(false);
-      setUserDetails(null);
-      setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [isWidget]);
+
+  if (isWidget) {
+    return <EmbeddablePage />;
+  }
 
   if (!isReadyToLoad) {
     return <div>Loading...</div>;
