@@ -73,24 +73,30 @@ const VideoDetails = ({ match }) => {
   const getVideoDetails = useCallback(
     async (videoId) => {
       try {
-        const { status, data } = await apis.videos.getVideoById(videoId);
+        const videoDetailsResponse = await apis.videos.getVideoById(videoId);
 
-        if (isAPISuccess(status) && data) {
-          setVideo(data);
+        if (isAPISuccess(videoDetailsResponse.status) && videoDetailsResponse.data) {
+          setVideo(videoDetailsResponse.data);
 
-          const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
+          const creatorUsername = videoDetailsResponse.data.creator_username || window.location.hostname.split('.')[0];
           setUsername(creatorUsername);
           await getProfileDetails(creatorUsername);
 
-          if (data.is_course) {
-            const courseDetails = await apis.courses.getVideoCoursesByVideoId(data.external_id);
+          if (videoDetailsResponse.data.is_course) {
+            const courseDetailsResponse = await apis.courses.getVideoCoursesByVideoId(
+              videoDetailsResponse.data.external_id
+            );
 
-            if (isAPISuccess(courseDetails.status) && courseDetails.data) {
-              setCourses(courseDetails.data);
+            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
+              setCourses(courseDetailsResponse.data);
+            } else {
+              console.error('Failed to fetch courses data for session', courseDetailsResponse);
             }
           }
 
           setIsLoading(false);
+        } else {
+          console.error('Failed to fetch video details', videoDetailsResponse);
         }
       } catch (error) {
         setIsLoading(false);

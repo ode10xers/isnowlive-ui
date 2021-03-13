@@ -106,6 +106,8 @@ const SessionDetails = ({ match, history }) => {
 
           if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
             setCreator(creatorDetailsResponse.data);
+          } else {
+            console.error('Failed to fetch creator for session', creatorDetailsResponse);
           }
 
           if (sessionDetails.is_course) {
@@ -113,6 +115,8 @@ const SessionDetails = ({ match, history }) => {
 
             if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
               setCourses(courseDetailsResponse.data || []);
+            } else {
+              console.error('Failed to fetch courses for session', courseDetailsResponse);
             }
           }
 
@@ -125,6 +129,8 @@ const SessionDetails = ({ match, history }) => {
           }
 
           setIsLoading(false);
+        } else {
+          console.error('Failed to fetch session data', sessionDetailsResponse);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
