@@ -95,6 +95,7 @@ export const mixPanelEventTags = {
         becomeHost: '(Attendee) Become Host Clicked',
         videosNav: '(Attendee) Videos Nav Clicked',
         coursesNav: '(Attendee) Courses Nav Clicked',
+        subscriptionsNav: '(Attendee) Subscriptions Nav Clicked',
       },
       sessions: {
         pastSessionDetails: '(Attendee) Past Session Details Clicked',

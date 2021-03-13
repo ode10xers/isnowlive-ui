@@ -65,7 +65,11 @@ const CreatorSubscriptions = ({ subscriptions }) => {
         (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
     }
 
-    return <div className={styles.baseCreditsText}>{calculatedBaseCredits} credits / month</div>;
+    return (
+      <div className={styles.baseCreditsText}>
+        {calculatedBaseCredits} {isCourse ? 'Course' : 'Session or Video'} credits / month
+      </div>
+    );
   };
 
   const generateIncludedProducts = (subscription, isCourse = false) => {

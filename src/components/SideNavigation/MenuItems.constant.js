@@ -174,4 +174,12 @@ export const attendeeMenuItems = [
     mixPanelTag: attendee.click.dashboard.coursesNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses,
   },
+  {
+    order: 5,
+    key: 'subscription',
+    title: 'Memberships',
+    icon: <ScheduleOutlined />,
+    mixPanelTag: attendee.click.dashboard.subscriptionsNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions,
+  },
 ];
