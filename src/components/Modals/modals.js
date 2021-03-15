@@ -68,9 +68,14 @@ export const showBookingSuccessModal = (
   userPass = null,
   isContinuedFlow = false,
   userDidPayment = false,
-  redirectDomainName = 'app',
+  targetDomainName,
   orderDetails = null
 ) => {
+  let redirectDomainName = targetDomainName;
+  if (!redirectDomainName) {
+    redirectDomainName = window.location.hostname.split('.')[0] || 'app';
+  }
+
   Modal.success({
     width: 480,
     closable: true,
@@ -138,7 +143,7 @@ export const showBookingSuccessModal = (
                     eventData={{
                       ...orderDetails,
                       page_url: `${generateUrlFromUsername(
-                        orderDetails?.username || orderDetails?.creator_username
+                        orderDetails?.username || orderDetails?.creator_username || redirectDomainName
                       )}/e/${orderDetails.inventory_id}`,
                     }}
                   />
@@ -166,7 +171,7 @@ export const showBookingSuccessModal = (
   });
 };
 
-export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectDomainName = 'app') => {
+export const showAlreadyBookedModal = (prodType = productType.PRODUCT, targetDomainName) => {
   let titleText = 'Product already purchased';
   let contentText = 'purchased this product';
 
@@ -187,6 +192,12 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectD
       titleText = 'Product already purchased';
       contentText = 'purchased this product';
       break;
+  }
+
+  let redirectDomainName = targetDomainName;
+
+  if (!redirectDomainName) {
+    redirectDomainName = window.location.hostname.split('.')[0] || 'app';
   }
 
   Modal.warning({
@@ -210,7 +221,7 @@ export const showVideoPurchaseSuccessModal = (
   userPass = null,
   isContinuedFlow = false,
   userDidPayment = false,
-  redirectDomainName = 'app'
+  targetDomainName
 ) => {
   let title = 'Video Purchased';
   let modalContent = (
@@ -263,6 +274,12 @@ export const showVideoPurchaseSuccessModal = (
     }
   }
 
+  let redirectDomainName = targetDomainName;
+
+  if (!redirectDomainName) {
+    redirectDomainName = window.location.hostname.split('.')[0] || 'app';
+  }
+
   Modal.success({
     center: true,
     closable: true,
@@ -274,7 +291,7 @@ export const showVideoPurchaseSuccessModal = (
   });
 };
 
-export const showCourseBookingSuccessModal = (userEmail, redirectDomainName = 'app') => {
+export const showCourseBookingSuccessModal = (userEmail, targetDomainName) => {
   let title = 'Course booked';
   let modalContent = (
     <>
@@ -285,6 +302,12 @@ export const showCourseBookingSuccessModal = (userEmail, redirectDomainName = 'a
       <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
     </>
   );
+
+  let redirectDomainName = targetDomainName;
+
+  if (!redirectDomainName) {
+    redirectDomainName = window.location.hostname.split('.')[0] || 'app';
+  }
 
   Modal.success({
     center: true,
