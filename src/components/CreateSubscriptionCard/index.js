@@ -297,7 +297,6 @@ const CreateSubscriptionCard = ({
       let payload = {
         name: values.subscriptionName,
         price: values.price,
-        currency: currency,
         validity: 30,
         color_code: values.colorCode || colorCode || whiteColor,
         products: productsData,
