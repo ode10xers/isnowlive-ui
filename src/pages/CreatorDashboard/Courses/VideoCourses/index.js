@@ -83,7 +83,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
           children: (
             <>
               <Text> {record?.name} </Text>
-              {record.is_published ? null : <EyeInvisibleOutlined />}
+              {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
             </>
           ),
         };

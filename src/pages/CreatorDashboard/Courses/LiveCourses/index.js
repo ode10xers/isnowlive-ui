@@ -84,7 +84,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
           children: (
             <>
               <Text> {record?.name} </Text>
-              {record.is_published ? null : <EyeInvisibleOutlined />}
+              {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
             </>
           ),
         };

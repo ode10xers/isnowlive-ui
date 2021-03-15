@@ -134,7 +134,7 @@ const ManageSessions = () => {
             <>
               {' '}
               <Text className={styles.textAlignLeft}>{record.name}</Text>{' '}
-              {record.is_active ? null : <EyeInvisibleOutlined />}{' '}
+              {record.is_active ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
             </>
           ),
         };
@@ -260,7 +260,7 @@ const ManageSessions = () => {
               })
             }
           >
-            <Text>{item.name}</Text> {item.is_active ? null : <EyeInvisibleOutlined />}
+            <Text>{item.name}</Text> {item.is_active ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
           </div>
         }
         actions={[
