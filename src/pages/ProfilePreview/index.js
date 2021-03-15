@@ -207,7 +207,7 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
-  const getSubscriptionDetails = useCallback(() => {
+  const getSubscriptionDetails = useCallback(async () => {
     setIsSubscriptionsLoading(true);
 
     try {
@@ -222,7 +222,8 @@ const ProfilePreview = ({ username = null }) => {
       console.log(profileUsername);
 
       //TODO: Implement API Here later
-      // const { status, data } = await apis.subscriptions.getSubscriptionsByUsername(profileUsername);
+      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername(profileUsername);
+      /*
 
       const { status, data } = {
         status: 200,
@@ -333,6 +334,8 @@ const ProfilePreview = ({ username = null }) => {
           },
         ],
       };
+
+      */
 
       if (isAPISuccess(status) && data) {
         setSubscriptions(data);

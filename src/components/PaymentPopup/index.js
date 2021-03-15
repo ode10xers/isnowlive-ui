@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import classNames from 'classnames';
 
 import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 
@@ -16,7 +17,7 @@ const { Text, Title } = Typography;
 
 const PaymentPopup = () => {
   const {
-    state: { userDetails, paymentPopupVisible, paymentPopupCallback, paymentPopupData },
+    state: { userDetails, paymentPopupVisible, paymentPopupCallback, paymentPopupData, showCouponField },
     hidePaymentPopup,
   } = useGlobalContext();
 
@@ -50,7 +51,7 @@ const PaymentPopup = () => {
   };
 
   const handleInitiatePayment = () => {
-    const appliedCouponCode = couponApplied ? couponCode : '';
+    const appliedCouponCode = couponApplied && !showCouponField ? couponCode : '';
 
     paymentPopupCallback(userDetails.email, appliedCouponCode);
     closePaymentPopup();
@@ -60,7 +61,7 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      //TODO: MAKE SURE TO REMIND THIS
+      //TODO: Adjust this when coupon is implemented for other products
       const payload = {
         coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
         course_id: productId,
@@ -145,7 +146,7 @@ const PaymentPopup = () => {
             </Col>
           </Row>
         </Col>
-        <Col xs={24} className={styles.topBorder}>
+        <Col xs={24} className={classNames(styles.topBorder, showCouponField ? undefined : styles.hidden)}>
           <Row justify="start">
             <Col xs={24}>
               <Input.Search
@@ -154,8 +155,7 @@ const PaymentPopup = () => {
                 loading={isApplyingCoupon}
                 enterButton={
                   <Button block type="primary" disabled={couponCode === ''}>
-                    {' '}
-                    Apply{' '}
+                    Apply
                   </Button>
                 }
                 placeholder="Input discount code here"

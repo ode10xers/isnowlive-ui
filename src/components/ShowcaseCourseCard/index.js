@@ -116,7 +116,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       ],
     };
 
-    showPaymentPopup(paymentPopupData, createOrder);
+    showPaymentPopup(paymentPopupData, createOrder, true);
   };
 
   const createOrder = async (userEmail, couponCode = '') => {

@@ -49,6 +49,7 @@ const reducer = (state, action) => {
         paymentPopupVisible: false,
         paymentPopupData: null,
         paymentPopupCallback: () => {},
+        showCouponField: false,
       };
     default:
       return state;
@@ -93,8 +94,8 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'SET_COOKIE_CONSENT', payload: cookieConsent });
   }
 
-  function showPaymentPopup(paymentPopupData, paymentPopupCallback) {
-    dispatch({ type: 'SHOW_PAYMENT_POPUP', payload: { paymentPopupData, paymentPopupCallback } });
+  function showPaymentPopup(paymentPopupData, paymentPopupCallback, showCouponField = false) {
+    dispatch({ type: 'SHOW_PAYMENT_POPUP', payload: { paymentPopupData, paymentPopupCallback, showCouponField } });
   }
 
   function hidePaymentPopup() {

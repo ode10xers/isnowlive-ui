@@ -1,5 +1,9 @@
 @import '../../styles/variables.scss';
 
+.hidden {
+  display: none !important;
+}
+
 .greenBtn {
   background-color: map-get($map: $colors, $key: 'KellyGreen') !important;
   border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
