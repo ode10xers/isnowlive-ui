@@ -10,12 +10,12 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import PurchaseModal from 'components/PurchaseModal';
-import { showCourseBookingSuccessModal, showErrorModal } from 'components/Modals/modals';
+import { showCourseBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isValidFile, isAPISuccess, orderType, courseType } from 'utils/helper';
+import { isValidFile, isAPISuccess, orderType, courseType, productType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -153,6 +153,11 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
           'Discount Code Not Applicable',
           'The discount code you entered is not applicable this product. Please try again with a different discount code'
         );
+      } else if (
+        error?.response?.status === 500 &&
+        error?.response?.data?.message === 'user already has a confirmed order for this course'
+      ) {
+        showAlreadyBookedModal(productType.COURSE, username);
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }

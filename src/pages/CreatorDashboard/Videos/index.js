@@ -282,21 +282,21 @@ const Videos = () => {
                   />
                 </Tooltip>
               </Col>
-              <Col xs={24} md={2}>
-                <Popconfirm
-                  title="Do you want to delete video?"
-                  icon={<DeleteOutlined className={styles.danger} />}
-                  okText="Yes"
-                  cancelText="No"
-                  onConfirm={() => deleteVideo(record.external_id)}
-                >
-                  <Tooltip title="Delete Video">
-                    <Button danger type="text" icon={<DeleteOutlined />} />
-                  </Tooltip>
-                </Popconfirm>
-              </Col>
             </>
           )}
+          <Col xs={24} md={2}>
+            <Popconfirm
+              title="Do you want to delete video?"
+              icon={<DeleteOutlined className={styles.danger} />}
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => deleteVideo(record.external_id)}
+            >
+              <Tooltip title="Delete Video">
+                <Button danger type="text" icon={<DeleteOutlined />} />
+              </Tooltip>
+            </Popconfirm>
+          </Col>
           <Col xs={24} md={2}>
             <Tooltip title="Copy Video Page Link">
               <Button
@@ -432,6 +432,17 @@ const Videos = () => {
                 icon={<ExportOutlined />}
               />
             </Tooltip>,
+            <Popconfirm
+              title="Do you want to delete video?"
+              icon={<DeleteOutlined className={styles.danger} />}
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => deleteVideo(video?.external_id)}
+            >
+              <Tooltip title="Delete Video">
+                <Button danger type="text" icon={<DeleteOutlined />} />
+              </Tooltip>
+            </Popconfirm>,
             <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
@@ -482,6 +493,17 @@ const Videos = () => {
                 icon={<CloudUploadOutlined />}
               />
             </Tooltip>,
+            <Popconfirm
+              title="Do you want to delete video?"
+              icon={<DeleteOutlined className={styles.danger} />}
+              okText="Yes"
+              cancelText="No"
+              onConfirm={() => deleteVideo(video?.external_id)}
+            >
+              <Tooltip title="Delete Video">
+                <Button danger type="text" icon={<DeleteOutlined />} />
+              </Tooltip>
+            </Popconfirm>,
             <Tooltip title="Copy Video Page Link">
               <Button
                 type="text"
