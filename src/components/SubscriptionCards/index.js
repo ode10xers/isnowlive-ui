@@ -74,7 +74,7 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
     },
     {
       label: subscription.products['SESSION']
-        ? renderProductListButton('Sessions', subscription.products['SESSION'].items, 'name')
+        ? renderProductListButton('Sessions', subscription.product_details['SESSION'], 'name')
         : 'None',
       className: subscription.products['SESSION'] ? styles.buttonContainer : styles.disabled,
     },
@@ -86,7 +86,7 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
     },
     {
       label: subscription.products['VIDEO']
-        ? renderProductListButton('Videos', subscription.products['VIDEO'].items, 'title')
+        ? renderProductListButton('Videos', subscription.product_details['VIDEO'], 'title')
         : 'None',
       className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
     },
@@ -110,7 +110,7 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
     },
     {
       label: subscription.products['COURSE']
-        ? renderProductListButton('Courses', subscription.products['COURSE'].items, 'name')
+        ? renderProductListButton('Courses', subscription.product_details['COURSE'], 'name')
         : 'None',
       className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
     },

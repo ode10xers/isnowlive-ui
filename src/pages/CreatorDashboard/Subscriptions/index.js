@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, List, Modal, message } from 'antd';
+import { Row, Col, Button, Typography, List, Modal } from 'antd';
 
 import apis from 'apis';
 
@@ -21,47 +21,6 @@ const Subscriptions = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
   const [targetSubscription, setTargetSubscription] = useState(null);
-  const [sessions, setSessions] = useState([]);
-  const [videos, setVideos] = useState([]);
-  const [courses, setCourses] = useState([]);
-
-  const mapProductItems = (subscription) => {
-    if (!subscription.external_id) {
-      return subscription;
-    }
-
-    let mappedProductData = subscription.products;
-
-    Object.entries(subscription.products).forEach(([key, val]) => {
-      let items = [];
-
-      if (val.product_ids?.length > 0) {
-        switch (key) {
-          case 'SESSION':
-            items = sessions.filter((session) => val.product_ids?.includes(session.external_id));
-            break;
-          case 'VIDEO':
-            items = videos.filter((video) => val.product_ids?.includes(video.external_id));
-            break;
-          case 'COURSE':
-            items = courses.filter((course) => val.product_ids?.includes(course.id));
-            break;
-          default:
-            break;
-        }
-      }
-
-      mappedProductData[key] = {
-        ...val,
-        items: items,
-      };
-    });
-
-    return {
-      ...subscription,
-      products: mappedProductData,
-    };
-  };
 
   const getCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
@@ -90,54 +49,14 @@ const Subscriptions = () => {
 
       setSubscriptions(mappedSubscriptionData);
     } catch (error) {
-      showErrorModal('Failed to fetch subscriptions', error?.response?.data?.message || 'Something wrong happened');
+      showErrorModal('Failed to fetch memberships', error?.response?.data?.message || 'Something wrong happened');
     }
     setIsLoading(false);
   }, []);
 
-  const getCreatorProducts = useCallback(async () => {
-    try {
-      const { status, data } = await apis.session.getSession();
-
-      if (isAPISuccess(status) && data) {
-        setSessions(data);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to load sessions');
-    }
-
-    try {
-      const { status, data } = await apis.videos.getCreatorVideos();
-
-      if (isAPISuccess(status) && data) {
-        setVideos(data);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to load videos');
-    }
-
-    try {
-      const { status, data } = await apis.courses.getCreatorCourses();
-
-      if (isAPISuccess(status) && data) {
-        setCourses(data);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to load courses');
-    }
-  }, []);
-
   useEffect(() => {
-    // const fetchSubscriptionDetails = async () => {
-    //   await getCreatorProducts();
-    //   await getCreatorSubscriptions();
-    // };
-    // fetchSubscriptionDetails();
-    //eslint-disable-next-line
-
-    getCreatorProducts();
     getCreatorSubscriptions();
-  }, [getCreatorProducts, getCreatorSubscriptions]);
+  }, [getCreatorSubscriptions]);
 
   const deleteSubscription = async (subscription) => {
     setIsLoading(true);
@@ -149,7 +68,7 @@ const Subscriptions = () => {
         getCreatorSubscriptions();
       }
     } catch (error) {
-      showErrorModal('Failed to remove subsription', error?.response?.data?.message || 'Something wrong happened');
+      showErrorModal('Failed to remove membership', error?.response?.data?.message || 'Something wrong happened');
     }
     setIsLoading(true);
   };
@@ -214,11 +133,11 @@ const Subscriptions = () => {
 
   const subscriptionFields = [
     {
-      label: 'Subscription Tier Name',
+      label: 'Membership Tier Name',
       className: styles.subscriptionNameField,
     },
     {
-      label: 'Monthly Subscription Price',
+      label: 'Monthly Membership Price',
       className: undefined,
     },
     {
@@ -273,13 +192,10 @@ const Subscriptions = () => {
     <List.Item>
       {subscription.isButton ? (
         <Button block type="primary" onClick={() => setColumnState(subscription.idx, 'CREATE')} disabled={isEditing}>
-          Add new Subscription Tier
+          Add new Membership Tier
         </Button>
       ) : !subscription.external_id || subscription.editing ? (
         <CreateSubscriptionCard
-          sessions={sessions}
-          videos={videos}
-          courses={courses}
           cancelChanges={() => setColumnState(subscription.idx, 'EMPTY')}
           saveChanges={() => setColumnState(subscription.idx, 'SAVED')}
           editedSubscription={targetSubscription}
@@ -299,10 +215,10 @@ const Subscriptions = () => {
     <div className={styles.box}>
       <Row gutter={[8, 10]}>
         <Col xs={24}>
-          <Title level={4}> Monthly Subscriptions </Title>
+          <Title level={4}> Monthly Memberships </Title>
         </Col>
         <Col xs={24}>
-          <Loader size="large" loading={isLoading} text="Fetching subscriptions...">
+          <Loader size="large" loading={isLoading} text="Fetching memberships...">
             <Row gutter={10} justify="start">
               <Col xs={7}>
                 <List
@@ -313,11 +229,7 @@ const Subscriptions = () => {
                 />
               </Col>
               <Col xs={17}>
-                <List
-                  grid={{ gutter: 8, column: 3 }}
-                  dataSource={subscriptions?.map(mapProductItems)}
-                  renderItem={renderSubscriptionList}
-                />
+                <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
               </Col>
             </Row>
           </Loader>

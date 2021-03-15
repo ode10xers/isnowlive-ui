@@ -49,7 +49,6 @@ const CreatorSubscriptions = ({ subscriptions }) => {
     setShowPurchaseModal(false);
   };
 
-  //TODO: Implement payment popup here
   const showConfirmPaymentPopup = () => {
     if (!selectedSubscription) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');

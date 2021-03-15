@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Form, Card, List, Button, Input, InputNumber, Typography, Checkbox, Select } from 'antd';
+import { Row, Col, Form, Card, List, Button, Input, InputNumber, Typography, Checkbox, Select, message } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 
 import { TwitterPicker } from 'react-color';
@@ -63,17 +63,13 @@ const includedProductsList = [
   },
 ];
 
-//TODO: Confirm the key and format for color_code
-const CreateSubscriptionCard = ({
-  sessions = [],
-  videos = [],
-  courses = [],
-  cancelChanges,
-  saveChanges,
-  editedSubscription = null,
-}) => {
+//TODO: Move the fetchCreatorProducts here
+const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription = null }) => {
   const [form] = Form.useForm();
 
+  const [sessions, setSessions] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setIsSubmitting] = useState(false);
   const [isSessionIncluded, setIsSessionIncluded] = useState(false);
@@ -87,6 +83,38 @@ const CreateSubscriptionCard = ({
   const [includedVideosType, setIncludedVideosType] = useState([]);
   const [includedCoursesType, setIncludedCoursesType] = useState([]);
   const [colorCode, setColorCode] = useState(initialColor);
+
+  const getCreatorProducts = useCallback(async () => {
+    try {
+      const { status, data } = await apis.session.getSession();
+
+      if (isAPISuccess(status) && data) {
+        setSessions(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load sessions');
+    }
+
+    try {
+      const { status, data } = await apis.videos.getCreatorVideos();
+
+      if (isAPISuccess(status) && data) {
+        setVideos(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load videos');
+    }
+
+    try {
+      const { status, data } = await apis.courses.getCreatorCourses();
+
+      if (isAPISuccess(status) && data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load courses');
+    }
+  }, []);
 
   const fetchCreatorCurrency = useCallback(async () => {
     setIsLoading(true);
@@ -106,6 +134,8 @@ const CreateSubscriptionCard = ({
   }, []);
 
   useEffect(() => {
+    getCreatorProducts();
+
     if (editedSubscription) {
       const formData = {
         subscriptionName: editedSubscription?.name,
@@ -177,7 +207,7 @@ const CreateSubscriptionCard = ({
     }
 
     fetchCreatorCurrency();
-  }, [fetchCreatorCurrency, form, editedSubscription]);
+  }, [fetchCreatorCurrency, getCreatorProducts, form, editedSubscription]);
 
   const onIncludedProductsChange = (values) => {
     setIsSessionIncluded(values.includes('SESSION'));
