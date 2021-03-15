@@ -140,7 +140,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
       productText = availableProducts.join(' or ');
     }
 
-    return `${calculatedBaseCredits} ${productText} credits / month`;
+    return `${calculatedBaseCredits} ${productText} credits/month`;
   };
 
   const generateIncludedProducts = (subscription, isCourse = false) => {
