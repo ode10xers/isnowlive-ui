@@ -168,11 +168,11 @@ export const getPaymentStatus = (status) => {
   }
 };
 
-export const copyPageLinkToClipboard = (pageLink) => {
+export const copyToClipboard = (link) => {
   // Fallback method if navigator.clipboard is not supported
   if (!navigator.clipboard) {
     var textArea = document.createElement('textarea');
-    textArea.value = pageLink;
+    textArea.value = link;
 
     // Avoid scrolling to bottom
     textArea.style.top = '0';
@@ -187,22 +187,22 @@ export const copyPageLinkToClipboard = (pageLink) => {
       var successful = document.execCommand('copy');
 
       if (successful) {
-        message.success('Page link copied to clipboard!');
+        message.success('Copied to clipboard!');
       } else {
-        message.error('Failed to copy link to clipboard');
+        message.error('Failed to copy to clipboard');
       }
     } catch (err) {
-      message.error('Failed to copy link to clipboard');
+      message.error('Failed to copy to clipboard');
     }
 
     document.body.removeChild(textArea);
   } else {
-    navigator.clipboard.writeText(pageLink).then(
+    navigator.clipboard.writeText(link).then(
       function () {
-        message.success('Page link copied to clipboard!');
+        message.success('Copied to clipboard!');
       },
       function (err) {
-        message.error('Failed to copy link to clipboard');
+        message.error('Failed to copy to clipboard');
       }
     );
   }

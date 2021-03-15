@@ -8,7 +8,7 @@ import Table from 'components/Table';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { copyPageLinkToClipboard, generateUrlFromUsername } from 'utils/helper';
+import { copyToClipboard, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -27,7 +27,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/c/${courseId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const toggleExpandAllPublished = () => {

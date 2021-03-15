@@ -19,7 +19,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './styles.module.scss';
@@ -128,7 +128,7 @@ const ClassPassList = () => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/p/${passId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const toggleExpandAll = () => {

@@ -24,7 +24,7 @@ import dateUtil from 'utils/date';
 import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -141,7 +141,7 @@ const Videos = () => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/v/${videoId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const cloneVideo = async (video) => {
