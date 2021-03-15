@@ -34,7 +34,7 @@ const formInitialValues = {
   colorCode: initialColor,
 };
 
-const whiteColor = '#ffffff';
+const defaultBorderColor = '#f0f0f0';
 
 const colorPickerChoices = [
   '#f44336',
@@ -296,8 +296,8 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
   };
 
   const handleColorChange = (color) => {
-    setColorCode(color.hex || whiteColor);
-    form.setFieldsValue({ ...form.getFieldsValue(), colorCode: color.hex || whiteColor });
+    setColorCode(color.hex || defaultBorderColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), colorCode: color.hex || defaultBorderColor });
   };
 
   const handleFinish = async (values) => {
@@ -328,7 +328,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         name: values.subscriptionName,
         price: values.price,
         validity: 30,
-        color_code: values.colorCode || colorCode || whiteColor,
+        color_code: values.colorCode || colorCode || defaultBorderColor,
         products: productsData,
       };
 
@@ -361,8 +361,12 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
     >
       <Loader size="large" loading={isLoading || submitting}>
         <Card
-          style={{ border: `2px solid ${colorCode || whiteColor}` }}
-          headStyle={{ textAlign: 'center', padding: '0px 10px', borderBottom: `2px solid ${colorCode || whiteColor}` }}
+          style={{ border: `2px solid ${colorCode || defaultBorderColor}` }}
+          headStyle={{
+            textAlign: 'center',
+            padding: '0px 10px',
+            borderBottom: `2px solid ${colorCode || defaultBorderColor}`,
+          }}
           title={
             <Form.Item
               className={styles.compactFormItem}

@@ -19,7 +19,7 @@ const {
 } = dateUtil;
 
 const { Text } = Typography;
-const whiteColor = '#ffffff';
+const defaultBorderColor = '#f0f0f0';
 
 const productTextMapping = {
   SESSION: 'Sessions',
@@ -177,7 +177,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
       <Card
         hoverable={true}
         style={{ border: `1px solid ${subscription?.color_code || '#ffffff'}` }}
-        headStyle={{ textAlign: 'center', borderBottom: `1px solid ${subscription?.color_code || whiteColor}` }}
+        headStyle={{ textAlign: 'center', borderBottom: `1px solid ${subscription?.color_code || defaultBorderColor}` }}
         title={
           <div className={styles.subscriptionNameWrapper}>
             <Text strong> {subscription?.name} </Text>
