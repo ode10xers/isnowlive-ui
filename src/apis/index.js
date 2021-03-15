@@ -138,6 +138,6 @@ export default {
     getSubscriptionDetails: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}`),
     deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),
     getSubscriptionsByUsername: (creatorUsername) => http.get(`/subscriptions?creator_username=${creatorUsername}`),
-    createSubscriptionOrder: (payload) => http.post('/secure/customer/subscription/orders', payload),
+    createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
   },
 };
