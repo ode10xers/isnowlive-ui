@@ -45,12 +45,15 @@ const CourseDetails = ({ match, history }) => {
   const [course, setCourse] = useState(null);
   const [courseSessions, setCourseSessions] = useState(null);
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
+  const [username, setUsername] = useState(null);
 
-  const username = location.state?.username || window.location.hostname.split('.')[0];
+  // const username = location.state?.username || window.location.hostname.split('.')[0];
 
-  const getProfileDetails = useCallback(async () => {
+  const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
-      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
       if (data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
@@ -60,29 +63,37 @@ const CourseDetails = ({ match, history }) => {
       message.error('Failed to load profile details');
       setIsLoading(false);
     }
-  }, [username]);
-
-  const getCourseDetails = useCallback(async (courseId) => {
-    try {
-      const { status, data } = await apis.courses.getDetails(courseId);
-
-      if (isAPISuccess(status) && data) {
-        setCourse(data);
-
-        if (data.type === courseType.MIXED && data.sessions?.length > 0) {
-          const sessionResponses = await Promise.all(
-            data.sessions.map(async (session) => await apis.session.getSessionDetails(session.session_id))
-          );
-          setCourseSessions(sessionResponses.map((sessionResponse) => sessionResponse.data));
-        }
-
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error('Failed to load course details');
-    }
   }, []);
+
+  const getCourseDetails = useCallback(
+    async (courseId) => {
+      try {
+        const { status, data } = await apis.courses.getDetails(courseId);
+
+        if (isAPISuccess(status) && data) {
+          setCourse(data);
+
+          const creatorUsername =
+            data.creator_username || location.state?.username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          await getProfileDetails(creatorUsername);
+
+          if (data.type === courseType.MIXED && data.sessions?.length > 0) {
+            const sessionResponses = await Promise.all(
+              data.sessions.map(async (session) => await apis.session.getSessionDetails(session.session_id))
+            );
+            setCourseSessions(sessionResponses.map((sessionResponse) => sessionResponse.data));
+          }
+
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        message.error('Failed to load course details');
+      }
+    },
+    [getProfileDetails, location]
+  );
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
@@ -90,8 +101,8 @@ const CourseDetails = ({ match, history }) => {
     }
 
     if (match.params.course_id) {
-      if (username && !reservedDomainName.includes(username)) {
-        getProfileDetails();
+      const domainUsername = window.location.hostname.split('.')[0];
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getCourseDetails(match.params.course_id);
       }
     } else {
@@ -103,7 +114,7 @@ const CourseDetails = ({ match, history }) => {
 
   const redirectToVideoDetails = (video) => {
     if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+      const baseUrl = generateUrlFromUsername(username || video?.username || video?.creator_username || 'app');
       window.open(`${baseUrl}/v/${video?.external_id}`);
     }
   };
