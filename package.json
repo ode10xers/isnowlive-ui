@@ -9,7 +9,7 @@
     "@uppy/core": "^1.16.0",
     "@uppy/react": "^1.11.2",
     "@uppy/tus": "^1.8.4",
-    "antd": "^4.13.1",
+    "antd": "^4.14.0",
     "antd-img-crop": "^3.12.0",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",

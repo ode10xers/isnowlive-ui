@@ -36,19 +36,7 @@ const formInitialValues = {
 
 const defaultBorderColor = '#f0f0f0';
 
-const colorPickerChoices = [
-  '#f44336',
-  '#e91e63',
-  '#673ab7',
-  '#1890ff',
-  '#4caf50',
-  '#ffc107',
-  '#607d8b',
-  '#9ae2b6',
-  '#f379b2',
-  '#34727c',
-  '#5030fd',
-];
+const colorPickerChoices = ['#f44336', '#e91e63', '#673ab7', '#1890ff', '#4caf50', '#ffc107', '#f379b2', '#34727c'];
 
 const { Text } = Typography;
 
