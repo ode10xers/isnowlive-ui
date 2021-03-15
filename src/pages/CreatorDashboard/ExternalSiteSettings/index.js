@@ -18,7 +18,7 @@ const ExternalSiteSettings = () => {
   const [selectedWidget, setSelectedWidget] = useState(widgetComponentsName['CALENDAR'].value);
 
   const generateWidgetText = useCallback(() => {
-    return `<iframe src="${widgetLink}" />`;
+    return `<iframe src="${widgetLink}" width="100%" />`;
   }, [widgetLink]);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const ExternalSiteSettings = () => {
             <Col xs={24}>
               <Row gutter={[10, 10]}>
                 <Col xs={24} lg={4}>
-                  <Text strong> Select Page </Text>
+                  <Text strong> Select Widget </Text>
                 </Col>
                 <Col xs={24} lg={20}>
                   <Select

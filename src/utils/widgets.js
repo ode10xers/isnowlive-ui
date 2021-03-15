@@ -14,7 +14,7 @@ export const generateWidgetLink = (widgetName) => {
 
   const queryParams = Object.entries({
     isWidget: true,
-    page: widgetName || 'calendar',
+    widgetType: widgetName || 'calendar',
   })
     .map(([key, val]) => `${key}=${val}`)
     .join('&');
