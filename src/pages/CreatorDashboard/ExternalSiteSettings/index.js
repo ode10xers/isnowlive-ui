@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { github } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 import { Row, Col, Select, Typography, Button, Tooltip } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
@@ -36,7 +38,7 @@ const ExternalSiteSettings = () => {
 
   return (
     <div className={styles.box}>
-      <Row gutter={[8, 16]}>
+      <Row gutter={[20, 16]}>
         <Col xs={24}>
           <Title level={4}> Widgets </Title>
         </Col>
@@ -47,6 +49,7 @@ const ExternalSiteSettings = () => {
             </Col>
             <Col xs={24} lg={12}>
               <Select
+                size="small"
                 className={styles.widgetSelect}
                 placeholder="Select page to show"
                 value={selectedWidget}
@@ -56,14 +59,19 @@ const ExternalSiteSettings = () => {
             </Col>
             <Col xs={24}>
               <div className={styles.codeSnippetContainer}>
+                <SyntaxHighlighter
+                  wrapLongLines={true}
+                  language="htmlbars"
+                  style={github}
+                  className={styles.codeSnippet}
+                >
+                  {generateWidgetText()}
+                </SyntaxHighlighter>
                 <div className={styles.copySnippetBtnContainer}>
-                  <Tooltip title="Copy code snippet">
-                    <Button onClick={() => copyWidgetSnippet()} icon={<CopyOutlined />} />
+                  <Tooltip title="Copy code snippet" trigger="hover">
+                    <Button ghost type="primary" onClick={() => copyWidgetSnippet()} icon={<CopyOutlined />} />
                   </Tooltip>
                 </div>
-                <Text code className={styles.codeSnippet}>
-                  {generateWidgetText()}
-                </Text>
               </div>
             </Col>
           </Row>
