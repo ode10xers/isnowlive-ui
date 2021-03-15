@@ -1,0 +1,24 @@
+@import '../../../styles/variables.scss';
+
+.widgetSelect {
+  width: 100%;
+}
+
+.codeSnippetContainer {
+  position: relative;
+
+  .copySnippetBtnContainer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  .codeSnippet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 400px;
+  }
+}
+
