@@ -2,10 +2,12 @@
 
 .widgetSelect {
   width: 100%;
+  max-width: 300px;
 }
 
 .codeSnippetContainer {
   position: relative;
+  border: 1px solid map-get($map: $colors, $key: 'Havana');
 
   .copySnippetBtnContainer {
     position: absolute;
@@ -15,9 +17,6 @@
   }
 
   .codeSnippet {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     min-height: 150px;
   }
