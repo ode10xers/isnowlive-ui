@@ -25,7 +25,8 @@
 }
 
 .saveBtn {
-  background-color: map-get($map: $colors, $key: 'KellyGreen');
+  background-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
 }
 
 .colorPicker {
