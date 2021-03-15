@@ -58,6 +58,36 @@ const Subscriptions = () => {
     getCreatorSubscriptions();
   }, [getCreatorSubscriptions]);
 
+  const publishSubscription = async (subscriptionId) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.subscriptions.publishSubscription(subscriptionId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Membership Published');
+        getCreatorSubscriptions();
+      }
+    } catch (error) {
+      showErrorModal('Failed publishing membership', error?.response?.data?.message || '');
+    }
+    setIsLoading(true);
+  };
+
+  const unpublishSubscription = async (subscriptionId) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.subscriptions.publishSubscription(subscriptionId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Membership Published');
+        getCreatorSubscriptions();
+      }
+    } catch (error) {
+      showErrorModal('Failed publishing membership', error?.response?.data?.message || '');
+    }
+    setIsLoading(true);
+  };
+
   const deleteSubscription = async (subscription) => {
     setIsLoading(true);
     try {
@@ -206,6 +236,8 @@ const Subscriptions = () => {
           editing={isEditing}
           editSubscription={() => setColumnState(subscription.idx, 'EDIT', subscription)}
           deleteSubscription={() => handleDelete(subscription)}
+          publishSubscription={publishSubscription}
+          unpublishSubscription={unpublishSubscription}
         />
       )}
     </List.Item>
@@ -220,7 +252,7 @@ const Subscriptions = () => {
         <Col xs={24}>
           <Loader size="large" loading={isLoading} text="Fetching memberships...">
             <Row gutter={10} justify="start">
-              <Col xs={7}>
+              <Col xs={7} xl={6}>
                 <List
                   itemLayout="vertical"
                   size="large"
@@ -228,7 +260,7 @@ const Subscriptions = () => {
                   renderItem={renderSubscriptionFields}
                 />
               </Col>
-              <Col xs={17}>
+              <Col xs={17} xl={18}>
                 <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
               </Col>
             </Row>

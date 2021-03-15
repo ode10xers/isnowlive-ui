@@ -139,5 +139,7 @@ export default {
     deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),
     getSubscriptionsByUsername: (creatorUsername) => http.get(`/subscriptions?creator_username=${creatorUsername}`),
     createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
+    publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
+    unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
   },
 };

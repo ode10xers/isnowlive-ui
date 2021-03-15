@@ -17,3 +17,7 @@
 .buttonContainer {
   padding: 13px 10px 12px !important;
 }
+
+.greenText {
+  color: map-get($map: $colors, $key: 'KellyGreen') !important;
+}

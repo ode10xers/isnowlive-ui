@@ -10,7 +10,14 @@ import styles from './styles.module.scss';
 const { Text } = Typography;
 const whiteColor = '#ffffff';
 
-const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubscription }) => {
+const SubscriptionCards = ({
+  subscription,
+  editing,
+  editSubscription,
+  deleteSubscription,
+  publishSubscription,
+  unpublishSubscription,
+}) => {
   const renderTickOrCross = (isTrue) =>
     isTrue ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#bb2124" />;
 
@@ -135,6 +142,21 @@ const SubscriptionCards = ({ subscription, editing, editSubscription, deleteSubs
         <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.external_id)}>
           Delete
         </Button>,
+        subscription.is_published ? (
+          <Button danger type="link" onClick={() => unpublishSubscription(subscription.external_id)}>
+            {' '}
+            Hide{' '}
+          </Button>
+        ) : (
+          <Button
+            className={styles.greenText}
+            type="link"
+            onClick={() => publishSubscription(subscription.external_id)}
+          >
+            {' '}
+            Show{' '}
+          </Button>
+        ),
         <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.external_id)}>
           Edit
         </Button>,
