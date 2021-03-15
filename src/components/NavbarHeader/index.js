@@ -27,14 +27,28 @@ const NavbarHeader = ({ removePadding = false }) => {
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [authModalState, setAuthModalState] = useState('signIn');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [shouldShowSessionLink, setShouldShowSessionLink] = useState(false);
   const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
   const [shouldShowVideoLink, setShouldShowVideoLink] = useState(false);
   const [shouldShowCourseLink, setShouldShowCourseLink] = useState(false);
+  const [shouldShowSubscriptionLink, setShouldShowSubscriptionLink] = useState(false);
 
   const {
     state: { userDetails },
     logOut,
   } = useGlobalContext();
+
+  const checkShouldShowSessionLink = async (username) => {
+    try {
+      const { status, data } = await apis.user.getSessionsByUsername(username, 'upcoming');
+
+      if (isAPISuccess(status) && data) {
+        setShouldShowSessionLink(data.length > 0);
+      }
+    } catch (error) {
+      console.error(error.response?.data?.message || 'Failed to fetch upcoming sessions for username');
+    }
+  };
 
   const checkShouldShowPassLink = async (username) => {
     try {
@@ -69,6 +83,18 @@ const NavbarHeader = ({ removePadding = false }) => {
       }
     } catch (error) {
       console.error(error.response?.data?.message || 'Failed to fetch courses for username');
+    }
+  };
+
+  const checkShouldShowSubscriptionLink = async (username) => {
+    try {
+      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername(username);
+
+      if (isAPISuccess(status) && data) {
+        setShouldShowSubscriptionLink(data.length > 0);
+      }
+    } catch (error) {
+      console.error(error.response?.data?.message || 'Failed to fetch memberships for username');
     }
   };
 
@@ -162,9 +188,11 @@ const NavbarHeader = ({ removePadding = false }) => {
     document.body.removeAttribute('style');
 
     if (username && !reservedDomainName.includes(username)) {
+      checkShouldShowSessionLink(username);
       checkShouldShowPassLink(username);
       checkShouldShowVideoLink(username);
       checkShouldShowCourseLink(username);
+      checkShouldShowSubscriptionLink(username);
     }
   }, [username]);
 
@@ -228,13 +256,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
                   Site Home
                 </Menu.Item>
-                <Menu.Item
-                  key="Session"
-                  className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
-                  onClick={() => redirectToCreatorProfile('session')}
-                >
-                  Sessions
-                </Menu.Item>
+                {shouldShowSessionLink && (
+                  <Menu.Item
+                    key="Session"
+                    className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('session')}
+                  >
+                    Sessions
+                  </Menu.Item>
+                )}
                 {shouldShowPassLink && (
                   <Menu.Item
                     key="Pass"
@@ -260,6 +290,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                     onClick={() => redirectToCreatorProfile('course')}
                   >
                     Courses
+                  </Menu.Item>
+                )}
+                {shouldShowSubscriptionLink && (
+                  <Menu.Item
+                    key="Membership"
+                    className={siteLinkActive('membership') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('membership')}
+                  >
+                    Memberships
                   </Menu.Item>
                 )}
                 {localUserDetails ? (
@@ -389,13 +428,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                       >
                         <span className={styles.menuLink}>Site Home</span>
                       </li>
-                      <li
-                        key="Creator Sessions"
-                        className={siteLinkActive('session') ? styles.active : undefined}
-                        onClick={() => redirectToCreatorProfile('session')}
-                      >
-                        <span className={styles.menuLink}>Sessions</span>
-                      </li>
+                      {shouldShowSessionLink && (
+                        <li
+                          key="Creator Sessions"
+                          className={siteLinkActive('session') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('session')}
+                        >
+                          <span className={styles.menuLink}>Sessions</span>
+                        </li>
+                      )}
                       {shouldShowPassLink && (
                         <li
                           key="Creator Passes"
@@ -421,6 +462,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                           onClick={() => redirectToCreatorProfile('course')}
                         >
                           <span className={styles.menuLink}>Courses</span>
+                        </li>
+                      )}
+                      {shouldShowSubscriptionLink && (
+                        <li
+                          key="Creator Memberships"
+                          className={siteLinkActive('membership') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('membership')}
+                        >
+                          <span className={styles.menuLink}>Memberships</span>
                         </li>
                       )}
                       {localUserDetails && (

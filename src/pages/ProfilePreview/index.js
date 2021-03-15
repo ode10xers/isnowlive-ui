@@ -46,6 +46,7 @@ const productKeys = {
   PASS: 'pass',
   VIDEO: 'video',
   COURSE: 'course',
+  SUBSCRIPTION: 'membership',
 };
 
 const ProfilePreview = ({ username = null }) => {
@@ -219,123 +220,7 @@ const ProfilePreview = ({ username = null }) => {
         profileUsername = getLocalUserDetails().username;
       }
 
-      console.log(profileUsername);
-
-      //TODO: Implement API Here later
       const { status, data } = await apis.subscriptions.getSubscriptionsByUsername(profileUsername);
-      /*
-
-      const { status, data } = {
-        status: 200,
-        data: [
-          {
-            name: 'first test subscription',
-            price: 220,
-            currency: 'usd',
-            products: {
-              SESSION: {
-                access_types: ['PUBLIC', 'MEMBERSHIP'],
-                credits: 10,
-                product_ids: [
-                  '67925511-ccee-404d-bb30-3fe1a7a69ea6',
-                  '162e6a18-87b3-4b41-87cd-ab36e9cfde5f',
-                  '05341f43-f693-4c54-a3c2-20e4ba349ae1',
-                ],
-              },
-              VIDEO: {
-                access_types: ['PUBLIC', 'MEMBERSHIP'],
-                credits: 10,
-                product_ids: ['a46def9e-6f61-4199-965d-b29a1ae0c29d'],
-              },
-            },
-            validity: 30,
-            color_code: '#1890ff',
-            is_published: false,
-            external_id: '56b1fac0-4429-4a62-9a14-babd7a372285',
-            product_details: {
-              SESSION: [
-                {
-                  session_id: 272,
-                  price: 80,
-                  currency: 'usd',
-                  max_participants: 800,
-                  group: true,
-                  name: 'Golang 1-1',
-                  description: '<p>test</p>\n',
-                  session_image_url: 'https://dkfqbuenrrvge.cloudfront.net/image/x5PJ30xboVq1GvVD_passion_do.png',
-                  category: '',
-                  sub_category: '',
-                  duration: 0,
-                  document_url: '',
-                  beginning: '2021-02-22T18:30:00Z',
-                  expiry: '2021-03-31T18:29:59Z',
-                  prerequisites: '<p></p>\n',
-                  pay_what_you_want: false,
-                  recurring: true,
-                  is_active: true,
-                  is_refundable: true,
-                  refund_before_hours: 24,
-                  color_code: '#ff9800',
-                  is_course: true,
-                  external_id: '67925511-ccee-404d-bb30-3fe1a7a69ea6',
-                  access: 'PUBLIC',
-                  creator_username: '',
-                },
-                {
-                  session_id: 264,
-                  price: 56,
-                  currency: 'usd',
-                  max_participants: 20,
-                  group: true,
-                  name: 'maserati',
-                  description: 'test',
-                  session_image_url:
-                    'https://dkfqbuenrrvge.cloudfront.net/image/GolRxgMpYisfSesk_psychological mind.jpg',
-                  category: '',
-                  sub_category: '',
-                  duration: 0,
-                  document_url: '',
-                  beginning: '2021-02-17T18:30:00Z',
-                  expiry: '2021-03-16T18:29:59Z',
-                  prerequisites: '',
-                  pay_what_you_want: false,
-                  recurring: true,
-                  is_active: true,
-                  is_refundable: true,
-                  refund_before_hours: 24,
-                  color_code: '#4caf50',
-                  is_course: true,
-                  external_id: '162e6a18-87b3-4b41-87cd-ab36e9cfde5f',
-                  access: 'PUBLIC',
-                  creator_username: '',
-                },
-              ],
-              VIDEO: [
-                {
-                  title: 'eawdas',
-                  description: '<p>dadsa</p>\n',
-                  validity: 33,
-                  price: 10,
-                  currency: 'usd',
-                  thumbnail_url:
-                    'https://dkfqbuenrrvge.cloudfront.net/image/sArSnOcT0Wd38T0i_promotional-cover-4000x4000.jpg',
-                  external_id: 'a46def9e-6f61-4199-965d-b29a1ae0c29d',
-                  is_published: true,
-                  video_url: '',
-                  video_uid: 'fd625704cb898ebdd540d884948dc331',
-                  duration: 1167.6,
-                  status: '',
-                  watch_limit: 13,
-                  is_course: false,
-                  access: 'PUBLIC',
-                },
-              ],
-            },
-          },
-        ],
-      };
-
-      */
 
       if (isAPISuccess(status) && data) {
         setSubscriptions(data);
@@ -369,18 +254,20 @@ const ProfilePreview = ({ username = null }) => {
 
   const getDefaultTabToShow = useCallback(() => {
     let targetListTab = '';
-    if (sessions.length) {
+    if (sessions.length > 0) {
       targetListTab = productKeys.SESSION;
-    } else if (passes.length) {
+    } else if (passes.length > 0) {
       targetListTab = productKeys.PASS;
-    } else if (videos.length) {
+    } else if (videos.length > 0) {
       targetListTab = productKeys.VIDEO;
-    } else if (liveCourses.length || videoCourses.length) {
+    } else if (liveCourses.length > 0 || videoCourses.length > 0) {
       targetListTab = productKeys.COURSE;
+    } else if (subscriptions.length > 0) {
+      targetListTab = productKeys.SUBSCRIPTION;
     }
 
     return targetListTab;
-  }, [sessions, passes, videos, liveCourses, videoCourses]);
+  }, [sessions, passes, videos, liveCourses, videoCourses, subscriptions]);
 
   useEffect(() => {
     let targetListTab = getDefaultTabToShow();
@@ -401,6 +288,9 @@ const ProfilePreview = ({ username = null }) => {
       } else if (sectionToShow === productKeys.COURSE && (liveCourses.length > 0 || videoCourses.length > 0)) {
         targetListTab = productKeys.COURSE;
         targetElement = document.getElementById(productKeys.COURSE);
+      } else if (sectionToShow === productKeys.SUBSCRIPTION && subscriptions.length > 0) {
+        targetListTab = productKeys.SUBSCRIPTION;
+        targetElement = document.getElementById(productKeys.SUBSCRIPTION);
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
         targetListTab = getDefaultTabToShow();
@@ -417,7 +307,7 @@ const ProfilePreview = ({ username = null }) => {
 
     setSelectedListTab(targetListTab);
     //eslint-disable-next-line
-  }, [location.state, sessions, passes, videos, liveCourses, videoCourses, profile]);
+  }, [location.state, sessions, passes, videos, liveCourses, videoCourses, subscriptions, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -655,7 +545,7 @@ const ProfilePreview = ({ username = null }) => {
               <Tabs.TabPane
                 key={productKeys.SUBSCRIPTION}
                 tab={
-                  <div className={styles.largeTabHeader} id="subscription">
+                  <div className={styles.largeTabHeader} id="membership">
                     <ScheduleOutlined />
                     Membership
                   </div>
