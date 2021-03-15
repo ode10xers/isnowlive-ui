@@ -1,10 +1,14 @@
 @import '../../../styles/variables.scss';
 
 .baseCreditsText {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
 }
 
-.includedProductsList {
+.includedTextWrapper {
   font-size: 12px;
+}
+
+.includedProductsList {
+  font-size: 13px;
 }

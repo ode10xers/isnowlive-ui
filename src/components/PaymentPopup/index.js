@@ -60,7 +60,7 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      //TODO: Readjust for other products whenever necessary
+      //TODO: MAKE SURE TO REMIND THIS
       const payload = {
         coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
         course_id: productId,

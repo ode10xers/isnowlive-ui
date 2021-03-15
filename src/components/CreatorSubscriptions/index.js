@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Card, Typography, Button, Divider, List, Space } from 'antd';
+import { Row, Col, Card, Typography, Button, Divider, List, Space, message } from 'antd';
 
 import Loader from 'components/Loader';
 import PurchaseModal from 'components/PurchaseModal';
 import { showErrorModal } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
+
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
+import apis from 'apis';
+import { isAPISuccess } from 'utils/helper';
+
+const {
+  timezoneUtils: { getTimezoneLocation },
+} = dateUtil;
 
 const { Text } = Typography;
 const whiteColor = '#ffffff';
@@ -23,6 +33,8 @@ const accessTypeTextMapping = {
 };
 
 const CreatorSubscriptions = ({ subscriptions }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
@@ -45,31 +57,91 @@ const CreatorSubscriptions = ({ subscriptions }) => {
     }
 
     console.log(selectedSubscription);
-    createOrder();
+
+    let itemDescription = [];
+
+    itemDescription.push(generateBaseCreditsText(selectedSubscription, false));
+
+    if (selectedSubscription.products['COURSE']) {
+      itemDescription.push(generateBaseCreditsText(selectedSubscription, true));
+    }
+
+    const paymentPopupData = {
+      productId: selectedSubscription.external_id,
+      itemList: [
+        {
+          name: selectedSubscription.name,
+          description: itemDescription.join(', '),
+          currency: selectedSubscription.currency,
+          price: selectedSubscription.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  //TODO: Implement payment flow here
-  const createOrder = () => {
+  //TODO: Integrate this once implemented
+  const initiatePaymentForOrder = async (orderDetails) => {
+    console.log(orderDetails);
+    message.success('Order created!');
+  };
+
+  const createOrder = async (userEmail, couponCode = '') => {
     setIsLoading(true);
-    console.log('Paying...');
+
+    console.log(couponCode);
+
+    try {
+      const payload = {
+        subscription_id: selectedSubscription.external_id,
+        user_timezone_location: getTimezoneLocation(),
+      };
+
+      const { status, data } = await apis.subscriptions.createSubscriptionOrder(payload);
+
+      if (isAPISuccess(status) && data) {
+        initiatePaymentForOrder(data);
+      }
+    } catch (error) {
+      if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {
+        showErrorModal(
+          'Discount Code Not Applicable',
+          'The discount code you entered is not applicable this product. Please try again with a different discount code'
+        );
+      } else {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
+    }
+
     setIsLoading(false);
   };
 
   const generateBaseCreditsText = (subscription, isCourse = false) => {
     let calculatedBaseCredits = 0;
+    let productText = '';
 
     if (isCourse) {
       calculatedBaseCredits = subscription?.products['COURSE']?.credits || 0;
+      productText = 'Course';
     } else {
       calculatedBaseCredits =
         (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
+
+      let availableProducts = [];
+
+      if (subscription?.products['SESSION']) {
+        availableProducts.push('Sessions');
+      }
+
+      if (subscription?.products['VIDEO']) {
+        availableProducts.push('Videos');
+      }
+
+      productText = availableProducts.join(' or ');
     }
 
-    return (
-      <div className={styles.baseCreditsText}>
-        {calculatedBaseCredits} {isCourse ? 'Course' : 'Session or Video'} credits / month
-      </div>
-    );
+    return `${calculatedBaseCredits} ${productText} credits / month`;
   };
 
   const generateIncludedProducts = (subscription, isCourse = false) => {
@@ -117,7 +189,9 @@ const CreatorSubscriptions = ({ subscriptions }) => {
         <Row gutter={[8, 8]} justify="center">
           <Col xs={24} className={styles.includedProductsWrapper}>
             <Row gutter={[8, 10]} justify="center">
-              <Col xs={24}>{generateBaseCreditsText(subscription)}</Col>
+              <Col xs={24}>
+                <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscription, false)}</div>
+              </Col>
               <Col xs={24} className={styles.includeTextWrapper}>
                 <Text disabled> Includes access to </Text>
               </Col>
@@ -129,7 +203,9 @@ const CreatorSubscriptions = ({ subscriptions }) => {
           </Col>
           <Col xs={24} className={styles.includedCoursesWrapper}>
             <Row gutter={[8, 10]} justify="center">
-              <Col xs={24}>{generateBaseCreditsText(subscription, true)}</Col>
+              <Col xs={24}>
+                <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscription, true)}</div>
+              </Col>
               <Col xs={24} className={styles.includeTextWrapper}>
                 {subscription?.products['COURSE']?.access_types?.length > 0 && (
                   <Text disabled> Includes access to </Text>
@@ -144,7 +220,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
                 {' '}
                 {subscription?.currency?.toUpperCase()} {subscription?.price}{' '}
               </span>
-              /month
+              / month
             </div>
           </Col>
           <Col xs={24} className={styles.buyButtonWrapper}>

@@ -64,7 +64,7 @@ const Subscriptions = () => {
               products: {
                 SESSION: {
                   access_types: ['PUBLIC'],
-                  credits: 15,
+                  credits: 10,
                   product_ids: ['abcd', 'defg'],
                 },
                 COURSE: {

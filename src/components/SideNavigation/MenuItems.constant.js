@@ -80,7 +80,7 @@ export const creatorMenuItems = [
   {
     order: 6,
     key: 'subscriptions',
-    title: 'Subscriptions',
+    title: 'Membership',
     icon: <ScheduleOutlined />,
     mixPanelTag: creator.click.dashboard.coursesNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
