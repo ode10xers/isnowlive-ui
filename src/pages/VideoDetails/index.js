@@ -52,9 +52,11 @@ const VideoDetails = ({ match }) => {
   const [availablePassesForVideo, setAvailablePassesForVideo] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
+  const [userSubscriptions, setUserSubscriptions] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [username, setUsername] = useState(null);
+  const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
@@ -144,6 +146,23 @@ const VideoDetails = ({ match }) => {
     }
   }, []);
 
+  const getUsableSubscriptionForUser = useCallback(async (videoId) => {
+    try {
+      const loggedInUserData = getLocalUserDetails();
+
+      if (loggedInUserData) {
+        const { status, data } = await apis.subscriptions.getUserSubscriptionForVideo(videoId);
+
+        if (isAPISuccess(status) && data) {
+          setUserSubscriptions(data);
+        }
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed fetching usable membership for user');
+      setIsLoading(false);
+    }
+  }, []);
+
   const openPurchaseVideoModal = () => {
     setSelectedPass(null);
     setShowPurchaseVideoModal(true);
@@ -178,6 +197,7 @@ const VideoDetails = ({ match }) => {
 
         if (getLocalUserDetails()) {
           getUsablePassesForUser(match.params.video_id);
+          getUsableSubscriptionForUser(match.params.video_id);
         }
       }
     } else {
@@ -330,6 +350,26 @@ const VideoDetails = ({ match }) => {
     }
   };
 
+  const buyVideoUsingSubscription = async (userEmail, payload) => {
+    try {
+      const { status, data } = await purchaseVideo(payload);
+
+      if (isAPISuccess(status) && data) {
+        showVideoPurchaseSuccessModal(userEmail, video, null, true, false, username);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        showAlreadyBookedModal(productType.VIDEO, username);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
+    }
+  };
+
   const handleOrder = async (userEmail) => {
     setIsLoading(true);
 
@@ -364,6 +404,17 @@ const VideoDetails = ({ match }) => {
         };
 
         buyPassAndGetVideo(userEmail, payload);
+      }
+    } else if (selectedSubscription && video?.price > 0) {
+      //TODO: Confirm the flow and conditions
+      if (userSubscriptions.length > 0) {
+        const payload = {
+          video_id: video.external_id,
+          payment_source: paymentSource.SUBSCRIPTION,
+          source_id: selectedSubscription.subscription_order_id,
+        };
+
+        buyVideoUsingSubscription(userEmail, payload);
       }
     } else {
       const payload = {
