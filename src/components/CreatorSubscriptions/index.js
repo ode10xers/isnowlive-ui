@@ -4,7 +4,7 @@ import { Row, Col, Card, Typography, Button, Divider, List, Space, message } fro
 
 import Loader from 'components/Loader';
 import PurchaseModal from 'components/PurchaseModal';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 
@@ -100,7 +100,12 @@ const CreatorSubscriptions = ({ subscriptions }) => {
       const { status, data } = await apis.subscriptions.createSubscriptionOrder(payload);
 
       if (isAPISuccess(status) && data) {
-        initiatePaymentForOrder(data);
+        if (data.payment_required) {
+          initiatePaymentForOrder(data);
+        } else {
+          //TODO: Confirm with Rahul about the content of confirmation popup
+          showSuccessModal('Subscription Purchased');
+        }
       }
     } catch (error) {
       if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {

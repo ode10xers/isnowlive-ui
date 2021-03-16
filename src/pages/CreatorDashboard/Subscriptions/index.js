@@ -68,7 +68,7 @@ const Subscriptions = () => {
         getCreatorSubscriptions();
       }
     } catch (error) {
-      showErrorModal('Failed publishing membership', error?.response?.data?.message || '');
+      showErrorModal('Failed publishing membership', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(true);
   };
@@ -76,14 +76,17 @@ const Subscriptions = () => {
   const unpublishSubscription = async (subscriptionId) => {
     setIsLoading(true);
     try {
-      const { status } = await apis.subscriptions.publishSubscription(subscriptionId);
+      const { status } = await apis.subscriptions.unpublishSubscription(subscriptionId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Membership Published');
+        showSuccessModal('Membership Unpublished');
         getCreatorSubscriptions();
       }
     } catch (error) {
-      showErrorModal('Failed publishing membership', error?.response?.data?.message || '');
+      showErrorModal(
+        'Failed unpublishing membership',
+        error?.response?.data?.message || 'https://www.getpostman.com/collections/5b70cace98cec39eeb6d'
+      );
     }
     setIsLoading(true);
   };

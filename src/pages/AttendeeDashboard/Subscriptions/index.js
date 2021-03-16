@@ -10,6 +10,7 @@ import { showErrorModal } from 'components/Modals/modals';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import apis from 'apis';
 
 const { Title, Text } = Typography;
 
@@ -30,11 +31,14 @@ const Subscriptions = () => {
   const [subscriptionOrders, setSubscriptionOrders] = useState([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
-  const fetchUserSubscriptionOrders = useCallback(() => {
+  const fetchUserSubscriptionOrders = useCallback(async () => {
     setIsLoading(true);
 
     try {
       //TODO: Implement API Here later
+      const { status, data } = await apis.subscriptions.getAttendeeSubscriptions();
+
+      /*
       //TODO: FE Needs info of the subscription to show
       const { status, data } = {
         status: 200,
@@ -90,10 +94,12 @@ const Subscriptions = () => {
         ],
       };
 
-      if (isAPISuccess(status) && data) {
-        setSubscriptionOrders(data);
-        setIsLoading(false);
-      }
+      */
+      console.log(data);
+      // if (isAPISuccess(status) && data) {
+      //   setSubscriptionOrders(data);
+      //   setIsLoading(false);
+      // }
     } catch (error) {
       setIsLoading(false);
       showErrorModal(

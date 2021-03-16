@@ -148,5 +148,6 @@ export default {
     createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
     publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
     unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
+    getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders'),
   },
 };
