@@ -16,19 +16,7 @@ const {
   formatDate: { toLocaleTime },
 } = dateUtil;
 
-function EventContainerWrapper(props) {
-  const clonedEl = React.cloneElement(props.children, {}, props.children);
-  console.log('clonedEl', clonedEl);
-
-  return (
-    <>
-      {clonedEl}
-    </>
-  )
-}
-
-function Event({ event, children }) {
-  console.log('event', children);
+function Event({ event }) {
   return (
     <span style={{ fontSize: '12px' }}>
       {event.name}
@@ -42,6 +30,7 @@ const CalendarSessions = () => {
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [calendarSession, setCalendarSession] = useState([]);
   const [calendarView, setCalendarView] = useState('month');
+
 
   const redirectToSessionsPage = (session) => {
     const baseUrl = generateUrlFromUsername('ellianto' || session.username || 'app');
@@ -88,7 +77,6 @@ const CalendarSessions = () => {
           classes={['custom-calendar-view']}
           customComponents={{
             event: Event,
-            eventContainerWrapper: EventContainerWrapper,
           }}
           step={30}
         />
