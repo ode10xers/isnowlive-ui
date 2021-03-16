@@ -22,15 +22,13 @@ function Event({ event }) {
       {event.name}
       <span style={{ float: 'right', fontSize: '12px' }}>{toLocaleTime(event.beginning)}</span>
     </span>
-  )
+  );
 }
 
 const CalendarSessions = () => {
-
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [calendarSession, setCalendarSession] = useState([]);
   const [calendarView, setCalendarView] = useState('month');
-
 
   const redirectToSessionsPage = (session) => {
     const baseUrl = generateUrlFromUsername('ellianto' || session.username || 'app');
@@ -64,7 +62,7 @@ const CalendarSessions = () => {
 
   useEffect(() => {
     getCalendarSessions();
-  }, [])
+  }, []);
 
   return (
     <Loader loading={isSessionLoading} size="large" text="Loading sessions">
@@ -81,10 +79,10 @@ const CalendarSessions = () => {
           step={30}
         />
       ) : (
-          <Empty />
-        )}
+        <Empty />
+      )}
     </Loader>
-  )
-}
+  );
+};
 
 export default CalendarSessions;

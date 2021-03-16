@@ -14,7 +14,15 @@ const {
   formatDate: { toShortTimeWithPeriod },
 } = dateUtil;
 
-const CalendarView = ({ inventories = [], onSelectInventory, calendarView, onViewChange, classes = [], customComponents = {}, step = 60 }) => {
+const CalendarView = ({
+  inventories = [],
+  onSelectInventory,
+  calendarView,
+  onViewChange,
+  classes = [],
+  customComponents = {},
+  step = 60,
+}) => {
   let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
   return (
     <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
