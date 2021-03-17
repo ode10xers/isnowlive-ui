@@ -1,19 +1,13 @@
-@import "../../../styles/variables.scss";
+@import '../../../styles/variables.scss';
 
 $colors: red, orange, yellow, blue, purple;
 $repeat: 20;
-@for $i from 1 through $repeat {
-  .custom-calendar-view .rbc-event:nth-child(#{length($colors)}n + #{$i}) {
-    border-color: lighten(nth($colors, random(length($colors))), 20%);
-  }
-}
-
 .custom-calendar-view {
   width: 100%;
   .rbc-event {
     background-color: white;
     color: black;
-    border: 1px solid;
+    border: 0;
   }
   .rbc-month-header {
     background-color: #f5f5f5;
@@ -51,7 +45,7 @@ $repeat: 20;
   }
   .rbc-day-slot .rbc-event {
     position: initial;
-    height: 100px !important;
+    height: 120px !important;
     margin-bottom: 10px;
   }
   .rbc-day-slot .rbc-events-container {
@@ -62,5 +56,14 @@ $repeat: 20;
   }
   .rbc-day-slot .rbc-time-slot {
     border-top: 0;
+  }
+  .rbc-day-slot .rbc-event-label {
+    display: none;
+  }
+  .rbc-show-more {
+    // color: red;
+  }
+  .rbc-current-time-indicator {
+    display: none;
   }
 }
