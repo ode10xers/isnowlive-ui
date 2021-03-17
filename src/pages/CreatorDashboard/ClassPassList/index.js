@@ -8,6 +8,7 @@ import {
   EditOutlined,
   CopyOutlined,
   EyeInvisibleOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -15,6 +16,7 @@ import apis from 'apis';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CreatePassModal from 'components/CreatePassModal';
+import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -35,6 +37,17 @@ const ClassPassList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [emailModalVisible, setEmailModalVisible] = useState(false);
+
+  const showSendEmailModal = (pass) => {
+    setTargetPass(pass);
+    setEmailModalVisible(true);
+  };
+
+  const hideSendEmailModal = () => {
+    setTargetPass(null);
+    setEmailModalVisible(false);
+  };
 
   const showCreatePassesModal = () => {
     setCreateModalVisible(true);
@@ -110,6 +123,7 @@ const ClassPassList = () => {
             videos: classPass.videos,
             buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
             color_code: classPass.color_code,
+            external_id: classPass.external_id,
           }))
         );
       }
@@ -198,6 +212,11 @@ const ClassPassList = () => {
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
+          <Col xs={24} md={4}>
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+            </Tooltip>
+          </Col>
           <Col xs={24} md={4}>
             <Tooltip title="Edit">
               <Button
@@ -322,6 +341,9 @@ const ClassPassList = () => {
             </div>
           }
           actions={[
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(pass)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -371,6 +393,13 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
+      <SendCustomerEmailModal
+        visible={emailModalVisible}
+        closeModal={hideSendEmailModal}
+        productId={targetPass?.external_id}
+        productType={'PASS'}
+        recipients={targetPass?.buyers}
+      />
       <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={14}>
