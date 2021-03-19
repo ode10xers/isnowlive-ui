@@ -204,6 +204,8 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
       message.error('Video details not found.');
     }
+
+    setSelectedSubscription(null);
     //eslint-disable-next-line
   }, [match.params.video_id]);
 

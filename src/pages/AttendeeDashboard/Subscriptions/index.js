@@ -96,10 +96,10 @@ const Subscriptions = () => {
 
       */
       console.log(data);
-      // if (isAPISuccess(status) && data) {
-      //   setSubscriptionOrders(data);
-      //   setIsLoading(false);
-      // }
+      if (isAPISuccess(status) && data) {
+        setSubscriptionOrders([]);
+        setIsLoading(false);
+      }
     } catch (error) {
       setIsLoading(false);
       showErrorModal(
