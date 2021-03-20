@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover, Radio, Empty } from 'antd';
 import { BookTwoTone, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 
@@ -31,6 +32,7 @@ const { attendee } = mixPanelEventTags;
 const whiteColor = '#FFF';
 
 const SessionsInventories = ({ match }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [isPast, setIsPast] = useState(false);
@@ -97,7 +99,7 @@ const SessionsInventories = ({ match }) => {
       }
       setIsLoading(false);
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
   }, []);
@@ -157,7 +159,7 @@ const SessionsInventories = ({ match }) => {
         closable: true,
         maskClosable: true,
         title: 'An Error Occured',
-        content: error.response?.data?.message || 'Something went wrong.',
+        content: error.response?.data?.message || translate('SOMETHING_WENT_WRONG'),
       });
     }
   };

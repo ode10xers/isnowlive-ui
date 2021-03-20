@@ -20,8 +20,12 @@
 .isActiveNavItem {
   color: map-get($colors, 'DodgerBlue');
 }
+.selectLanguage {
+  margin-left: 10px !important;
+  width: 100px;
+}
 .logout {
-  margin-left: 100px;
+  // margin-left: 100px;
 }
 
 @media (max-width: 767px) {

@@ -10,14 +10,17 @@ import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpa
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
+import { useTranslation } from 'react-i18next';
 
 import styles from './style.module.scss';
+import SelectLanguage from 'components/SelectLanguage';
 const logo = require('assets/images/Logo-passion-transparent.png');
 
 const { user, attendee } = mixPanelEventTags;
 const { Paragraph } = Typography;
 
 const DashboardHeader = () => {
+  const { t: translate } = useTranslation();
   const { logOut } = useGlobalContext();
   const history = useHistory();
 
@@ -41,17 +44,15 @@ const DashboardHeader = () => {
         maskClosable: true,
         content: (
           <>
-            <Paragraph>Ready to become a host and start making money by hosting live events?</Paragraph>
+            <Paragraph></Paragraph>
             <Paragraph>
-              By clicking on "<strong>Become Host</strong>" your account will be upgraded to a host account and you will
-              get access to your dashboard and features empowering you to host live events on topics you are passionate
-              about and make money from it.
+              {translate('READY_TO_BECOME_HOST_TEXT1')}"<strong>{translate('BECOME_HOST')}</strong>"
             </Paragraph>
           </>
         ),
-        title: 'Become a Host',
-        okText: 'Become Host',
-        cancelText: 'Talk to Us',
+        title: translate('BECOME_A_HOST'),
+        okText: translate('BECOME_HOST'),
+        cancelText: translate('TALK_TO_US'),
         onOk: () => trackAndNavigate(Routes.profile, attendee.click.dashboard.becomeHost),
         onCancel: () => openFreshChatWidget(),
       });
@@ -79,17 +80,18 @@ const DashboardHeader = () => {
           onClick={() => isCreatorCheck()}
         >
           <VideoCameraAddOutlined className={styles.navItemIcon} />
-          Hosting
+          {translate('HOSTING')}
         </span>
         <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.attendeeDashboard.rootPath))}
           onClick={() => trackAndNavigate(Routes.attendeeDashboard.rootPath, user.click.switchToAttendee)}
         >
           <TeamOutlined className={styles.navItemIcon} />
-          Attending
+          {translate('ATTENDING')}
         </span>
+        <SelectLanguage className={styles.selectLanguage} />
         <Button type="text" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
-          Logout
+          {translate('LOGOUT')}
         </Button>
       </Col>
     </Row>

@@ -11,12 +11,14 @@ import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const { Item } = Form;
 const { Password } = Input;
 const { user } = mixPanelEventTags;
 
 const AdminLogin = ({ history }) => {
+  const { t: translate } = useTranslation();
   const [loginForm] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,7 +65,7 @@ const AdminLogin = ({ history }) => {
         user_email: values.user_email,
         admin_email: values.email,
       });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

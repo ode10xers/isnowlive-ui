@@ -20,6 +20,7 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -100,6 +101,7 @@ const initialSession = {
 };
 
 const Session = ({ match, history }) => {
+  const { t: translate } = useTranslation();
   const location = useLocation();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -148,7 +150,7 @@ const Session = ({ match, history }) => {
           });
           setIsSessionFree(true);
         } else {
-          message.error(error.response?.data?.message || 'Something went wrong.');
+          message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         }
         setIsLoading(false);
       }
@@ -193,7 +195,7 @@ const Session = ({ match, history }) => {
           await getCreatorStripeDetails(data);
         }
       } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
         if (isOnboarding) {
           history.push(Routes.session);
@@ -614,7 +616,7 @@ const Session = ({ match, history }) => {
       trackFailedEvent(session.session_id ? eventTagObject.submitUpdate : eventTagObject.submitNewSession, error, {
         form_values: values,
       });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

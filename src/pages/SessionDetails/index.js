@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography, Tabs } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { useTranslation } from 'react-i18next';
 import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
@@ -51,6 +52,7 @@ const {
 } = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [course, setCourse] = useState(null);
@@ -108,7 +110,7 @@ const SessionDetails = ({ match, history }) => {
 
         setSessionVideos(sessionDetails.data.Videos);
       } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
         history.push(Routes.root);
       }
@@ -488,7 +490,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

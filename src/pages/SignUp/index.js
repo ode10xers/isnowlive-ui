@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import { useGlobalContext } from 'services/globalContext';
 import {
@@ -21,6 +22,7 @@ const { Item } = Form;
 const { user } = mixPanelEventTags;
 
 const SignUp = ({ history }) => {
+  const { t: translate } = useTranslation();
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +47,7 @@ const SignUp = ({ history }) => {
     } catch (error) {
       setIsLoading(false);
       trackFailedEvent(eventTag, error, { email: values.email });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

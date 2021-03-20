@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
 
@@ -27,6 +28,7 @@ const { Text, Paragraph, Title } = Typography;
 
 //TODO: Refactor this to use PaymentPopup as an intermediate flow
 const PurchaseModal = ({ visible, closeModal, createOrder }) => {
+  const { t: translate } = useTranslation();
   const { logIn } = useGlobalContext();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -166,7 +168,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

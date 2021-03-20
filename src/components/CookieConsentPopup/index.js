@@ -9,6 +9,7 @@ import { isMobileDevice } from 'utils/device';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const { Paragraph, Text } = Typography;
 
@@ -19,6 +20,7 @@ const DOMAIN = {
 };
 
 const CookieConsentPopup = () => {
+  const { t: translate } = useTranslation();
   const { setCookieConsent } = useGlobalContext();
 
   // Since for some reason the cookies are not settable in dev environment, disable on dev
@@ -35,21 +37,20 @@ const CookieConsentPopup = () => {
       content: (
         <>
           <Paragraph>
-            Our website requires the use of certain cookies in order to fully function and give you the best possible
-            service. Some of these cookies are <Text strong> third party cookies </Text> that we use to enable us to:
+            {translate('COOKIES_CONCENT_TEXT_1')}
+            <Text strong>{translate('COOKIES_CONCENT_TEXT_2')}</Text>
+            {translate('COOKIES_CONCENT_TEXT_3')}
           </Paragraph>
           <ul>
-            <li className={styles.cookieUsageList}> provide realtime chat to support you whenever needed, </li>
-            <li className={styles.cookieUsageList}> give a smoother payment experience, and </li>
-            <li className={styles.cookieUsageList}> analyze the site's performance on your device </li>
+            <li className={styles.cookieUsageList}>{translate('COOKIES_CONCENT_TEXT_4')}</li>
+            <li className={styles.cookieUsageList}>{translate('COOKIES_CONCENT_TEXT_5')}</li>
+            <li className={styles.cookieUsageList}>{translate('COOKIES_CONCENT_TEXT_6')}</li>
           </ul>
-          <Paragraph>
-            In order to continue to the website, we need you to acknowledge and accept the use of these cookies.
-          </Paragraph>
-          <Paragraph>You can also choose not to use this website and we will take you to Google's homepage</Paragraph>
+          <Paragraph>{translate('COOKIES_CONCENT_TEXT_7')}</Paragraph>
+          <Paragraph>{translate('COOKIES_CONCENT_TEXT_8')}</Paragraph>
         </>
       ),
-      okText: 'I Accept',
+      okText: translate('I_ACCEPT'),
       okButtonProps: {
         type: 'text',
         style: {
@@ -70,7 +71,7 @@ const CookieConsentPopup = () => {
         Cookies.set('CookieConsent', 'true', cookieOptions);
         setCookieConsent(true);
       },
-      cancelText: 'Not use this website',
+      cancelText: translate('NOT_USE_THIS_WEBSITE'),
       cancelButtonProps: {
         type: 'text',
         style: {
@@ -89,8 +90,8 @@ const CookieConsentPopup = () => {
       extraCookieOptions={{
         domain: DOMAIN[process.env.NODE_ENV],
       }}
-      buttonText="Yes, I understand"
-      declineButtonText="No, I decline"
+      buttonText={translate('YES_I_UNDERSTAND')}
+      declineButtonText={translate('NO_I_DECLINE')}
       location="bottom"
       overlay={true}
       enableDeclineButton={true}

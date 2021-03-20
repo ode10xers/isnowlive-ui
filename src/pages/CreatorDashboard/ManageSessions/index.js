@@ -20,6 +20,7 @@ import {
 import { generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const {
   formatDate: { toLongDateWithDay },
@@ -29,6 +30,7 @@ const { Panel } = Collapse;
 const { creator } = mixPanelEventTags;
 
 const ManageSessions = () => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -55,7 +57,7 @@ const ManageSessions = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -75,7 +77,7 @@ const ManageSessions = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -93,7 +95,7 @@ const ManageSessions = () => {
       getSessionsList();
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);

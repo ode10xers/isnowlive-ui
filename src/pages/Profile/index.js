@@ -26,11 +26,13 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text, Paragraph } = Typography;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
@@ -56,7 +58,7 @@ const Profile = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
   }, [form]);
@@ -85,7 +87,7 @@ const Profile = () => {
     } catch (error) {
       setIsLoading(false);
       trackFailedEvent(eventTag, error, { form_values: values });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -141,7 +143,7 @@ const Profile = () => {
         setIsLoadingUsernameCheck(false);
       } catch (error) {
         setIsLoadingUsernameCheck(false);
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     }
   };

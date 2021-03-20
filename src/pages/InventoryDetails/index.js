@@ -38,6 +38,7 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
+import { useTranslation } from 'react-i18next';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -50,6 +51,7 @@ const {
 const SoldOutImage = require('assets/images/sold_out.png');
 
 const InventoryDetails = ({ match, history }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
@@ -77,7 +79,7 @@ const InventoryDetails = ({ match, history }) => {
         setAvailablePasses(passes.data);
         setIsLoading(false);
       } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
         history.push(Routes.root);
       }
@@ -384,7 +386,7 @@ const InventoryDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

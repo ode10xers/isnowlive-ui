@@ -21,11 +21,13 @@ import config from 'config';
 
 import styles from './style.module.scss';
 import parseQueryString from 'utils/parseQueryString';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Link } = Typography;
 const { creator } = mixPanelEventTags;
 
 const LiveStream = () => {
+  const { t: translate } = useTranslation();
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
@@ -50,7 +52,7 @@ const LiveStream = () => {
     } catch (error) {
       console.log(error);
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   }, [form]);
 
@@ -73,7 +75,7 @@ const LiveStream = () => {
           }, 2000);
         }
       } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     },
     [history, isOnboarding]
@@ -121,7 +123,7 @@ const LiveStream = () => {
     } catch (error) {
       setIsLoading(false);
       trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

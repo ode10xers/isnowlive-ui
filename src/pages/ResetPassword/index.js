@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Form, Input, Button, Row, Col, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -16,6 +17,7 @@ const { Password } = Input;
 const { user } = mixPanelEventTags;
 
 const ResetPassword = () => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const location = useLocation();
   const [form] = Form.useForm();
@@ -44,7 +46,7 @@ const ResetPassword = () => {
     } catch (error) {
       setSubmitting(false);
       trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

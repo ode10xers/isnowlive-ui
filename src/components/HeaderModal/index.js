@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 
@@ -21,6 +22,7 @@ import styles from './style.module.scss';
 const { Paragraph, Title, Text } = Typography;
 
 const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn }) => {
+  const { t: translate } = useTranslation();
   const { logIn } = useGlobalContext();
   const history = useHistory();
   const [form] = Form.useForm();
@@ -134,7 +136,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

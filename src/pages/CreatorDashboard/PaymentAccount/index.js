@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import countryList from 'react-select-country-list';
 import { Select, Typography, Button, message, Row, Col } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import Section from 'components/Section';
 import { useGlobalContext } from 'services/globalContext';
@@ -17,6 +18,7 @@ const { Option } = Select;
 const { creator } = mixPanelEventTags;
 
 const PaymentAccount = () => {
+  const { t: translate } = useTranslation();
   const location = useLocation();
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +43,7 @@ const PaymentAccount = () => {
         openStripeConnect(data.onboarding_url);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
   }, []);
@@ -61,7 +63,7 @@ const PaymentAccount = () => {
       ) {
         relinkStripe();
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
       setIsLoading(false);
     }
@@ -109,7 +111,7 @@ const PaymentAccount = () => {
         relinkStripe();
       } else {
         trackFailedEvent(eventTag, error, { country: selectedCountry });
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
       }
     }

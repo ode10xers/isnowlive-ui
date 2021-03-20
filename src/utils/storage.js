@@ -13,3 +13,12 @@ export const getRememberUserEmail = () => {
   }
   return null;
 };
+
+export const getLanguage = () => {
+  const userLanguage = localStorage.getItem('user-language');
+  return userLanguage || 'en';
+};
+
+export const setLanguage = (lang) => {
+  localStorage.setItem('user-language', lang);
+};

@@ -21,6 +21,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const cashIcon = require('assets/images/cash.png');
 const checkIcon = require('assets/images/check.png');
@@ -41,6 +42,7 @@ const getEarningsAPIs = {
 };
 
 const Earnings = () => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const {
     state: {
@@ -84,7 +86,7 @@ const Earnings = () => {
         setBalance(data);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -144,7 +146,7 @@ const Earnings = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
   };
@@ -159,7 +161,7 @@ const Earnings = () => {
         window.open(data?.onboarding_url, '_self');
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
   }, []);
@@ -183,7 +185,7 @@ const Earnings = () => {
       ) {
         relinkStripe();
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
       setIsLoading(false);
     }
@@ -205,7 +207,7 @@ const Earnings = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoadingPayout(false);
     }
   };

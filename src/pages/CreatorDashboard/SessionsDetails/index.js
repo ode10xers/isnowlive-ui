@@ -34,6 +34,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },
@@ -42,6 +43,7 @@ const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
 
 const SessionsDetails = ({ match }) => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
@@ -60,7 +62,7 @@ const SessionsDetails = ({ match }) => {
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   }, []);
 
@@ -109,7 +111,7 @@ const SessionsDetails = ({ match }) => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
+import { Row, Col, Menu, Button, Typography, Modal, Divider } from 'antd';
 import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -16,12 +17,14 @@ import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
+import SelectLanguage from 'components/SelectLanguage';
 
 const { Text, Paragraph } = Typography;
 
 const NavbarHeader = ({ removePadding = false }) => {
   const history = useHistory();
   const location = useLocation();
+  const { t: translate } = useTranslation();
 
   const [localUserDetails, setLocalUserDetails] = useState(getLocalUserDetails());
   const [authModalVisible, setAuthModalVisible] = useState(false);
@@ -219,6 +222,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                 </span>
               </Col>
             )}
+
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
               <Menu
                 mode="horizontal"
@@ -271,6 +275,9 @@ const NavbarHeader = ({ removePadding = false }) => {
                     >
                       My Dashboard
                     </Menu.Item>
+                    <Menu.Item key="SelectLanguage">
+                      <SelectLanguage />
+                    </Menu.Item>
                     <Menu.Item key="UserName" disabled>
                       <Text strong> Hi, {localUserDetails.first_name} </Text>
                     </Menu.Item>
@@ -282,14 +289,17 @@ const NavbarHeader = ({ removePadding = false }) => {
                   </>
                 ) : (
                   <>
+                    <Menu.Item key="SelectLanguage">
+                      <SelectLanguage />
+                    </Menu.Item>
                     <Menu.Item key="SignIn">
                       <Button block type="primary" className={styles.lightRedBtn} onClick={() => showSignInModal()}>
-                        Sign In
+                        {translate('SIGN_IN')}
                       </Button>
                     </Menu.Item>
                     <Menu.Item key="SignUp">
                       <Button block type="primary" onClick={() => showSignUpModal()}>
-                        Sign Up
+                        {translate('SIGN_UP')}
                       </Button>
                     </Menu.Item>
                   </>
@@ -323,6 +333,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                   </span>
                 </Col>
               </Row>
+
               <Modal
                 style={{ top: 0, margin: 0, maxWidth: '100vw' }}
                 className={styles.mobileMenuModal}
@@ -473,6 +484,10 @@ const NavbarHeader = ({ removePadding = false }) => {
                             <Text strong> Hi, {localUserDetails.first_name} </Text>
                           </Col>
                           <Col xs={24}>
+                            <SelectLanguage />
+                            <Divider />
+                          </Col>
+                          <Col xs={24}>
                             <Button block danger type="default" onClick={() => logOut(history, true)}>
                               Sign Out
                             </Button>
@@ -480,6 +495,10 @@ const NavbarHeader = ({ removePadding = false }) => {
                         </>
                       ) : (
                         <>
+                          <Col xs={24}>
+                            <SelectLanguage />
+                            <Divider />
+                          </Col>
                           <Col xs={12}>
                             <Button
                               block

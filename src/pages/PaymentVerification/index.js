@@ -18,6 +18,7 @@ import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
 import { useGlobalContext } from 'services/globalContext';
 import { isAPISuccess, paymentSource, orderType, productType } from 'utils/helper';
+import { useTranslation } from 'react-i18next';
 
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -27,7 +28,7 @@ const PaymentVerification = () => {
   const {
     state: { userDetails },
   } = useGlobalContext();
-
+  const { t: translate } = useTranslation();
   const location = useLocation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
@@ -157,7 +158,7 @@ const PaymentVerification = () => {
           setIsLoading(false);
         } catch (error) {
           setIsLoading(false);
-          message.error(error.response?.data?.message || 'Something went wrong.');
+          message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         }
       };
       verifyPayment();

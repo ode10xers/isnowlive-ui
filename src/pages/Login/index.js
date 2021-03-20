@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -28,6 +29,7 @@ const { Password } = Input;
 const { user } = mixPanelEventTags;
 
 const Login = ({ history }) => {
+  const { t: translate } = useTranslation();
   const [loginForm] = Form.useForm();
   const [emailPasswordForm] = Form.useForm();
   const { state, logIn } = useGlobalContext();
@@ -70,7 +72,7 @@ const Login = ({ history }) => {
     } catch (error) {
       setIsLoading(false);
       trackFailedEvent(eventTag, error, { email: values.email });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -89,7 +91,7 @@ const Login = ({ history }) => {
     } catch (error) {
       setIsLoading(false);
       trackFailedEvent(eventTag, error, { email: values.email });
-      message.error(error.response?.data?.message || 'Something went wrong.');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -113,17 +115,17 @@ const Login = ({ history }) => {
     view = (
       <>
         <Form form={loginForm} {...formLayout} name="basic" onFinish={onFinish}>
-          <Item label="Email" name="email" rules={validationRules.emailValidation}>
+          <Item label={translate('EMAIL')} name="email" rules={validationRules.emailValidation}>
             <Input />
           </Item>
 
-          <Item label="Password" name="password" rules={validationRules.passwordValidation}>
+          <Item label={translate('PASSWORD')} name="password" rules={validationRules.passwordValidation}>
             <Password />
           </Item>
 
           <Item {...formTailLayout}>
             <Button type="primary" htmlType="submit" loading={isLoading}>
-              Submit
+              {translate('SUBMIT')}
             </Button>
           </Item>
         </Form>
@@ -131,7 +133,7 @@ const Login = ({ history }) => {
         <Row>
           <Col {...formTailLayout.wrapperCol}>
             <a href onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
-              Set a new password
+              {translate('SET_NEW_PASSWORD')}
             </a>
           </Col>
         </Row>
@@ -142,17 +144,17 @@ const Login = ({ history }) => {
       <>
         <Row>
           <Col xs={24} md={{ span: 18, offset: 6 }}>
-            <h1>Set a new password</h1>
+            <h1>{translate('SET_NEW_PASSWORD')}</h1>
           </Col>
         </Row>
 
         <Form form={emailPasswordForm} {...formLayout} name="basic" onFinish={handleSendNewPasswordEmail}>
-          <Item label="Email" name="email" rules={validationRules.emailValidation}>
+          <Item label={translate('EMAIL')} name="email" rules={validationRules.emailValidation}>
             <Input />
           </Item>
           <Item {...formTailLayout}>
             <Button type="primary" htmlType="submit" loading={isLoading}>
-              Send Email
+              {translate('SEND_EMAIL')}
             </Button>
           </Item>
         </Form>
@@ -160,7 +162,7 @@ const Login = ({ history }) => {
         <Row>
           <Col {...formTailLayout.wrapperCol}>
             <a href onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
-              Login with password
+              {translate('LOGIN_WITH_PASSWORD')}
             </a>
           </Col>
         </Row>
