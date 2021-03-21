@@ -22,6 +22,7 @@ const CalendarView = ({
   classes = [],
   customComponents = {},
   step = 60,
+  defaultDate = new Date(),
 }) => {
   let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
   return (
@@ -45,6 +46,7 @@ const CalendarView = ({
           `${e.name} - ${toShortTimeWithPeriod(e.start_time)} - ${toShortTimeWithPeriod(e.end_time)}`
         }
         components={customComponents}
+        date={defaultDate}
       />
     </div>
   );
