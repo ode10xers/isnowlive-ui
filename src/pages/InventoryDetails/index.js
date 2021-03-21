@@ -103,7 +103,7 @@ const InventoryDetails = ({ match, history }) => {
         );
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
   };
 
@@ -182,7 +182,7 @@ const InventoryDetails = ({ match, history }) => {
         setCurrentUser(values);
         message.info('Enter password to register session');
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     }
   };
@@ -216,7 +216,7 @@ const InventoryDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   };
@@ -319,7 +319,7 @@ const InventoryDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       const username = window.location.hostname.split('.')[0];
 
       if (
@@ -362,7 +362,7 @@ const InventoryDetails = ({ match, history }) => {
             setIncorrectPassword(true);
             message.error('Incorrect email or password');
           } else {
-            message.error(error.response?.data?.message || 'Something went wrong');
+            message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
           }
         }
       } else if (!getLocalUserDetails()) {
@@ -372,7 +372,7 @@ const InventoryDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

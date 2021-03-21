@@ -20,6 +20,7 @@ import {
   showErrorModal,
   showVideoPurchaseSuccessModal,
 } from 'components/Modals/modals';
+import { useTranslation } from 'react-i18next';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -43,6 +44,7 @@ const {
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -214,7 +216,7 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -253,11 +255,11 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -291,7 +293,7 @@ const VideoDetails = ({ match }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -306,12 +308,12 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };

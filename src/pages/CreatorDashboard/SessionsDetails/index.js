@@ -118,7 +118,7 @@ const SessionsDetails = ({ match }) => {
   const isDisabled = session?.participants ? session?.participants.length > 0 : false;
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading session details">
+    <Loader loading={isLoading} size="large" text={translate('LOADING_SESSION_DETAILS')}>
       <Row gutter={8} justify="start" className={classNames(styles.mt20, styles.mb20)}>
         {isPastSession ? (
           <>
@@ -133,7 +133,7 @@ const SessionsDetails = ({ match }) => {
                 }
                 icon={<ArrowLeftOutlined />}
               >
-                Past Sessions
+                {translate('PAST_SESSIONS')}
               </Button>
             </Col>
           </>
@@ -150,7 +150,7 @@ const SessionsDetails = ({ match }) => {
                 }
                 icon={<ArrowLeftOutlined />}
               >
-                Upcoming Sessions
+                {translate('UPCOMING_SESSIONS')}
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
@@ -159,12 +159,12 @@ const SessionsDetails = ({ match }) => {
                 icon={<GlobalOutlined />}
                 onClick={() => trackAndNavigate(publicUrl, creator.click.sessions.details.publicPage, true)}
               >
-                Public Page
+                {translate('PUBLIC_PAGE')}
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
               <div className={styles.headButton}>
-                <Share label="Share Session" title={session?.name} shareUrl={publicUrl} />
+                <Share label={translate('SHARE_SESSIONS')} title={session?.name} shareUrl={publicUrl} />
               </div>
             </Col>
           </>
@@ -178,18 +178,21 @@ const SessionsDetails = ({ match }) => {
                 <Title level={5}>{session?.name}</Title>
               </Col>
               <Col span={24}>
-                <Title level={5}>Session Details</Title>
+                <Title level={5}>{translate('SESSION_DETAILS')}</Title>
               </Col>
               <Col xs={24} md={12}>
-                {layout('Session Day and Date', toLongDateWithDay(session?.session_date))}
-                {layout('Session Type', session?.group ? 'Group Session' : '1-on-1 Session')}
-                {layout('Session Duration', getDuration(session?.start_time, session?.end_time))}
-              </Col>
-              <Col xs={24} md={12}>
-                {layout('Session Attendees', `${session?.num_participants} / ${session?.max_participants}`)}
-                {layout('Session Price', `${session?.price} ${session?.currency.toUpperCase()} `)}
+                {layout(translate('SESSION_DAY_DATE'), toLongDateWithDay(session?.session_date))}
                 {layout(
-                  'Session Earning',
+                  translate('SESSION_TYPE'),
+                  session?.group ? translate('GROUP_SESSION') : translate('1_TO_1_SESSION')
+                )}
+                {layout(translate('SESSION_DURATION'), getDuration(session?.start_time, session?.end_time))}
+              </Col>
+              <Col xs={24} md={12}>
+                {layout(translate('SESSION_ATTENDEES'), `${session?.num_participants} / ${session?.max_participants}`)}
+                {layout(translate('SESSION_PRICE'), `${session?.price} ${session?.currency.toUpperCase()} `)}
+                {layout(
+                  translate('SESSION_EARNING'),
                   `${
                     session.participants
                       ? session.participants.reduce((item, participant) => item + (participant.fee_paid || 0), 0)
@@ -223,7 +226,7 @@ const SessionsDetails = ({ match }) => {
                         trackAndNavigate(session?.start_url, creator.click.sessions.details.startSession, true)
                       }
                     >
-                      Start Session
+                      {translate('START_SESSION')}
                     </Button>
                   </Col>
                   <Col xs={12} lg={24}>
@@ -244,7 +247,7 @@ const SessionsDetails = ({ match }) => {
                         )
                       }
                     >
-                      Edit Session
+                      {translate('EDIT_SESSION')}
                     </Button>
                   </Col>
                   <Col xs={12} lg={24}>
@@ -257,15 +260,15 @@ const SessionsDetails = ({ match }) => {
                         trackSimpleEvent(creator.click.sessions.details.sendEmail);
                       }}
                     >
-                      Send Email
+                      {translate('SEND_EMAIL')}
                     </Button>
                   </Col>
                   <Col xs={12} lg={24}>
                     <Popconfirm
-                      title="Do you want to cancel session?"
+                      title={translate('CANCEL_SESSIONS_QUESTION')}
                       icon={<DeleteOutlined className={styles.danger} />}
-                      okText="Yes"
-                      cancelText="No"
+                      okText={translate('YES')}
+                      cancelText={translate('NO')}
                       disabled={isDisabled}
                       onConfirm={() => deleteInventory(session?.inventory_id)}
                     >
@@ -277,7 +280,7 @@ const SessionsDetails = ({ match }) => {
                         className={styles.actionButton}
                         icon={<CloseCircleOutlined />}
                       >
-                        Cancel Session
+                        {translate('CANCEL_SESSION')}
                       </Button>
                     </Popconfirm>
                   </Col>
@@ -287,7 +290,7 @@ const SessionsDetails = ({ match }) => {
               <Col xs={24} md={18} className={styles.mt20}>
                 {session?.description && (
                   <>
-                    <Title level={5}>Session Information</Title>
+                    <Title level={5}>{translate('SESSION_INFORMATION')}</Title>
                     <Text type="secondary" level={5}>
                       {ReactHtmlParser(session?.description)}
                     </Text>
@@ -296,7 +299,7 @@ const SessionsDetails = ({ match }) => {
                 {session?.prerequisites && (
                   <>
                     <Title level={5} className={styles.mt50}>
-                      Session Prerequisite
+                      {translate('SESSION_PREREQUISITE')}
                     </Title>
                     <Text type="secondary" level={5}>
                       {ReactHtmlParser(session?.prerequisites)}

@@ -68,7 +68,7 @@ const PaymentVerification = () => {
               if (isAPISuccess(userPassResponse.status)) {
                 usersPass = userPassResponse.data.active.filter((userPass) => userPass.pass_order_id === order_id)[0];
               } else {
-                showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
+                showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), "Failed to fetch user's pass list");
               }
 
               if (inventory_id) {
@@ -102,7 +102,7 @@ const PaymentVerification = () => {
                   ) {
                     showAlreadyBookedModal(productType.CLASS, username);
                   } else {
-                    showErrorModal('Something went wrong', error.response?.data?.message);
+                    showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
                   }
                 }
               } else if (video_id) {
@@ -128,7 +128,7 @@ const PaymentVerification = () => {
                   if (error.response?.data?.message === 'user already has a confirmed order for this video') {
                     showAlreadyBookedModal(productType.VIDEO, username);
                   } else {
-                    showErrorModal('Something went wrong', error.response?.data?.message);
+                    showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
                   }
                 }
               } else {
@@ -164,7 +164,7 @@ const PaymentVerification = () => {
       verifyPayment();
     } else {
       setIsLoading(false);
-      showErrorModal('Something went wrong');
+      showErrorModal(translate('SOMETHING_WENT_WRONG'));
     }
   }, [order_id, transaction_id, order_type, inventory_id, video_id, history, userDetails]);
 

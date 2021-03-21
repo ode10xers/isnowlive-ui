@@ -52,7 +52,7 @@ const ManageSessions = () => {
 
       if (data) {
         trackSuccessEvent(eventTag, { session_id: sessionId });
-        message.success('Session published successfully!');
+        message.success(translate('SESSION_PUBLISHED_SUCCESS'));
         getSessionsList();
       }
     } catch (error) {
@@ -72,7 +72,7 @@ const ManageSessions = () => {
 
       if (data) {
         trackSuccessEvent(eventTag, { session_id: sessionId });
-        message.success('Session is now unpublished!');
+        message.success(translate('SESSION_UNPUBLISHED_SUCCESS'));
         getSessionsList();
       }
     } catch (error) {
@@ -91,7 +91,7 @@ const ManageSessions = () => {
       await apis.session.deleteSession(sessionId);
 
       trackSuccessEvent(eventTag, { session_id: sessionId });
-      message.success('Session deleted successfully!');
+      message.success(translate('SESSION_DELETE_SUCCESS'));
       getSessionsList();
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
@@ -123,7 +123,7 @@ const ManageSessions = () => {
 
   let sessionColumns = [
     {
-      title: 'Session Name',
+      title: translate('SESSION_NAME'),
       key: 'name',
       render: (text, record) => {
         return {
@@ -143,21 +143,21 @@ const ManageSessions = () => {
       },
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       dataIndex: 'price',
       key: 'price',
       width: '85px',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
     },
     {
-      title: 'Type',
+      title: translate('TYPE'),
       dataIndex: 'type',
       key: 'type',
       width: '80px',
-      render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
+      render: (text, record) => <Text>{record.group ? translate('GROUP') : translate('1_TO_1')}</Text>,
     },
     {
-      title: 'Session Date',
+      title: translate('SESSION_DATE'),
       dataIndex: 'session_date',
       key: 'session_date',
       render: (text, record) => (
@@ -175,14 +175,14 @@ const ManageSessions = () => {
       ),
     },
     {
-      title: 'Actions',
+      title: translate('ACTIONS'),
       align: 'right',
       width: '200px',
       render: (text, record) => {
         return (
           <Row justify="end" gutter={8}>
             <Col xs={24} md={5}>
-              <Tooltip title="Edit">
+              <Tooltip title={translate('EDIT')}>
                 <Button
                   className={styles.detailsButton}
                   type="text"
@@ -197,7 +197,7 @@ const ManageSessions = () => {
               </Tooltip>
             </Col>
             <Col xs={24} md={5}>
-              <Tooltip title="Copy Session Link">
+              <Tooltip title={translate('COPY_SESSION_LINK')}>
                 <Button
                   type="text"
                   className={styles.detailsButton}
@@ -207,25 +207,25 @@ const ManageSessions = () => {
               </Tooltip>
             </Col>
             <Col xs={24} md={8}>
-              <Tooltip title={`${record.is_active ? 'Hide' : 'Unhide'} Session`}>
+              <Tooltip title={`${record.is_active ? translate('HIDE') : translate('SHOW')} ${translate('SESSION')}`}>
                 {!record.is_active ? (
                   <Button type="text" className={styles.sucessButton} onClick={() => publishSession(record.session_id)}>
-                    Show
+                    {translate('SHOW')}
                   </Button>
                 ) : (
                   <Button type="text" danger onClick={() => unpublishSession(record.session_id)}>
-                    Hide
+                    {translate('HIDE')}
                   </Button>
                 )}
               </Tooltip>
             </Col>
             <Col xs={24} md={5}>
-              <Tooltip title="Delete Session">
+              <Tooltip title={translate('DELETE_SESSION')}>
                 <Popconfirm
-                  title="Do you want to delete session?"
+                  title={translate('DELETE_SESSION_QUESTION')}
                   icon={<DeleteOutlined className={styles.danger} />}
-                  okText="Yes"
-                  cancelText="No"
+                  okText={translate('YES')}
+                  cancelText={translate('NO')}
                   onConfirm={() => deleteSession(record.session_id)}
                 >
                   <Button danger type="text" icon={<DeleteOutlined />} />
@@ -286,28 +286,31 @@ const ManageSessions = () => {
           <>
             {!item.is_active ? (
               <Button type="text" className={styles.sucessButton} onClick={() => publishSession(item.session_id)}>
-                Show
+                {translate('SHOW')}
               </Button>
             ) : (
               <Button type="text" danger onClick={() => unpublishSession(item.session_id)}>
-                Hide
+                {translate('HIDE')}
               </Button>
             )}
           </>,
           <Popconfirm
-            title="Do you want to delete session?"
+            title={translate('DELETE_SESSION_QUESTION')}
             icon={<DeleteOutlined className={styles.danger} />}
-            okText="Yes"
-            cancelText="No"
+            okText={translate('YES')}
+            cancelText={translate('NO')}
             onConfirm={() => deleteSession(item.session_id)}
           >
             <Button danger type="text" icon={<DeleteOutlined />} />
           </Popconfirm>,
         ]}
       >
-        {layout('Type', <Text>{item.group ? 'Group Session' : '1-to-1 Session'}</Text>)}
         {layout(
-          'Date',
+          translate('TYPE'),
+          <Text>{item.group ? translate('GROUP_SESSION') : translate('1_TO_1_SESSION')}</Text>
+        )}
+        {layout(
+          translate('DATE'),
           <>
             {item.recurring ? (
               <Text>
@@ -319,7 +322,7 @@ const ManageSessions = () => {
           </>
         )}
         {layout(
-          'Attendee',
+          translate('ATTENDEE'),
           <Text>
             {item.total_bookings || 0} {'/'} {item.max_participants}
           </Text>
@@ -330,15 +333,15 @@ const ManageSessions = () => {
 
   return (
     <div className={styles.box}>
-      <Title level={4}>Manage Sessions</Title>
+      <Title level={4}>{translate('MANAGE_SESSIONS')}</Title>
       <Collapse>
-        <Panel header={<Title level={5}> Normal Sessions </Title>} key="Normal">
+        <Panel header={<Title level={5}> {translate('NORMAL_SESSIONS')} </Title>} key="Normal">
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
+            <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
               {sessions?.filter((session) => !session.is_course).length > 0 ? (
                 sessions?.filter((session) => !session.is_course).map(renderSessionItem)
               ) : (
-                <div className="text-empty"> No Normal Sessions Found </div>
+                <div className="text-empty"> {translate('NO_NORMAL_SESSIONS_FOUND')} </div>
               )}
             </Loader>
           ) : (
@@ -349,13 +352,13 @@ const ManageSessions = () => {
             />
           )}
         </Panel>
-        <Panel header={<Title level={5}> Course Sessions </Title>} key="Course">
+        <Panel header={<Title level={5}> {translate('COURSE_SESSIONS')} </Title>} key="Course">
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
+            <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
               {sessions?.filter((session) => session.is_course).length > 0 ? (
                 sessions?.filter((session) => session.is_course).map(renderSessionItem)
               ) : (
-                <div className="text-empty"> No Course Sessions Found </div>
+                <div className="text-empty"> {translate('NO_COURSE_SESSIONS_FOUND')} </div>
               )}
             </Loader>
           ) : (

@@ -9,6 +9,7 @@ import {
   CopyOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 
@@ -30,6 +31,7 @@ const {
 } = dateUtil;
 
 const ClassPassList = () => {
+  const { t: translate } = useTranslation();
   const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,11 +63,11 @@ const ClassPassList = () => {
       const { status } = await apis.passes.publishPass(passId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Pass Published');
+        showSuccessModal(translate('PASS_PUBLISHED'));
         getPassesForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
 
     setIsLoading(false);
@@ -78,11 +80,11 @@ const ClassPassList = () => {
       const { status } = await apis.passes.unpublishPass(passId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Pass Unpublished');
+        showSuccessModal(translate('PASS_UNPUBLISHED'));
         getPassesForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
 
     setIsLoading(false);
@@ -114,7 +116,10 @@ const ClassPassList = () => {
         );
       }
     } catch (error) {
-      showErrorModal('Failed fetching Passes', error.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        translate('FAILED_FETCHING_PASSES'),
+        error.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
     setIsLoading(false);
   }, []);
@@ -149,7 +154,7 @@ const ClassPassList = () => {
 
   const passesColumns = [
     {
-      title: 'Pass Name',
+      title: translate('PASS_NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '35%',
@@ -170,23 +175,23 @@ const ClassPassList = () => {
       },
     },
     {
-      title: 'Credit Count',
+      title: translate('CREDIT_COUNT'),
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credits'),
+      render: (text, record) => (record.limited ? `${text} ${translate('CREDITS')}` : translate('UNLIMITED_CREDITS')),
     },
     {
-      title: 'Validity',
+      title: translate('VALIDITY'),
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
       width: '12%',
-      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) => `${text} ${translate('DAY')}${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       dataIndex: 'price',
       key: 'price',
       align: 'left',
@@ -199,7 +204,7 @@ const ClassPassList = () => {
       render: (text, record) => (
         <Row gutter={8}>
           <Col xs={24} md={4}>
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -209,7 +214,7 @@ const ClassPassList = () => {
             </Tooltip>
           </Col>
           <Col xs={24} md={4}>
-            <Tooltip title="Copy Pass Link">
+            <Tooltip title={translate('COPY_PASS_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -220,15 +225,15 @@ const ClassPassList = () => {
           </Col>
           <Col xs={24} md={5}>
             {record.is_published ? (
-              <Tooltip title="Hide Session">
+              <Tooltip title={translate('HIDE_SESSION')}>
                 <Button type="link" danger onClick={() => unpublishPass(record.id)}>
-                  Hide
+                  {translate('HIDE_SESSION')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Session">
+              <Tooltip title={translate('SHOW_SESSION')}>
                 <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             )}
@@ -236,11 +241,11 @@ const ClassPassList = () => {
           <Col xs={24} md={6}>
             {expandedRowKeys.includes(record.id) ? (
               <Button type="link" onClick={() => collapseRow(record.id)}>
-                {`${record.buyers.length} Buyers `} <UpOutlined />
+                {`${record.buyers.length} ${translate('BUYERS')} `} <UpOutlined />
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(record.id)}>
-                {`${record.buyers.length} Buyers `} <DownOutlined />
+                {`${record.buyers.length} ${translate('BUYERS')} `} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -251,20 +256,20 @@ const ClassPassList = () => {
 
   const buyersColumns = [
     {
-      title: 'Name',
+      title: translate('NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '30%',
     },
     {
-      title: 'Date of Purchase',
+      title: translate('DATE_OF_PURCHASE'),
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
       width: '30%',
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
-      title: 'Net Price',
+      title: translate('NET_PRICE'),
       dataIndex: 'price_paid',
       key: 'price_paid',
       render: (text, record) => `${record.price_paid} ${record.currency?.toUpperCase()}`,
@@ -292,7 +297,9 @@ const ClassPassList = () => {
             <Title level={5}> {subscriber.name} </Title>
           </Col>
           <Col xs={24}>
-            <Text> Purchased at {toDateAndTime(subscriber.date_of_purchase)} </Text>
+            <Text>
+              {translate('PURCHASED_AT')} {toDateAndTime(subscriber.date_of_purchase)}{' '}
+            </Text>
           </Col>
           <Col xs={24}>
             <Text> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
@@ -322,7 +329,7 @@ const ClassPassList = () => {
             </div>
           }
           actions={[
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -330,7 +337,7 @@ const ClassPassList = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Copy Pass Link">
+            <Tooltip title={translate('COPY_PASS_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -339,15 +346,15 @@ const ClassPassList = () => {
               />
             </Tooltip>,
             pass.is_published ? (
-              <Tooltip title="Hide Pass">
+              <Tooltip title={translate('HIDE_PASS')}>
                 <Button type="link" danger onClick={() => unpublishPass(pass.id)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Pass">
+              <Tooltip title={translate('SHOW_PASS')}>
                 <Button type="link" className={styles.successBtn} onClick={() => publishPass(pass.id)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             ),
@@ -358,9 +365,12 @@ const ClassPassList = () => {
             ),
           ]}
         >
-          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
-          {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
+          {layout(
+            translate('CREDIT_COUNT'),
+            <Text>{pass.limited ? `${pass.class_count} ${translate('CREDITS')}` : translate('UNLIMITED_CREDITS')}</Text>
+          )}
+          {layout(translate('VALIDITY'), <Text>{`${pass.validity} ${translate('DAYS')}`}</Text>)}
+          {layout(translate('PRICE'), <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>
@@ -374,21 +384,21 @@ const ClassPassList = () => {
       <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={14}>
-          <Title level={4}> Passes </Title>
+          <Title level={4}> {translate('PASSES')} </Title>
         </Col>
         <Col xs={12} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            {expandedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
           </Button>
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>
-            Create New Pass
+            {translate('CREATE_NEW_PASS')}
           </Button>
         </Col>
         <Col xs={24}>
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading Passes">
+            <Loader loading={isLoading} size="large" text={translate('LOADING_PASSES')}>
               <Row gutter={[8, 16]}>{passes.map(renderPassItem)}</Row>
             </Loader>
           ) : (

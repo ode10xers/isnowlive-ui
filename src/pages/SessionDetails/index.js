@@ -136,7 +136,7 @@ const SessionDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
   };
 
@@ -218,7 +218,7 @@ const SessionDetails = ({ match, history }) => {
         setCurrentUser(values);
         message.info('Enter password to register session');
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     }
   };
@@ -240,7 +240,7 @@ const SessionDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   };
@@ -329,7 +329,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -375,7 +375,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -399,7 +399,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -431,7 +431,7 @@ const SessionDetails = ({ match, history }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -466,7 +466,7 @@ const SessionDetails = ({ match, history }) => {
             setIncorrectPassword(true);
             message.error('Incorrect email or password');
           } else {
-            message.error(error.response?.data?.message || 'Something went wrong');
+            message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
           }
         }
       } else if (!getLocalUserDetails()) {
@@ -476,7 +476,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 

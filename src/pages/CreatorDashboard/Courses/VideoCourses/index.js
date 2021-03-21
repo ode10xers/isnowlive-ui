@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import Table from 'components/Table';
 
@@ -20,6 +21,7 @@ const {
 } = dateUtil;
 
 const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCourse }) => {
+  const { t: translate } = useTranslation();
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
 
@@ -70,7 +72,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
 
   const generateVideoCourseColumns = (published) => [
     {
-      title: 'Course Name',
+      title: translate('COURSE_NAME'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => {
@@ -90,19 +92,19 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       },
     },
     {
-      title: 'Total Videos',
+      title: translate('TOTAL_VIDEO'),
       width: '120px',
-      render: (text, record) => `${record?.videos?.length} Videos`,
+      render: (text, record) => `${record?.videos?.length} ${translate('VIDEOS')}`,
     },
     {
-      title: 'Duration',
+      title: translate('DURATION'),
       dataIndex: 'validity',
       key: 'validity',
       width: '100px',
-      render: (text, record) => `${record?.validity} days`,
+      render: (text, record) => `${record?.validity} ${translate('DAYS')}`,
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       dataIndex: 'price',
       key: 'price',
       width: '85px',
@@ -111,11 +113,11 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     {
       title: published ? (
         <Button shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedPublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
         </Button>
       ) : (
         <Button shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedUnpublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
         </Button>
       ),
       width: '250px',
@@ -123,7 +125,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       render: (text, record) => (
         <Row gutter={8} justify="end">
           <Col xs={4}>
-            <Tooltip title="Edit Course">
+            <Tooltip title={translate('EDIT_COURSES')}>
               <Button
                 block
                 type="text"
@@ -133,21 +135,21 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             </Tooltip>
           </Col>
           <Col xs={4}>
-            <Tooltip title="Copy Course Link">
+            <Tooltip title={translate('COPY_COURSE_LINK')}>
               <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
             </Tooltip>
           </Col>
           <Col xs={6}>
             {record.is_published ? (
-              <Tooltip title="Hide Course">
+              <Tooltip title={translate('HIDE_COURSE')}>
                 <Button danger block type="link" onClick={() => unpublishCourse(record)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Course">
+              <Tooltip title={translate('SHOW_COURSE')}>
                 <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             )}
@@ -180,30 +182,30 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
 
   const buyersColumns = [
     {
-      title: 'Name',
+      title: translate('NAME'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Date of Purchase',
+      title: translate('DATE_OF_PURCHASE'),
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
       width: '170px',
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
-      title: 'Net Price',
+      title: translate('NET_PRICE'),
       dataIndex: 'price_paid',
       key: 'price_paid',
       width: '100px',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.price_paid}`,
     },
     {
-      title: 'Discount Code',
+      title: translate('DISCOUNT_CODE'),
       dataIndex: 'discount',
       key: 'discount',
       width: '180px',
-      render: (text, record) => record.discount?.code || 'No Discount',
+      render: (text, record) => record.discount?.code || translate('NO_DISCOUNT'),
     },
   ];
 
@@ -232,9 +234,15 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     return (
       <Col xs={24} key={`${subscriber.name}_${subscriber.date_of_purchase}`}>
         <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {subscriber.name} </Title>}>
-          {layout('Buy Date', toDateAndTime(subscriber.date_of_purchase))}
-          {layout('Price', <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>)}
-          {layout('Discount Code', <Text strong> {subscriber.discount?.code || 'No Discount'} </Text>)}
+          {layout(translate('BUY_DATE'), toDateAndTime(subscriber.date_of_purchase))}
+          {layout(
+            translate('PRICE'),
+            <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
+          )}
+          {layout(
+            translate('DISCOUNT_CODE'),
+            <Text strong> {subscriber.discount?.code || translate('NO_DISCOUNT')} </Text>
+          )}
         </Card>
       </Col>
     );
@@ -261,7 +269,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             </div>
           }
           actions={[
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -269,7 +277,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
-            <Tooltip title="Copy Course Link">
+            <Tooltip title={translate('COPY_COURSE_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -278,15 +286,15 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
               />
             </Tooltip>,
             course.is_published ? (
-              <Tooltip title="Hide Course">
+              <Tooltip title={translate('HIDE_COURSE')}>
                 <Button type="link" danger onClick={() => unpublishCourse(course)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Course">
+              <Tooltip title={translate('SHOW_COURSE')}>
                 <Button type="link" className={styles.successBtn} onClick={() => publishCourse(course)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             ),
@@ -303,9 +311,9 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             ),
           ]}
         >
-          {layout('Total Videos', <Text>{course.videos?.length} videos</Text>)}
-          {layout('Duration', <Text> {course?.validity} days</Text>)}
-          {layout('Price', <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
+          {layout(translate('TOTAL_VIDEO'), <Text>{course.videos?.length} videos</Text>)}
+          {layout(translate('DURATION'), <Text> {course?.validity} days</Text>)}
+          {layout(translate('PRICE'), <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course?.id) && (
@@ -322,12 +330,13 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     <div>
       {videoCourses?.length > 0 ? (
         <Collapse>
-          <Panel header={<Title level={5}> Published </Title>} key="published">
+          <Panel header={<Title level={5}> {translate('PUBLISHED')} </Title>} key="published">
             {isMobileDevice ? (
               <Row gutter={[8, 16]}>
                 <Col xs={24}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-                    {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                    {expandedPublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')}{' '}
+                    {translate('ALL')}
                   </Button>
                 </Col>
                 {videoCourses?.filter((videoCourse) => videoCourse.is_published).map(renderCourseItem)}
@@ -348,12 +357,13 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
               />
             )}
           </Panel>
-          <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+          <Panel header={<Title level={5}> {translate('UNPUBLISHED')} </Title>} key="unpublished">
             {isMobileDevice ? (
               <Row gutter={[8, 16]}>
                 <Col xs={24}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-                    {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                    {expandedUnpublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')}{' '}
+                    {translate('ALL')}
                   </Button>
                 </Col>
                 {videoCourses?.filter((videoCourse) => !videoCourse.is_published).map(renderCourseItem)}
@@ -376,7 +386,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
           </Panel>
         </Collapse>
       ) : (
-        <Empty description="No Courses found" />
+        <Empty description={translate('NO_COURSE_FOUND')} />
       )}
     </div>
   );

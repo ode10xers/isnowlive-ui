@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, message } from 'antd';
 import classNames from 'classnames';
 import { loadStripe } from '@stripe/stripe-js';
+import { useTranslation } from 'react-i18next';
 
 import config from 'config';
 import apis from 'apis';
@@ -24,6 +25,7 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 const { Title, Text } = Typography;
 
 const PassDetails = ({ match, history }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -121,13 +123,13 @@ const PassDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
   const createOrder = async (userEmail) => {
     if (!pass) {
-      showErrorModal('Something went wrong', 'Invalid Pass Selected');
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), 'Invalid Pass Selected');
       return;
     }
 
@@ -152,7 +154,7 @@ const PassDetails = ({ match, history }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS, username);
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     }
   };

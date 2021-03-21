@@ -150,7 +150,7 @@ const SessionsInventories = ({ match }) => {
       Modal.success({
         closable: true,
         maskClosable: true,
-        title: 'Refund Successful',
+        title: translate('REFUND_SUCCESSFULLY'),
       });
       getStaffSession(match?.params?.session_type);
     } catch (error) {
@@ -158,7 +158,7 @@ const SessionsInventories = ({ match }) => {
       Modal.error({
         closable: true,
         maskClosable: true,
-        title: 'An Error Occured',
+        title: translate('AN_ERROR_OCCURRED'),
         content: error.response?.data?.message || translate('SOMETHING_WENT_WRONG'),
       });
     }
@@ -173,17 +173,18 @@ const SessionsInventories = ({ match }) => {
             placement="topRight"
             title={
               <Text>
-                Do you want to refund this session? <br />
-                You will get <strong>{` ${data.currency.toUpperCase()} ${data.refund_amount} `}</strong>
-                back.
+                {translate('DO_YOU_WANT_TO_REFUND')} <br />
+                {translate('DO_YOU_WANT_TO_REFUND_TEXT1')}{' '}
+                <strong>{` ${data.currency.toUpperCase()} ${data.refund_amount} `}</strong>
+                {translate('DO_YOU_WANT_TO_REFUND_TEXT2')}
               </Text>
             }
             onConfirm={() => cancelOrderForSession(data.order_id)}
-            okText="Yes, Refund Session"
-            cancelText="No"
+            okText={translate('DO_YOU_WANT_TO_REFUND_CONFIRM')}
+            cancelText={translate('NO')}
           >
             <Button type="text" danger>
-              Cancel
+              {translate('CANCEL')}
             </Button>
           </Popconfirm>
         );
@@ -193,21 +194,23 @@ const SessionsInventories = ({ match }) => {
             arrowPointAtCenter
             placement="topRight"
             trigger="click"
-            title="Refund Time Limit Reached"
+            title={translate('DO_YOU_WANT_TO_REFUND_ERROR_TITLE')}
             content={
               <Text>
-                Sorry, as per the cancellation policy of <br />
-                this session,
+                {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT1')}
+                <br />
+                {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT2')}
                 <strong>
-                  it can only be cancelled <br />
-                  {data.refund_before_hours} hours
+                  {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT3')}
+                  <br />
+                  {data.refund_before_hours} {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT4')}
                 </strong>
-                before the session starts.
+                {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT5')}
               </Text>
             }
           >
             <Button type="text" danger>
-              Cancel
+              {translate('CANCEL')}
             </Button>
           </Popover>
         );
@@ -218,16 +221,17 @@ const SessionsInventories = ({ match }) => {
           arrowPointAtCenter
           placement="topRight"
           trigger="click"
-          title="Session Cannot be Refunded"
+          title={translate('SESSION_CANNOT_REFUND_ERROR_TITLE')}
           content={
             <Text>
-              Sorry, this session is not refundable based <br />
-              on the creator's settings
+              {translate('SESSION_CANNOT_REFUND_ERROR_TEXT1')}
+              <br />
+              {translate('SESSION_CANNOT_REFUND_ERROR_TEXT2')}
             </Text>
           }
         >
           <Button type="text" danger>
-            Cancel
+            {translate('CANCEL')}
           </Button>
         </Popover>
       );
@@ -271,7 +275,7 @@ const SessionsInventories = ({ match }) => {
 
   let dateColumns = [
     {
-      title: 'Session Name',
+      title: translate('SESSION_NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '150px',
@@ -305,35 +309,35 @@ const SessionsInventories = ({ match }) => {
       },
     },
     {
-      title: 'Type',
+      title: translate('TYPE'),
       dataIndex: 'type',
       key: 'type',
       width: '72px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Day',
+      title: translate('DAY'),
       key: 'days',
       dataIndex: 'days',
       width: '150px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Duration',
+      title: translate('DURATION'),
       dataIndex: 'duration',
       key: 'duration',
       width: '90px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Time',
+      title: translate('TIME'),
       dataIndex: 'time',
       key: 'time',
       width: '180px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Actions',
+      title: translate('ACTIONS'),
       // width: isPast ? '56px' : '360px',
       render: (text, record) => {
         if (record.is_date) {
@@ -344,7 +348,7 @@ const SessionsInventories = ({ match }) => {
           <Row justify="start">
             <Col>
               <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
-                Details
+                {translate('DETAILS')}
               </Button>
             </Col>
           </Row>
@@ -353,7 +357,7 @@ const SessionsInventories = ({ match }) => {
             {!isPast && (
               <Col md={24} xl={6}>
                 <AddToCalendarButton
-                  buttonText="Add to Cal"
+                  buttonText={translate('ADD_TO_CAL')}
                   eventData={{
                     ...record,
                     page_url: `${generateUrlFromUsername(record?.username)}/e/${record.inventory_id}`,
@@ -371,7 +375,7 @@ const SessionsInventories = ({ match }) => {
                     disabled={!record.join_url}
                     onClick={() => trackAndJoinSession(record)}
                   >
-                    Join
+                    {translate('JOIN')}
                   </Button>
                 </Col>
                 <Col md={24} lg={24} xl={4}>
@@ -381,14 +385,14 @@ const SessionsInventories = ({ match }) => {
             )}
             <Col md={24} lg={24} xl={4}>
               <Button type="link" onClick={() => openSessionInventoryDetails(record)}>
-                Details
+                {translate('DETAILS')}
               </Button>
             </Col>
 
             {!isPast && (
               <Col md={24} lg={24} xl={6}>
                 <Button type="text" className={styles.warning} onClick={() => rescheduleSession(record)}>
-                  Reschedule
+                  {translate('RESCHEDULE')}
                 </Button>
               </Col>
             )}
@@ -435,7 +439,7 @@ const SessionsInventories = ({ match }) => {
           isPast
             ? [
                 <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(item)}>
-                  Details
+                  {translate('DETAILS')}
                 </Button>,
               ]
             : [
@@ -445,25 +449,25 @@ const SessionsInventories = ({ match }) => {
                   onClick={() => trackAndJoinSession(item)}
                   className={styles.success}
                 >
-                  Join
+                  {translate('JOIN')}
                 </Button>,
                 renderRefundPopup(item),
                 <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
-                  Reschedule
+                  {translate('RESCHEDULE')}
                 </Button>,
               ]
         }
       >
         <div onClick={() => openSessionInventoryDetails(item)}>
-          {layout('Type', <Text>{item.type}</Text>)}
-          {layout('Duration', <Text>{item.duration}</Text>)}
-          {layout('Day', <Text>{item.days}</Text>)}
-          {layout('Time', <Text>{item.time}</Text>)}
+          {layout(translate('TYPE'), <Text>{item.type}</Text>)}
+          {layout(translate('DURATION'), <Text>{item.duration}</Text>)}
+          {layout(translate('DAY'), <Text>{item.days}</Text>)}
+          {layout(translate('TIME'), <Text>{item.time}</Text>)}
         </div>
         <div className={styles.mt20}>
           <AddToCalendarButton
             type="button"
-            buttonText="Add to My Calendar"
+            buttonText={translate('ADD_TO_MY_CAL')}
             eventData={{
               ...item,
               page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
@@ -486,20 +490,22 @@ const SessionsInventories = ({ match }) => {
     <div className={styles.box}>
       <Row gutter={[8, 8]}>
         <Col xs={24} md={18} lg={20}>
-          <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
+          <Title level={4}>
+            {isPast ? translate('PAST') : translate('UPCOMING')} {translate('SESSIONS')}
+          </Title>
           <Radio.Group value={view} onChange={handleViewChange}>
-            <Radio.Button value="list">List</Radio.Button>
-            <Radio.Button value="calendar">Calendar</Radio.Button>
+            <Radio.Button value="list">{translate('LIST')}</Radio.Button>
+            <Radio.Button value="calendar">{translate('CALENDAR')}</Radio.Button>
           </Radio.Group>
         </Col>
         <Col xs={24} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            {expandedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
           </Button>
         </Col>
         <Col xs={24}>
           {view === 'calendar' ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
+            <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
               {sessions.length > 0 ? (
                 <CalendarView
                   inventories={sessions}
@@ -508,7 +514,7 @@ const SessionsInventories = ({ match }) => {
                   calendarView={calendarView}
                 />
               ) : (
-                <Empty />
+                <Empty description={translate('NO_DATA')} />
               )}
             </Loader>
           ) : (
@@ -516,9 +522,9 @@ const SessionsInventories = ({ match }) => {
               {isMobileDevice ? (
                 <>
                   <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                    Click on the card to show session details
+                    {translate('SHOW_SESSION_DETAILS_CARD_TEXT')}
                   </Text>
-                  <Loader loading={isLoading} size="large" text="Loading sessions">
+                  <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
                     {sessions.length > 0 ? (
                       <Table
                         columns={mobileTableColumns}
@@ -553,7 +559,9 @@ const SessionsInventories = ({ match }) => {
                         }}
                       />
                     ) : (
-                      <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                      <div className="text-empty">
+                        {translate('NO')} {isPast ? translate('PAST') : translate('UPCOMING')} {translate('SESSIONS')}
+                      </div>
                     )}
                   </Loader>
                 </>
@@ -580,7 +588,9 @@ const SessionsInventories = ({ match }) => {
                   }}
                 />
               ) : (
-                <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                <div className="text-empty">
+                  {translate('NO')} {isPast ? translate('PAST') : translate('UPCOMING')} {translate('SESSIONS')}
+                </div>
               )}
             </>
           )}

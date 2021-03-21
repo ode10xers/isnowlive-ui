@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import { Row, Col, Button, Checkbox, Typography } from 'antd';
 
 import apis from 'apis';
@@ -14,6 +14,7 @@ import styles from './styles.module.scss';
 const { Title } = Typography;
 
 const NotificationSettings = () => {
+  const { t: translate } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [checkedEmailOptions, setCheckedEmailOptions] = useState([]);
@@ -35,7 +36,10 @@ const NotificationSettings = () => {
         setCheckedEmailOptions(checkedKeys);
       }
     } catch (error) {
-      showErrorModal('Failed to fetch user preferences', error.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        translate('FAILED_TO_FETCH_USER_PREFERENCES'),
+        error.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
 
     setIsLoading(false);
@@ -51,10 +55,13 @@ const NotificationSettings = () => {
       const { status } = await apis.user.setCreatorUserPreferences(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('User Preferences Updated Successfully');
+        showSuccessModal(translate('UPDATED_USER_PREFERENCES_SUCCESS'));
       }
     } catch (error) {
-      showErrorModal('Failed updating user preferences', error.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        translate('UPDATED_USER_PREFERENCES_FAILED'),
+        error.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
 
     setSubmitting(false);
@@ -64,27 +71,27 @@ const NotificationSettings = () => {
     getCreatorNotificationPreferences();
   }, [getCreatorNotificationPreferences]);
 
-  const generateLabel = (item) => `Send email notifications for ${item}`;
+  const generateLabel = (item) => `${translate('SEND_EMAIL_NOTIFICATION_FOR')} ${item}`;
 
   const emailOptions = [
     {
-      label: generateLabel('booking confirmations'),
+      label: generateLabel(translate('BOOKING_CONFIRMATIONS')),
       value: 'receive_mails',
     },
   ];
 
   return (
     <div>
-      <Loader size="large" text="Fetching user preferences" loading={isLoading}>
+      <Loader size="large" text={translate('FETCHING_USER_PREFERENCES')} loading={isLoading}>
         <Row gutter={[8, 24]} className={styles.notificationSettingsWrapper}>
           <Col span={24} className={styles.textAlignLeft}>
-            <Title level={3}> Notification Settings </Title>
+            <Title level={3}> {translate('NOTIFICATION_SETTINGS')} </Title>
           </Col>
           <Col span={24}>
             <div className={styles.sectionWrapper}>
               <Row gutter={[8, 10]}>
                 <Col span={24} className={styles.textAlignLeft}>
-                  <Title level={4}> Email Notification </Title>
+                  <Title level={4}> {translate('EMAIL_NOTIFICATIONS')} </Title>
                 </Col>
                 <Col span={24}>
                   <div className={styles.optionWrapper}>
@@ -110,7 +117,7 @@ const NotificationSettings = () => {
         <Row justify="center">
           <Col xs={24} md={8} lg={4}>
             <Button block type="primary" loading={submitting} onClick={saveUserPreferences} className={styles.saveBtn}>
-              Save Changes
+              {translate('SAVE_CHANGES')}
             </Button>
           </Col>
         </Row>

@@ -36,7 +36,7 @@ export default function EmailVerification() {
 
   return (
     <Row justify="center" align="center">
-      <Loader loading={isLoading} size="large" text="Verifying email" />
+      <Loader loading={isLoading} size="large" text={translate('VERIFYING_EMAIL')} />
     </Row>
   );
 }

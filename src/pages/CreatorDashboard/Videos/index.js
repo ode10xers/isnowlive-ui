@@ -13,6 +13,7 @@ import {
   BookTwoTone,
   DeleteOutlined,
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 
@@ -35,6 +36,7 @@ const {
 } = dateUtil;
 
 const Videos = () => {
+  const { t: translate } = useTranslation();
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +79,10 @@ const Videos = () => {
         );
       }
     } catch (error) {
-      showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        translate('FAIL_TO_FETCH_VIDEOS'),
+        error.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
     setIsLoading(false);
   }, []);
@@ -110,11 +115,11 @@ const Videos = () => {
       const { status } = await apis.videos.publishVideo(videoId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Video Published');
+        showSuccessModal(translate('VIDEO_PUBLISHED'));
         getVideosForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
 
     setIsLoading(false);
@@ -127,11 +132,11 @@ const Videos = () => {
       const { status } = await apis.videos.unpublishVideo(videoId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Video Unpublished');
+        showSuccessModal(translate('VIDEO_UNPUBLISHED'));
         getVideosForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
 
     setIsLoading(false);
@@ -157,7 +162,7 @@ const Videos = () => {
       }
     } catch (error) {
       setIsLoading(false);
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
   };
 
@@ -168,11 +173,14 @@ const Videos = () => {
       const { status } = await apis.videos.deleteVideo(videoId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Video has been deleted');
+        showSuccessModal(translate('VIDEO_DELETE_SUCCESS'));
         getVideosForCreator();
       }
     } catch (error) {
-      showErrorModal('Failed to delete video', error?.response?.data?.message || 'Something wrong happened');
+      showErrorModal(
+        translate('VIDEO_DELETE_FAILED'),
+        error?.response?.data?.message || translate('SOMETHING_WRONG_HAPPENED')
+      );
     }
 
     setIsLoading(false);
@@ -206,7 +214,7 @@ const Videos = () => {
       },
     },
     {
-      title: 'Title',
+      title: translate('TITLE'),
       dataIndex: 'title',
       key: 'title',
       width: '30%',
@@ -218,20 +226,20 @@ const Videos = () => {
       ),
     },
     {
-      title: 'Validity',
+      title: translate('VALIDITY'),
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
       width: '90px',
-      render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) => `${text} ${translate('DAY')}${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       dataIndex: 'price',
       key: 'price',
       align: 'left',
       width: '80px',
-      render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
+      render: (text, record) => (parseInt(text) === 0 ? translate('FREE') : `${text} ${record.currency.toUpperCase()}`),
     },
     {
       title: '',
@@ -239,7 +247,7 @@ const Videos = () => {
       render: (text, record) => (
         <Row gutter={8}>
           <Col xs={24} md={2}>
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -250,7 +258,7 @@ const Videos = () => {
           </Col>
           <Col xs={24} md={2}>
             {record.status === 'UPLOAD_SUCCESS' ? (
-              <Tooltip title="Video uploaded">
+              <Tooltip title={translate('VIDEO_UPLOADED')}>
                 <Button
                   className={classNames(styles.detailsButton, styles.checkIcon)}
                   type="text"
@@ -258,7 +266,9 @@ const Videos = () => {
                 />
               </Tooltip>
             ) : (
-              <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+              <Tooltip
+                title={record.video_uid.length > 0 ? translate('VIDEO_IS_PROCESSING') : translate('UPLOAD_VIDEO')}
+              >
                 <Button
                   className={styles.detailsButton}
                   type="text"
@@ -272,7 +282,7 @@ const Videos = () => {
           {record.status === 'UPLOAD_SUCCESS' && (
             <>
               <Col xs={24} md={2}>
-                <Tooltip title="Clone Video">
+                <Tooltip title={translate('CLONE_VIDEO')}>
                   <Button
                     type="text"
                     className={styles.detailsButton}
@@ -285,19 +295,19 @@ const Videos = () => {
           )}
           <Col xs={24} md={2}>
             <Popconfirm
-              title="Do you want to delete video?"
+              title={translate('DELETE_VIDEO_QUESTION')}
               icon={<DeleteOutlined className={styles.danger} />}
-              okText="Yes"
-              cancelText="No"
+              okText={translate('YES')}
+              cancelText={translate('NO')}
               onConfirm={() => deleteVideo(record.external_id)}
             >
-              <Tooltip title="Delete Video">
+              <Tooltip title={translate('DELETE_VIDEO')}>
                 <Button danger type="text" icon={<DeleteOutlined />} />
               </Tooltip>
             </Popconfirm>
           </Col>
           <Col xs={24} md={2}>
-            <Tooltip title="Copy Video Page Link">
+            <Tooltip title={translate('COPY_VIDEO_PAGE_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -308,20 +318,20 @@ const Videos = () => {
           </Col>
           <Col xs={24} md={6}>
             {record.is_published ? (
-              <Tooltip title="Hide Video">
+              <Tooltip title={translate('HIDE_VIDEO')}>
                 <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Video">
+              <Tooltip title={translate('SHOW_VIDEO')}>
                 <Button
                   type="link"
                   disabled={record.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(record.external_id)}
                 >
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             )}
@@ -329,11 +339,11 @@ const Videos = () => {
           <Col xs={24} md={6}>
             {expandedRowKeys.includes(record.external_id) ? (
               <Button type="link" onClick={() => collapseRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyer `} <UpOutlined />
+                {`${record?.buyers?.length || 0} ${translate('BUYERS')} `} <UpOutlined />
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyer`} <DownOutlined />
+                {`${record?.buyers?.length || 0} ${translate('BUYERS')}`} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -344,27 +354,27 @@ const Videos = () => {
 
   const buyerColumns = [
     {
-      title: 'Name',
+      title: translate('NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '30%',
     },
     {
-      title: 'Date of Purchase',
+      title: translate('DATE_OF_PURCHASE'),
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
       width: '30%',
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
-      title: 'Net Price',
+      title: translate('NET_PRICE'),
       dataIndex: 'price_paid',
       key: 'price_paid',
       render: (text, record) => `${record.price_paid} ${record.currency.toUpperCase()}`,
     },
   ];
 
-  const renderSubsciberList = (record) => {
+  const renderSubscriberList = (record) => {
     return (
       <div className={styles.mb20}>
         <Table
@@ -385,7 +395,9 @@ const Videos = () => {
             <Title level={5}> {buyer?.name} </Title>
           </Col>
           <Col xs={24}>
-            <Text> Purchased at {toDateAndTime(buyer?.date_of_purchase)} </Text>
+            <Text>
+              {translate('PURCHASED_AT')} {toDateAndTime(buyer?.date_of_purchase)}{' '}
+            </Text>
           </Col>
           <Col xs={24}>
             <Text> {`${buyer?.price_paid} ${buyer?.currency?.toUpperCase()}`} </Text>
@@ -408,7 +420,7 @@ const Videos = () => {
     const actionButtons =
       video?.status === 'UPLOAD_SUCCESS'
         ? [
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -416,14 +428,14 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title="Video uploaded">
+            <Tooltip title={translate('VIDEO_UPLOADED')}>
               <Button
                 className={classNames(styles.detailsButton, styles.checkIcon)}
                 type="text"
                 icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
               />
             </Tooltip>,
-            <Tooltip title="Clone Video">
+            <Tooltip title={translate('CLONE_VIDEO')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -432,17 +444,17 @@ const Videos = () => {
               />
             </Tooltip>,
             <Popconfirm
-              title="Do you want to delete video?"
+              title={translate('DELETE_VIDEO_QUESTION')}
               icon={<DeleteOutlined className={styles.danger} />}
-              okText="Yes"
-              cancelText="No"
+              okText={translate('YES')}
+              cancelText={translate('NO')}
               onConfirm={() => deleteVideo(video?.external_id)}
             >
-              <Tooltip title="Delete Video">
+              <Tooltip title={translate('DELETE_VIDEO')}>
                 <Button danger type="text" icon={<DeleteOutlined />} />
               </Tooltip>
             </Popconfirm>,
-            <Tooltip title="Copy Video Page Link">
+            <Tooltip title={translate('COPY_VIDEO_PAGE_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -451,20 +463,20 @@ const Videos = () => {
               />
             </Tooltip>,
             video?.is_published ? (
-              <Tooltip title="Hide Video">
+              <Tooltip title={translate('HIDE_VIDEO')}>
                 <Button type="link" danger onClick={() => unpublishVideo(video?.external_id)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Video">
+              <Tooltip title={translate('SHOW_VIDEO')}>
                 <Button
                   type="link"
                   disabled={video?.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(video?.external_id)}
                 >
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             ),
@@ -475,7 +487,7 @@ const Videos = () => {
             ),
           ]
         : [
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -483,7 +495,7 @@ const Videos = () => {
                 icon={<EditOutlined />}
               />
             </Tooltip>,
-            <Tooltip title={video?.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+            <Tooltip title={video?.video_uid.length > 0 ? translate('VIDEO_IS_PROCESSING') : translate('UPLOAD_VIDEO')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -493,17 +505,17 @@ const Videos = () => {
               />
             </Tooltip>,
             <Popconfirm
-              title="Do you want to delete video?"
+              title={translate('DELETE_VIDEO_QUESTION')}
               icon={<DeleteOutlined className={styles.danger} />}
-              okText="Yes"
-              cancelText="No"
+              okText={translate('YES')}
+              cancelText={translate('NO')}
               onConfirm={() => deleteVideo(video?.external_id)}
             >
-              <Tooltip title="Delete Video">
+              <Tooltip title={translate('DELETE_VIDEO')}>
                 <Button danger type="text" icon={<DeleteOutlined />} />
               </Tooltip>
             </Popconfirm>,
-            <Tooltip title="Copy Video Page Link">
+            <Tooltip title={translate('COPY_VIDEO_PAGE_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -512,20 +524,20 @@ const Videos = () => {
               />
             </Tooltip>,
             video?.is_published ? (
-              <Tooltip title="Hide Video">
+              <Tooltip title={translate('HIDE_VIDEO')}>
                 <Button type="link" danger onClick={() => unpublishVideo(video?.external_id)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Video">
+              <Tooltip title={translate('SHOW_VIDEO')}>
                 <Button
                   type="link"
                   disabled={video?.status === 'UPLOAD_SUCCESS' ? false : true}
                   className={styles.successBtn}
                   onClick={() => publishVideo(video?.external_id)}
                 >
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             ),
@@ -548,8 +560,8 @@ const Videos = () => {
           }
           actions={actionButtons}
         >
-          {layout('Validity', <Text>{`${video?.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
+          {layout(translate('VALIDITY'), <Text>{`${video?.validity} ${translate('DAYS')}`}</Text>)}
+          {layout(translate('PRICE'), <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(video?.external_id) && (
           <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
@@ -571,25 +583,25 @@ const Videos = () => {
       />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={14}>
-          <Title level={4}> Videos </Title>
+          <Title level={4}> {translate('VIDEOS')} </Title>
         </Col>
         <Col xs={12} md={6} lg={4}>
           <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            {expandedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
           </Button>
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showUploadVideoModal()} icon={<CloudUploadOutlined />}>
-            Upload New Video
+            {translate('UPLOAD_NEW_VIDEO')}
           </Button>
         </Col>
         <Col xs={24}>
           <Collapse>
-            <Panel header={<Title level={5}> Published </Title>} key="Active">
+            <Panel header={<Title level={5}> {translate('PUBLISHED')} </Title>} key="Active">
               {videos.length ? (
                 <>
                   {isMobileDevice ? (
-                    <Loader loading={isLoading} size="large" text="Loading Videos">
+                    <Loader loading={isLoading} size="large" text={translate('LOADING_VIDEOS')}>
                       <Row gutter={[8, 16]}>{videos?.filter((video) => video?.is_published)?.map(renderVideoItem)}</Row>
                     </Loader>
                   ) : (
@@ -601,7 +613,7 @@ const Videos = () => {
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
-                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandedRowRender: (record) => renderSubscriberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
                         expandedRowKeys: expandedRowKeys,
@@ -610,14 +622,14 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description="No Published Videos" />
+                <Empty description={translate('NO_PUBLISHED_VIDEOS')} />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Unpublished </Title>} key="Expired">
+            <Panel header={<Title level={5}> {translate('UNPUBLISHED')} </Title>} key="Expired">
               {videos.length ? (
                 <>
                   {isMobileDevice ? (
-                    <Loader loading={isLoading} size="large" text="Loading Videos">
+                    <Loader loading={isLoading} size="large" text={translate('LOADING_VIDEOS')}>
                       <Row gutter={[8, 16]}>
                         {videos?.filter((video) => !video?.is_published)?.map(renderVideoItem)}
                       </Row>
@@ -631,7 +643,7 @@ const Videos = () => {
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
-                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandedRowRender: (record) => renderSubscriberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
                         expandedRowKeys: expandedRowKeys,
@@ -640,7 +652,7 @@ const Videos = () => {
                   )}
                 </>
               ) : (
-                <Empty description="No Unpublished Videos" />
+                <Empty description={translate('NO_UNPUBLISHED_VIDEOS')} />
               )}
             </Panel>
           </Collapse>

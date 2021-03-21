@@ -79,21 +79,21 @@ const AdminLogin = ({ history }) => {
     <Row align="middle" className={styles.mt50}>
       <Col xs={24} md={{ span: 12, offset: 6 }}>
         <Form form={loginForm} {...formLayout} name="basic" onFinish={onFinish}>
-          <Item label="User Email" name="user_email" rules={validationRules.emailValidation}>
+          <Item label={translate('USER_EMAIL')} name="user_email" rules={validationRules.emailValidation}>
             <Input />
           </Item>
 
-          <Item label="Admin Email" name="email" rules={validationRules.emailValidation}>
+          <Item label={translate('ADMIN_EMAIL')} name="email" rules={validationRules.emailValidation}>
             <Input />
           </Item>
 
-          <Item label="Password" name="password" rules={validationRules.passwordValidation}>
+          <Item label={translate('PASSWORD')} name="password" rules={validationRules.passwordValidation}>
             <Password />
           </Item>
 
           <Item {...formTailLayout}>
             <Button type="primary" htmlType="submit" loading={isLoading}>
-              Submit
+              {translate('SUBMIT')}
             </Button>
           </Item>
         </Form>
