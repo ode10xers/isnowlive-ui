@@ -26,7 +26,7 @@ function generateLightColorHex() {
 const CalendarSessions = () => {
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [calendarSession, setCalendarSession] = useState([]);
-  const [calendarView, setCalendarView] = useState('week');
+  const [calendarView, setCalendarView] = useState('month');
 
   const redirectToSessionsPage = (session) => {
     const baseUrl = generateUrlFromUsername('ellianto' || session.username || 'app');
@@ -40,12 +40,7 @@ const CalendarSessions = () => {
   const getCalendarSessions = async (e) => {
     try {
       setIsSessionLoading(true);
-      let profileUsername = 'ellianto';
-      // if (username) {
-      //   profileUsername = username;
-      // } else {
-      //   profileUsername = getLocalUserDetails().username;
-      // }
+      const profileUsername = window.location.hostname.split('.')[0] || '';
       const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
       const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
@@ -87,8 +82,8 @@ const CalendarSessions = () => {
 
     if (calendarView === 'week' || calendarView === 'day') {
       return (
-        <div style={{ height: '118px', fontSize: '12px', padding: '2px 4px 0', border: `2px solid ${borderColor}`, borderRadius: '3px', fontFamily: 'Roboto' }}>
-          <div style={{ fontSize: '14px', margin: '5px 0 8px', color: '#595959', lineHeight: '16px' }}>
+        <div style={{ height: '135px', fontSize: '12px', padding: '2px 4px 0', border: `2px solid ${borderColor}`, borderRadius: '3px', fontFamily: 'Roboto' }}>
+          <div style={{ fontSize: '14px', margin: '5px 0 8px', color: '#595959', lineHeight: '16px', height: '30px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {event.name}
           </div>
           <div style={{ fontSize: '12px', marginBottom: '5px', color: '#595959', lineHeight: '14px' }}>
