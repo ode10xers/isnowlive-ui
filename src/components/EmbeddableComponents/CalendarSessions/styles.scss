@@ -9,6 +9,80 @@ $repeat: 20;
     color: black;
     border: 0;
   }
+  .custom-event-container {
+    font-size: 12px;
+    padding: 2px 4px 0;
+    font-family: Roboto;
+    border-radius: 3px;
+    &.custom-month-event-container {
+      @media screen and (max-width: 635px) {
+        display: none;
+      }
+      .event-title {
+        display: inline-block;
+        max-width: calc(100% - 60px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .event-time {
+        float: right;
+        font-size: 12px;
+      }
+    }
+
+    &.custom-day-event-container {
+      height: 135px;
+      .event-title {
+        font-size: 14px;
+        margin: 5px 0 8px;
+        color: #595959;
+        line-height: 16px;
+        height: 30px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .event-time {
+        font-size: 12px;
+        margin-bottom: 5px;
+        color: #595959;
+        line-height: 14px;
+      }
+      .event-tags-container {
+        margin-bottom: 10px;
+        .group-pill {
+          display: inline-block;
+          padding: 5px;
+          background: #b5f5ec;
+          color: #006d75;
+          border-radius: 4px;
+        }
+      }
+      .book-btn {
+        width: 100%;
+        text-align: center;
+        padding: 5px;
+        background: #ffffff;
+        color: #595959;
+        border: 1px solid #f0f0f0;
+        border-radius: 2px;
+      }
+    }
+  }
+  .custom-event-month-container-mb {
+    @media screen and (min-width: 636px) {
+      display: none;
+    }
+    @media screen and (max-width: 635px) {
+      display: block;
+      color: white;
+      margin-top: 10px;
+      border-radius: 50%;
+      padding-left: 38%;
+      padding-top: 15%;
+      font-weight: 700;
+      height: 35px;
+    }
+  }
   .rbc-month-header {
     background-color: #f5f5f5;
     padding: 5px 0;
@@ -65,5 +139,16 @@ $repeat: 20;
   }
   .rbc-current-time-indicator {
     display: none;
+  }
+  @media screen and (max-width: 635px) {
+    .rbc-month-view {
+      .rbc-month-row {
+        .rbc-row-content {
+          .rbc-row:nth-child(3) {
+            display: none;
+          }
+        }
+      }
+    }
   }
 }
