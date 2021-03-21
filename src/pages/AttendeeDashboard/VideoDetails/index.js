@@ -181,7 +181,7 @@ const VideoDetails = ({ match }) => {
                       <SessionCards
                         sessions={video?.sessions}
                         shouldFetchInventories={true}
-                        username={video?.username}
+                        username={video?.username || videoOrderDetails?.creator_username}
                       />
                     </Col>
                   </Row>

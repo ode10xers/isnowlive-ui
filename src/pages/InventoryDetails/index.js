@@ -67,17 +67,40 @@ const InventoryDetails = ({ match, history }) => {
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [username, setUsername] = useState(null);
 
   const getDetails = useCallback(
-    async (username, inventory_id) => {
+    async (inventory_id) => {
       try {
-        const inventoryDetails = await apis.session.getPublicInventoryById(inventory_id);
-        const userDetails = await apis.user.getProfileByUsername(username);
-        const passes = await apis.passes.getPassesBySessionId(inventoryDetails.data.session_id);
-        setSession(inventoryDetails.data);
-        setCreator(userDetails.data);
-        setAvailablePasses(passes.data);
-        setIsLoading(false);
+        const inventoryDetailsResponse = await apis.session.getPublicInventoryById(inventory_id);
+
+        if (isAPISuccess(inventoryDetailsResponse.status) && inventoryDetailsResponse.data) {
+          const inventoryDetails = inventoryDetailsResponse.data;
+
+          setSession(inventoryDetails);
+
+          const creatorUsername = inventoryDetails.creator_username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+
+          const creatorDetailsResponse = await apis.user.getProfileByUsername(creatorUsername);
+          if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
+            setCreator(creatorDetailsResponse.data);
+          } else {
+            console.error('Failed to fetch creator of inventory', creatorDetailsResponse);
+          }
+
+          const passesResponse = await apis.passes.getPassesBySessionId(inventoryDetails?.session_id);
+
+          if (isAPISuccess(passesResponse.response) && passesResponse.data) {
+            setAvailablePasses(passesResponse.data);
+          } else {
+            console.error('Failed to fetch pass related to inventory', passesResponse);
+          }
+
+          setIsLoading(false);
+        } else {
+          console.error('Failed to fetch inventoryDetails', inventoryDetailsResponse);
+        }
       } catch (error) {
         message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
@@ -123,9 +146,9 @@ const InventoryDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.inventory_id) {
-      const username = window.location.hostname.split('.')[0];
-      if (username && !reservedDomainName.includes(username)) {
-        getDetails(username, match.params.inventory_id);
+      const domainUsername = window.location.hostname.split('.')[0];
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
+        getDetails(match.params.inventory_id);
       }
     } else {
       setIsLoading(false);
@@ -283,8 +306,6 @@ const InventoryDetails = ({ match, history }) => {
             initiatePaymentForOrder(data);
           }
         } else {
-          const username = window.location.hostname.split('.')[0];
-
           if (selectedPass) {
             if (!usersPass) {
               // If user (for some reason) buys a free pass (if any exists)
@@ -339,7 +360,7 @@ const InventoryDetails = ({ match, history }) => {
       // check if user is login
 
       // NOTE: Reason the check have getLocalUserDetails() and not currentUser
-      // is beause if user aleady existing and have to login then value will be
+      // is because if user already existing and have to login then value will be
       // set to currentUser where as getLocalUserDetails is only set if user has
       // actually login
       if (!getLocalUserDetails() && values.password) {

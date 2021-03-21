@@ -31,12 +31,13 @@ const PassDetails = ({ match, history }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [pass, setPass] = useState(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [username, setUsername] = useState(null);
 
-  const username = window.location.hostname.split('.')[0];
-
-  const getProfileDetails = useCallback(async () => {
+  const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
-      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
       if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
@@ -46,7 +47,7 @@ const PassDetails = ({ match, history }) => {
       message.error('Failed to load profile details');
       setIsLoading(false);
     }
-  }, [username]);
+  }, []);
 
   const openPurchaseModal = () => {
     setShowPurchaseModal(true);
@@ -68,15 +69,19 @@ const PassDetails = ({ match, history }) => {
               data.sessions?.map((session) => ({
                 ...session,
                 key: `${data.id}_${session.session_id}`,
-                username: username,
+                username: data.creator_username,
               })) || [],
             videos:
               data.videos?.map((video) => ({
                 ...video,
                 key: `${data.id}_${video.external_id}`,
-                username: username,
+                username: data.creator_username,
               })) || [],
           });
+
+          const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          await getProfileDetails(creatorUsername);
           setIsLoading(false);
         }
       } catch (error) {
@@ -84,13 +89,13 @@ const PassDetails = ({ match, history }) => {
         message.error('Failed to load pass details');
       }
     },
-    [username]
+    [getProfileDetails]
   );
 
   useEffect(() => {
     if (match.params.pass_id) {
-      if (username && !reservedDomainName.includes(username)) {
-        getProfileDetails();
+      const domainUsername = window.location.hostname.split('.')[0];
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getPassDetails(match.params.pass_id);
       }
     } else {
