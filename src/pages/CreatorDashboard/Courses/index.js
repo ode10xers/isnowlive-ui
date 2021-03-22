@@ -114,7 +114,7 @@ const Courses = () => {
       <SendCustomerEmailModal
         visible={emailModalVisible}
         closeModal={hideSendEmailModal}
-        productId={targetCourse?.external_id}
+        productId={targetCourse?.id}
         productType={'COURSE'}
         recipients={targetCourse?.buyers}
       />
