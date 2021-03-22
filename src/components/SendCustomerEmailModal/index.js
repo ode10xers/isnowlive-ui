@@ -9,50 +9,59 @@ import FileUpload from 'components/FileUpload';
 import TextEditor from 'components/TextEditor';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 
 import { sendCustomerEmailFormLayout, sendCustomerEmailBodyFormLayout } from 'layouts/FormLayouts';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
-const { Title } = Typography;
-const {
-  timeCalculation: { isBeforeDate },
-} = dateUtil;
-
+const { Title, Text } = Typography;
 const formInitialValues = {
   recipients: [],
   subject: '',
 };
 
-const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, productType }) => {
+const SendCustomerEmailModal = () => {
+  const {
+    state: { emailPopupVisible, emailPopupData },
+    hideSendEmailPopup,
+  } = useGlobalContext();
+
+  const { recipients, productId, productType } = emailPopupData;
+
   const [form] = Form.useForm();
 
   const [submitting, setSubmitting] = useState(false);
-  const [filteredRecipients, setFilteredRecipients] = useState([]);
+  const [validRecipients, setValidRecipients] = useState({
+    active: [],
+    expired: [],
+  });
   const [selectedRecipients, setSelectedRecipients] = useState([]);
   const [emailDocumentUrl, setEmailDocumentUrl] = useState(null);
 
   useEffect(() => {
-    if (!visible || recipients?.length < 1) {
+    if (!emailPopupVisible || (recipients?.active?.length < 1 && recipients?.expired?.length < 1)) {
       setSubmitting(false);
-      setFilteredRecipients([]);
+      setValidRecipients({
+        active: [],
+        expired: [],
+      });
       setSelectedRecipients([]);
       setEmailDocumentUrl(null);
 
       form.resetFields();
     } else {
-      const validRecipients = recipients?.filter((user) => isBeforeDate(user.expiry_date)) || [];
-      setFilteredRecipients(validRecipients);
-      setSelectedRecipients(validRecipients.map((user) => user.external_id));
+      setValidRecipients(recipients);
+      setSelectedRecipients(recipients?.active?.map((user) => user.external_id));
 
       form.setFieldsValue({
-        recipients: validRecipients.map((user) => user.external_id),
+        recipients: recipients.active.map((user) => user.external_id),
       });
     }
-  }, [visible, recipients, form]);
+  }, [emailPopupVisible, recipients, form]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -78,7 +87,7 @@ const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, pr
 
       if (isAPISuccess(status)) {
         showSuccessModal('Emails sent');
-        closeModal();
+        hideSendEmailPopup();
       }
     } catch (error) {
       showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
@@ -90,9 +99,9 @@ const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, pr
   return (
     <Modal
       title={<Title level={5}> Send email to customers </Title>}
-      visible={visible}
+      visible={emailPopupVisible}
       centered={true}
-      onCancel={() => closeModal()}
+      onCancel={() => hideSendEmailPopup()}
       footer={null}
       width={640}
     >
@@ -120,11 +129,31 @@ const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, pr
                 mode="multiple"
                 maxTagCount="responsive"
                 values={selectedRecipients}
-                options={filteredRecipients.map((user) => ({
-                  label: user.name,
-                  value: user.external_id,
-                }))}
-              />
+                optionLabelProp="label"
+              >
+                <Select.OptGroup
+                  label={<Text className={styles.optionSeparatorText}> Active User </Text>}
+                  key="Active User"
+                >
+                  {validRecipients?.active?.map((recipient) => (
+                    <Select.Option value={recipient.external_id} key={recipient.external_id} label={recipient.name}>
+                      {recipient.name}
+                    </Select.Option>
+                  ))}
+                  {validRecipients?.active?.length <= 0 && <Text disabled> No active user </Text>}
+                </Select.OptGroup>
+                <Select.OptGroup
+                  label={<Text className={styles.optionSeparatorText}> Expired User </Text>}
+                  key="Expired User"
+                >
+                  {validRecipients?.expired?.map((recipient) => (
+                    <Select.Option value={recipient.external_id} key={recipient.external_id} label={recipient.name}>
+                      {recipient.name}
+                    </Select.Option>
+                  ))}
+                  {validRecipients?.expired?.length <= 0 && <Text disabled> No expired user </Text>}
+                </Select.OptGroup>
+              </Select>
             </Form.Item>
           </Col>
           <Col xs={24}>
@@ -189,7 +218,7 @@ const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, pr
         </Row>
         <Row justify="end" align="center" gutter={16}>
           <Col xs={12} md={6}>
-            <Button block type="default" onClick={() => closeModal()} loading={submitting}>
+            <Button block type="default" onClick={() => hideSendEmailPopup()} loading={submitting}>
               Cancel
             </Button>
           </Col>

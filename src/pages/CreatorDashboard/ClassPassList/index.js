@@ -16,7 +16,6 @@ import apis from 'apis';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CreatePassModal from 'components/CreatePassModal';
-import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -24,29 +23,92 @@ import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
   formatDate: { toDateAndTime },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 const ClassPassList = () => {
+  const { showSendEmailPopup } = useGlobalContext();
+
   const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [emailModalVisible, setEmailModalVisible] = useState(false);
 
   const showSendEmailModal = (pass) => {
-    setTargetPass(pass);
-    setEmailModalVisible(true);
-  };
+    let activeRecipients = [];
+    let expiredRecipients = [];
+    let userIdMap = new Map();
 
-  const hideSendEmailModal = () => {
-    setTargetPass(null);
-    setEmailModalVisible(false);
+    if (pass.buyers && pass.buyers?.length > 0) {
+      // Since pass can be repeatedly bought by the same user
+      // (after it expires), we put checks here
+      pass.buyers.forEach((buyer) => {
+        if (!userIdMap.has(buyer.external_id)) {
+          let isActive = isBeforeDate(buyer.expiry_date);
+          if (isActive) {
+            const foundBuyer = activeRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              activeRecipients.push(buyer);
+            }
+          } else {
+            const foundBuyer = expiredRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              expiredRecipients.push(buyer);
+            }
+          }
+
+          userIdMap.set(buyer.external_id, {
+            ...buyer,
+            isActive,
+          });
+        } else {
+          const mappedBuyer = userIdMap.get(buyer.external_id);
+
+          // If the user in the map is already active user
+          // that means it's the most up to date data
+          if (mappedBuyer.isActive) {
+            return;
+          }
+
+          // If the user in the map is expired user
+          // We check if the current data is an active
+          // if it is we update the data in the map
+          if (isBeforeDate(buyer.expiry_date)) {
+            userIdMap.set(buyer.external_id, {
+              ...buyer,
+              isActive: true,
+            });
+
+            // Move the buyer data from expired to active array
+            const foundBuyer = activeRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              activeRecipients.push(buyer);
+              expiredRecipients = expiredRecipients.filter((recipient) => recipient.external_id !== buyer.external_id);
+            }
+          }
+        }
+      });
+    }
+
+    showSendEmailPopup({
+      recipients: {
+        active: activeRecipients,
+        expired: expiredRecipients,
+      },
+      productId: pass?.external_id || null,
+      productType: 'PASS',
+    });
   };
 
   const showCreatePassesModal = () => {
@@ -393,13 +455,6 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
-      <SendCustomerEmailModal
-        visible={emailModalVisible}
-        closeModal={hideSendEmailModal}
-        productId={targetPass?.external_id}
-        productType={'PASS'}
-        recipients={targetPass?.buyers}
-      />
       <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={14}>
