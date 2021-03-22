@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Typography, Empty, Image, Collapse } from 'antd';
 import apis from 'apis';
@@ -19,6 +20,7 @@ const {
 } = dateUtil;
 
 const Videos = () => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const [activeVideos, setActiveVideos] = useState([]);
   const [expiredVideos, setExpiredVideos] = useState([]);
@@ -34,7 +36,10 @@ const Videos = () => {
         setExpiredVideos(data.expired);
       }
     } catch (error) {
-      showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        translate('FAIL_TO_FETCH_VIDEOS'),
+        error.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
     setIsLoading(false);
   }, []);
@@ -72,7 +77,7 @@ const Videos = () => {
               </Col>
               <Col xs={24}>
                 {video.price === 0 ? (
-                  <Text type="secondary">Free video</Text>
+                  <Text type="secondary">{translate('FREE_VIDEO')}</Text>
                 ) : (
                   <Text type="secondary">
                     {video.currency.toUpperCase()} {video.price}
@@ -81,7 +86,7 @@ const Videos = () => {
               </Col>
               <Col xs={24}>
                 <Text type="secondary" className={styles.expiryText}>
-                  Available Till : {toLongDateWithDayTime(video.expiry)}
+                  {translate('AVAILABLE_TILL')} : {toLongDateWithDayTime(video.expiry)}
                 </Text>
               </Col>
             </Row>
@@ -95,26 +100,26 @@ const Videos = () => {
     <div className={styles.box}>
       <Row gutter={[8, 24]}>
         <Col xs={12} md={10} lg={14}>
-          <Title level={4}> Videos </Title>
+          <Title level={4}> {translate('VIDEOS')} </Title>
         </Col>
         <Col xs={24}>
           <Collapse>
-            <Panel header={<Title level={5}> Active </Title>} key="Active">
+            <Panel header={<Title level={5}> {translate('ACTIVE')} </Title>} key="Active">
               {activeVideos.length ? (
-                <Loader loading={isLoading} size="large" text="Loading Active Videos">
+                <Loader loading={isLoading} size="large" text={translate('LOADING_ACTIVE_VIDEOS')}>
                   <Row gutter={[8, 16]}>{activeVideos.map((video) => renderVideoItem(video, false))}</Row>
                 </Loader>
               ) : (
-                <Empty description={'No Active Videos'} />
+                <Empty description={translate('NO_ACTIVE_VIDEOS')} />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Expired </Title>} key="Expired">
+            <Panel header={<Title level={5}> {translate('EXPIRED')} </Title>} key="Expired">
               {expiredVideos.length ? (
-                <Loader loading={isLoading} size="large" text="Loading Expired Videos">
+                <Loader loading={isLoading} size="large" text={translate('LOADING_EXPIRED_VIDEOS')}>
                   <Row gutter={[8, 16]}>{expiredVideos.map((video) => renderVideoItem(video, true))}</Row>
                 </Loader>
               ) : (
-                <Empty description={'No Expired Videos'} />
+                <Empty description={translate('NO_EXPIRED_VIDEOS')} />
               )}
             </Panel>
           </Collapse>

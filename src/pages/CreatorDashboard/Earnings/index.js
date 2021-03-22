@@ -111,7 +111,9 @@ const Earnings = () => {
           }));
         }
       } catch (error) {
-        message.error(error.response?.data?.message || `Something went wrong when fetching ${key} earning info`);
+        message.error(
+          error.response?.data?.message || `${translate('SWW_WHEN_FETCHING')} ${key} ${translate('EARNING_INFO')}`
+        );
       }
     });
 
@@ -181,7 +183,7 @@ const Earnings = () => {
       trackFailedEvent(eventTag, error);
       if (
         error.response?.data?.code === 500 &&
-        error.response?.data?.message === 'error while generating dashboard URL from stripe'
+        error.response?.data?.message === 'error while generating dashboard URL from stripe' // do not translate this (BE hardcoded)
       ) {
         relinkStripe();
       } else {
@@ -212,7 +214,7 @@ const Earnings = () => {
     }
   };
 
-  const availabeForPayout = (
+  const availableForPayout = (
     <div className={styles.box1}>
       <Row>
         <Col xs={24}>
@@ -224,17 +226,17 @@ const Earnings = () => {
         <Col xs={24} xl={12}>
           {balance === null || balance?.available === 0 ? (
             <Button disabled type="primary">
-              Request Payout
+              {translate('REQUESTING_PAYOUT')}
             </Button>
           ) : (
             <Popconfirm
-              title="Are you sure to request payout?"
+              title={translate('REQUESTING_PAYOUT_QUESTION')}
               onConfirm={confirmPayout}
-              okText="Yes, Request Payout"
-              cancelText="No"
+              okText={translate('YES_REQUESTING_PAYOUT')}
+              cancelText={translate('NO')}
             >
               <Button className={styles.box1Button} loading={isLoadingPayout}>
-                {isLoadingPayout ? '...Requesting' : 'Request Payout'}
+                {isLoadingPayout ? translate('___REQUESTING') : translate('REQUESTING_PAYOUT')}
               </Button>
             </Popconfirm>
           )}
@@ -262,22 +264,22 @@ const Earnings = () => {
   );
 
   const totalAmountEarned = paymentBoxLayout(
-    'Total Amount Earned ',
+    translate('TOTAL_AMOUNT_EARNED'),
     styles.box2Text,
     'default',
     balance?.total_earned,
     cashIcon
   );
 
-  const paidOut = paymentBoxLayout('Paid Out', null, 'success', balance?.paid_out, checkIcon);
+  const paidOut = paymentBoxLayout(translate('PAID_OUT'), null, 'success', balance?.paid_out, checkIcon);
 
-  const inProcess = paymentBoxLayout('In Process', null, 'default', balance?.in_process, timerIcon);
+  const inProcess = paymentBoxLayout(translate('IN_PROCESS'), null, 'default', balance?.in_process, timerIcon);
 
   const stripePaymentDashboard = (
     <div className={styles.box2}>
       <Row>
         <Col xs={24}>
-          <Text>Edit Bank Account</Text>
+          <Text>{translate('EDIT_BANK_ACCOUNT')}</Text>
         </Col>
         <Col xs={24}>
           <Button
@@ -287,8 +289,8 @@ const Earnings = () => {
             onClick={() => openStripeDashboard()}
           >
             {payment_account_status === StripeAccountStatus.VERIFICATION_PENDING
-              ? 'Verify Bank Account'
-              : 'Edit Bank Account'}
+              ? translate('VERIFY_BANK_ACCOUNT')
+              : translate('EDIT_BANK_ACCOUNT')}
           </Button>
         </Col>
       </Row>
@@ -322,20 +324,20 @@ const Earnings = () => {
 
   let sessionColumns = [
     {
-      title: 'Session Name',
+      title: translate('SESSION_NAME'),
       key: 'name',
       width: '12%',
       render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
     },
     {
-      title: 'Session Date and Time',
+      title: translate('SESSION_DATE_TIME'),
       dataIndex: 'session_date',
       key: 'session_date',
       width: '12%',
       render: (text, record) => <Text>{toLongDateWithDayTime(record.session_date)}</Text>,
     },
     {
-      title: 'Earnings',
+      title: translate('EARNINGS'),
       dataIndex: 'total_earned',
       key: 'total_earned',
       width: '5%',
@@ -352,7 +354,7 @@ const Earnings = () => {
         <Row justify="start">
           <Col>
             <Button type="link" className={styles.detailsButton} onClick={() => openSessionDetails(record)}>
-              Details
+              {translate('DETAILS')}
             </Button>
           </Col>
         </Row>
@@ -380,14 +382,14 @@ const Earnings = () => {
         }
         actions={[
           <Button type="link" className={styles.detailsButton} onClick={() => openSessionDetails(item)}>
-            Details
+            {translate('DETAILS')}
           </Button>,
         ]}
       >
-        {layout('Date', <Text>{toLongDateWithDayTime(item.session_date)}</Text>)}
+        {layout(translate('DATE'), <Text>{toLongDateWithDayTime(item.session_date)}</Text>)}
 
         {layout(
-          'Earnings',
+          translate('EARNINGS'),
           <Text>
             {item.currency.toUpperCase()} {item.total_earned}
           </Text>
@@ -396,16 +398,16 @@ const Earnings = () => {
     );
   };
 
-  const generateEarningsColumns = (productName = 'Product', redirectToDetailsMethod = () => {}) => [
+  const generateEarningsColumns = (productName = 'PRODUCT', redirectToDetailsMethod = () => {}) => [
     {
-      title: `${productName} Name`,
+      title: `${translate(productName)} ${translate('NAME')}`,
       key: 'name',
       dataIndex: 'name',
       align: 'left',
       width: '50%',
     },
     {
-      title: 'Total Earned',
+      title: translate('TOTAL_EARNED'),
       key: 'total_earned',
       dataIndex: 'total_earned',
       align: 'right',
@@ -419,7 +421,7 @@ const Earnings = () => {
         <Row justify="start">
           <Col>
             <Button type="link" className={styles.detailsButton} onClick={() => redirectToDetailsMethod(record)}>
-              Details
+              {translate('DETAILS')}
             </Button>
           </Col>
         </Row>
@@ -447,12 +449,12 @@ const Earnings = () => {
         }
         actions={[
           <Button type="link" className={styles.detailsButton} onClick={() => redirectToDetailsMethod(product)}>
-            Details
+            {translate('DETAILS')}
           </Button>,
         ]}
       >
         {layout(
-          'Earnings',
+          translate('EARNINGS'),
           <Text>
             {product?.currency?.toUpperCase()} {product?.total_earned}
           </Text>
@@ -463,21 +465,21 @@ const Earnings = () => {
 
   const productEarningsItems = [
     {
-      name: 'Pass',
+      name: translate('PASS'),
       key: 'pass_id',
       stateKey: 'passes',
       redirectMethod: openPassDetails,
       showMoreMethod: () => handleShowMore('passes'),
     },
     {
-      name: 'Video',
+      name: translate('VIDEO'),
       key: 'video_id',
       stateKey: 'videos',
       redirectMethod: openVideoDetails,
       showMoreMethod: () => handleShowMore('videos'),
     },
     {
-      name: 'Course',
+      name: translate('COURSE'),
       key: 'course_id',
       stateKey: 'courses',
       redirectMethod: openCourseDetails,
@@ -486,17 +488,17 @@ const Earnings = () => {
   ];
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading Earning Details">
+    <Loader loading={isLoading} size="large" text={translate('LOADING_EARNING_DETAILS')}>
       <div className={styles.box}>
         <Row>
           <Col xs={24} lg={8}>
-            <Title level={2}>Your Earnings</Title>
+            <Title level={2}>{translate('YOUR_EARNINGS')}</Title>
           </Col>
           <Col xs={24} lg={8}>
             {stripePaymentDashboard}
           </Col>
           <Col xs={24} lg={8}>
-            {availabeForPayout}
+            {availableForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>
@@ -513,17 +515,17 @@ const Earnings = () => {
         <Row className={styles.mt20}>
           <Col xs={24}>
             <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
-              <Panel header={<Title level={5}> Sessions Earnings </Title>} key="Sessions">
+              <Panel header={<Title level={5}> {translate('SESSIONS_EARNINGS')} </Title>} key="Sessions">
                 <Row className={styles.mt10}>
                   <Col span={24}>
                     {isMobileDevice ? (
-                      <Loader loading={isLoading} size="large" text="Loading sessions">
+                      <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
                         {earnings['sessions']?.length > 0 ? (
                           earnings['sessions']?.map(renderSessionItem)
                         ) : (
                           <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                            Sessions List
-                            <Empty />
+                            {translate('SESSIONS_LIST')}
+                            <Empty description={translate('NO_DATA')} />
                           </div>
                         )}
                       </Loader>
@@ -539,7 +541,7 @@ const Earnings = () => {
                           disabled={!showMore['sessions']}
                           className={styles.ml20}
                         >
-                          Show More
+                          {translate('SHOW_MORE')}
                         </Button>
                       </Col>
                     </Row>
@@ -548,21 +550,30 @@ const Earnings = () => {
               </Panel>
               {productEarningsItems?.map((productEarningsItem) => (
                 <Panel
-                  header={<Title level={5}> {productEarningsItem.name} Earnings </Title>}
+                  header={
+                    <Title level={5}>
+                      {' '}
+                      {productEarningsItem.name} {translate('EARNINGS')}{' '}
+                    </Title>
+                  }
                   key={productEarningsItem.name}
                 >
                   <Row className={styles.mt10}>
                     <Col span={24}>
                       {isMobileDevice ? (
-                        <Loader loading={isLoading} size="large" text={`Loading ${productEarningsItem?.name}`}>
+                        <Loader
+                          loading={isLoading}
+                          size="large"
+                          text={`${translate('LOADING')} ${productEarningsItem?.name}`}
+                        >
                           {earnings[productEarningsItem?.stateKey]?.length > 0 ? (
                             earnings[productEarningsItem?.stateKey].map((productEarnings) =>
                               renderMobileEarningsItem(productEarnings, productEarningsItem?.redirectMethod)
                             )
                           ) : (
                             <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                              {productEarningsItem?.name} List
-                              <Empty />
+                              {productEarningsItem?.name} {translate('LIST')}
+                              <Empty description={translate('NO_DATA')} />
                             </div>
                           )}
                         </Loader>
@@ -586,7 +597,7 @@ const Earnings = () => {
                             disabled={!showMore[productEarningsItem?.stateKey]}
                             className={styles.ml20}
                           >
-                            Show More
+                            {translate('SHOW_MORE')}
                           </Button>
                         </Col>
                       </Row>

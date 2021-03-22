@@ -59,7 +59,7 @@ const PaymentAccount = () => {
     } catch (error) {
       if (
         error.response?.data?.code === 500 &&
-        error.response?.data?.message === 'error while generating dashboard URL from stripe'
+        error.response?.data?.message === 'error while generating dashboard URL from stripe' // do not translate this(BE hardcoded)
       ) {
         relinkStripe();
       } else {
@@ -75,10 +75,11 @@ const PaymentAccount = () => {
         try {
           const { status } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
-            message.success('Stripe Account Connected Succesfully!!');
+            message.success(translate('STRIPE_ACCOUNT_CONNECTED_SUCCESS'));
             setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
           }
         } catch (error) {
+          // do not translate this(BE hardcoded)
           if (error.response?.data?.message !== 'unable to find payment credentials') {
             openStripeDashboard();
           }
@@ -106,7 +107,7 @@ const PaymentAccount = () => {
     } catch (error) {
       if (
         error.response?.data?.code === 500 &&
-        error.response?.data?.message === 'user already registered for account, trigger relink'
+        error.response?.data?.message === 'user already registered for account, trigger relink' // do not translate this(BE hardcoded)
       ) {
         relinkStripe();
       } else {
@@ -121,22 +122,18 @@ const PaymentAccount = () => {
   if (paymentConnected === StripeAccountStatus.NOT_CONNECTED) {
     view = (
       <>
-        <Title level={2}>Get Paid</Title>
+        <Title level={2}>{translate('GET_PAID')}</Title>
 
         <Row className={styles.mt50}>
           <Col xs={24} md={12}>
-            <Paragraph>
-              We use Stripe as our payment processor. Stripe lets you accept credit/debit cards, Apple, Google and
-              Microsoft Pay. All charges will show up immediately in your account. You don't need an existing Stripe
-              account to connect.
-            </Paragraph>
+            <Paragraph>{translate('GET_PAID_TEXT')}</Paragraph>
           </Col>
         </Row>
 
         <Row>
           <Col className={styles.stripeContainer} sm={24} md={18} lg={14} xl={12}>
             <Row>
-              <Col>Your Country</Col>
+              <Col>{translate('YOUR_COUNTRY')}</Col>
             </Row>
 
             <Row className={styles.mt10}>
@@ -146,7 +143,7 @@ const PaymentAccount = () => {
                   showSearch
                   style={{ width: 200 }}
                   onChange={handleChange}
-                  placeholder="Select country"
+                  placeholder={translate('SELECT_COUNTRY')}
                   optionFilterProp="children"
                   filterOption={(input, option) => option.children.toLowerCase().startsWith(input.toLowerCase())}
                 >
@@ -157,7 +154,7 @@ const PaymentAccount = () => {
               </Col>
               <Col sm={24} md={12} className={styles.connectBtn}>
                 <Button type="primary" loading={isLoading} onClick={onboardUserToStripe}>
-                  Connect Stripe
+                  {translate('CONNECT_STRIPE')}
                 </Button>
               </Col>
             </Row>

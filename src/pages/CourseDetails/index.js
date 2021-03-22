@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Typography, message, Button, Card, Tag } from 'antd';
 
@@ -38,6 +39,7 @@ const {
 const { Title, Text } = Typography;
 
 const CourseDetails = ({ match, history }) => {
+  const { t: translate } = useTranslation();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
@@ -45,44 +47,55 @@ const CourseDetails = ({ match, history }) => {
   const [course, setCourse] = useState(null);
   const [courseSessions, setCourseSessions] = useState(null);
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
+  const [username, setUsername] = useState(null);
 
-  const username = location.state?.username || window.location.hostname.split('.')[0];
+  // const username = location.state?.username || window.location.hostname.split('.')[0];
 
-  const getProfileDetails = useCallback(async () => {
+  const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
-      const { data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
       if (data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      message.error(translate('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
-    }
-  }, [username]);
-
-  const getCourseDetails = useCallback(async (courseId) => {
-    try {
-      const { status, data } = await apis.courses.getDetails(courseId);
-
-      if (isAPISuccess(status) && data) {
-        setCourse(data);
-
-        if (data.type === courseType.MIXED && data.sessions?.length > 0) {
-          const sessionResponses = await Promise.all(
-            data.sessions.map(async (session) => await apis.session.getSessionDetails(session.session_id))
-          );
-          setCourseSessions(sessionResponses.map((sessionResponse) => sessionResponse.data));
-        }
-
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error('Failed to load course details');
     }
   }, []);
+
+  const getCourseDetails = useCallback(
+    async (courseId) => {
+      try {
+        const { status, data } = await apis.courses.getDetails(courseId);
+
+        if (isAPISuccess(status) && data) {
+          setCourse(data);
+
+          const creatorUsername =
+            data.creator_username || location.state?.username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          await getProfileDetails(creatorUsername);
+
+          if (data.type === courseType.MIXED && data.sessions?.length > 0) {
+            const sessionResponses = await Promise.all(
+              data.sessions.map(async (session) => await apis.session.getSessionDetails(session.session_id))
+            );
+            setCourseSessions(sessionResponses.map((sessionResponse) => sessionResponse.data));
+          }
+
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        message.error(translate('FAIL_TO_LOAD_COURSE_DETAILS'));
+      }
+    },
+    [getProfileDetails, location]
+  );
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
@@ -90,20 +103,20 @@ const CourseDetails = ({ match, history }) => {
     }
 
     if (match.params.course_id) {
-      if (username && !reservedDomainName.includes(username)) {
-        getProfileDetails();
+      const domainUsername = window.location.hostname.split('.')[0];
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getCourseDetails(match.params.course_id);
       }
     } else {
       setIsLoading(false);
-      message.error('Course details not found.');
+      message.error(translate('COURSE_DETAILS_NOT_FOUND'));
     }
     //eslint-disable-next-line
   }, [match.params.course_id]);
 
   const redirectToVideoDetails = (video) => {
     if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
+      const baseUrl = generateUrlFromUsername(username || video?.username || video?.creator_username || 'app');
       window.open(`${baseUrl}/v/${video?.external_id}`);
     }
   };
@@ -154,7 +167,7 @@ const CourseDetails = ({ match, history }) => {
 
   const sessionSchedulesColumns = [
     {
-      title: 'Session Name',
+      title: translate('SESSION_NAME'),
       key: 'name',
       dataIndex: 'name',
       width: '30%',
@@ -165,14 +178,14 @@ const CourseDetails = ({ match, history }) => {
       ),
     },
     {
-      title: 'Session Date',
+      title: translate('SESSION_DATE'),
       key: 'start_time',
       dataIndex: 'start_time',
       width: '30%',
       render: (text, record) => toLongDateWithLongDay(record.start_time),
     },
     {
-      title: 'Session Time',
+      title: translate('SESSION_TIME'),
       key: 'end_time',
       dataIndex: 'end_time',
       width: '40%',
@@ -203,9 +216,9 @@ const CourseDetails = ({ match, history }) => {
             </Tag>
           }
         >
-          {layout('Date', <Text> {toLongDateWithLongDay(schedule.start_time)} </Text>)}
+          {layout(translate('DATE'), <Text> {toLongDateWithLongDay(schedule.start_time)} </Text>)}
           {layout(
-            'Time',
+            translate('TIME'),
             <Text>
               {' '}
               {`${toLocaleTime(schedule.start_time)} - ${toLocaleTime(
@@ -220,7 +233,7 @@ const CourseDetails = ({ match, history }) => {
 
   const mainContent = (
     <div className={styles.mt50}>
-      <Loader size="large" text="Loading course details" loading={isLoading}>
+      <Loader size="large" text={translate('LOADING_COURSE_DETAILS')} loading={isLoading}>
         <Row gutter={[8, 24]}>
           {isOnAttendeeDashboard && (
             <Col xs={24} className={classNames(styles.mb50, styles.mt20)}>
@@ -228,7 +241,7 @@ const CourseDetails = ({ match, history }) => {
                 onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses)}
                 icon={<ArrowLeftOutlined />}
               >
-                Back to Course List
+                {translate('BACK_TO_COURSE_LIST')}
               </Button>
             </Col>
           )}
@@ -241,8 +254,7 @@ const CourseDetails = ({ match, history }) => {
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
                 <Col xs={24}>
                   <Title level={3} className={styles.ml20}>
-                    {' '}
-                    Course Details{' '}
+                    {translate('COURSE_DETAILS')}
                   </Title>
                 </Col>
                 <Col xs={24}>
@@ -253,7 +265,7 @@ const CourseDetails = ({ match, history }) => {
                   <>
                     <Col xs={24}>
                       <Title level={3} className={styles.ml20}>
-                        Sessions Included
+                        {translate('SESSION_INCLUDED')}
                       </Title>
                     </Col>
                     <Col xs={24}>
@@ -262,7 +274,7 @@ const CourseDetails = ({ match, history }) => {
                     {course?.inventory_ids?.length > 0 && (
                       <Col xs={24}>
                         <Title level={3} className={styles.ml20}>
-                          Course Schedules
+                          {translate('COURSE_SCHEDULED')}
                         </Title>
                         {isMobileDevice ? (
                           <Row gutter={[8, 10]}>
@@ -285,7 +297,7 @@ const CourseDetails = ({ match, history }) => {
                     <Row gutter={[8, 8]}>
                       <Col xs={24}>
                         <Title level={3} className={styles.ml20}>
-                          Videos Included
+                          {translate('VIDEO_INCLUDED')}
                         </Title>
                       </Col>
                       <Col xs={24}>

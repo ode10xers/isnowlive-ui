@@ -20,6 +20,7 @@ import {
   showErrorModal,
   showVideoPurchaseSuccessModal,
 } from 'components/Modals/modals';
+import { useTranslation } from 'react-i18next';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -43,6 +44,7 @@ const {
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -54,12 +56,13 @@ const VideoDetails = ({ match }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
+  const [username, setUsername] = useState(null);
 
-  const username = window.location.hostname.split('.')[0];
-
-  const getProfileDetails = useCallback(async () => {
+  const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
-      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
       if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
@@ -69,30 +72,43 @@ const VideoDetails = ({ match }) => {
       message.error('Failed to load profile details');
       setIsLoading(false);
     }
-  }, [username]);
-
-  const getVideoDetails = useCallback(async (videoId) => {
-    try {
-      const { status, data } = await apis.videos.getVideoById(videoId);
-
-      if (isAPISuccess(status) && data) {
-        setVideo(data);
-
-        if (data.is_course) {
-          const courseDetails = await apis.courses.getVideoCoursesByVideoId(data.external_id);
-
-          if (isAPISuccess(courseDetails.status) && courseDetails.data) {
-            setCourses(courseDetails.data);
-          }
-        }
-
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error('Failed to load class video details');
-    }
   }, []);
+
+  const getVideoDetails = useCallback(
+    async (videoId) => {
+      try {
+        const videoDetailsResponse = await apis.videos.getVideoById(videoId);
+
+        if (isAPISuccess(videoDetailsResponse.status) && videoDetailsResponse.data) {
+          setVideo(videoDetailsResponse.data);
+
+          const creatorUsername = videoDetailsResponse.data.creator_username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          await getProfileDetails(creatorUsername);
+
+          if (videoDetailsResponse.data.is_course) {
+            const courseDetailsResponse = await apis.courses.getVideoCoursesByVideoId(
+              videoDetailsResponse.data.external_id
+            );
+
+            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
+              setCourses(courseDetailsResponse.data);
+            } else {
+              console.error('Failed to fetch courses data for session', courseDetailsResponse);
+            }
+          }
+
+          setIsLoading(false);
+        } else {
+          console.error('Failed to fetch video details', videoDetailsResponse);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        message.error('Failed to load class video details');
+      }
+    },
+    [getProfileDetails]
+  );
 
   const getAvailablePassesForVideo = useCallback(async (videoId) => {
     try {
@@ -157,8 +173,8 @@ const VideoDetails = ({ match }) => {
 
   useEffect(() => {
     if (match.params.video_id) {
-      if (username && !reservedDomainName.includes(username)) {
-        getProfileDetails();
+      const domainUsername = window.location.hostname.split('.')[0];
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getVideoDetails(match.params.video_id);
         getAvailablePassesForVideo(match.params.video_id);
 
@@ -214,7 +230,7 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -253,11 +269,11 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -291,7 +307,7 @@ const VideoDetails = ({ match }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -306,12 +322,12 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -367,7 +383,7 @@ const VideoDetails = ({ match }) => {
   };
 
   const redirectToVideosPage = (video) => {
-    const baseUrl = generateUrlFromUsername(username || 'app');
+    const baseUrl = generateUrlFromUsername(username || video?.creator_username || 'app');
     window.open(`${baseUrl}/v/${video.external_id}`);
   };
 

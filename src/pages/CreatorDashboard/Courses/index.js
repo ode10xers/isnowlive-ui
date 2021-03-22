@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
+import { useTranslation } from 'react-i18next';
 import { Row, Col, Tabs, Typography, Button } from 'antd';
 
 import Loader from 'components/Loader';
@@ -17,6 +18,7 @@ const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 const Courses = () => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('liveClassCourse');
@@ -33,7 +35,10 @@ const Courses = () => {
         setCourses(data);
       }
     } catch (error) {
-      showErrorModal('Failed fetching courses', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        translate('FAILED_FETCHING_COURSES'),
+        error?.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
     setIsLoading(false);
   }, []);
@@ -44,11 +49,14 @@ const Courses = () => {
       const { status } = await apis.courses.publishCourse(course.id);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Course Published');
+        showSuccessModal(translate('COURSE_PUBLISHED'));
         fetchAllCoursesForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
+      showErrorModal(
+        translate('SOMETHING_WRONG_HAPPENED'),
+        error.response?.data?.message || translate('FAILED_TO_PUBLISH_COURSE')
+      );
     }
     setIsLoading(false);
   };
@@ -59,11 +67,14 @@ const Courses = () => {
       const { status } = await apis.courses.unpublishCourse(course.id);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Course Unpublished');
+        showSuccessModal(translate('COURSE_UNPUBLISHED'));
         fetchAllCoursesForCreator();
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
+      showErrorModal(
+        translate('SOMETHING_WRONG_HAPPENED'),
+        error.response?.data?.message || translate('FAILED_TO_UNPUBLISHED_COURSE')
+      );
     }
     setIsLoading(false);
   };
@@ -107,7 +118,7 @@ const Courses = () => {
       />
       <Row gutter={[8, 8]}>
         <Col xs={24}>
-          <Title level={3}> Courses </Title>
+          <Title level={3}> {translate('COURSES')} </Title>
         </Col>
         <Col xs={24}>
           <Tabs
@@ -116,12 +127,12 @@ const Courses = () => {
             activeKey={selectedListTab}
             onChange={handleChangeListTab}
           >
-            <TabPane key="liveClassCourse" tab={<Text> Live Class Courses </Text>}>
-              <Loader loading={isLoading} size="large" text="Fetching Live Courses">
+            <TabPane key="liveClassCourse" tab={<Text> {translate('LIVE_CLASS_COURSES')} </Text>}>
+              <Loader loading={isLoading} size="large" text={translate('FETCHING_LIVE_COURSES')}>
                 <Row gutter={[8, 8]}>
                   <Col xs={24} md={{ span: 10, offset: 14 }} lg={{ span: 8, offset: 16 }} xl={{ span: 6, offset: 18 }}>
                     <Button block size="large" type="primary" onClick={() => openCreateCourseModal('mixed')}>
-                      Create Live Course
+                      {translate('CREATE_LIVE_COURSES')}
                     </Button>
                   </Col>
                   <Col xs={24}>
@@ -137,12 +148,12 @@ const Courses = () => {
                 </Row>
               </Loader>
             </TabPane>
-            <TabPane key="videoCourse" tab={<Text> Video Courses </Text>}>
-              <Loader loading={isLoading} size="large" text="Fetching Video Courses">
+            <TabPane key="videoCourse" tab={<Text> {translate('VIDEO_COURSES')} </Text>}>
+              <Loader loading={isLoading} size="large" text={translate('FETCHING_VIDEO_COURSES')}>
                 <Row gutter={[8, 8]}>
                   <Col xs={24} md={{ span: 10, offset: 14 }} lg={{ span: 8, offset: 16 }} xl={{ span: 6, offset: 18 }}>
                     <Button block size="large" type="primary" onClick={() => openCreateCourseModal('video')}>
-                      Create Video Course
+                      {translate('CREATE_VIDEO_COURSES')}
                     </Button>
                   </Col>
                   <Col xs={24}>

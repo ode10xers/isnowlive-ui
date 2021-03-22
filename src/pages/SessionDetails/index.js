@@ -55,8 +55,8 @@ const SessionDetails = ({ match, history }) => {
   const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
-  const [course, setCourse] = useState(null);
   const [creator, setCreator] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -77,45 +77,70 @@ const SessionDetails = ({ match, history }) => {
   const [sessionVideos, setSessionVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
-
-  const username = window.location.hostname.split('.')[0];
+  const [username, setUsername] = useState(null);
 
   const getDetails = useCallback(
     async (session_id) => {
       try {
-        const sessionDetails = await apis.session.getSessionDetails(session_id);
-        const userDetails = await apis.user.getProfileByUsername(username);
-        const passes = await apis.passes.getPassesBySessionId(session_id);
-        setSession({
-          ...sessionDetails.data,
-          inventory: sessionDetails.data.inventory.filter(
-            (inventory) => inventory.num_participants < sessionDetails.data.max_participants
-          ),
-        });
+        const sessionDetailsResponse = await apis.session.getSessionDetails(session_id);
 
-        if (sessionDetails.data.is_course) {
-          const courseDetails = await apis.courses.getCoursesBySessionId(session_id);
+        if (isAPISuccess(sessionDetailsResponse.status) && sessionDetailsResponse.data) {
+          const sessionDetails = sessionDetailsResponse.data;
 
-          setCourse(courseDetails.data[0]);
+          setSession({
+            ...sessionDetails,
+            inventory: sessionDetails.inventory.filter(
+              (inventory) => inventory.num_participants < sessionDetails.max_participants
+            ),
+          });
+
+          const latestInventories = sessionDetails.inventory
+            .filter((inventory) => isBeforeDate(inventory.end_time))
+            .filter((inventory) => inventory.num_participants < sessionDetails.max_participants)
+            .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
+          setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
+
+          setSessionVideos(sessionDetails.Videos || []);
+
+          const creatorUsername = sessionDetails.creator_username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          const creatorDetailsResponse = await apis.user.getProfileByUsername(creatorUsername);
+
+          if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
+            setCreator(creatorDetailsResponse.data);
+          } else {
+            console.error('Failed to fetch creator for session', creatorDetailsResponse);
+          }
+
+          if (sessionDetails.is_course) {
+            const courseDetailsResponse = await apis.courses.getCoursesBySessionId(session_id);
+
+            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
+              setCourses(courseDetailsResponse.data || []);
+            } else {
+              console.error('Failed to fetch courses for session', courseDetailsResponse);
+            }
+          }
+
+          const passesResponse = await apis.passes.getPassesBySessionId(session_id);
+
+          if (isAPISuccess(passesResponse.status) && passesResponse.data) {
+            setAvailablePasses(passesResponse.data);
+          } else {
+            console.error('Failed to fetch pass data for session', passesResponse);
+          }
+
+          setIsLoading(false);
+        } else {
+          console.error('Failed to fetch session data', sessionDetailsResponse);
         }
-
-        setCreator(userDetails.data);
-        setAvailablePasses(passes.data);
-        setIsLoading(false);
-        const latestInventories = sessionDetails.data.inventory
-          .filter((inventory) => isBeforeDate(inventory.end_time))
-          .filter((inventory) => inventory.num_participants < sessionDetails.data.max_participants)
-          .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
-        setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
-
-        setSessionVideos(sessionDetails.data.Videos);
       } catch (error) {
         message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
         history.push(Routes.root);
       }
     },
-    [history, username]
+    [history]
   );
 
   const getUsablePassesForUser = async () => {
@@ -136,7 +161,7 @@ const SessionDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
   };
 
@@ -156,7 +181,9 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.session_id) {
-      if (username && !reservedDomainName.includes(username)) {
+      const domainUsername = window.location.hostname.split('.')[0];
+
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getDetails(match.params.session_id);
       }
     } else {
@@ -218,7 +245,7 @@ const SessionDetails = ({ match, history }) => {
         setCurrentUser(values);
         message.info('Enter password to register session');
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     }
   };
@@ -240,7 +267,7 @@ const SessionDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   };
@@ -329,7 +356,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -375,7 +402,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -399,7 +426,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -431,7 +458,7 @@ const SessionDetails = ({ match, history }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -466,7 +493,7 @@ const SessionDetails = ({ match, history }) => {
             setIncorrectPassword(true);
             message.error('Incorrect email or password');
           } else {
-            message.error(error.response?.data?.message || 'Something went wrong');
+            message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
           }
         }
       } else if (!getLocalUserDetails()) {
@@ -476,7 +503,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -594,11 +621,11 @@ const SessionDetails = ({ match, history }) => {
           )}
         </Col>
         <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
-          <HostDetails host={creator} />
+          {creator && <HostDetails host={creator} />}
         </Col>
       </Row>
-      {session?.is_course ? (
-        course && (
+      {session?.is_course && courses ? (
+        courses?.length > 0 && (
           <div className={classNames(styles.mb50, styles.mt20)}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
@@ -606,7 +633,7 @@ const SessionDetails = ({ match, history }) => {
               </Col>
               <Col xs={24}>
                 <ShowcaseCourseCard
-                  courses={[course]}
+                  courses={courses}
                   onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
                   username={username}
                 />

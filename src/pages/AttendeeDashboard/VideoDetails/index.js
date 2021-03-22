@@ -3,6 +3,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { Row, Col, Typography, Image, message, Button } from 'antd';
 import { ArrowLeftOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -22,6 +23,7 @@ import styles from './style.module.scss';
 const { Text } = Typography;
 
 const VideoDetails = ({ match }) => {
+  const { t: translate } = useTranslation();
   const location = useLocation();
   const history = useHistory();
 
@@ -44,7 +46,7 @@ const VideoDetails = ({ match }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      message.error(translate('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
   }, []);
@@ -65,7 +67,7 @@ const VideoDetails = ({ match }) => {
       } catch (error) {
         setIsLoading(false);
         if (error?.response?.status !== 404) {
-          message.error('Failed to load video details');
+          message.error(translate('FAIL_TO_LOAD_VIDEO_DETAILS'));
         } else {
           if (videoOrderDetails) {
             getProfileDetails(videoOrderDetails?.creator_username);
@@ -87,7 +89,7 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      showErrorModal('Failed to load video token. Either video is expired or you have reached viewing limit of video');
+      showErrorModal(translate('FAIL_TO_LOAD_VIDEO_TOKEN_TEXT'));
     }
   };
 
@@ -96,7 +98,7 @@ const VideoDetails = ({ match }) => {
       getVideoDetails(match.params.video_id);
     } else {
       setIsLoading(false);
-      message.error('Video details not found.');
+      message.error(translate('FAIL_TO_LOAD_VIDEO_DETAILS_NOT_FOUND'));
     }
 
     //eslint-disable-next-line
@@ -107,12 +109,12 @@ const VideoDetails = ({ match }) => {
     if (match.params.video_order_id) {
       getVideoToken(match.params.video_order_id);
     } else {
-      message.error('Video token not found.');
+      message.error(translate('FAIL_TO_LOAD_VIDEO_TOKEN_NOT_FOUND'));
     }
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading video details">
+    <Loader loading={isLoading} size="large" text={translate('LOADING_VIDEO_DETAILS')}>
       <Row justify="start" className={styles.mb50}>
         <Col xs={24} md={4}>
           <Button
@@ -120,7 +122,7 @@ const VideoDetails = ({ match }) => {
             onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos)}
             icon={<ArrowLeftOutlined />}
           >
-            Back to Video List
+            {translate('BACK_TO_VIDEO_LIST')}
           </Button>
         </Col>
       </Row>
@@ -135,7 +137,7 @@ const VideoDetails = ({ match }) => {
                   <Image
                     preview={false}
                     className={styles.videoThumbnail}
-                    src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                    src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || translate('ERROR')}
                     alt={video?.title || videoOrderDetails?.title}
                     fallback={DefaultImage()}
                   />
@@ -147,7 +149,7 @@ const VideoDetails = ({ match }) => {
                     <Image
                       preview={false}
                       className={styles.videoThumbnail}
-                      src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                      src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || translate('ERROR')}
                       alt={video?.title || videoOrderDetails?.title}
                       fallback={DefaultImage()}
                     />
@@ -179,7 +181,7 @@ const VideoDetails = ({ match }) => {
                       <SessionCards
                         sessions={video?.sessions}
                         shouldFetchInventories={true}
-                        username={video?.username}
+                        username={video?.username || videoOrderDetails?.creator_username}
                       />
                     </Col>
                   </Row>

@@ -12,6 +12,7 @@ import {
   BookTwoTone,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -47,6 +48,7 @@ const { creator } = mixPanelEventTags;
 const whiteColor = '#FFFFFF';
 
 const SessionsInventories = ({ match }) => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -66,7 +68,7 @@ const SessionsInventories = ({ match }) => {
           index,
           key: i?.inventory_id,
           name: i.name,
-          type: i.max_participants > 1 ? 'Group' : '1-on-1',
+          type: i.max_participants > 1 ? translate('GROUP') : translate('1_TO_1'),
           duration: getDuration(i.start_time, i.end_time),
           days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
           session_date: i?.session_date,
@@ -106,7 +108,7 @@ const SessionsInventories = ({ match }) => {
       }
       setIsLoading(false);
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       setIsLoading(false);
     }
   }, []);
@@ -155,11 +157,11 @@ const SessionsInventories = ({ match }) => {
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag, { inventory_id: inventory_id });
         getStaffSession(match?.params?.session_type);
-        showSuccessModal('Event has been cancelled');
+        showSuccessModal(translate('EVENT_CANCEL_SUCCESS'));
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { inventory_id: inventory_id });
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
   };
 
@@ -197,7 +199,7 @@ const SessionsInventories = ({ match }) => {
 
   let dateColumns = [
     {
-      title: 'Session Name',
+      title: translate('SESSION_NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '25%',
@@ -232,28 +234,28 @@ const SessionsInventories = ({ match }) => {
       },
     },
     {
-      title: 'Type',
+      title: translate('TYPE'),
       dataIndex: 'type',
       key: 'type',
       width: '10%',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Duration',
+      title: translate('DURATION'),
       dataIndex: 'duration',
       key: 'duration',
       width: '15%',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Time',
+      title: translate('TIME'),
       dataIndex: 'time',
       key: 'time',
       width: '15%',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Participants',
+      title: translate('PARTICIPANTS'),
       key: 'participants',
       dataIndex: 'participants',
       width: '12%',
@@ -261,7 +263,7 @@ const SessionsInventories = ({ match }) => {
         renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
     },
     {
-      title: 'Actions',
+      title: translate('ACTIONS'),
       width: isPast ? '10%' : '25%',
       render: (text, record) => {
         if (record.is_date) {
@@ -272,7 +274,7 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Tooltip title="Event Details">
+              <Tooltip title={translate('EVENT_DETAILS')}>
                 <Button
                   type="link"
                   className={styles.detailsButton}
@@ -285,7 +287,7 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start" gutter={[8, 8]}>
             <Col md={24} lg={24} xl={4}>
-              <Tooltip title="Event Details">
+              <Tooltip title={translate('EVENT_DETAILS')}>
                 <Button
                   type="link"
                   className={styles.detailsButton}
@@ -295,24 +297,24 @@ const SessionsInventories = ({ match }) => {
               </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
-              <Tooltip title="Copy Event Page Link">
+              <Tooltip title={translate('COPY_EVENT_PAGE_LINK')}>
                 <Button type="text" onClick={() => copyInventoryLink(record.inventory_id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
               {isDisabled ? (
-                <Tooltip title="Event cannot be cancelled">
+                <Tooltip title={translate('EVENT_CANNOT_CANCEL')}>
                   <Button type="text" disabled icon={<DeleteOutlined />} />
                 </Tooltip>
               ) : (
                 <Popconfirm
-                  title="Do you want to cancel session?"
+                  title={translate('CANCEL_SESSIONS_QUESTION')}
                   icon={<DeleteOutlined className={styles.danger} />}
-                  okText="Yes"
-                  cancelText="No"
+                  okText={translate('YES')}
+                  cancelText={translate('NO')}
                   onConfirm={() => deleteInventory(record.inventory_id)}
                 >
-                  <Tooltip title="Cancel event">
+                  <Tooltip title={translate('CANCEL_EVENT')}>
                     <Button type="text" danger icon={<DeleteOutlined />} />
                   </Tooltip>
                 </Popconfirm>
@@ -323,7 +325,7 @@ const SessionsInventories = ({ match }) => {
               (record.start_url ? (
                 <>
                   <Col md={24} lg={24} xl={4}>
-                    <Tooltip title="Show Zoom Meeting Details">
+                    <Tooltip title={translate('SHOW_ZOOM_MEETING_DETAILS')}>
                       <Button
                         type="link"
                         icon={<Icons.VideoLink />}
@@ -332,7 +334,7 @@ const SessionsInventories = ({ match }) => {
                     </Tooltip>
                   </Col>
                   <Col md={24} lg={24} xl={4}>
-                    <Tooltip title="Start event">
+                    <Tooltip title={translate('START_EVENT')}>
                       <Button
                         type="text"
                         onClick={() => trackAndStartSession(record)}
@@ -343,7 +345,7 @@ const SessionsInventories = ({ match }) => {
                 </>
               ) : (
                 <Col md={24} lg={24} xl={4}>
-                  <Tooltip title="Add Zoom Meeting Details">
+                  <Tooltip title={translate('ADD_ZOOM_MEETING_DETAILS')}>
                     <Button
                       type="link"
                       icon={<VideoCameraAddOutlined />}
@@ -384,13 +386,13 @@ const SessionsInventories = ({ match }) => {
     );
 
     const meetingDetailsButton = (
-      <Tooltip title="Show Zoom Meeting Details">
+      <Tooltip title={translate('SHOW_ZOOM_MEETING_DETAILS')}>
         <Button type="link" icon={<Icons.VideoLink />} onClick={() => setSelectedInventoryForZoom(item)} />
       </Tooltip>
     );
 
     const startMeetingButton = (
-      <Tooltip title="Start event">
+      <Tooltip title={translate('START_EVENT')}>
         <Button
           type="text"
           onClick={() => trackAndStartSession(item)}
@@ -400,31 +402,31 @@ const SessionsInventories = ({ match }) => {
     );
 
     const addMeetingDetailsButton = (
-      <Tooltip title="Add Zoom Meeting Details">
+      <Tooltip title={translate('ADD_ZOOM_MEETING_DETAILS')}>
         <Button type="link" icon={<VideoCameraAddOutlined />} onClick={() => setSelectedInventoryForZoom(item)} />
       </Tooltip>
     );
 
     const actionButtons = [
-      <Tooltip title="Event Details">
+      <Tooltip title={translate('EVENT_DETAILS')}>
         <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
       </Tooltip>,
-      <Tooltip title="Copy Event Page Link">
+      <Tooltip title={translate('COPY_EVENT_PAGE_LINK')}>
         <Button type="text" onClick={() => copyInventoryLink(item.inventory_id)} icon={<CopyOutlined />} />
       </Tooltip>,
       isCancelDisabled ? (
-        <Tooltip title="Event cannot be cancelled">
+        <Tooltip title={translate('EVENT_CANNOT_CANCEL')}>
           <Button type="text" disabled icon={<DeleteOutlined />} />
         </Tooltip>
       ) : (
         <Popconfirm
-          title="Do you want to cancel session?"
+          title={translate('CANCEL_SESSIONS_QUESTION')}
           icon={<DeleteOutlined className={styles.danger} />}
-          okText="Yes"
+          okText={translate('YES')}
           cancelText={'No'}
           onConfirm={() => deleteInventory(item.inventory_id)}
         >
-          <Tooltip title="Cancel event">
+          <Tooltip title={translate('CANCEL_EVENT')}>
             <Button type="text" danger icon={<DeleteOutlined />} />
           </Tooltip>
         </Popconfirm>
@@ -456,11 +458,11 @@ const SessionsInventories = ({ match }) => {
           </div>
         }
       >
-        {layout('Type', <Text>{item.type}</Text>)}
-        {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Time', <Text>{item.time}</Text>)}
+        {layout(translate('TYPE'), <Text>{item.type}</Text>)}
+        {layout(translate('DURATION'), <Text>{item.duration}</Text>)}
+        {layout(translate('TIME'), <Text>{item.time}</Text>)}
         {layout(
-          isPast ? 'Registrations' : 'Attendees',
+          isPast ? translate('REGISTRATIONS') : translate('ATTENDEES'),
           <Text>
             {item.participants || 0} {'/'} {item.max_participants}
           </Text>
@@ -482,7 +484,7 @@ const SessionsInventories = ({ match }) => {
 
     if (shouldRefetch) {
       setIsLoading(true);
-      getStaffSession(isPast ? 'past' : 'upcoming');
+      getStaffSession(isPast ? 'past' : 'upcoming'); // Do not translate this
     }
   };
 
@@ -492,21 +494,23 @@ const SessionsInventories = ({ match }) => {
       <div className={styles.box}>
         <Row gutter={[8, 8]}>
           <Col xs={24} md={18} lg={20}>
-            <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
+            <Title level={4}>
+              {isPast ? translate('PAST') : translate('UPCOMING')} {translate('SESSIONS')}
+            </Title>
             <Radio.Group value={view} onChange={handleViewChange}>
-              <Radio.Button value="list">List</Radio.Button>
-              <Radio.Button value="calendar">Calendar</Radio.Button>
+              <Radio.Button value="list">{translate('LIST')}</Radio.Button>
+              <Radio.Button value="calendar">{translate('CALENDAR')}</Radio.Button>
             </Radio.Group>
           </Col>
           <Col xs={24} md={6} lg={4}>
             <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-              {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+              {expandedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
             </Button>
           </Col>
 
           <Col xs={24}>
             {view === 'calendar' ? (
-              <Loader loading={isLoading} size="large" text="Loading sessions">
+              <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
                 {sessions.length > 0 ? (
                   <CalendarView
                     inventories={sessions}
@@ -515,13 +519,13 @@ const SessionsInventories = ({ match }) => {
                     calendarView={calendarView}
                   />
                 ) : (
-                  <Empty />
+                  <Empty description={translate('NO_DATA')} />
                 )}
               </Loader>
             ) : (
               <>
                 {isMobileDevice ? (
-                  <Loader loading={isLoading} size="large" text="Loading sessions">
+                  <Loader loading={isLoading} size="large" text={translate('LOADING_SESSIONS')}>
                     {sessions.length > 0 ? (
                       <Table
                         columns={mobileTableColumns}
@@ -556,10 +560,10 @@ const SessionsInventories = ({ match }) => {
                         }}
                       />
                     ) : (
-                      <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                      <div className="text-empty">No {isPast ? translate('PAST') : translate('UPCOMING')} Session</div>
                     )}
                   </Loader>
-                ) : (
+                ) : filteredByDateSession.length > 0 ? (
                   <Table
                     sticky={true}
                     columns={dateColumns}
@@ -582,6 +586,8 @@ const SessionsInventories = ({ match }) => {
                       },
                     }}
                   />
+                ) : (
+                  <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
                 )}
               </>
             )}

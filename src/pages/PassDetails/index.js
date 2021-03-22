@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, message } from 'antd';
 import classNames from 'classnames';
 import { loadStripe } from '@stripe/stripe-js';
+import { useTranslation } from 'react-i18next';
 
 import config from 'config';
 import apis from 'apis';
@@ -24,17 +25,19 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 const { Title, Text } = Typography;
 
 const PassDetails = ({ match, history }) => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [pass, setPass] = useState(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [username, setUsername] = useState(null);
 
-  const username = window.location.hostname.split('.')[0];
-
-  const getProfileDetails = useCallback(async () => {
+  const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
-      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
       if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
@@ -44,7 +47,7 @@ const PassDetails = ({ match, history }) => {
       message.error('Failed to load profile details');
       setIsLoading(false);
     }
-  }, [username]);
+  }, []);
 
   const openPurchaseModal = () => {
     setShowPurchaseModal(true);
@@ -66,15 +69,19 @@ const PassDetails = ({ match, history }) => {
               data.sessions?.map((session) => ({
                 ...session,
                 key: `${data.id}_${session.session_id}`,
-                username: username,
+                username: data.creator_username,
               })) || [],
             videos:
               data.videos?.map((video) => ({
                 ...video,
                 key: `${data.id}_${video.external_id}`,
-                username: username,
+                username: data.creator_username,
               })) || [],
           });
+
+          const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          await getProfileDetails(creatorUsername);
           setIsLoading(false);
         }
       } catch (error) {
@@ -82,13 +89,13 @@ const PassDetails = ({ match, history }) => {
         message.error('Failed to load pass details');
       }
     },
-    [username]
+    [getProfileDetails]
   );
 
   useEffect(() => {
     if (match.params.pass_id) {
-      if (username && !reservedDomainName.includes(username)) {
-        getProfileDetails();
+      const domainUsername = window.location.hostname.split('.')[0];
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getPassDetails(match.params.pass_id);
       }
     } else {
@@ -121,13 +128,13 @@ const PassDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
   };
 
   const createOrder = async (userEmail) => {
     if (!pass) {
-      showErrorModal('Something went wrong', 'Invalid Pass Selected');
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), 'Invalid Pass Selected');
       return;
     }
 
@@ -152,7 +159,7 @@ const PassDetails = ({ match, history }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS, username);
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     }
   };

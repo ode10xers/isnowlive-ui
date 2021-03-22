@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Button, Typography, Collapse, Card, Tag } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 
@@ -24,6 +25,7 @@ const {
 } = dateUtil;
 
 const ClassPassList = () => {
+  const { t: translate } = useTranslation();
   const [passes, setPasses] = useState([]);
   const [expiredPasses, setExpiredPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +97,7 @@ const ClassPassList = () => {
         );
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
     setIsLoading(false);
   }, []);
@@ -149,22 +151,24 @@ const ClassPassList = () => {
 
   const passesColumns = [
     {
-      title: 'Pass Name',
+      title: translate('PASS_NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '35%',
     },
     {
-      title: 'Credit Left',
+      title: translate('CREDIT_LEFT'),
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',
       render: (text, record) =>
-        record.limited ? `${record.classes_remaining}/${record.class_count} Credits` : 'Unlimited Credits',
+        record.limited
+          ? `${record.classes_remaining}/${record.class_count} ${translate('CREDITS')}`
+          : translate('UNLIMITED_CREDITS'),
     },
     {
-      title: 'Expires On',
+      title: translate('EXPIRES_ON'),
       dataIndex: 'expiry',
       key: 'expiry',
       align: 'center',
@@ -172,7 +176,7 @@ const ClassPassList = () => {
       render: (text, record) => toShortDate(record.expiry),
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       dataIndex: 'price',
       key: 'price',
       align: 'left',
@@ -186,20 +190,20 @@ const ClassPassList = () => {
         record.expired ? (
           expandedExpiredRowKeys.includes(record.pass_order_id) ? (
             <Button type="link" onClick={() => collapseExpiredRow(record.pass_order_id)} icon={<UpOutlined />}>
-              Close
+              {translate('CLOSE')}
             </Button>
           ) : (
             <Button type="link" onClick={() => expandExpiredRow(record.pass_order_id)} icon={<DownOutlined />}>
-              More
+              {translate('MORE')}
             </Button>
           )
         ) : expandedActiveRowKeys.includes(record.pass_order_id) ? (
           <Button type="link" onClick={() => collapseActiveRow(record.pass_order_id)} icon={<UpOutlined />}>
-            Close
+            {translate('CLOSE')}
           </Button>
         ) : (
           <Button type="link" onClick={() => expandActiveRow(record.pass_order_id)} icon={<DownOutlined />}>
-            More
+            {translate('MORE')}
           </Button>
         ),
     },
@@ -210,7 +214,7 @@ const ClassPassList = () => {
       {record.sessions?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+            <Text className={styles.ml20}>{translate('SESSIONS_BOOKABLE_WITH_PASS')}</Text>
           </Col>
           <Col xs={24}>
             <SessionCards sessions={record.sessions} />
@@ -220,7 +224,7 @@ const ClassPassList = () => {
       {record.videos?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+            <Text className={styles.ml20}>{translate('VIDEOS_PURCHASABLE_WITH_PASS')}</Text>
           </Col>
           <Col xs={24}>
             <SimpleVideoCardsList passDetails={record} videos={record.videos} />
@@ -249,30 +253,34 @@ const ClassPassList = () => {
             pass.expired ? (
               expandedExpiredRowKeys.includes(pass.pass_order_id) ? (
                 <Button type="link" onClick={() => collapseExpiredRow(pass.pass_order_id)} icon={<UpOutlined />}>
-                  Close
+                  {translate('CLOSE')}
                 </Button>
               ) : (
                 <Button type="link" onClick={() => expandExpiredRow(pass.pass_order_id)} icon={<DownOutlined />}>
-                  More
+                  {translate('MORE')}
                 </Button>
               )
             ) : expandedActiveRowKeys.includes(pass.pass_order_id) ? (
               <Button type="link" onClick={() => collapseActiveRow(pass.pass_order_id)} icon={<UpOutlined />}>
-                Close
+                {translate('CLOSE')}
               </Button>
             ) : (
               <Button type="link" onClick={() => expandActiveRow(pass.pass_order_id)} icon={<DownOutlined />}>
-                More
+                {translate('MORE')}
               </Button>
             ),
           ]}
         >
           {layout(
-            'Credits Left',
-            <Text>{pass.limited ? `${pass.classes_remaining}/${pass.class_count} Credits` : 'Unlimited Credits'}</Text>
+            translate('CREDIT_LEFT'),
+            <Text>
+              {pass.limited
+                ? `${pass.classes_remaining}/${pass.class_count} ${translate('CREDITS')}`
+                : translate('UNLIMITED_CREDITS')}
+            </Text>
           )}
-          {layout('Expires On', <Text>{toShortDate(pass.expiry)}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout(translate('EXPIRES_ON'), <Text>{toShortDate(pass.expiry)}</Text>)}
+          {layout(translate('PRICE'), <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {((pass.expired && expandedExpiredRowKeys.includes(pass.pass_order_id)) ||
           expandedActiveRowKeys.includes(pass.pass_order_id)) && (
@@ -319,21 +327,21 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <Row gutter={[8, 8]}>
         <Col xs={24}>
-          <Title level={4}> Passes </Title>
+          <Title level={4}> {translate('PASSES')} </Title>
         </Col>
         <Col xs={24}>
           <Collapse>
-            <Panel header={<Title level={5}> Active Passes </Title>} key="Active">
+            <Panel header={<Title level={5}> {translate('ACTIVE_PASSES')} </Title>} key="Active">
               <Row gutter={8}>
                 <Col xs={24} md={16} lg={21}></Col>
                 <Col xs={24} md={8} lg={3}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllActivePasses()}>
-                    {expandedActiveRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                    {expandedActiveRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
                   </Button>
                 </Col>
                 <Col xs={24}>
                   {isMobileDevice ? (
-                    <Loader loading={isLoading} size="large" text="Loading Active Passes">
+                    <Loader loading={isLoading} size="large" text={translate('LOADING_ACTIVE_PASS')}>
                       {passes.map(renderPassItem)}
                     </Loader>
                   ) : (
@@ -354,17 +362,18 @@ const ClassPassList = () => {
                 </Col>
               </Row>
             </Panel>
-            <Panel header={<Title level={5}> Expired Passes </Title>} key="Expired">
+            <Panel header={<Title level={5}> {translate('EXPIRED_PASSES')} </Title>} key="Expired">
               <Row gutter={8}>
                 <Col xs={24} md={16} lg={21}></Col>
                 <Col xs={24} md={8} lg={3}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllExpiredPasses()}>
-                    {expandedExpiredRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                    {expandedExpiredRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')}
+                    {translate('ALL')}
                   </Button>
                 </Col>
                 <Col xs={24}>
                   {isMobileDevice ? (
-                    <Loader loading={isLoading} size="large" text="Loading Expired Passes">
+                    <Loader loading={isLoading} size="large" text={translate('LOADING_EXPIRED_PASS')}>
                       {expiredPasses.map(renderPassItem)}
                     </Loader>
                   ) : (

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Row, Col, Button, Typography, Card, Collapse, Tag } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -22,6 +23,7 @@ const {
 } = dateUtil;
 
 const CourseList = () => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrders, setCourseOrders] = useState([]);
@@ -36,7 +38,10 @@ const CourseList = () => {
         setCourseOrders(data);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error?.response?.data?.message || 'Failed to fetch course orders');
+      showErrorModal(
+        translate('SOMETHING_WENT_WRONG'),
+        error?.response?.data?.message || translate('FAILED_TO_FETCH_COURSE_ORDERS')
+      );
     }
 
     setIsLoading(false);
@@ -56,7 +61,7 @@ const CourseList = () => {
 
   const courseColumns = [
     {
-      title: 'Course Name',
+      title: translate('COURSE_NAME'),
       key: 'name',
       dataIndex: 'name',
       render: (text, record) => {
@@ -71,7 +76,7 @@ const CourseList = () => {
       },
     },
     {
-      title: 'Course Content',
+      title: translate('COURSE_CONTENT'),
       key: 'videos',
       dataIndex: 'videos',
       render: (text, record) => (
@@ -82,14 +87,14 @@ const CourseList = () => {
       ),
     },
     {
-      title: 'Duration',
+      title: translate('DURATION'),
       key: 'start_date',
       dataIndex: 'start_date',
       width: '210px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       key: 'price',
       dataIndex: 'price',
       width: '85px',
@@ -103,7 +108,7 @@ const CourseList = () => {
         <Row gutter={[8, 8]} justify="end">
           <Col>
             <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(record)}>
-              Details
+              {translate('Details')}
             </Button>
           </Col>
         </Row>
@@ -140,18 +145,18 @@ const CourseList = () => {
       >
         <div onClick={() => redirectToCourseOrderDetails(item)}>
           {layout(
-            'Contents',
+            translate('CONTENTS'),
             <Text>
               {item?.videos?.length > 0 && <Tag color="blue"> {item?.videos?.length} Videos </Tag>}
               {item?.inventory_ids?.length > 0 && <Tag color="volcano"> {item?.inventory_ids?.length} Sessions </Tag>}
             </Text>
           )}
           {layout(
-            'Duration',
+            translate('DURATION'),
             <Text>{`${toShortDateWithYear(item?.start_date)} - ${toShortDateWithYear(item?.end_date)}`}</Text>
           )}
           {layout(
-            'Price',
+            translate('PRICE'),
             <Text>
               {item?.currency?.toUpperCase()} {item?.price}
             </Text>
@@ -165,22 +170,22 @@ const CourseList = () => {
     <div className={styles.box}>
       <Row gutter={[8, 8]}>
         <Col xs={24}>
-          <Title level={4}> My Courses </Title>
+          <Title level={4}> {translate('MY_COURSES')} </Title>
         </Col>
         <Col xs={24}>
           <Collapse>
-            <Panel header={<Title level={5}> Active Courses </Title>} key="Active">
+            <Panel header={<Title level={5}> {translate('ACTIVE_COURSES')} </Title>} key="Active">
               {isMobileDevice ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.active?.length > 0 ? (
                     <>
                       <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                        Click on the card to show course details
+                        {translate('SHOW_COURSE_CARD_TEXT')}
                       </Text>
                       {courseOrders?.active?.map(renderCourseItem)}
                     </>
                   ) : (
-                    <div className="text-empty"> No course found </div>
+                    <div className="text-empty"> {translate('NO_COURSE_FOUND')} </div>
                   )}
                 </Loader>
               ) : (
@@ -192,18 +197,18 @@ const CourseList = () => {
                 />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Expired Courses </Title>} key="Expired">
+            <Panel header={<Title level={5}> {translate('EXPIRED_COURSES')} </Title>} key="Expired">
               {isMobileDevice ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.expired?.length > 0 ? (
                     <>
                       <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                        Click on the card to show course details
+                        {translate('SHOW_COURSE_CARD_TEXT')}
                       </Text>
                       {courseOrders?.expired?.map(renderCourseItem)}
                     </>
                   ) : (
-                    <div className="text-empty"> No course found </div>
+                    <div className="text-empty"> {translate('NO_COURSE_FOUND')} </div>
                   )}
                 </Loader>
               ) : (

@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import { Row, Col, Typography, Button, Card, Empty, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -21,6 +22,7 @@ const {
 } = dateUtil;
 
 const CourseEarnings = ({ match }) => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [earnings, setEarnings] = useState(null);
@@ -34,7 +36,7 @@ const CourseEarnings = ({ match }) => {
           setEarnings(data);
         }
       } catch (error) {
-        message.error('Unable to fetch the course earning details');
+        message.error(translate('UNABLE_TO_FETCH_THE_COURSE_EARNINGS_DETAILS'));
         setTimeout(() => {
           history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
         }, 1500);
@@ -47,7 +49,7 @@ const CourseEarnings = ({ match }) => {
     if (match?.params?.course_id) {
       getEarningData(match?.params?.course_id);
     } else {
-      message.error('Unable to find the course.');
+      message.error(translate('COURSE_NOT_FOUND'));
       setTimeout(() => {
         history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
       }, 1500);
@@ -66,31 +68,31 @@ const CourseEarnings = ({ match }) => {
   );
 
   const showCourseName = showCourseLayout(
-    'Course Name',
+    translate('COURSE_NAME'),
     <Title level={isMobileDevice ? 5 : 3}>{earnings?.name}</Title>
   );
 
   const showCourseEarnings = showCourseLayout(
-    'Total Earning',
+    translate('TOTAL_EARNING'),
     <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency?.toUpperCase()} />
   );
 
   let courseColumns = [
     {
-      title: 'Attendee Name',
+      title: translate('ATTENDEE_NAME'),
       key: 'name',
       width: '12%',
       render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
     },
     {
-      title: 'Date',
+      title: translate('DATE'),
       dataIndex: 'booking_time',
       key: 'booking_time',
       width: '5%',
       render: (text, record) => <Text>{toLongDateWithTime(record.booking_time)}</Text>,
     },
     {
-      title: 'Amount',
+      title: translate('AMOUNT'),
       dataIndex: 'total_price',
       key: 'total_price',
       width: '5%',
@@ -101,7 +103,7 @@ const CourseEarnings = ({ match }) => {
       ),
     },
     {
-      title: 'Fees',
+      title: translate('FEES'),
       dataIndex: 'platform_fees',
       key: 'platform_fees',
       width: '5%',
@@ -112,7 +114,7 @@ const CourseEarnings = ({ match }) => {
       ),
     },
     {
-      title: 'Net Price',
+      title: translate('NET_PRICE'),
       dataIndex: 'net_price',
       key: 'net_price',
       width: '5%',
@@ -123,7 +125,7 @@ const CourseEarnings = ({ match }) => {
       ),
     },
     {
-      title: 'Status',
+      title: translate('STATUS'),
       dataIndex: 'status',
       key: 'status',
       width: '5%',
@@ -143,32 +145,32 @@ const CourseEarnings = ({ match }) => {
 
     return (
       <Card className={styles.card} title={<Text>{item.name}</Text>}>
-        {layout('Date', <Text>{toLongDateWithTime(item.booking_time)}</Text>)}
+        {layout(translate('DATE'), <Text>{toLongDateWithTime(item.booking_time)}</Text>)}
         {layout(
-          'Amount',
+          translate('AMOUNT'),
           <Text>
             {item.currency?.toUpperCase()} {item.total_price}
           </Text>
         )}
         {layout(
-          'Fees',
+          translate('FEES'),
           <Text>
             {item.currency?.toUpperCase()} {item.platform_fees}
           </Text>
         )}
         {layout(
-          'Net',
+          translate('NET'),
           <Text>
             {item.currency?.toUpperCase()} {item.net_price}
           </Text>
         )}
-        {layout('Status', <Text>{getPaymentStatus(item.status)}</Text>)}
+        {layout(translate('STATUS'), <Text>{getPaymentStatus(item.status)}</Text>)}
       </Card>
     );
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading Earning Details">
+    <Loader loading={isLoading} size="large" text={translate('LOADING_EARNING_DETAILS')}>
       <div className={styles.box}>
         <Row justify="start" className={classNames(styles.mt20, styles.mb20)}>
           <Col xs={24} md={4}>
@@ -177,13 +179,13 @@ const CourseEarnings = ({ match }) => {
               onClick={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount)}
               icon={<ArrowLeftOutlined />}
             >
-              All Earnings
+              {translate('ALL_EARNINGS')}
             </Button>
           </Col>
         </Row>
         <Row className={styles.mt50}>
           <Col xs={24} md={24}>
-            <Title level={5}>Course Earning Details</Title>
+            <Title level={5}>{translate('COURSE_EARNING_DETAILS')}</Title>
           </Col>
           <Col xs={24} md={16}>
             {showCourseName}
@@ -194,7 +196,7 @@ const CourseEarnings = ({ match }) => {
         </Row>
         <Row className={styles.mt50}>
           <Col xs={24} md={24}>
-            <Title level={5}>Attendee Details</Title>
+            <Title level={5}>{translate('ATTENDEE_DETAILS')}</Title>
           </Col>
           <Col xs={24} md={24}>
             {isMobileDevice ? (
@@ -203,7 +205,7 @@ const CourseEarnings = ({ match }) => {
                   earnings.details.map(renderCourseItem)
                 ) : (
                   <div className={classNames(styles.textAlignCenter, 'text-empty')}>
-                    <Empty />
+                    <Empty description={translate('NO_DATA')} />
                   </div>
                 )}
               </>

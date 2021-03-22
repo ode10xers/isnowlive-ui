@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Tag, Collapse } from 'antd';
 import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import Table from 'components/Table';
 
@@ -20,6 +21,7 @@ const {
 } = dateUtil;
 
 const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse }) => {
+  const { t: translate } = useTranslation();
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
   const [expandedSection, setExpandedSection] = useState([]);
@@ -71,7 +73,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   const generateLiveCourseColumns = (published) => [
     {
-      title: 'Course Name',
+      title: translate('COURSE_NAME'),
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => {
@@ -91,14 +93,14 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       },
     },
     {
-      title: 'Duration',
+      title: translate('DURATION'),
       dataIndex: 'start_time',
       key: 'start_time',
       width: '210px',
       render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
     },
     {
-      title: 'Course Content',
+      title: translate('COURSE_CONTENT'),
       dataIndex: 'inventory_ids',
       key: 'inventory_ids',
       width: '140px',
@@ -110,7 +112,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       ),
     },
     {
-      title: 'Price',
+      title: translate('PRICE'),
       dataIndex: 'price',
       key: 'price',
       width: '85px',
@@ -119,11 +121,11 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
     {
       title: published ? (
         <Button shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedPublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
         </Button>
       ) : (
         <Button shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedUnpublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
         </Button>
       ),
       width: '250px',
@@ -131,7 +133,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       render: (text, record) => (
         <Row gutter={8} justify="end">
           <Col xs={4}>
-            <Tooltip title="Edit Course">
+            <Tooltip title={translate('EDIT_COURSES')}>
               <Button
                 block
                 type="text"
@@ -141,21 +143,21 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             </Tooltip>
           </Col>
           <Col xs={4}>
-            <Tooltip title="Copy Course Link">
+            <Tooltip title={translate('COPY_COURSE_LINK')}>
               <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
             </Tooltip>
           </Col>
           <Col xs={6}>
             {record.is_published ? (
-              <Tooltip title="Hide Course">
+              <Tooltip title={translate('HIDE_COURSE')}>
                 <Button danger block type="link" onClick={() => unpublishCourse(record)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Course">
+              <Tooltip title={translate('SHOW_COURSE')}>
                 <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             )}
@@ -164,20 +166,20 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             {record.is_published ? (
               expandedPublishedRowKeys.includes(record.id) ? (
                 <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
-                  {record.buyers?.length} Buyers <UpOutlined />
+                  {record.buyers?.length} {translate('BUYERS')} <UpOutlined />
                 </Button>
               ) : (
                 <Button block type="link" onClick={() => expandRowPublished(record.id)}>
-                  {record.buyers?.length} Buyers <DownOutlined />
+                  {record.buyers?.length} {translate('BUYERS')} <DownOutlined />
                 </Button>
               )
             ) : expandedUnpublishedRowKeys.includes(record.id) ? (
               <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
-                {record.buyers?.length} Buyers <UpOutlined />
+                {record.buyers?.length} {translate('BUYERS')} <UpOutlined />
               </Button>
             ) : (
               <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
-                {record.buyers?.length} Buyers <DownOutlined />
+                {record.buyers?.length} {translate('BUYERS')} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -188,30 +190,30 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   const buyersColumns = [
     {
-      title: 'Name',
+      title: translate('NAME'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Date of Purchase',
+      title: translate('DATE_OF_PURCHASE'),
       dataIndex: 'date_of_purchase',
       key: 'date_of_purchase',
       width: '170px',
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
-      title: 'Net Price',
+      title: translate('NET_PRICE'),
       dataIndex: 'price_paid',
       key: 'price_paid',
       width: '100px',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.price_paid}`,
     },
     {
-      title: 'Discount Code',
+      title: translate('DISCOUNT_CODE'),
       dataIndex: 'discount',
       key: 'discount',
       width: '180px',
-      render: (text, record) => record.discount?.code || 'No Discount',
+      render: (text, record) => record.discount?.code || translate('NO_DISCOUNT'),
     },
   ];
 
@@ -240,9 +242,15 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
     return (
       <Col xs={24} key={subscriber.date_of_purchase}>
         <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {subscriber.name} </Title>}>
-          {layout('Buy Date', toDateAndTime(subscriber.date_of_purchase))}
-          {layout('Price', <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>)}
-          {layout('Discount Code', <Text strong> {subscriber.discount?.code || 'No Discount'} </Text>)}
+          {layout(translate('BUY_DATE'), toDateAndTime(subscriber.date_of_purchase))}
+          {layout(
+            translate('PRICE'),
+            <Text strong> {`${subscriber.price_paid} ${subscriber.currency.toUpperCase()}`} </Text>
+          )}
+          {layout(
+            translate('DISCOUNT_CODE'),
+            <Text strong> {subscriber.discount?.code || translate('NO_DISCOUNT')} </Text>
+          )}
         </Card>
       </Col>
     );
@@ -269,7 +277,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             </div>
           }
           actions={[
-            <Tooltip title="Edit">
+            <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
@@ -277,7 +285,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
-            <Tooltip title="Copy Course Link">
+            <Tooltip title={translate('COPY_COURSE_LINK')}>
               <Button
                 type="text"
                 className={styles.detailsButton}
@@ -286,15 +294,15 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               />
             </Tooltip>,
             course.is_published ? (
-              <Tooltip title="Hide Course">
+              <Tooltip title={translate('HIDE_COURSE')}>
                 <Button type="link" danger onClick={() => unpublishCourse(course)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Course">
+              <Tooltip title={translate('SHOW_COURSE')}>
                 <Button type="link" className={styles.successBtn} onClick={() => publishCourse(course)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             ),
@@ -312,17 +320,17 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
           ]}
         >
           {layout(
-            'Duration',
+            translate('DURATION'),
             <Text> {`${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`} </Text>
           )}
           {layout(
-            'Content',
+            translate('CONTENT'),
             <>
               {course.inventory_ids?.length > 0 && <Tag color="volcano"> {course.inventory_ids?.length} sessions</Tag>}
               {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
             </>
           )}
-          {layout('Price', <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}
+          {layout(translate('PRICE'), <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course.id) && (
@@ -338,12 +346,12 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
   return (
     <div>
       <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
-        <Panel header={<Title level={5}> Published </Title>} key="published">
+        <Panel header={<Title level={5}> {translate('PUBLISHED')} </Title>} key="published">
           {isMobileDevice ? (
             <Row gutter={[8, 16]}>
               <Col xs={24}>
                 <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-                  {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  {expandedPublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
                 </Button>
               </Col>
               {liveCourses?.filter((liveCourse) => liveCourse.is_published).map(renderCourseItem)}
@@ -364,12 +372,13 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             />
           )}
         </Panel>
-        <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+        <Panel header={<Title level={5}> {translate('UNPUBLISHED')} </Title>} key="unpublished">
           {isMobileDevice ? (
             <Row gutter={[8, 16]}>
               <Col xs={24}>
                 <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-                  {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                  {expandedUnpublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')}{' '}
+                  {translate('ALL')}
                 </Button>
               </Col>
               {liveCourses?.filter((liveCourse) => !liveCourse.is_published).map(renderCourseItem)}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import { Row, Col, Button, Typography, Collapse, Empty, Tooltip, Popover, List, Card } from 'antd';
 import { EditTwoTone, UpOutlined, DownOutlined } from '@ant-design/icons';
 
@@ -20,6 +20,7 @@ const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 const Coupons = () => {
+  const { t: translate } = useTranslation();
   const [isLoading, setIsLoading] = useState([]);
   const [coupons, setCoupons] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -73,7 +74,7 @@ const Coupons = () => {
         setCoupons(data);
       }
     } catch (error) {
-      showErrorModal('Failed fetching coupons', error.response?.data?.message || 'Something went wrong');
+      showErrorModal('Failed fetching coupons', error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -181,11 +182,11 @@ const Coupons = () => {
     {
       title: published ? (
         <Button shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedPublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
         </Button>
       ) : (
         <Button shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedUnpublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')} {translate('ALL')}
         </Button>
       ),
       align: 'right',
@@ -196,21 +197,21 @@ const Coupons = () => {
         return (
           <Row gutter={[8, 8]} justify="end">
             <Col xs={4}>
-              <Tooltip title="Edit Discount Code">
+              <Tooltip title={translate('EDIT_DISCOUNT_CODE')}>
                 <Button type="link" icon={<EditTwoTone />} onClick={() => editCoupon(record)} />
               </Tooltip>
             </Col>
             <Col xs={8}>
               {record.is_published ? (
-                <Tooltip title="Hide Discount Code">
+                <Tooltip title={translate('HIDE_DISCOUNT_CODE')}>
                   <Button danger type="link" onClick={() => unpublishCoupon(record.external_id)}>
-                    Hide
+                    {translate('HIDE')}
                   </Button>
                 </Tooltip>
               ) : (
-                <Tooltip title="Unhide Discount Code">
+                <Tooltip title={translate('SHOW_DISCOUNT_CODE')}>
                   <Button type="link" className={styles.greenBtn} onClick={() => publishCoupon(record.external_id)}>
-                    Show
+                    {translate('SHOW')}
                   </Button>
                 </Tooltip>
               )}
@@ -244,21 +245,16 @@ const Coupons = () => {
 
   const redemptionColumns = [
     {
-      title: 'User Name',
+      title: translate('USER_NAME'),
       dataIndex: 'customer_name',
       key: 'customer_name',
     },
     {
-      title: 'Discount Amount',
+      title: translate('DISCOUNT_AMOUNT'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record) => `${record.currency?.toUpperCase()} ${record.amount}`,
     },
-    // {
-    //   title: '',
-    //   dataIndex: '',
-    //   key: '',
-    // },
   ];
 
   const renderRedemptionList = (record) => {
@@ -284,7 +280,7 @@ const Coupons = () => {
     const productListBtn = (
       <Popover
         trigger="click"
-        title={`${productName} List`}
+        title={`${productName} ${translate('LIST')}`}
         content={
           <List size="small" dataSource={coupon.products} renderItem={(item) => <List.Item> {item.name} </List.Item>} />
         }
@@ -301,19 +297,19 @@ const Coupons = () => {
           title={<Title level={5}> {coupon.code} </Title>}
           bodyStyle={{ padding: '24px 24px 10px 24px' }}
           actions={[
-            <Tooltip title="Edit Discount Code">
+            <Tooltip title={translate('EDIT_DISCOUNT_CODE')}>
               <Button type="link" icon={<EditTwoTone />} onClick={() => editCoupon(coupon)} />
             </Tooltip>,
             coupon.is_published ? (
-              <Tooltip title="Hide Discount Code">
+              <Tooltip title={translate('HIDE_DISCOUNT_CODE')}>
                 <Button danger type="link" onClick={() => unpublishCoupon(coupon.external_id)}>
-                  Hide
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (
-              <Tooltip title="Unhide Discount Code">
+              <Tooltip title={translate('SHOW_DISCOUNT_CODE')}>
                 <Button type="link" className={styles.greenBtn} onClick={() => publishCoupon(coupon.external_id)}>
-                  Show
+                  {translate('SHOW')}
                 </Button>
               </Tooltip>
             ),
@@ -330,11 +326,10 @@ const Coupons = () => {
             ),
           ]}
         >
-          {layout('Discount Value', `${coupon.value} %`)}
+          {layout(translate('DISCOUNT_VALUE'), `${coupon.value} %`)}
           <Row gutter={[8, 16]}>
             <Col xs={18}>
-              {' '}
-              <Text strong>Applicable Products</Text> :{' '}
+              <Text strong>{translate('APPLICABLE_PRODUCTS')}</Text> :{' '}
             </Col>
             <Col xs={24}>
               <Row gutter={[8, 8]} justify="center">
@@ -367,7 +362,7 @@ const Coupons = () => {
     return (
       <Col xs={24} key={item.order_id}>
         <Card bodyStyle={{ padding: '20px 10px' }} title={<Title level={5}> {item.customer_name} </Title>}>
-          {layout('Discount Amount', `${item.currency?.toUpperCase()} ${item.amount}`)}
+          {layout(translate('DISCOUNT_AMOUNT'), `${item.currency?.toUpperCase()} ${item.amount}`)}
         </Card>
       </Col>
     );
@@ -382,23 +377,24 @@ const Coupons = () => {
       />
       <Row gutter={[8, 8]}>
         <Col xs={12} md={14} lg={18}>
-          <Title level={4}> Coupons </Title>
+          <Title level={4}> {translate('COUPONS')} </Title>
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showCreateCouponModal()}>
-            Create New Coupon
+            {translate('CREATE_COUPONS')}
           </Button>
         </Col>
         <Col xs={24}>
           <Collapse>
-            <Panel header={<Title level={5}> Published </Title>} key="Published">
+            <Panel header={<Title level={5}> {translate('PUBLISHED')} </Title>} key="Published">
               {coupons?.length ? (
                 isMobileDevice ? (
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
                         <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
-                          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                          {expandedPublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')}{' '}
+                          {translate('ALL')}
                         </Button>
                       </Col>
                       {coupons?.filter((coupon) => coupon?.is_published).map(renderMobileCouponItem)}
@@ -421,17 +417,18 @@ const Coupons = () => {
                   />
                 )
               ) : (
-                <Empty description="No Published Coupons" />
+                <Empty description={translate('NO_PUBLISHED_COUPONS')} />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Unpublished </Title>} key="Unpublished">
+            <Panel header={<Title level={5}> {translate('UNPUBLISHED')} </Title>} key="Unpublished">
               {coupons?.length ? (
                 isMobileDevice ? (
-                  <Loader loading={isLoading} size="large" text="Loading coupons">
+                  <Loader loading={isLoading} size="large" text={translate('LOADING_COUPONS')}>
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
                         <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
-                          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                          {expandedUnpublishedRowKeys.length > 0 ? translate('COLLAPSE') : translate('EXPAND')}{' '}
+                          {translate('ALL')}
                         </Button>
                       </Col>
                       {coupons?.filter((coupon) => !coupon?.is_published).map(renderMobileCouponItem)}
@@ -454,7 +451,7 @@ const Coupons = () => {
                   />
                 )
               ) : (
-                <Empty description="No Unpublished Coupons" />
+                <Empty description={translate('NO_UNPUBLISHED_COUPONS')} />
               )}
             </Panel>
           </Collapse>

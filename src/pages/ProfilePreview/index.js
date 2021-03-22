@@ -32,6 +32,7 @@ import dateUtil from 'utils/date';
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
+import { useTranslation } from 'react-i18next';
 
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
@@ -47,6 +48,7 @@ const productKeys = {
 };
 
 const ProfilePreview = ({ username = null }) => {
+  const { t: translate } = useTranslation();
   const history = useHistory();
   const location = useLocation();
   const md = new MobileDetect(window.navigator.userAgent);
@@ -415,7 +417,7 @@ const ProfilePreview = ({ username = null }) => {
                             calendarView={calendarView}
                           />
                         ) : (
-                          <Empty />
+                          <Empty description={translate('NO_DATA')} />
                         )}
                       </Loader>
                     ) : (
