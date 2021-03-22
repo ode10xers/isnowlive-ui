@@ -18,7 +18,7 @@ const ExternalSiteSettings = () => {
   const [selectedWidget, setSelectedWidget] = useState(widgetComponentsName['CALENDAR'].value);
 
   const generateWidgetText = useCallback(() => {
-    return `<iframe src="${widgetLink}" width="100%" />`;
+    return `<iframe src="${widgetLink}" width="100%" height="700px" />`;
   }, [widgetLink]);
 
   useEffect(() => {
