@@ -55,10 +55,16 @@ const SendCustomerEmailModal = () => {
       form.resetFields();
     } else {
       setValidRecipients(recipients);
-      setSelectedRecipients(recipients?.active?.map((user) => user.external_id));
+      setSelectedRecipients([
+        ...recipients?.active?.map((user) => user.external_id),
+        ...recipients?.expired?.map((user) => user.external_id),
+      ]);
 
       form.setFieldsValue({
-        recipients: recipients.active.map((user) => user.external_id),
+        recipients: [
+          ...recipients?.active?.map((user) => user.external_id),
+          ...recipients?.expired?.map((user) => user.external_id),
+        ],
       });
     }
   }, [emailPopupVisible, recipients, form]);
