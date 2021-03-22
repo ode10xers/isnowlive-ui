@@ -10,6 +10,7 @@ import {
   VideoCameraAddOutlined,
   InfoCircleOutlined,
   BookTwoTone,
+  MailOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -33,6 +34,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { useGlobalContext } from 'services/globalContext';
 
 import Icons from 'assets/icons';
 
@@ -47,6 +49,8 @@ const { creator } = mixPanelEventTags;
 const whiteColor = '#FFFFFF';
 
 const SessionsInventories = ({ match }) => {
+  const { showSendEmailPopup } = useGlobalContext();
+
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -73,7 +77,8 @@ const SessionsInventories = ({ match }) => {
           time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
           start_time: i?.start_time,
           end_time: i?.end_time,
-          participants: i.num_participants,
+          num_participants: i.num_participants,
+          participants: i.participants,
           start_url: i.start_url,
           inventory_id: i?.inventory_id,
           session_id: i.session_id,
@@ -81,6 +86,7 @@ const SessionsInventories = ({ match }) => {
           color_code: i.color_code,
           is_published: i.is_published,
           is_course: i.is_course,
+          external_id: i.inventory_external_id,
         }));
 
         let filterByDateSessions = [];
@@ -123,6 +129,19 @@ const SessionsInventories = ({ match }) => {
       getStaffSession(match?.params?.session_type);
     }
   }, [match.params.session_type, getStaffSession]);
+
+  const showEmailPopup = (inventory) => {
+    // Since user cannot book past inventory, we only have one type here
+    // either active if upcoming or expired if past
+    showSendEmailPopup({
+      recipients: {
+        active: isPast ? [] : inventory.participants || [],
+        expired: isPast ? inventory.participants || [] : [],
+      },
+      productId: inventory.external_id,
+      productType: 'SESSION',
+    });
+  };
 
   const trackAndStartSession = (data) => {
     const eventTag = isMobileDevice
@@ -254,11 +273,11 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: 'Participants',
-      key: 'participants',
-      dataIndex: 'participants',
+      key: 'num_participants',
+      dataIndex: 'num_participants',
       width: '12%',
       render: (text, record) =>
-        renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
+        renderSimpleTableCell(record.is_date, `${record.num_participants || 0} / ${record.max_participants}`),
     },
     {
       title: 'Actions',
@@ -268,9 +287,14 @@ const SessionsInventories = ({ match }) => {
           return emptyTableCell;
         }
 
-        const isDisabled = record.participants > 0;
+        const isDisabled = record.num_participants > 0;
         return isPast ? (
           <Row justify="start">
+            <Col>
+              <Tooltip title="Send Customer Email">
+                <Button type="text" onClick={() => showEmailPopup(record)} icon={<MailOutlined />} />
+              </Tooltip>
+            </Col>
             <Col>
               <Tooltip title="Event Details">
                 <Button
@@ -284,6 +308,11 @@ const SessionsInventories = ({ match }) => {
           </Row>
         ) : (
           <Row justify="start" gutter={[8, 8]}>
+            <Col md={24} lg={24} xl={4}>
+              <Tooltip title="Send Customer Email">
+                <Button type="text" onClick={() => showEmailPopup(record)} icon={<MailOutlined />} />
+              </Tooltip>
+            </Col>
             <Col md={24} lg={24} xl={4}>
               <Tooltip title="Event Details">
                 <Button
@@ -372,7 +401,7 @@ const SessionsInventories = ({ match }) => {
   ];
 
   const renderSessionItem = (item) => {
-    const isCancelDisabled = item.participants > 0;
+    const isCancelDisabled = item.num_participants > 0;
 
     const layout = (label, value) => (
       <Row>
@@ -462,7 +491,7 @@ const SessionsInventories = ({ match }) => {
         {layout(
           isPast ? 'Registrations' : 'Attendees',
           <Text>
-            {item.participants || 0} {'/'} {item.max_participants}
+            {item.num_participants || 0} {'/'} {item.max_participants}
           </Text>
         )}
       </Card>
