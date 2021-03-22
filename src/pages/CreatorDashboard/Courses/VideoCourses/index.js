@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse } from 'antd';
-import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import {
+  MailOutlined,
+  CopyOutlined,
+  EditTwoTone,
+  DownOutlined,
+  UpOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons';
 
 import Table from 'components/Table';
 
@@ -19,7 +26,7 @@ const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
-const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCourse }) => {
+const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCourse, showSendEmailModal }) => {
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
 
@@ -122,7 +129,12 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       align: 'right',
       render: (text, record) => (
         <Row gutter={8} justify="end">
-          <Col xs={4}>
+          <Col xs={3}>
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+            </Tooltip>
+          </Col>
+          <Col xs={3}>
             <Tooltip title="Edit Course">
               <Button
                 block
@@ -132,12 +144,12 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
               />
             </Tooltip>
           </Col>
-          <Col xs={4}>
+          <Col xs={3}>
             <Tooltip title="Copy Course Link">
               <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
             </Tooltip>
           </Col>
-          <Col xs={6}>
+          <Col xs={5}>
             {record.is_published ? (
               <Tooltip title="Hide Course">
                 <Button danger block type="link" onClick={() => unpublishCourse(record)}>

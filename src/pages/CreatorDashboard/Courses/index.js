@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Tabs, Typography, Button } from 'antd';
 
 import Loader from 'components/Loader';
+import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import CreateCourseModal from 'components/CreateCourseModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
@@ -23,6 +24,7 @@ const Courses = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [targetCourse, setTargetCourse] = useState(null);
   const [isVideoModal, setIsVideoModal] = useState(false);
+  const [emailModalVisible, setEmailModalVisible] = useState(false);
 
   const fetchAllCoursesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -77,6 +79,16 @@ const Courses = () => {
     setSelectedListTab(key);
   };
 
+  const showSendEmailModal = (course) => {
+    setTargetCourse(course);
+    setEmailModalVisible(true);
+  };
+
+  const hideSendEmailModal = () => {
+    setTargetCourse(null);
+    setEmailModalVisible(false);
+  };
+
   const openCreateCourseModal = (type = 'mixed') => {
     setIsVideoModal(type === 'video');
     setCreateModalVisible(true);
@@ -99,6 +111,13 @@ const Courses = () => {
 
   return (
     <div className={styles.box}>
+      <SendCustomerEmailModal
+        visible={emailModalVisible}
+        closeModal={hideSendEmailModal}
+        productId={targetCourse?.external_id}
+        productType={'COURSE'}
+        recipients={targetCourse?.buyers}
+      />
       <CreateCourseModal
         visible={createModalVisible}
         closeModal={hideCreateCourseModal}
@@ -132,6 +151,7 @@ const Courses = () => {
                       showEditModal={openEditCourseModal}
                       publishCourse={publishCourse}
                       unpublishCourse={unpublishCourse}
+                      showSendEmailModal={showSendEmailModal}
                     />
                   </Col>
                 </Row>
@@ -153,6 +173,7 @@ const Courses = () => {
                       showEditModal={openEditCourseModal}
                       publishCourse={publishCourse}
                       unpublishCourse={unpublishCourse}
+                      showSendEmailModal={showSendEmailModal}
                     />
                   </Col>
                 </Row>
