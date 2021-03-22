@@ -7,12 +7,10 @@ export default function EmbeddablePage() {
   const location = window.location;
   const { widgetType } = parseQueryString(location.search);
 
-  console.log('widgetType', widgetType);
-
   let componentToLoad = null;
   if (widgetType === 'calendar') {
     componentToLoad = <CalendarSessions />;
   }
 
-  return <>{componentToLoad}</>;
+  return <div style={{ padding: '20px' }}>{componentToLoad}</div>;
 }
