@@ -33,7 +33,7 @@ const CookieConsentPopup = () => {
       mask: true,
       closable: false,
       maskClosable: false,
-      title: 'Need your attention',
+      title: translate('COOKIES_CONSENT_TITLE'),
       content: (
         <>
           <Paragraph>
@@ -107,18 +107,13 @@ const CookieConsentPopup = () => {
       disableButtonStyles={true}
     >
       <Paragraph className={styles.whiteText}>
-        Our website requires the use of certain cookies in order to fully function and give you the best possible
-        service. Some of these cookies are{' '}
+        {translate('COOKIES_CONCENT_TEXT_1')}
         <Text strong className={styles.whiteText}>
-          {' '}
-          third party cookies{' '}
+          {translate('COOKIES_CONCENT_TEXT_2')}
         </Text>
-        that we use to enable us to provide realtime chat to support you whenever needed, give a smoother payment
-        experience and analyze the site's performance on your device,
+        {translate('COOKIES_CONCENT_TEXT_9')}
       </Paragraph>
-      <Paragraph className={styles.whiteText}>
-        In order to continue to the website, we need you to acknowledge and accept the use of these cookies.
-      </Paragraph>
+      <Paragraph className={styles.whiteText}>{translate('COOKIES_CONCENT_TEXT_7')}</Paragraph>
     </CookieConsent>
   );
 };
