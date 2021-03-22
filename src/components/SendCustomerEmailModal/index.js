@@ -22,6 +22,11 @@ const {
   timeCalculation: { isBeforeDate },
 } = dateUtil;
 
+const formInitialValues = {
+  recipients: [],
+  subject: '',
+};
+
 const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, productType }) => {
   const [form] = Form.useForm();
 
@@ -36,12 +41,18 @@ const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, pr
       setFilteredRecipients([]);
       setSelectedRecipients([]);
       setEmailDocumentUrl(null);
+
+      form.resetFields();
     } else {
       const validRecipients = recipients?.filter((user) => isBeforeDate(user.expiry_date)) || [];
       setFilteredRecipients(validRecipients);
       setSelectedRecipients(validRecipients.map((user) => user.external_id));
+
+      form.setFieldsValue({
+        recipients: validRecipients.map((user) => user.external_id),
+      });
     }
-  }, [visible, recipients]);
+  }, [visible, recipients, form]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -85,7 +96,14 @@ const SendCustomerEmailModal = ({ visible, closeModal, recipients, productId, pr
       footer={null}
       width={640}
     >
-      <Form layout="horizontal" name="EmailForm" form={form} onFinish={handleFinish} scrollToFirstError={true}>
+      <Form
+        layout="horizontal"
+        name="EmailForm"
+        form={form}
+        onFinish={handleFinish}
+        scrollToFirstError={true}
+        initialValues={formInitialValues}
+      >
         <Row gutter={[8, 16]}>
           <Col xs={24}>
             <Form.Item
