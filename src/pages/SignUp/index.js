@@ -22,7 +22,7 @@ const { Item } = Form;
 const { user } = mixPanelEventTags;
 
 const SignUp = ({ history }) => {
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +47,7 @@ const SignUp = ({ history }) => {
     } catch (error) {
       setIsLoading(false);
       trackFailedEvent(eventTag, error, { email: values.email });
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -55,13 +55,13 @@ const SignUp = ({ history }) => {
     <Row align="middle" className={styles.mt50}>
       <Col xs={24} md={{ span: 12, offset: 6 }}>
         <Form form={form} {...formLayout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
-          <Item label="Email" name="email" rules={validationRules.emailValidation}>
+          <Item label={t('EMAIL')} name="email" rules={validationRules.emailValidation}>
             <Input />
           </Item>
 
           <Item {...formTailLayout}>
             <Button type="primary" htmlType="submit" loading={isLoading}>
-              Submit
+              {t('SUBMIT')}
             </Button>
           </Item>
         </Form>
