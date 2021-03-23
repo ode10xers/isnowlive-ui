@@ -22,7 +22,7 @@ import styles from './style.module.scss';
 const { Paragraph, Title, Text } = Typography;
 
 const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn }) => {
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
   const { logIn } = useGlobalContext();
   const history = useHistory();
   const [form] = Form.useForm();
@@ -45,7 +45,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   const signinUser = (data) => {
     http.setAuthToken(data.auth_token);
     logIn(data, true);
-    message.success('You have logged in');
+    message.success(t('YOU_HAVE_LOGGED_IN'));
 
     const user_type = data.is_creator ? 'creator' : 'attendee';
     history.push(`/${user_type}/dashboard/sessions/upcoming`);
@@ -68,9 +68,9 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setShowPasswordField(true);
-        message.info('Enter password to register session');
+        message.info(t('ENTER_PASSWORD'));
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       }
     }
     setIsLoading(false);
@@ -99,16 +99,16 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
         } catch (error) {
           if (error.response?.status === 403) {
             setIncorrectPassword(true);
-            message.error('Incorrect email or password');
+            message.error(t('INCORRECT_EMAIL_OR_PASSWORD'));
           } else {
-            message.error(error.response?.data?.message || 'Something went wrong');
+            message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
           }
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   };
@@ -122,7 +122,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
       const values = await form.validateFields(['email']);
       handleSendNewPasswordEmail(values.email);
     } catch (error) {
-      showErrorModal('Please input your email first!');
+      showErrorModal(t('MISSING_EMAIL_ERROR_TEXT'));
     }
   };
 
@@ -136,7 +136,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -154,37 +154,37 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
             <Row gutter={[8, 8]}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
-                  <Title level={4}>{`Sign ${signingIn ? 'In' : 'Up'} To Continue`}</Title>
-                  {`Sign ${signingIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
+                  <Title level={4}>{`${signingIn ? t('SIGN_IN') : t('SIGN_UP')} ${t('HEADER_MODAL_TITLE_1')}`}</Title>
+                  {`${signingIn ? t('SIGN_IN') : t('SIGN_UP')} ${t('HEADER_MODAL_TEXT_1')}`}
                 </Paragraph>
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 {!signingIn && (
-                  <Form.Item label="Name" className={styles.nameInputWrapper}>
+                  <Form.Item label={t('NAME')} className={styles.nameInputWrapper}>
                     <Form.Item
                       className={styles.firstNameInput}
                       name="first_name"
                       rules={validationRules.nameValidation}
                     >
-                      <Input placeholder="First Name" disabled={showPasswordField} />
+                      <Input placeholder={t('FIRST_NAME')} disabled={showPasswordField} />
                     </Form.Item>
                     <Form.Item className={styles.lastNameInput} name="last_name" rules={validationRules.nameValidation}>
-                      <Input placeholder="Last Name" disabled={showPasswordField} />
+                      <Input placeholder={t('LAST_NAME')} disabled={showPasswordField} />
                     </Form.Item>
                   </Form.Item>
                 )}
-                <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                  <Input placeholder="Enter your email" disabled={!signingIn && showPasswordField} />
+                <Form.Item label={t('EMAIL')} name="email" rules={validationRules.emailValidation}>
+                  <Input placeholder={t('ENTER_YOUR_EMAIL')} disabled={!signingIn && showPasswordField} />
                 </Form.Item>
                 {(signingIn || showPasswordField) && (
                   <>
-                    <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-                      <Input.Password placeholder="Enter your password" />
+                    <Form.Item label={t('PASSWORD')} name="password" rules={validationRules.passwordValidation}>
+                      <Input.Password placeholder={t('ENTER_PASSWORD')} />
                     </Form.Item>
                     {incorrectPassword && (
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.incorrectPasswordText}>
-                          <Text type="danger">Email or password you entered was incorrect, please try again</Text>
+                          <Text type="danger"> {t('HEADER_MODAL_LOGIN_ERROR_TEXT')} </Text>
                         </div>
                       </Form.Item>
                     )}
@@ -192,9 +192,9 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.passwordHelpText}>
                           <Text>
-                            You already have an account, but if you haven't set your password, please{' '}
+                            {t('HEADER_MODAL_SIGN_UP_HELP_TEXT_1')}{' '}
                             <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
-                              set a new password
+                              {t('SET_NEW_PASSWORD').toLowerCase()}
                             </Text>
                           </Text>
                         </div>
@@ -205,7 +205,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                 {signingIn && (
                   <Form.Item {...purchaseModalCenterLayout}>
                     <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
-                      Set a new password
+                      {t('SET_NEW_PASSWORD')}
                     </Button>
                   </Form.Item>
                 )}
@@ -213,13 +213,13 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
-                    Sign {signingIn ? 'In' : 'Up'}
+                    {signingIn ? t('SIGN_IN') : t('SIGN_UP')}
                   </Button>
                 </Form.Item>
                 <Paragraph className={styles.textAlignCenter}>
-                  {signingIn ? "Don't" : 'Already'} have an account?{' '}
+                  {signingIn ? t('DONT_HAVE_AN_ACCOUNT') : t('ALREADY_HAVE_AN_ACCOUNT')}{' '}
                   <Button className={styles.linkBtn} type="link" onClick={() => toggleSigningIn()}>
-                    Sign {signingIn ? 'Up' : 'In'}
+                    {signingIn ? t('SIGN_UP') : t('SIGN_IN')}
                   </Button>
                 </Paragraph>
               </Col>
