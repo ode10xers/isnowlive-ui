@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm } from 'antd';
 import {
-  EditOutlined,
+  EditTwoTone,
   CloudUploadOutlined,
   DownOutlined,
   UpOutlined,
@@ -321,7 +321,7 @@ const Videos = () => {
                 className={styles.detailsButton}
                 type="text"
                 onClick={() => showUploadVideoModal(record)}
-                icon={<EditOutlined />}
+                icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>
           </Col>
@@ -485,19 +485,15 @@ const Videos = () => {
     const actionButtons =
       video?.status === 'UPLOAD_SUCCESS'
         ? [
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showEmailModal(video)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
                 type="text"
                 onClick={() => showUploadVideoModal(video)}
-                icon={<EditOutlined />}
-              />
-            </Tooltip>,
-            <Tooltip title="Video uploaded">
-              <Button
-                className={classNames(styles.detailsButton, styles.checkIcon)}
-                type="text"
-                icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
             <Tooltip title="Clone Video">
@@ -552,12 +548,15 @@ const Videos = () => {
             ),
           ]
         : [
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showEmailModal(video)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
                 type="text"
                 onClick={() => showUploadVideoModal(video)}
-                icon={<EditOutlined />}
+                icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
             <Tooltip title={video?.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
@@ -619,8 +618,16 @@ const Videos = () => {
           className={styles.card}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${video?.color_code || '#FFF'}` }}>
-              <Text>{video?.title}</Text>
-              {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              <Text>{video?.title}</Text> {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              {video?.status === 'UPLOAD_SUCCESS' ? (
+                <Tooltip title="Video uploaded">
+                  <Button
+                    className={classNames(styles.detailsButton, styles.checkIcon)}
+                    type="text"
+                    icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                  />
+                </Tooltip>
+              ) : null}
             </div>
           }
           actions={actionButtons}

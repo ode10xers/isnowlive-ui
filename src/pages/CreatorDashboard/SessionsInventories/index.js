@@ -435,6 +435,9 @@ const SessionsInventories = ({ match }) => {
     );
 
     const actionButtons = [
+      <Tooltip title="Send Customer Email">
+        <Button type="text" onClick={() => showEmailPopup(item)} icon={<MailOutlined />} />
+      </Tooltip>,
       <Tooltip title="Event Details">
         <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
       </Tooltip>,
@@ -479,8 +482,7 @@ const SessionsInventories = ({ match }) => {
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
-            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
-            <Text>{item.name}</Text>
+            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>{' '}
             {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
@@ -489,7 +491,7 @@ const SessionsInventories = ({ match }) => {
         {layout('Duration', <Text>{item.duration}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
         {layout(
-          isPast ? 'Registrations' : 'Attendees',
+          'Attendees',
           <Text>
             {item.num_participants || 0} {'/'} {item.max_participants}
           </Text>
