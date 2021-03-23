@@ -10,11 +10,11 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { i18n } from 'utils/i18n';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { i18n } from 'utils/i18n';
 
 const { Text } = Typography;
 
@@ -34,7 +34,7 @@ const creatorProductInfo = [
 // ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
 const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   const { t } = useTranslation();
-  
+
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -131,12 +131,14 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       }
     } catch (error) {
       if (error?.response?.status === 500 && error?.response?.data?.message === 'a coupon like this already exists') {
-        showErrorModal(
-          t('DUPLICATE_DISCOUNT_CODE'),
-          t('DUPLICATE_DISCOUNT_CODE_MESSAGE')
-        );
+        showErrorModal(t('DUPLICATE_DISCOUNT_CODE'), t('DUPLICATE_DISCOUNT_CODE_MESSAGE'));
       } else {
-        showErrorModal(`${t('FAILED_TO')} ${editedCoupon ? t('EDIT').toLowerCase() : t('CREATE').toLowerCase()} ${t('DISCOUNT_CODE').toLowerCase()}`, error?.response?.data?.message);
+        showErrorModal(
+          `${t('FAILED_TO')} ${editedCoupon ? t('EDIT').toLowerCase() : t('CREATE').toLowerCase()} ${t(
+            'DISCOUNT_CODE'
+          ).toLowerCase()}`,
+          error?.response?.data?.message
+        );
       }
     }
 
@@ -181,7 +183,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                       noStyle
                       id="discountPercent"
                       name="discountPercent"
-                      rules={validationRules.numberValidation(t('DISCOUNT_AMOUNT_ERROR_MESSAGE'), 1, true, 100)}
+                      rules={validationRules.numberValidation(t('DISCOUNT_AMOUNT_ERROR_TEXT'), 1, true, 100)}
                     >
                       <InputNumber
                         min={1}

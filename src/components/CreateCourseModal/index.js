@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -17,6 +18,7 @@ import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
+import { i18n } from 'utils/i18n';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
 
@@ -25,11 +27,11 @@ import styles from './styles.module.scss';
 const courseTypes = {
   MIXED: {
     name: 'MIXED',
-    label: 'Live Session Course',
+    label: i18n.t('LIVE_SESSION_COURSE'),
   },
   VIDEO_NON_SEQ: {
     name: 'VIDEO_NON_SEQUENCE',
-    label: 'Non-Sequential Video Course',
+    label: i18n.t('NON_SEQUENTIAL_VIDEO_COURSE'),
   },
 };
 
@@ -71,6 +73,7 @@ const {
 } = dateUtil;
 
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   const [courseClasses, setCourseClasses] = useState([]);
@@ -97,7 +100,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setCourseClasses(data.filter((session) => session.inventory.length > 0));
       }
     } catch (error) {
-      showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal(t('FAILED_TO_FETCH_COURSE_CLASSES'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   }, []);
@@ -117,7 +120,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setVideos(filteredVideos);
       }
     } catch (error) {
-      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal(t('FAILED_TO_FETCH_VIDEOS'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   }, []);
@@ -132,8 +135,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       }
     } catch (error) {
       showErrorModal(
-        'Failed to fetch creator currency details',
-        error?.response?.data?.message || 'Something went wrong'
+        t('FAILED_TO_FETCH_CREATOR_CURRENCY_DETAILS'),
+        error?.response?.data?.message || t('SOMETHING_WENT_WRONG')
       );
     }
     setIsLoading(false);
@@ -406,7 +409,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       let processedVideosIDs = selectedVideos;
 
       if (processedVideosIDs.length <= 0) {
-        showErrorModal('Course Video Required', 'Please select at least one course video to include in this course');
+        showErrorModal(t('COURSE_VIDEO_REQUIRED'), t('COURSE_VIDEO_REQUIRED_MESSAGE'));
         setSubmitting(false);
         return;
       }
@@ -427,7 +430,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       const sessionInventories = selectedInventories.filter((inv) => allInventoryIds.includes(inv));
 
       if (!sessionInventories || sessionInventories?.length <= 0) {
-        showErrorModal('Schedule not found', 'Please select at least one schedule in the table');
+        showErrorModal(t('SCHEDULE_NOT_FOUND'), t('SCHEDULE_NOT_FOUND_MESSAGE'));
         setSubmitting(false);
         return;
       }
@@ -454,11 +457,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         : await apis.courses.createCourse(payload);
 
       if (isAPISuccess(response.status)) {
-        showSuccessModal(`${payload.name} successfully ${editedCourse ? 'updated' : 'created'}`);
+        showSuccessModal(
+          `${payload.name} successfully ${editedCourse ? t('UPDATED').toLowerCase() : t('CREATED').toLowerCase()}`
+        );
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedCourse ? 'update' : 'create'} course`);
+      showErrorModal(`${t('FAILED_TO')} ${editedCourse ? t('UPDATE') : t('CREATE')} ${t('COURSE')}`);
     }
 
     setSubmitting(false);
@@ -467,7 +472,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const renderSessionDates = () => {
     const noInventoryComponent = (
       <Col xs={24}>
-        <Text type="secondary">No sessions found for the date range</Text>
+        <Text type="secondary">{t('NO_SESSIONS_FOR_DATE_RANGE')}</Text>
       </Col>
     );
 
@@ -479,7 +484,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
     const tableColumns = [
       {
-        title: 'Name',
+        title: t('NAME'),
         dataIndex: 'name',
         key: 'name',
         render: (text, record) => {
@@ -506,7 +511,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         },
       },
       {
-        title: 'Date & Time',
+        title: t('DATE_AND_TIME'),
         dataIndex: 'start_date',
         key: 'start_date',
         align: 'right',
@@ -562,7 +567,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           {...courseModalFormLayout}
           id="selectedCourseClass"
           name="selectedCourseClass"
-          label="Course Session"
+          label={t('COURSE_SESSIONS')}
           hidden={isVideoModal}
           rules={isVideoModal ? [] : validationRules.arrayValidation}
         >
@@ -571,13 +576,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             showSearch={false}
             mode="multiple"
             maxTagCount={2}
-            placeholder="Select Class"
+            placeholder={t('SELECT_COURSE_CLASSES')}
             value={selectedCourseClass}
             onChange={handleCourseClassChange}
             optionLabelProp="label"
           >
             <Select.OptGroup
-              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+              label={<Text className={styles.optionSeparatorText}> {t('VISIBLE_PUBLICLY')} </Text>}
               key="Published Session"
             >
               {courseClasses
@@ -605,11 +610,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   </Select.Option>
                 ))}
               {courseClasses?.filter((courseClass) => courseClass.is_active).length <= 0 && (
-                <Text disabled> No published sessions </Text>
+                <Text disabled> {t('NO_PUBLISHED_SESSIONS')} </Text>
               )}
             </Select.OptGroup>
             <Select.OptGroup
-              label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+              label={<Text className={styles.optionSeparatorText}> {t('HIDDEN_FROM_EVERYONE')} </Text>}
               key="Unpublished Sessions"
             >
               {courseClasses
@@ -637,14 +642,14 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   </Select.Option>
                 ))}
               {courseClasses?.filter((courseClass) => !courseClass.is_active).length <= 0 && (
-                <Text disabled> No unpublished sessions </Text>
+                <Text disabled> {t('NO_UNPUBLISHED_SESSIONS')} </Text>
               )}
             </Select.OptGroup>
           </Select>
         </Form.Item>
       </Col>
       <Col xs={isVideoModal ? 0 : 24}>
-        <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={isVideoModal}>
+        <Form.Item {...courseModalFormLayout} label={t('COURSE_DURATION')} required={true} hidden={isVideoModal}>
           <Row gutter={8}>
             <Col xs={12}>
               <Form.Item
@@ -654,7 +659,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 noStyle
               >
                 <DatePicker
-                  placeholder="Select Start Date"
+                  placeholder={t('SELECT_START_DATE')}
                   onChange={handleStartDateChange}
                   disabledDate={disabledStartDates}
                   className={styles.datePicker}
@@ -669,7 +674,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 noStyle
               >
                 <DatePicker
-                  placeholder="Select End Date"
+                  placeholder={t('SELECT_END_DATE')}
                   disabled={!Boolean(courseStartDate)}
                   onChange={handleEndDateChange}
                   disabledDate={disabledEndDates}
@@ -685,29 +690,27 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           {...courseModalFormLayout}
           id="maxParticipants"
           name="maxParticipants"
-          label="Max Course Participants"
+          label={t('MAX_COURSE_PARTICIPANTS')}
           extra={
             <Text className={styles.helpText}>
-              This is the max attendee count of the{' '}
+              {t('MAX_COURSE_PARTICIPANTS_HELP_TEXT_1')}{' '}
               <Text type="danger"> {highestMaxParticipantCourseSession?.name} </Text>
-              session you selected. You can update the max count here and we'll update it in the sessions too.
+              {t('MAX_COURSE_PARTICIPANTS_HELP_TEXT_2')}
             </Text>
           }
           hidden={isVideoModal}
           rules={
-            isVideoModal
-              ? []
-              : validationRules.numberValidation('Please Input Max Participants Value (min. 2)', 2, true, 100)
+            isVideoModal ? [] : validationRules.numberValidation(t('MAX_COURSE_PARTICIPANTS_ERROR_TEXT'), 2, true, 100)
           }
         >
-          <InputNumber min={0} placeholder="Max Participants" className={styles.numericInput} />
+          <InputNumber min={0} placeholder={t('MAX_COURSE_PARTICIPANTS')} className={styles.numericInput} />
         </Form.Item>
       </Col>
       <Col xs={isVideoModal ? 0 : 24}>
         <Row gutter={[8, 4]}>
           <Col xs={24} className={styles.courseDatesText}>
-            Course Classes Date & Time :{' '}
-            <Text type="danger"> Please select the session checkbox you want to add to this course </Text>
+            {t('COURSE_CLASS_DATE_AND_TIME_TEXT_1')}{' '}
+            <Text type="danger"> {t('COURSE_CLASS_DATE_AND_TIME_TEXT_2')} </Text>
           </Col>
           <Col xs={24}>
             <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
@@ -738,7 +741,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       <Col xs={!isVideoModal ? 0 : 24}>
         <Form.Item
           {...courseModalFormLayout}
-          label="Course Duration"
+          label={t('COURSE_DURATION')}
           required={true}
           hidden={!isVideoModal}
           scrollToFirstError={true}
@@ -748,18 +751,14 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
               <Form.Item
                 id="validity"
                 name="validity"
-                rules={
-                  !isVideoModal
-                    ? []
-                    : validationRules.numberValidation('Please Input Course Duration in days', 1, false)
-                }
+                rules={!isVideoModal ? [] : validationRules.numberValidation(t('COURSE_DURATION_ERROR_TEXT'), 1, false)}
                 noStyle
               >
-                <InputNumber min={1} placeholder="Course Duration" className={styles.numericInput} />
+                <InputNumber min={1} placeholder={t('COURSE_DURATION')} className={styles.numericInput} />
               </Form.Item>
             </Col>
             <Col xs={4} className={styles.textAlignCenter}>
-              <Text className={styles.currencyWrapper}>days</Text>
+              <Text className={styles.currencyWrapper}>{t('DAYS')}</Text>
             </Col>
           </Row>
         </Form.Item>
@@ -769,7 +768,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
   return (
     <Modal
-      title={`${editedCourse ? 'Edit' : 'Create New'} ${isVideoModal ? 'Video' : 'Live'} Course`}
+      title={`${editedCourse ? t('EDIT') : t('CREATE')} ${isVideoModal ? t('VIDEO_COURSES') : t('LIVE_CLASS_COURSES')}`}
       centered={true}
       visible={visible}
       footer={null}
@@ -801,7 +800,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                     onChange={handleCourseImageUpload}
                     value={courseImageUrl}
-                    label="Course Image"
+                    label={t('COURSE_IMAGE')}
                   />
                 </div>
               </Form.Item>
@@ -811,10 +810,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 {...courseModalFormLayout}
                 id="courseName"
                 name="courseName"
-                label="Course Name"
+                label={t('COURSE_NAME')}
                 rules={validationRules.nameValidation}
               >
-                <Input placeholder="Enter Course Name" maxLength={50} />
+                <Input placeholder={t('COURSE_NAME')} maxLength={50} />
               </Form.Item>
             </Col>
             {renderVideoCourseInputs()}
@@ -824,13 +823,13 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 {...courseModalFormLayout}
                 id="videoList"
                 name="videoList"
-                label="Course Video(s)"
+                label={t('COURSE_VIDEOS')}
                 rules={isVideoModal ? validationRules.arrayValidation : []}
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  placeholder="Select Video(s)"
+                  placeholder={t('SELECT_COURSE_VIDEOS')}
                   mode="multiple"
                   maxTagCount={2}
                   value={selectedVideos}
@@ -838,7 +837,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                   optionLabelProp="label"
                 >
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                    label={<Text className={styles.optionSeparatorText}> {t('VISIBLE_PUBLICLY')} </Text>}
                     key="Published Videos"
                   >
                     {videos
@@ -866,11 +865,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => video.is_published).length <= 0 && (
-                      <Text disabled> No published video </Text>
+                      <Text disabled> {t('NO_PUBLISHED_VIDEOS')} </Text>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    label={<Text className={styles.optionSeparatorText}> {t('HIDDEN_FROM_EVERYONE')} </Text>}
                     key="Unpublished Videos"
                   >
                     {videos
@@ -899,23 +898,23 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => !video.is_published).length <= 0 && (
-                      <Text disabled> No unpublished video </Text>
+                      <Text disabled> {t('NO_UNPUBLISHED_VIDEOS')} </Text>
                     )}
                   </Select.OptGroup>
                 </Select>
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item {...courseModalFormLayout} label="Course Price" required={true}>
+              <Form.Item {...courseModalFormLayout} label={t('COURSE_PRICE')} required={true}>
                 <Row gutter={8}>
                   <Col xs={20}>
                     <Form.Item
                       id="price"
                       name="price"
-                      rules={validationRules.numberValidation('Please Input Course Price', 1, false)}
+                      rules={validationRules.numberValidation(t('COURSE_PRICE_ERROR_TEXT'), 1, false)}
                       noStyle
                     >
-                      <InputNumber min={1} placeholder="Course Price" className={styles.numericInput} />
+                      <InputNumber min={1} placeholder={t('COURSE_PRICE')} className={styles.numericInput} />
                     </Form.Item>
                   </Col>
                   <Col xs={4} className={styles.textAlignCenter}>
@@ -927,7 +926,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item {...courseModalFormLayout} name="colorCode" label="Color Tag">
+              <Form.Item {...courseModalFormLayout} name="colorCode" label={t('COLOR_CODE')}>
                 <div className={styles.colorPickerPreview} style={{ borderColor: colorCode }}>
                   <TwitterPicker
                     triangle="hide"
@@ -944,12 +943,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
             <Col xs={12} md={6}>
               <Button block type="default" onClick={() => closeModal(false)} loading={submitting}>
-                Cancel
+                {t('CANCEL')}
               </Button>
             </Col>
             <Col xs={12} md={8}>
               <Button block type="primary" htmlType="submit" loading={submitting}>
-                {editedCourse ? 'Update' : 'Create'} Course
+                {editedCourse ? t('UPDATE') : t('CREATE')} {t('COURSE')}
               </Button>
             </Col>
           </Row>
