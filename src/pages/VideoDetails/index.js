@@ -44,7 +44,7 @@ const {
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -69,7 +69,7 @@ const VideoDetails = ({ match }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      message.error(t('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
   }, []);
@@ -104,7 +104,7 @@ const VideoDetails = ({ match }) => {
         }
       } catch (error) {
         setIsLoading(false);
-        message.error('Failed to load class video details');
+        message.error(t('FAILED_TO_LOAD_CLASS_VIDEO_DETAILS'));
       }
     },
     [getProfileDetails]
@@ -118,7 +118,7 @@ const VideoDetails = ({ match }) => {
         setAvailablePassesForVideo(data);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching available pass for video');
+      message.error(error.response?.data?.message || t('FAILED_FETCHING_AVAILABLE_PASS_FOR_VIDEO'));
       setIsLoading(false);
     }
     //eslint-disable-next-line
@@ -141,7 +141,7 @@ const VideoDetails = ({ match }) => {
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
+      message.error(error.response?.data?.message || t('FAILED_FETCHING_USABLE_PASS_FOR_USER'));
       setIsLoading(false);
     }
   }, []);
@@ -184,7 +184,7 @@ const VideoDetails = ({ match }) => {
       }
     } else {
       setIsLoading(false);
-      message.error('Video details not found.');
+      message.error(t('FAIL_TO_LOAD_VIDEO_DETAILS_NOT_FOUND'));
     }
     //eslint-disable-next-line
   }, [match.params.video_id]);
@@ -224,13 +224,13 @@ const VideoDetails = ({ match }) => {
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
+          message.error(t('INITIATE_PAYMENT_ERROR_TEXT'));
           setIsLoading(false);
         }
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -251,16 +251,13 @@ const VideoDetails = ({ match }) => {
           if (selectedPass) {
             const modalContent = (
               <>
-                <Paragraph> You tried to use a pass to book a free video </Paragraph>
-                <Paragraph>
-                  {' '}
-                  To prevent unnecessary payment/credit usage, we got the video for you without using the pass.{' '}
-                </Paragraph>
-                <Paragraph> You can see all your purchases in one place in your dashboard </Paragraph>
+                <Paragraph> {t('BOOK_FREE_VIDEO_WITH_PASS_TEXT_1')} </Paragraph>
+                <Paragraph> {t('BOOK_FREE_VIDEO_WITH_PASS_TEXT_2')} </Paragraph>
+                <Paragraph> {t('PURCHASES_IN_ONE_PLACE_TEXT')} </Paragraph>
               </>
             );
 
-            showSuccessModal('Video Purchase Successful', modalContent);
+            showSuccessModal(t('VIDEO_PURCHASE_SUCCESSFUL'), modalContent);
             setSelectedPass(null);
           } else {
             showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
@@ -269,11 +266,11 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
+        showErrorModal(t('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -307,7 +304,7 @@ const VideoDetails = ({ match }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
+        showErrorModal(t('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -322,12 +319,12 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
+        showErrorModal(t('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -419,21 +416,21 @@ const VideoDetails = ({ match }) => {
               {purchased ? (
                 <Space size={isMobileDevice ? 'small' : 'middle'}>
                   <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                    {pass?.classes_remaining}/{pass?.class_count} credits left
+                    {pass?.classes_remaining}/{pass?.class_count} {t('CREDITS_LEFT')}
                   </Text>
                   <Divider type="vertical" />
                   <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                    Pass is valid till : {toLongDateWithDay(pass?.expiry)}
+                    {t('PASS_IS_VALID_TILL')} : {toLongDateWithDay(pass?.expiry)}
                   </Text>
                 </Space>
               ) : (
                 <Space size={isMobileDevice ? 'small' : 'middle'}>
                   <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                    {pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
+                    {pass?.limited ? `${pass?.class_count} ${t('CREDITS')}` : t('UNLIMITED_CREDITS')}
                   </Text>
                   <Divider type="vertical" />
                   <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                    {`${pass?.validity} Days Validity`}
+                    {`${pass?.validity} ${t('DAYS')} ${t('VALIDITY')}`}
                   </Text>
                 </Space>
               )}
@@ -444,13 +441,13 @@ const VideoDetails = ({ match }) => {
           <Row gutter={[8, 16]} justify="center">
             <Col xs={12} md={24}>
               <Button block type="primary" onClick={() => openPurchasePassModal(pass)}>
-                {purchased ? 'Buy Video' : 'Buy Pass'}
+                {purchased ? t('BUY_VIDEO') : t('BUY_PASS')}
               </Button>
             </Col>
             <Col xs={12} md={24}>
               {expandedPassKeys.includes(pass?.id) ? (
                 <Button block type="default" onClick={() => hidePassDetails(pass?.id)} icon={<UpOutlined size={16} />}>
-                  Detail
+                  {t('DETAILS')}
                 </Button>
               ) : (
                 <Button
@@ -459,7 +456,7 @@ const VideoDetails = ({ match }) => {
                   onClick={() => showPassDetails(pass?.id)}
                   icon={<DownOutlined size={16} />}
                 >
-                  Detail
+                  {t('DETAILS')}
                 </Button>
               )}
             </Col>
@@ -470,7 +467,7 @@ const VideoDetails = ({ match }) => {
             {pass?.sessions?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text strong> Sessions bookable with this pass </Text>
+                  <Text strong> {t('SESSIONS_BOOKABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 {isMobileDevice ? (
                   <Col xs={24}>
@@ -494,7 +491,7 @@ const VideoDetails = ({ match }) => {
             {pass?.videos?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text strong> Videos purchasable with this pass </Text>
+                  <Text strong> {t('VIDEOS_PURCHASABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 {isMobileDevice ? (
                   <Col xs={24}>
@@ -523,7 +520,7 @@ const VideoDetails = ({ match }) => {
 
   return (
     <div className={styles.mt50}>
-      <Loader loading={isLoading} size="large" text="Loading video details">
+      <Loader loading={isLoading} size="large" text={t('LOADING_VIDEO_DETAILS')}>
         <Row gutter={[8, 24]}>
           <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
           <Col xs={24}>
@@ -544,7 +541,7 @@ const VideoDetails = ({ match }) => {
                       <div className={classNames(styles.mb50, styles.mt20)}>
                         <Row gutter={[8, 16]}>
                           <Col xs={24}>
-                            <Title level={5}> This video can only be purchased via this course </Title>
+                            <Title level={5}> {t('THIS_VIDEO_CAN_ONLY_BE_PURCHASED_VIA_THESE_COURSES')} </Title>
                           </Col>
                           <Col xs={24}>
                             <ShowcaseCourseCard
@@ -572,12 +569,12 @@ const VideoDetails = ({ match }) => {
                                   <Col xs={24}>
                                     <Space size={isMobileDevice ? 'small' : 'middle'}>
                                       <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                        {`Validity ${video?.validity} Days`}
+                                        {`${t('VALIDITY')} ${video?.validity} ${t('DAYS')}`}
                                       </Text>
                                       <Divider type="vertical" />
                                       <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
                                         {video?.price === 0
-                                          ? 'Free video'
+                                          ? t('FREE_VIDEO')
                                           : ` ${video?.currency.toUpperCase()} ${video?.price}`}
                                       </Text>
                                     </Space>
@@ -586,7 +583,7 @@ const VideoDetails = ({ match }) => {
                               </Col>
                               <Col xs={24} md={8} xl={6}>
                                 <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                                  {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                                  {video?.price === 0 ? t('GET') : t('BUY')} {t('VIDEO')}
                                 </Button>
                               </Col>
                             </Row>
@@ -597,8 +594,8 @@ const VideoDetails = ({ match }) => {
                       <Col xs={24} className={styles.mt10}>
                         <Title level={3} className={styles.ml20}>
                           {getLocalUserDetails() && userPasses.length > 0
-                            ? 'Buy using your pass'
-                            : 'Buy a pass and this video'}
+                            ? t('BUY_USING_YOUR_PASS')
+                            : t('BUY_A_PASS_AND_THIS_VIDEO')}
                         </Title>
                       </Col>
 
@@ -612,7 +609,7 @@ const VideoDetails = ({ match }) => {
                         <Col xs={24}>
                           <Row gutter={[8, 8]}>
                             <Col xs={24}>
-                              <Text className={styles.ml20}> Related to these class(es) </Text>
+                              <Text className={styles.ml20}> {t('RELATED_TO_THESE_CLASSES')} </Text>
                             </Col>
                             <Col xs={24}>
                               <SessionCards
