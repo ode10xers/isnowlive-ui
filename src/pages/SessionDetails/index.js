@@ -52,7 +52,7 @@ const {
 } = dateUtil;
 
 const SessionDetails = ({ match, history }) => {
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
@@ -135,7 +135,7 @@ const SessionDetails = ({ match, history }) => {
           console.error('Failed to fetch session data', sessionDetailsResponse);
         }
       } catch (error) {
-        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+        message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
         history.push(Routes.root);
       }
@@ -161,7 +161,7 @@ const SessionDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
+      showErrorModal(t('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
   };
 
@@ -188,7 +188,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } else {
       setIsLoading(false);
-      message.error('Session details not found.');
+      message.error(t('SESSION_DETAILS_NOT_FOUND'));
     }
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
@@ -243,9 +243,9 @@ const SessionDetails = ({ match, history }) => {
         setIsLoading(false);
         setShowPasswordField(true);
         setCurrentUser(values);
-        message.info('Enter password to register session');
+        message.info(t('ENTER_PASSWORD_TO_REGISTER_SESSION'));
       } else {
-        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+        message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       }
     }
   };
@@ -263,11 +263,11 @@ const SessionDetails = ({ match, history }) => {
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
+          message.error(t('INITIATE_PAYMENT_ERROR_TEXT'));
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   };
@@ -283,7 +283,7 @@ const SessionDetails = ({ match, history }) => {
         return data.find((orderDetails) => orderDetails.order_id === orderId);
       }
     } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+      message.error(error?.response?.data?.message || t('FAILED_FETCH_ATTENDEE_ORDER_DETAILS'));
     }
 
     return null;
@@ -356,7 +356,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -402,7 +402,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -426,7 +426,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -458,7 +458,7 @@ const SessionDetails = ({ match, history }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
+        showErrorModal(t('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -491,9 +491,9 @@ const SessionDetails = ({ match, history }) => {
 
           if (error.response?.status === 403) {
             setIncorrectPassword(true);
-            message.error('Incorrect email or password');
+            message.error(t('INCORRECT_EMAIL_OR_PASSWORD'));
           } else {
-            message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+            message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
           }
         }
       } else if (!getLocalUserDetails()) {
@@ -503,7 +503,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -517,7 +517,7 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -560,7 +560,7 @@ const SessionDetails = ({ match, history }) => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading profile">
+    <Loader loading={isLoading} size="large" text={t('LOADING_PROFILE')}>
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24}>
           <Image
@@ -582,7 +582,7 @@ const SessionDetails = ({ match, history }) => {
         {creator && (
           <Col xs={6} lg={{ span: 3, offset: 3 }}>
             <Share
-              label="Share"
+              label={t('SHARE')}
               shareUrl={`${generateUrlFromUsername(creator?.username)}/s/${session.session_id}`}
               title={`${session?.name} - ${creator?.first_name} ${creator?.last_name}`}
             />
@@ -591,21 +591,21 @@ const SessionDetails = ({ match, history }) => {
       </Row>
       <Row justify="space-between" className={styles.mt50} gutter={16}>
         <Col xs={24} lg={14}>
-          <Title level={5}>Session Information</Title>
+          <Title level={5}>{t('SESSION_INFORMATION')}</Title>
           {showDescription ? (
             <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
           ) : (
             <>
               <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
               <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
-                Read More
+                {t('READ_MORE')}
               </div>
             </>
           )}
           {session?.prerequisites && (
             <>
               <Title level={5} className={styles.mt50}>
-                Session Prerequisite
+                {t('SESSION_PREREQUISITE')}
               </Title>
               {showPrerequisite ? (
                 <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.prerequisites)}</div>
@@ -613,7 +613,7 @@ const SessionDetails = ({ match, history }) => {
                 <>
                   <div className={styles.sessionPrereq}>{ReactHtmlParser(session?.prerequisites)}</div>
                   <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
-                    Read More
+                    {t('READ_MORE')}
                   </div>
                 </>
               )}
@@ -629,7 +629,7 @@ const SessionDetails = ({ match, history }) => {
           <div className={classNames(styles.mb50, styles.mt20)}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={5}> This session can only be attended by doing this course </Title>
+                <Title level={5}> {t('THIS_SESSION_CAN_ONLY_BE_ATTENDED_BY_DOING_THESE_COURSES')} </Title>
               </Col>
               <Col xs={24}>
                 <ShowcaseCourseCard
@@ -718,7 +718,7 @@ const SessionDetails = ({ match, history }) => {
                 <Col xs={24}>
                   <div className={styles.box}>
                     <Tabs size="large" defaultActiveKey="Buy" activeKey="Buy">
-                      <Tabs.TabPane key="Buy" tab="Buy Recorded Videos" className={styles.videoListContainer}>
+                      <Tabs.TabPane key="Buy" tab={t('BUY_RECORDED_VIDEOS')} className={styles.videoListContainer}>
                         <Row gutter={[8, 20]}>
                           {sessionVideos?.length > 0 &&
                             sessionVideos?.map((videoDetails) => (
