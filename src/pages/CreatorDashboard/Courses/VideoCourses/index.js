@@ -273,6 +273,9 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             </div>
           }
           actions={[
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
