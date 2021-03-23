@@ -24,7 +24,7 @@ const { Text, Paragraph } = Typography;
 const NavbarHeader = () => {
   const history = useHistory();
   const location = useLocation();
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
 
   const [localUserDetails, setLocalUserDetails] = useState(getLocalUserDetails());
   const [authModalVisible, setAuthModalVisible] = useState(false);
@@ -106,17 +106,15 @@ const NavbarHeader = () => {
         maskClosable: true,
         content: (
           <>
-            <Paragraph>Ready to become a host and start making money by hosting live events?</Paragraph>
+            <Paragraph>{t('READY_TO_BECOME_HOST_TITLE')}</Paragraph>
             <Paragraph>
-              By clicking on "<strong>Become Host</strong>" your account will be upgraded to a host account and you will
-              get access to your dashboard and features empowering you to host live events on topics you are passionate
-              about and make money from it.
+              {t('READY_TO_BECOME_HOST_TEXT1')} "<strong>{t('BECOME_HOST')}</strong>" {t('READY_TO_BECOME_HOST_TEXT2')}
             </Paragraph>
           </>
         ),
-        title: 'Become a Host',
-        okText: 'Become Host',
-        cancelText: 'Talk to Us',
+        title: t('BECOME_A_HOST'),
+        okText: t('BECOME_HOST'),
+        cancelText: t('TALK_TO_US'),
         onOk: () => history.push(Routes.profile),
         onCancel: () => openFreshChatWidget(),
       });
@@ -211,7 +209,7 @@ const NavbarHeader = () => {
                   onClick={() => isCreatorCheck()}
                 >
                   <VideoCameraAddOutlined className={styles.navItemIcon} />
-                  Hosting
+                  {t('HOSTING')}
                 </span>
                 <span
                   className={classNames(
@@ -222,7 +220,7 @@ const NavbarHeader = () => {
                   onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
                 >
                   <TeamOutlined className={styles.navItemIcon} />
-                  Attending
+                  {t('ATTENDING')}
                 </span>
               </Col>
             )}
@@ -234,14 +232,14 @@ const NavbarHeader = () => {
                 className={styles.menuContainer}
               >
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
-                  Site Home
+                  {t('SITE_HOME')}
                 </Menu.Item>
                 <Menu.Item
                   key="Session"
                   className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
                   onClick={() => redirectToCreatorProfile('session')}
                 >
-                  Sessions
+                  {t('SESSIONS')}
                 </Menu.Item>
                 {shouldShowPassLink && (
                   <Menu.Item
@@ -249,7 +247,7 @@ const NavbarHeader = () => {
                     className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
                     onClick={() => redirectToCreatorProfile('pass')}
                   >
-                    Passes
+                    {t('PASSES')}
                   </Menu.Item>
                 )}
                 {shouldShowVideoLink && (
@@ -258,7 +256,7 @@ const NavbarHeader = () => {
                     className={siteLinkActive('video') ? 'ant-menu-item-active' : undefined}
                     onClick={() => redirectToCreatorProfile('video')}
                   >
-                    Videos
+                    {t('VIDEOS')}
                   </Menu.Item>
                 )}
                 {shouldShowCourseLink && (
@@ -267,7 +265,7 @@ const NavbarHeader = () => {
                     className={siteLinkActive('course') ? 'ant-menu-item-active' : undefined}
                     onClick={() => redirectToCreatorProfile('course')}
                   >
-                    Courses
+                    {t('COURSES')}
                   </Menu.Item>
                 )}
                 {localUserDetails ? (
@@ -277,7 +275,7 @@ const NavbarHeader = () => {
                       className={isActive('/attendee/dashboard') ? 'ant-menu-item-active' : undefined}
                       onClick={() => redirectToDashboard()}
                     >
-                      My Dashboard
+                      {t('MY_DASHBOARD')}
                     </Menu.Item>
                     <Menu.Item key="SelectLanguage">
                       <SelectLanguage />
@@ -287,7 +285,7 @@ const NavbarHeader = () => {
                     </Menu.Item>
                     <Menu.Item key="SignOut">
                       <Button block danger type="default" onClick={() => logOut(history, true)}>
-                        Sign Out
+                        {t('SIGN_OUT')}
                       </Button>
                     </Menu.Item>
                   </>
@@ -298,12 +296,12 @@ const NavbarHeader = () => {
                     </Menu.Item>
                     <Menu.Item key="SignIn">
                       <Button block type="primary" className={styles.lightRedBtn} onClick={() => showSignInModal()}>
-                        {translate('SIGN_IN')}
+                        {t('SIGN_IN')}
                       </Button>
                     </Menu.Item>
                     <Menu.Item key="SignUp">
                       <Button block type="primary" onClick={() => showSignUpModal()}>
-                        {translate('SIGN_UP')}
+                        {t('SIGN_UP')}
                       </Button>
                     </Menu.Item>
                   </>
@@ -317,16 +315,16 @@ const NavbarHeader = () => {
                     {localUserDetails ? (
                       inDashboard() ? (
                         <Button className={styles.orangeBtn} onClick={() => redirectToCreatorProfile('home')}>
-                          Site Home
+                          {t('SITE_HOME')}
                         </Button>
                       ) : (
                         <Button className={styles.greenBtn} onClick={() => redirectToDashboard()}>
-                          My Dashboard
+                          {t('MY_DASHBOARD')}
                         </Button>
                       )
                     ) : (
                       <Button className={styles.lightRedBtn} type="primary" onClick={() => showSignInModal()}>
-                        Sign In
+                        {t('SIGN_IN')}
                       </Button>
                     )}
                   </span>
@@ -379,7 +377,7 @@ const NavbarHeader = () => {
                                 onClick={() => isCreatorCheck()}
                               >
                                 <VideoCameraAddOutlined className={styles.navItemIcon} />
-                                Hosting
+                                {t('HOSTING')}
                               </span>
                             </Col>
                             <Col xs={12}>
@@ -391,7 +389,7 @@ const NavbarHeader = () => {
                                 onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
                               >
                                 <TeamOutlined className={styles.navItemIcon} />
-                                Attending
+                                {t('ATTENDING')}
                               </span>
                             </Col>
                           </Row>
@@ -402,14 +400,14 @@ const NavbarHeader = () => {
                         className={siteLinkActive('home') ? styles.active : undefined}
                         onClick={() => redirectToCreatorProfile('home')}
                       >
-                        <span className={styles.menuLink}>Site Home</span>
+                        <span className={styles.menuLink}>{t('SITE_HOME')}</span>
                       </li>
                       <li
                         key="Creator Sessions"
                         className={siteLinkActive('session') ? styles.active : undefined}
                         onClick={() => redirectToCreatorProfile('session')}
                       >
-                        <span className={styles.menuLink}>Sessions</span>
+                        <span className={styles.menuLink}>{t('SESSIONS')}</span>
                       </li>
                       {shouldShowPassLink && (
                         <li
@@ -417,7 +415,7 @@ const NavbarHeader = () => {
                           className={siteLinkActive('pass') ? styles.active : undefined}
                           onClick={() => redirectToCreatorProfile('pass')}
                         >
-                          <span className={styles.menuLink}>Passes</span>
+                          <span className={styles.menuLink}>{t('PASSES')}</span>
                         </li>
                       )}
                       {shouldShowVideoLink && (
@@ -426,7 +424,7 @@ const NavbarHeader = () => {
                           className={siteLinkActive('video') ? styles.active : undefined}
                           onClick={() => redirectToCreatorProfile('video')}
                         >
-                          <span className={styles.menuLink}>Videos</span>
+                          <span className={styles.menuLink}>{t('VIDEOS')}</span>
                         </li>
                       )}
                       {shouldShowCourseLink && (
@@ -435,7 +433,7 @@ const NavbarHeader = () => {
                           className={siteLinkActive('course') ? styles.active : undefined}
                           onClick={() => redirectToCreatorProfile('course')}
                         >
-                          <span className={styles.menuLink}>Courses</span>
+                          <span className={styles.menuLink}>{t('COURSES')}</span>
                         </li>
                       )}
                       {localUserDetails && (
@@ -446,35 +444,35 @@ const NavbarHeader = () => {
                             className={isActive('/attendee/dashboard/sessions/upcoming') ? styles.active : undefined}
                             onClick={() => redirectToDashboard('/sessions/upcoming')}
                           >
-                            <span className={styles.menuLink}>My Upcoming Sessions</span>
+                            <span className={styles.menuLink}>{t('MY_UPCOMING_SESSIONS')}</span>
                           </li>
                           <li
                             key="Attendee Past Sessions"
                             className={isActive('/attendee/dashboard/sessions/past') ? styles.active : undefined}
                             onClick={() => redirectToDashboard('/sessions/past')}
                           >
-                            <span className={styles.menuLink}>My Past Sessions</span>
+                            <span className={styles.menuLink}>{t('MY_PAST_SESSIONS')}</span>
                           </li>
                           <li
                             key="Attendee Passes"
                             className={isActive('/attendee/dashboard/passes') ? styles.active : undefined}
                             onClick={() => redirectToDashboard('/passes')}
                           >
-                            <span className={styles.menuLink}>My Passes</span>
+                            <span className={styles.menuLink}>{t('MY_PASSES')}</span>
                           </li>
                           <li
                             key="Attendee Videos"
                             className={isActive('/attendee/dashboard/videos') ? styles.active : undefined}
                             onClick={() => redirectToDashboard('/videos')}
                           >
-                            <span className={styles.menuLink}>My Videos</span>
+                            <span className={styles.menuLink}>{t('MY_VIDEOS')}</span>
                           </li>
                           <li
                             key="Attendee Courses"
                             className={isActive('/attendee/dashboard/courses') ? styles.active : undefined}
                             onClick={() => redirectToDashboard('/courses')}
                           >
-                            <span className={styles.menuLink}>My Courses</span>
+                            <span className={styles.menuLink}>{t('MY_COURSES')}</span>
                           </li>
                         </>
                       )}
@@ -493,7 +491,7 @@ const NavbarHeader = () => {
                           </Col>
                           <Col xs={24}>
                             <Button block danger type="default" onClick={() => logOut(history, true)}>
-                              Sign Out
+                              {t('SIGN_OUT')}
                             </Button>
                           </Col>
                         </>
@@ -510,12 +508,12 @@ const NavbarHeader = () => {
                               className={styles.lightRedBtn}
                               onClick={() => showSignInModal()}
                             >
-                              Sign In
+                              {t('SIGN_IN')}
                             </Button>
                           </Col>
                           <Col xs={12}>
                             <Button block type="default" onClick={() => showSignUpModal()}>
-                              Sign Up
+                              {t('SIGN_UP')}
                             </Button>
                           </Col>
                         </>
