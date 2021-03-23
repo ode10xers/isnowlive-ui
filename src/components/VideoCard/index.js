@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
 import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
@@ -37,6 +38,8 @@ const VideoCard = ({
   showDesc = false,
   showDetailsBtn = true,
 }) => {
+  const { t } = useTranslation();
+
   const redirectToVideoDetails = () => {
     if (video?.external_id) {
       const username = window.location.hostname.split('.')[0];
@@ -51,15 +54,15 @@ const VideoCard = ({
       return (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
+            {t('VALID_TILL')} : {toLongDateWithDayTime(orderDetails.expiry)}
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
-            Allowed Watches : {orderDetails.watch_limit}
+            {t('ALLOWED_WATCHES')} : {orderDetails.watch_limit}
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
-            You have watched {orderDetails.num_views} times
+            {t('YOU_HAVE_WATCHED')} {orderDetails.num_views} {t('TIMES')}
           </Text>
         </Space>
       );
@@ -68,13 +71,13 @@ const VideoCard = ({
     return (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
+          {t('VALID_TILL')} : {toLongDateWithDayTime(orderDetails.expiry)}
         </Title>
         <Title level={5} className={styles.blueText}>
-          Allowed Watches : {orderDetails.watch_limit}
+          {t('ALLOWED_WATCHES')} : {orderDetails.watch_limit}
         </Title>
         <Title level={5} className={styles.blueText}>
-          You have watched {orderDetails.num_views} times
+          {t('YOU_HAVE_WATCHED')} {orderDetails.num_views} {t('TIMES')}
         </Title>
       </Space>
     );
@@ -120,12 +123,13 @@ const VideoCard = ({
                 <Row gutter={16} justify="space-evenly">
                   <Col span={14} className={styles.textAlignLeft}>
                     <Text strong className={styles.validityText}>
-                      Viewable for : {video?.validity} days
+                      {t('VIEWABLE_FOR')} : {video?.validity} {t('DAYS')}
                     </Text>
                   </Col>
                   <Col span={10} className={styles.textAlignRight}>
                     <Text strong className={styles.priceText}>
-                      Price : {video?.price === 0 ? 'Free' : `${video?.currency.toUpperCase()} ${video?.price}`}
+                      {t('PRICE')} :{' '}
+                      {video?.price === 0 ? t('FREE') : `${video?.currency.toUpperCase()} ${video?.price}`}
                     </Text>
                   </Col>
                 </Row>
@@ -152,7 +156,7 @@ const VideoCard = ({
                           redirectToVideoDetails(video);
                         }}
                       >
-                        Details
+                        {t('DETAILS')}
                       </Button>
                     </Col>
                   )}
@@ -166,7 +170,7 @@ const VideoCard = ({
                           showPurchaseModal(video);
                         }}
                       >
-                        {video?.price === 0 ? 'Get' : 'Buy'}
+                        {video?.price === 0 ? t('GET') : t('BUY')}
                       </Button>
                     </Col>
                   )}
