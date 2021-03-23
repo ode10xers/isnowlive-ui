@@ -2,22 +2,23 @@ import React from 'react';
 import { Steps } from 'antd';
 import MobileDetect from 'mobile-detect';
 import styles from './styles.module.scss';
+import { i18n } from 'utils/i18n';
 
 const stepsList = [
   {
     id: 1,
-    title: 'Setup Public Page',
-    description: 'Your customer will see this page',
+    title: i18n.t('SETUP_PUBLIC_PAGE'),
+    description: i18n.t('SETUP_PUBLIC_PAGE_DESC_TEXT'),
   },
   {
     id: 2,
-    title: 'Setup Livestream',
-    description: 'Connect your zoom account',
+    title: i18n.t('SETUP_LIVESTREAM'),
+    description: i18n.t('SETUP_LIVESTREAM_DESC_TEXT'),
   },
   {
     id: 3,
-    title: 'Setup Session',
-    description: 'Create your first session',
+    title: i18n.t('SETUP_SESSION'),
+    description: i18n.t('SETUP_SESSION_DESC_TEXT'),
   },
 ];
 
