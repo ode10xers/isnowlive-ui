@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 
@@ -15,6 +16,7 @@ const PaymentSupportImage = require('../../assets/images/payment_support_image.p
 const { Text, Title } = Typography;
 
 const PaymentPopup = () => {
+  const { t } = useTranslation();
   const {
     state: { userDetails, paymentPopupVisible, paymentPopupCallback, paymentPopupData },
     hidePaymentPopup,
@@ -70,11 +72,11 @@ const PaymentPopup = () => {
 
       if (isAPISuccess(status) && data) {
         setDiscountedPrice(data.discounted_amount);
-        setCouponErrorText(<Text type="success"> Coupon Applied! </Text>);
+        setCouponErrorText(<Text type="success"> {t('COUPON_APPLIED')} </Text>);
         setCouponApplied(true);
       }
     } catch (error) {
-      setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
+      setCouponErrorText(<Text type="danger"> {t('INVALID_COUPON_ENTERED')} </Text>);
       setCouponApplied(false);
     }
     setIsApplyingCoupon(false);
@@ -95,7 +97,7 @@ const PaymentPopup = () => {
       maskClosable={true}
       centered={true}
       footer={null}
-      title={<Title level={4}> Confirm your purchase </Title>}
+      title={<Title level={4}> {t('PAYMENT_POPUP_TITLE')} </Title>}
       onCancel={() => closePaymentPopup()}
     >
       <Row gutter={[8, 32]} justify="center">
@@ -123,7 +125,7 @@ const PaymentPopup = () => {
         <Col xs={24}>
           <Row gutter={10}>
             <Col xs={14}>
-              <Text strong>Total payable amount</Text>
+              <Text strong>{t('PAYMENT_POPUP_TEXT_1')}</Text>
             </Col>
             <Col xs={10} className={styles.paymentTotalText}>
               {itemList &&
@@ -155,10 +157,10 @@ const PaymentPopup = () => {
                 enterButton={
                   <Button block type="primary" disabled={couponCode === ''}>
                     {' '}
-                    Apply{' '}
+                    {t('APPLY')}{' '}
                   </Button>
                 }
-                placeholder="Input discount code here"
+                placeholder={t('INPUT_DISCOUNT_CODE_HERE')}
                 onChange={handleCouponCodeChange}
                 onSearch={applyCouponCode}
               />
@@ -179,7 +181,7 @@ const PaymentPopup = () => {
                 onClick={handleInitiatePayment}
                 disabled={itemList?.length <= 0}
               >
-                Pay Now
+                {t('PAY_NOW')}
               </Button>
             </Col>
           </Row>
