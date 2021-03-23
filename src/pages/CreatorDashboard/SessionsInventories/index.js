@@ -119,6 +119,7 @@ const SessionsInventories = ({ match }) => {
 
   useEffect(() => {
     if (match?.params?.session_type) {
+      setExpandedRowKeys([]);
       setSessions([]);
       setIsLoading(true);
       if (match?.params?.session_type === 'past') {
