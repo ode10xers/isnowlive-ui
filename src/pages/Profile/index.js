@@ -73,7 +73,7 @@ const Profile = () => {
       if (isAPISuccess(status)) {
         setIsLoading(false);
         trackSuccessEvent(eventTag, { form_values: values });
-        message.success('Profile successfully updated.');
+        message.success(translate('PROFILE_UPDATE_SUCCESS'));
         const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
@@ -107,7 +107,7 @@ const Profile = () => {
       updateProfileDetails(values);
     } else {
       setIsLoading(false);
-      message.error('Please enter valid username.');
+      message.error(translate('ENTER_VALID_USERNAME'));
     }
   };
 
@@ -182,14 +182,17 @@ const Profile = () => {
                 trackAndNavigate('/creator/dashboard/profile', creator.click.profile.editForm.backToProfile)
               }
             >
-              Back
+              {translate('BACK')}
             </Button>
           </Col>
         </Row>
       )}
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
-          <Title> {isOnboarding ? 'Setup' : 'Update'} Public Profile</Title>
+          <Title>
+            {' '}
+            {isOnboarding ? translate('SETUP') : translate('UPDATE')} {translate('PUBLIC_PROFILE')}
+          </Title>
         </Typography>
       </Space>
 
@@ -203,10 +206,9 @@ const Profile = () => {
       >
         {/* ========PRIMARY INFO======== */}
         <Section>
-          <Title level={4}>1. Primary Information</Title>
+          <Title level={4}>{translate('1_PRIMARY_INFO')}</Title>
           <Paragraph className={styles.mt10} type="secondary">
-            This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
-            page and an a breif description to showcase yourself to your attendees.
+            {translate('1_PRIMARY_INFO_TEXT')}
           </Paragraph>
           <div className={styles.imageWrapper}>
             <ImageUpload
@@ -215,7 +217,7 @@ const Profile = () => {
               name="cover_image_url"
               onChange={onCoverImageUpload}
               value={coverImage}
-              label="Cover Photo"
+              label={translate('COVER_PHOTO')}
             />
 
             <ImageUpload
@@ -223,31 +225,31 @@ const Profile = () => {
               className={classNames('avatar-uploader', styles.profileImage)}
               onChange={onProfileImageUpload}
               value={profileImage}
-              label="Profile Photo"
+              label={translate('PROFILE_PHOTO')}
             />
           </div>
-          <Form.Item label="Name" className={styles.nameInputWrapper}>
+          <Form.Item label={translate('NAME')} className={styles.nameInputWrapper}>
             <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-              <Input placeholder="First Name" />
+              <Input placeholder={translate('FIRST_NAME')} />
             </Form.Item>
             <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-              <Input placeholder="Last Name" />
+              <Input placeholder={translate('LAST_NAME')} />
             </Form.Item>
           </Form.Item>
 
           <Form.Item
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label="Short bio"
+            label={translate('SHORT_BIO')}
             name={['profile', 'bio']}
           >
-            <TextEditor name={['profile', 'bio']} form={form} placeholder="  Please input your short bio" />
+            <TextEditor name={['profile', 'bio']} form={form} placeholder={translate('SHORT_BIO_PLACEHOLDER')} />
           </Form.Item>
 
-          <Form.Item label="Public URL">
+          <Form.Item label={translate('PUBLIC_URL')}>
             <Row align="middle" className={styles.alignUrl}>
               <Col>
                 <Form.Item name="username" rules={validationRules.publicUrlValidation} onBlur={handlePublicUrlChange}>
-                  <Input placeholder="username" />
+                  <Input placeholder={translate('USERNAME')} />
                 </Form.Item>
               </Col>
               <Col className={classNames(styles.ml10)}>
@@ -261,11 +263,11 @@ const Profile = () => {
                 <Col className={classNames(styles.ml10)}>
                   {isPublicUrlAvaiable ? (
                     <Text type="success">
-                      <span className={classNames(styles.dot, styles.success)}></span> Available
+                      <span className={classNames(styles.dot, styles.success)}></span> {translate('AVAILABLE')}
                     </Text>
                   ) : (
                     <Text type="danger">
-                      <span className={classNames(styles.dot, styles.danger)}></span> Unavailable
+                      <span className={classNames(styles.dot, styles.danger)}></span> {translate('UNAVAILABLE')}
                     </Text>
                   )}
                 </Col>
@@ -276,43 +278,43 @@ const Profile = () => {
 
         {/* =========ONLINE PRESENCE==== */}
         <Section>
-          <Title level={4}>2. Online Presence</Title>
-          <p className={styles.subtext}>Let people know where else to follow you on social media</p>
+          <Title level={4}>{translate('2_ONLINE_PRESENCE')}</Title>
+          <p className={styles.subtext}>{translate('2_ONLINE_PRESENCE_TEXT')}</p>
 
-          <Form.Item label="Website" name={['profile', 'social_media_links', 'website']}>
-            <Input placeholder="Your website link" />
+          <Form.Item label={translate('WEBSITE')} name={['profile', 'social_media_links', 'website']}>
+            <Input placeholder={translate('WEBSITE_PLACEHOLDER')} />
           </Form.Item>
 
-          <Form.Item label="Facebook" name={['profile', 'social_media_links', 'facebook_link']}>
-            <Input placeholder="Facebook profile link" />
+          <Form.Item label={translate('FACEBOOK')} name={['profile', 'social_media_links', 'facebook_link']}>
+            <Input placeholder={translate('FACEBOOK_PLACEHOLDER')} />
           </Form.Item>
 
-          <Form.Item label="Twitter" name={['profile', 'social_media_links', 'twitter_link']}>
-            <Input placeholder="Twitter profile link" />
+          <Form.Item label={translate('TWITTER')} name={['profile', 'social_media_links', 'twitter_link']}>
+            <Input placeholder={translate('TWITTER_PLACEHOLDER')} />
           </Form.Item>
 
-          <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
-            <Input placeholder="Instagram profile link" />
+          <Form.Item label={translate('INSTAGRAM')} name={['profile', 'social_media_links', 'instagram_link']}>
+            <Input placeholder={translate('INSTAGRAM_PLACEHOLDER')} />
           </Form.Item>
 
-          <Form.Item label="LinkedIn" name={['profile', 'social_media_links', 'linkedin_link']}>
-            <Input placeholder="LinkedIn profile link" />
+          <Form.Item label={translate('LINKEDIN')} name={['profile', 'social_media_links', 'linkedin_link']}>
+            <Input placeholder={translate('LINKEDIN_PLACEHOLDER')} />
           </Form.Item>
         </Section>
 
         {/* ========TESTIMONIALS======== */}
         <Section>
-          <Title level={4}>3. Testimonials</Title>
-          <p className={styles.subtext}>Embed social media posts to add social proof on your public page</p>
+          <Title level={4}>{translate('3_TESTIMONIAL')}</Title>
+          <p className={styles.subtext}>{translate('3_TESTIMONIAL_TEXT')}</p>
 
-          <Form.Item label="Embed code" name="testimonials">
-            <Input.TextArea rows={4} placeholder="Please input your short bio" />
+          <Form.Item label={translate('EMBED_CODE')} name="testimonials">
+            <Input.TextArea rows={4} placeholder={translate('EMBED_CODE_PLACEHOLDER')} />
           </Form.Item>
           <Form.Item {...profileFormTailLayout}>
             <Row>
               <Col xs={24}>
                 <Button className={styles.mb10} onClick={() => addTestimonial()}>
-                  <PlusOutlined /> Add
+                  <PlusOutlined /> {translate('ADD')}
                 </Button>
               </Col>
             </Row>
@@ -324,7 +326,7 @@ const Profile = () => {
                 <Col xs={24} md={24} lg={12} key={index}>
                   {item && item.length ? (
                     <Card
-                      title="Preview"
+                      title={translate('PREVIEW')}
                       bordered={false}
                       extra={
                         <DeleteOutlined
@@ -352,7 +354,7 @@ const Profile = () => {
             <Col>
               <Form.Item>
                 <Button htmlType="submit" type="primary">
-                  Publish Page
+                  {translate('PUBLISH_PAGE')}
                 </Button>
               </Form.Item>
             </Col>

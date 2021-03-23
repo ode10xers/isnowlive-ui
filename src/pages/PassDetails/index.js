@@ -44,7 +44,7 @@ const PassDetails = ({ match, history }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      message.error(translate('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
   }, []);
@@ -86,7 +86,7 @@ const PassDetails = ({ match, history }) => {
         }
       } catch (error) {
         setIsLoading(false);
-        message.error('Failed to load pass details');
+        message.error(translate('FAILED_TO_LOAD_PASS_DETAILS'));
       }
     },
     [getProfileDetails]
@@ -100,7 +100,7 @@ const PassDetails = ({ match, history }) => {
       }
     } else {
       setIsLoading(false);
-      message.error('Session details not found.');
+      message.error(translate('SESSION_DETAILS_NOT_FOUND'));
     }
 
     //eslint-disable-next-line
@@ -122,7 +122,7 @@ const PassDetails = ({ match, history }) => {
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
+          message.error(translate('CANNOT_INITIATE_PAYMENT'));
           setIsLoading(false);
         }
       }
@@ -134,7 +134,7 @@ const PassDetails = ({ match, history }) => {
 
   const createOrder = async (userEmail) => {
     if (!pass) {
-      showErrorModal(translate('SOMETHING_WENT_WRONG'), 'Invalid Pass Selected');
+      showErrorModal(translate('SOMETHING_WENT_WRONG'), translate('INVALID_PASS_SELECTED'));
       return;
     }
 
@@ -166,7 +166,7 @@ const PassDetails = ({ match, history }) => {
 
   return (
     <div className={styles.mt50}>
-      <Loader loading={isLoading} size="large" text="Loading pass details">
+      <Loader loading={isLoading} size="large" text={translate('LOADING_PASS_DETAILS')}>
         <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
         <Row gutter={[8, 24]}>
           <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
@@ -186,11 +186,13 @@ const PassDetails = ({ match, history }) => {
                           <Col xs={24}>
                             <Space size={isMobileDevice ? 'small' : 'middle'}>
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
+                                {pass && pass?.limited
+                                  ? `${pass?.class_count} ${translate('CREDITS')}`
+                                  : translate('UNLIMITED_CREDITS')}
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {`${pass?.validity} days`}
+                                {`${pass?.validity} ${translate('DAYS')}`}
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
@@ -202,7 +204,7 @@ const PassDetails = ({ match, history }) => {
                       </Col>
                       <Col xs={24} md={6}>
                         <Button block type="primary" onClick={() => openPurchaseModal()}>
-                          Buy Pass
+                          {translate('BUY_PASS')}
                         </Button>
                       </Col>
                     </Row>
@@ -213,7 +215,7 @@ const PassDetails = ({ match, history }) => {
                   <Col xs={24}>
                     <Row gutter={[8, 8]}>
                       <Col xs={24}>
-                        <Text className={styles.ml20}> Applicable to below class(es) </Text>
+                        <Text className={styles.ml20}> {translate('APPLICABLE_TO_BELOW_CLASS')} </Text>
                       </Col>
                       <Col xs={24}>
                         <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
@@ -226,7 +228,7 @@ const PassDetails = ({ match, history }) => {
                   <Col xs={24}>
                     <Row gutter={[8, 8]}>
                       <Col xs={24}>
-                        <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                        <Text className={styles.ml20}> {translate('VIDEO_PURCHASE_WITH_THIS_PASS')} </Text>
                       </Col>
                       <Col xs={24}>
                         <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />

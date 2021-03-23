@@ -218,7 +218,7 @@ const Earnings = () => {
     <div className={styles.box1}>
       <Row>
         <Col xs={24}>
-          <Text className={styles.box1Text}>Available for Payout</Text>
+          <Text className={styles.box1Text}>{translate('AVAILABLE_FOR_PAYOUT')}</Text>
         </Col>
         <Col xs={24} sm={12}>
           <ShowAmount amount={balance?.available} currency={balance?.currency.toUpperCase()} />

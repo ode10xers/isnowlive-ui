@@ -560,7 +560,9 @@ const SessionsInventories = ({ match }) => {
                         }}
                       />
                     ) : (
-                      <div className="text-empty">No {isPast ? translate('PAST') : translate('UPCOMING')} Session</div>
+                      <div className="text-empty">
+                        {translate('NO')} {isPast ? translate('PAST') : translate('UPCOMING')} {translate('SESSION')}
+                      </div>
                     )}
                   </Loader>
                 ) : filteredByDateSession.length > 0 ? (
@@ -587,7 +589,9 @@ const SessionsInventories = ({ match }) => {
                     }}
                   />
                 ) : (
-                  <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                  <div className="text-empty">
+                    {translate('NO')} {isPast ? translate('PAST') : translate('UPCOMING')} {translate('SESSION')}
+                  </div>
                 )}
               </>
             )}

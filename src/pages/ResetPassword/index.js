@@ -40,7 +40,7 @@ const ResetPassword = () => {
       if (isAPISuccess(status)) {
         setSubmitting(false);
         trackSuccessEvent(eventTag);
-        message.success('Password set successfully.');
+        message.success(translate('PASSWORD_SET_SUCCESS'));
         history.push(Routes.login);
       }
     } catch (error) {
@@ -55,17 +55,17 @@ const ResetPassword = () => {
       <Col xs={24} md={{ span: 12, offset: 6 }}>
         <Row>
           <Col xs={24} md={{ span: 16, offset: 4 }}>
-            <h1>Set a new password</h1>
+            <h1>{translate('SET_NEW_PASSWORD')}</h1>
           </Col>
         </Row>
 
         <Form form={form} {...formLayout} name="basic" onFinish={setNewPassword}>
-          <Item label="Password" name="password" rules={validationRules.passwordValidation}>
+          <Item label={translate('PASSWORD')} name="password" rules={validationRules.passwordValidation}>
             <Password />
           </Item>
           <Item {...formTailLayout}>
             <Button type="primary" htmlType="submit" loading={submitting}>
-              Set Password
+              {translate('SET_PASSWORD')}
             </Button>
           </Item>
         </Form>

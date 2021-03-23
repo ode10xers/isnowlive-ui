@@ -86,7 +86,7 @@ const ProfilePreview = ({ username = null }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      message.error(translate('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
   }, [username]);
@@ -329,7 +329,7 @@ const ProfilePreview = ({ username = null }) => {
         }
       } catch (error) {
         setIsSessionLoading(false);
-        message.error('Failed to load user session details');
+        message.error(translate('FAILED_TO_LOAD_USER_SESSION_DETAILS'));
       }
     }
   };
@@ -339,7 +339,7 @@ const ProfilePreview = ({ username = null }) => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading profile">
+    <Loader loading={isLoading} size="large" text={translate('LOADING_PROFILE')}>
       {isOnDashboard && (
         <Row>
           <Col span={24}>
@@ -348,14 +348,14 @@ const ProfilePreview = ({ username = null }) => {
               icon={<ArrowLeftOutlined />}
               onClick={() => trackAndNavigate('/creator/dashboard', creator.click.profile.backToDashboard)}
             >
-              Dashboard
+              {translate('DASHBOARD')}
             </Button>
             <Button
               className={styles.headButton}
               icon={<EditOutlined />}
               onClick={() => trackAndNavigate('/creator/dashboard/profile/edit', creator.click.profile.editProfile)}
             >
-              Edit Profile
+              {translate('EDIT_PROFILE')}
             </Button>
             <Button
               className={styles.headButton}
@@ -364,7 +364,7 @@ const ProfilePreview = ({ username = null }) => {
                 trackAndNavigate(generateUrlFromUsername(profile.username), creator.click.profile.publicPage, true)
               }
             >
-              Public Page
+              {translate('PUBLIC_PAGE')}
             </Button>
           </Col>
         </Row>
@@ -388,27 +388,27 @@ const ProfilePreview = ({ username = null }) => {
                 tab={
                   <div className={styles.largeTabHeader} id="session">
                     <VideoCameraOutlined />
-                    Sessions
+                    {translate('SESSIONS')}
                   </div>
                 }
               >
                 {/* =====SESSION======== */}
                 <Row className={styles.mt20}>
                   <Col span={24}>
-                    <Title level={isMobileDevice ? 4 : 2}>Sessions</Title>
+                    <Title level={isMobileDevice ? 4 : 2}>{translate('SESSIONS')}</Title>
                     <Text type="primary" strong>
-                      All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+                      {translate('ALL_EVENT_TIMEZONE_TEXT')} ({getCurrentLongTimezone()})
                     </Text>
                   </Col>
                   <Col span={24} className={styles.mt10}>
                     <Radio.Group value={view} onChange={handleViewChange}>
-                      <Radio.Button value="list">List View</Radio.Button>
-                      <Radio.Button value="calendar">Calendar View</Radio.Button>
+                      <Radio.Button value="list">{translate('LIST_VIEW')}</Radio.Button>
+                      <Radio.Button value="calendar">{translate('CALENDAR_VIEW')}</Radio.Button>
                     </Radio.Group>
                   </Col>
                   <Col span={24}>
                     {view === 'calendar' ? (
-                      <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                      <Loader loading={isSessionLoading} size="large" text={translate('LOADING_SESSIONS')}>
                         {calendarSession.length > 0 ? (
                           <CalendarView
                             inventories={calendarSession}
@@ -424,7 +424,7 @@ const ProfilePreview = ({ username = null }) => {
                       <Tabs defaultActiveKey={0}>
                         {['Upcoming Sessions'].map((item, index) => (
                           <Tabs.TabPane tab={item} key={index}>
-                            <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                            <Loader loading={isSessionLoading} size="large" text={translate('LOADING_SESSIONS')}>
                               <Sessions username={username} sessions={sessions} />
                             </Loader>
                           </Tabs.TabPane>
@@ -441,13 +441,13 @@ const ProfilePreview = ({ username = null }) => {
                 tab={
                   <div className={styles.largeTabHeader} id="pass">
                     <TagsOutlined />
-                    Passes
+                    {translate('PASSES')}
                   </div>
                 }
               >
                 <Row className={styles.mt20}>
                   <Col span={24}>
-                    <Loader loading={isPassesLoading} size="large" text="Loading passes">
+                    <Loader loading={isPassesLoading} size="large" text={translate('LOADING_PASSES')}>
                       <PublicPassList passes={passes} username={username} />
                     </Loader>
                   </Col>
@@ -460,13 +460,13 @@ const ProfilePreview = ({ username = null }) => {
                 tab={
                   <div className={styles.largeTabHeader} id="video">
                     <PlayCircleOutlined />
-                    Videos
+                    {translate('VIDEOS')}
                   </div>
                 }
               >
                 <Row className={styles.mt20}>
                   <Col span={24}>
-                    <Loader loading={isVideosLoading} size="large" text="Loading videos">
+                    <Loader loading={isVideosLoading} size="large" text={translate('LOADING_VIDEOS')}>
                       <PublicVideoList videos={videos} username={username} />
                     </Loader>
                   </Col>
@@ -479,7 +479,7 @@ const ProfilePreview = ({ username = null }) => {
                 tab={
                   <div className={styles.largeTabHeader} id="course">
                     <BookOutlined />
-                    Courses
+                    {translate('COURSES')}
                   </div>
                 }
               >
@@ -490,14 +490,14 @@ const ProfilePreview = ({ username = null }) => {
                 >
                   {liveCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
-                      <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
+                      <Loader loading={isCoursesLoading} size="large" text={translate('LOADING_LIVE_COURSES')}>
                         <PublicCourseList username={username} courses={liveCourses} />
                       </Loader>
                     </Tabs.TabPane>
                   )}
                   {videoCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
-                      <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
+                      <Loader loading={isCoursesLoading} size="large" text={translate('LOADING_VIDEO_COURSES')}>
                         <PublicCourseList username={username} courses={videoCourses} />
                       </Loader>
                     </Tabs.TabPane>
@@ -512,7 +512,7 @@ const ProfilePreview = ({ username = null }) => {
         {profile && profile?.profile?.testimonials ? (
           <Row className={styles.mt50}>
             <Col span={24}>
-              <Title level={isMobileDevice ? 4 : 2}>What people are saying</Title>
+              <Title level={isMobileDevice ? 4 : 2}>{translate('WHAT_PEOPLE_ARE_SAYING')}</Title>
             </Col>
             <Col span={24}>
               <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>
