@@ -21,7 +21,7 @@ import SelectLanguage from 'components/SelectLanguage';
 
 const { Text, Paragraph } = Typography;
 
-const NavbarHeader = ({ removePadding = false }) => {
+const NavbarHeader = () => {
   const history = useHistory();
   const location = useLocation();
   const { t: translate } = useTranslation();
@@ -172,7 +172,11 @@ const NavbarHeader = ({ removePadding = false }) => {
   }, [username]);
 
   if (reservedDomainName.includes(username)) {
-    return null;
+    return (
+      <div className={styles.languageSelectWrapper}>
+        <SelectLanguage className={styles.selectLanguage} />
+      </div>
+    );
   }
 
   return (
