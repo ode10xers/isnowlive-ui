@@ -14,16 +14,25 @@ const {
   formatDate: { toShortTimeWithPeriod },
 } = dateUtil;
 
-const CalendarView = ({ inventories = [], onSelectInventory, calendarView, onViewChange }) => {
+const CalendarView = ({
+  inventories = [],
+  onSelectInventory,
+  calendarView,
+  onViewChange,
+  classes = [],
+  customComponents = {},
+  step = 60,
+  defaultDate = new Date(),
+}) => {
   let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
   return (
-    <div className={classNames(styles.calendarWrapper, styles.mt20)}>
+    <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
       <Calendar
         views={views}
         className={styles.calendar}
         localizer={localizer}
         events={inventories}
-        step={60}
+        step={step}
         selectable
         showMultiDayTimes
         style={{ minHeight: 600, height: '100%' }}
@@ -36,6 +45,8 @@ const CalendarView = ({ inventories = [], onSelectInventory, calendarView, onVie
         tooltipAccessor={(e) =>
           `${e.name} - ${toShortTimeWithPeriod(e.start_time)} - ${toShortTimeWithPeriod(e.end_time)}`
         }
+        components={customComponents}
+        date={defaultDate}
       />
     </div>
   );
