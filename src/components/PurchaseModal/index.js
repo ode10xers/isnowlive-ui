@@ -21,14 +21,16 @@ import styles from './style.module.scss';
 
 const { Text, Paragraph, Title } = Typography;
 
+// This Modal will be used to capture the details of the user
+// and automatically logs them in, and then call the passed
+// createOrder method to execute the logic
+
 // On special cases, closeModal will take a boolean input
 // These cases are for when there are multiple object that
 // can trigger the Modal and we need to 'reset' the value
 // of the object in the parent component (see SessionDetails)
-
-//TODO: Refactor this to use PaymentPopup as an intermediate flow
 const PurchaseModal = ({ visible, closeModal, createOrder }) => {
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
   const { logIn } = useGlobalContext();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
@@ -98,9 +100,9 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
         setShowPasswordField(true);
         setCurrentUser(values);
-        message.info('Enter password to register session');
+        message.info(t('ENTER_PASSWORD_TO_REGISTER_SESSION'));
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       }
     }
   };
@@ -129,9 +131,9 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
         } catch (error) {
           if (error.response?.status === 403) {
             setIncorrectPassword(true);
-            message.error('Incorrect email or password');
+            message.error(t('INCORRECT_EMAIL_OR_PASSWORD'));
           } else {
-            message.error(error.response?.data?.message || 'Something went wrong');
+            message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
           }
         }
       } else if (!getLocalUserDetails()) {
@@ -141,7 +143,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
         createOrder(values.email);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -154,7 +156,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
       const values = await form.validateFields(['email']);
       handleSendNewPasswordEmail(values.email);
     } catch (error) {
-      showErrorModal('Please input your email first!');
+      showErrorModal(t('MISSING_EMAIL_ERROR_TEXT'));
     }
   };
 
@@ -168,7 +170,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -186,37 +188,37 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
             <Row gutter={[8, 8]}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
-                  <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
-                  {`Sign ${showSignIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
+                  <Title level={4}>{`${showSignIn ? t('SIGN_IN') : t('SIGN_UP')} ${t('HEADER_MODAL_TITLE_1')}`}</Title>
+                  {`${showSignIn ? t('SIGN_IN') : t('SIGN_UP')} ${t('HEADER_MODAL_TEXT_1')}`}
                 </Paragraph>
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 {!showSignIn && (
-                  <Form.Item label="Name" className={styles.nameInputWrapper}>
+                  <Form.Item label={t('NAME')} className={styles.nameInputWrapper}>
                     <Form.Item
                       className={styles.firstNameInput}
                       name="first_name"
                       rules={validationRules.nameValidation}
                     >
-                      <Input placeholder="First Name" disabled={showPasswordField} />
+                      <Input placeholder={t('FIRST_NAME')} disabled={showPasswordField} />
                     </Form.Item>
                     <Form.Item className={styles.lastNameInput} name="last_name" rules={validationRules.nameValidation}>
-                      <Input placeholder="Last Name" disabled={showPasswordField} />
+                      <Input placeholder={t('LAST_NAME')} disabled={showPasswordField} />
                     </Form.Item>
                   </Form.Item>
                 )}
-                <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                  <Input placeholder="Enter your email" disabled={!showSignIn && showPasswordField} />
+                <Form.Item label={t('EMAIL')} name="email" rules={validationRules.emailValidation}>
+                  <Input placeholder={t('ENTER_YOUR_EMAIL')} disabled={!showSignIn && showPasswordField} />
                 </Form.Item>
                 {(showSignIn || showPasswordField) && (
                   <>
-                    <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
-                      <Input.Password placeholder="Enter your password" />
+                    <Form.Item label={t('PASSWORD')} name="password" rules={validationRules.passwordValidation}>
+                      <Input.Password placeholder={t('ENTER_PASSWORD')} />
                     </Form.Item>
                     {incorrectPassword && (
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.incorrectPasswordText}>
-                          <Text type="danger">Email or password you entered was incorrect, please try again</Text>
+                          <Text type="danger">{t('HEADER_MODAL_LOGIN_ERROR_TEXT')}</Text>
                         </div>
                       </Form.Item>
                     )}
@@ -224,9 +226,9 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.passwordHelpText}>
                           <Text>
-                            You already have an account, but if you haven't set your password, please
+                            {t('HEADER_MODAL_SIGN_UP_HELP_TEXT_1')}
                             <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
-                              set a new password
+                              {t('SET_NEW_PASSWORD').toLowerCase()}
                             </Text>
                           </Text>
                         </div>
@@ -237,7 +239,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                 {showSignIn && (
                   <Form.Item {...purchaseModalCenterLayout}>
                     <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
-                      Set a new password
+                      {t('SET_NEW_PASSWORD')}
                     </Button>
                   </Form.Item>
                 )}
@@ -245,13 +247,13 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
-                    Sign {showSignIn ? 'In' : 'Up'}
+                    {showSignIn ? t('SIGN_IN') : t('SIGN_UP')}
                   </Button>
                 </Form.Item>
                 <Paragraph className={styles.textAlignCenter}>
-                  {showSignIn ? "Don't" : 'Already'} have an account?{' '}
+                  {showSignIn ? t('DONT_HAVE_AN_ACCOUNT') : t('ALREADY_HAVE_AN_ACCOUNT')}{' '}
                   <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
-                    Sign {showSignIn ? 'Up' : 'In'}
+                    {showSignIn ? t('SIGN_UP') : t('SIGN_IN')}
                   </Button>
                 </Paragraph>
               </Col>

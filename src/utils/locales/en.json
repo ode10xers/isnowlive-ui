@@ -146,6 +146,7 @@
   "EMAIL": "Email",
   "EMAIL_NOTIFICATIONS": "Email Notification",
   "ENTER_PASSWORD": "Enter password",
+  "ENTER_PASSWORD_TO_REGISTER_SESSION": "Enter password to register session",
   "ENTER_YOUR_EMAIL": "Enter your email",
   "ERROR": "error",
   "EVENT_CANCEL_SUCCESS": "Event has been cancelled",
