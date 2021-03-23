@@ -4,31 +4,37 @@ import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, B
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
+import { useTranslation } from 'react-i18next';
 
 import { BookTwoTone } from '@ant-design/icons';
 
 import config from 'config';
 import apis from 'apis';
+
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
+
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
+import { i18n } from 'utils/i18n';
 
 import styles from './styles.module.scss';
+
 const { Text, Paragraph } = Typography;
 
 const videoTypes = {
   FREE: {
     name: 'FREE',
-    label: 'FREE',
+    label: i18n.t('FREE'),
   },
   PAID: {
     name: 'PAID',
-    label: 'PAID',
+    label: i18n.t('PAID'),
   },
 };
 
@@ -51,6 +57,7 @@ const UploadVideoModal = ({
   updateEditedVideo,
   shouldClone,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
@@ -90,17 +97,14 @@ const UploadVideoModal = ({
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
       showSuccessModal(
-        'Video Successfully Uploaded',
+        t('VIDEO_SUCCESSFULLY_UPLOADED'),
         <>
-          <Paragraph>
-            We have received your video. It takes us about 10 minutes to process your video. Until then your video is
-            hidden.
-          </Paragraph>
-          <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+          <Paragraph>{t('VIDEO_UPLOAD_SUCCESS_TEXT_1')}</Paragraph>
+          <Paragraph>{t('VIDEO_UPLOAD_SUCCESS_TEXT_2')}</Paragraph>
         </>
       );
     } else {
-      showErrorModal(`Failed to upload video`);
+      showErrorModal(t('FAILED_TO_UPLOAD_VIDEO'));
     }
 
     setTimeout(() => {
@@ -126,7 +130,7 @@ const UploadVideoModal = ({
         setCurrency(data[0].currency.toUpperCase() || 'SGD');
       }
     } catch (error) {
-      showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal(t('FAILED_TO_FETCH_CLASSES'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -206,9 +210,9 @@ const UploadVideoModal = ({
         } else {
           if (editedVideo.video_uid.length) {
             if (shouldClone) {
-              showSuccessModal('Video cloned successfully');
+              showSuccessModal(t('VIDEO_CLONED_SUCCESSFULLY'));
             } else {
-              showSuccessModal('Video details updated successfully');
+              showSuccessModal(t('VIDEO_DETAILS_UPDATED_SUCCESSFULLY'));
             }
 
             closeModal(true);
@@ -218,7 +222,11 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedVideo ? 'update' : 'create'} video`);
+      showErrorModal(
+        `${t('FAILED_TO')} ${editedVideo ? t('UPDATE').toLowerCase() : t('CREATE').toLowerCase()} ${t(
+          'VIDEO'
+        ).toLowerCase()}`
+      );
     }
 
     setIsSubmitting(false);
@@ -259,7 +267,7 @@ const UploadVideoModal = ({
 
   return (
     <Modal
-      title={`${editedVideo ? 'Edit' : 'Upload New'} Video`}
+      title={editedVideo ? t('EDIT_VIDEO') : t('UPLOAD_NEW_VIDEO')}
       centered={true}
       visible={visible}
       footer={null}
@@ -288,32 +296,32 @@ const UploadVideoModal = ({
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       onChange={onCoverImageUpload}
                       value={coverImageUrl}
-                      label="Cover Image"
+                      label={t('COVER_IMAGE')}
                     />
                   </div>
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item id="title" name="title" label="Title" rules={validationRules.requiredValidation}>
-                  <Input placeholder="Enter title" maxLength={50} />
+                <Form.Item id="title" name="title" label={t('TITLE')} rules={validationRules.requiredValidation}>
+                  <Input placeholder={t('ENTER_TITLE')} maxLength={50} />
                 </Form.Item>
               </Col>
               <Col xs={24}>
                 <Form.Item
                   className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   name="description"
-                  label="Description"
+                  label={t('DESCRIPTION')}
                   rules={validationRules.requiredValidation}
                 >
-                  <TextEditor name="description" form={form} placeholder="Enter description" />
+                  <TextEditor name="description" form={form} placeholder={t('ENTER_DESCRIPTION')} />
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item id="session_ids" name="session_ids" label="Related to Class(es)">
+                <Form.Item id="session_ids" name="session_ids" label={t('RELATED_TO_CLASSES')}>
                   <Select
                     showArrow
                     showSearch={false}
-                    placeholder="Select your Class(es)"
+                    placeholder={t('SELECT_YOUR_CLASSES')}
                     mode="multiple"
                     maxTagCount={2}
                     value={selectedSessionIds}
@@ -321,7 +329,7 @@ const UploadVideoModal = ({
                     optionLabelProp="label"
                   >
                     <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                      label={<Text className={styles.optionSeparatorText}> {t('VISIBLE_PUBLICLY')} </Text>}
                       key="Published Sessions"
                     >
                       {classes
@@ -349,11 +357,11 @@ const UploadVideoModal = ({
                           </Select.Option>
                         ))}
                       {classes?.filter((session) => session.is_active).length <= 0 && (
-                        <Text disabled> No published sessions </Text>
+                        <Text disabled> {t('NO_PUBLISHED_SESSIONS')} </Text>
                       )}
                     </Select.OptGroup>
                     <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                      label={<Text className={styles.optionSeparatorText}> {t('HIDDEN_FROM_EVERYONE')} </Text>}
                       key="Unpublished Sessions"
                     >
                       {classes
@@ -381,7 +389,7 @@ const UploadVideoModal = ({
                           </Select.Option>
                         ))}
                       {classes?.filter((session) => !session.is_active).length <= 0 && (
-                        <Text disabled> No unpublished sessions </Text>
+                        <Text disabled> {t('NO_UNPUBLISHED_SESSIONS')} </Text>
                       )}
                     </Select.OptGroup>
                   </Select>
@@ -391,13 +399,13 @@ const UploadVideoModal = ({
                 <Form.Item
                   id="video_course_type"
                   name="video_course_type"
-                  label="Video Course Type"
+                  label={t('VIDEO_COURSE_TYPE')}
                   rules={validationRules.requiredValidation}
                   onChange={onCourseTypeChange}
                 >
                   <Radio.Group className="video-type-radio">
-                    <Radio value="normal"> Normal Video </Radio>
-                    <Radio value="course"> Course Video </Radio>
+                    <Radio value="normal"> {t('NORMAL_VIDEO')} </Radio>
+                    <Radio value="course"> {t('COURSE_VIDEOS')} </Radio>
                   </Radio.Group>
                 </Form.Item>
               </Col>
@@ -405,7 +413,7 @@ const UploadVideoModal = ({
                 <Form.Item
                   id="videoType"
                   name="videoType"
-                  label="Video Pricing"
+                  label={t('VIDEO_PRICING')}
                   rules={validationRules.requiredValidation}
                 >
                   <Radio.Group
@@ -425,10 +433,10 @@ const UploadVideoModal = ({
                   <Form.Item
                     id="price"
                     name="price"
-                    label={`Price (${currency.toUpperCase()})`}
-                    rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
+                    label={`${t('PRICE')} (${currency.toUpperCase()})`}
+                    rules={validationRules.numberValidation(t('VIDEO_PRICE_ERROR_TEXT'), 0, false)}
                   >
-                    <InputNumber min={0} placeholder="Price" className={styles.numericInput} />
+                    <InputNumber min={0} placeholder={t('PRICE')} className={styles.numericInput} />
                   </Form.Item>
                 </Col>
               )}
@@ -437,23 +445,21 @@ const UploadVideoModal = ({
                 <Form.Item
                   id="validity"
                   name="validity"
-                  label="Validity (days)"
-                  extra={
-                    <Text className={styles.helpText}>The duration in days this will be usable after purchase</Text>
-                  }
-                  rules={validationRules.numberValidation('Please Input Validity', 1, false)}
+                  label={`${t('VALIDITY')} (${t('DAYS')})`}
+                  extra={<Text className={styles.helpText}>{t('VIDEO_VALIDITY_HELP_TEXT')} </Text>}
+                  rules={validationRules.numberValidation(t('VALIDITY_ERROR_TEXT'), 1, false)}
                 >
-                  <InputNumber min={1} placeholder="Validity" className={styles.numericInput} />
+                  <InputNumber min={1} placeholder={t('VALIDITY')} className={styles.numericInput} />
                 </Form.Item>
               </Col>
               <Col xs={24}>
                 <Form.Item
                   id="watch_limit"
                   name="watch_limit"
-                  label="Watch Count"
-                  extra={<Text className={styles.helpText}>Max number of time buyer can watch video</Text>}
+                  label={t('WATCH_COUNT')}
+                  extra={<Text className={styles.helpText}>{t('WATCH_COUNT_HELP_TEXT')}</Text>}
                 >
-                  <InputNumber min={1} placeholder="Watch Count" className={styles.numericInput} />
+                  <InputNumber min={1} placeholder={t('WATCH_COUNT')} className={styles.numericInput} />
                 </Form.Item>
               </Col>
             </Row>
@@ -461,12 +467,12 @@ const UploadVideoModal = ({
               <Row>
                 <Col xs={12}>
                   <Button block type="default" onClick={() => closeModal(false)}>
-                    Cancel
+                    {t('CANCEL')}
                   </Button>
                 </Col>
                 <Col xs={12}>
                   <Button className={styles.ml10} block type="primary" htmlType="submit" loading={isSubmitting}>
-                    Continue
+                    {t('CONTINUE')}
                   </Button>
                 </Col>
               </Row>
@@ -480,8 +486,8 @@ const UploadVideoModal = ({
                 uppy={uppy.current}
                 locale={{
                   strings: {
-                    dropHereOr: 'Drop your video here or %{browse}',
-                    browse: 'browse',
+                    dropHereOr: `${t('DROP_YOUR_VIDEO_HERE_OR')} %{browse}`,
+                    browse: t('BROWSE'),
                   },
                 }}
               />
@@ -495,7 +501,7 @@ const UploadVideoModal = ({
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
                 <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFlie ? true : false}>
-                  Cancel
+                  {t('CANCEL')}
                 </Button>
               </Col>
             </Row>
