@@ -10,6 +10,8 @@ import VideoCourses from 'pages/CreatorDashboard/Courses/VideoCourses';
 
 import { courseType, isAPISuccess } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 import apis from 'apis';
 
@@ -17,6 +19,8 @@ const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 const Courses = () => {
+  const { showSendEmailPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('liveClassCourse');
@@ -77,6 +81,29 @@ const Courses = () => {
     setSelectedListTab(key);
   };
 
+  const showSendEmailModal = (course) => {
+    let userIdMap = new Map();
+
+    // TODO: Confirm whether COURSE can be bought repeatedly
+    // This mapping is used to make sure the recipients sent to modal is unique
+    if (course.buyers && course?.buyers?.length > 0) {
+      course.buyers.forEach((buyer) => {
+        if (!userIdMap.has(buyer.external_id)) {
+          userIdMap.set(buyer.external_id, buyer);
+        }
+      });
+    }
+
+    showSendEmailPopup({
+      recipients: {
+        active: Array.from(userIdMap, ([key, val]) => val),
+        expired: [],
+      },
+      productId: course?.id || null,
+      productType: 'COURSE',
+    });
+  };
+
   const openCreateCourseModal = (type = 'mixed') => {
     setIsVideoModal(type === 'video');
     setCreateModalVisible(true);
@@ -132,6 +159,7 @@ const Courses = () => {
                       showEditModal={openEditCourseModal}
                       publishCourse={publishCourse}
                       unpublishCourse={unpublishCourse}
+                      showSendEmailModal={showSendEmailModal}
                     />
                   </Col>
                 </Row>
@@ -153,6 +181,7 @@ const Courses = () => {
                       showEditModal={openEditCourseModal}
                       publishCourse={publishCourse}
                       unpublishCourse={unpublishCourse}
+                      showSendEmailModal={showSendEmailModal}
                     />
                   </Col>
                 </Row>
