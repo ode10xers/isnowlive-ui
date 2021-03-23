@@ -3,6 +3,7 @@ import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Toolt
 import moment from 'moment';
 import classNames from 'classnames';
 import { DeleteFilled } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -18,6 +19,7 @@ const {
 } = dateUtil;
 
 const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsChange, handleSlotDelete }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState(null);
   const [date, setDate] = useState(moment());
   const [selectedDate, setSelectedDate] = useState(moment());
@@ -410,7 +412,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
             </>
           ) : (
             <>
-              <p className={styles.titlePrefix}>Create Session Slot for </p>
+              <p className={styles.titlePrefix}> {t('CREATE_SESSION_SLOT_FOR')} </p>
               <p className={styles.slotTitle}>{selectedDate && toLongDate(selectedDate)}</p>
             </>
           )
@@ -429,7 +431,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       value={slot.start_time && toShortTimeWithPeriod(slot.start_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('start_time', value, index)}
-                      placeholder="Start time"
+                      placeholder={t('SELECT_START_DATE')}
                       disabled={!slot.inventory_id && slot.num_participants === 0 ? false : true}
                     >
                       {slotsList?.map((item) => {
@@ -455,7 +457,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                       value={slot.end_time && toShortTimeWithPeriod(slot.end_time)}
                       style={{ width: 120 }}
                       onChange={(value) => handleSelectChange('end_time', value, index)}
-                      placeholder="End time"
+                      placeholder={t('SELECT_END_DATE')}
                     >
                       {slotsList?.map((item) => {
                         if (
@@ -485,12 +487,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                         <Tooltip
                           title={
                             <Paragraph className={styles.textWhite}>
-                              This is an existing slot which is already booked but{' '}
+                              {t('EXISTING_SLOT_WARNING_TEXT_1')}{' '}
                               <Text strong className={styles.textWhite}>
                                 {' '}
-                                you can still delete it{' '}
+                                {t('EXISTING_SLOT_WARNING_TEXT_2')}{' '}
                               </Text>{' '}
-                              and modify this and future dates
+                              {t('EXISTING_SLOT_WARNING_TEXT_3')}
                             </Paragraph>
                           }
                         >
@@ -515,19 +517,19 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
               <Row justify="center">
                 <Col className={styles.textAlignCenter} xs={24} md={{ span: 10, offset: 1 }}>
                   <Button className={styles.mt10} onClick={() => createSession(1)} type="primary">
-                    Apply to all {toDayOfWeek(selectedDate)}
+                    {t('APPLY_TO_ALL')} {toDayOfWeek(selectedDate)}
                   </Button>
                 </Col>
                 <Col className={styles.textAlignCenter} xs={24} md={{ span: 10, offset: 1 }}>
                   <Button className={styles.mt10} onClick={() => createSession(2)} type="primary">
-                    Apply to multiple days
+                    {t('APPLY_TO_MULTIPLE_DAYS')}
                   </Button>
                 </Col>
               </Row>
               <Row justify="center">
                 <Col className={styles.textAlignCenter} xs={24} md={{ span: 12, offset: 3 }}>
                   <Button className={styles.mt10} onClick={() => createSession(0)} type="link">
-                    Apply to {toLongDate(selectedDate)} only
+                    {t('APPLY_TO')} {toLongDate(selectedDate)} {t('ONLY')}
                   </Button>
                 </Col>
               </Row>
@@ -543,12 +545,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                   </Col>
                   <Col span={4} offset={4}>
                     <Button onClick={() => createSession(3)} type="primary" ghost>
-                      Apply
+                      {t('APPLY')}
                     </Button>
                   </Col>
                   <Col span={4} offset={4}>
                     <Button className={styles.ml20} onClick={handleCancel}>
-                      Cancel
+                      {t('CANCEL')}
                     </Button>
                   </Col>
                 </Row>
@@ -558,12 +560,12 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
             <Row>
               <Col span={4} offset={4}>
                 <Button onClick={() => createSession(0)} type="primary" ghost>
-                  Apply
+                  {t('APPLY')}
                 </Button>
               </Col>
               <Col span={4} offset={4}>
                 <Button className={styles.ml20} onClick={handleCancel}>
-                  Cancel
+                  {t('CANCEL')}
                 </Button>
               </Col>
             </Row>
