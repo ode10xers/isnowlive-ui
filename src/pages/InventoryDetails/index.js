@@ -152,7 +152,7 @@ const InventoryDetails = ({ match, history }) => {
       }
     } else {
       setIsLoading(false);
-      message.error('Session details not found.');
+      message.error(translate('SESSION_DETAILS_NOT_FOUND'));
     }
     if (getLocalUserDetails()) {
       setCurrentUser(getLocalUserDetails());
@@ -203,7 +203,7 @@ const InventoryDetails = ({ match, history }) => {
         setIsLoading(false);
         setShowPasswordField(true);
         setCurrentUser(values);
-        message.info('Enter password to register session');
+        message.info(translate('ENTER_PASSWORD_TO_REGISTER_SESSION'));
       } else {
         message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
@@ -255,7 +255,7 @@ const InventoryDetails = ({ match, history }) => {
         return data.find((orderDetails) => orderDetails.order_id === orderId);
       }
     } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+      message.error(error?.response?.data?.message || translate('FAILED_FETCH_ATTENDEE_ORDER_DETAILS'));
     }
 
     return null;
@@ -381,7 +381,7 @@ const InventoryDetails = ({ match, history }) => {
 
           if (error.response?.status === 403) {
             setIncorrectPassword(true);
-            message.error('Incorrect email or password');
+            message.error(translate('INCORRECT_EMAIL_PASSWORD'));
           } else {
             message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
           }
@@ -427,7 +427,7 @@ const InventoryDetails = ({ match, history }) => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading profile">
+    <Loader loading={isLoading} size="large" text={translate('LOADING_PROFILE')}>
       <Row justify="space-between" className={styles.mt50}>
         <Col span={24} className={classNames(styles.imageWrapper, styles.mb20)}>
           <img
@@ -465,21 +465,21 @@ const InventoryDetails = ({ match, history }) => {
       </Row>
       <Row justify="space-between" className={styles.mt50}>
         <Col xs={24} lg={15}>
-          <Title level={5}>Session Information</Title>
+          <Title level={5}>{translate('SESSION_INFORMATION')}</Title>
           {showDescription ? (
             <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
           ) : (
             <>
               <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
               <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
-                Read More
+                {translate('READ_MORE')}
               </div>
             </>
           )}
           {session?.prerequisites && (
             <>
               <Title level={5} className={styles.mt50}>
-                Session Prerequisite
+                {translate('SESSION_PREREQUISITE')}
               </Title>
               {showPrerequisite ? (
                 <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.prerequisites)}</div>
@@ -487,7 +487,7 @@ const InventoryDetails = ({ match, history }) => {
                 <>
                   <div className={styles.sessionPrereq}>{ReactHtmlParser(session?.prerequisites)}</div>
                   <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
-                    Read More
+                    {translate('READ_MORE')}
                   </div>
                 </>
               )}

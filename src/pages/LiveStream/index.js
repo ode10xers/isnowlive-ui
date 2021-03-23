@@ -21,7 +21,7 @@ import config from 'config';
 
 import styles from './style.module.scss';
 import parseQueryString from 'utils/parseQueryString';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 
 const { Title, Link } = Typography;
 const { creator } = mixPanelEventTags;
@@ -64,7 +64,7 @@ const LiveStream = () => {
           const localUserDetails = getLocalUserDetails();
           localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
           localStorage.setItem('user-details', JSON.stringify(localUserDetails));
-          message.success('Zoom successfully setup!');
+          message.success(translate('ZOOM_SUCCESSFULLY_SETUP'));
           // setTimeout is used for better user experince suggest by Rahul
           setTimeout(() => {
             if (isOnboarding) {
@@ -107,7 +107,7 @@ const LiveStream = () => {
       setIsLoading(false);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
-        message.success('Zoom successfully setup!');
+        message.success(translate('ZOOM_SUCCESSFULLY_SETUP'));
         const localUserDetails = getLocalUserDetails();
         localUserDetails.zoom_connected = ZoomAuthType.JWT;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
@@ -136,20 +136,20 @@ const LiveStream = () => {
       {isOnboarding && <OnboardSteps current={1} />}
       <Space size="small" direction="vertical" className={styles.mb20}>
         <Typography>
-          <Title>Setup Livestream</Title>
+          <Title>{translate('SETUP_LIVESTREAM')}</Title>
         </Typography>
 
-        {isOnboarding && <Link href={Routes.session}>Do it later</Link>}
+        {isOnboarding && <Link href={Routes.session}>{translate('DO_IT_LATER')}</Link>}
       </Space>
 
       <Section>
-        <Title level={4}>Setup your Zoom</Title>
+        <Title level={4}>{translate('SETUP_YOUR_ZOOM')}</Title>
 
         <Row className={styles.zoomOption}>
-          <label className={styles.accountSelectionLabel}>Ways to setup:</label>
+          <label className={styles.accountSelectionLabel}>{translate('WAYS_TO_SETUP')}:</label>
           <Radio.Group onChange={(e) => setSelectedZoomOption(e.target.value)} value={selectedZoomOption}>
-            <Radio value={ZoomAuthType.OAUTH}>Connect your Zoom account</Radio>
-            <Radio value={ZoomAuthType.JWT}>Add your Zoom details</Radio>
+            <Radio value={ZoomAuthType.OAUTH}>{translate('CONNECT_YOUR_ZOOM_ACCOUNT')}</Radio>
+            <Radio value={ZoomAuthType.JWT}>{translate('ADD_YOUR_ZOOM_DETAILS')}</Radio>
           </Radio.Group>
         </Row>
 
@@ -158,15 +158,12 @@ const LiveStream = () => {
             {zoom_connected === ZoomAuthType.OAUTH ? (
               <>
                 <Button type="primary" className={styles.success}>
-                  Zoom account is connected
+                  {translate('ZOOM_ACCOUNT_IS_CONNECTED')}
                 </Button>
               </>
             ) : (
               <>
-                <p className={styles.textAlignCenter}>
-                  We will connect your Zoom Account. You will be taken to Zoom authorization page. You'll be taken back
-                  to this page.
-                </p>
+                <p className={styles.textAlignCenter}>{translate('LIVESTREAM_TEXT1')}</p>
                 <Button
                   type="primary"
                   className={styles.mt30}
@@ -175,7 +172,7 @@ const LiveStream = () => {
                     trackSimpleEvent(creator.click.livestream.connectZoomAccount);
                   }}
                 >
-                  Connect my Zoom Account
+                  {translate('CONNECT_MY_ZOOM_ACCOUNT')}
                 </Button>
               </>
             )}
@@ -185,43 +182,42 @@ const LiveStream = () => {
           <Row className={styles.zoomConnectAccountForm}>
             <Col span={24}>
               <p>
-                Want a tour of this page? <a href>Watch the video</a>
+                {translate('LIVESTREAM_TEXT2')} <a href>{translate('LIVESTREAM_TEXT3')}</a>
               </p>
-              <p>
-                Our Zoom integration will automatically create unique Zoom Meetings for each event that you create in
-                your dashboard. This means that you never have to keep track of Zoom links again. Unique Zoom meetings
-                will also be created for each recurring event.
-              </p>
-              <p>Note: Your account needs to be under a paid plan.</p>
+              <p>{translate('LIVESTREAM_TEXT4')}</p>
+              <p>{translate('LIVESTREAM_TEXT5')}</p>
             </Col>
             <Col span={24}>
-              <Title level={3}>Setting up the integration</Title>
+              <Title level={3}>{translate('SETTING_UP_THE_INTEGRATION')}</Title>
               <p>
-                We'll need three things. Your <strong>API Key,</strong> <strong>API Secret,</strong> and{' '}
-                <strong>email</strong> that is associated with your Zoom account.
+                {translate('LIVESTREAM_TEXT6')} <strong>API Key, API Secret,</strong> {translate('AND')}{' '}
+                <strong>{translate('EMAIL')}</strong> {translate('LIVESTREAM_TEXT7')}
               </p>
               <ol>
                 <li>
-                  Go to{' '}
+                  {translate('GO_TO')}{' '}
                   <a href="https://marketplace.zoom.us" target="_blank" rel="noopener noreferrer">
                     https://marketplace.zoom.us
                   </a>{' '}
-                  and Sign In.
+                  {translate('LIVESTREAM_TEXT8')}
                 </li>
-                <li>Top right, select Develop and then Build App.</li>
-                <li>Click Create under JWT app type.</li>
-                <li>Name the app "Passion".</li>
-                <li>Fill in all the required information and make sure the app is activated.</li>
+                <li>{translate('LIVESTREAM_TEXT9')}</li>
+                <li>{translate('LIVESTREAM_TEXT10')}</li>
+                <li>{translate('LIVESTREAM_TEXT11')}</li>
+                <li>{translate('LIVESTREAM_TEXT12')}</li>
                 <li>
-                  Collect your <strong>API Key</strong> and your <strong>API Secret,</strong> and the{' '}
-                  <strong>email</strong> of your Zoom account. Paste these below.
+                  {translate('LIVESTREAM_TEXT13')} <strong>API Key, API Secret,</strong> {translate('AND')}{' '}
+                  <strong>{translate('EMAIL')}</strong> {translate('LIVESTREAM_TEXT14')}
                 </li>
               </ol>
               <p>
-                <strong>Note:</strong>In your Zoom account (at <a href>zoom.us</a>), please go to settings and ensure
-                that{' '}
+                <strong>{translate('NOTE')}:</strong>
+                {translate('LIVESTREAM_TEXT15')} ({translate('AT')} <a href>zoom.us</a>),{' '}
+                {translate('LIVESTREAM_TEXT16')}{' '}
                 <em>
-                  Use Personal Meeting ID (PMI) when scheduling a meeting is turned <strong>off</strong>
+                  <Trans i18nKey="LIVESTREAM_TEXT17">
+                    Use Personal Meeting ID (PMI) when scheduling a meeting is turned <strong>off</strong>
+                  </Trans>
                 </em>
                 .
               </p>
@@ -235,8 +231,8 @@ const LiveStream = () => {
                   <Form.Item label="API Secret" name="api_secret" rules={validationRules.requiredValidation}>
                     <Input.Password placeholder="API Secret" />
                   </Form.Item>
-                  <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                    <Input placeholder="Email" />
+                  <Form.Item label={translate('EMAIL')} name="email" rules={validationRules.emailValidation}>
+                    <Input placeholder={translate('EMAIL')} />
                   </Form.Item>
                 </Col>
                 <Col span={24}>
@@ -244,7 +240,7 @@ const LiveStream = () => {
                     <Col>
                       <Form.Item>
                         <Button htmlType="submit" type="primary" loading={isLoading}>
-                          Submit
+                          {translate('SUBMIT')}
                         </Button>
                       </Form.Item>
                     </Col>

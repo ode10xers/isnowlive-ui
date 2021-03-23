@@ -42,7 +42,7 @@ const PaymentVerification = () => {
         return data.find((orderDetails) => orderDetails.order_id === orderId);
       }
     } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+      message.error(error?.response?.data?.message || translate('FAILED_FETCH_ATTENDEE_ORDER_DETAILS'));
     }
 
     return null;
@@ -68,7 +68,7 @@ const PaymentVerification = () => {
               if (isAPISuccess(userPassResponse.status)) {
                 usersPass = userPassResponse.data.active.filter((userPass) => userPass.pass_order_id === order_id)[0];
               } else {
-                showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), "Failed to fetch user's pass list");
+                showErrorModal(translate('SOMETHING_WRONG_HAPPENED'), translate('FAILED_FETCH_USER_PASS_LIST'));
               }
 
               if (inventory_id) {
@@ -170,7 +170,7 @@ const PaymentVerification = () => {
 
   return (
     <Row justify="center">
-      <Loader loading={isLoading} size="large" text="Verifying order payment"></Loader>
+      <Loader loading={isLoading} size="large" text={translate('VERIFYING_ORDER_PAYMENT')}></Loader>
     </Row>
   );
 };
