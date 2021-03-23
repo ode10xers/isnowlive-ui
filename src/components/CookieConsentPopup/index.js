@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import { useTranslation } from 'react-i18next';
 
 import { Modal, Typography } from 'antd';
 
@@ -9,7 +10,6 @@ import { isMobileDevice } from 'utils/device';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import { useTranslation } from 'react-i18next';
 
 const { Paragraph, Text } = Typography;
 
