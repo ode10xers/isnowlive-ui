@@ -5,6 +5,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import { generateUrl, productType, generateUrlFromUsername } from 'utils/helper';
+import { i18n } from 'utils/i18n';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
@@ -15,14 +16,14 @@ const { Text, Paragraph } = Typography;
 
 export const showErrorModal = (title, message = '') => {
   Modal.error({
-    title: title || 'Something wrong occured',
+    title: title || i18n.t('SOMETHING_WRONG_HAPPENED'),
     content: message,
   });
 };
 
 export const showSuccessModal = (title, message = '') => {
   Modal.success({
-    title: title || 'Success',
+    title: title || i18n.t('SUCCESS'),
     content: message,
   });
 };
@@ -35,29 +36,29 @@ export const showSetNewPasswordModal = (email) => {
     center: true,
     closable: true,
     maskClosable: true,
-    title: 'Set a new password',
+    title: i18n.t('SET_NEW_PASSWORD'),
     content: (
       <>
         <Paragraph>
-          We have sent you a link to setup your new password on your email <Text strong>{email}</Text>.
+          {i18n.t('SET_NEW_PASSWORD_MODAL_TEXT_1')} <Text strong>{email}</Text>.
         </Paragraph>
         <Paragraph type="danger">
-          If you can't find it, please search for{' '}
+          {i18n.t('SET_NEW_PASSWORD_MODAL_TEXT_2')}{' '}
           <Text type="danger" strong>
             {' '}
             friends@passion.do{' '}
           </Text>{' '}
-          in your email app or in the spam folder.
+          {i18n.t('SET_NEW_PASSWORD_MODAL_TEXT_3')}
         </Paragraph>
         <Paragraph>
           <Button className={styles.linkButton} type="link" onClick={() => sendNewPasswordEmail(email)}>
-            Didn't get it? Send again.
+            {i18n.t('SET_NEW_PASSWORD_MODAL_TEXT_4')}
           </Button>
         </Paragraph>
       </>
     ),
-    okText: 'Okay',
-    cancelText: 'Talk to us',
+    okText: i18n.t('OKAY'),
+    cancelText: i18n.t('TALK_TO_US'),
     onCancel: () => openFreshChatWidget(),
   });
 };
@@ -80,7 +81,7 @@ export const showBookingSuccessModal = (
     width: 480,
     closable: true,
     maskClosable: false,
-    title: 'Registration Successful',
+    title: i18n.t('REGISTRATION_SUCCESSFUL'),
     content: (
       <>
         {isContinuedFlow ? (
@@ -88,48 +89,54 @@ export const showBookingSuccessModal = (
             //* Purchase Pass & Immediately Book Class
             <>
               <Paragraph>
-                You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+                {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_1')}{' '}
+                <Text strong> {userPass?.name || userPass?.pass_name} </Text>
               </Paragraph>
               <Paragraph>
-                We have <Text strong> used 1 credit </Text>
-                to book this class for you.
+                {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_2')}{' '}
+                <Text strong> {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_3')} </Text>
+                {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_4')}
               </Paragraph>
               <Paragraph>
-                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-                from <Text strong> friends@passion.do. </Text>
+                {i18n.t('CONFIRMATION_EMAIL_TEXT_1')} <Text strong> {userEmail} </Text>.{' '}
+                {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}
+                <Text strong> friends@passion.do. </Text>
               </Paragraph>
-              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+              <Paragraph> {i18n.t('BOOKING_IN_ONE_PLACE')} </Paragraph>
             </>
           ) : (
             //* Book class from previously purchased Pass
             <>
               <Paragraph>
-                We have booked this session using 1 credit from your pass
+                {i18n.t('BOOK_CLASS_USING_PASS_TEXT_1')}
                 <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
               </Paragraph>
               <Paragraph>
-                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-                from <Text strong> friends@passion.do. </Text>
+                {i18n.t('CONFIRMATION_EMAIL_TEXT_1')} <Text strong> {userEmail} </Text>.{' '}
+                {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}
+                <Text strong> friends@passion.do. </Text>
               </Paragraph>
-              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+              <Paragraph> {i18n.t('BOOKING_IN_ONE_PLACE')} </Paragraph>
             </>
           )
         ) : userPass ? (
           //* Purchase Individual Pass without Booking Class
           <>
             <Paragraph>
-              You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+              {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_1')}{' '}
+              <Text strong> {userPass?.name || userPass?.pass_name} </Text>
             </Paragraph>
-            <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
+            <Paragraph> {i18n.t('PURCHASES_IN_ONE_PLACE_TEXT')} </Paragraph>
           </>
         ) : (
           //* Book Class without Pass
           <>
             <Paragraph>
-              We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+              {i18n.t('BOOK_WITHOUT_PASS_TEXT_1')} <Text strong> {userEmail} </Text>.{' '}
+              {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}
               <Text strong> friends@passion.do. </Text>
             </Paragraph>
-            <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+            <Paragraph>{i18n.t('BOOKING_IN_ONE_PLACE')}</Paragraph>
           </>
         )}
         <div classname={styles.mt20}>
@@ -139,7 +146,6 @@ export const showBookingSuccessModal = (
                 <div>
                   <AddToCalendarButton
                     type="button"
-                    buttonText="Add to Cal"
                     eventData={{
                       ...orderDetails,
                       page_url: `${generateUrlFromUsername(
@@ -158,7 +164,7 @@ export const showBookingSuccessModal = (
                   (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath)
                 }
               >
-                Go To Dashboard
+                {i18n.t('GO_TO_DASHBOARD')}
               </Button>
             </Col>
           </Row>
@@ -166,31 +172,31 @@ export const showBookingSuccessModal = (
       </>
     ),
     okButtonProps: { style: { display: 'none' } },
-    okText: 'Go To Dashboard',
+    okText: i18n.t('GO_TO_DASHBOARD'),
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
 
 export const showAlreadyBookedModal = (prodType = productType.PRODUCT, targetDomainName) => {
-  let titleText = 'Product already purchased';
-  let contentText = 'purchased this product';
+  let titleText = i18n.t('DEFAULT_PRODUCT_ALREADY_PURCHASED_TITLE');
+  let contentText = i18n.t('DEFAULT_PRODUCT_ALREADY_PURCHASED_CONTENT');
 
   switch (prodType) {
     case productType.CLASS:
-      titleText = 'Session already booked';
-      contentText = 'booked this session';
+      titleText = i18n.t('SESSION_ALREADY_PURCHASED_TITLE');
+      contentText = i18n.t('SESSION_ALREADY_PURCHASED_CONTENT');
       break;
     case productType.PASS:
-      titleText = 'Pass already purchased';
-      contentText = 'purchased this pass';
+      titleText = i18n.t('PASS_ALREADY_PURCHASED_TITLE');
+      contentText = i18n.t('PASS_ALREADY_PURCHASED_CONTENT');
       break;
     case productType.VIDEO:
-      titleText = 'Video already purchased';
-      contentText = 'purchased this video';
+      titleText = i18n.t('VIDEO_ALREADY_PURCHASED_TITLE');
+      contentText = i18n.t('VIDEO_ALREADY_PURCHASED_CONTENT');
       break;
     default:
-      titleText = 'Product already purchased';
-      contentText = 'purchased this product';
+      titleText = i18n.t('DEFAULT_PRODUCT_ALREADY_PURCHASED_TITLE');
+      contentText = i18n.t('DEFAULT_PRODUCT_ALREADY_PURCHASED_CONTENT');
       break;
   }
 
@@ -207,10 +213,10 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT, targetDom
     title: titleText,
     content: (
       <Paragraph>
-        It seems you have already <Text strong> {contentText} </Text>, please check your dashboard
+        {i18n.t('PRODUCT_PURCHASED_TEXT_1')} <Text strong> {contentText} </Text>, {i18n.t('PRODUCT_PURCHASED_TEXT_2')}
       </Paragraph>
     ),
-    okText: 'Go To Dashboard',
+    okText: i18n.t('GO_TO_DASHBOARD'),
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
@@ -227,48 +233,53 @@ export const showVideoPurchaseSuccessModal = (
   let modalContent = (
     <>
       <Paragraph>
-        You have purchased the video <Text strong> {video?.title} </Text>
+        {i18n.t('PURCHASE_VIDEO_TEXT_1')} <Text strong> {video?.title} </Text>
       </Paragraph>
       <Paragraph>
-        We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+        {i18n.t('BOOK_WITHOUT_PASS_TEXT_1')} <Text strong> {userEmail} </Text>. {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}
         <Text strong> friends@passion.do. </Text>
       </Paragraph>
-      <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      <Paragraph> {i18n.t('PURCHASES_IN_ONE_PLACE_TEXT')} </Paragraph>
     </>
   );
 
   if (isContinuedFlow) {
-    title = 'Video Purchased using Pass';
+    title = i18n.t('PURCHASE_VIDEO_USING_PASS_TITLE');
 
     if (userDidPayment) {
       modalContent = (
         <>
           <Paragraph>
-            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
+            {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_1')}{' '}
+            <Text strong> {userPass?.name || userPass?.pass_name} </Text>
           </Paragraph>
           <Paragraph>
-            We have <Text strong> used 1 credit </Text>
-            to buy <Text strong> {video?.title} </Text> video for you.
+            {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_2')}{' '}
+            <Text strong> {i18n.t('PURCHASE_PASS_AND_BOOK_CLASS_TEXT_3')} </Text>
+            {i18n.t('TO_BUY')} <Text strong> {video?.title} </Text> {i18n.t('VIDEO_FOR_YOU')}
           </Paragraph>
           <Paragraph>
-            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-            from <Text strong> friends@passion.do. </Text>
+            {i18n.t('CONFIRMATION_EMAIL_TEXT_1')} <Text strong> {userEmail} </Text>.{' '}
+            {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}
+            <Text strong> friends@passion.do. </Text>
           </Paragraph>
-          <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+          <Paragraph> {i18n.t('PURCHASES_IN_ONE_PLACE_TEXT')} </Paragraph>
         </>
       );
     } else {
       modalContent = (
         <>
           <Paragraph>
-            We have bought <Text strong> {video?.title} </Text> video using 1 credit from your pass
+            {i18n.t('BUY_VIDEO_USING_PASS_TEXT_1')} <Text strong> {video?.title} </Text>{' '}
+            {i18n.t('BUY_VIDEO_USING_PASS_TEXT_2')}
             <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
           </Paragraph>
           <Paragraph>
-            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-            from <Text strong> friends@passion.do. </Text>
+            {i18n.t('CONFIRMATION_EMAIL_TEXT_1')} <Text strong> {userEmail} </Text>.{' '}
+            {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}
+            <Text strong> friends@passion.do. </Text>
           </Paragraph>
-          <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+          <Paragraph> {i18n.t('PURCHASES_IN_ONE_PLACE_TEXT')} </Paragraph>
         </>
       );
     }
@@ -286,20 +297,20 @@ export const showVideoPurchaseSuccessModal = (
     maskClosable: false,
     title: title,
     content: modalContent,
-    okText: 'Go To Dashboard',
+    okText: i18n.t('GO_TO_DASHBOARD'),
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
 
 export const showCourseBookingSuccessModal = (userEmail, targetDomainName) => {
-  let title = 'Course booked';
+  let title = i18n.t('COURSE_BOOKED_MODAL_TITLE');
   let modalContent = (
     <>
       <Paragraph>
-        You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+        {i18n.t('CONFIRMATION_EMAIL_TEXT_1')} <Text strong> {userEmail} </Text>. {i18n.t('CONFIRMATION_EMAIL_TEXT_2')}{' '}
         <Text strong> friends@passion.do. </Text>
       </Paragraph>
-      <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+      <Paragraph>{i18n.t('BOOKING_IN_ONE_PLACE')}</Paragraph>
     </>
   );
 
@@ -315,7 +326,7 @@ export const showCourseBookingSuccessModal = (userEmail, targetDomainName) => {
     maskClosable: false,
     title: title,
     content: modalContent,
-    okText: 'Go To Dashboard',
+    okText: i18n.t('GO_TO_DASHBOARD'),
     onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
