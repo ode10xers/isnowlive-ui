@@ -3,6 +3,8 @@ import classNames from 'classnames';
 import { Upload, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+
 // import ImageBlobReduce from 'image-blob-reduce';
 
 import apis from 'apis';
@@ -19,16 +21,18 @@ const ImageUpload = ({
   aspect = 1,
   className,
 }) => {
+  const { t } = useTranslation();
+
   const [loading] = useState(false);
 
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const isValidFileSize = file.size / 1024 / 1024 < 2;
     if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!');
+      message.error(t('INVALID_IMAGE_FORMAT_ERROR_TEXT'));
     }
     if (!isValidFileSize) {
-      message.error('Image must smaller than 2MB!');
+      message.error(t('IMAGE_SIZE_TOO_BIG_ERROR_TEXT'));
     }
     return isJpgOrPng && isValidFileSize;
   };
