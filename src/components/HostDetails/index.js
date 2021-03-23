@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Image, Space, Typography } from 'antd';
 import { GlobalOutlined, FacebookOutlined, TwitterOutlined, InstagramOutlined } from '@ant-design/icons';
 import ReactHtmlParser from 'react-html-parser';
+import { useTranslation } from 'react-i18next';
 
 import DefaultImage from '../Icons/DefaultImage/index';
 import { isMobileDevice } from 'utils/device';
@@ -11,6 +12,8 @@ import styles from './styles.module.scss';
 const { Title } = Typography;
 
 const HostDetails = ({ host }) => {
+  const { t } = useTranslation();
+
   const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
@@ -18,7 +21,7 @@ const HostDetails = ({ host }) => {
     setTimeout(() => {
       if (document.getElementsByClassName('ant-typography-expand').length) {
         for (let i = 0; i < document.getElementsByClassName('ant-typography-expand').length; i++) {
-          document.getElementsByClassName('ant-typography-expand')[i].innerText = 'Read more';
+          document.getElementsByClassName('ant-typography-expand')[i].innerText = t('READ_MORE');
         }
       }
     }, 200);
@@ -50,7 +53,7 @@ const HostDetails = ({ host }) => {
           <Title className={styles.mt10} level={4}>
             {host?.first_name} {host?.last_name}
           </Title>
-          <Title level={5}>Full Profile</Title>
+          <Title level={5}> {t('FULL_PROFILE')} </Title>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           {showMore ? (
@@ -59,7 +62,7 @@ const HostDetails = ({ host }) => {
             <>
               <div className={styles.creatorBio}>{ReactHtmlParser(host?.profile?.bio)}</div>
               <div className={styles.readMoreText} onClick={() => setShowMore(true)}>
-                Read More
+                {t('READ_MORE')}
               </div>
             </>
           )}
