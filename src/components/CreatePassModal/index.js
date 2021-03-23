@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
+import { useTranslation } from 'react-i18next';
 
 import { BookTwoTone } from '@ant-design/icons';
 
@@ -11,6 +12,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
+import { i18n } from 'utils/i18n';
 
 import styles from './styles.module.scss';
 
@@ -19,11 +21,11 @@ const { Text } = Typography;
 const passTypes = {
   LIMITED: {
     name: 'LIMITED',
-    label: 'Limited',
+    label: i18n.t('LIMITED'),
   },
   UNLIMITED: {
     name: 'UNLIMITED',
-    label: 'Unlimited',
+    label: i18n.t('UNLIMITED'),
   },
 };
 
@@ -60,6 +62,8 @@ const colorPickerChoices = [
 ];
 
 const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
+  const { t } = useTranslation();
+
   const [form] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
@@ -83,7 +87,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         setCurrency(data[0].currency.toUpperCase());
       }
     } catch (error) {
-      showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal(t('FAILED_TO_FETCH_CLASSES'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -99,7 +103,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         setVideos(data.filter((video) => video.price > 0));
       }
     } catch (error) {
-      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
+      showErrorModal(t('FAILED_TO_FETCH_VIDEOS'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
 
     setIsLoading(false);
@@ -158,14 +162,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       const noVideosSelected = selectedVideos.length <= 0 && values.videoList.length <= 0;
 
       if (noClassesSelected && noVideosSelected) {
-        showErrorModal('Select Class/Video', 'Please select some class or videos to include in the pass');
+        showErrorModal(t('NO_CLASS_OR_VIDEO_IN_PASS_ERROR_TITLE'), t('NO_CLASS_OR_VIDEO_IN_PASS_ERROR_TEXT'));
         form.setFieldsValue(values);
         setIsSubmitting(false);
         return;
       }
 
       if (passType !== passTypes.LIMITED.name && passType !== passTypes.UNLIMITED.name) {
-        showErrorModal('Select Pass Type', 'Please select a pass type for this pass');
+        showErrorModal(t('NO_PASS_TYPE_ERROR_TITLE'), t('NO_PASS_TYPE_ERROR_TEXT'));
         form.setFieldsValue(values);
         setIsSubmitting(false);
         return;
@@ -188,11 +192,17 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         : await apis.passes.createClassPass(data);
 
       if (isAPISuccess(response.status)) {
-        showSuccessModal(`${data.name} successfully ${editedPass ? 'updated' : 'created'}`);
+        showSuccessModal(
+          `${data.name} ${t('SUCCESSFULLY')} ${editedPass ? t('UPDATED').toLowerCase() : t('CREATED').toLowerCase()}`
+        );
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedPass ? 'update' : 'create'} pass`);
+      showErrorModal(
+        `${t('FAILED_TO')} ${editedPass ? t('UPDATE').toLowerCase() : t('CREATE').toLowerCase()} ${t(
+          'PASS'
+        ).toLowerCase()}`
+      );
     }
 
     setIsSubmitting(false);
@@ -200,7 +210,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
 
   return (
     <Modal
-      title={`${editedPass ? 'Edit' : 'Create New'} Pass`}
+      title={`${editedPass ? t('EDIT') : t('CREATE')} ${t('PASS')}`}
       centered={true}
       visible={visible}
       footer={null}
@@ -218,21 +228,21 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         >
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
-              <Form.Item id="passName" name="passName" label="Pass Name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Pass Name" maxLength={50} />
+              <Form.Item id="passName" name="passName" label={t('PASS_NAME')} rules={validationRules.nameValidation}>
+                <Input placeholder={t('PASS_NAME')} maxLength={50} />
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item
                 id="classList"
                 name="classList"
-                label="Apply to Class(es)"
-                extra={<Text className={styles.helpText}> The classes that will be bookable using this pass </Text>}
+                label={t('APPLY_TO_CLASSES')}
+                extra={<Text className={styles.helpText}> {t('APPLY_TO_CLASSES_HELP_TEXT')} </Text>}
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  placeholder="Select your Class(es)"
+                  placeholder={t('SELECT_YOUR_CLASSES')}
                   mode="multiple"
                   maxTagCount={2}
                   value={selectedClasses}
@@ -240,7 +250,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   optionLabelProp="label"
                 >
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    label={<Text className={styles.optionSeparatorText}> {t('VISIBLE_PUBLICLY')} </Text>}
                     key="Published Sessions"
                   >
                     {classes
@@ -266,11 +276,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                         </Select.Option>
                       ))}
                     {classes?.filter((session) => session.is_active).length <= 0 && (
-                      <Text disabled> No published sessions </Text>
+                      <Text disabled> {t('NO_PUBLISHED_SESSIONS')} </Text>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    label={<Text className={styles.optionSeparatorText}> {t('HIDDEN_FROM_EVERYONE')} </Text>}
                     key="Unpublished Sessions"
                   >
                     {classes
@@ -296,7 +306,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                         </Select.Option>
                       ))}
                     {classes?.filter((session) => !session.is_active).length <= 0 && (
-                      <Text disabled> No unpublished sessions </Text>
+                      <Text disabled> {t('NO_UNPUBLISHED_SESSIONS')} </Text>
                     )}
                   </Select.OptGroup>
                 </Select>
@@ -308,8 +318,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
               <Form.Item
                 id="passType"
                 name="passType"
-                label="Pass Type"
-                extra={<Text className={styles.helpText}>Type of usage limit this pass will have</Text>}
+                label={t('PASS_TYPE')}
+                extra={<Text className={styles.helpText}> {t('PASS_TYPE_HELP_TEXT')} </Text>}
               >
                 <Radio.Group
                   className="pass-type-radio"
@@ -326,13 +336,13 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
               <Form.Item
                 id="videoList"
                 name="videoList"
-                label="Apply to Video(s)"
-                extra={<Text className={styles.helpText}> The videos that will be bookable using this pass </Text>}
+                label={t('APPLY_TO_VIDEOS')}
+                extra={<Text className={styles.helpText}> {t('APPLY_TO_VIDEOS_HELP_TEXT')} </Text>}
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  placeholder="Select your Video(s)"
+                  placeholder={t('SELECT_YOUR_VIDEOS')}
                   mode="multiple"
                   maxTagCount={2}
                   value={selectedVideos}
@@ -340,7 +350,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   optionLabelProp="label"
                 >
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Visible Publicly </Text>}
+                    label={<Text className={styles.optionSeparatorText}> {t('VISIBLE_PUBLICLY')} </Text>}
                     key="Published Videos"
                   >
                     {videos
@@ -366,11 +376,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => video.is_published).length <= 0 && (
-                      <Text disabled> No published videos </Text>
+                      <Text disabled> {t('NO_PUBLISHED_VIDEOS')} </Text>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    label={<Text className={styles.optionSeparatorText}> {t('HIDDEN_FROM_EVERYONE')} </Text>}
                     key="Unpublished Videos"
                   >
                     {videos
@@ -396,7 +406,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => !video.is_published).length <= 0 && (
-                      <Text disabled> No unpublished videos </Text>
+                      <Text disabled> {t('NO_UNPUBLISHED_VIDEOS')} </Text>
                     )}
                   </Select.OptGroup>
                 </Select>
@@ -410,43 +420,35 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   <Form.Item
                     id="validity"
                     name="validity"
-                    label="Pass Validity (days)"
-                    extra={
-                      <Text className={styles.helpText}>
-                        The duration in days this pass will be usable after purchase
-                      </Text>
-                    }
-                    rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
+                    label={`${t('PASS_VALIDITY')} (${t('DAYS')})`}
+                    extra={<Text className={styles.helpText}>{t('PASS_VALIDITY_HELP_TEXT')}</Text>}
+                    rules={validationRules.numberValidation(t('PASS_VALIDITY_ERROR_TEXT'), 1, false)}
                   >
-                    <InputNumber min={1} placeholder="Pass Validity" className={styles.numericInput} />
+                    <InputNumber min={1} placeholder={t('PASS_VALIDITY')} className={styles.numericInput} />
                   </Form.Item>
                 </Col>
                 <Col xs={24}>
                   <Form.Item
                     id="price"
                     name="price"
-                    label="Pass Price"
-                    rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
+                    label={t('PASS_PRICE')}
+                    rules={validationRules.numberValidation(t('PASS_PRICE_ERROR_TEXT'), 0, false)}
                   >
-                    <InputNumber min={0} placeholder="Pass Price" className={styles.numericInput} />
+                    <InputNumber min={0} placeholder={t('PASS_PRICE')} className={styles.numericInput} />
                   </Form.Item>
                 </Col>
                 <Col xs={24}>
                   <Form.Item
                     id="classCount"
                     name="classCount"
-                    label="Pass Credits"
-                    extra={
-                      <Text className={styles.helpText}>
-                        The maximum amount of live classes and videos bookable with this pass
-                      </Text>
-                    }
+                    label={t('PASS_CREDITS')}
+                    extra={<Text className={styles.helpText}>{t('PASS_CREDITS_HELP_TEXT')}</Text>}
                     rules={[
                       {
                         required: true,
                         validator: (_, value) => {
                           if (passType === passTypes.LIMITED.name && !value) {
-                            return Promise.reject('Please select the amount of classes');
+                            return Promise.reject(t('PASS_CREDITS_ERROR_TEXT'));
                           }
                           return Promise.resolve();
                         },
@@ -456,7 +458,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                     <InputNumber
                       disabled={passType === passTypes.UNLIMITED.name}
                       min={1}
-                      placeholder="Amount of Credits"
+                      placeholder={t('AMOUNT_OF_CREDITS')}
                       className={styles.numericInput}
                     />
                   </Form.Item>
@@ -464,7 +466,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
               </Row>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
-              <Form.Item name="colorCode" label="Color Tag">
+              <Form.Item name="colorCode" label={t('COLOR_CODE')}>
                 <div className={styles.colorPickerPreview} style={{ borderColor: colorCode }}>
                   <TwitterPicker
                     className={styles.colorPicker}
@@ -480,12 +482,12 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
           <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
             <Col xs={12} md={4}>
               <Button block type="default" onClick={() => closeModal(false)} loading={isSubmitting}>
-                Cancel
+                {t('CANCEL')}
               </Button>
             </Col>
             <Col xs={12} md={6}>
               <Button block type="primary" htmlType="submit" loading={isSubmitting}>
-                {editedPass ? 'Update' : 'Create'} Pass
+                {editedPass ? t('UPDATE') : t('CREATE')} {t('PASS')}
               </Button>
             </Col>
           </Row>
