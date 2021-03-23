@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import MobileDetect from 'mobile-detect';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Button, Form, Input, Typography, Tag, Card } from 'antd';
 import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
@@ -40,6 +41,7 @@ const SessionRegistration = ({
   classDetails,
   logOut,
 }) => {
+  const { t } = useTranslation();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -119,21 +121,21 @@ const SessionRegistration = ({
         ),
     },
     {
-      title: 'Pass',
+      title: t('PASS'),
       dataIndex: 'name',
       key: 'name',
       width: '50%',
     },
     {
-      title: 'Validity',
+      title: t('VALIDITY'),
       dataIndex: 'validity',
       key: 'validity',
       width: '15%',
       align: 'right',
-      render: (text, record) => `${record.validity} day`,
+      render: (text, record) => `${record.validity} ${t('DAYS')}`,
     },
     {
-      title: 'Price',
+      title: t('PRICE'),
       dataIndex: 'price',
       key: 'price',
       align: 'left',
@@ -141,16 +143,16 @@ const SessionRegistration = ({
       render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
     },
     {
-      title: 'Credit Count',
+      title: t('CREDIT_COUNT'),
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       render: (text, record) => {
         const btnText = record.limited
           ? record.user_usable
-            ? `${record.classes_remaining}/${record.class_count} remaining `
-            : `${record.class_count} Credits `
-          : 'Unlimited Credits ';
+            ? `${record.classes_remaining}/${record.class_count} ${t('REMAINING')} `
+            : `${record.class_count} ${t('CREDITS')} `
+          : t('UNLIMITED_CREDITS');
 
         return expandedRowKeys.includes(record.id) ? (
           <Button className={styles.linkBtn} type="link" onClick={() => collapseRow(record.id)}>
@@ -181,20 +183,20 @@ const SessionRegistration = ({
         ),
     },
     {
-      title: 'Pass',
+      title: t('PASS'),
       dataIndex: 'name',
       key: 'name',
       align: 'left',
     },
     {
-      title: 'Credits Left',
+      title: t('CREDITS_LEFT'),
       dataIndex: 'classes_remaining',
       key: 'classes_remaining',
       width: '20%',
       render: (text, record) => `${record.classes_remaining}/${record.class_count}`,
     },
     {
-      title: 'Valid Till',
+      title: t('VALID_TILL'),
       dataIndex: 'expiry',
       key: 'expiry',
       width: '20%',
@@ -217,7 +219,7 @@ const SessionRegistration = ({
       {record.sessions?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+            <Text className={styles.ml20}> {t('SESSIONS_BOOKABLE_WITH_THIS_PASS')} </Text>
           </Col>
           <Col xs={24}>
             <div className={styles.ml20}>
@@ -237,7 +239,7 @@ const SessionRegistration = ({
       {record.videos?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+            <Text className={styles.ml20}> {t('VIDEOS_PURCHASABLE_WITH_THIS_PASS')} </Text>
           </Col>
           <Col xs={24}>
             <div className={styles.ml20}>
@@ -289,29 +291,32 @@ const SessionRegistration = ({
           }
           actions={[
             <Button type="primary" onClick={() => setSelectedPass(pass)}>
-              Select Pass
+              {t('SELECT_PASS')}
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
               <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
-                Close
+                {t('CLOSE')}
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
-                More
+                {t('MORE')}
               </Button>
             ),
           ]}
         >
-          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
-          {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout(
+            t('CREDIT_COUNT'),
+            <Text>{pass.limited ? `${pass.class_count} ${t('CREDITS')}` : t('UNLIMITED_CREDITS')}</Text>
+          )}
+          {layout(t('VALIDITY'), <Text>{`${pass.validity} ${t('DAYS')}`}</Text>)}
+          {layout(t('PRICE'), <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
             {pass?.sessions?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                  <Text className={styles.ml20}> {t('SESSIONS_BOOKABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -331,7 +336,7 @@ const SessionRegistration = ({
             {pass?.videos?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                  <Text className={styles.ml20}> {t('VIDEOS_PURCHASABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -386,28 +391,28 @@ const SessionRegistration = ({
           }
           actions={[
             <Button type="primary" onClick={() => setSelectedPass(pass)}>
-              Select Pass
+              {t('SELECT_PASS')}
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
               <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
-                Close
+                {t('CLOSE')}
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
-                More
+                {t('MORE')}
               </Button>
             ),
           ]}
         >
-          {layout('Credits Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
-          {layout('Expiry', <Text>{toShortDate(pass.expiry)}</Text>)}
+          {layout(t('CREDITS_LEFT'), <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
+          {layout(t('EXPIRY'), <Text>{toShortDate(pass.expiry)}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
             {pass?.sessions?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                  <Text className={styles.ml20}> {t('SESSIONS_BOOKABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -427,7 +432,7 @@ const SessionRegistration = ({
             {pass?.videos?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                  <Text className={styles.ml20}> {t('VIDEOS_PURCHASABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -454,19 +459,18 @@ const SessionRegistration = ({
     <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
         <Col xs={24}>
-          <Title level={3}>Registration</Title>
+          <Title level={3}>{t('REGISTRATION')}</Title>
         </Col>
         <Col xs={24}>
           <Text>
-            <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are always
-            available in your
+            <a href="https://zoom.us/download"> {t('ZOOM')} </a> {t('SESSION_REGISTRATION_TEXT_1')}
             <a
               href={`${generateUrlFromUsername('app')}${Routes.attendeeDashboard.rootPath}${
                 Routes.attendeeDashboard.defaultPath
               }`}
             >
               {' '}
-              dashboard
+              {t('DASHBOARD')}
             </a>
             .
           </Text>
@@ -482,23 +486,23 @@ const SessionRegistration = ({
             {!user && (
               <Item label="Name" className={styles.nameInputWrapper}>
                 <Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-                  <Input placeholder="First Name" disabled={showPasswordField} />
+                  <Input placeholder={t('FIRST_NAME')} disabled={showPasswordField} />
                 </Item>
                 <Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-                  <Input placeholder="Last Name" disabled={showPasswordField} />
+                  <Input placeholder={t('LAST_NAME')} disabled={showPasswordField} />
                 </Item>
               </Item>
             )}
 
             <Item className={styles.emailInput} label="Email" name="email" rules={validationRules.emailValidation}>
-              <Input placeholder="Enter your email" disabled={user} />
+              <Input placeholder={t('ENTER_YOUR_EMAIL')} disabled={user} />
             </Item>
 
             {showPasswordField && (
               <>
                 <Item
                   className={styles.passwordInput}
-                  label="Password"
+                  label={t('PASSWORD')}
                   name="password"
                   rules={validationRules.passwordValidation}
                   ref={passwordInput}
@@ -507,17 +511,17 @@ const SessionRegistration = ({
                 </Item>
                 <Item {...sessionRegistrationTailLayout}>
                   {incorrectPassword ? (
-                    <Text type="danger">Email or password you entered was incorrect, please try again</Text>
+                    <Text type="danger">{t('HEADER_MODAL_LOGIN_ERROR_TEXT')}</Text>
                   ) : (
                     <div className={styles.passwordHelpText}>
                       <Text>
-                        You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                        {t('HEADER_MODAL_SIGN_UP_HELP_TEXT_1')}{' '}
                         <Button
                           type="link"
                           className={classNames(styles.setNewPassword, styles.linkBtn)}
                           onClick={() => onSetNewPassword(form.getFieldsValue().email)}
                         >
-                          set a new password
+                          {t('SET_NEW_PASSWORD').toLowerCase()}
                         </Button>
                       </Text>
                     </div>
@@ -529,18 +533,18 @@ const SessionRegistration = ({
             <Item {...sessionRegistrationTailLayout}>
               {user ? (
                 <Button className={styles.linkBtn} type="link" onClick={() => logOut()}>
-                  Not this account? Logout
+                  {t('NOT_THIS_ACCOUNT_LOGOUT')}
                 </Button>
               ) : (
                 <Button className={styles.linkBtn} type="link" onClick={() => showSignInForm()}>
-                  Already have an account? Sign In
+                  {t('ALREADY_HAVE_AN_ACCOUNT')} {t('SIGN_IN')}
                 </Button>
               )}
             </Item>
 
             {user && userPasses.length > 0 ? (
               <div>
-                <Title level={5}> Purchased pass(es) usable for this class </Title>
+                <Title level={5}> {t('PURCHASED_PASSES_USABLE_FOR_CLASS')} </Title>
                 {isMobileDevice ? (
                   userPasses.map(renderUserPassItem)
                 ) : (
@@ -559,7 +563,8 @@ const SessionRegistration = ({
                     <div>
                       <Title level={5}>
                         {' '}
-                        Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class{' '}
+                        {t('BOOK')} {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : t('THIS')}{' '}
+                        {t('CLASS')}{' '}
                       </Title>
                       <Table
                         size="small"
@@ -573,10 +578,8 @@ const SessionRegistration = ({
                     <div className={styles.mt20}>
                       <Title level={5}>
                         {' '}
-                        Buy pass & book {selectedInventory
-                          ? toLongDateWithTime(selectedInventory.start_time)
-                          : 'this'}{' '}
-                        class
+                        {t('BUY_PASS_AND_BOOK')}{' '}
+                        {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : t('THIS')} {t('CLASS')}
                       </Title>
                       {isMobileDevice ? (
                         availablePasses.map(renderPassItem)
@@ -598,7 +601,8 @@ const SessionRegistration = ({
                 ) : (
                   <Item {...sessionRegistrationTailLayout}>
                     <Title level={5}>
-                      Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
+                      {t('BOOK')} {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : t('THIS')}{' '}
+                      {t('CLASS')}
                     </Title>
                   </Item>
                 )}
@@ -608,11 +612,12 @@ const SessionRegistration = ({
             <Row className={styles.mt10}>
               {user && selectedInventory && selectedPass && userPasses.length > 0 && (
                 <Paragraph>
-                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
+                  {t('BOOKING')} {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : t('THIS')}{' '}
+                  {t('CLASS_FOR')}
                   <Text delete>
                     {classDetails.price} {classDetails.currency.toUpperCase()}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> using your purchased pass
+                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> {t('USING_YOUR_PURCHASED_PASS')}
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}
@@ -622,14 +627,14 @@ const SessionRegistration = ({
               <Row className={styles.mt10} gutter={[8, 8]}>
                 <Col xs={8} md={8} xl={5}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                    {user ? 'Buy' : 'Register'}
+                    {user ? t('BUY') : t('REGISTER')}
                   </Button>
                 </Col>
                 {!selectedInventory && (
                   <Col xs={24}>
                     <Paragraph>
-                      Please select the date & time for the class you wish to attend
-                      {isMobileDevice ? '' : ', in the calendar on the right'}
+                      {t('SELECT_DATE_AND_TIME_FOR_CLASS_ATTEND')}
+                      {isMobileDevice ? '' : t('IN_THE_CALENDAR_ON_THE_RIGHT')}
                     </Paragraph>
                   </Col>
                 )}
