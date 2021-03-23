@@ -26,7 +26,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -169,7 +169,7 @@ const SessionsInventories = ({ match }) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/e/${inventoryId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const emptyTableCell = {

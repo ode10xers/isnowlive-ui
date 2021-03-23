@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Form, Modal, Button, Radio, Typography, Input, message } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, copyToClipboard } from 'utils/helper';
 import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
@@ -15,6 +16,7 @@ import styles from './style.module.scss';
 const { Title, Text, Link } = Typography;
 
 const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +34,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
         setZoomMeetingDetails(data);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(t('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
     setIsLoading(false);
   }, []);
@@ -43,55 +45,15 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
       const { status } = await apis.session.generateZoomMeetingInfo(inventoryId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Zoom meeting generated!');
+        showSuccessModal(t('ZOOM_MEETING_GENERATED'));
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(t('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
     setIsSubmitting(false);
     //eslint-disable-next-line
   }, []);
-
-  const copyTextToClipboard = (text, itemName) => {
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = text;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success(`${itemName} copied to clipboard!`);
-        } else {
-          message.error('Failed to copy to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(text).then(
-        () => {
-          message.success(`${itemName} copied to clipboard!`);
-        },
-        (err) => {
-          message.error('Failed to copy to clipboard');
-        }
-      );
-    }
-  };
 
   useEffect(() => {
     form.resetFields();
@@ -119,7 +81,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
     setIsSubmitting(true);
 
     if (!selectedInventory) {
-      showErrorModal('Invalid Inventory Selected');
+      showErrorModal(t('INVALID_INVENTORY_SELECTED'));
       setIsSubmitting(false);
       closeModal(false);
       return;
@@ -237,7 +199,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                           </Title>{' '}
                           <Button
                             type="text"
-                            onClick={() => copyTextToClipboard(zoomMeetingDetails.join_url, 'Meeting Link')}
+                            onClick={() => copyToClipboard(zoomMeetingDetails.join_url)}
                             icon={<CopyOutlined />}
                           />
                         </Col>
@@ -260,7 +222,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                           </Title>{' '}
                           <Button
                             type="text"
-                            onClick={() => copyTextToClipboard(zoomMeetingDetails.meeting_id, 'Meeting ID')}
+                            onClick={() => copyToClipboard(zoomMeetingDetails.meeting_id)}
                             icon={<CopyOutlined />}
                           />
                         </Col>
@@ -280,7 +242,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                           </Title>{' '}
                           <Button
                             type="text"
-                            onClick={() => copyTextToClipboard(zoomMeetingDetails.password, 'Meeting Password')}
+                            onClick={() => copyToClipboard(zoomMeetingDetails.password)}
                             icon={<CopyOutlined />}
                           />
                         </Col>

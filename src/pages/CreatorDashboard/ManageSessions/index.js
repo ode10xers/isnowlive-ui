@@ -17,7 +17,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-import { generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 import { useTranslation } from 'react-i18next';
@@ -118,7 +118,7 @@ const ManageSessions = () => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/s/${sessionId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   let sessionColumns = [
