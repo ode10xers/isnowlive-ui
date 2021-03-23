@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
@@ -34,6 +35,7 @@ const noop = () => {};
 //TODO: Compare to LiveCourseCard, if similar then refactor
 const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = null }) => {
   const history = useHistory();
+  const { t } = useTranslation();
 
   const { showPaymentPopup } = useGlobalContext();
 
@@ -78,30 +80,30 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
+          message.error(t('INITIATE_PAYMENT_ERROR_TEXT'));
           setIsLoading(false);
         }
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
-      showErrorModal('Something went wrong', 'Invalid Course Selected');
+      showErrorModal(t('SOMETHING_WENT_WRONG'), t('INVALID_COURSE_SELECTED'));
       return;
     }
 
     let desc = [];
 
     if (selectedCourse.inventory_ids?.length > 0) {
-      desc.push(`${selectedCourse.inventory_ids.length} Sessions`);
+      desc.push(`${selectedCourse.inventory_ids.length} ${t('SESSIONS')}`);
     }
 
     if (selectedCourse.videos?.length > 0) {
-      desc.push(`${selectedCourse.videos.length} Videos`);
+      desc.push(`${selectedCourse.videos.length} ${t('VIDEOS')}`);
     }
 
     const paymentPopupData = {
@@ -121,7 +123,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
 
   const createOrder = async (userEmail, couponCode = '') => {
     if (!selectedCourse) {
-      showErrorModal('Something went wrong', 'Invalid Course Selected');
+      showErrorModal(t('SOMETHING_WENT_WRONG'), t('INVALID_COURSE_SELECTED'));
       return;
     }
 
@@ -149,17 +151,14 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     } catch (error) {
       setIsLoading(false);
       if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {
-        showErrorModal(
-          'Discount Code Not Applicable',
-          'The discount code you entered is not applicable this product. Please try again with a different discount code'
-        );
+        showErrorModal(t('DISCOUNT_CODE_NOT_APPLICABLE'), t('DISCOUNT_CODE_NOT_APPLICABLE_MESSAGE'));
       } else if (
         error?.response?.status === 500 &&
         error?.response?.data?.message === 'user already has a confirmed order for this course'
       ) {
         showAlreadyBookedModal(productType.COURSE, username);
       } else {
-        message.error(error.response?.data?.message || 'Something went wrong');
+        message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       }
     }
   };
@@ -176,7 +175,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         closeModal={closePurchaseModal}
         createOrder={showConfirmPaymentPopup}
       />
-      <Loader loading={isLoading} text="Processing payment" size="large">
+      <Loader loading={isLoading} text={t('PROCESSING_PAYMENT')} size="large">
         <Row gutter={[8, 10]}>
           {courses?.length > 0 &&
             courses.map((course) => (
@@ -212,13 +211,21 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
                           <Text>
                             {course?.type === courseType.MIXED
                               ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
-                              : `Validity: ${course?.validity} days`}
+                              : `${t('VALIDITY')}: ${course?.validity} ${t('DAYS')}`}
                           </Text>
                         </Col>
                         <Col xs={24} className={styles.courseDetailsWrapper}>
-                          {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
+                          {course?.videos?.length > 0 && (
+                            <Tag color="blue">
+                              {' '}
+                              {course?.videos?.length} {t('VIDEOS')}{' '}
+                            </Tag>
+                          )}
                           {course?.inventory_ids?.length > 0 && (
-                            <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                            <Tag color="volcano">
+                              {' '}
+                              {course?.inventory_ids?.length} {t('SESSIONS')}{' '}
+                            </Tag>
                           )}
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
@@ -239,7 +246,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
                             openPurchaseModal(course);
                           }}
                         >
-                          Buy Course
+                          {t('BUY_COURSE')}
                         </Button>
                       </Col>
                     )}
