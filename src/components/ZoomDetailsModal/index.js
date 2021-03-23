@@ -97,11 +97,11 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
       const { status } = await apis.session.submitZoomMeetingInfo(selectedInventory.inventory_id, payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Zoom Meeting information successfully submitted');
+        showSuccessModal(t('ZOOM_MEETING_INFORMATION_SUCCESSFULLY_SUBMITTED'));
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      showErrorModal(t('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
     }
 
     setIsSubmitting(false);
@@ -118,11 +118,11 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
         destroyOnClose={true}
         title={
           !showForm ? (
-            <Title level={3}> Zoom Details Sent to Attendee </Title>
+            <Title level={3}> {t('ZOOM_DETAILS_SENT_TO_ATTENDEE')} </Title>
           ) : (
             <Radio.Group value={view} onChange={handleViewChange}>
-              <Radio.Button value="generate"> Generate </Radio.Button>
-              <Radio.Button value="add"> Add </Radio.Button>
+              <Radio.Button value="generate"> {t('GENERATE')} </Radio.Button>
+              <Radio.Button value="add"> {t('ADD')} </Radio.Button>
             </Radio.Group>
           )
         }
@@ -137,34 +137,34 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                       <Form.Item
                         id="joinUrl"
                         name="joinUrl"
-                        label="Zoom Meeting Link"
+                        label={t('ZOOM_MEETING_LINK')}
                         rules={validationRules.requiredValidation}
                       >
-                        <Input placeholder="Add your zoom meeting link here" />
+                        <Input placeholder={t('ADD_YOUR_ZOOM_MEETING_LINK_HERE')} />
                       </Form.Item>
                     </Col>
                   </Row>
                   <Row gutter={[8, 16]}>
                     <Col xs={24} md={12}>
-                      <Form.Item id="meetingId" name="meetingId" label="Meeting ID">
-                        <Input placeholder="Add zoom meeting ID" />
+                      <Form.Item id="meetingId" name="meetingId" label={t('MEETING_ID')}>
+                        <Input placeholder={t('ADD_ZOOM_MEETING_ID')} />
                       </Form.Item>
                     </Col>
                     <Col xs={24} md={{ span: 11, offset: 1 }}>
-                      <Form.Item id="password" name="password" label="Meeting Password">
-                        <Input.Password placeholder="Add meeting password" />
+                      <Form.Item id="password" name="password" label={t('MEETING_PASSWORD')}>
+                        <Input.Password placeholder={t('ADD_MEETING_PASSWORD')} />
                       </Form.Item>
                     </Col>
                   </Row>
                   <Row justify="end" align="center" gutter={[8, 8]}>
                     <Col xs={12} md={4}>
                       <Button block type="default" onClick={() => closeModal(false)} loading={isSubmitting}>
-                        Cancel
+                        {t('CANCEL')}
                       </Button>
                     </Col>
                     <Col xs={12} md={4}>
                       <Button block type="primary" htmlType="submit" loading={isSubmitting}>
-                        Submit
+                        {t('SUBMIT')}
                       </Button>
                     </Col>
                   </Row>
@@ -180,7 +180,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                     onClick={() => generateZoomMeetingInformation(selectedInventory.inventory_id)}
                     loading={isSubmitting}
                   >
-                    Create a Zoom Meeting
+                    {t('CREATE_A_ZOOM_MEETING')}
                   </Button>
                 </Col>
               </Row>
@@ -195,7 +195,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                         <Col xs={24}>
                           <Title level={4} className={styles.detailsHeader}>
                             {' '}
-                            Zoom Meeting Link{' '}
+                            {t('ZOOM_MEETING_LINK')}{' '}
                           </Title>{' '}
                           <Button
                             type="text"
@@ -218,7 +218,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                         <Col xs={24}>
                           <Title level={4} className={styles.detailsHeader}>
                             {' '}
-                            Meeting ID{' '}
+                            {t('MEETING_ID')}{' '}
                           </Title>{' '}
                           <Button
                             type="text"
@@ -238,7 +238,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                         <Col xs={24}>
                           <Title level={4} className={styles.detailsHeader}>
                             {' '}
-                            Meeting Password{' '}
+                            {t('MEETING_PASSWORD')}{' '}
                           </Title>{' '}
                           <Button
                             type="text"
@@ -257,7 +257,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                 <Col xs={24}>
                   <Title disabled level={5} className={styles.textAlignCenter}>
                     {' '}
-                    No Zoom Meeting Details available{' '}
+                    {t('NO_ZOOM_MEETING_DETAILS_AVAILABLE')}{' '}
                   </Title>
                 </Col>
               )}
