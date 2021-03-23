@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Image, Card, Typography, Tag } from 'antd';
 
@@ -15,7 +16,9 @@ const {
 
 const noop = () => {};
 
-const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurchaseModal = noop }) => {
+const LiveCourseCard = ({ course, onCardClick = noop, buyable = false }) => {
+  const { t } = useTranslation();
+
   return (
     <Card
       hoverable={true}
@@ -41,13 +44,21 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
               <Text type="secondary">
                 {course?.type === courseType.MIXED
                   ? `${toShortDateWithYear(course?.start_date)} - ${toShortDateWithYear(course?.end_date)}`
-                  : `Validity: ${course?.validity} days`}
+                  : `${t('VALIDITY')}: ${course?.validity} ${t('DAYS')}`}
               </Text>
             </Col>
             <Col xs={24} className={styles.courseDetailsWrapper}>
-              {course?.videos?.length > 0 && <Tag color="blue"> {course?.videos?.length} Videos </Tag>}
+              {course?.videos?.length > 0 && (
+                <Tag color="blue">
+                  {' '}
+                  {course?.videos?.length} {t('VIDEOS')}{' '}
+                </Tag>
+              )}
               {course?.inventory_ids?.length > 0 && (
-                <Tag color="volcano"> {course?.inventory_ids?.length} Sessions </Tag>
+                <Tag color="volcano">
+                  {' '}
+                  {course?.inventory_ids?.length} {t('SESSIONS')}{' '}
+                </Tag>
               )}
             </Col>
             <Col xs={24} className={styles.coursePriceWrapper}>
@@ -57,19 +68,6 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
             </Col>
           </Row>
         </Col>
-        {/* <Col xs={24} md={buyable ? 4 : 0} className={styles.buyButtonWrapper}>
-          <Button
-            block
-            className={styles.buyButton}
-            type="primary"
-            onClick={(e) => {
-              e.stopPropagation();
-              showPurchaseModal(course);
-            }}
-          >
-            Buy
-          </Button>
-        </Col> */}
       </Row>
     </Card>
   );
