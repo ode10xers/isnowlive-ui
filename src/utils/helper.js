@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { message } from 'antd';
 import dateUtil from 'utils/date';
+import { i18n } from 'utils/i18n';
 
 const {
   formatDate: { getTimeDiff },
@@ -143,12 +144,12 @@ export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagC
 export const getDuration = (start_time, end_time) => {
   let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration >= 60) {
-    return `${duration / 60} Hr`;
+    return `${duration / 60} ${i18n.t('HOURS')}`;
   }
   if (duration < 0) {
     return null;
   }
-  return `${duration} Min`;
+  return `${duration} ${i18n.t('MIN')}`;
 };
 
 export const scrollToErrorField = (errorFields) => {
@@ -160,11 +161,11 @@ export const scrollToErrorField = (errorFields) => {
 export const getPaymentStatus = (status) => {
   switch (status) {
     case 'PAYMENT_COMPLETED':
-      return 'Paid';
+      return i18n.t('PAID');
     case 'CANCELLED':
-      return 'Cancel';
+      return i18n.t('CANCEL');
     default:
-      return 'Unpaid';
+      return i18n.t('UNPAID');
   }
 };
 
@@ -187,22 +188,22 @@ export const copyToClipboard = (text) => {
       var successful = document.execCommand('copy');
 
       if (successful) {
-        message.success('Copied to clipboard!');
+        message.success(i18n.t('COPIED_TO_CLIPBOARD'));
       } else {
-        message.error('Failed to copy to clipboard');
+        message.error(i18n.t('FAILED_TO_COPY_TO_CLIPBOARD'));
       }
     } catch (err) {
-      message.error('Failed to copy to clipboard');
+      message.error(i18n.t('FAILED_TO_COPY_TO_CLIPBOARD'));
     }
 
     document.body.removeChild(textArea);
   } else {
     navigator.clipboard.writeText(text).then(
       function () {
-        message.success('Copied to clipboard!');
+        message.success(i18n.t('COPIED_TO_CLIPBOARD'));
       },
       function (err) {
-        message.error('Failed to copy to clipboard');
+        message.error(i18n.t('FAILED_TO_COPY_TO_CLIPBOARD'));
       }
     );
   }
@@ -238,6 +239,8 @@ export const courseType = {
   VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE',
 };
 
+// This object is used in internal logic and not rendered
+// so does not require translation
 export const productType = {
   CLASS: 'Session',
   PASS: 'Pass',
@@ -246,6 +249,14 @@ export const productType = {
   PRODUCT: 'Product', //As a default
 };
 
-export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+export const isoDayOfWeek = [
+  i18n.t('MON'),
+  i18n.t('TUE'),
+  i18n.t('WED'),
+  i18n.t('THU'),
+  i18n.t('FRI'),
+  i18n.t('SAT'),
+  i18n.t('SUN'),
+];
 
 export const reservedDomainName = ['app', ...(process.env.NODE_ENV === 'development' ? ['localhost'] : [])];

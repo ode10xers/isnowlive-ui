@@ -203,7 +203,7 @@ const SessionsInventories = ({ match }) => {
                 <strong>
                   {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT3')}
                   <br />
-                  {data.refund_before_hours} {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT4')}
+                  {data.refund_before_hours} {translate('HOURS')}
                 </strong>
                 {translate('DO_YOU_WANT_TO_REFUND_ERROR_TEXT5')}
               </Text>
