@@ -50,6 +50,25 @@ const reducer = (state, action) => {
         paymentPopupData: null,
         paymentPopupCallback: () => {},
       };
+    case 'SHOW_SEND_EMAIL_POPUP':
+      return {
+        ...state,
+        emailPopupVisible: true,
+        emailPopupData: action.payload,
+      };
+    case 'HIDE_SEND_EMAIL_POPUP':
+      return {
+        ...state,
+        emailPopupVisible: false,
+        emailPopupData: {
+          recipients: {
+            active: [],
+            expired: [],
+          },
+          productId: null,
+          productType: null,
+        },
+      };
     default:
       return state;
   }
@@ -64,6 +83,15 @@ const GlobalDataProvider = ({ children }) => {
     paymentPopupVisible: false,
     paymentPopupData: null,
     paymentPopupCallback: () => {},
+    emailPopupVisible: false,
+    emailPopupData: {
+      recipients: {
+        active: [],
+        expired: [],
+      },
+      productId: null,
+      productType: null,
+    },
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -101,6 +129,14 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'HIDE_PAYMENT_POPUP' });
   }
 
+  function showSendEmailPopup(emailPopupData) {
+    dispatch({ type: 'SHOW_SEND_EMAIL_POPUP', payload: emailPopupData });
+  }
+
+  function hideSendEmailPopup() {
+    dispatch({ type: 'HIDE_SEND_EMAIL_POPUP' });
+  }
+
   function logOut(history, dontRedirect = false) {
     if (!dontRedirect) {
       history.push(Routes.login);
@@ -121,6 +157,8 @@ const GlobalDataProvider = ({ children }) => {
     setCookieConsent,
     showPaymentPopup,
     hidePaymentPopup,
+    showSendEmailPopup,
+    hideSendEmailPopup,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

@@ -35,6 +35,7 @@ import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
 import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
+import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 
 function RouteWithLayout({ layout, component, ...rest }) {
@@ -123,6 +124,7 @@ function App() {
   return (
     <>
       <PaymentPopup />
+      <SendCustomerEmailModal />
       <Router>
         <Switch>
           <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
