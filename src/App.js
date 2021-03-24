@@ -114,7 +114,12 @@ function App() {
   }, [isWidget]);
 
   if (isWidget) {
-    return <EmbeddablePage />;
+    return (
+      <>
+        <PaymentPopup />
+        <EmbeddablePage />
+      </>
+    );
   }
 
   if (!isReadyToLoad) {

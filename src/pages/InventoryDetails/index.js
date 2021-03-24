@@ -253,7 +253,7 @@ const InventoryDetails = ({ match, history }) => {
         return data.find((orderDetails) => orderDetails.order_id === orderId);
       }
     } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+      console.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
     }
 
     return null;

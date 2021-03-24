@@ -24,7 +24,7 @@ const CalendarView = ({
   step = 60,
   defaultDate = new Date(),
 }) => {
-  let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
+  let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'agenda'];
   return (
     <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
       <Calendar
