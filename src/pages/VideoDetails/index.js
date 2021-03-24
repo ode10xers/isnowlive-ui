@@ -58,21 +58,24 @@ const VideoDetails = ({ match }) => {
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [username, setUsername] = useState(null);
 
-  const getProfileDetails = useCallback(async (creatorUsername) => {
-    try {
-      const { status, data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
-      if (isAPISuccess(status) && data) {
-        setProfile(data);
-        setProfileImage(data.profile_image_url);
+  const getProfileDetails = useCallback(
+    async (creatorUsername) => {
+      try {
+        const { status, data } = creatorUsername
+          ? await apis.user.getProfileByUsername(creatorUsername)
+          : await apis.user.getProfile();
+        if (isAPISuccess(status) && data) {
+          setProfile(data);
+          setProfileImage(data.profile_image_url);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        message.error(t('FAIL_TO_LOAD_PROFILE'));
         setIsLoading(false);
       }
-    } catch (error) {
-      message.error(t('FAIL_TO_LOAD_PROFILE'));
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [t]
+  );
 
   const getVideoDetails = useCallback(
     async (videoId) => {
@@ -107,7 +110,7 @@ const VideoDetails = ({ match }) => {
         message.error(t('FAILED_TO_LOAD_CLASS_VIDEO_DETAILS'));
       }
     },
-    [getProfileDetails]
+    [getProfileDetails, t]
   );
 
   const getAvailablePassesForVideo = useCallback(async (videoId) => {
@@ -124,27 +127,30 @@ const VideoDetails = ({ match }) => {
     //eslint-disable-next-line
   }, []);
 
-  const getUsablePassesForUser = useCallback(async (videoId) => {
-    try {
-      const loggedInUserData = getLocalUserDetails();
-      if (loggedInUserData) {
-        const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
+  const getUsablePassesForUser = useCallback(
+    async (videoId) => {
+      try {
+        const loggedInUserData = getLocalUserDetails();
+        if (loggedInUserData) {
+          const { status, data } = await apis.passes.getAttendeePassesForVideo(videoId);
 
-        if (isAPISuccess(status) && data) {
-          setUserPasses(
-            data.active.map((userPass) => ({
-              ...userPass,
-              id: userPass.pass_id,
-              name: userPass.pass_name,
-            }))
-          );
+          if (isAPISuccess(status) && data) {
+            setUserPasses(
+              data.active.map((userPass) => ({
+                ...userPass,
+                id: userPass.pass_id,
+                name: userPass.pass_name,
+              }))
+            );
+          }
         }
+      } catch (error) {
+        message.error(error.response?.data?.message || t('FAILED_FETCHING_USABLE_PASS_FOR_USER'));
+        setIsLoading(false);
       }
-    } catch (error) {
-      message.error(error.response?.data?.message || t('FAILED_FETCHING_USABLE_PASS_FOR_USER'));
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [t]
+  );
 
   const openPurchaseVideoModal = () => {
     setSelectedPass(null);

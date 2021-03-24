@@ -41,68 +41,71 @@ const SessionsInventories = ({ match }) => {
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
-  const getStaffSession = useCallback(async (sessionType) => {
-    try {
-      const { data } =
-        sessionType === 'past'
-          ? await apis.session.getAttendeePastSession()
-          : await apis.session.getAttendeeUpcomingSession();
-      if (data) {
-        const unfilteredSessions = data.map((i, index) => ({
-          index,
-          key: i?.session_id,
-          name: i?.name,
-          type: i?.max_participants > 1 ? 'Group' : '1-on-1',
-          duration: getDuration(i?.start_time, i?.end_time),
-          days: i?.start_time ? toLongDateWithDay(i?.start_time) : null,
-          session_date: i?.session_date,
-          time: i?.start_time && i?.end_time ? `${toLocaleTime(i?.start_time)} - ${toLocaleTime(i?.end_time)}` : null,
-          start_time: i?.start_time,
-          end_time: i?.end_time,
-          participants: i?.num_participants,
-          join_url: i?.join_url,
-          inventory_id: i?.inventory_id,
-          session_id: i?.session_id,
-          order_id: i?.order_id,
-          max_participants: i?.max_participants,
-          username: i?.creator_username,
-          price: i?.price,
-          currency: i?.currency.toUpperCase() || 'SGD',
-          refund_amount: i?.refund_amount || 0,
-          is_refundable: i?.is_refundable || false,
-          refund_before_hours: i?.refund_before_hours || 24,
-          is_course: i?.is_course,
-          color_code: i?.color_code || whiteColor,
-        }));
+  const getStaffSession = useCallback(
+    async (sessionType) => {
+      try {
+        const { data } =
+          sessionType === 'past'
+            ? await apis.session.getAttendeePastSession()
+            : await apis.session.getAttendeeUpcomingSession();
+        if (data) {
+          const unfilteredSessions = data.map((i, index) => ({
+            index,
+            key: i?.session_id,
+            name: i?.name,
+            type: i?.max_participants > 1 ? 'Group' : '1-on-1',
+            duration: getDuration(i?.start_time, i?.end_time),
+            days: i?.start_time ? toLongDateWithDay(i?.start_time) : null,
+            session_date: i?.session_date,
+            time: i?.start_time && i?.end_time ? `${toLocaleTime(i?.start_time)} - ${toLocaleTime(i?.end_time)}` : null,
+            start_time: i?.start_time,
+            end_time: i?.end_time,
+            participants: i?.num_participants,
+            join_url: i?.join_url,
+            inventory_id: i?.inventory_id,
+            session_id: i?.session_id,
+            order_id: i?.order_id,
+            max_participants: i?.max_participants,
+            username: i?.creator_username,
+            price: i?.price,
+            currency: i?.currency.toUpperCase() || 'SGD',
+            refund_amount: i?.refund_amount || 0,
+            is_refundable: i?.is_refundable || false,
+            refund_before_hours: i?.refund_before_hours || 24,
+            is_course: i?.is_course,
+            color_code: i?.color_code || whiteColor,
+          }));
 
-        let filterByDateSessions = [];
+          let filterByDateSessions = [];
 
-        unfilteredSessions.forEach((session) => {
-          const foundIndex = filterByDateSessions.findIndex(
-            (val) => val.start_time === toLocaleDate(session.start_time)
-          );
+          unfilteredSessions.forEach((session) => {
+            const foundIndex = filterByDateSessions.findIndex(
+              (val) => val.start_time === toLocaleDate(session.start_time)
+            );
 
-          if (foundIndex >= 0) {
-            filterByDateSessions[foundIndex].children.push(session);
-          } else {
-            filterByDateSessions.push({
-              start_time: toLocaleDate(session.start_time),
-              name: session.start_time,
-              is_date: true,
-              children: [session],
-            });
-          }
-        });
+            if (foundIndex >= 0) {
+              filterByDateSessions[foundIndex].children.push(session);
+            } else {
+              filterByDateSessions.push({
+                start_time: toLocaleDate(session.start_time),
+                name: session.start_time,
+                is_date: true,
+                children: [session],
+              });
+            }
+          });
 
-        setSessions(unfilteredSessions);
-        setFilteredByDateSession(filterByDateSessions);
+          setSessions(unfilteredSessions);
+          setFilteredByDateSession(filterByDateSessions);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    } catch (error) {
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [translate]
+  );
 
   useEffect(() => {
     if (match?.params?.session_type) {

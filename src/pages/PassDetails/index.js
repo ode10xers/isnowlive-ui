@@ -33,21 +33,24 @@ const PassDetails = ({ match, history }) => {
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [username, setUsername] = useState(null);
 
-  const getProfileDetails = useCallback(async (creatorUsername) => {
-    try {
-      const { status, data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
-      if (isAPISuccess(status) && data) {
-        setProfile(data);
-        setProfileImage(data.profile_image_url);
+  const getProfileDetails = useCallback(
+    async (creatorUsername) => {
+      try {
+        const { status, data } = creatorUsername
+          ? await apis.user.getProfileByUsername(creatorUsername)
+          : await apis.user.getProfile();
+        if (isAPISuccess(status) && data) {
+          setProfile(data);
+          setProfileImage(data.profile_image_url);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        message.error(translate('FAIL_TO_LOAD_PROFILE'));
         setIsLoading(false);
       }
-    } catch (error) {
-      message.error(translate('FAIL_TO_LOAD_PROFILE'));
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [translate]
+  );
 
   const openPurchaseModal = () => {
     setShowPurchaseModal(true);
@@ -89,7 +92,7 @@ const PassDetails = ({ match, history }) => {
         message.error(translate('FAILED_TO_LOAD_PASS_DETAILS'));
       }
     },
-    [getProfileDetails]
+    [getProfileDetails, translate]
   );
 
   useEffect(() => {

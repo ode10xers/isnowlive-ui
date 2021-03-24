@@ -91,7 +91,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   const fetchAllVideosForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -107,7 +107,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (visible) {

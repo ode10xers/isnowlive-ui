@@ -60,7 +60,7 @@ const SessionReschedule = () => {
       message.error(error.message || t('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
-  }, [username]);
+  }, [username, t]);
 
   const getAvailableSessions = useCallback(async () => {
     setIsSessionLoading(true);
@@ -117,7 +117,7 @@ const SessionReschedule = () => {
       setIsSessionLoading(false);
       message.error(error.response?.data?.message || t('FAILED_TO_LOAD_USER_SESSION_DETAILS'));
     }
-  }, [inventory_id, username, price]);
+  }, [inventory_id, username, price, t]);
 
   const handleSessionReschedule = async (newInventory) => {
     setIsLoading(true);
@@ -154,7 +154,7 @@ const SessionReschedule = () => {
       getProfileDetails();
       getAvailableSessions();
     }
-  }, [getProfileDetails, getAvailableSessions, inventory_id, order_id, price]);
+  }, [getProfileDetails, getAvailableSessions, inventory_id, order_id, price, t]);
 
   const emptyTableCell = {
     props: {

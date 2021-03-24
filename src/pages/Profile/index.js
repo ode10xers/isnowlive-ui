@@ -61,7 +61,7 @@ const Profile = () => {
       message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
-  }, [form]);
+  }, [form, translate]);
 
   const updateProfileDetails = async (values) => {
     const eventTag = creator.click.profile.editForm.submitProfile;

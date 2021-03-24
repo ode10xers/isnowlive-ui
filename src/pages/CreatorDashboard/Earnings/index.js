@@ -90,7 +90,7 @@ const Earnings = () => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   const getCreatorEarnings = useCallback(() => {
     setIsLoading(true);
@@ -118,7 +118,7 @@ const Earnings = () => {
     });
 
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   const handleShowMore = async (productName) => {
     const eventTag = creator.click.payment.showMoreEarnings;
@@ -166,7 +166,7 @@ const Earnings = () => {
       message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
-  }, []);
+  }, [translate]);
 
   const openStripeDashboard = async () => {
     const eventTag = creator.click.payment.verifyBankAccount;

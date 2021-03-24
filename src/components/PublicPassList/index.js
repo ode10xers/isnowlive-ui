@@ -149,7 +149,7 @@ const PublicPassList = ({ username, passes }) => {
       key: 'validity',
       align: 'center',
       width: '12%',
-      render: (text, record) => `${text} ${t('DAYS')}}`,
+      render: (text, record) => `${text} ${t('DAYS')}`,
     },
     {
       title: t('PRICE'),

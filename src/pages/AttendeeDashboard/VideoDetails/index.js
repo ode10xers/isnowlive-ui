@@ -36,20 +36,25 @@ const VideoDetails = ({ match }) => {
 
   const videoOrderDetails = location.state ? location.state.video_order : null;
 
-  const getProfileDetails = useCallback(async (username) => {
-    try {
-      setIsLoading(true);
-      const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
-      if (isAPISuccess(status) && data) {
-        setProfile(data);
-        setProfileImage(data.profile_image_url);
+  const getProfileDetails = useCallback(
+    async (username) => {
+      try {
+        setIsLoading(true);
+        const { status, data } = username
+          ? await apis.user.getProfileByUsername(username)
+          : await apis.user.getProfile();
+        if (isAPISuccess(status) && data) {
+          setProfile(data);
+          setProfileImage(data.profile_image_url);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        message.error(translate('FAIL_TO_LOAD_PROFILE'));
         setIsLoading(false);
       }
-    } catch (error) {
-      message.error(translate('FAIL_TO_LOAD_PROFILE'));
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [translate]
+  );
 
   const getVideoDetails = useCallback(
     async (videoId) => {
@@ -75,7 +80,7 @@ const VideoDetails = ({ match }) => {
         }
       }
     },
-    [getProfileDetails, videoOrderDetails]
+    [getProfileDetails, videoOrderDetails, translate]
   );
 
   const getVideoToken = async (videoOrderId) => {

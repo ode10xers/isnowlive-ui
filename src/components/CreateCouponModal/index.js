@@ -84,7 +84,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
 
     setProducts(productInfo);
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (visible) {

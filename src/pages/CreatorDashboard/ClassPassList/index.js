@@ -122,7 +122,7 @@ const ClassPassList = () => {
       );
     }
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     getPassesForCreator();

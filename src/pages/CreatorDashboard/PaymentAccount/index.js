@@ -46,7 +46,7 @@ const PaymentAccount = () => {
       message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       setIsLoading(false);
     }
-  }, []);
+  }, [translate]);
 
   const openStripeDashboard = useCallback(async () => {
     try {
@@ -67,7 +67,7 @@ const PaymentAccount = () => {
       }
       setIsLoading(false);
     }
-  }, [relinkStripe]);
+  }, [relinkStripe, translate]);
 
   useEffect(() => {
     if (validateAccount) {
@@ -87,7 +87,7 @@ const PaymentAccount = () => {
       };
       validateStripeAccount();
     }
-  }, [validateAccount, openStripeDashboard]);
+  }, [validateAccount, openStripeDashboard, translate]);
 
   const handleChange = (value) => {
     setSelectedCountry(value);

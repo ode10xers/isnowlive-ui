@@ -42,7 +42,7 @@ const Videos = () => {
       );
     }
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     getVideosForCreator();

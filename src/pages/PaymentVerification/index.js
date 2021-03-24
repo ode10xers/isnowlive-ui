@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 
 import { message, Row } from 'antd';
@@ -34,19 +34,22 @@ const PaymentVerification = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { order_id, transaction_id, order_type, inventory_id, video_id } = parseQueryString(location.search);
 
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+  const getAttendeeOrderDetails = useCallback(
+    async (orderId) => {
+      try {
+        const { status, data } = await apis.session.getAttendeeUpcomingSession();
 
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
+        if (isAPISuccess(status) && data) {
+          return data.find((orderDetails) => orderDetails.order_id === orderId);
+        }
+      } catch (error) {
+        message.error(error?.response?.data?.message || translate('FAILED_FETCH_ATTENDEE_ORDER_DETAILS'));
       }
-    } catch (error) {
-      message.error(error?.response?.data?.message || translate('FAILED_FETCH_ATTENDEE_ORDER_DETAILS'));
-    }
 
-    return null;
-  };
+      return null;
+    },
+    [translate]
+  );
 
   useEffect(() => {
     if (order_id && transaction_id) {
@@ -166,7 +169,17 @@ const PaymentVerification = () => {
       setIsLoading(false);
       showErrorModal(translate('SOMETHING_WENT_WRONG'));
     }
-  }, [order_id, transaction_id, order_type, inventory_id, video_id, history, userDetails]);
+  }, [
+    order_id,
+    transaction_id,
+    order_type,
+    inventory_id,
+    video_id,
+    history,
+    userDetails,
+    getAttendeeOrderDetails,
+    translate,
+  ]);
 
   return (
     <Row justify="center">

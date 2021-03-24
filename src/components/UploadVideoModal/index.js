@@ -134,7 +134,7 @@ const UploadVideoModal = ({
     }
 
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (visible) {

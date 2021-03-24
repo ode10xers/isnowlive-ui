@@ -45,7 +45,7 @@ const CourseList = () => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     fetchUserCourseOrders();

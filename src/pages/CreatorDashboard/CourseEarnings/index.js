@@ -42,7 +42,7 @@ const CourseEarnings = ({ match }) => {
         }, 1500);
       }
     },
-    [history]
+    [history, translate]
   );
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const CourseEarnings = ({ match }) => {
         history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
       }, 1500);
     }
-  }, [getEarningData, history, match.params.course_id]);
+  }, [getEarningData, history, match.params.course_id, translate]);
 
   const showCourseLayout = (title, details) => (
     <div className={styles.box2}>

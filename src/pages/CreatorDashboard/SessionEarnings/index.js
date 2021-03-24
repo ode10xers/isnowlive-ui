@@ -45,7 +45,7 @@ const SessionEarnings = ({ match }) => {
         }, 1500);
       }
     },
-    [history]
+    [history, translate]
   );
 
   useEffect(() => {
@@ -57,7 +57,7 @@ const SessionEarnings = ({ match }) => {
         history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
       }, 1500);
     }
-  }, [getEarningData, history, match.params.inventory_id]);
+  }, [getEarningData, history, match.params.inventory_id, translate]);
 
   const trackAndNavigate = (destination, eventTag) => {
     trackSimpleEvent(eventTag);

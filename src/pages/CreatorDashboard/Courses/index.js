@@ -41,7 +41,7 @@ const Courses = () => {
       );
     }
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   const publishCourse = async (course) => {
     setIsLoading(true);

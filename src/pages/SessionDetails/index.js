@@ -140,7 +140,7 @@ const SessionDetails = ({ match, history }) => {
         history.push(Routes.root);
       }
     },
-    [history]
+    [history, t]
   );
 
   const getUsablePassesForUser = async () => {

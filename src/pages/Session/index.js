@@ -155,7 +155,7 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       }
     },
-    [form]
+    [form, t]
   );
 
   const getSessionDetails = useCallback(
@@ -204,7 +204,7 @@ const Session = ({ match, history }) => {
         }
       }
     },
-    [form, history, isOnboarding, getCreatorStripeDetails]
+    [form, history, isOnboarding, getCreatorStripeDetails, t]
   );
 
   useEffect(() => {
@@ -236,7 +236,7 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error(t('FAILED_TO_LOAD_CURRENCY_LIST')));
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails, t]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);

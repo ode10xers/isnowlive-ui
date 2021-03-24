@@ -54,7 +54,7 @@ const LiveStream = () => {
       setIsLoading(false);
       message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
-  }, [form]);
+  }, [form, translate]);
 
   const verifyZoomProfile = useCallback(
     async (code) => {
@@ -78,7 +78,7 @@ const LiveStream = () => {
         message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
       }
     },
-    [history, isOnboarding]
+    [history, isOnboarding, translate]
   );
 
   useEffect(() => {

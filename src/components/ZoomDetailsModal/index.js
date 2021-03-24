@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Col, Form, Modal, Button, Radio, Typography, Input, message } from 'antd';
+import { Row, Col, Form, Modal, Button, Radio, Typography, Input } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -25,19 +25,22 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
   const [view, setView] = useState('generate');
   const [zoomMeetingDetails, setZoomMeetingDetails] = useState(null);
 
-  const getZoomMeetingInformation = useCallback(async (inventoryId) => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.session.getZoomMeetingInfo(inventoryId);
+  const getZoomMeetingInformation = useCallback(
+    async (inventoryId) => {
+      setIsLoading(true);
+      try {
+        const { status, data } = await apis.session.getZoomMeetingInfo(inventoryId);
 
-      if (isAPISuccess(status)) {
-        setZoomMeetingDetails(data);
+        if (isAPISuccess(status)) {
+          setZoomMeetingDetails(data);
+        }
+      } catch (error) {
+        showErrorModal(t('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
       }
-    } catch (error) {
-      showErrorModal(t('SOMETHING_WRONG_HAPPENED'), error.response?.data?.message);
-    }
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    },
+    [t]
+  );
 
   const generateZoomMeetingInformation = useCallback(async (inventoryId) => {
     setIsSubmitting(true);

@@ -103,27 +103,30 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       showErrorModal(t('FAILED_TO_FETCH_COURSE_CLASSES'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
-  const fetchAllVideosForCreator = useCallback(async (filterCourseVideos = false) => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.videos.getCreatorVideos();
+  const fetchAllVideosForCreator = useCallback(
+    async (filterCourseVideos = false) => {
+      setIsLoading(true);
+      try {
+        const { status, data } = await apis.videos.getCreatorVideos();
 
-      if (isAPISuccess(status) && data) {
-        let filteredVideos = data;
+        if (isAPISuccess(status) && data) {
+          let filteredVideos = data;
 
-        if (filterCourseVideos) {
-          filteredVideos = filteredVideos.filter((video) => video.is_course);
+          if (filterCourseVideos) {
+            filteredVideos = filteredVideos.filter((video) => video.is_course);
+          }
+
+          setVideos(filteredVideos);
         }
-
-        setVideos(filteredVideos);
+      } catch (error) {
+        showErrorModal(t('FAILED_TO_FETCH_VIDEOS'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       }
-    } catch (error) {
-      showErrorModal(t('FAILED_TO_FETCH_VIDEOS'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
-    }
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    },
+    [t]
+  );
 
   const fetchCreatorCurrency = useCallback(async () => {
     setIsLoading(true);
@@ -140,7 +143,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       );
     }
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   const getSelectedCourseClasses = useCallback(
     (selectedClassIds = []) => {

@@ -25,7 +25,7 @@ const HostDetails = ({ host }) => {
         }
       }
     }, 200);
-  }, [host]);
+  }, [host, t]);
 
   return (
     <div className={styles.box}>
