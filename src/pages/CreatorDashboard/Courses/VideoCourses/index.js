@@ -170,20 +170,20 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             {record.is_published ? (
               expandedPublishedRowKeys.includes(record.id) ? (
                 <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
-                  {record.buyers?.length} Buyers <UpOutlined />
+                  {record.buyers?.length} {translate('BUYERS')} <UpOutlined />
                 </Button>
               ) : (
                 <Button block type="link" onClick={() => expandRowPublished(record.id)}>
-                  {record.buyers?.length} Buyers <DownOutlined />
+                  {record.buyers?.length} {translate('BUYERS')} <DownOutlined />
                 </Button>
               )
             ) : expandedUnpublishedRowKeys.includes(record.id) ? (
               <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
-                {record.buyers?.length} Buyers <UpOutlined />
+                {record.buyers?.length} {translate('BUYERS')} <UpOutlined />
               </Button>
             ) : (
               <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
-                {record.buyers?.length} Buyers <DownOutlined />
+                {record.buyers?.length} {translate('BUYERS')} <DownOutlined />
               </Button>
             )}
           </Col>
@@ -326,8 +326,19 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             ),
           ]}
         >
-          {layout(translate('TOTAL_VIDEO'), <Text>{course.videos?.length} videos</Text>)}
-          {layout(translate('DURATION'), <Text> {course?.validity} days</Text>)}
+          {layout(
+            translate('TOTAL_VIDEO'),
+            <Text>
+              {course.videos?.length} {translate('VIDEOS')}
+            </Text>
+          )}
+          {layout(
+            translate('DURATION'),
+            <Text>
+              {' '}
+              {course?.validity} {translate('DAYS')}{' '}
+            </Text>
+          )}
           {layout(translate('PRICE'), <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
         </Card>
         {course.is_published

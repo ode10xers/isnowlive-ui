@@ -113,8 +113,18 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       width: '140px',
       render: (text, record) => (
         <>
-          {record.inventory_ids?.length > 0 && <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>}
-          {record.videos?.length > 0 && <Tag color="blue"> {record.videos?.length} videos </Tag>}
+          {record.inventory_ids?.length > 0 && (
+            <Tag color="volcano">
+              {' '}
+              {record.inventory_ids?.length} {translate('SESSIONS')}
+            </Tag>
+          )}
+          {record.videos?.length > 0 && (
+            <Tag color="blue">
+              {' '}
+              {record.videos?.length} {translate('VIDEOS')}{' '}
+            </Tag>
+          )}
         </>
       ),
     },
@@ -341,8 +351,18 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
           {layout(
             translate('CONTENT'),
             <>
-              {course.inventory_ids?.length > 0 && <Tag color="volcano"> {course.inventory_ids?.length} sessions</Tag>}
-              {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
+              {course.inventory_ids?.length > 0 && (
+                <Tag color="volcano">
+                  {' '}
+                  {course.inventory_ids?.length} {translate('SESSIONS')}{' '}
+                </Tag>
+              )}
+              {course.videos?.length > 0 && (
+                <Tag color="blue">
+                  {' '}
+                  {course.videos?.length} {translate('VIDEOS')}{' '}
+                </Tag>
+              )}
             </>
           )}
           {layout(translate('PRICE'), <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}

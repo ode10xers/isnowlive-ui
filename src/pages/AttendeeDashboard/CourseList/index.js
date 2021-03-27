@@ -81,8 +81,18 @@ const CourseList = () => {
       dataIndex: 'videos',
       render: (text, record) => (
         <>
-          {record?.videos?.length > 0 && <Tag color="blue"> {record?.videos?.length} Videos </Tag>}
-          {record?.inventory_ids?.length > 0 && <Tag color="volcano"> {record?.inventory_ids?.length} Sessions </Tag>}
+          {record?.videos?.length > 0 && (
+            <Tag color="blue">
+              {' '}
+              {record?.videos?.length} {translate('VIDEOS')}{' '}
+            </Tag>
+          )}
+          {record?.inventory_ids?.length > 0 && (
+            <Tag color="volcano">
+              {' '}
+              {record?.inventory_ids?.length} {translate('SESSIONS')}{' '}
+            </Tag>
+          )}
         </>
       ),
     },
@@ -108,7 +118,7 @@ const CourseList = () => {
         <Row gutter={[8, 8]} justify="end">
           <Col>
             <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(record)}>
-              {translate('Details')}
+              {translate('DETAILS')}
             </Button>
           </Col>
         </Row>
@@ -139,7 +149,7 @@ const CourseList = () => {
         }
         actions={[
           <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(item)}>
-            Details
+            {translate('DETAILS')}
           </Button>,
         ]}
       >
@@ -147,8 +157,18 @@ const CourseList = () => {
           {layout(
             translate('CONTENTS'),
             <Text>
-              {item?.videos?.length > 0 && <Tag color="blue"> {item?.videos?.length} Videos </Tag>}
-              {item?.inventory_ids?.length > 0 && <Tag color="volcano"> {item?.inventory_ids?.length} Sessions </Tag>}
+              {item?.videos?.length > 0 && (
+                <Tag color="blue">
+                  {' '}
+                  {item?.videos?.length} {translate('VIDEOS')}{' '}
+                </Tag>
+              )}
+              {item?.inventory_ids?.length > 0 && (
+                <Tag color="volcano">
+                  {' '}
+                  {item?.inventory_ids?.length} {translate('SESSIONS')}{' '}
+                </Tag>
+              )}
             </Text>
           )}
           {layout(
