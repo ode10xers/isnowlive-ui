@@ -44,7 +44,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
   // For products that have different keys for names/id
   const getProductId = (productType, productData) => {
     switch (productType) {
-      case 'course':
+      case 'COURSE':
         return productData['id'];
       default:
         break;
@@ -55,7 +55,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
 
   const getProductName = (productType, productData) => {
     switch (productType) {
-      case 'course':
+      case 'COURSE':
         return productData['name'];
       default:
         break;
@@ -74,7 +74,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         const { status, data } = await product.apiMethod();
 
         if (isAPISuccess(status) && data) {
-          productInfo[product.key.toLowerCase()] = data;
+          productInfo[product.key] = data;
         }
       } catch (error) {
         message.error(error?.response?.data?.message || `${t('FAILED_TO_FETCH')} ${t(product.name)}`);
@@ -91,11 +91,11 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         form.setFieldsValue({
           discountCode: editedCoupon.code,
           discountPercent: editedCoupon.value,
-          selectedProductTypes: editedCoupon.product_type.toLowerCase(),
+          selectedProductTypes: editedCoupon.product_type,
           selectedProducts: editedCoupon.product_ids,
         });
 
-        setSelectedProductTypes(editedCoupon.product_type.toLowerCase());
+        setSelectedProductTypes(editedCoupon.product_type);
       } else {
         form.resetFields();
       }
@@ -116,7 +116,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       const payload = {
         code: values.discountCode,
         value: values.discountPercent,
-        product_type: selectedProductTypes.toUpperCase() || values.selectedProductTypes.toUpperCase(),
+        product_type: selectedProductTypes || values.selectedProductTypes,
         product_ids: values.selectedProducts,
       };
 
@@ -214,7 +214,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                   maxTagCount={2}
                   options={Object.entries(products).map(([key, val]) => ({
                     value: key,
-                    label: key.charAt(0).toUpperCase() + key.slice(1),
+                    label: t(key),
                   }))}
                   value={selectedProductTypes}
                   onChange={handleSelectedProductTypesChanged}
@@ -237,9 +237,9 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                   maxTagCount={2}
                 >
                   {Object.entries(products)
-                    .filter(([key, value]) => selectedProductTypes.includes(key.toLowerCase()))
+                    .filter(([key, value]) => selectedProductTypes.includes(key))
                     .map(([key, value]) => (
-                      <Select.OptGroup label={`${key.charAt(0).toUpperCase()}${key.slice(1)}`} key={key}>
+                      <Select.OptGroup label={t(key)} key={key}>
                         {value?.map((product) => (
                           <Select.Option key={product.id} value={getProductId(key, product)}>
                             {getProductName(key, product)}

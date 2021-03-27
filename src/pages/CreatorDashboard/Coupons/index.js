@@ -166,8 +166,8 @@ const Coupons = () => {
       align: 'center',
       width: '150px',
       render: (text, record) => {
-        const key = record.product_type.toLowerCase();
-        const productName = `${key.charAt(0).toUpperCase()}${key.slice(1)}`;
+        const key = record.product_type;
+        const productName = translate(key);
 
         return (
           <Popover

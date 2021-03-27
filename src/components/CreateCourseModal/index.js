@@ -460,7 +460,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
       if (isAPISuccess(response.status)) {
         showSuccessModal(
-          `${payload.name} {t('SUCCESSFULLY')} ${
+          `${payload.name} ${t('SUCCESSFULLY')} ${
             editedCourse ? t('UPDATED').toLowerCase() : t('CREATED').toLowerCase()
           }`
         );
