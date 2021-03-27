@@ -404,7 +404,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         title={
           recurring ? (
             <>
-              <p className={styles.titlePrefix}>Add Session Slot: </p>
+              <p className={styles.titlePrefix}> {t('ADD_SESSION_SLOT')}: </p>
               <p className={styles.slotTitle}>
                 {recurringDatesRange && toLongDate(recurringDatesRange[0])} -{' '}
                 {recurringDatesRange && toLongDate(recurringDatesRange[1])}

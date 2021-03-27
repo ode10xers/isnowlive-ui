@@ -484,7 +484,7 @@ const SessionRegistration = ({
             onFinishFailed={onFinishFailed}
           >
             {!user && (
-              <Item label="Name" className={styles.nameInputWrapper}>
+              <Item label={t('NAME')} className={styles.nameInputWrapper}>
                 <Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
                   <Input placeholder={t('FIRST_NAME')} disabled={showPasswordField} />
                 </Item>
@@ -494,7 +494,7 @@ const SessionRegistration = ({
               </Item>
             )}
 
-            <Item className={styles.emailInput} label="Email" name="email" rules={validationRules.emailValidation}>
+            <Item className={styles.emailInput} label={t('EMAIL')} name="email" rules={validationRules.emailValidation}>
               <Input placeholder={t('ENTER_YOUR_EMAIL')} disabled={user} />
             </Item>
 

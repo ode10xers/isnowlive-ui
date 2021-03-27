@@ -31,7 +31,7 @@ const HostDetails = ({ host }) => {
     <div className={styles.box}>
       <Row>
         <Col xs={24} md={24}>
-          <Title level={5}>Host</Title>
+          <Title level={5}>{t('HOST')}</Title>
         </Col>
         <Col flex={isMobileDevice ? '80px' : '120px'}>
           <Image

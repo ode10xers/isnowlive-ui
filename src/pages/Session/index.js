@@ -400,7 +400,7 @@ const Session = ({ match, history }) => {
         title: t('UPDATE_SESSION_SCHEDULE_MODAL_TITLE'),
         okText: t('UPDATE_SESSION_SCHEDULE_MODAL_OK_BUTTON'),
         cancelText: t('UPDATE_SESSION_SCHEDULE_MODAL_CANCEL_BUTTON'),
-        content: <Text>t('UPDATE_SESSION_SCHEDULE_MODAL_TEXT')</Text>,
+        content: <Text>{t('UPDATE_SESSION_SCHEDULE_MODAL_TEXT')}</Text>,
         onOk: () => handleRecurringDatesRange(value, true),
         onCancel: () => handleRecurringDatesRange(value, false),
       });
@@ -926,6 +926,7 @@ const Session = ({ match, history }) => {
                 disabledDate={disabledDate}
                 onChange={handleDateRangeChange}
                 onFocus={handleCalenderPop}
+                placeholder={[t('SELECT_START_DATE'), t('SELECT_END_DATE')]}
               />
             </Form.Item>
           )}

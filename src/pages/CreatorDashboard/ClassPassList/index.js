@@ -308,7 +308,7 @@ const ClassPassList = () => {
             {record.is_published ? (
               <Tooltip title={translate('HIDE_SESSION')}>
                 <Button type="link" danger onClick={() => unpublishPass(record.id)}>
-                  {translate('HIDE_SESSION')}
+                  {translate('HIDE')}
                 </Button>
               </Tooltip>
             ) : (

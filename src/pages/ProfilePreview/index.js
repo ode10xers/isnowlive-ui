@@ -422,7 +422,7 @@ const ProfilePreview = ({ username = null }) => {
                       </Loader>
                     ) : (
                       <Tabs defaultActiveKey={0}>
-                        {['Upcoming Sessions'].map((item, index) => (
+                        {[translate('UPCOMING_SESSIONS')].map((item, index) => (
                           <Tabs.TabPane tab={item} key={index}>
                             <Loader loading={isSessionLoading} size="large" text={translate('LOADING_SESSIONS')}>
                               <Sessions username={username} sessions={sessions} />
@@ -489,14 +489,14 @@ const ProfilePreview = ({ username = null }) => {
                   }
                 >
                   {liveCourses.length > 0 && (
-                    <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
+                    <Tabs.TabPane tab={<Title level={5}> {translate('LIVE_COURSES')} </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text={translate('LOADING_LIVE_COURSES')}>
                         <PublicCourseList username={username} courses={liveCourses} />
                       </Loader>
                     </Tabs.TabPane>
                   )}
                   {videoCourses.length > 0 && (
-                    <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
+                    <Tabs.TabPane tab={<Title level={5}> {translate('VIDEO_COURSES')} </Title>} key="videoCourses">
                       <Loader loading={isCoursesLoading} size="large" text={translate('LOADING_VIDEO_COURSES')}>
                         <PublicCourseList username={username} courses={videoCourses} />
                       </Loader>
