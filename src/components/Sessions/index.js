@@ -66,7 +66,7 @@ const Sessions = ({ sessions, username }) => {
         </>
       ) : (
         <Col span={24}>
-          <Empty description={false} />
+          <Empty description={t('NO_UPCOMING_SESSIONS')} />
         </Col>
       )}
     </Row>

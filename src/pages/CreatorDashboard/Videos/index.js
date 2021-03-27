@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm } from 'antd';
 import {
-  EditOutlined,
+  EditTwoTone,
   CloudUploadOutlined,
   DownOutlined,
   UpOutlined,
@@ -12,6 +12,7 @@ import {
   CheckCircleTwoTone,
   BookTwoTone,
   DeleteOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -27,6 +28,8 @@ import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
@@ -37,6 +40,8 @@ const {
 
 const Videos = () => {
   const { t: translate } = useTranslation();
+  const { showSendEmailPopup } = useGlobalContext();
+
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +49,73 @@ const Videos = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [formPart, setFormPart] = useState(1);
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
+
+  const showEmailModal = (video) => {
+    let activeRecipients = [];
+    let expiredRecipients = [];
+    let userIdMap = new Map();
+
+    if (video.buyers && video.buyers?.length > 0) {
+      // Since video can be repeatedly bought by the same user
+      // (after it expires), we put checks here
+
+      video.buyers.forEach((buyer) => {
+        if (!userIdMap.has(buyer.external_id)) {
+          let isActive = !buyer.expired;
+
+          if (!buyer.expired) {
+            const foundBuyer = activeRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              activeRecipients.push(buyer);
+            }
+          } else {
+            const foundBuyer = expiredRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              expiredRecipients.push(buyer);
+            }
+          }
+
+          userIdMap.set(buyer.external_id, {
+            ...buyer,
+            isActive,
+          });
+        } else {
+          const mappedBuyer = userIdMap.get(buyer.external_id);
+
+          // If the user in the map is already active user
+          // that means it's the most up to date data
+          if (mappedBuyer.isActive) {
+            return;
+          }
+
+          // If the user in the map is expired user
+          // We check if the current data is an active
+          // if it is we update the data in the map
+          if (!buyer.expired) {
+            userIdMap.set(buyer.external_id, {
+              ...buyer,
+              isActive: true,
+            });
+
+            // Move the buyer data from expired to active array
+            activeRecipients.push(buyer);
+            expiredRecipients = expiredRecipients.filter((recipient) => recipient.external_id !== buyer.external_id);
+          }
+        }
+      });
+    }
+
+    showSendEmailPopup({
+      recipients: {
+        active: activeRecipients,
+        expired: expiredRecipients,
+      },
+      productId: video?.external_id || null,
+      productType: 'VIDEO',
+    });
+  };
 
   const showUploadVideoModal = (video = null, screen = 1) => {
     if (video !== null) {
@@ -247,12 +319,17 @@ const Videos = () => {
       render: (text, record) => (
         <Row gutter={8}>
           <Col xs={24} md={2}>
+            <Tooltip title={translate('SEND_CUSTOMER_EMAIL')}>
+              <Button type="text" onClick={() => showEmailModal(record)} icon={<MailOutlined />} />
+            </Tooltip>
+          </Col>
+          <Col xs={24} md={2}>
             <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
                 onClick={() => showUploadVideoModal(record)}
-                icon={<EditOutlined />}
+                icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>
           </Col>
@@ -420,19 +497,15 @@ const Videos = () => {
     const actionButtons =
       video?.status === 'UPLOAD_SUCCESS'
         ? [
+            <Tooltip title={translate('SEND_CUSTOMER_EMAIL')}>
+              <Button type="text" onClick={() => showEmailModal(video)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
                 onClick={() => showUploadVideoModal(video)}
-                icon={<EditOutlined />}
-              />
-            </Tooltip>,
-            <Tooltip title={translate('VIDEO_UPLOADED')}>
-              <Button
-                className={classNames(styles.detailsButton, styles.checkIcon)}
-                type="text"
-                icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
             <Tooltip title={translate('CLONE_VIDEO')}>
@@ -487,12 +560,15 @@ const Videos = () => {
             ),
           ]
         : [
+            <Tooltip title={translate('SEND_CUSTOMER_EMAIL')}>
+              <Button type="text" onClick={() => showEmailModal(video)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
                 type="text"
                 onClick={() => showUploadVideoModal(video)}
-                icon={<EditOutlined />}
+                icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
             <Tooltip title={video?.video_uid.length > 0 ? translate('VIDEO_IS_PROCESSING') : translate('UPLOAD_VIDEO')}>
@@ -554,8 +630,16 @@ const Videos = () => {
           className={styles.card}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${video?.color_code || '#FFF'}` }}>
-              <Text>{video?.title}</Text>
-              {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              <Text>{video?.title}</Text> {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+              {video?.status === 'UPLOAD_SUCCESS' ? (
+                <Tooltip title={translate('VIDEO_UPLOADED')}>
+                  <Button
+                    className={classNames(styles.detailsButton, styles.checkIcon)}
+                    type="text"
+                    icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                  />
+                </Tooltip>
+              ) : null}
             </div>
           }
           actions={actionButtons}

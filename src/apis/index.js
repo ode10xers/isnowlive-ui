@@ -23,6 +23,7 @@ export default {
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
     setCreatorUserPreferences: (payload) => http.patch('/secure/user/preferences', payload),
     getCreatorUserPreferences: () => http.get('/secure/user/preferences'),
+    sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
   },
   payment: {
     stripe: {

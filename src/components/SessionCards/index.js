@@ -176,7 +176,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
             </>
           ) : (
             <Col span={24}>
-              <Empty description={false} />
+              <Empty description={t('NO_UPCOMING_SESSIONS')} />
             </Col>
           )}
         </Row>

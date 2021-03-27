@@ -37,8 +37,8 @@ const timezoneUtils = {
 };
 
 const timeCalculation = {
-  dateIsBeforeDate: (startDate, endDate) => moment(startDate).isBefore(endDate),
-  isBeforeDate: (date) => moment().isBefore(moment(date)),
+  dateIsBeforeDate: (startDate, endDate) => moment(startDate).isSameOrBefore(moment(endDate)),
+  isBeforeDate: (date) => moment().isSameOrBefore(moment(date)),
   isSameOrBeforeToday: (date) => moment(date).endOf('day').isSameOrBefore(moment().startOf('day')),
   isBeforeLimitHours: (date, limitInHours) => moment().isBefore(moment(date).subtract(limitInHours, 'hours')),
   createRange: (startTime, endTime) => moment.range(startTime, endTime).snapTo('day'),

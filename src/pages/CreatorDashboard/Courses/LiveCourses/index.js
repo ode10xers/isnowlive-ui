@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Tag, Collapse } from 'antd';
-import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import {
+  MailOutlined,
+  CopyOutlined,
+  EditTwoTone,
+  DownOutlined,
+  UpOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons';
 
 import Table from 'components/Table';
 
@@ -20,7 +27,7 @@ const {
   formatDate: { toShortDateWithYear, toDateAndTime },
 } = dateUtil;
 
-const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse }) => {
+const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse, showSendEmailModal }) => {
   const { t: translate } = useTranslation();
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
@@ -131,8 +138,13 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       width: '250px',
       align: 'right',
       render: (text, record) => (
-        <Row gutter={8} justify="end">
-          <Col xs={4}>
+        <Row gutter={4} justify="end">
+          <Col xs={3}>
+            <Tooltip title={translate('SEND_CUSTOMER_EMAIL')}>
+              <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+            </Tooltip>
+          </Col>
+          <Col xs={3}>
             <Tooltip title={translate('EDIT_COURSES')}>
               <Button
                 block
@@ -142,12 +154,12 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               />
             </Tooltip>
           </Col>
-          <Col xs={4}>
+          <Col xs={3}>
             <Tooltip title={translate('COPY_COURSE_LINK')}>
               <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
             </Tooltip>
           </Col>
-          <Col xs={6}>
+          <Col xs={5}>
             {record.is_published ? (
               <Tooltip title={translate('HIDE_COURSE')}>
                 <Button danger block type="link" onClick={() => unpublishCourse(record)}>
@@ -277,6 +289,9 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             </div>
           }
           actions={[
+            <Tooltip title={translate('SEND_CUSTOMER_EMAIL')}>
+              <Button type="text" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title={translate('EDIT')}>
               <Button
                 className={styles.detailsButton}
