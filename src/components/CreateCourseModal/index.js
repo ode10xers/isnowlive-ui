@@ -18,7 +18,6 @@ import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
-import { i18n } from 'utils/i18n';
 
 import { courseModalFormLayout } from 'layouts/FormLayouts';
 
@@ -27,11 +26,11 @@ import styles from './styles.module.scss';
 const courseTypes = {
   MIXED: {
     name: 'MIXED',
-    label: i18n.t('LIVE_SESSION_COURSE'),
+    label: 'LIVE_SESSION_COURSE',
   },
   VIDEO_NON_SEQ: {
     name: 'VIDEO_NON_SEQUENCE',
-    label: i18n.t('NON_SEQUENTIAL_VIDEO_COURSE'),
+    label: 'NON_SEQUENTIAL_VIDEO_COURSE',
   },
 };
 

@@ -2,29 +2,30 @@ import React from 'react';
 import { Steps } from 'antd';
 import MobileDetect from 'mobile-detect';
 import styles from './styles.module.scss';
-import { i18n } from 'utils/i18n';
+import { useTranslation } from 'react-i18next';
 
 const stepsList = [
   {
     id: 1,
-    title: i18n.t('SETUP_PUBLIC_PAGE'),
-    description: i18n.t('SETUP_PUBLIC_PAGE_DESC_TEXT'),
+    title: 'SETUP_PUBLIC_PAGE',
+    description: 'SETUP_PUBLIC_PAGE_DESC_TEXT',
   },
   {
     id: 2,
-    title: i18n.t('SETUP_LIVESTREAM'),
-    description: i18n.t('SETUP_LIVESTREAM_DESC_TEXT'),
+    title: 'SETUP_LIVESTREAM',
+    description: 'SETUP_LIVESTREAM_DESC_TEXT',
   },
   {
     id: 3,
-    title: i18n.t('SETUP_SESSION'),
-    description: i18n.t('SETUP_SESSION_DESC_TEXT'),
+    title: 'SETUP_SESSION',
+    description: 'SETUP_SESSION_DESC_TEXT',
   },
 ];
 
 const OnboardSteps = ({ current }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
+  const { t } = useTranslation();
 
   return (
     <Steps
@@ -34,7 +35,9 @@ const OnboardSteps = ({ current }) => {
       current={current}
     >
       {stepsList.map((step) => {
-        return <Steps.Step key={step.id} title={step.title} description={!isMobileDevice ? step.description : null} />;
+        return (
+          <Steps.Step key={step.id} title={t(step.title)} description={!isMobileDevice ? t(step.description) : null} />
+        );
       })}
     </Steps>
   );

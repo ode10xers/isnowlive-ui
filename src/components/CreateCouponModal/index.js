@@ -10,7 +10,6 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
-import { i18n } from 'utils/i18n';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
@@ -26,7 +25,7 @@ const formInitialValues = {
 const creatorProductInfo = [
   {
     key: 'COURSE',
-    name: i18n.t('COURSES'),
+    name: 'COURSES',
     apiMethod: apis.courses.getCreatorCourses,
   },
 ];
@@ -78,7 +77,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
           productInfo[product.key.toLowerCase()] = data;
         }
       } catch (error) {
-        message.error(error?.response?.data?.message || `${t('FAILED_TO_FETCH')} ${product.name}`);
+        message.error(error?.response?.data?.message || `${t('FAILED_TO_FETCH')} ${t(product.name)}`);
       }
     }
 

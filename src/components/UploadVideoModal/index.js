@@ -21,7 +21,6 @@ import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
-import { i18n } from 'utils/i18n';
 
 import styles from './styles.module.scss';
 
@@ -30,11 +29,11 @@ const { Text, Paragraph } = Typography;
 const videoTypes = {
   FREE: {
     name: 'FREE',
-    label: i18n.t('FREE'),
+    label: 'FREE',
   },
   PAID: {
     name: 'PAID',
-    label: i18n.t('PAID'),
+    label: 'PAID',
   },
 };
 
@@ -420,9 +419,9 @@ const UploadVideoModal = ({
                     className="video-type-radio"
                     onChange={(e) => handleChangeLimitType(e.target.value)}
                     value={videoType}
-                    options={Object.values(videoTypes).map((pType) => ({
-                      label: pType.label,
-                      value: pType.name,
+                    options={Object.values(videoTypes).map((vType) => ({
+                      label: t(vType.label),
+                      value: vType.name,
                     }))}
                   />
                 </Form.Item>

@@ -1,16 +1,20 @@
 import React from 'react';
 import { Table as AntTable } from 'antd';
-import { i18n } from 'utils/i18n';
+import { useTranslation } from 'react-i18next';
 
-const Table = ({ columns, data, loading, ...props }) => (
-  <AntTable
-    {...props}
-    columns={columns}
-    dataSource={data}
-    pagination={false}
-    loading={loading}
-    locale={{ emptyText: i18n.t('NO_DATA_FOUND') }}
-  />
-);
+const Table = ({ columns, data, loading, ...props }) => {
+  const { t } = useTranslation();
+
+  return (
+    <AntTable
+      {...props}
+      columns={columns}
+      dataSource={data}
+      pagination={false}
+      loading={loading}
+      locale={{ emptyText: t('NO_DATA_FOUND') }}
+    />
+  );
+};
 
 export default Table;

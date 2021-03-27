@@ -12,7 +12,6 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
-import { i18n } from 'utils/i18n';
 
 import styles from './styles.module.scss';
 
@@ -21,11 +20,11 @@ const { Text } = Typography;
 const passTypes = {
   LIMITED: {
     name: 'LIMITED',
-    label: i18n.t('LIMITED'),
+    label: 'LIMITED',
   },
   UNLIMITED: {
     name: 'UNLIMITED',
-    label: i18n.t('UNLIMITED'),
+    label: 'UNLIMITED',
   },
 };
 
@@ -326,7 +325,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   onChange={(e) => handleChangeLimitType(e.target.value)}
                   value={passType}
                   options={Object.values(passTypes).map((pType) => ({
-                    label: pType.label,
+                    label: t(pType.label),
                     value: pType.name,
                   }))}
                 />
