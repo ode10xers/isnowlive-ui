@@ -1,7 +1,7 @@
 import Moment from 'moment';
 
 // Import the specific locale, else it won't show properly
-import 'moment/locale/hi';
+// import 'moment/locale/hi';
 
 //Pending Use
 import { extendMoment } from 'moment-range';
