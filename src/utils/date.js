@@ -1,25 +1,31 @@
 import Moment from 'moment';
+
+// Import the specific locale, else it won't show properly
+import 'moment/locale/hi';
+
 //Pending Use
 import { extendMoment } from 'moment-range';
+
+import { getLanguage } from 'utils/storage';
 
 const moment = extendMoment(Moment);
 
 const formatDate = {
-  toLocaleTime: (date) => moment(date).format('LT'),
-  toLocaleDate: (date) => moment(date).format('L'),
-  toShortTime: (date) => moment(date).format('hh:mm'),
-  toShortTimeWithPeriod: (date) => moment(date).format('hh:mm a'),
-  toLongDate: (date) => moment(date).format('Do MMM YYYY'),
-  toShortDate: (date) => moment(date).format('YYYY-MM-DD'),
-  toDayOfWeek: (date) => moment(date).format('dddd'),
-  toShortDayOfWeek: (date) => moment(date).format('ddd'),
-  toShortMonth: (date) => moment(date).format('MMM'),
-  toDate: (date) => moment(date).format('DD'),
-  toDateAndTime: (date) => moment(date).format('DD/MM/YYYY, hh:mm A'),
-  toLongDateWithDay: (date) => moment(date).format('ddd, DD MMM YYYY'),
-  toLongDateWithLongDay: (date) => moment(date).format('dddd, D MMMM YYYY'),
-  toLongDateWithTime: (date) => moment(date).format('lll'),
-  toLongDateWithDayTime: (date) => moment(date).format('llll'),
+  toLocaleTime: (date) => moment(date).locale(getLanguage()).format('LT'),
+  toLocaleDate: (date) => moment(date).locale(getLanguage()).format('L'),
+  toShortTime: (date) => moment(date).locale(getLanguage()).format('hh:mm'),
+  toShortTimeWithPeriod: (date) => moment(date).locale(getLanguage()).format('hh:mm a'),
+  toLongDate: (date) => moment(date).locale(getLanguage()).format('Do MMM YYYY'),
+  toShortDate: (date) => moment(date).locale(getLanguage()).format('YYYY-MM-DD'),
+  toDayOfWeek: (date) => moment(date).locale(getLanguage()).format('dddd'),
+  toShortDayOfWeek: (date) => moment(date).locale(getLanguage()).format('ddd'),
+  toShortMonth: (date) => moment(date).locale(getLanguage()).format('MMM'),
+  toDate: (date) => moment(date).locale(getLanguage()).format('DD'),
+  toDateAndTime: (date) => moment(date).locale(getLanguage()).format('DD/MM/YYYY, hh:mm A'),
+  toLongDateWithDay: (date) => moment(date).locale(getLanguage()).format('ddd, DD MMM YYYY'),
+  toLongDateWithLongDay: (date) => moment(date).locale(getLanguage()).format('dddd, D MMMM YYYY'),
+  toLongDateWithTime: (date) => moment(date).locale(getLanguage()).format('lll'),
+  toLongDateWithDayTime: (date) => moment(date).locale(getLanguage()).format('llll'),
   toShortDateWithYear: (date) => moment(date).format(`DD MMM 'YY`),
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
