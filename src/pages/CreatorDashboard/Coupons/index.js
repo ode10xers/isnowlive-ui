@@ -74,7 +74,10 @@ const Coupons = () => {
         setCoupons(data);
       }
     } catch (error) {
-      showErrorModal('Failed fetching coupons', error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      showErrorModal(
+        translate('FAILED_FETCHING_COUPONS'),
+        error.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
 
     setIsLoading(false);
@@ -109,11 +112,14 @@ const Coupons = () => {
       const { status } = await apis.coupons.publishCoupon(couponId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Coupon Published');
+        showSuccessModal(translate('COUPON_PUBLISHED'));
         getCreatorCoupons();
       }
     } catch (error) {
-      showErrorModal('Failed to publish coupon', error?.response?.data?.message);
+      showErrorModal(
+        translate('FAILED_TO_PUBLISH_COUPON'),
+        error?.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
 
     setIsLoading(false);
@@ -126,11 +132,14 @@ const Coupons = () => {
       const { status } = await apis.coupons.unpublishCoupon(couponId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Coupon Unpublished');
+        showSuccessModal(translate('COUPON_UNPUBLISHED'));
         getCreatorCoupons();
       }
     } catch (error) {
-      showErrorModal('Failed to unpublish coupon', error?.response?.data?.message);
+      showErrorModal(
+        translate('FAILED_TO_UNPUBLISH_COUPON'),
+        error?.response?.data?.message || translate('SOMETHING_WENT_WRONG')
+      );
     }
 
     setIsLoading(false);
@@ -138,12 +147,12 @@ const Coupons = () => {
 
   const generateCouponColumns = (published) => [
     {
-      title: 'Discount Code',
+      title: translate('DISCOUNT_CODE'),
       dataIndex: 'code',
       key: 'code',
     },
     {
-      title: 'Discount Value',
+      title: translate('DISCOUNT_VALUE'),
       dataIndex: 'value',
       key: 'value',
       align: 'right',
@@ -151,7 +160,7 @@ const Coupons = () => {
       render: (text, record) => `${record.value} %`,
     },
     {
-      title: 'Applicable Products',
+      title: translate('APPLICABLE_PRODUCTS'),
       key: 'products',
       dataIndex: 'products',
       align: 'center',
@@ -163,7 +172,7 @@ const Coupons = () => {
         return (
           <Popover
             trigger="click"
-            title={`${productName} List`}
+            title={`${productName} ${translate('LIST')}`}
             content={
               <List
                 size="small"
@@ -192,7 +201,7 @@ const Coupons = () => {
       align: 'right',
       width: '220px',
       render: (text, record) => {
-        const redemptionText = `${record.redemption?.length || 0} Users`;
+        const redemptionText = `${record.redemption?.length || 0} ${translate('USERS')}`;
 
         return (
           <Row gutter={[8, 8]} justify="end">
@@ -389,7 +398,7 @@ const Coupons = () => {
             <Panel header={<Title level={5}> {translate('PUBLISHED')} </Title>} key="Published">
               {coupons?.length ? (
                 isMobileDevice ? (
-                  <Loader loading={isLoading} size="large" text="Loading coupons">
+                  <Loader loading={isLoading} size="large" text={translate('LOADING_COUPONS')}>
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
                         <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
