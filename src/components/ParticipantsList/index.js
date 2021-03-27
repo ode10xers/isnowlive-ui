@@ -1,5 +1,6 @@
 import React from 'react';
 import { Typography, Card, Row, Col } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import Table from 'components/Table';
 import { isMobileDevice } from 'utils/device';
@@ -14,15 +15,17 @@ const {
 } = dateUtil;
 
 const ParticipantsList = ({ participants, isPast, currency }) => {
+  const { t } = useTranslation();
+
   const columns = [
     {
-      title: 'Name',
+      title: t('NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '12%',
     },
     {
-      title: 'Registered on',
+      title: t('REGISTERED_ON'),
       dataIndex: 'booking_time',
       key: 'booking_time',
       width: '12%',
@@ -31,7 +34,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       ),
     },
     {
-      title: 'Net Price',
+      title: t('NET_PRICE'),
       dataIndex: 'net_price',
       key: 'net_price',
       width: '12%',
@@ -45,7 +48,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
         ),
     },
     {
-      title: 'Status',
+      title: t('STATUS'),
       dataIndex: 'status',
       key: 'status',
       width: '12%',
@@ -65,19 +68,20 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
     );
     return (
       <Card className={styles.card} key={item?.id}>
-        {layout('Name', item?.name)}
-        {layout('Registered on', item?.booking_time && toLongDate(item?.booking_time))}
-        {layout('Total Fee Paid', `${currency.toUpperCase()} ${item?.total_price}`)}
-        {layout('Net Price', `${currency.toUpperCase()} ${item?.net_price}`)}
-        {layout('Platform Fees', `${currency.toUpperCase()} ${item?.platform_fees}`)}
-        {layout('Status', getPaymentStatus(item?.status))}
+        {layout(t('NAME'), item?.name)}
+        {layout(t('REGISTERED_ON'), item?.booking_time && toLongDate(item?.booking_time))}
+        {layout(t('NET_PRICE'), `${currency.toUpperCase()} ${item?.net_price}`)}
+        {layout(t('PLATFORM_FEES'), `${currency.toUpperCase()} ${item?.platform_fees}`)}
+        {layout(t('STATUS'), getPaymentStatus(item?.status))}
       </Card>
     );
   };
 
   return (
     <div>
-      <Title level={5}>{!isPast && 'Current'} Registrations</Title>
+      <Title level={5}>
+        {!isPast && t('CURRENT')} {t('REGISTRATIONS')}
+      </Title>
       {isMobileDevice ? (
         participants?.map(renderParticipant)
       ) : (

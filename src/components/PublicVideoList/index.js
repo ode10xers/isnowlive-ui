@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, message } from 'antd';
 import { loadStripe } from '@stripe/stripe-js';
@@ -18,6 +19,8 @@ import styles from './styles.module.scss';
 const stripePromise = loadStripe(config.stripe.secretKey);
 
 const PublicVideoList = ({ username = null, videos }) => {
+  const { t } = useTranslation();
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
@@ -42,12 +45,12 @@ const PublicVideoList = ({ username = null, videos }) => {
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
+          message.error(t('INITIATE_PAYMENT_ERROR_TEXT'));
           hideVideoDetailModal();
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
     setIsLoading(false);
   };
@@ -78,7 +81,7 @@ const PublicVideoList = ({ username = null, videos }) => {
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO, username);
       } else {
-        showErrorModal('Something went wrong', error.response?.data?.message);
+        showErrorModal(t('SOMETHING_WENT_WRONG'), error.response?.data?.message);
       }
     }
   };
@@ -106,7 +109,7 @@ const PublicVideoList = ({ username = null, videos }) => {
   return (
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
-      <Loader loading={isLoading} size="large" text="Processing...">
+      <Loader loading={isLoading} size="large" text={t('LOADING_VIDEOS')}>
         <Row justify="start" gutter={[20, 20]}>
           {videos?.map((video) => (
             <Col xs={24} lg={12} key={video?.external_id}>

@@ -78,7 +78,7 @@ const Coupons = () => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     getCreatorCoupons();

@@ -2,6 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Row, Col, Typography, Button, Popconfirm, Card, Modal, message } from 'antd';
 import { UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -27,6 +28,7 @@ const {
 const whiteColor = '#FFFFFF';
 //TODO: Add MixPanel Tracking later
 const SessionReschedule = () => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
@@ -55,10 +57,10 @@ const SessionReschedule = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error(error.message || 'Failed to load profile details');
+      message.error(error.message || t('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
-  }, [username]);
+  }, [username, t]);
 
   const getAvailableSessions = useCallback(async () => {
     setIsSessionLoading(true);
@@ -113,9 +115,9 @@ const SessionReschedule = () => {
       }
     } catch (error) {
       setIsSessionLoading(false);
-      message.error(error.response?.data?.message || 'Failed to load user session details');
+      message.error(error.response?.data?.message || t('FAILED_TO_LOAD_USER_SESSION_DETAILS'));
     }
-  }, [inventory_id, username, price]);
+  }, [inventory_id, username, price, t]);
 
   const handleSessionReschedule = async (newInventory) => {
     setIsLoading(true);
@@ -132,14 +134,14 @@ const SessionReschedule = () => {
           centered: true,
           closable: true,
           maskClosable: true,
-          title: 'Session Successfully Rescheduled',
+          title: t('SESSION_SUCCESSFULLY_RESCHEDULED'),
           onOk: () => {
             window.location.href = `${generateUrlFromUsername('app')}${Routes.attendeeDashboard.rootPath}`;
           },
         });
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to reschedule session');
+      message.error(error.response?.data?.message || t('FAILED_TO_RESCHEDULE_SESSION'));
     }
 
     setIsLoading(false);
@@ -147,12 +149,12 @@ const SessionReschedule = () => {
 
   useEffect(() => {
     if (!inventory_id || !order_id || price < 0) {
-      message.error('Invalid Search Params');
+      message.error(t('INVALID_SEARCH_PARAMS'));
     } else {
       getProfileDetails();
       getAvailableSessions();
     }
-  }, [getProfileDetails, getAvailableSessions, inventory_id, order_id, price]);
+  }, [getProfileDetails, getAvailableSessions, inventory_id, order_id, price, t]);
 
   const emptyTableCell = {
     props: {
@@ -165,7 +167,7 @@ const SessionReschedule = () => {
 
   let dateColumns = [
     {
-      title: 'Session Name',
+      title: t('SESSION_NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '30%',
@@ -194,21 +196,21 @@ const SessionReschedule = () => {
       },
     },
     {
-      title: 'Type',
+      title: t('TYPE'),
       dataIndex: 'type',
       key: 'type',
       width: '10%',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Duration',
+      title: t('DURATION'),
       dataIndex: 'duration',
       key: 'duration',
       width: '10%',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
-      title: 'Time',
+      title: t('TIME'),
       dataIndex: 'time',
       key: 'time',
       width: '25%',
@@ -222,7 +224,7 @@ const SessionReschedule = () => {
         ),
     },
     {
-      title: 'Actions',
+      title: t('ACTIONS'),
       width: '13%',
       render: (text, record) => {
         if (record.is_date) {
@@ -233,13 +235,13 @@ const SessionReschedule = () => {
           <Row justify="start">
             <Col md={24} lg={24} xl={8}>
               <Popconfirm
-                title="Do you want to reschedule to this session?"
-                okText="Yes"
-                cancelText="No"
+                title={t('DO_YOU_WANT_TO_RESCHEDULE_TO_THIS_SESSION')}
+                okText={t('YES')}
+                cancelText={t('NO')}
                 onConfirm={() => handleSessionReschedule(record)}
               >
                 <Button type="link" className={styles.detailsButton}>
-                  Reschedule
+                  {t('RESCHEDULE')}
                 </Button>
               </Popconfirm>
             </Col>
@@ -283,38 +285,38 @@ const SessionReschedule = () => {
         }
         actions={[
           <Popconfirm
-            title="Do you want to reschedule to this session?"
-            okText="Yes"
-            cancelText="No"
+            title={t('DO_YOU_WANT_TO_RESCHEDULE_TO_THIS_SESSION')}
+            okText={t('YES')}
+            cancelText={t('NO')}
             onConfirm={() => handleSessionReschedule(item)}
           >
-            <Button type="link">Reschedule</Button>
+            <Button type="link">{t('RESCHEDULE')}</Button>
           </Popconfirm>,
         ]}
       >
-        {layout('Type', <Text>{item.type}</Text>)}
-        {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Time', <Text>{item.time}</Text>)}
+        {layout(t('TYPE'), <Text>{item.type}</Text>)}
+        {layout(t('DURATION'), <Text>{item.duration}</Text>)}
+        {layout(t('TIME'), <Text>{item.time}</Text>)}
       </Card>
     );
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading available sessions">
+    <Loader loading={isLoading} size="large" text={t('LOADING_AVAILABLE_SESSIONS')}>
       <div>
         <CreatorProfile profile={profile} profileImage={profileImage} showCoverImage={true} coverImage={coverImage} />
       </div>
 
       <Row className={styles.mt50}>
         <Col span={24} className={styles.mb20}>
-          <Title level={isMobileDevice ? 4 : 2}>Available Sessions</Title>
+          <Title level={isMobileDevice ? 4 : 2}>{t('AVAILABLE_SESSIONS')}</Title>
           <Text type="primary" strong>
-            All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+            {t('ALL_EVENT_TIMEZONE_TEXT')} ({getCurrentLongTimezone()})
           </Text>
         </Col>
         <Col span={24}>
           {isMobileDevice ? (
-            <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+            <Loader loading={isSessionLoading} size="large" text={t('LOADING_SESSIONS')}>
               {availableSessions.length > 0 ? (
                 <Table
                   columns={mobileTableColumns}
@@ -341,7 +343,7 @@ const SessionReschedule = () => {
                   }}
                 />
               ) : (
-                <div className="text-empty"> No Available Session to Reschedule </div>
+                <div className="text-empty"> {t('NO_AVAILABLE_SESSION_TO_RESCHEDULE')} </div>
               )}
             </Loader>
           ) : (

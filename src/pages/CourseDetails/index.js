@@ -51,21 +51,24 @@ const CourseDetails = ({ match, history }) => {
 
   // const username = location.state?.username || window.location.hostname.split('.')[0];
 
-  const getProfileDetails = useCallback(async (creatorUsername) => {
-    try {
-      const { data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
-      if (data) {
-        setProfile(data);
-        setProfileImage(data.profile_image_url);
+  const getProfileDetails = useCallback(
+    async (creatorUsername) => {
+      try {
+        const { data } = creatorUsername
+          ? await apis.user.getProfileByUsername(creatorUsername)
+          : await apis.user.getProfile();
+        if (data) {
+          setProfile(data);
+          setProfileImage(data.profile_image_url);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        message.error(translate('FAIL_TO_LOAD_PROFILE'));
         setIsLoading(false);
       }
-    } catch (error) {
-      message.error(translate('FAIL_TO_LOAD_PROFILE'));
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [translate]
+  );
 
   const getCourseDetails = useCallback(
     async (courseId) => {
@@ -94,7 +97,7 @@ const CourseDetails = ({ match, history }) => {
         message.error(translate('FAIL_TO_LOAD_COURSE_DETAILS'));
       }
     },
-    [getProfileDetails, location]
+    [getProfileDetails, location, translate]
   );
 
   useEffect(() => {

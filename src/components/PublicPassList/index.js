@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
 import { loadStripe } from '@stripe/stripe-js';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -25,6 +26,7 @@ const stripePromise = loadStripe(config.stripe.secretKey);
 const { Text, Paragraph } = Typography;
 
 const PublicPassList = ({ username, passes }) => {
+  const { t } = useTranslation();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -59,19 +61,19 @@ const PublicPassList = ({ username, passes }) => {
         });
 
         if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
+          message.error(t('INITIATE_PAYMENT_ERROR_TEXT'));
           setIsLoading(false);
         }
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
   const createOrder = async (userEmail) => {
     if (!selectedPass) {
-      showErrorModal('Something went wrong', 'Invalid Pass ID');
+      showErrorModal(t('SOMETHING_WENT_WRONG'), t('INVALID_PASS_ID'));
       return;
     }
 
@@ -93,7 +95,7 @@ const PublicPassList = ({ username, passes }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS, username);
       }
@@ -128,29 +130,29 @@ const PublicPassList = ({ username, passes }) => {
 
   const passesColumns = [
     {
-      title: 'Pass Name',
+      title: t('NAME'),
       dataIndex: 'name',
       key: 'name',
       width: '35%',
     },
     {
-      title: 'Credit Count',
+      title: t('CREDIT_COUNT'),
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
       width: '15%',
-      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credit'),
+      render: (text, record) => (record.limited ? `${text} ${t('CREDITS')}` : t('UNLIMITED_CREDITS')),
     },
     {
-      title: 'Validity',
+      title: t('VALIDITY'),
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
       width: '12%',
-      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
+      render: (text, record) => `${text} ${t('DAYS')}`,
     },
     {
-      title: 'Price',
+      title: t('PRICE'),
       dataIndex: 'price',
       key: 'price',
       align: 'left',
@@ -161,22 +163,22 @@ const PublicPassList = ({ username, passes }) => {
     {
       title: (
         <Button shape="round" type="primary" onClick={() => toggleExpandAll()}>
-          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          {expandedRowKeys.length > 0 ? t('COLLAPSE') : t('EXPAND')} {t('ALL')}
         </Button>
       ),
       align: 'right',
       render: (text, record) => (
         <Space size="small">
           <Button type="primary" onClick={() => openPurchaseModal(record.id)}>
-            Buy Pass
+            {t('BUY_PASS')}
           </Button>
           {expandedRowKeys.includes(record.id) ? (
             <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
-              Close
+              {t('CLOSE')}
             </Button>
           ) : (
             <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
-              More
+              {t('MORE')}
             </Button>
           )}
         </Space>
@@ -190,7 +192,7 @@ const PublicPassList = ({ username, passes }) => {
         <>
           <Col xs={24}>
             <Text strong className={styles.ml20}>
-              Sessions bookable with this pass
+              {t('SESSIONS_BOOKABLE_WITH_THIS_PASS')}
             </Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
@@ -202,7 +204,7 @@ const PublicPassList = ({ username, passes }) => {
         <>
           <Col xs={24}>
             <Text strong className={styles.ml20}>
-              Videos purchasable with this pass
+              {t('VIDEOS_PURCHASABLE_WITH_THIS_PASS')}
             </Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
@@ -230,29 +232,32 @@ const PublicPassList = ({ username, passes }) => {
           title={<Text>{pass.name}</Text>}
           actions={[
             <Button type="primary" onClick={() => openPurchaseModal(pass.id)}>
-              Buy Pass
+              {t('BUY_PASS')}
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
               <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
-                Close
+                {t('CLOSE')}
               </Button>
             ) : (
               <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
-                More
+                {t('MORE')}
               </Button>
             ),
           ]}
         >
-          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
-          {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout(
+            t('CREDIT_COUNT'),
+            <Text>{pass.limited ? `${pass.class_count} ${t('CREDITS')}` : t('UNLIMITED_CREDITS')}</Text>
+          )}
+          {layout(t('VALIDITY'), <Text>{`${pass.validity} ${t('DAYS')}`}</Text>)}
+          {layout(t('PRICE'), <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
             {pass.sessions?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                  <Text className={styles.ml20}> {t('SESSIONS_BOOKABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -268,7 +273,7 @@ const PublicPassList = ({ username, passes }) => {
             {pass.videos?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                  <Text className={styles.ml20}> {t('VIDEOS_PURCHASABLE_WITH_THIS_PASS')} </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -290,16 +295,11 @@ const PublicPassList = ({ username, passes }) => {
   return (
     <div className={styles.box}>
       <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
-      <Loader loading={isLoading} size="large" text="Loading pass details">
+      <Loader loading={isLoading} size="large" text={t('LOADING_PASS_DETAILS')}>
         <Row gutter={[16, 16]}>
           <Col xs={24}>
-            <Paragraph>
-              Passes enable you to make a single payment and forget the hassle of paying for each product seperately.
-            </Paragraph>
-            <Paragraph>
-              Depending on the pass you buy, you can use the credits and book the class or video products made available
-              in that pass for free. A Pass is valid from the date you buy it until the validity period.
-            </Paragraph>
+            <Paragraph>{t('PUBLIC_PASSES_DESCRIPTION_TEXT_1')}</Paragraph>
+            <Paragraph>{t('PUBLIC_PASSES_DESCRIPTION_TEXT_2')}</Paragraph>
           </Col>
           <Col xs={24}>
             {isMobileDevice ? (
@@ -308,7 +308,7 @@ const PublicPassList = ({ username, passes }) => {
               ) : (
                 <div className={styles.textAlignCenter}>
                   {' '}
-                  <Text disabled> No Passes </Text>{' '}
+                  <Text disabled> {t('NO_PASSES')} </Text>{' '}
                 </div>
               )
             ) : (

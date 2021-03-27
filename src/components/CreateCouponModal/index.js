@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Modal, Button, Form, Input, InputNumber, Select, Typography, message } from 'antd';
 
@@ -9,6 +10,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { i18n } from 'utils/i18n';
 
 import { couponModalFormLayout } from 'layouts/FormLayouts';
 
@@ -24,13 +26,15 @@ const formInitialValues = {
 const creatorProductInfo = [
   {
     key: 'COURSE',
-    name: 'Courses',
+    name: i18n.t('COURSES'),
     apiMethod: apis.courses.getCreatorCourses,
   },
 ];
 
 // ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
 const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
+  const { t } = useTranslation();
+
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -74,13 +78,13 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
           productInfo[product.key.toLowerCase()] = data;
         }
       } catch (error) {
-        message.error(error?.response?.data?.message || `Failed to fetch ${product.name}`);
+        message.error(error?.response?.data?.message || `${t('FAILED_TO_FETCH')} ${product.name}`);
       }
     }
 
     setProducts(productInfo);
     setIsLoading(false);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (visible) {
@@ -122,17 +126,19 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
         : await apis.coupons.createCoupon(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal(`Discount Code ${editedCoupon ? 'Updated' : 'Created'}`);
+        showSuccessModal(`${t('DISCOUNT_CODE')} ${editedCoupon ? t('UPDATED') : t('CREATED')}`);
         closeModal(true);
       }
     } catch (error) {
       if (error?.response?.status === 500 && error?.response?.data?.message === 'a coupon like this already exists') {
-        showErrorModal(
-          'Duplicate Discount Code',
-          'A coupon with the same discount code already exists! Please use a different discount code'
-        );
+        showErrorModal(t('DUPLICATE_DISCOUNT_CODE'), t('DUPLICATE_DISCOUNT_CODE_MESSAGE'));
       } else {
-        showErrorModal(`Failed to ${editedCoupon ? 'edit' : 'create'} discount code`, error?.response?.data?.message);
+        showErrorModal(
+          `${t('FAILED_TO')} ${editedCoupon ? t('EDIT').toLowerCase() : t('CREATE').toLowerCase()} ${t(
+            'DISCOUNT_CODE'
+          ).toLowerCase()}`,
+          error?.response?.data?.message
+        );
       }
     }
 
@@ -141,7 +147,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
 
   return (
     <Modal
-      title={`${editedCoupon ? 'Edit' : 'Create New'} Coupon`}
+      title={`${editedCoupon ? t('EDIT') : t('CREATE')} ${t('COUPONS')}`}
       centered={true}
       visible={visible}
       footer={null}
@@ -163,27 +169,27 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 {...couponModalFormLayout}
                 id="discountCode"
                 name="discountCode"
-                label="Discount Code"
+                label={t('DISCOUNT_CODE')}
                 rules={validationRules.discountCodeValidation}
               >
-                <Input placeholder="Input code here (Alphanumeric)" maxLength={20} />
+                <Input placeholder={t('COUPON_CODE_INPUT_PLACEHOLDER')} maxLength={20} />
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item {...couponModalFormLayout} label="Discount Amount (%)" required={true}>
+              <Form.Item {...couponModalFormLayout} label={`${t('DISCOUNT_AMOUNT')} (%)`} required={true}>
                 <Row gutter={4}>
                   <Col xs={20}>
                     <Form.Item
                       noStyle
                       id="discountPercent"
                       name="discountPercent"
-                      rules={validationRules.numberValidation('Please Input valid discount amount', 1, true, 100)}
+                      rules={validationRules.numberValidation(t('DISCOUNT_AMOUNT_ERROR_TEXT'), 1, true, 100)}
                     >
                       <InputNumber
                         min={1}
                         max={100}
                         precision={0}
-                        placeholder="Discount amount"
+                        placeholder={t('DISCOUNT_AMOUNT')}
                         className={styles.numericInput}
                       />
                     </Form.Item>
@@ -199,13 +205,13 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 {...couponModalFormLayout}
                 id="selectedProductTypes"
                 name="selectedProductTypes"
-                label="Applicable Product Types"
+                label={t('APPLICABLE_PRODUCT_TYPES')}
                 rules={validationRules.requiredValidation}
               >
                 <Select
                   showArrow
                   showSearch={false}
-                  placeholder="Select product type(s)"
+                  placeholder={t('SELECT_PRODUCT_TYPE')}
                   maxTagCount={2}
                   options={Object.entries(products).map(([key, val]) => ({
                     value: key,
@@ -221,13 +227,13 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
                 {...couponModalFormLayout}
                 id="selectedProducts"
                 name="selectedProducts"
-                label="Applicable Products"
+                label={t('APPLICABLE_PRODUCTS')}
                 rules={validationRules.arrayValidation}
               >
                 <Select
                   showArrow
                   showSearch
-                  placeholder="Select the products applicable with this code"
+                  placeholder={t('SELECT_PRODUCT_TYPE_PLACEHOLDER')}
                   mode="multiple"
                   maxTagCount={2}
                 >
@@ -249,12 +255,12 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
           <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
             <Col xs={12} md={4}>
               <Button block type="default" loading={submitting} onClick={() => closeModal(false)}>
-                Cancel
+                {t('CANCEL')}
               </Button>
             </Col>
             <Col xs={12} md={10}>
               <Button block type="primary" loading={submitting} htmlType="submit">
-                {editedCoupon ? 'Edit' : 'Create'} Discount Code
+                {editedCoupon ? t('EDIT') : t('CREATE')} {t('DISCOUNT_CODE')}
               </Button>
             </Col>
           </Row>

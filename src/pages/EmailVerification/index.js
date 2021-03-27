@@ -26,7 +26,7 @@ export default function EmailVerification() {
       setIsLoading(false);
       message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
     }
-  }, [token, history]);
+  }, [token, history, translate]);
 
   useEffect(() => {
     if (token) {

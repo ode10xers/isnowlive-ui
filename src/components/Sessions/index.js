@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Empty, Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 import SessionCards from 'components/SessionCards';
 
@@ -10,6 +11,7 @@ import styles from './style.module.scss';
 const { user } = mixPanelEventTags;
 
 const Sessions = ({ sessions, username }) => {
+  const { t } = useTranslation();
   const [sessionCount, setSessionCount] = useState(6);
   const [reformattedSessions, setReformattedSessions] = useState([]);
 
@@ -57,7 +59,7 @@ const Sessions = ({ sessions, username }) => {
           {sessionCount < reformattedSessions.length && (
             <Col span={24} className={styles.textAlignCenter}>
               <Button type="primary" onClick={() => showMore()}>
-                Show more
+                {t('SHOW_MORE')}
               </Button>
             </Col>
           )}

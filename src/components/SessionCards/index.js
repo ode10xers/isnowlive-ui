@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import MobileDetect from 'mobile-detect';
+import { useTranslation } from 'react-i18next';
 
 import { Card, Image, Row, Col, Typography, Empty, Tag, message } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
@@ -21,6 +22,7 @@ const {
 } = dateUtil;
 
 const SessionCards = ({ sessions, shouldFetchInventories = true, username = null }) => {
+  const { t } = useTranslation();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -35,7 +37,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
       const { data } = await apis.session.getSessionDetails(sessionId);
       return mapInventoryDays(data.inventory);
     } catch (error) {
-      message.error('Something wrong happened!');
+      message.error(t('SOMETHING_WRONG_HAPPENED'));
     }
   };
 
@@ -70,7 +72,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
 
   return (
     <div>
-      <Loader loading={isLoading} text="Fetching session informations">
+      <Loader loading={isLoading} text={t('FETCHING_SESSION_INFORMATIONS')}>
         <Row gutter={[8, 8]}>
           {adjustedSessions && adjustedSessions.length > 0 ? (
             <>
@@ -117,7 +119,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                         </Col>
                         <Col xs={24}>
                           <Tag color="cyan" className={styles.sessionTag}>
-                            {session.group ? 'Group Session' : '1-to-1 Session'}
+                            {session.group ? t('GROUP_SESSION') : t('1_TO_1_SESSION')}
                           </Tag>
                         </Col>
                       </Row>
@@ -159,7 +161,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
                                 </Col>
                                 <Col xs={24} lg={3}>
                                   <Tag color="cyan" className={styles.sessionTag}>
-                                    {session.group ? 'Group' : '1-on-1'}
+                                    {session.group ? t('GROUP') : t('1_TO_1')}
                                   </Tag>
                                 </Col>
                               </Row>

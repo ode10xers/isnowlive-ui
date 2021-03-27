@@ -43,7 +43,7 @@ const NotificationSettings = () => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   const saveUserPreferences = async () => {
     setSubmitting(true);

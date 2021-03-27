@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Row, Col, Calendar, Typography, Button } from 'antd';
 import { CheckCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 import moment from 'moment';
 
@@ -19,6 +20,8 @@ const {
 } = dateUtil;
 
 const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => {
+  const { t } = useTranslation();
+
   const [selectedDate, setSelectedDate] = useState(moment(selectedSlot?.start_time).format());
   const [slots, setSlots] = useState([]);
 
@@ -101,10 +104,10 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
       <Row>
         <Col xs={24}>
           <Title className={styles.textAlignCenter} level={3}>
-            Select date and time
+            {t('SELECT_DATE_AND_TIME')}
           </Title>
           <Title className={styles.textAlignCenter} level={5}>
-            All times shown below are in your local time zone ({getCurrentLongTimezone()})
+            {t('TIME_SHOWN_IN_LOCAL_TIMEZONE')} ({getCurrentLongTimezone()})
           </Title>
           <div className={styles.siteCalendarCard}>
             <Calendar
@@ -120,7 +123,7 @@ const SessionInventorySelect = ({ inventories, selectedSlot, handleSubmit }) => 
           <Row className={styles.slotWrapper}>
             <Col xs={24}>
               <Title level={4}>{toLongDate(selectedDate)}</Title>
-              <Text type="secondary"> {slots?.length > 0 ? 'Select time' : 'No timeslot available'} </Text>
+              <Text type="secondary"> {slots?.length > 0 ? t('SELECT_TIME') : t('NO_TIMESLOT_AVAILABLE')} </Text>
             </Col>
             <Col xs={24} className={styles.mt10}>
               <Row justify="center" gutter={[8, 8]}>

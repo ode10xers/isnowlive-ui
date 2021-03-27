@@ -26,7 +26,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -59,59 +59,62 @@ const SessionsInventories = ({ match }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [selectedInventoryForZoom, setSelectedInventoryForZoom] = useState(null);
 
-  const getStaffSession = useCallback(async (sessionType) => {
-    try {
-      const { data } =
-        sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
-      if (data) {
-        const unfilteredSessions = data.map((i, index) => ({
-          index,
-          key: i?.inventory_id,
-          name: i.name,
-          type: i.max_participants > 1 ? translate('GROUP') : translate('1_TO_1'),
-          duration: getDuration(i.start_time, i.end_time),
-          days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
-          session_date: i?.session_date,
-          time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
-          start_time: i?.start_time,
-          end_time: i?.end_time,
-          participants: i.num_participants,
-          start_url: i.start_url,
-          inventory_id: i?.inventory_id,
-          session_id: i.session_id,
-          max_participants: i.max_participants,
-          color_code: i.color_code,
-          is_published: i.is_published,
-          is_course: i.is_course,
-        }));
+  const getStaffSession = useCallback(
+    async (sessionType) => {
+      try {
+        const { data } =
+          sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
+        if (data) {
+          const unfilteredSessions = data.map((i, index) => ({
+            index,
+            key: i?.inventory_id,
+            name: i.name,
+            type: i.max_participants > 1 ? translate('GROUP') : translate('1_TO_1'),
+            duration: getDuration(i.start_time, i.end_time),
+            days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
+            session_date: i?.session_date,
+            time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
+            start_time: i?.start_time,
+            end_time: i?.end_time,
+            participants: i.num_participants,
+            start_url: i.start_url,
+            inventory_id: i?.inventory_id,
+            session_id: i.session_id,
+            max_participants: i.max_participants,
+            color_code: i.color_code,
+            is_published: i.is_published,
+            is_course: i.is_course,
+          }));
 
-        let filterByDateSessions = [];
+          let filterByDateSessions = [];
 
-        unfilteredSessions.forEach((session) => {
-          const foundIndex = filterByDateSessions.findIndex(
-            (val) => val.start_time === toLocaleDate(session.start_time)
-          );
+          unfilteredSessions.forEach((session) => {
+            const foundIndex = filterByDateSessions.findIndex(
+              (val) => val.start_time === toLocaleDate(session.start_time)
+            );
 
-          if (foundIndex >= 0) {
-            filterByDateSessions[foundIndex].children.push(session);
-          } else {
-            filterByDateSessions.push({
-              start_time: toLocaleDate(session.start_time),
-              name: session.start_time,
-              is_date: true,
-              children: [session],
-            });
-          }
-        });
-        setSessions(unfilteredSessions);
-        setFilteredByDateSession(filterByDateSessions);
+            if (foundIndex >= 0) {
+              filterByDateSessions[foundIndex].children.push(session);
+            } else {
+              filterByDateSessions.push({
+                start_time: toLocaleDate(session.start_time),
+                name: session.start_time,
+                is_date: true,
+                children: [session],
+              });
+            }
+          });
+          setSessions(unfilteredSessions);
+          setFilteredByDateSession(filterByDateSessions);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    } catch (error) {
-      showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [translate]
+  );
 
   useEffect(() => {
     if (match?.params?.session_type) {
@@ -169,7 +172,7 @@ const SessionsInventories = ({ match }) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/e/${inventoryId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const emptyTableCell = {

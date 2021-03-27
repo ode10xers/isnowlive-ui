@@ -100,7 +100,7 @@ const ClassPassList = () => {
       showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
     }
     setIsLoading(false);
-  }, []);
+  }, [translate]);
 
   useEffect(() => {
     getPassesForAttendee();

@@ -101,7 +101,7 @@ const initialSession = {
 };
 
 const Session = ({ match, history }) => {
-  const { t: translate } = useTranslation();
+  const { t } = useTranslation();
   const location = useLocation();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
@@ -150,12 +150,12 @@ const Session = ({ match, history }) => {
           });
           setIsSessionFree(true);
         } else {
-          message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+          message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
         }
         setIsLoading(false);
       }
     },
-    [form]
+    [form, t]
   );
 
   const getSessionDetails = useCallback(
@@ -195,7 +195,7 @@ const Session = ({ match, history }) => {
           await getCreatorStripeDetails(data);
         }
       } catch (error) {
-        message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+        message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
         setIsLoading(false);
         if (isOnboarding) {
           history.push(Routes.session);
@@ -204,7 +204,7 @@ const Session = ({ match, history }) => {
         }
       }
     },
-    [form, history, isOnboarding, getCreatorStripeDetails]
+    [form, history, isOnboarding, getCreatorStripeDetails, t]
   );
 
   useEffect(() => {
@@ -235,8 +235,8 @@ const Session = ({ match, history }) => {
     }
     getCurrencyList()
       .then((res) => setCurrencyList(res))
-      .catch(() => message.error('Failed to load currency list'));
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
+      .catch(() => message.error(t('FAILED_TO_LOAD_CURRENCY_LIST')));
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails, t]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -291,9 +291,9 @@ const Session = ({ match, history }) => {
         setIsSessionFree(false);
       } else {
         Modal.confirm({
-          title: `The session cannot be paided untill you setup stripe account. Would you like to setup stripe account now?`,
-          okText: 'Yes, Setup stripe account now',
-          cancelText: 'No',
+          title: t('PAID_SESSION_SETUP_STRIPE_MODAL_TITLE'),
+          okText: t('PAID_SESSION_SETUP_STRIPE_MODAL_OK_BUTTON'),
+          cancelText: t('NO'),
           onCancel: () => setFreeSession(),
           onOk: () => {
             history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
@@ -328,17 +328,21 @@ const Session = ({ match, history }) => {
         centered: true,
         closable: true,
         maskClosable: true,
-        title: 'Keep Existing Slots?',
+        title: t('KEEP_EXISTING_SLOTS'),
         content: (
           <Paragraph>
-            You are switching from{' '}
-            <Text strong>{isRecurring ? 'One-time to Recurring Sessions' : 'Recurring to One-time Sessions'} </Text>,
-            would you like to <Text strong> keep your existing time slots </Text> marked on the calendar?
+            {t('KEEP_INVENTORY_ON_DATES_MODAL_TEXT_1')}{' '}
+            <Text strong>
+              {isRecurring ? t('KEEP_INVENTORY_ON_DATES_MODAL_TEXT_2') : t('KEEP_INVENTORY_ON_DATES_MODAL_TEXT_3')}{' '}
+            </Text>
+            ,{t('KEEP_INVENTORY_ON_DATES_MODAL_TEXT_4')}{' '}
+            <Text strong> {t('KEEP_INVENTORY_ON_DATES_MODAL_TEXT_5')} </Text>{' '}
+            {t('KEEP_INVENTORY_ON_DATES_MODAL_TEXT_6')}
           </Paragraph>
         ),
-        okText: 'No, Clear Slots',
+        okText: t('KEEP_INVENTORY_ON_DATES_MODAL_OK_BUTTON'),
         okButtonProps: { type: 'default' },
-        cancelText: 'Yes, Keep Slots',
+        cancelText: t('KEEP_INVENTORY_ON_DATES_MODAL_CANCEL_TEXT'),
         cancelButtonProps: { type: 'primary' },
         onCancel: () => changeSessionRecurrance(isRecurring),
         onOk: () => {
@@ -393,15 +397,10 @@ const Session = ({ match, history }) => {
         mask: true,
         maskClosable: true,
         autoFocusButton: 'cancel',
-        title: 'Update Session Schedule?',
-        okText: `Copy on new dates`,
-        cancelText: 'Leave it as is',
-        content: (
-          <Text>
-            You have changed the date range, would you like us to copy the sessions currently on the calender to this
-            date range?
-          </Text>
-        ),
+        title: t('UPDATE_SESSION_SCHEDULE_MODAL_TITLE'),
+        okText: t('UPDATE_SESSION_SCHEDULE_MODAL_OK_BUTTON'),
+        cancelText: t('UPDATE_SESSION_SCHEDULE_MODAL_CANCEL_BUTTON'),
+        content: <Text>t('UPDATE_SESSION_SCHEDULE_MODAL_TEXT')</Text>,
         onOk: () => handleRecurringDatesRange(value, true),
         onCancel: () => handleRecurringDatesRange(value, false),
       });
@@ -558,14 +557,14 @@ const Session = ({ match, history }) => {
           const updatedSessionResponse = await apis.session.update(session.session_id, data);
           if (isAPISuccess(updatedSessionResponse.status)) {
             trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
-            message.success('Session successfully updated.');
+            message.success(t('SESSION_SUCCESSFULLY_UPDATED'));
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${data.name} session successfully updated`,
+              title: `${data.name} ${t('SESSION_SUCCESSFULLY_UPDATED').toLowerCase()}`,
               className: styles.confirmModal,
-              okText: 'Done',
-              cancelText: 'Add New',
+              okText: t('DONE'),
+              cancelText: t('ADD_NEW'),
               onCancel: () => {
                 trackSimpleEvent(eventTagObject.addNewInModal);
                 const startDate = data.beginning || toUtcStartOfDay(moment().subtract(1, 'month'));
@@ -589,10 +588,10 @@ const Session = ({ match, history }) => {
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
-              title: `${newSessionResponse.data.name} session successfully created`,
+              title: `${newSessionResponse.data.name} ${t('SESSION_SUCCESSFULLY_CREATED')}`,
               className: styles.confirmModal,
-              okText: 'Done',
-              cancelText: 'Add New',
+              okText: t('DONE'),
+              cancelText: t('ADD_NEW'),
               onCancel: () => {
                 trackSimpleEvent(eventTagObject.addNewInModal);
                 window.location.reload();
@@ -608,7 +607,7 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        message.error('Need at least 1 sesssion to publish');
+        message.error(t('SESSION_CREATION_ERROR_MESSAGE'));
       }
     } catch (error) {
       setIsLoading(false);
@@ -616,7 +615,7 @@ const Session = ({ match, history }) => {
       trackFailedEvent(session.session_id ? eventTagObject.submitUpdate : eventTagObject.submitNewSession, error, {
         form_values: values,
       });
-      message.error(error.response?.data?.message || translate('SOMETHING_WENT_WRONG'));
+      message.error(error.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
   };
 
@@ -653,7 +652,7 @@ const Session = ({ match, history }) => {
               }
               icon={<ArrowLeftOutlined />}
             >
-              Sessions
+              {t('SESSIONS')}
             </Button>
           </Col>
         </Row>
@@ -661,13 +660,11 @@ const Session = ({ match, history }) => {
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
           <Title level={isMobileDevice ? 3 : 1} className={styles.titleText}>
-            {session.session_id ? 'Update' : 'Create'} Session
+            {session.session_id ? t('UPDATE') : t('CREATE')} {t('SESSION')}
           </Title>
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph className={styles.mt10} type="secondary">
-            Setup the event you plan to host. Adding a name, session image and description for the attendees is
-            mandatory and you can also add pre-requisite or a document to make it more descriptive. Then select the days
-            and time you want to host this session.
+            {t('SESSION_CREATION_PAGE_DESC')}
           </Paragraph>
         </Typography>
       </Space>
@@ -682,7 +679,7 @@ const Session = ({ match, history }) => {
       >
         {/* ========= SESSION INFORMATION ======== */}
         <Section>
-          <Title level={4}>1. Primary Information</Title>
+          <Title level={4}>1. {t('PRIMARY_INFORMATION')}</Title>
           <Form.Item
             id="session_image_url"
             name="session_image_url"
@@ -697,23 +694,23 @@ const Session = ({ match, history }) => {
                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 onChange={onSessionImageUpload}
                 value={sessionImageUrl}
-                label="Session Image"
+                label={t('SESSION_IMAGE')}
               />
             </div>
           </Form.Item>
 
-          <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
-            <Input placeholder="Enter Session Name" />
+          <Form.Item label={t('SESSION_NAME')} id="name" name="name" rules={validationRules.nameValidation}>
+            <Input placeholder={t('ENTER_SESSION_NAME')} />
           </Form.Item>
 
           <Form.Item
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label={<Text> Session Description </Text>}
+            label={<Text> {t('SESSION_DESCRIPTION')} </Text>}
             name="description"
             id="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="Please input description" />
+            <TextEditor name="description" form={form} placeholder={t('PLEASE_INPUT_DESCRIPTION')} />
           </Form.Item>
           <Form.Item
             name="document_url"
@@ -721,7 +718,7 @@ const Session = ({ match, history }) => {
             valuePropName="fileList"
             getValueFromEvent={normFile}
           >
-            <Text>or upload a session pre-requisite document</Text>
+            <Text>{t('OR_UPLOAD_A_SESSION_PRE_REQUISITE_DOCUMENT')}</Text>
             <br />
             <br />
             <Row>
@@ -731,7 +728,7 @@ const Session = ({ match, history }) => {
                   value={sessionDocumentUrl}
                   onChange={handleDocumentUrlUpload}
                   listType="text"
-                  label="Upload a PDF file"
+                  label={t('UPLOAD_A_PDF_FILE')}
                 />
               </Col>
 
@@ -746,7 +743,7 @@ const Session = ({ match, history }) => {
                   >
                     {sessionDocumentUrl.split('_').slice(-1)[0]}
                   </Button>
-                  <Tooltip title="Remove this file">
+                  <Tooltip title={t('REMOVE_THIS_FILE')}>
                     <Button
                       type="text"
                       size="middle"
@@ -765,10 +762,10 @@ const Session = ({ match, history }) => {
 
           <Form.Item
             className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label="Session Pre-requisite"
+            label={t('SESSION_PRE_REQUISITE')}
             name="prerequisites"
           >
-            <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
+            <TextEditor name="prerequisites" form={form} placeholder={t('PLEASE_INPUT_SESSION_PRE_REQUISITE')} />
           </Form.Item>
 
           {/* ---- Session Course Type ---- */}
@@ -776,13 +773,13 @@ const Session = ({ match, history }) => {
             <Form.Item
               name="session_course_type"
               id="session_course_type"
-              label="Session Type"
+              label={t('SESSION_TYPE')}
               rules={validationRules.requiredValidation}
               onChange={handleSessionCourseType}
             >
               <Radio.Group>
-                <Radio value="normal">Normal Session</Radio>
-                <Radio value="course">Course Session</Radio>
+                <Radio value="normal">{t('NORMAL_SESSIONS')}</Radio>
+                <Radio value="course">{t('COURSE_SESSIONS')}</Radio>
               </Radio.Group>
             </Form.Item>
           </>
@@ -792,14 +789,14 @@ const Session = ({ match, history }) => {
             <Form.Item
               name="type"
               id="type"
-              label="Attendee Type"
+              label={t('ATTENDEE_TYPE')}
               rules={validationRules.requiredValidation}
               onChange={handleSessionType}
             >
               <Radio.Group>
-                <Radio value="Group">Group</Radio>
+                <Radio value="Group">{t('GROUP')}</Radio>
                 <Radio disabled={isCourseSession} value="1-on-1">
-                  Individual (1-on-1)
+                  {t('INDIVIDUAL')} ({t('1_TO_1')})
                 </Radio>
               </Radio.Group>
             </Form.Item>
@@ -807,7 +804,7 @@ const Session = ({ match, history }) => {
             <Form.Item
               {...(!isMobileDevice && profileFormTailLayout)}
               name="max_participants"
-              extra="Maximum 100 supported"
+              extra={t('SESSION_MAX_PARTICIPANTS_HELP_TEXT')}
               rules={validationRules.requiredValidation}
               hidden={!isSessionTypeGroup}
             >
@@ -819,19 +816,19 @@ const Session = ({ match, history }) => {
           <>
             <Form.Item
               name="price_type"
-              label="Session Price"
+              label={t('SESSION_PRICE')}
               rules={validationRules.requiredValidation}
               onChange={handleSessionPriceType}
             >
               <Radio.Group>
-                <Radio value="Paid">Paid</Radio>
-                <Radio value="Free">Free</Radio>
+                <Radio value="Paid">{t('PAID')}</Radio>
+                <Radio value="Free">{t('FREE')}</Radio>
               </Radio.Group>
             </Form.Item>
 
             {!isSessionFree && (
               <>
-                <Form.Item name="currency" label="Currency" rules={validationRules.requiredValidation}>
+                <Form.Item name="currency" label={t('CURRENCY')} rules={validationRules.requiredValidation}>
                   <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
                     {currencyList &&
                       Object.entries(currencyList).map(([key, value], i) => (
@@ -844,10 +841,10 @@ const Session = ({ match, history }) => {
                 <Form.Item
                   {...(!isMobileDevice && profileFormTailLayout)}
                   name="price"
-                  extra="Set your price"
+                  extra={t('SESSION_PRICE_HELP_TEXT')}
                   rules={validationRules.requiredValidation}
                 >
-                  <InputNumber min={1} placeholder="Amount" />
+                  <InputNumber min={1} placeholder={t('AMOUNT')} />
                 </Form.Item>
               </>
             )}
@@ -855,13 +852,13 @@ const Session = ({ match, history }) => {
             {!isSessionFree && (
               <Form.Item
                 name="is_refundable"
-                label="Refundable"
+                label={t('REFUNDABLE')}
                 rules={validationRules.requiredValidation}
                 onChange={handleSessionRefundable}
               >
                 <Radio.Group>
-                  <Radio value="Yes">Yes</Radio>
-                  <Radio value="No">No</Radio>
+                  <Radio value="Yes">{t('YES')}</Radio>
+                  <Radio value="No">{t('NO')}</Radio>
                 </Radio.Group>
               </Form.Item>
             )}
@@ -870,21 +867,21 @@ const Session = ({ match, history }) => {
               <>
                 <Form.Item
                   {...(!isMobileDevice && profileFormItemLayout)}
-                  label="Cancellable Before"
+                  label={t('CANCELLABLE_BEFORE')}
                   name="refund_before_hours"
-                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
+                  extra={t('SESSION_REFUNDABLE_HELP_TEXT')}
                   rules={validationRules.requiredValidation}
                   onChange={handleRefundBeforeHoursChange}
                 >
-                  <InputNumber value={refundBeforeHours} min={0} placeholder="Hours limit" />
-                  <span className="ant-form-text"> hour(s) before the session starts </span>
+                  <InputNumber value={refundBeforeHours} min={0} placeholder={t('HOURS_LIMIT')} />
+                  <span className="ant-form-text"> {t('HOURS_BEFORE_THE_SESSION_STARTS')} </span>
                 </Form.Item>
               </>
             )}
           </>
           <Form.Item
             name="color_code"
-            label="Color Tag"
+            label={t('COLOR_CODE')}
             rules={validationRules.requiredValidation}
             style={{ marginTop: 32 }}
           >
@@ -900,17 +897,17 @@ const Session = ({ match, history }) => {
 
         {/* ========= SESSION SCHEDULE =========== */}
         <Section>
-          <Title level={4}>2. Session Schedule</Title>
+          <Title level={4}>2. {t('SESSION_SCHEDULE')}</Title>
 
           <Form.Item
             name="recurring"
-            label="Session Recurrance"
+            label={t('SESSION_RECURRANCE')}
             rules={validationRules.requiredValidation}
             onChange={handleSessionRecurrance}
           >
             <Radio.Group>
-              <Radio value={false}>One Time Session</Radio>
-              <Radio value={true}>Repeating Sessions</Radio>
+              <Radio value={false}>{t('ONE_TIME_SESSION')}</Radio>
+              <Radio value={true}>{t('REPEATING_SESSIONS')}</Radio>
             </Radio.Group>
           </Form.Item>
 
@@ -921,8 +918,8 @@ const Session = ({ match, history }) => {
               {...(!isMobileDevice && profileFormTailLayout)}
               layout="vertical"
             >
-              <Text>First Session Date: </Text>
-              <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> Last Session Date:</Text> <br />
+              <Text>{t('FIRST_SESSION_DATE')}: </Text>
+              <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> {t('LAST_SESSION_DATE')}:</Text> <br />
               <RangePicker
                 className={styles.rangePicker}
                 defaultValue={recurringDatesRanges}
@@ -947,13 +944,13 @@ const Session = ({ match, history }) => {
           <Row justify="center">
             <Col flex={4}>
               <Title level={4} className={styles.scheduleCount}>
-                {session?.inventory?.length || 0} Schedules will be created
+                {session?.inventory?.length || 0} {t('SCHEDULES_WILL_BE_CREATED')}
               </Title>
             </Col>
             <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
               <Form.Item>
                 <Button htmlType="submit" type="primary">
-                  Publish
+                  {t('PUBLISH')}
                 </Button>
               </Form.Item>
             </Col>

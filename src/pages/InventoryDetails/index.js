@@ -107,7 +107,7 @@ const InventoryDetails = ({ match, history }) => {
         history.push(Routes.root);
       }
     },
-    [history]
+    [history, translate]
   );
 
   const getUsablePassesForUser = async () => {

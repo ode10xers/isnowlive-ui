@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Image, Space, Typography } from 'antd';
 import {
@@ -22,6 +23,8 @@ import styles from './styles.module.scss';
 const { Title } = Typography;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  const { t } = useTranslation();
+
   return (
     <Row className={styles.imageWrapper} gutter={[8, 8]}>
       {showCoverImage && (
@@ -48,7 +51,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </div>
           <div className={styles.shareButton}>
             <Share
-              label="Share"
+              label={t('SHARE')}
               shareUrl={generateUrlFromUsername(profile.username)}
               title={`${profile.first_name} ${profile.last_name}`}
             />

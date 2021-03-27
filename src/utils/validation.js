@@ -1,26 +1,28 @@
+import { i18n } from 'utils/i18n';
+
 const validationRules = {
-  nameValidation: [{ required: true, message: 'Please input name' }],
+  nameValidation: [{ required: true, message: i18n.t('NAME_VALIDATION_MESSAGE') }],
   publicUrlValidation: [
-    { required: true, message: 'Please input public URL' },
+    { required: true, message: i18n.t('PUBLIC_URL_REQUIRED_VALIDATION_MESSAGE') },
     {
       pattern: new RegExp('^[a-z]*$'),
-      message: 'Public URL can only contain lowercase letters',
+      message: i18n.t('PUBLIC_URL_LOWERCASE_VALIDATION_MESSAGE'),
     },
   ],
-  emailValidation: [{ type: 'email', required: true, message: 'Please input your email' }],
-  passwordValidation: [{ required: true, message: 'Please input your password' }],
-  requiredValidation: [{ required: true, message: 'This field is required.' }],
+  emailValidation: [{ type: 'email', required: true, message: i18n.t('EMAIL_REQUIRED_VALIDATION_MESSAGE') }],
+  passwordValidation: [{ required: true, message: i18n.t('PASSWORD_REQUIRED_VALIDATION_MESSAGE') }],
+  requiredValidation: [{ required: true, message: i18n.t('FIELD_REQUIRED_VALIDATION_MESSAGE') }],
   arrayValidation: [
     {
       type: 'array',
       required: true,
-      message: 'Please select at least one item',
+      message: i18n.t('ARRAY_REQUIRED_VALIDATION_MESSAGE'),
       min: 1,
       // validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
     },
   ],
   numberValidation: (message, min = 0, maxLimited = true, max = 10000) => {
-    const errorMessage = message || `Please input valid amount (${min} - ${max})`;
+    const errorMessage = message || `${i18n.t('NUMBER_RANGE_DEFAULT_VALIDATION_MESSAGE')} (${min} - ${max})`;
     const invalidValue = (value) => value === undefined || value === null || value < min || (maxLimited && value > max);
 
     return [
@@ -34,11 +36,11 @@ const validationRules = {
   discountCodeValidation: [
     {
       required: true,
-      message: 'Please input a discount code',
+      message: i18n.t('DISCOUNT_CODE_REQUIRED_VALIDATION_MESSAGE'),
     },
     {
       pattern: new RegExp('^[a-zA-Z0-9]*$'),
-      message: 'Discount code should only contain letters or numbers',
+      message: i18n.t('DISCOUNT_CODE_FORMAT_VALIDATION_MESSAGE'),
     },
   ],
 };

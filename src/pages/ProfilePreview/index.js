@@ -89,7 +89,7 @@ const ProfilePreview = ({ username = null }) => {
       message.error(translate('FAIL_TO_LOAD_PROFILE'));
       setIsLoading(false);
     }
-  }, [username]);
+  }, [username, translate]);
 
   const getSessionDetails = useCallback(
     async (type) => {
