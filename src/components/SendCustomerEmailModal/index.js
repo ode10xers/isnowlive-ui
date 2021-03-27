@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Form, Modal, Tooltip, Input, Select, Typography, Button } from 'antd';
 import { FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
@@ -25,6 +26,8 @@ const formInitialValues = {
 };
 
 const SendCustomerEmailModal = () => {
+  const { t } = useTranslation();
+
   const {
     state: { emailPopupVisible, emailPopupData },
     hideSendEmailPopup,
@@ -92,11 +95,11 @@ const SendCustomerEmailModal = () => {
       const { status } = await apis.user.sendProductEmailToCustomers(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Emails sent');
+        showSuccessModal(t('EMAILS_SENT'));
         hideSendEmailPopup();
       }
     } catch (error) {
-      showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
+      showErrorModal(t('FAILED_TO_SEND_EMAILS'), error?.response?.data?.message || t('SOMETHING_WENT_WRONG'));
     }
 
     setSubmitting(false);
@@ -104,7 +107,7 @@ const SendCustomerEmailModal = () => {
 
   return (
     <Modal
-      title={<Title level={5}> Send email to customers </Title>}
+      title={<Title level={5}> {t('SEND_CUSTOMER_EMAIL')} </Title>}
       visible={emailPopupVisible}
       centered={true}
       onCancel={() => hideSendEmailPopup()}
@@ -125,20 +128,20 @@ const SendCustomerEmailModal = () => {
               {...sendCustomerEmailFormLayout}
               id="recipients"
               name="recipients"
-              label="Recipients"
+              label={t('RECIPIENTS')}
               rules={validationRules.arrayValidation}
             >
               <Select
                 showArrow
                 showSearch
-                placeholder="Select the recipients"
+                placeholder={t('SELECT_THE_RECIPIENTS')}
                 mode="multiple"
                 maxTagCount="responsive"
                 values={selectedRecipients}
                 optionLabelProp="label"
               >
                 <Select.OptGroup
-                  label={<Text className={styles.optionSeparatorText}> Active User </Text>}
+                  label={<Text className={styles.optionSeparatorText}> {t('ACTIVE_USER')} </Text>}
                   key="Active User"
                 >
                   {validRecipients?.active?.map((recipient) => (
@@ -146,10 +149,10 @@ const SendCustomerEmailModal = () => {
                       {recipient.name}
                     </Select.Option>
                   ))}
-                  {validRecipients?.active?.length <= 0 && <Text disabled> No active user </Text>}
+                  {validRecipients?.active?.length <= 0 && <Text disabled> {t('NO_ACTIVE_USER')} </Text>}
                 </Select.OptGroup>
                 <Select.OptGroup
-                  label={<Text className={styles.optionSeparatorText}> Expired User </Text>}
+                  label={<Text className={styles.optionSeparatorText}> {t('EXPIRED_USER')} </Text>}
                   key="Expired User"
                 >
                   {validRecipients?.expired?.map((recipient) => (
@@ -157,7 +160,7 @@ const SendCustomerEmailModal = () => {
                       {recipient.name}
                     </Select.Option>
                   ))}
-                  {validRecipients?.expired?.length <= 0 && <Text disabled> No expired user </Text>}
+                  {validRecipients?.expired?.length <= 0 && <Text disabled> {t('NO_EXPIRED_USER')} </Text>}
                 </Select.OptGroup>
               </Select>
             </Form.Item>
@@ -167,21 +170,21 @@ const SendCustomerEmailModal = () => {
               {...sendCustomerEmailFormLayout}
               id="subject"
               name="subject"
-              label="Email Subject"
+              label={t('EMAIL_SUBJECT')}
               rules={validationRules.requiredValidation}
             >
-              <Input placeholder="Subject of the email goes here" />
+              <Input placeholder={t('SUBJECT_OF_THE_EMAIL')} />
             </Form.Item>
           </Col>
           <Col xs={24}>
             <Form.Item
               {...sendCustomerEmailBodyFormLayout}
-              label="Email Body"
+              label={t('EMAIL_BODY')}
               name="emailBody"
               id="emailBody"
               rules={validationRules.requiredValidation}
             >
-              <TextEditor name="emailBody" form={form} placeholder="Content of the email goes here" />
+              <TextEditor name="emailBody" form={form} placeholder={t('CONTENT_OF_THE_EMAIL')} />
             </Form.Item>
           </Col>
           <Col xs={24}>
@@ -193,7 +196,7 @@ const SendCustomerEmailModal = () => {
                     value={emailDocumentUrl}
                     onChange={setEmailDocumentUrl}
                     listType="text"
-                    label="Upload a PDF file"
+                    label={t('UPLOAD_A_PDF_FILE')}
                   />
                 </Col>
                 {emailDocumentUrl && (
@@ -207,7 +210,7 @@ const SendCustomerEmailModal = () => {
                     >
                       {emailDocumentUrl.split('_').slice(-1)[0]}
                     </Button>
-                    <Tooltip title="Remove this file">
+                    <Tooltip title={t('REMOVE_THIS_FILE')}>
                       <Button
                         danger
                         type="text"
@@ -225,12 +228,12 @@ const SendCustomerEmailModal = () => {
         <Row justify="end" align="center" gutter={16}>
           <Col xs={12} md={6}>
             <Button block type="default" onClick={() => hideSendEmailPopup()} loading={submitting}>
-              Cancel
+              {t('CANCEL')}
             </Button>
           </Col>
           <Col xs={12} md={6}>
             <Button block type="primary" htmlType="submit" loading={submitting}>
-              Send Email
+              {t('SEND_EMAIL')}
             </Button>
           </Col>
         </Row>
