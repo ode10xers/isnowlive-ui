@@ -281,7 +281,7 @@ const SessionsInventories = ({ match }) => {
       title: translate('SESSION_NAME'),
       dataIndex: 'name',
       key: 'name',
-      width: '150px',
+      width: isPast ? '320px' : '150px',
       render: (text, record) => {
         if (record.is_date) {
           return {
@@ -341,7 +341,7 @@ const SessionsInventories = ({ match }) => {
     },
     {
       title: translate('ACTIONS'),
-      // width: isPast ? '56px' : '360px',
+      width: isPast ? '70px' : '360px',
       render: (text, record) => {
         if (record.is_date) {
           return emptyTableCell;

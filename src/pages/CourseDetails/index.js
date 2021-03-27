@@ -20,14 +20,7 @@ import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import {
-  isAPISuccess,
-  tagColors,
-  getRandomTagColor,
-  reservedDomainName,
-  generateUrlFromUsername,
-  courseType,
-} from 'utils/helper';
+import { isAPISuccess, tagColors, getRandomTagColor, generateUrlFromUsername, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -106,10 +99,7 @@ const CourseDetails = ({ match, history }) => {
     }
 
     if (match.params.course_id) {
-      const domainUsername = window.location.hostname.split('.')[0];
-      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
-        getCourseDetails(match.params.course_id);
-      }
+      getCourseDetails(match.params.course_id);
     } else {
       setIsLoading(false);
       message.error(translate('COURSE_DETAILS_NOT_FOUND'));

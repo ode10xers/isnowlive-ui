@@ -115,8 +115,8 @@ const SessionsInventories = ({ match }) => {
         }
       } catch (error) {
         showErrorModal(translate('SOMETHING_WENT_WRONG'), error.response?.data?.message);
-        setIsLoading(false);
       }
+      setIsLoading(false);
     },
     [translate]
   );
