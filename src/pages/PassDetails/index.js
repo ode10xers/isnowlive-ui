@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, message } from 'antd';
 import classNames from 'classnames';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
+
+// import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -19,7 +19,7 @@ import { isAPISuccess, reservedDomainName, orderType, productType } from 'utils/
 
 import styles from './style.module.scss';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+const stripePromise = null;
 
 const { Title, Text } = Typography;
 

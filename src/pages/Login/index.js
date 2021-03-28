@@ -28,6 +28,7 @@ const { Password } = Input;
 const { user } = mixPanelEventTags;
 
 const Login = ({ history }) => {
+
   const [loginForm] = Form.useForm();
   const [emailPasswordForm] = Form.useForm();
   const { state, logIn } = useGlobalContext();
