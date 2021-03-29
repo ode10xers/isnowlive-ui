@@ -18,7 +18,6 @@ export const createPaymentSessionForOrder = async (payload) => {
 };
 
 export const verifyPaymentForOrder = async (payload) => {
-
   const { order_type } = payload;
 
   try {
@@ -27,9 +26,8 @@ export const verifyPaymentForOrder = async (payload) => {
     if (isAPISuccess(status)) {
       return order_type;
     }
-
   } catch (error) {
     message.error(error.response?.data?.message || 'Something went wrong.');
     return null;
   }
-}
+};

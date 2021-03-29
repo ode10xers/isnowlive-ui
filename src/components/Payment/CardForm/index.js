@@ -78,10 +78,12 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
     const orderResponse = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
 
     if (orderResponse) {
-      const paymentSessionRes = await createPaymentSessionForOrder({ order_id: orderResponse.payment_order_id, order_type: orderResponse.payment_order_type });
+      const paymentSessionRes = await createPaymentSessionForOrder({
+        order_id: orderResponse.payment_order_id,
+        order_type: orderResponse.payment_order_type,
+      });
 
       if (paymentSessionRes) {
-
         const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, cardEl);
 
         if (paymentRes) {
@@ -113,15 +115,11 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
           if (verifyOrderRes === orderType.COURSE) {
             showCourseBookingSuccessModal(userDetails.email, username);
           }
-
         } else {
           alert('error in payment');
         }
-
       }
-
     }
-
   };
 
   return (
@@ -139,7 +137,14 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
         />
       </Col>
       <Col xs={24} className={styles.mt30}>
-        <Button block size="middle" type="primary" disabled={isButtonDisabled} onClick={handleSubmit} className={styles.greenBtn}>
+        <Button
+          block
+          size="middle"
+          type="primary"
+          disabled={isButtonDisabled}
+          onClick={handleSubmit}
+          className={styles.greenBtn}
+        >
           {text}
         </Button>
       </Col>

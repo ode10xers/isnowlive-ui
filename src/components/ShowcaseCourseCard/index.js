@@ -132,7 +132,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
-        payment_source: 'PAYMENT_GATEWAY' // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION 
+        payment_source: 'PAYMENT_GATEWAY', // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
       });
 
       if (isAPISuccess(status) && data) {
@@ -140,13 +140,13 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
           return {
             ...data,
             payment_order_type: orderType.COURSE,
-            payment_order_id: data.course_order_id
-          }
+            payment_order_id: data.course_order_id,
+          };
 
           // initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
-          
+
           showCourseBookingSuccessModal(userEmail, username);
           setSelectedCourse(null);
           return null;
