@@ -127,4 +127,5 @@ $spacing: (
 .greenBtn {
   background-color: map-get($map: $colors, $key: 'KellyGreen') !important;
   border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
 }

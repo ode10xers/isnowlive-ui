@@ -1,22 +1,43 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { Button, Row, Col } from 'antd';
 import { useHistory } from 'react-router-dom';
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { Button, Row, Col, message } from 'antd';
+
+import apis from 'apis';
+
+import { showCourseBookingSuccessModal, showBookingSuccessModal } from 'components/Modals/modals';
+
+import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
+import { orderType, isAPISuccess } from 'utils/helper';
+
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import { useState } from 'react';
-import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
-import { useGlobalContext } from 'services/globalContext';
-import { orderType, isAPISuccess } from 'utils/helper';
-import { showCourseBookingSuccessModal, showBookingSuccessModal } from 'components/Modals/modals';
-import apis from 'apis';
-import { message } from 'antd';
+import classNames from 'classnames';
 
+// Additional CardOptions Reference:
+// https://stripe.com/docs/stripe-js/react#customization-and-styling
+// https://codesandbox.io/s/react-stripe-js-card-detailed-omfb3?file=/src/App.js:410-877
 const useOptions = () => {
   const options = useMemo(
     () => ({
       hidePostalCode: true,
+      iconStyle: 'solid',
+      style: {
+        base: {
+          iconColor: '#1890ff',
+          color: '#000',
+          fontWeight: 500,
+          fontSize: '16px',
+          fontFamily:
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+        },
+        invalid: {
+          iconColor: '#ff4d4f',
+          color: '#ff4d4f',
+        },
+      },
     }),
     []
   );
@@ -24,7 +45,7 @@ const useOptions = () => {
   return options;
 };
 
-const CardForm = ({ btnProps, onBeforePayment, form }) => {
+const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
   const { text = 'PAY' } = btnProps;
 
   const {
@@ -36,6 +57,7 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
   const options = useOptions();
   const history = useHistory();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   console.log('history', history);
 
@@ -80,12 +102,13 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setIsSubmitting(true);
     console.log('history', history);
 
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet. Make sure to disable
       // form submission until Stripe.js has loaded.
+      setIsSubmitting(false);
       return;
     }
 
@@ -127,25 +150,26 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
           });
 
           const username = window.location.hostname.split('.')[0];
-
           // TODO: Need to move all this post verification stuff to other place
           if (verifyOrderRes === orderType.COURSE) {
             showCourseBookingSuccessModal(userDetails.email, username);
           } else {
             const orderDetails = await getAttendeeOrderDetails(orderResponse.payment_order_id);
-
             showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
           }
+
+          onAfterPayment();
         } else {
           alert('error in payment');
         }
       }
     }
+    setIsSubmitting(false);
   };
 
   return (
     <Row>
-      <Col xs={24}>
+      <Col xs={24} className={styles.inlineCardForm}>
         <CardElement
           options={options}
           onChange={(event) => {
@@ -164,7 +188,8 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
           type="primary"
           disabled={isButtonDisabled}
           onClick={handleSubmit}
-          className={styles.greenBtn}
+          className={classNames(styles.greenBtn, isButtonDisabled ? styles.disabledBtn : undefined)}
+          loading={isSubmitting}
         >
           {text}
         </Button>
