@@ -4,6 +4,9 @@ import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
+// import { loadStripe } from "@stripe/stripe-js";
+
+// import config from 'config';
 
 const Context = createContext(null);
 
@@ -69,6 +72,11 @@ const reducer = (state, action) => {
           productType: null,
         },
       };
+    case 'INIT_STRIPE': 
+      return {
+        ...state,
+        stripePromise: action.payload
+      }
     default:
       return state;
   }
@@ -92,6 +100,7 @@ const GlobalDataProvider = ({ children }) => {
       productId: null,
       productType: null,
     },
+    // stripePromise: null,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -148,6 +157,11 @@ const GlobalDataProvider = ({ children }) => {
     resetMixPanel();
   }
 
+  // function initStripe() {
+  //   const stripePromise = null;
+  //   dispatch({ type: 'INIT_STRIPE', payload: stripePromise });
+  // }
+
   const value = {
     state,
     logOut,
@@ -159,6 +173,7 @@ const GlobalDataProvider = ({ children }) => {
     hidePaymentPopup,
     showSendEmailPopup,
     hideSendEmailPopup,
+    // initStripe
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

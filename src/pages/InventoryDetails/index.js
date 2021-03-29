@@ -3,9 +3,9 @@ import { Row, Col, message, Typography } from 'antd';
 import classNames from 'classnames';
 import moment from 'moment';
 import ReactHtmlParser from 'react-html-parser';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
+
+// import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -39,7 +39,7 @@ import {
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+const stripePromise = null;
 
 const { Title } = Typography;
 const {

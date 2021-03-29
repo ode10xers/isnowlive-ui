@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
+
 
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
-import config from 'config';
+// import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -21,7 +21,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+const stripePromise = null;
 
 const { Text } = Typography;
 const {
