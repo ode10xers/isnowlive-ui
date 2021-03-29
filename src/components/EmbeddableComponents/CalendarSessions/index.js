@@ -129,11 +129,8 @@ const CalendarSessions = () => {
 
     // Some front end checks to prevent the logic below from breaking
     if (!selectedInventory) {
-      // message.error('Invalid session schedule selected');
-      return {
-        status: 'INVALID',
-        message: 'Invalid session schedule selected',
-      };
+      message.error('Invalid session schedule selected');
+      return null;
     }
 
     setIsSessionLoading(true);
@@ -158,7 +155,6 @@ const CalendarSessions = () => {
           //   order_type: orderType.CLASS,
           // });
           return {
-            status: 'SUCCESS',
             ...data,
             payment_order_type: orderType.CLASS,
             payment_order_id: data.order_id,
@@ -172,7 +168,6 @@ const CalendarSessions = () => {
           setSelectedInventory(null);
           return {
             ...data,
-            status: 'SUCCESS',
             order_type: orderType.CLASS,
             payment_order_id: data.order_id,
           };
@@ -191,9 +186,7 @@ const CalendarSessions = () => {
         showAlreadyBookedModal(productType.PASS, profileUsername);
       }
 
-      return {
-        status: 'ERROR',
-      };
+      return null;
     }
   };
 

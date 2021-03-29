@@ -132,7 +132,7 @@ export const showBookingSuccessModal = (
             <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
           </>
         )}
-        <div classname={styles.mt20}>
+        <div className={styles.mt20}>
           <Row justify="end" gutter={10}>
             {(isContinuedFlow || !userPass) && orderDetails && (
               <Col>
