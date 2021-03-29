@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 
-
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
 // import config from 'config';
@@ -106,6 +105,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
 
     const paymentPopupData = {
       productId: selectedCourse.id,
+      productType: 'COURSE',
       itemList: [
         {
           name: selectedCourse.name,

@@ -1,13 +1,15 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
 
-import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
-import { Button, Row, Col } from "antd";
-import { useHistory } from "react-router-dom";
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
+import { Button, Row, Col } from 'antd';
+import { useHistory } from 'react-router-dom';
+
+import styles from './styles.module.scss';
 
 const useOptions = () => {
   const options = useMemo(
     () => ({
-      hidePostalCode: true
+      hidePostalCode: true,
     }),
     []
   );
@@ -16,7 +18,6 @@ const useOptions = () => {
 };
 
 const CardForm = ({ btnProps, onBeforePayment, form }) => {
-
   const { text = 'PAY' } = btnProps;
 
   const stripe = useStripe();
@@ -25,24 +26,22 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
   const history = useHistory();
 
   const makePayment = async (secret, cardEl) => {
-
     try {
       const result = await stripe.confirmCardPayment(secret, {
         payment_method: {
           card: cardEl,
         },
-        setup_future_usage: 'off_session'
+        setup_future_usage: 'off_session',
       });
 
-
-      console.log("SavedCardCheckout", result)
+      console.log('SavedCardCheckout', result);
       if (result.error) {
         // Show error to your customer
-        console.log("SavedCardCheckout Error", result.error.message);
+        console.log('SavedCardCheckout Error', result.error.message);
         return false;
       } else {
         if (result.paymentIntent) {
-          console.log("SavedCardCheckout Success", result.paymentIntent)
+          console.log('SavedCardCheckout Success', result.paymentIntent);
           return true;
           // Show a success message to your customer
           // There's a risk of the customer closing the window before callback execution
@@ -52,12 +51,11 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
           // The PaymentMethod ID can be found on result.paymentIntent.payment_method
         }
       }
-
     } catch (e) {
-      console.log("SavedCardCheckout Error", e);
+      console.log('SavedCardCheckout Error', e);
       return false;
     }
-  }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -70,17 +68,25 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
 
     const cardEl = elements.getElement(CardElement);
 
-    const value = await onBeforePayment(form.getFieldsValue());
+    const value = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
 
-    const res = await makePayment(value.payment_gateway_session_token, cardEl);
-    console.log('makePayment Completed');
+    if (value) {
+      console.log('makePayment Completed');
 
-    if (res) {
-      history.push(`/stripe/payment/success?order_id=${value.order_id}&transaction_id=${value.transaction_id}&order_type=${'SESSION_ORDER'}`)
+      const res = await makePayment(value.payment_gateway_session_token, cardEl);
+
+      if (res) {
+        history.push(
+          `/stripe/payment/success?order_id=${value.order_id}&transaction_id=${
+            value.transaction_id
+          }&order_type=${'SESSION_ORDER'}`
+        );
+      } else {
+        alert('error in payment');
+      }
     } else {
-      alert('error in payment');
+      console.log('onBeforePayment returned null');
     }
-
   };
 
   // const disableBtn = () => {
@@ -99,26 +105,25 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
         <CardElement
           options={options}
           onReady={() => {
-            console.log("CardElement [ready]");
+            console.log('CardElement [ready]');
           }}
-          onChange={event => {
-            console.log("CardElement [change]", event);
+          onChange={(event) => {
+            console.log('CardElement [change]', event);
           }}
           onBlur={() => {
-            console.log("CardElement [blur]");
+            console.log('CardElement [blur]');
           }}
           onFocus={() => {
-            console.log("CardElement [focus]");
+            console.log('CardElement [focus]');
           }}
         />
       </Col>
       <Col xs={24} style={{ marginTop: '30px' }}>
-        <Button block size="middle" type="primary" onClick={handleSubmit}>
+        <Button block size="middle" type="primary" onClick={handleSubmit} className={styles.greenBtn}>
           {text}
         </Button>
       </Col>
     </Row>
-
   );
 };
 
