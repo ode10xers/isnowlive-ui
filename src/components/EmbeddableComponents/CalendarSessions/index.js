@@ -51,7 +51,7 @@ const CalendarSessions = () => {
   const profileUsername = window.location.hostname.split('.')[0] || '';
 
   const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session.username || 'app');
+    const baseUrl = generateUrlFromUsername(session.creator_username || 'app');
     window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
