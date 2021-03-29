@@ -55,10 +55,10 @@ const PaymentPopup = () => {
   const handleInitiatePayment = async () => {
     const appliedCouponCode = couponApplied ? couponCode : '';
 
-    const resultPromise = await paymentPopupCallback(userDetails.email, appliedCouponCode);
+    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
 
-    if (resultPromise) {
-      return resultPromise;
+    if (result) {
+      return result;
     } else {
       return null;
     }

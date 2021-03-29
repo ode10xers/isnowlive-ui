@@ -174,6 +174,7 @@ const CalendarSessions = () => {
             ...data,
             status: 'SUCCESS',
             order_type: orderType.CLASS,
+            payment_order_id: data.order_id,
           };
         }
       }
