@@ -62,6 +62,7 @@ const PaymentVerification = () => {
 
           if (isAPISuccess(status)) {
             if (order_type === orderType.PASS) {
+              // It's a pass purchase
               let usersPass = null;
               const userPassResponse = await apis.passes.getAttendeePasses();
               if (isAPISuccess(userPassResponse.status)) {
@@ -71,6 +72,8 @@ const PaymentVerification = () => {
               }
 
               if (inventory_id) {
+                // if inventory_id is present in query params
+                // it is the BUY PASS AND BOOK CLASS flow
                 try {
                   //Continue to book the class after Pass Purchase is successful
                   const followUpBooking = await apis.session.createOrderForUser({
@@ -105,6 +108,8 @@ const PaymentVerification = () => {
                   }
                 }
               } else if (video_id) {
+                // if video_id is present in query params
+                // it is the BUY PASS AND GET VIDEO flow
                 try {
                   // Continue to book the video after Pass Purchase is successful
                   const followUpGetVideo = await apis.videos.createOrderForUser({
@@ -131,6 +136,8 @@ const PaymentVerification = () => {
                   }
                 }
               } else {
+                // if both inventory_id and video_id is not present
+                // it is just a BUY PASS flow
                 showBookingSuccessModal(
                   userDetails.email,
                   { ...usersPass, name: usersPass.pass_name },
@@ -140,6 +147,7 @@ const PaymentVerification = () => {
                 );
               }
             } else if (order_type === orderType.VIDEO) {
+              // it is a video purchase
               const { data } = await apis.videos.getAttendeeVideos();
 
               if (data) {
@@ -147,8 +155,11 @@ const PaymentVerification = () => {
                 showVideoPurchaseSuccessModal(userDetails.email, purchasedVideo, null, false, true, username);
               }
             } else if (order_type === orderType.COURSE) {
+              // it is a video purchase
+
               showCourseBookingSuccessModal(userDetails.email, username);
             } else {
+              // it is a session purchase
               const orderDetails = await getAttendeeOrderDetails(order_id);
 
               showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
