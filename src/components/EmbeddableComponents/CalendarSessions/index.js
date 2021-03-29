@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { message, Empty } from 'antd';
-// import { loadStripe } from '@stripe/stripe-js';
 
-// import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -17,8 +15,6 @@ import { useGlobalContext } from 'services/globalContext';
 
 // eslint-disable-next-line
 import styles from './styles.scss';
-
-// const stripePromise = loadStripe(config.stripe.secretKey);
 
 const {
   formatDate: { toLocaleTime },
@@ -124,26 +120,8 @@ const CalendarSessions = () => {
     return null;
   };
 
-  const initiatePaymentForOrder = async (payload) => {
-    try {
-      const { status, data } = await apis.payment.createPaymentSessionForOrder(payload);
-
-      if (isAPISuccess(status) && data) {
-        // const stripe = await stripePromise;
-        // const result = await stripe.redirectToCheckout({
-        //   sessionId: data.payment_gateway_session_id,
-        // });
-
-        // if (result.error) {
-        //   message.error('Cannot initiate payment at this time, please try again...');
-        // }
-        return data;
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
+  // User Email is only passed for the modals, but for now we can ignore it
+  // The modal can get the email from local storaage, so I'll remove it from here later
   const createOrder = async (userEmail, couponCode = '') => {
     // Currently discount engine has not been implemented for session
     // however this form of createOrder will be what is used to accomodate
@@ -151,7 +129,7 @@ const CalendarSessions = () => {
 
     if (!selectedInventory) {
       message.error('Invalid session schedule selected');
-      return;
+      return null;
     }
 
     setIsSessionLoading(true);
@@ -169,11 +147,17 @@ const CalendarSessions = () => {
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          return await initiatePaymentForOrder({
-            order_id: data.order_id,
+          // return await initiatePaymentForOrder({
+          //   order_id: data.order_id,
+          //   order_type: orderType.CLASS,
+          // });
+          return {
+            ...data,
             order_type: orderType.CLASS,
-          });
+          };
         } else {
+          // Show confirmation message for free products
+          // Ideally this should happen in PaymentPopup logic
           const orderDetails = await getAttendeeOrderDetails(data.order_id);
           showBookingSuccessModal(userEmail, null, false, false, profileUsername, orderDetails);
 
@@ -192,7 +176,6 @@ const CalendarSessions = () => {
       }
     }
 
-    //TODO: Confirm to Gopal what will be the behavior for not required payment case
     setIsSessionLoading(false);
     return null;
   };
