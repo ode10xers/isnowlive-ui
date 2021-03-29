@@ -160,7 +160,8 @@ const CalendarSessions = () => {
           return {
             status: 'SUCCESS',
             ...data,
-            order_type: orderType.CLASS,
+            payment_order_type: orderType.CLASS,
+            payment_order_id: data.order_id,
           };
         } else {
           // Show confirmation message for free products

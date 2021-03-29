@@ -8,8 +8,10 @@ import styles from './styles.module.scss';
 import { useState } from 'react';
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 import { useGlobalContext } from 'services/globalContext';
-import { orderType } from 'utils/helper';
-import { showCourseBookingSuccessModal } from 'components/Modals/modals';
+import { orderType, isAPISuccess } from 'utils/helper';
+import { showCourseBookingSuccessModal, showBookingSuccessModal } from 'components/Modals/modals';
+import apis from 'apis';
+import { message } from 'antd';
 
 const useOptions = () => {
   const options = useMemo(
@@ -62,6 +64,20 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
     }
   };
 
+  const getAttendeeOrderDetails = async (orderId) => {
+    try {
+      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        return data.find((orderDetails) => orderDetails.order_id === orderId);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -112,8 +128,13 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
 
           const username = window.location.hostname.split('.')[0];
 
+          // TODO: Need to move all this post verification stuff to other place
           if (verifyOrderRes === orderType.COURSE) {
             showCourseBookingSuccessModal(userDetails.email, username);
+          } else {
+            const orderDetails = await getAttendeeOrderDetails(orderResponse.payment_order_id);
+
+            showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
           }
         } else {
           alert('error in payment');
