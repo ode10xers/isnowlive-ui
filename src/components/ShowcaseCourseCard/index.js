@@ -20,8 +20,6 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
-const stripePromise = null;
-
 const { Text } = Typography;
 const {
   formatDate: { toShortDateWithYear },
@@ -58,7 +56,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     }
   }, [history]);
 
-  const initiatePaymentForOrder = async (orderDetails) => {
+  /* const initiatePaymentForOrder = async (orderDetails) => {
     setIsLoading(true);
 
     try {
@@ -85,7 +83,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
     }
-  };
+  }; */
 
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
@@ -134,16 +132,24 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
+        payment_source: 'PAYMENT_GATEWAY', // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
       });
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          return {
+            ...data,
+            payment_order_type: orderType.COURSE,
+            payment_order_id: data.course_order_id,
+          };
+
+          // initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
 
           showCourseBookingSuccessModal(userEmail, username);
           setSelectedCourse(null);
+          return null;
         }
       }
     } catch (error) {

@@ -52,10 +52,10 @@ const PaymentPopup = () => {
     setDiscountedPrice(null);
   };
 
-  const handleInitiatePayment = () => {
+  const handleInitiatePayment = async () => {
     const appliedCouponCode = couponApplied ? couponCode : '';
 
-    const resultPromise = paymentPopupCallback(userDetails.email, appliedCouponCode);
+    const resultPromise = await paymentPopupCallback(userDetails.email, appliedCouponCode);
 
     if (resultPromise) {
       return resultPromise;
