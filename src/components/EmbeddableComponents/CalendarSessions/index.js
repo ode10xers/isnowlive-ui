@@ -127,9 +127,13 @@ const CalendarSessions = () => {
     // however this form of createOrder will be what is used to accomodate
     // the new Payment Popup
 
+    // Some front end checks to prevent the logic below from breaking
     if (!selectedInventory) {
-      message.error('Invalid session schedule selected');
-      return null;
+      // message.error('Invalid session schedule selected');
+      return {
+        status: 'INVALID',
+        message: 'Invalid session schedule selected',
+      };
     }
 
     setIsSessionLoading(true);
@@ -146,12 +150,15 @@ const CalendarSessions = () => {
       const { status, data } = await apis.session.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsSessionLoading(false);
+
         if (data.payment_required) {
           // return await initiatePaymentForOrder({
           //   order_id: data.order_id,
           //   order_type: orderType.CLASS,
           // });
           return {
+            status: 'SUCCESS',
             ...data,
             order_type: orderType.CLASS,
           };
@@ -162,9 +169,16 @@ const CalendarSessions = () => {
           showBookingSuccessModal(userEmail, null, false, false, profileUsername, orderDetails);
 
           setSelectedInventory(null);
+          return {
+            ...data,
+            status: 'SUCCESS',
+            order_type: orderType.CLASS,
+          };
         }
       }
     } catch (error) {
+      setIsSessionLoading(false);
+
       message.error(error.response?.data?.message || 'Something went wrong');
 
       if (
@@ -174,10 +188,11 @@ const CalendarSessions = () => {
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS, profileUsername);
       }
-    }
 
-    setIsSessionLoading(false);
-    return null;
+      return {
+        status: 'ERROR',
+      };
+    }
   };
 
   const showConfirmPaymentPopup = () => {
