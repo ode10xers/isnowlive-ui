@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
 
@@ -9,7 +9,6 @@ import CardForm from 'components/Payment/CardForm';
 // import { useGlobalContext } from 'services/globalContext';
 
 const PaymentCard = (props) => {
-
   // const { state, initStripe } = useGlobalContext();
 
   // const { stripePromise } = state;
@@ -28,7 +27,7 @@ const PaymentCard = (props) => {
     <Elements stripe={stripePromise}>
       <CardForm {...props} />
     </Elements>
-  )
-}
+  );
+};
 
 export default PaymentCard;

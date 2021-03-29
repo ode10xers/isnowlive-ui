@@ -251,9 +251,7 @@ const SessionDetails = ({ match, history }) => {
       const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
       if (isAPISuccess(status) && data) {
-
         return data;
-
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
@@ -332,10 +330,8 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        console.log('Reached till Payment')
+        console.log('Reached till Payment');
         if (data.payment_required) {
-
-
           const resData = initiatePaymentForOrder({
             order_id: data.order_id,
             order_type: orderType.CLASS,

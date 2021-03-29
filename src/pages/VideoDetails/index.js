@@ -3,7 +3,6 @@ import { Row, Col, Typography, Space, Divider, Card, Button, Tag, message } from
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 
-
 // import config from 'config';
 import apis from 'apis';
 

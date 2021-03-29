@@ -41,7 +41,6 @@ const SessionRegistration = ({
   classDetails,
   logOut,
 }) => {
-
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -83,10 +82,10 @@ const SessionRegistration = ({
         selectedPass ? (
           <div className={styles.roundBtn} onClick={() => setSelectedPass(null)} />
         ) : (
-            <div onClick={() => setSelectedPass(null)}>
-              <CheckCircleTwoTone twoToneColor="#52c41a" />
-            </div>
-          ),
+          <div onClick={() => setSelectedPass(null)}>
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
+          </div>
+        ),
     },
     {
       title: '',
@@ -117,8 +116,8 @@ const SessionRegistration = ({
             <CheckCircleTwoTone twoToneColor="#52c41a" />
           </div>
         ) : (
-            <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
-          ),
+          <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
+        ),
     },
     {
       title: 'Pass',
@@ -159,10 +158,10 @@ const SessionRegistration = ({
             {btnText} <UpOutlined />
           </Button>
         ) : (
-            <Button className={styles.linkBtn} type="link" onClick={() => expandRow(record.id)}>
-              {btnText} <DownOutlined />
-            </Button>
-          );
+          <Button className={styles.linkBtn} type="link" onClick={() => expandRow(record.id)}>
+            {btnText} <DownOutlined />
+          </Button>
+        );
       },
     },
   ];
@@ -179,8 +178,8 @@ const SessionRegistration = ({
             <CheckCircleTwoTone twoToneColor="#52c41a" />
           </div>
         ) : (
-            <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
-          ),
+          <div className={styles.roundBtn} onClick={() => setSelectedPass(record)} />
+        ),
     },
     {
       title: 'Pass',
@@ -281,8 +280,8 @@ const SessionRegistration = ({
                     <CheckCircleTwoTone twoToneColor="#52c41a" />
                   </div>
                 ) : (
-                    <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
-                  )}
+                  <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
+                )}
               </Col>
               <Col xs={20}>
                 <Text>{pass.name}</Text>
@@ -298,10 +297,10 @@ const SessionRegistration = ({
                 Close
               </Button>
             ) : (
-                <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
-                  More
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
+                More
               </Button>
-              ),
+            ),
           ]}
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
@@ -378,8 +377,8 @@ const SessionRegistration = ({
                     <CheckCircleTwoTone twoToneColor="#52c41a" />
                   </div>
                 ) : (
-                    <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
-                  )}
+                  <div className={styles.roundBtn} onClick={() => setSelectedPass(pass)} />
+                )}
               </Col>
               <Col xs={20}>
                 <Text>{pass.name}</Text>
@@ -395,10 +394,10 @@ const SessionRegistration = ({
                 Close
               </Button>
             ) : (
-                <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
-                  More
+              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
+                More
               </Button>
-              ),
+            ),
           ]}
         >
           {layout('Credits Left', <Text>{`${pass.classes_remaining}/${pass.class_count}`}</Text>)}
@@ -465,7 +464,7 @@ const SessionRegistration = ({
             <a
               href={`${generateUrlFromUsername('app')}${Routes.attendeeDashboard.rootPath}${
                 Routes.attendeeDashboard.defaultPath
-                }`}
+              }`}
             >
               {' '}
               dashboard
@@ -511,19 +510,19 @@ const SessionRegistration = ({
                   {incorrectPassword ? (
                     <Text type="danger">Email or password you entered was incorrect, please try again</Text>
                   ) : (
-                      <div className={styles.passwordHelpText}>
-                        <Text>
-                          You have booked a session with us earlier, but if you haven't set your password, please{' '}
-                          <Button
-                            type="link"
-                            className={classNames(styles.setNewPassword, styles.linkBtn)}
-                            onClick={() => onSetNewPassword(form.getFieldsValue().email)}
-                          >
-                            set a new password
+                    <div className={styles.passwordHelpText}>
+                      <Text>
+                        You have booked a session with us earlier, but if you haven't set your password, please{' '}
+                        <Button
+                          type="link"
+                          className={classNames(styles.setNewPassword, styles.linkBtn)}
+                          onClick={() => onSetNewPassword(form.getFieldsValue().email)}
+                        >
+                          set a new password
                         </Button>
-                        </Text>
-                      </div>
-                    )}
+                      </Text>
+                    </div>
+                  )}
                 </Item>
               </>
             )}
@@ -534,10 +533,10 @@ const SessionRegistration = ({
                   Not this account? Logout
                 </Button>
               ) : (
-                  <Button className={styles.linkBtn} type="link" onClick={() => showSignInForm()}>
-                    Already have an account? Sign In
+                <Button className={styles.linkBtn} type="link" onClick={() => showSignInForm()}>
+                  Already have an account? Sign In
                 </Button>
-                )}
+              )}
             </Item>
 
             {user && userPasses.length > 0 ? (
@@ -546,66 +545,66 @@ const SessionRegistration = ({
                 {isMobileDevice ? (
                   userPasses.map(renderUserPassItem)
                 ) : (
-                    <Table
-                      size="small"
-                      columns={userPassesColumns}
-                      data={userPasses}
-                      rowKey={(record) => record.pass_order_id}
-                    />
-                  )}
+                  <Table
+                    size="small"
+                    columns={userPassesColumns}
+                    data={userPasses}
+                    rowKey={(record) => record.pass_order_id}
+                  />
+                )}
               </div>
             ) : (
-                <>
-                  {availablePasses.length > 0 ? (
-                    <>
-                      <div>
-                        <Title level={5}>
-                          {' '}
-                          Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class{' '}
-                        </Title>
+              <>
+                {availablePasses.length > 0 ? (
+                  <>
+                    <div>
+                      <Title level={5}>
+                        {' '}
+                        Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class{' '}
+                      </Title>
+                      <Table
+                        size="small"
+                        showHeader={false}
+                        columns={singleClassColumns}
+                        data={[classDetails]}
+                        rowKey={(record) => 'dropIn'}
+                      />
+                    </div>
+
+                    <div className={styles.mt20}>
+                      <Title level={5}>
+                        {' '}
+                        Buy pass & book {selectedInventory
+                          ? toLongDateWithTime(selectedInventory.start_time)
+                          : 'this'}{' '}
+                        class
+                      </Title>
+                      {isMobileDevice ? (
+                        availablePasses.map(renderPassItem)
+                      ) : (
                         <Table
                           size="small"
-                          showHeader={false}
-                          columns={singleClassColumns}
-                          data={[classDetails]}
-                          rowKey={(record) => 'dropIn'}
+                          columns={passesColumns}
+                          data={availablePasses}
+                          rowKey={(record) => record.id}
+                          expandable={{
+                            expandedRowRender: renderPassDetails,
+                            expandIconColumnIndex: -1,
+                            expandedRowKeys: expandedRowKeys,
+                          }}
                         />
-                      </div>
-
-                      <div className={styles.mt20}>
-                        <Title level={5}>
-                          {' '}
-                          Buy pass & book {selectedInventory
-                            ? toLongDateWithTime(selectedInventory.start_time)
-                            : 'this'}{' '}
-                          class
-                      </Title>
-                        {isMobileDevice ? (
-                          availablePasses.map(renderPassItem)
-                        ) : (
-                            <Table
-                              size="small"
-                              columns={passesColumns}
-                              data={availablePasses}
-                              rowKey={(record) => record.id}
-                              expandable={{
-                                expandedRowRender: renderPassDetails,
-                                expandIconColumnIndex: -1,
-                                expandedRowKeys: expandedRowKeys,
-                              }}
-                            />
-                          )}
-                      </div>
-                    </>
-                  ) : (
-                      <Item {...sessionRegistrationTailLayout}>
-                        <Title level={5}>
-                          Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <Item {...sessionRegistrationTailLayout}>
+                    <Title level={5}>
+                      Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
                     </Title>
-                      </Item>
-                    )}
-                </>
-              )}
+                  </Item>
+                )}
+              </>
+            )}
 
             <Row className={styles.mt10}>
               {user && selectedInventory && selectedPass && userPasses.length > 0 && (
@@ -622,17 +621,21 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                {user ?
+                {user ? (
                   <Col xs={24} md={24} xl={24}>
-                    <PaymentCard btnProps={{ text: 'Buy', disableCondition: !selectedInventory }} onBeforePayment={onFinish} form={form} />
+                    <PaymentCard
+                      btnProps={{ text: 'Buy', disableCondition: !selectedInventory }}
+                      onBeforePayment={onFinish}
+                      form={form}
+                    />
                   </Col>
-                  :
+                ) : (
                   <Col xs={8} md={8} xl={5}>
                     <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                       Register
                     </Button>
                   </Col>
-                }
+                )}
 
                 {!selectedInventory && (
                   <Col xs={24}>

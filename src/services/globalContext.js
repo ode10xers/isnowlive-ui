@@ -72,11 +72,11 @@ const reducer = (state, action) => {
           productType: null,
         },
       };
-    case 'INIT_STRIPE': 
+    case 'INIT_STRIPE':
       return {
         ...state,
-        stripePromise: action.payload
-      }
+        stripePromise: action.payload,
+      };
     default:
       return state;
   }

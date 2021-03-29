@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 
 import { Row, Col, message } from 'antd';
 
-
 // import config from 'config';
 import apis from 'apis';
 

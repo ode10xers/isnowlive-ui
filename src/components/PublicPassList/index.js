@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
 
-
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
