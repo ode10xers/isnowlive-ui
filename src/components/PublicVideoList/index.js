@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 
-import { Row, Col, message } from 'antd';
+import { Row, Col } from 'antd';
 
-// import config from 'config';
 import apis from 'apis';
 
 import VideoCard from 'components/VideoCard';
@@ -12,11 +11,13 @@ import { showAlreadyBookedModal, showErrorModal, showVideoPurchaseSuccessModal }
 
 import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource, productType } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
-const stripePromise = null;
-
 const PublicVideoList = ({ username = null, videos }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
@@ -28,30 +29,31 @@ const PublicVideoList = ({ username = null, videos }) => {
     }
   };
 
-  const initiatePaymentForOrder = async (payload) => {
-    setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
-
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          hideVideoDetailModal();
-        }
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
+  const showConfirmPaymentPopup = () => {
+    if (!selectedVideo) {
+      showErrorModal('Something went wrong', 'Invalid Video Selected');
+      return;
     }
-    setIsLoading(false);
+
+    const desc = `Can be watched up to ${selectedVideo.watch_limit} times, valid for ${selectedVideo.validity} days`;
+
+    const paymentPopupData = {
+      productId: selectedVideo.external_id,
+      productType: 'VIDEO',
+      itemList: [
+        {
+          name: selectedVideo.title,
+          description: desc,
+          currency: selectedVideo.currency,
+          price: selectedVideo.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail) => {
+  const createOrder = async (userEmail, couponCode = '') => {
     try {
       const payload = {
         video_id: selectedVideo?.external_id,
@@ -61,14 +63,20 @@ const PublicVideoList = ({ username = null, videos }) => {
       const { status, data } = await apis.videos.createOrderForUser(payload);
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.video_order_id,
-            order_type: orderType.VIDEO,
-          });
+          return {
+            ...data,
+            payment_order_id: data.video_order_id,
+            payment_order_type: orderType.VIDEO,
+          };
         } else {
           setIsLoading(false);
           showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
-          hideVideoDetailModal();
+
+          return {
+            ...data,
+            payment_order_id: data.video_order_id,
+            payment_order_type: orderType.VIDEO,
+          };
         }
       }
     } catch (error) {
@@ -79,12 +87,9 @@ const PublicVideoList = ({ username = null, videos }) => {
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
-    }
-  };
 
-  const hideVideoDetailModal = () => {
-    setSelectedVideo(null);
-    setShowPurchaseVideoModal(false);
+      return null;
+    }
   };
 
   const openPurchaseModal = () => {
@@ -104,7 +109,11 @@ const PublicVideoList = ({ username = null, videos }) => {
 
   return (
     <div className={styles.box}>
-      <PurchaseModal visible={showPurchaseVideoModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+      <PurchaseModal
+        visible={showPurchaseVideoModal}
+        closeModal={closePurchaseModal}
+        createOrder={showConfirmPaymentPopup}
+      />
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
           {videos?.map((video) => (

@@ -96,6 +96,9 @@ const PaymentPopup = () => {
     setDiscountedPrice(null);
     setCouponApplied(false);
 
+    //TODO: Might also want to trigger clearing the CardElement from stripe here if required
+    // But if we're showing the saved cards for the user, it won't be required
+
     hidePaymentPopup();
   };
 
@@ -143,7 +146,7 @@ const PaymentPopup = () => {
               >
                 <List.Item.Meta
                   title={item?.name}
-                  description={<Text className={styles.blueText}>{item?.description}</Text>}
+                  description={<Text className={styles.descriptionText}>{item?.description}</Text>}
                 />
               </List.Item>
             )}

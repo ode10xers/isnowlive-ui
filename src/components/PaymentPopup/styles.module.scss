@@ -4,6 +4,11 @@
   padding: 0px !important;
 }
 
+.descriptionText {
+  @extend .greenText;
+  opacity: 0.8;
+}
+
 .topBorder {
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
