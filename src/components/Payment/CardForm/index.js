@@ -5,6 +5,11 @@ import { Button, Row, Col } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import styles from './styles.module.scss';
+import { useState } from 'react';
+import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
+import { useGlobalContext } from 'services/globalContext';
+import { orderType } from 'utils/helper';
+import { showCourseBookingSuccessModal } from 'components/Modals/modals';
 
 const useOptions = () => {
   const options = useMemo(
@@ -20,10 +25,17 @@ const useOptions = () => {
 const CardForm = ({ btnProps, onBeforePayment, form }) => {
   const { text = 'PAY' } = btnProps;
 
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
   const stripe = useStripe();
   const elements = useElements();
   const options = useOptions();
   const history = useHistory();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  console.log('history', history);
 
   const makePayment = async (secret, cardEl) => {
     try {
@@ -36,19 +48,12 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
 
       console.log('SavedCardCheckout', result);
       if (result.error) {
-        // Show error to your customer
         console.log('SavedCardCheckout Error', result.error.message);
         return false;
       } else {
         if (result.paymentIntent) {
           console.log('SavedCardCheckout Success', result.paymentIntent);
           return true;
-          // Show a success message to your customer
-          // There's a risk of the customer closing the window before callback execution
-          // Set up a webhook or plugin to listen for the payment_intent.succeeded event
-          // to save the card to a Customer
-
-          // The PaymentMethod ID can be found on result.paymentIntent.payment_method
         }
       }
     } catch (e) {
@@ -60,6 +65,8 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    console.log('history', history);
+
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet. Make sure to disable
       // form submission until Stripe.js has loaded.
@@ -68,58 +75,71 @@ const CardForm = ({ btnProps, onBeforePayment, form }) => {
 
     const cardEl = elements.getElement(CardElement);
 
-    const value = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
+    const orderResponse = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
 
-    if (value) {
-      console.log('makePayment Completed');
+    if (orderResponse) {
+      const paymentSessionRes = await createPaymentSessionForOrder({ order_id: orderResponse.payment_order_id, order_type: orderResponse.payment_order_type });
 
-      const res = await makePayment(value.payment_gateway_session_token, cardEl);
+      if (paymentSessionRes) {
 
-      if (res) {
-        history.push(
-          `/stripe/payment/success?order_id=${value.order_id}&transaction_id=${
-            value.transaction_id
-          }&order_type=${'SESSION_ORDER'}`
-        );
-      } else {
-        alert('error in payment');
+        const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, cardEl);
+
+        if (paymentRes) {
+          console.log('history', history);
+
+          // const windowHost = window.location.host;
+          // const urlToRedirect = `${windowHost}/stripe/payment/success?order_id=${orderResponse.payment_order_id}&transaction_id=${
+          //   paymentSessionRes.transaction_id
+          //   }&order_type=${orderResponse.payment_order_type}`;
+
+          //   if (history) {
+          //     history.push(`/stripe/payment/success?order_id=${orderResponse.payment_order_id}&transaction_id=${
+          //       paymentSessionRes.transaction_id
+          //       }&order_type=${orderResponse.payment_order_type}`
+          //     );
+          //   } else {
+          //     window.location = urlToRedirect;
+          //   }
+
+          console.log('userDetails', userDetails);
+          const verifyOrderRes = await verifyPaymentForOrder({
+            order_id: orderResponse.payment_order_id,
+            transaction_id: paymentSessionRes.transaction_id,
+            order_type: orderResponse.payment_order_type,
+          });
+
+          const username = window.location.hostname.split('.')[0];
+
+          if (verifyOrderRes === orderType.COURSE) {
+            showCourseBookingSuccessModal(userDetails.email, username);
+          }
+
+        } else {
+          alert('error in payment');
+        }
+
       }
-    } else {
-      console.log('onBeforePayment returned null');
+
     }
+
   };
-
-  // const disableBtn = () => {
-  //   if (!stripe) {
-  //     return true;
-  //   }
-
-  //   if (disableCondition !== null) {
-  //     return disableCondition;
-  //   }
-  // }
 
   return (
     <Row>
       <Col xs={24}>
         <CardElement
           options={options}
-          onReady={() => {
-            console.log('CardElement [ready]');
-          }}
           onChange={(event) => {
-            console.log('CardElement [change]', event);
-          }}
-          onBlur={() => {
-            console.log('CardElement [blur]');
-          }}
-          onFocus={() => {
-            console.log('CardElement [focus]');
+            if (event.complete) {
+              setIsButtonDisabled(false);
+            } else {
+              setIsButtonDisabled(true);
+            }
           }}
         />
       </Col>
-      <Col xs={24} style={{ marginTop: '30px' }}>
-        <Button block size="middle" type="primary" onClick={handleSubmit} className={styles.greenBtn}>
+      <Col xs={24} className={styles.mt30}>
+        <Button block size="middle" type="primary" disabled={isButtonDisabled} onClick={handleSubmit} className={styles.greenBtn}>
           {text}
         </Button>
       </Col>
