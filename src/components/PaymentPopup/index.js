@@ -60,7 +60,6 @@ const PaymentPopup = () => {
     if (resultPromise) {
       return resultPromise;
     } else {
-      closePaymentPopup();
       return null;
     }
   };
@@ -108,6 +107,13 @@ const PaymentPopup = () => {
     }
 
     setShowCouponField(!showCouponField);
+  };
+
+  const handleAfterPayment = () => {
+    // We can move the post verifications here by passing the
+    // required information for showing confirmations
+
+    closePaymentPopup();
   };
 
   return (
@@ -201,6 +207,7 @@ const PaymentPopup = () => {
               <PaymentCard
                 btnProps={{ text: 'Buy', disableCondition: false }}
                 onBeforePayment={handleInitiatePayment}
+                onAfterPayment={handleAfterPayment}
                 form={null}
               />
             </Col>
