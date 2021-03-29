@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
-import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -15,12 +14,12 @@ import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 
 
 import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
 
-import config from 'config';
+// import config from 'config';
 import apis from 'apis';
 
 import styles from './style.module.scss';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+const stripePromise = null;
 
 const { Text, Paragraph } = Typography;
 

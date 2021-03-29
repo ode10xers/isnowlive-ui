@@ -19,6 +19,7 @@ export const mixPanelEventTags = {
         paymentNav: '(Creator) Get Paid Nav Clicked',
         settingsNav: '(Creator) Settings Nav Clicked',
         accountNav: '(Creator) Account Nav Clicked',
+        externalSiteSettingsNav: '(Creator) External Site Settings Nav Clicked',
       },
       sessions: {
         manage: {

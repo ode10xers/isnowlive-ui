@@ -2,9 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography, Tabs } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
+// import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
 import http from 'services/http';
@@ -41,8 +40,6 @@ import {
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
-
-const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Title } = Typography;
 const {
@@ -249,25 +246,17 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const initiatePaymentForOrder = async (payload) => {
-    setIsLoading(true);
+    // setIsLoading(true);
     try {
       const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
       if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-        }
+        return data;
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
@@ -287,8 +276,8 @@ const SessionDetails = ({ match, history }) => {
     return null;
   };
 
-  const handleOrder = (userEmail) => {
-    setIsLoading(true);
+  const handleOrder = async (userEmail) => {
+    // setIsLoading(true);
 
     if (selectedVideo) {
       const payload = {
@@ -331,7 +320,8 @@ const SessionDetails = ({ match, history }) => {
         payment_source: paymentSource.GATEWAY,
       };
 
-      buySingleClass(payload, userEmail);
+      const resData = await buySingleClass(payload, userEmail);
+      return resData;
     }
   };
 
@@ -340,11 +330,14 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
+        console.log('Reached till Payment');
         if (data.payment_required) {
-          initiatePaymentForOrder({
+          const resData = initiatePaymentForOrder({
             order_id: data.order_id,
             order_type: orderType.CLASS,
           });
+
+          return resData;
         } else {
           const orderDetails = await getAttendeeOrderDetails(data.order_id);
 
@@ -462,9 +455,10 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const onFinish = async (values) => {
+    console.log('calling onFinish', values);
     try {
-      setIsLoading(true);
-      setIncorrectPassword(false);
+      // setIsLoading(true);
+      // setIncorrectPassword(false);
       // check if user is login
 
       // NOTE: Reason the check have getLocalUserDetails() and not currentUser
@@ -497,7 +491,8 @@ const SessionDetails = ({ match, history }) => {
       } else if (!getLocalUserDetails()) {
         signupUser(values);
       } else {
-        handleOrder(values.email);
+        const resData = await handleOrder(values.email);
+        return resData;
       }
     } catch (error) {
       setIsLoading(false);

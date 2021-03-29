@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 
 import { Row, Col, message } from 'antd';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
+// import config from 'config';
 import apis from 'apis';
 
 import VideoCard from 'components/VideoCard';
@@ -15,7 +14,7 @@ import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource, produc
 
 import styles from './styles.module.scss';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+const stripePromise = null;
 
 const PublicVideoList = ({ username = null, videos }) => {
   const [isLoading, setIsLoading] = useState(false);

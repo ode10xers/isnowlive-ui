@@ -2,9 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, Tag, message } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
+// import config from 'config';
 import apis from 'apis';
 
 import CreatorProfile from 'components/CreatorProfile';
@@ -35,7 +34,7 @@ import {
 
 import styles from './style.module.scss';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+const stripePromise = null;
 
 const { Title, Text, Paragraph } = Typography;
 const {

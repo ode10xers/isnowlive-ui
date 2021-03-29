@@ -9,6 +9,7 @@ import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons'
 import Routes from 'routes';
 
 import Table from 'components/Table';
+import PaymentCard from 'components/Payment/PaymentCard';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -620,11 +621,22 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={8} md={8} xl={5}>
-                  <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                    {user ? 'Buy' : 'Register'}
-                  </Button>
-                </Col>
+                {user ? (
+                  <Col xs={24} md={24} xl={24}>
+                    <PaymentCard
+                      btnProps={{ text: 'Buy', disableCondition: !selectedInventory }}
+                      onBeforePayment={onFinish}
+                      form={form}
+                    />
+                  </Col>
+                ) : (
+                  <Col xs={8} md={8} xl={5}>
+                    <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
+                      Register
+                    </Button>
+                  </Col>
+                )}
+
                 {!selectedInventory && (
                   <Col xs={24}>
                     <Paragraph>

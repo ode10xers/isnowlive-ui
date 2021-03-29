@@ -67,21 +67,21 @@ function App() {
   const location = window.location;
   const { isWidget } = parseQueryString(location.search);
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
-    if (cookieConsent) {
+    if (cookieConsent && !isWidget) {
       initMixPanel();
     }
-  }, [cookieConsent]);
+  }, [cookieConsent, isWidget]);
 
   useEffect(() => {
-    initializeFreshChat(userDetails, cookieConsent);
+    if (!isWidget) {
+      initializeFreshChat(userDetails, cookieConsent);
 
-    if (cookieConsent) {
-      initFreshChatWidget(userDetails);
+      if (cookieConsent) {
+        initFreshChatWidget(userDetails);
+      }
     }
-  }, [userDetails, cookieConsent]);
+  }, [userDetails, cookieConsent, isWidget]);
 
   useEffect(() => {
     if (!isWidget) {
@@ -114,7 +114,12 @@ function App() {
   }, [isWidget]);
 
   if (isWidget) {
-    return <EmbeddablePage />;
+    return (
+      <>
+        <PaymentPopup />
+        <EmbeddablePage />
+      </>
+    );
   }
 
   if (!isReadyToLoad) {

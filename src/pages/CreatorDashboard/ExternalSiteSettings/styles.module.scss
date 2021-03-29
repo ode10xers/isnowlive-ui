@@ -1,0 +1,23 @@
+@import '../../../styles/variables.scss';
+
+.widgetSelect {
+  width: 100%;
+  max-width: 300px;
+}
+
+.codeSnippetContainer {
+  position: relative;
+  border: 1px solid map-get($map: $colors, $key: 'Havana');
+
+  .copySnippetBtnContainer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+  }
+
+  .codeSnippet {
+    width: 100%;
+    min-height: 150px;
+  }
+}

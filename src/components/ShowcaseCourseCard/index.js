@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
-import config from 'config';
+// import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -20,8 +19,6 @@ import { isValidFile, isAPISuccess, orderType, courseType, productType } from 'u
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-
-const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text } = Typography;
 const {
@@ -59,7 +56,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     }
   }, [history]);
 
-  const initiatePaymentForOrder = async (orderDetails) => {
+  /* const initiatePaymentForOrder = async (orderDetails) => {
     setIsLoading(true);
 
     try {
@@ -86,7 +83,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
     }
-  };
+  }; */
 
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
@@ -106,6 +103,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
 
     const paymentPopupData = {
       productId: selectedCourse.id,
+      productType: 'COURSE',
       itemList: [
         {
           name: selectedCourse.name,
@@ -134,16 +132,24 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
+        payment_source: 'PAYMENT_GATEWAY', // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
       });
 
       if (isAPISuccess(status) && data) {
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          return {
+            ...data,
+            payment_order_type: orderType.COURSE,
+            payment_order_id: data.course_order_id,
+          };
+
+          // initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
 
           showCourseBookingSuccessModal(userEmail, username);
           setSelectedCourse(null);
+          return null;
         }
       }
     } catch (error) {
