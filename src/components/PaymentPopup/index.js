@@ -99,7 +99,16 @@ const PaymentPopup = () => {
     hidePaymentPopup();
   };
 
-  const toggleCouponFieldVisibility = () => setShowCouponField(!showCouponField);
+  const toggleCouponFieldVisibility = () => {
+    if (showCouponField) {
+      setCouponCode('');
+      setCouponApplied(false);
+      setCouponErrorText(null);
+      setDiscountedPrice(null);
+    }
+
+    setShowCouponField(!showCouponField);
+  };
 
   return (
     <Modal
@@ -177,7 +186,7 @@ const PaymentPopup = () => {
                       Apply{' '}
                     </Button>
                   }
-                  placeholder="Input discount code here"
+                  placeholder="Input discount code"
                   onChange={handleCouponCodeChange}
                   onSearch={applyCouponCode}
                 />
