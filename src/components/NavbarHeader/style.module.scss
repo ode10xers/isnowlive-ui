@@ -12,6 +12,12 @@
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
+.greenBtn {
+  background: map-get($map: $colors, $key: 'KellyGreen') !important;
+  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
 .domainNameWrapper {
   flex: 1 1 30%;
 
