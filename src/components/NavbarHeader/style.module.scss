@@ -69,7 +69,7 @@
 
 .menuIndicator {
   font-size: 14px;
-  color: map-get($colors, 'DodgerBlue') !important;
+  padding: 4px 8px !important;
 }
 
 .navItem {
@@ -90,7 +90,7 @@
 
   .externalButtonWrapper {
     align-self: right;
-    margin-right: 48px;
+    margin-right: 64px;
   }
 }
 
@@ -159,11 +159,11 @@
     .mobileMenu {
       margin-left: 12px;
       position: absolute;
+      top: 2px;
       right: 4px;
 
       .menuIndicator {
         font-size: 16px;
-        color: map-get($colors, 'DodgerBlue');
       }
     }
   }

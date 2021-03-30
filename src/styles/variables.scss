@@ -123,3 +123,6 @@ $spacing: (
   color: map-get($colors, 'DodgerBlue');
   margin-top: -15px;
 }
+.ant-btn {
+  border-radius: 5px !important;
+}
