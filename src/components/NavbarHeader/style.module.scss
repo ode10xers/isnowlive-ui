@@ -12,12 +12,6 @@
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
-.greenBtn {
-  background: map-get($map: $colors, $key: 'KellyGreen') !important;
-  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
-  color: map-get($map: $colors, $key: 'White') !important;
-}
-
 .domainNameWrapper {
   flex: 1 1 30%;
 
@@ -37,7 +31,11 @@
   color: map-get($map: $colors, $key: 'DodgerBlue');
   cursor: pointer;
 
-  .siteHomeText {
+  &.textLength9 {
+    font-size: 18px;
+  }
+
+  &.textLength15 {
     font-size: 14px;
   }
 }
@@ -120,6 +118,16 @@
 @media screen and (max-width: 768px) {
   .domainNameWrapper {
     flex: 3 1 auto;
+  }
+
+  .creatorSiteName {
+    &.textLength9 {
+      font-size: 16px;
+    }
+  
+    &.textLength15 {
+      font-size: 12px;
+    }
   }
 
   .modeSelectWrapper {
