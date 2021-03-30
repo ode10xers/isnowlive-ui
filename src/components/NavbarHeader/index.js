@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
-import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
+import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -177,14 +177,14 @@ const NavbarHeader = ({ removePadding = false }) => {
   // Currently implemented (inelegant solution) : https://stackoverflow.com/a/56588899
 
   return (
-    <div className={styles.navbarWrapper}>
+    <div>
       <HeaderModal
         visible={!localUserDetails && authModalVisible}
         closeModal={() => setAuthModalVisible(false)}
         signingIn={authModalState === 'signIn'}
         toggleSigningIn={toggleAuthModalState}
       />
-      <Row>
+      <Row className={styles.navbarWrapper}>
         <Col xs={24}>
           <Row>
             <Col
@@ -232,7 +232,12 @@ const NavbarHeader = ({ removePadding = false }) => {
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
               <Menu
                 mode="horizontal"
-                overflowedIndicator={<MenuOutlined className={styles.overflowMenuIcon} size={50} />}
+                overflowedIndicator={
+                  <Button ghost type="primary" className={styles.menuIndicator}>
+                    {' '}
+                    Menu{' '}
+                  </Button>
+                }
                 className={styles.menuContainer}
               >
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
@@ -321,7 +326,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                         </Button>
                       )
                     ) : (
-                      <Button className={styles.lightRedBtn} type="primary" onClick={() => showSignInModal()}>
+                      <Button className={styles.lightRedBtn} onClick={() => showSignInModal()}>
                         Sign In
                       </Button>
                     )}
@@ -329,7 +334,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                 </Col>
                 <Col>
                   <span className={styles.mobileMenu}>
-                    <MenuOutlined style={{ fontSize: 20 }} onClick={() => setShowMobileMenu(true)} />
+                    <Button
+                      ghost
+                      type="primary"
+                      className={styles.menuIndicator}
+                      onClick={() => setShowMobileMenu(true)}
+                    >
+                      {' '}
+                      Menu{' '}
+                    </Button>
                   </span>
                 </Col>
               </Row>

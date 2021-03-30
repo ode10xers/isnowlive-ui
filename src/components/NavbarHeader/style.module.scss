@@ -12,6 +12,12 @@
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
+.greenBtn {
+  background: map-get($map: $colors, $key: 'KellyGreen') !important;
+  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
 .domainNameWrapper {
   flex: 1 1 30%;
 
@@ -25,7 +31,7 @@
 }
 
 .creatorSiteName {
-  margin-left: 12px;
+  margin-left: -4px;
   font-size: 24px;
   font-weight: 700;
   color: map-get($map: $colors, $key: 'DodgerBlue');
@@ -57,6 +63,15 @@
   margin-left: 20px;
 }
 
+.hamburgerMenu {
+  font-size: 14px;
+}
+
+.menuIndicator {
+  font-size: 14px;
+  padding: 4px 8px !important;
+}
+
 .navItem {
   cursor: pointer;
 
@@ -69,17 +84,13 @@
   }
 }
 
-.hamburgerMenu {
-  font-size: 14px;
-}
-
 .mobileMenuContainer {
   flex: 1 0 auto;
   display: none;
 
   .externalButtonWrapper {
     align-self: right;
-    margin-right: 32px;
+    margin-right: 64px;
   }
 }
 
@@ -146,8 +157,14 @@
     display: block;
 
     .mobileMenu {
+      margin-left: 12px;
       position: absolute;
+      top: 2px;
       right: 4px;
+
+      .menuIndicator {
+        font-size: 16px;
+      }
     }
   }
 
