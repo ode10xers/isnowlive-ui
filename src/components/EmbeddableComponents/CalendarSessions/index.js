@@ -28,12 +28,10 @@ function generateLightColorHex() {
   return color;
 }
 
-function getDarkColor() {
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += Math.floor(Math.random() * 10);
-  }
-  return color;
+const backdropColors = ['fcb096', 'fce992', 'dffc9b', 'a3feae', '85d2ff', '8a98ff', 'c098ff', 'fdade9', 'f1ffdc'];
+
+function getBackgroundColorsForMobile() {
+  return `#${backdropColors[Math.floor(Math.random() * backdropColors.length)]}`;
 }
 
 const CalendarSessions = () => {
@@ -84,7 +82,16 @@ const CalendarSessions = () => {
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
         const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
         setSessionCountByDate(res);
-        setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
+        setCalendarSession([
+          ...UpcomingRes.data.map((upcomingSessions) => ({
+            ...upcomingSessions,
+            isPast: false,
+          })),
+          ...PastRes.data.map((pastSessions) => ({
+            ...pastSessions,
+            isPast: true,
+          })),
+        ]);
         setReadyToPaint(true);
         setIsSessionLoading(false);
       }
@@ -240,20 +247,21 @@ const CalendarSessions = () => {
         e.stopPropagation();
       };
 
-      const bgColor = getDarkColor();
+      const bgColor = getBackgroundColorsForMobile();
 
       return (
         <>
           <div
             className="custom-event-container custom-month-event-container"
             style={{ border: `2px solid ${borderColor}` }}
+            onClick={() => redirectToSessionsPage(event)}
           >
             <span className="event-title">{event.name}</span>
             <span className="event-time">{toLocaleTime(event.start_time)}</span>
           </div>
           <div
             className="custom-event-month-container-mb"
-            style={{ background: `${bgColor}` }}
+            style={{ background: `${bgColor}`, color: '#333333' }}
             onClick={onMobileDateCellClick}
           >
             {totalSessionThisDay.length}
@@ -265,7 +273,7 @@ const CalendarSessions = () => {
     if (calendarView === 'week' || calendarView === 'day') {
       return (
         <div
-          className="custom-event-container custom-day-event-container"
+          className={`custom-event-container custom-day-event-container ${event.isPast ? 'past-event' : ''}`}
           style={{
             border: `2px solid ${borderColor}`,
           }}
