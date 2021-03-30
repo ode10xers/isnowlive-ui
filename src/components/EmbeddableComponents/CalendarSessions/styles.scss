@@ -1,13 +1,16 @@
 @import '../../../styles/variables.scss';
 
-$colors: red, orange, yellow, blue, purple;
-$repeat: 20;
 .custom-calendar-view {
   width: 100%;
   .rbc-event {
     background-color: white;
     color: black;
     border: 0;
+  }
+  .rbc-month-view {
+    .rbc-event {
+      background-color: transparent;
+    }
   }
   .custom-event-container {
     font-size: 12px;
@@ -31,7 +34,6 @@ $repeat: 20;
     }
 
     &.custom-day-event-container {
-      height: 135px;
       .event-title {
         font-size: 14px;
         margin: 5px 0 8px;
@@ -74,15 +76,19 @@ $repeat: 20;
         color: #000;
         cursor: initial;
 
-
-        .event-title, .event-time {
+        .event-title,
+        .event-time {
           color: #000;
         }
+      }
 
-        .book-btn {
-          color: #000;
-          background-color: #aaaaaa;
-          cursor: initial;
+      .book-btn {
+        color: #000;
+        background-color: #aaaaaa;
+        pointer-events: auto;
+        cursor: pointer;
+        &:focus {
+          border: 1px solid #f0f0f0;
         }
       }
     }
@@ -92,14 +98,15 @@ $repeat: 20;
       display: none;
     }
     @media screen and (max-width: 635px) {
-      display: block;
-      color: white;
+      display: flex;
+      color: #333333;
       margin-top: 10px;
       border-radius: 50%;
-      padding-left: 38%;
-      padding-top: 15%;
       font-weight: 700;
       height: 35px;
+      width: 32px;
+      align-items: center;
+      justify-content: center;
     }
   }
   .rbc-month-header {
@@ -138,8 +145,9 @@ $repeat: 20;
   }
   .rbc-day-slot .rbc-event {
     position: initial;
-    height: 138px !important;
+    height: 150px !important;
     margin-bottom: 10px;
+    pointer-events: none;
   }
   .rbc-day-slot .rbc-events-container {
     margin: 1px;
@@ -168,6 +176,9 @@ $repeat: 20;
           }
         }
       }
+    }
+    .rbc-toolbar {
+      flex-direction: column;
     }
   }
 }

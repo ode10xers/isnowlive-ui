@@ -42,7 +42,7 @@ const CalendarSessions = () => {
   const [calendarView, setCalendarView] = useState('month');
   const [readyToPaint, setReadyToPaint] = useState(false);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
-  const [calendarDate, setCalendarDate] = useState(new Date());
+  // const [calendarDate, setCalendarDate] = useState(new Date());
   const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
 
@@ -241,9 +241,9 @@ const CalendarSessions = () => {
       const totalSessionThisDay = sessionCountByDate[event?.session_date] || 0;
 
       const onMobileDateCellClick = (e) => {
-        const [y, m, d] = event.session_date.split('-');
-        setCalendarDate(new Date(y, m - 1, d));
-        setCalendarView('day');
+        // const [y, m, d] = event.session_date.split('-');
+        // setCalendarDate(new Date(y, m - 1, d));
+        // setCalendarView('day');
         e.stopPropagation();
       };
 
@@ -261,7 +261,7 @@ const CalendarSessions = () => {
           </div>
           <div
             className="custom-event-month-container-mb"
-            style={{ background: `${bgColor}`, color: '#333333' }}
+            style={{ background: `${bgColor}` }}
             onClick={onMobileDateCellClick}
           >
             {totalSessionThisDay.length}
@@ -306,8 +306,8 @@ const CalendarSessions = () => {
           customComponents={{
             event: Event,
           }}
-          step={30}
-          defaultDate={calendarDate}
+          step={60}
+          // defaultDate={calendarDate}
         />
       ) : (
         <Empty />

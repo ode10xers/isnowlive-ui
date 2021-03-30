@@ -46,7 +46,7 @@ const CalendarView = ({
           `${e.name} - ${toShortTimeWithPeriod(e.start_time)} - ${toShortTimeWithPeriod(e.end_time)}`
         }
         components={customComponents}
-        date={defaultDate}
+        // date={defaultDate}
       />
     </div>
   );
