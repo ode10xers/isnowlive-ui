@@ -4,6 +4,7 @@ import { Row, Col, Typography, Input, List, Modal, Button } from 'antd';
 
 import apis from 'apis';
 
+import Loader from 'components/Loader';
 import PaymentCard from 'components/Payment/PaymentCard';
 
 import { isAPISuccess } from 'utils/helper';
@@ -11,8 +12,6 @@ import { isAPISuccess } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-
-// const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
 const { Text, Title } = Typography;
 
@@ -28,6 +27,7 @@ const PaymentPopup = () => {
   const [couponErrorText, setCouponErrorText] = useState(null);
   const [couponApplied, setCouponApplied] = useState(false);
   const [showCouponField, setShowCouponField] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { itemList, productId, productType } = paymentPopupData || { itemList: [], productId: null, productType: null };
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
@@ -50,18 +50,6 @@ const PaymentPopup = () => {
     setCouponCode(e.target.value.toLowerCase());
     setCouponApplied(false);
     setDiscountedPrice(null);
-  };
-
-  const handleInitiatePayment = async () => {
-    const appliedCouponCode = couponApplied ? couponCode : '';
-
-    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
-
-    if (result) {
-      return result;
-    } else {
-      return null;
-    }
   };
 
   const applyCouponCode = async (value) => {
@@ -91,6 +79,20 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(false);
   };
 
+  const handleInitiatePayment = async () => {
+    setIsLoading(true);
+
+    const appliedCouponCode = couponApplied ? couponCode : '';
+
+    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
+
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
+  };
+
   const closePaymentPopup = () => {
     setCouponCode('');
     setDiscountedPrice(null);
@@ -117,6 +119,7 @@ const PaymentPopup = () => {
     // We can move the post verifications here by passing the
     // required information for showing confirmations
 
+    setIsLoading(false);
     closePaymentPopup();
   };
 
@@ -130,108 +133,96 @@ const PaymentPopup = () => {
       title={<Title level={4}> Confirm your purchase </Title>}
       onCancel={() => closePaymentPopup()}
     >
-      <Row gutter={[8, 32]} justify="center">
-        <Col xs={24}>
-          <List
-            rowKey={(record) => record.name}
-            dataSource={itemList || []}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  <Text strong>
-                    {' '}
-                    {item?.currency?.toUpperCase()} {item?.price}{' '}
-                  </Text>,
-                ]}
-              >
-                <List.Item.Meta
-                  title={item?.name}
-                  description={<Text className={styles.descriptionText}>{item?.description}</Text>}
-                />
-              </List.Item>
-            )}
-          />
-        </Col>
-        <Col xs={24} className={styles.topBorder}>
-          <Row gutter={10}>
-            <Col xs={14}>
-              <Text strong>Total payable amount</Text>
-            </Col>
-            <Col xs={10} className={styles.paymentTotalText}>
-              {itemList &&
-                itemList.length > 0 &&
-                (discountedPrice !== null ? (
-                  <>
-                    <Text delete className={styles.discounted}>
-                      {itemList[0].currency?.toUpperCase()} {totalPrice}
-                    </Text>{' '}
-                    <Text>
-                      {itemList[0].currency?.toUpperCase()} {discountedPrice}
-                    </Text>
-                  </>
-                ) : (
-                  <Text>
-                    {itemList[0].currency?.toUpperCase()} {totalPrice}
-                  </Text>
-                ))}
-            </Col>
-            <Col xs={24}>
-              <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
-                {showCouponField ? `Don't use ` : 'Use '} a coupon
-              </Button>
-            </Col>
-          </Row>
-        </Col>
-        {showCouponField && (
-          <Col xs={24} className={styles.topBorder}>
-            <Row justify="start">
-              <Col xs={24} md={14} lg={12}>
-                <Input.Search
-                  value={couponCode}
-                  disabled={isApplyingCoupon}
-                  loading={isApplyingCoupon}
-                  enterButton={
-                    <Button block type="primary" disabled={couponCode === ''}>
+      <Loader loading={isLoading} text="Processing payment...">
+        <Row gutter={[8, 32]} justify="center">
+          <Col xs={24}>
+            <List
+              rowKey={(record) => record.name}
+              dataSource={itemList || []}
+              renderItem={(item) => (
+                <List.Item
+                  actions={[
+                    <Text strong>
                       {' '}
-                      Apply{' '}
-                    </Button>
-                  }
-                  placeholder="Input discount code"
-                  onChange={handleCouponCodeChange}
-                  onSearch={applyCouponCode}
-                />
+                      {item?.currency?.toUpperCase()} {item?.price}{' '}
+                    </Text>,
+                  ]}
+                >
+                  <List.Item.Meta
+                    title={item?.name}
+                    description={<Text className={styles.descriptionText}>{item?.description}</Text>}
+                  />
+                </List.Item>
+              )}
+            />
+          </Col>
+          <Col xs={24} className={styles.topBorder}>
+            <Row gutter={10}>
+              <Col xs={14}>
+                <Text strong>Total payable amount</Text>
               </Col>
-              <Col xs={24}>{couponErrorText}</Col>
+              <Col xs={10} className={styles.paymentTotalText}>
+                {itemList &&
+                  itemList.length > 0 &&
+                  (discountedPrice !== null ? (
+                    <>
+                      <Text delete className={styles.discounted}>
+                        {itemList[0].currency?.toUpperCase()} {totalPrice}
+                      </Text>{' '}
+                      <Text>
+                        {itemList[0].currency?.toUpperCase()} {discountedPrice}
+                      </Text>
+                    </>
+                  ) : (
+                    <Text>
+                      {itemList[0].currency?.toUpperCase()} {totalPrice}
+                    </Text>
+                  ))}
+              </Col>
+              <Col xs={24}>
+                <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
+                  {showCouponField ? `Don't use ` : 'Use '} a coupon
+                </Button>
+              </Col>
             </Row>
           </Col>
-        )}
-        <Col xs={24} className={styles.topBorder}>
-          <Row gutter={[8, 10]} justify="center">
-            <Col xs={24}>
-              <PaymentCard
-                btnProps={{ text: 'Buy', disableCondition: false }}
-                onBeforePayment={handleInitiatePayment}
-                onAfterPayment={handleAfterPayment}
-                form={null}
-              />
+          {showCouponField && (
+            <Col xs={24} className={styles.topBorder}>
+              <Row justify="start">
+                <Col xs={24} md={14} lg={12}>
+                  <Input.Search
+                    value={couponCode}
+                    disabled={isApplyingCoupon}
+                    loading={isApplyingCoupon}
+                    enterButton={
+                      <Button block type="primary" disabled={couponCode === ''}>
+                        {' '}
+                        Apply{' '}
+                      </Button>
+                    }
+                    placeholder="Input discount code"
+                    onChange={handleCouponCodeChange}
+                    onSearch={applyCouponCode}
+                  />
+                </Col>
+                <Col xs={24}>{couponErrorText}</Col>
+              </Row>
             </Col>
-            {/* <Col>
-              <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
-            </Col>
-            <Col xs={24} md={10}>
-              <Button
-                block
-                className={styles.greenBtn}
-                type="primary"
-                onClick={handleInitiatePayment}
-                disabled={itemList?.length <= 0}
-              >
-                Pay Now
-              </Button>
-            </Col> */}
-          </Row>
-        </Col>
-      </Row>
+          )}
+          <Col xs={24} className={styles.topBorder}>
+            <Row gutter={[8, 10]} justify="center">
+              <Col xs={24}>
+                <PaymentCard
+                  btnProps={{ text: 'Buy', disableCondition: false }}
+                  onBeforePayment={handleInitiatePayment}
+                  onAfterPayment={handleAfterPayment}
+                  form={null}
+                />
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Loader>
     </Modal>
   );
 };
