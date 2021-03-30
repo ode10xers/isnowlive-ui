@@ -31,7 +31,7 @@
 }
 
 .creatorSiteName {
-  margin-left: 12px;
+  margin-left: -4px;
   font-size: 24px;
   font-weight: 700;
   color: map-get($map: $colors, $key: 'DodgerBlue');
@@ -63,6 +63,15 @@
   margin-left: 20px;
 }
 
+.hamburgerMenu {
+  font-size: 14px;
+}
+
+.menuIndicator {
+  font-size: 14px;
+  color: map-get($colors, 'DodgerBlue') !important;
+}
+
 .navItem {
   cursor: pointer;
 
@@ -75,17 +84,13 @@
   }
 }
 
-.hamburgerMenu {
-  font-size: 14px;
-}
-
 .mobileMenuContainer {
   flex: 1 0 auto;
   display: none;
 
   .externalButtonWrapper {
     align-self: right;
-    margin-right: 32px;
+    margin-right: 48px;
   }
 }
 
@@ -152,8 +157,14 @@
     display: block;
 
     .mobileMenu {
+      margin-left: 12px;
       position: absolute;
       right: 4px;
+
+      .menuIndicator {
+        font-size: 16px;
+        color: map-get($colors, 'DodgerBlue');
+      }
     }
   }
 
