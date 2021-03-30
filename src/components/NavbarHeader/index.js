@@ -172,6 +172,10 @@ const NavbarHeader = ({ removePadding = false }) => {
     return null;
   }
 
+  //TODO: Investigate better solution for dynamic font size adjustment
+  // Involves jquery: https://stackoverflow.com/questions/687998/auto-size-dynamic-text-to-fill-fixed-size-container?rq=1
+  // Currently implemented (inelegant solution) : https://stackoverflow.com/a/56588899
+
   return (
     <div className={styles.navbarWrapper}>
       <HeaderModal
@@ -189,7 +193,13 @@ const NavbarHeader = ({ removePadding = false }) => {
                 inDashboard() && !isMobileDevice ? styles.dashboard : undefined
               )}
             >
-              <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
+              <span
+                className={classNames(
+                  styles.creatorSiteName,
+                  username.length >= 15 ? styles.textLength15 : username.length >= 9 ? styles.textLength9 : undefined
+                )}
+                onClick={() => redirectToCreatorProfile()}
+              >
                 {username.toUpperCase()}
               </span>
             </Col>
@@ -307,7 +317,7 @@ const NavbarHeader = ({ removePadding = false }) => {
                         </Button>
                       ) : (
                         <Button className={styles.greenBtn} onClick={() => redirectToDashboard()}>
-                          My Dashboard
+                          Dashboard
                         </Button>
                       )
                     ) : (
@@ -342,7 +352,17 @@ const NavbarHeader = ({ removePadding = false }) => {
                 <Row className={styles.topRow}>
                   <Col xs={20}>
                     <div className={styles.siteHomeLink}>
-                      <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('home')}>
+                      <span
+                        className={classNames(
+                          styles.creatorSiteName,
+                          username.length >= 15
+                            ? styles.textLength15
+                            : username.length >= 9
+                            ? styles.textLength9
+                            : undefined
+                        )}
+                        onClick={() => redirectToCreatorProfile('home')}
+                      >
                         {username.toUpperCase()}
                       </span>
                     </div>
