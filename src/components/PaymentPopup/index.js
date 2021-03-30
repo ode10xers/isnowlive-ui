@@ -55,10 +55,10 @@ const PaymentPopup = () => {
   const handleInitiatePayment = async () => {
     const appliedCouponCode = couponApplied ? couponCode : '';
 
-    const resultPromise = await paymentPopupCallback(userDetails.email, appliedCouponCode);
+    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
 
-    if (resultPromise) {
-      return resultPromise;
+    if (result) {
+      return result;
     } else {
       return null;
     }
@@ -68,7 +68,8 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      //TODO: Use productType here
+      //TODO: Use productType here to adjust the payload
+      // e.g. if productType === PASS it should be pass_id (match the BE implementation)
       console.log(productType);
 
       const payload = {
@@ -94,6 +95,9 @@ const PaymentPopup = () => {
     setCouponCode('');
     setDiscountedPrice(null);
     setCouponApplied(false);
+
+    //TODO: Might also want to trigger clearing the CardElement from stripe here if required
+    // But if we're showing the saved cards for the user, it won't be required
 
     hidePaymentPopup();
   };
@@ -142,7 +146,7 @@ const PaymentPopup = () => {
               >
                 <List.Item.Meta
                   title={item?.name}
-                  description={<Text className={styles.blueText}>{item?.description}</Text>}
+                  description={<Text className={styles.descriptionText}>{item?.description}</Text>}
                 />
               </List.Item>
             )}

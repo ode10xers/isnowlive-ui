@@ -87,6 +87,9 @@ $spacing: (
 .blueText {
   color: map-get($map: $colors, $key: 'DodgerBlue') !important;
 }
+.greenText {
+  color: map-get($map: $colors, $key: 'KellyGreen') !important;
+}
 .whiteText {
   color: map-get($map: $colors, $key: 'White') !important;
 }
