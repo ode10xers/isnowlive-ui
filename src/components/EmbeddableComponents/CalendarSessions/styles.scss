@@ -64,10 +64,15 @@
         text-align: center;
         padding: 5px;
         background: #ffffff;
-        color: #595959;
+        color: #000;
+        margin-bottom: 8px;
         border: 1px solid #f0f0f0;
         border-radius: 2px;
         cursor: pointer;
+        pointer-events: auto;
+        &:focus {
+          border: 1px solid #f0f0f0;
+        }
       }
 
       &.past-event {
@@ -80,14 +85,10 @@
         .event-time {
           color: #000;
         }
-      }
 
-      .book-btn {
-        color: #000;
-        background-color: #aaaaaa;
-        pointer-events: auto;
-        cursor: pointer;
-        &:focus {
+        .book-btn {
+          color: #fff;
+          background-color: #aaaaaa;
           border: 1px solid #f0f0f0;
         }
       }
