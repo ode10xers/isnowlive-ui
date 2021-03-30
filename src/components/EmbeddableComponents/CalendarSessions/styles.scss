@@ -149,12 +149,18 @@
     height: 150px !important;
     margin-bottom: 10px;
     pointer-events: none;
+    width: 100% !important;
   }
   .rbc-day-slot .rbc-events-container {
     margin: 1px;
+    position:initial;
+    border-left: 1px solid #DDD;
+    border-right: 1px solid #DDD;
+    height: -webkit-fill-available;
   }
   .rbc-timeslot-group {
     border-bottom: 0;
+    display: none;
   }
   .rbc-day-slot .rbc-time-slot {
     border-top: 0;
