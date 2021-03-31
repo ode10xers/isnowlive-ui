@@ -11,6 +11,7 @@ import {
   InfoCircleOutlined,
   BookTwoTone,
   MailOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -220,7 +221,6 @@ const SessionsInventories = ({ match }) => {
       title: 'Session Name',
       dataIndex: 'name',
       key: 'name',
-      width: '25%',
       render: (text, record) => {
         if (record.is_date) {
           return {
@@ -255,34 +255,34 @@ const SessionsInventories = ({ match }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '10%',
+      width: '78px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
-      width: '15%',
+      width: '90px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      width: '15%',
+      width: '165px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Participants',
       key: 'num_participants',
       dataIndex: 'num_participants',
-      width: '12%',
+      width: '110px',
       render: (text, record) =>
         renderSimpleTableCell(record.is_date, `${record.num_participants || 0} / ${record.max_participants}`),
     },
     {
       title: 'Actions',
-      width: isPast ? '10%' : '25%',
+      width: isPast ? '100px' : '200px',
       render: (text, record) => {
         if (record.is_date) {
           return emptyTableCell;
@@ -315,12 +315,12 @@ const SessionsInventories = ({ match }) => {
               </Tooltip>
             </Col>
             <Col md={24} lg={24} xl={4}>
-              <Tooltip title="Event Details">
+              <Tooltip title="Edit Event Details">
                 <Button
                   type="link"
                   className={styles.detailsButton}
                   onClick={() => openSessionInventoryDetails(record)}
-                  icon={<InfoCircleOutlined />}
+                  icon={<EditOutlined />}
                 />
               </Tooltip>
             </Col>
@@ -439,9 +439,15 @@ const SessionsInventories = ({ match }) => {
       <Tooltip title="Send Customer Email">
         <Button type="text" onClick={() => showEmailPopup(item)} icon={<MailOutlined />} />
       </Tooltip>,
-      <Tooltip title="Event Details">
-        <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
-      </Tooltip>,
+      isPast ? (
+        <Tooltip title="Event Details">
+          <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
+        </Tooltip>
+      ) : (
+        <Tooltip title="Edit Event Details">
+          <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<EditOutlined />} />
+        </Tooltip>
+      ),
       <Tooltip title="Copy Event Page Link">
         <Button type="text" onClick={() => copyInventoryLink(item.inventory_id)} icon={<CopyOutlined />} />
       </Tooltip>,

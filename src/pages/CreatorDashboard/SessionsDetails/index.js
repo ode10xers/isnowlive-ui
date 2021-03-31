@@ -18,6 +18,8 @@ import apis from 'apis';
 import dateUtil from 'utils/date';
 import { generateUrlFromUsername, isAPISuccess, getDuration } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+
+import FileUpload from 'components/FileUpload';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import SessionDate from 'components/SessionDate';
@@ -38,7 +40,7 @@ import styles from './styles.module.scss';
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },
 } = dateUtil;
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { creator } = mixPanelEventTags;
 
 const SessionsDetails = ({ match }) => {
@@ -47,12 +49,16 @@ const SessionsDetails = ({ match }) => {
   const [session, setSession] = useState(null);
   const [isPastSession, setIsPastSession] = useState(false);
   const [publicUrl, setPublicUrl] = useState(null);
+  const [inventoryDocumentUrl, setInventoryDocumentUrl] = useState(null);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
     try {
       const { data } = await apis.session.getPrivateInventoryById(inventory_id);
       if (data) {
         setSession(data);
+        if (data.document_url) {
+          setInventoryDocumentUrl(data.document_url);
+        }
         if (getTimeDiff(data.end_time, moment(), 'days') < 0) {
           setIsPastSession(true);
         }
@@ -114,6 +120,21 @@ const SessionsDetails = ({ match }) => {
   };
 
   const isDisabled = session?.participants ? session?.participants.length > 0 : false;
+
+  const handleDocumentUrlUpload = async (imageUrl) => {
+    try {
+      const { status } = await apis.session.updateSessionInventoryDocument(session.inventory_id, {
+        document_url: imageUrl,
+      });
+
+      if (isAPISuccess(status)) {
+        setInventoryDocumentUrl(imageUrl);
+        setSession({ ...session, document_url: imageUrl });
+      }
+    } catch (error) {
+      message.error('Failed to update session event document');
+    }
+  };
 
   return (
     <Loader loading={isLoading} size="large" text="Loading session details">
@@ -206,6 +227,37 @@ const SessionsDetails = ({ match }) => {
                 <div className={styles.mt20}>
                   <SessionInfo session={session} />
                 </div>
+                <Row className={styles.mt10}>
+                  <Col
+                    xs={24}
+                    lg={{
+                      span: 8,
+                      offset: session?.is_course ? 8 : 16,
+                    }}
+                  >
+                    <FileUpload
+                      name="inventory_document_url"
+                      value={inventoryDocumentUrl}
+                      onChange={handleDocumentUrlUpload}
+                      listType="text"
+                      label={inventoryDocumentUrl ? 'Change document' : 'Upload a PDF file'}
+                      isEdit={Boolean(inventoryDocumentUrl)}
+                    />
+                    <Paragraph type="danger" className={styles.uploadHelpText}>
+                      This will change the document for{' '}
+                      <Text strong type="danger">
+                        {' '}
+                        THIS{' '}
+                      </Text>{' '}
+                      session only. To change the docs for all sessions go to{' '}
+                      <Text strong type="danger">
+                        {' '}
+                        Manage Sessions{' '}
+                      </Text>{' '}
+                      page.
+                    </Paragraph>
+                  </Col>
+                </Row>
               </Col>
               <Col xs={24} lg={6}>
                 <Row gutter={[8, 8]}>
