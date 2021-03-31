@@ -66,7 +66,7 @@ const SessionsInventories = ({ match }) => {
     try {
       const { data } =
         sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
-      if (data) {
+      if (data && data.length > 0) {
         const unfilteredSessions = data.map((i, index) => ({
           index,
           key: i?.inventory_id,
@@ -110,7 +110,10 @@ const SessionsInventories = ({ match }) => {
         });
         setSessions(unfilteredSessions);
         setFilteredByDateSession(filterByDateSessions);
-        setExpandedRowKeys([filterByDateSessions[0].start_time]);
+
+        if (filterByDateSessions.length > 0) {
+          setExpandedRowKeys([filterByDateSessions[0].start_time]);
+        }
       }
       setIsLoading(false);
     } catch (error) {
