@@ -610,9 +610,9 @@ const SessionRegistration = ({
                 <Paragraph>
                   Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
                   <Text delete>
-                    {classDetails.price} {classDetails.currency.toUpperCase()}
+                    {classDetails?.price} {classDetails?.currency.toUpperCase()}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> using your purchased pass
+                  <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased pass
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}
@@ -622,7 +622,7 @@ const SessionRegistration = ({
               <Row className={styles.mt10} gutter={[8, 8]}>
                 <Col xs={8} md={8} xl={5}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                    {user ? 'Buy' : 'Register'}
+                    {user && classDetails?.price > 0 ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
                 {!selectedInventory && (

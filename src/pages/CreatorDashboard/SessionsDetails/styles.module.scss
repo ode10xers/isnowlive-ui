@@ -11,6 +11,10 @@
   background-color: map-get($colors, $key: 'DarkGray1') !important;
   color: map-get($colors, $key: 'White') !important;
 }
+.uploadHelpText {
+  font-size: 12px;
+  margin-top: 10px;
+}
 @media (max-width: 768px) {
   .headButton {
     margin-top: 10px;

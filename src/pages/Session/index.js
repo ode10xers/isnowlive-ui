@@ -51,7 +51,7 @@ import {
 
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
@@ -556,7 +556,6 @@ const Session = ({ match, history }) => {
           const updatedSessionResponse = await apis.session.update(session.session_id, data);
           if (isAPISuccess(updatedSessionResponse.status)) {
             trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
-            message.success('Session successfully updated.');
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
@@ -758,6 +757,21 @@ const Session = ({ match, history }) => {
                   </Tooltip>
                 </Col>
               )}
+
+              <Col>
+                <Paragraph>
+                  Uploading a document here will update the document in all its child sessions happening on a different
+                  date.
+                </Paragraph>
+                <Paragraph>
+                  To change the document on a specific date, please edit that date's session in the{' '}
+                  <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath}>
+                    {' '}
+                    Upcoming Sessions{' '}
+                  </Link>{' '}
+                  page after you have published the session.
+                </Paragraph>
+              </Col>
             </Row>
           </Form.Item>
 
