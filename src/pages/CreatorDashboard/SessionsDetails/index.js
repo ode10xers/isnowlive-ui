@@ -3,12 +3,12 @@ import classNames from 'classnames';
 import { Row, Col, Typography, Button, Card, message, Popconfirm } from 'antd';
 import {
   ArrowLeftOutlined,
-  GlobalOutlined,
   VideoCameraOutlined,
   EditOutlined,
   MailOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
+  CopyOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
@@ -16,7 +16,7 @@ import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
-import { generateUrlFromUsername, isAPISuccess, getDuration } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, getDuration, copyPageLinkToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import FileUpload from 'components/FileUpload';
@@ -175,10 +175,10 @@ const SessionsDetails = ({ match }) => {
             <Col xs={24} md={7} lg={5} xl={4}>
               <Button
                 className={styles.headButton}
-                icon={<GlobalOutlined />}
-                onClick={() => trackAndNavigate(publicUrl, creator.click.sessions.details.publicPage, true)}
+                icon={<CopyOutlined />}
+                onClick={() => copyPageLinkToClipboard(publicUrl)}
               >
-                Public Page
+                Copy Page Link
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
@@ -249,17 +249,16 @@ const SessionsDetails = ({ match }) => {
                         {' '}
                         THIS{' '}
                       </Text>{' '}
-                      session only. To change the docs for all sessions go to{' '}
+                      session only. To change the docs for all sessions click on the
                       <Text strong type="danger">
-                        {' '}
-                        Manage Sessions{' '}
+                        Edit Session
                       </Text>{' '}
-                      page.
+                      button
                     </Paragraph>
                   </Col>
                 </Row>
               </Col>
-              <Col xs={24} lg={6}>
+              <Col xs={24} lg={{ span: 5, offset: 1 }}>
                 <Row gutter={[8, 8]}>
                   <Col xs={12} lg={24}>
                     <Button

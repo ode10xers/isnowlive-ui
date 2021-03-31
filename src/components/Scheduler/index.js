@@ -130,6 +130,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     setFormDeletedIndex([]);
     setOpenModal(false);
     setDayList(null);
+    setCustomTimePickerVisible(false);
+    setCustomTime({
+      session_date: null,
+      start_time: null,
+      end_time: null,
+      num_participants: 0,
+    });
   };
 
   const getSlotsList = (value) => {
@@ -629,9 +636,11 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                     />
                   </Col>
                   <Col xs={2} md={2}>
-                    <Tooltip title="Apply custom time">
+                    <Tooltip title="Apply custom time" visible={customTime.start_time && customTime.end_time}>
                       <Button
                         shape="circle"
+                        type="primary"
+                        ghost
                         disabled={!(customTime.start_time && customTime.end_time)}
                         onClick={() => applyCustomTime()}
                         icon={<SaveOutlined />}

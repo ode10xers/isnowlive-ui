@@ -110,6 +110,7 @@ const SessionsInventories = ({ match }) => {
         });
         setSessions(unfilteredSessions);
         setFilteredByDateSession(filterByDateSessions);
+        setExpandedRowKeys([filterByDateSessions[0].start_time]);
       }
       setIsLoading(false);
     } catch (error) {

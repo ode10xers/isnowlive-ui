@@ -51,7 +51,7 @@ import {
 
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
@@ -759,17 +759,17 @@ const Session = ({ match, history }) => {
               )}
 
               <Col>
-                <Paragraph type="danger">
+                <Paragraph>
                   Uploading a document here will update the document in all its child sessions happening on a different
                   date.
                 </Paragraph>
-                <Paragraph type="danger">
+                <Paragraph>
                   To change the document on a specific date, please edit that date's session in the{' '}
-                  <Text type="danger" strong>
+                  <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath}>
                     {' '}
                     Upcoming Sessions{' '}
-                  </Text>{' '}
-                  page
+                  </Link>{' '}
+                  page after you have published the session.
                 </Paragraph>
               </Col>
             </Row>
