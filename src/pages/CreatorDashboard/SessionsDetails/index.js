@@ -249,7 +249,7 @@ const SessionsDetails = ({ match }) => {
                         {' '}
                         THIS{' '}
                       </Text>{' '}
-                      session only. To change the docs for all sessions click on the
+                      session only. To change the docs for all sessions click on the{' '}
                       <Text strong type="danger">
                         Edit Session
                       </Text>{' '}

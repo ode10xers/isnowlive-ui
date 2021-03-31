@@ -636,7 +636,10 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                     />
                   </Col>
                   <Col xs={2} md={2}>
-                    <Tooltip title="Apply custom time" visible={customTime.start_time && customTime.end_time}>
+                    <Tooltip
+                      title="Click to save this custom time"
+                      visible={customTime.start_time && customTime.end_time}
+                    >
                       <Button
                         shape="circle"
                         type="primary"
