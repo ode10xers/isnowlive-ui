@@ -611,9 +611,9 @@ const SessionRegistration = ({
                 <Paragraph>
                   Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
                   <Text delete>
-                    {classDetails.price} {classDetails.currency.toUpperCase()}
+                    {classDetails?.price} {classDetails?.currency.toUpperCase()}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> using your purchased pass
+                  <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased pass
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}
@@ -621,22 +621,11 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                {user ? (
-                  <Col xs={24} md={24} xl={24}>
-                    <PaymentCard
-                      btnProps={{ text: 'Buy', disableCondition: !selectedInventory }}
-                      onBeforePayment={onFinish}
-                      form={form}
-                    />
-                  </Col>
-                ) : (
-                  <Col xs={8} md={8} xl={5}>
-                    <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                      Register
-                    </Button>
-                  </Col>
-                )}
-
+                <Col xs={8} md={8} xl={5}>
+                  <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
+                    {user && classDetails?.price > 0 ? 'Buy' : 'Register'}
+                  </Button>
+                </Col>
                 {!selectedInventory && (
                   <Col xs={24}>
                     <Paragraph>

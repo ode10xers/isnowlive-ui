@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
-import { MenuOutlined, VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
+import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -172,15 +172,19 @@ const NavbarHeader = ({ removePadding = false }) => {
     return null;
   }
 
+  //TODO: Investigate better solution for dynamic font size adjustment
+  // Involves jquery: https://stackoverflow.com/questions/687998/auto-size-dynamic-text-to-fill-fixed-size-container?rq=1
+  // Currently implemented (inelegant solution) : https://stackoverflow.com/a/56588899
+
   return (
-    <div className={styles.navbarWrapper}>
+    <div>
       <HeaderModal
         visible={!localUserDetails && authModalVisible}
         closeModal={() => setAuthModalVisible(false)}
         signingIn={authModalState === 'signIn'}
         toggleSigningIn={toggleAuthModalState}
       />
-      <Row>
+      <Row className={styles.navbarWrapper}>
         <Col xs={24}>
           <Row>
             <Col
@@ -189,7 +193,13 @@ const NavbarHeader = ({ removePadding = false }) => {
                 inDashboard() && !isMobileDevice ? styles.dashboard : undefined
               )}
             >
-              <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile()}>
+              <span
+                className={classNames(
+                  styles.creatorSiteName,
+                  username.length >= 15 ? styles.textLength15 : username.length >= 9 ? styles.textLength9 : undefined
+                )}
+                onClick={() => redirectToCreatorProfile()}
+              >
                 {username.toUpperCase()}
               </span>
             </Col>
@@ -222,7 +232,12 @@ const NavbarHeader = ({ removePadding = false }) => {
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
               <Menu
                 mode="horizontal"
-                overflowedIndicator={<MenuOutlined className={styles.overflowMenuIcon} size={50} />}
+                overflowedIndicator={
+                  <Button ghost type="primary" className={styles.menuIndicator}>
+                    {' '}
+                    Menu{' '}
+                  </Button>
+                }
                 className={styles.menuContainer}
               >
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
@@ -307,11 +322,11 @@ const NavbarHeader = ({ removePadding = false }) => {
                         </Button>
                       ) : (
                         <Button className={styles.greenBtn} onClick={() => redirectToDashboard()}>
-                          My Dashboard
+                          Dashboard
                         </Button>
                       )
                     ) : (
-                      <Button className={styles.lightRedBtn} type="primary" onClick={() => showSignInModal()}>
+                      <Button className={styles.lightRedBtn} onClick={() => showSignInModal()}>
                         Sign In
                       </Button>
                     )}
@@ -319,7 +334,15 @@ const NavbarHeader = ({ removePadding = false }) => {
                 </Col>
                 <Col>
                   <span className={styles.mobileMenu}>
-                    <MenuOutlined style={{ fontSize: 20 }} onClick={() => setShowMobileMenu(true)} />
+                    <Button
+                      ghost
+                      type="primary"
+                      className={styles.menuIndicator}
+                      onClick={() => setShowMobileMenu(true)}
+                    >
+                      {' '}
+                      Menu{' '}
+                    </Button>
                   </span>
                 </Col>
               </Row>
@@ -342,7 +365,17 @@ const NavbarHeader = ({ removePadding = false }) => {
                 <Row className={styles.topRow}>
                   <Col xs={20}>
                     <div className={styles.siteHomeLink}>
-                      <span className={styles.creatorSiteName} onClick={() => redirectToCreatorProfile('home')}>
+                      <span
+                        className={classNames(
+                          styles.creatorSiteName,
+                          username.length >= 15
+                            ? styles.textLength15
+                            : username.length >= 9
+                            ? styles.textLength9
+                            : undefined
+                        )}
+                        onClick={() => redirectToCreatorProfile('home')}
+                      >
                         {username.toUpperCase()}
                       </span>
                     </div>
