@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 
-import { useHistory } from 'react-router-dom';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { Button, Row, Col, message } from 'antd';
 
@@ -55,11 +54,8 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
   const stripe = useStripe();
   const elements = useElements();
   const options = useOptions();
-  const history = useHistory();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  console.log('history', history);
 
   const makePayment = async (secret, cardEl) => {
     try {
@@ -103,8 +99,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    console.log('history', history);
-
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet. Make sure to disable
       // form submission until Stripe.js has loaded.
@@ -126,8 +120,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
         const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, cardEl);
 
         if (paymentRes) {
-          console.log('history', history);
-
           // const windowHost = window.location.host;
           // const urlToRedirect = `${windowHost}/stripe/payment/success?order_id=${orderResponse.payment_order_id}&transaction_id=${
           //   paymentSessionRes.transaction_id
