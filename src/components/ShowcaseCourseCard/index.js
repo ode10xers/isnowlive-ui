@@ -4,7 +4,6 @@ import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
-// import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -55,35 +54,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       setSelectedCourse(null);
     }
   }, [history]);
-
-  /* const initiatePaymentForOrder = async (orderDetails) => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.course_order_id,
-        order_type: orderType.COURSE,
-      });
-
-      if (isAPISuccess(status) && data) {
-        setSelectedCourse(null);
-
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  }; */
 
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
@@ -142,8 +112,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
             payment_order_type: orderType.COURSE,
             payment_order_id: data.course_order_id,
           };
-
-          // initiatePaymentForOrder(data);
         } else {
           setIsLoading(false);
 

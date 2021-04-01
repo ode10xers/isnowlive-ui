@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, message } from 'antd';
 import classNames from 'classnames';
 
-// import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
@@ -10,19 +9,20 @@ import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 import CreatorProfile from 'components/CreatorProfile';
-
 import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, reservedDomainName, orderType, productType } from 'utils/helper';
 
-import styles from './style.module.scss';
+import { useGlobalContext } from 'services/globalContext';
 
-const stripePromise = null;
+import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
 const PassDetails = ({ match, history }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -103,36 +103,34 @@ const PassDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.pass_id]);
 
-  const initiatePaymentForOrder = async (orderDetails) => {
-    setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.pass_order_id,
-        order_type: orderType.PASS,
-      });
-
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
-  const createOrder = async (userEmail) => {
+  const showConfirmPaymentPopup = () => {
     if (!pass) {
       showErrorModal('Something went wrong', 'Invalid Pass Selected');
       return;
+    }
+
+    const desc = `${pass.class_count} Credits, Valid for ${pass.validity} days`;
+
+    const paymentPopupData = {
+      productId: pass.external_id,
+      productType: 'PASS',
+      itemList: [
+        {
+          name: pass.name,
+          description: desc,
+          currency: pass.currency,
+          price: pass.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
+  };
+
+  const createOrder = async (userEmail, couponCode = '') => {
+    if (!pass) {
+      showErrorModal('Something went wrong', 'Invalid Pass Selected');
+      return null;
     }
 
     setIsLoading(true);
@@ -144,11 +142,22 @@ const PassDetails = ({ match, history }) => {
       });
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          return {
+            ...data,
+            payment_order_type: orderType.PASS,
+            payment_order_id: data.pass_order_id,
+          };
         } else {
-          setIsLoading(false);
           showBookingSuccessModal(userEmail, pass, false, false, username);
+
+          return {
+            ...data,
+            payment_order_type: orderType.PASS,
+            payment_order_id: data.pass_order_id,
+          };
         }
       }
     } catch (error) {
@@ -164,7 +173,11 @@ const PassDetails = ({ match, history }) => {
   return (
     <div className={styles.mt50}>
       <Loader loading={isLoading} size="large" text="Loading pass details">
-        <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+        <PurchaseModal
+          visible={showPurchaseModal}
+          closeModal={closePurchaseModal}
+          createOrder={showConfirmPaymentPopup}
+        />
         <Row gutter={[8, 24]}>
           <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
           <Col xs={24}>
