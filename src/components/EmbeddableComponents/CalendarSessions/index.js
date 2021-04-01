@@ -6,7 +6,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
 import PurchaseModal from 'components/PurchaseModal';
-import { showBookingSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { showAlreadyBookedModal } from 'components/Modals/modals';
 
 import { generateUrlFromUsername, isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -111,25 +111,9 @@ const CalendarSessions = () => {
     setPurchaseModalVisible(false);
   };
 
-  // Used to fetch order details, which will then gets
-  // passed to confirmation modal
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
-
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
-      }
-    } catch (error) {
-      console.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-    }
-
-    return null;
-  };
-
   // User Email is only passed for the modals, but for now we can ignore it
   // The modal can get the email from local storaage, so I'll remove it from here later
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     // Currently discount engine has not been implemented for session
     // however this form of createOrder will be what is used to accomodate
     // the new Payment Popup
@@ -155,30 +139,13 @@ const CalendarSessions = () => {
 
       if (isAPISuccess(status) && data) {
         setIsSessionLoading(false);
+        setSelectedInventory(null);
 
-        if (data.payment_required) {
-          // return await initiatePaymentForOrder({
-          //   order_id: data.order_id,
-          //   order_type: orderType.CLASS,
-          // });
-          return {
-            ...data,
-            payment_order_type: orderType.CLASS,
-            payment_order_id: data.order_id,
-          };
-        } else {
-          // Show confirmation message for free products
-          // Ideally this should happen in PaymentPopup logic
-          const orderDetails = await getAttendeeOrderDetails(data.order_id);
-          showBookingSuccessModal(userEmail, null, false, false, profileUsername, orderDetails);
-
-          setSelectedInventory(null);
-          return {
-            ...data,
-            order_type: orderType.CLASS,
-            payment_order_id: data.order_id,
-          };
-        }
+        return {
+          ...data,
+          payment_order_type: orderType.CLASS,
+          payment_order_id: data.order_id,
+        };
       }
     } catch (error) {
       setIsSessionLoading(false);

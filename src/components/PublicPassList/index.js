@@ -49,7 +49,7 @@ const PublicPassList = ({ username, passes }) => {
       return;
     }
 
-    const desc = '';
+    const desc = `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`;
 
     const paymentPopupData = {
       productId: selectedPass.external_id,
@@ -82,15 +82,15 @@ const PublicPassList = ({ username, passes }) => {
       });
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
         if (data.payment_required) {
-          // initiatePaymentForOrder(data);
           return {
             ...data,
             payment_order_type: orderType.PASS,
             payment_order_id: data.pass_order_id,
           };
         } else {
-          setIsLoading(false);
           showBookingSuccessModal(userEmail, selectedPass, false, false, username);
 
           return {

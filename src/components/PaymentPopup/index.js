@@ -12,8 +12,6 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
-// const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
-
 const { Text, Title } = Typography;
 
 const PaymentPopup = () => {
@@ -52,18 +50,6 @@ const PaymentPopup = () => {
     setDiscountedPrice(null);
   };
 
-  const handleInitiatePayment = async () => {
-    const appliedCouponCode = couponApplied ? couponCode : '';
-
-    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
-
-    if (result) {
-      return result;
-    } else {
-      return null;
-    }
-  };
-
   const applyCouponCode = async (value) => {
     setIsApplyingCoupon(true);
 
@@ -89,6 +75,18 @@ const PaymentPopup = () => {
       setCouponApplied(false);
     }
     setIsApplyingCoupon(false);
+  };
+
+  const handleInitiatePayment = async () => {
+    const appliedCouponCode = couponApplied ? couponCode : '';
+
+    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
+
+    if (result) {
+      return result;
+    } else {
+      return null;
+    }
   };
 
   const closePaymentPopup = () => {
@@ -205,6 +203,7 @@ const PaymentPopup = () => {
             </Row>
           </Col>
         )}
+
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={[8, 10]} justify="center">
             <Col xs={24}>
@@ -215,20 +214,6 @@ const PaymentPopup = () => {
                 form={null}
               />
             </Col>
-            {/* <Col>
-              <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
-            </Col>
-            <Col xs={24} md={10}>
-              <Button
-                block
-                className={styles.greenBtn}
-                type="primary"
-                onClick={handleInitiatePayment}
-                disabled={itemList?.length <= 0}
-              >
-                Pay Now
-              </Button>
-            </Col> */}
           </Row>
         </Col>
       </Row>
