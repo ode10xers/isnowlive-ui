@@ -108,9 +108,8 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+      return null;
     }
-
-    return null;
   };
 
   const handleSubmit = async (event) => {
@@ -129,6 +128,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
 
     const orderResponse = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
 
+    // TODO: Handle payment_required = false here
     if (orderResponse) {
       const paymentSessionRes = await createPaymentSessionForOrder({
         order_id: orderResponse.payment_order_id,
@@ -167,6 +167,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
           if (verifyOrderRes === orderType.COURSE) {
             showCourseBookingSuccessModal(userDetails.email, username);
           } else {
+            // Temporary logic for showing confirmation for Single Session Booking
             const orderDetails = await getAttendeeOrderDetails(orderResponse.payment_order_id);
             showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
           }

@@ -42,9 +42,8 @@ const PaymentVerification = () => {
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+      return null;
     }
-
-    return null;
   };
 
   useEffect(() => {
