@@ -306,7 +306,7 @@ const CalendarSessions = () => {
           customComponents={{
             event: Event,
           }}
-          step={60}
+          step={40}
           // defaultDate={calendarDate}
         />
       ) : (
