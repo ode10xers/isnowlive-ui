@@ -143,7 +143,7 @@ export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagC
 export const getDuration = (start_time, end_time) => {
   let duration = start_time && end_time ? getTimeDiff(end_time, start_time, 'minute') : 0;
   if (duration >= 60) {
-    return `${duration / 60} Hr`;
+    return `${Math.floor(duration / 60)} Hr`;
   }
   if (duration < 0) {
     return null;
