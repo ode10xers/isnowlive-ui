@@ -591,19 +591,25 @@ const VideoDetails = ({ match }) => {
                         </Col>
                       )}
 
-                      <Col xs={24} className={styles.mt10}>
-                        <Title level={3} className={styles.ml20}>
-                          {getLocalUserDetails() && userPasses.length > 0
-                            ? 'Buy using your pass'
-                            : 'Buy a pass and this video'}
-                        </Title>
-                      </Col>
+                      {(userPasses?.length > 0 || availablePassesForVideo?.length > 0) && (
+                        <>
+                          <Col xs={24} className={styles.mt10}>
+                            <Title level={3} className={styles.ml20}>
+                              {getLocalUserDetails() && userPasses.length > 0
+                                ? 'Buy using your pass'
+                                : availablePassesForVideo?.length > 0
+                                ? 'Buy a pass and this video'
+                                : ''}
+                            </Title>
+                          </Col>
 
-                      <Col xs={24} className={styles.passListContainer}>
-                        {getLocalUserDetails() && userPasses.length > 0
-                          ? userPasses.map((pass) => renderPassCards(pass, true))
-                          : availablePassesForVideo.map((pass) => renderPassCards(pass, false))}
-                      </Col>
+                          <Col xs={24} className={styles.passListContainer}>
+                            {getLocalUserDetails() && userPasses?.length > 0
+                              ? userPasses?.map((pass) => renderPassCards(pass, true))
+                              : availablePassesForVideo?.map((pass) => renderPassCards(pass, false))}
+                          </Col>
+                        </>
+                      )}
 
                       {video.sessions?.length > 0 && (
                         <Col xs={24}>
