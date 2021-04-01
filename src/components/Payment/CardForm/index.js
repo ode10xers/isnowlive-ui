@@ -24,18 +24,31 @@ const useOptions = () => {
     () => ({
       hidePostalCode: true,
       iconStyle: 'solid',
+      classes: {
+        base: styles.StripeCustomElement,
+        invalid: styles.StripeCustomElementInvalid,
+        focus: styles.StripeCustomElementFocus,
+        complete: styles.StripeCustomElementComplete,
+      },
       style: {
+        // Our DodgerBlue in colors.scss
+        // Also adjusted the font to match our website
         base: {
           iconColor: '#1890ff',
-          color: '#000',
-          fontWeight: 500,
-          fontSize: '16px',
+          fontWeight: 400,
+          fontSize: '14px',
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
         },
+        // Ant Design's Red danger color
         invalid: {
           iconColor: '#ff4d4f',
           color: '#ff4d4f',
+        },
+        // Our KellyGreen in colors.scss
+        complete: {
+          iconColor: '#52c41a',
+          color: '#52c41a',
         },
       },
     }),
@@ -168,33 +181,37 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
   };
 
   return (
-    <Row>
-      <Col xs={24} className={styles.inlineCardForm}>
-        <CardElement
-          options={options}
-          onChange={(event) => {
-            if (event.complete) {
-              setIsButtonDisabled(false);
-            } else {
-              setIsButtonDisabled(true);
-            }
-          }}
-        />
-      </Col>
-      <Col xs={24} className={styles.mt30}>
-        <Button
-          block
-          size="middle"
-          type="primary"
-          disabled={isButtonDisabled}
-          onClick={handleSubmit}
-          className={classNames(styles.greenBtn, isButtonDisabled ? styles.disabledBtn : undefined)}
-          loading={isSubmitting}
-        >
-          {text}
-        </Button>
-      </Col>
-    </Row>
+    <>
+      <Row>
+        <Col xs={24} className={styles.inlineCardForm}>
+          <CardElement
+            options={options}
+            onChange={(event) => {
+              if (event.complete) {
+                setIsButtonDisabled(false);
+              } else {
+                setIsButtonDisabled(true);
+              }
+            }}
+          />
+        </Col>
+      </Row>
+      <Row justify="center" className={styles.mt30}>
+        <Col xs={24} md={12} lg={8}>
+          <Button
+            block
+            size="middle"
+            type="primary"
+            disabled={isButtonDisabled}
+            onClick={handleSubmit}
+            className={classNames(styles.greenBtn, isButtonDisabled ? styles.disabledBtn : undefined)}
+            loading={isSubmitting}
+          >
+            {text}
+          </Button>
+        </Col>
+      </Row>
+    </>
   );
 };
 
