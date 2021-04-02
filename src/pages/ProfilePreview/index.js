@@ -521,12 +521,6 @@ const ProfilePreview = ({ username = null }) => {
                     {view === 'calendar' ? (
                       <Loader loading={isSessionLoading} size="large" text="Loading sessions">
                         {calendarSession.length > 0 ? (
-                          // <CalendarView
-                          //   inventories={calendarSession}
-                          //   onSelectInventory={redirectToSessionsPage}
-                          //   onViewChange={onViewChange}
-                          //   calendarView={calendarView}
-                          // />
                           <CalendarWrapper
                             calendarSessions={calendarSession}
                             sessionCountByDate={sessionCountByDate}

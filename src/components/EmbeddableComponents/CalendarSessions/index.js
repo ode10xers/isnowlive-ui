@@ -170,18 +170,6 @@ const CalendarSessions = () => {
         createOrder={showConfirmPaymentPopup}
       />
       {calendarSession.length > 0 && readyToPaint ? (
-        // <CalendarView
-        //   inventories={calendarSession}
-        //   onSelectInventory={redirectToSessionsPage}
-        //   onViewChange={onViewChange}
-        //   calendarView={calendarView}
-        //   classes={['custom-calendar-view']}
-        //   customComponents={{
-        //     event: Event,
-        //   }}
-        //   step={40}
-        //   updateCalendarDate={explicitUpdateCalendarDate}
-        // />
         <CalendarWrapper
           calendarSessions={calendarSession}
           sessionCountByDate={sessionCountByDate}
