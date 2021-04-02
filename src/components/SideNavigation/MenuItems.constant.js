@@ -9,6 +9,7 @@ import {
   BookOutlined,
   SettingOutlined,
   PercentageOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -115,6 +116,14 @@ export const creatorMenuItems = [
     icon: <SettingOutlined />,
     mixPanelTag: creator.click.dashboard.settingsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
+  },
+  {
+    order: 11,
+    key: 'audiences',
+    title: 'Audiences',
+    icon: <AuditOutlined />,
+    mixPanelTag: creator.click.dashboard.audiencesNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,
   },
 ];
 

@@ -274,24 +274,8 @@ const ProfilePreview = ({ username = null }) => {
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
     setSelectedListTab(key);
-
-    // if (key === 'session') {
-    //   handleChangeSessionTab(selectedSessionTab);
-    // }
     setIsListLoading(false);
   };
-
-  // const handleChangeSessionTab = (key) => {
-  //   setIsSessionLoading(true);
-  //   setSelectedSessionTab(key);
-  //   if (parseInt(key) === 0) {
-  //     trackSimpleEvent(user.click.profile.upcomingSessionsTab);
-  //     getSessionDetails('upcoming');
-  //   } else {
-  //     trackSimpleEvent(user.click.profile.pastSessionsTab);
-  //     getSessionDetails('past');
-  //   }
-  // };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
     trackSimpleEvent(eventTag);
