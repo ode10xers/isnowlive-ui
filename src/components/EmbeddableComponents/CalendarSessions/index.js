@@ -5,6 +5,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
+import CalendarWrapper from 'components/CalendarWrapper';
 import PurchaseModal from 'components/PurchaseModal';
 import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
@@ -15,6 +16,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 // eslint-disable-next-line
 import styles from './styles.scss';
+import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithTime },
@@ -42,7 +44,6 @@ const CalendarSessions = () => {
   const [calendarView, setCalendarView] = useState('month');
   const [readyToPaint, setReadyToPaint] = useState(false);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
-  const [calendarDate, setCalendarDate] = useState(new Date());
   const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
   const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
@@ -59,29 +60,13 @@ const CalendarSessions = () => {
     setExplicitUpdateCalendarDate(false);
   };
 
-  const getSessionCountByDate = (allEvents) => {
-    const eventsPerDay = {};
-    setReadyToPaint(false);
-    allEvents.forEach((event) => {
-      if (eventsPerDay[event.session_date]) {
-        const tempVal = eventsPerDay[event.session_date];
-        if (!tempVal.includes(event.inventory_id)) {
-          const updatedVal = [...tempVal, event.inventory_id];
-          eventsPerDay[event.session_date] = updatedVal;
-        }
-      } else {
-        eventsPerDay[event.session_date] = [event.inventory_id];
-      }
-    });
-    return eventsPerDay;
-  };
-
   const getCalendarSessions = async (username) => {
     try {
       setIsSessionLoading(true);
       const UpcomingRes = await apis.user.getSessionsByUsername(username, 'upcoming');
       const PastRes = await apis.user.getSessionsByUsername(username, 'past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
+        setReadyToPaint(false);
         const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
         setSessionCountByDate(res);
         setCalendarSession([
@@ -107,6 +92,10 @@ const CalendarSessions = () => {
     setSelectedInventory(inventory);
     setPurchaseModalVisible(true);
   };
+
+  const onEventBookClick = (event) => {
+    showPurchaseModal(event);
+  }
 
   const closePurchaseModal = () => {
     setSelectedInventory(null);
@@ -273,18 +262,22 @@ const CalendarSessions = () => {
         createOrder={showConfirmPaymentPopup}
       />
       {calendarSession.length > 0 && readyToPaint ? (
-        <CalendarView
-          inventories={calendarSession}
-          onSelectInventory={redirectToSessionsPage}
-          onViewChange={onViewChange}
-          calendarView={calendarView}
-          classes={['custom-calendar-view']}
-          customComponents={{
-            event: Event,
-          }}
-          step={40}
-          defaultDate={calendarDate}
-          updateCalendarDate={explicitUpdateCalendarDate}
+        // <CalendarView
+        //   inventories={calendarSession}
+        //   onSelectInventory={redirectToSessionsPage}
+        //   onViewChange={onViewChange}
+        //   calendarView={calendarView}
+        //   classes={['custom-calendar-view']}
+        //   customComponents={{
+        //     event: Event,
+        //   }}
+        //   step={40}
+        //   updateCalendarDate={explicitUpdateCalendarDate}
+        // />
+        <CalendarWrapper
+          calendarSessions={calendarSession}
+          sessionCountByDate={sessionCountByDate}
+          onEventBookClick={onEventBookClick}
         />
       ) : (
         <Empty />

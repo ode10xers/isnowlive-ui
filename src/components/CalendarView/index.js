@@ -23,7 +23,6 @@ const CalendarView = ({
   classes = [],
   customComponents = {},
   step = 60,
-  defaultDate = new Date(),
   updateCalendarDate = false,
 }) => {
   const [viewDate, setViewDate] = useState(new Date());

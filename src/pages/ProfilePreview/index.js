@@ -23,20 +23,26 @@ import PublicCourseList from 'components/PublicCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
+import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
+import PurchaseModal from 'components/PurchaseModal';
 
-import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode } from 'utils/helper';
+import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode, paymentSource, orderType, productType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
+import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
+import { useGlobalContext } from 'services/globalContext';
+import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
 const {
-  timezoneUtils: { getCurrentLongTimezone },
+  formatDate: { toLocaleTime, toLongDateWithTime },
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
 const productKeys = {
@@ -49,6 +55,7 @@ const productKeys = {
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
   const location = useLocation();
+  const { showPaymentPopup } = useGlobalContext();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
@@ -73,6 +80,9 @@ const ProfilePreview = ({ username = null }) => {
   const [liveCourses, setLiveCourses] = useState([]);
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+  const [sessionCountByDate, setSessionCountByDate] = useState({});
+  const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState(null);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -212,7 +222,18 @@ const ProfilePreview = ({ username = null }) => {
       const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
       const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
-        setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
+        const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
+        setSessionCountByDate(res);
+        setCalendarSession([
+          ...UpcomingRes.data.map((upcomingSessions) => ({
+            ...upcomingSessions,
+            isPast: false,
+          })),
+          ...PastRes.data.map((pastSessions) => ({
+            ...pastSessions,
+            isPast: true,
+          })),
+        ]);
       }
     } catch (error) {
       message.error('Failed to load user session details');
@@ -301,6 +322,15 @@ const ProfilePreview = ({ username = null }) => {
     setIsListLoading(false);
   };
 
+  const onEventBookClick = (event) => {
+    showPurchaseModal(event);
+  }
+
+  const showPurchaseModal = (inventory) => {
+    setSelectedInventory(inventory);
+    setPurchaseModalVisible(true);
+  };
+
   // const handleChangeSessionTab = (key) => {
   //   setIsSessionLoading(true);
   //   setSelectedSessionTab(key);
@@ -336,8 +366,101 @@ const ProfilePreview = ({ username = null }) => {
     setCalendarView(e);
   };
 
+  const closePurchaseModal = () => {
+    setSelectedInventory(null);
+    setPurchaseModalVisible(false);
+  };
+
+  const createOrder = async (couponCode = '') => {
+    // Currently discount engine has not been implemented for session
+    // however this form of createOrder will be what is used to accomodate
+    // the new Payment Popup
+
+    // Some front end checks to prevent the logic below from breaking
+    if (!selectedInventory) {
+      message.error('Invalid session schedule selected');
+      return null;
+    }
+
+    setIsSessionLoading(true);
+
+    try {
+      const payload = {
+        inventory_id: selectedInventory.inventory_id,
+        user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone_location: getTimezoneLocation(),
+        user_timezone: getCurrentLongTimezone(),
+        payment_source: paymentSource.GATEWAY,
+      };
+
+      const { status, data } = await apis.session.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        setIsSessionLoading(false);
+        // Keeping inventory_id since it's needed in confirmation modal
+        const inventoryId = selectedInventory.inventory_id;
+        setSelectedInventory(null);
+
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_type: orderType.CLASS,
+            payment_order_id: data.order_id,
+            inventory_id: inventoryId,
+          };
+        } else {
+          showBookSingleSessionSuccessModal(inventoryId);
+          return null;
+        }
+      }
+    } catch (error) {
+      setIsSessionLoading(false);
+
+      message.error(error.response?.data?.message || 'Something went wrong');
+
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(productType.CLASS);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(productType.PASS);
+      }
+
+      return null;
+    }
+  };
+
+  const showConfirmPaymentPopup = () => {
+    if (!selectedInventory) {
+      message.error('Invalid session schedule selected');
+      return;
+    }
+
+    const desc = toLongDateWithTime(selectedInventory.start_time);
+
+    const paymentPopupData = {
+      productId: selectedInventory.inventory_id,
+      productType: 'SESSION',
+      itemList: [
+        {
+          name: selectedInventory.name,
+          description: desc,
+          currency: selectedInventory.currency,
+          price: selectedInventory.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
+      <PurchaseModal
+        visible={purchaseModalVisible}
+        closeModal={closePurchaseModal}
+        createOrder={showConfirmPaymentPopup}
+      />
       {isOnDashboard && (
         <Row>
           <Col span={24}>
@@ -408,11 +531,16 @@ const ProfilePreview = ({ username = null }) => {
                     {view === 'calendar' ? (
                       <Loader loading={isSessionLoading} size="large" text="Loading sessions">
                         {calendarSession.length > 0 ? (
-                          <CalendarView
-                            inventories={calendarSession}
-                            onSelectInventory={redirectToSessionsPage}
-                            onViewChange={onViewChange}
-                            calendarView={calendarView}
+                          // <CalendarView
+                          //   inventories={calendarSession}
+                          //   onSelectInventory={redirectToSessionsPage}
+                          //   onViewChange={onViewChange}
+                          //   calendarView={calendarView}
+                          // />
+                          <CalendarWrapper
+                            calendarSessions={calendarSession}
+                            sessionCountByDate={sessionCountByDate}
+                            onEventBookClick={onEventBookClick}
                           />
                         ) : (
                           <Empty />
