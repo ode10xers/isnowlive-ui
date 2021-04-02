@@ -22,7 +22,6 @@ import PublicVideoList from 'components/PublicVideoList';
 import PublicCourseList from 'components/PublicCourseList';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
-import CalendarView from 'components/CalendarView';
 import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
 import PurchaseModal from 'components/PurchaseModal';
@@ -41,7 +40,7 @@ import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'compo
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
 const {
-  formatDate: { toLocaleTime, toLongDateWithTime },
+  formatDate: { toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
@@ -66,7 +65,6 @@ const ProfilePreview = ({ username = null }) => {
   const [profile, setProfile] = useState({});
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [view, setView] = useState('list');
-  const [calendarView, setCalendarView] = useState('month');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -353,18 +351,10 @@ const ProfilePreview = ({ username = null }) => {
     }
   };
 
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(username || session.username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
-  };
-
   const handleViewChange = (e) => {
     setView(e.target.value);
   };
 
-  const onViewChange = (e) => {
-    setCalendarView(e);
-  };
 
   const closePurchaseModal = () => {
     setSelectedInventory(null);

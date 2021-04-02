@@ -34,7 +34,6 @@ const CalendarView = ({
   useEffect(() => {
     if (updateCalendarDate) {
       setViewDate(updateCalendarDate.date);
-      updateCalendarDate = false;
     }
   }, [updateCalendarDate]);
 

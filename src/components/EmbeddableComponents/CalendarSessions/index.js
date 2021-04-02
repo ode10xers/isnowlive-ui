@@ -4,61 +4,33 @@ import { message, Empty } from 'antd';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import CalendarView from 'components/CalendarView';
 import CalendarWrapper from 'components/CalendarWrapper';
 import PurchaseModal from 'components/PurchaseModal';
 import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
+import { isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
 import dateUtil from 'utils/date';
 
 import { useGlobalContext } from 'services/globalContext';
 
-// eslint-disable-next-line
-import styles from './styles.scss';
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 const {
-  formatDate: { toLocaleTime, toLongDateWithTime },
+  formatDate: { toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
-
-function generateLightColorHex() {
-  let color = '#';
-  for (let i = 0; i < 3; i++)
-    color += ('0' + Math.floor(((1 + Math.random()) * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
-  return color;
-}
-
-const backdropColors = ['fcb096', 'fce992', 'dffc9b', 'a3feae', '85d2ff', '8a98ff', 'c098ff', 'fdade9', 'f1ffdc'];
-
-function getBackgroundColorsForMobile() {
-  return `#${backdropColors[Math.floor(Math.random() * backdropColors.length)]}`;
-}
 
 const CalendarSessions = () => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [calendarSession, setCalendarSession] = useState([]);
-  const [calendarView, setCalendarView] = useState('month');
   const [readyToPaint, setReadyToPaint] = useState(false);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
   const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
-  const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
 
   const profileUsername = window.location.hostname.split('.')[0] || '';
-
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session.creator_username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
-  };
-
-  const onViewChange = (e) => {
-    setCalendarView(e);
-    setExplicitUpdateCalendarDate(false);
-  };
 
   const getCalendarSessions = async (username) => {
     try {
@@ -189,70 +161,6 @@ const CalendarSessions = () => {
     getCalendarSessions(profileUsername);
     // eslint-disable-next-line
   }, [profileUsername]);
-
-  function Event(props) {
-    const onBookClick = (e) => {
-      e.stopPropagation();
-      console.log(event);
-      showPurchaseModal(event);
-    };
-
-    const { event } = props;
-
-    const borderColor = generateLightColorHex();
-
-    if (calendarView === 'month' || calendarView === 'agenda') {
-      const totalSessionThisDay = sessionCountByDate[event?.session_date] || 0;
-
-      const onMobileDateCellClick = (e) => {
-        const [y, m, d] = event.session_date.split('-');
-        // setCalendarDate(new Date(y, m - 1, d));
-        setCalendarView('day');
-        setExplicitUpdateCalendarDate({ date: new Date(y, m - 1, d) });
-        e.stopPropagation();
-      };
-
-      const bgColor = getBackgroundColorsForMobile();
-
-      return (
-        <>
-          <div
-            className="custom-event-container custom-month-event-container"
-            style={{ border: `2px solid ${borderColor}` }}
-            onClick={() => redirectToSessionsPage(event)}
-          >
-            <span className="event-title">{event.name}</span>
-            <span className="event-time">{toLocaleTime(event.start_time)}</span>
-          </div>
-          <div
-            className="custom-event-month-container-mb"
-            style={{ background: `${bgColor}` }}
-            onClick={onMobileDateCellClick}
-          >
-            {totalSessionThisDay.length}
-          </div>
-        </>
-      );
-    }
-
-    if (calendarView === 'week' || calendarView === 'day') {
-      return (
-        <div
-          className={`custom-event-container custom-day-event-container ${event.isPast ? 'past-event' : ''}`}
-          style={{
-            border: `2px solid ${borderColor}`,
-          }}
-        >
-          <div className="event-title">{event.name}</div>
-          <div className="event-time">{`${toLocaleTime(event.start_time)} - ${toLocaleTime(event.end_time)}`}</div>
-          <div className="event-tags-container">{event.group && <span className="group-pill">Group</span>}</div>
-          <button onClick={(e) => onBookClick(e)} className="book-btn">
-            Book
-          </button>
-        </div>
-      );
-    }
-  }
 
   return (
     <Loader loading={isSessionLoading} size="large" text="Loading sessions">
