@@ -254,7 +254,7 @@ const SessionDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const showConfirmPaymentPopup = async () => {
+  const showConfirmPaymentPopup = () => {
     setCreateFollowUpOrder(false);
 
     if (selectedVideo) {

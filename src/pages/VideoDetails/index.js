@@ -199,7 +199,7 @@ const VideoDetails = ({ match }) => {
 
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
-  const getUserPurchasedPass = async (getDefault = false) => {
+  const getUserPurchasedPass = (getDefault = false) => {
     if (userPasses.length) {
       if (selectedPass && !getDefault) {
         return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
@@ -351,7 +351,7 @@ const VideoDetails = ({ match }) => {
     //Handling edge case, buy free video using pass
     //We redirect them to the buySingleVideo flow
     if (selectedPass && video?.price > 0) {
-      const usableUserPass = await getUserPurchasedPass(false);
+      const usableUserPass = getUserPurchasedPass(false);
 
       if (usableUserPass) {
         const paymentPopupData = {
