@@ -3,10 +3,19 @@ import React, { useMemo, useState } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { Button, Row, Col } from 'antd';
 
-import { showCoursePurchaseSuccessModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
+import apis from 'apis';
+
+import {
+  showCoursePurchaseSuccessModal,
+  showBookSingleSessionSuccessModal,
+  showErrorModal,
+  showAlreadyBookedModal,
+  showPurchasePassAndGetVideoSuccessModal,
+  showPurchasePassSuccessModal,
+} from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
-import { orderType } from 'utils/helper';
+import { orderType, paymentSource, productType, isAPISuccess } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -55,7 +64,9 @@ const useOptions = () => {
   return options;
 };
 
-const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
+// NOTE: isFree is a flag sent from PaymentPopup in case the user does not need to pay
+// It can be used to bypass button disable condition, hide the card form, etc
+const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) => {
   const { text = 'PAY' } = btnProps;
 
   const {
@@ -93,18 +104,22 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
     }
   };
 
-  // const getAttendeeOrderDetails = async (orderId) => {
-  //   try {
-  //     const { status, data } = await apis.session.getAttendeeUpcomingSession();
+  const followUpGetVideo = async (payload) => {
+    try {
+      // Continue to book the video after Pass Purchase is successful
+      const followUpGetVideo = await apis.videos.createOrderForUser(payload);
 
-  //     if (isAPISuccess(status) && data) {
-  //       return data.find((orderDetails) => orderDetails.order_id === orderId);
-  //     }
-  //   } catch (error) {
-  //     message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-  //     return null;
-  //   }
-  // };
+      if (isAPISuccess(followUpGetVideo.status)) {
+        showPurchasePassAndGetVideoSuccessModal(payload.source_id);
+      }
+    } catch (error) {
+      if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+        showAlreadyBookedModal(productType.VIDEO);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -120,7 +135,8 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
 
     const orderResponse = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
 
-    // TODO: Handle payment_required = false here
+    // TODO: Handle the case where payment is not required
+    // if payment is not required, orderResponse will be null
     if (orderResponse) {
       const paymentSessionRes = await createPaymentSessionForOrder({
         order_id: orderResponse.payment_order_id,
@@ -153,10 +169,43 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
           });
 
           // TODO: Need to move all this post verification stuff to other place
-          if (verifyOrderRes === orderType.COURSE) {
+
+          if (verifyOrderRes === orderType.PASS) {
+            /*
+              In pass order, there can be follow up bookings
+              If a follow up booking is required, orderResponse 
+              will contain the required info in follow_up_booking_info
+              The example below is for follow up purchasing video
+
+              follow_up_booking_info: {
+                productType: 'VIDEO',
+                productId: video.external_id,
+              }
+
+              more details on other flows can be found in pages/PaymentVerification
+            */
+
+            const followUpBookingInfo = orderResponse.follow_up_booking_info;
+
+            if (followUpBookingInfo) {
+              if (followUpBookingInfo.productType === 'VIDEO') {
+                const payload = {
+                  video_id: followUpBookingInfo.productId,
+                  payment_source: paymentSource.PASS,
+                  source_id: orderResponse.payment_order_id,
+                };
+
+                await followUpGetVideo(payload);
+              }
+            } else {
+              // If no followup booking info is attached, then it's only a simple pass purchase
+              showPurchasePassSuccessModal(orderResponse.payment_order_id);
+            }
+          } else if (verifyOrderRes === orderType.COURSE) {
             showCoursePurchaseSuccessModal();
-          } else {
+          } else if (verifyOrderRes === orderType.CLASS) {
             // Temporary logic for showing confirmation for Single Session Booking
+            // inventory_id is attached for session orders
             showBookSingleSessionSuccessModal(orderResponse.inventory_id);
           }
 
@@ -171,27 +220,29 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
 
   return (
     <>
-      <Row>
-        <Col xs={24} className={styles.inlineCardForm}>
-          <CardElement
-            options={options}
-            onChange={(event) => {
-              if (event.complete) {
-                setIsButtonDisabled(false);
-              } else {
-                setIsButtonDisabled(true);
-              }
-            }}
-          />
-        </Col>
-      </Row>
+      {!isFree && (
+        <Row>
+          <Col xs={24} className={styles.inlineCardForm}>
+            <CardElement
+              options={options}
+              onChange={(event) => {
+                if (event.complete) {
+                  setIsButtonDisabled(false);
+                } else {
+                  setIsButtonDisabled(true);
+                }
+              }}
+            />
+          </Col>
+        </Row>
+      )}
       <Row justify="center" className={styles.mt30}>
         <Col xs={24} md={12} lg={8}>
           <Button
             block
             size="middle"
             type="primary"
-            disabled={isButtonDisabled}
+            disabled={!isFree && isButtonDisabled}
             onClick={handleSubmit}
             className={classNames(styles.greenBtn, isButtonDisabled ? styles.disabledBtn : undefined)}
             loading={isSubmitting}

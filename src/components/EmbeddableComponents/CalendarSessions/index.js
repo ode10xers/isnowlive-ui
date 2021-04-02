@@ -17,7 +17,7 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './styles.scss';
 
 const {
-  formatDate: { toLocaleTime },
+  formatDate: { toLocaleTime, toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
@@ -176,7 +176,7 @@ const CalendarSessions = () => {
       return;
     }
 
-    const desc = '';
+    const desc = toLongDateWithTime(selectedInventory.start_time);
 
     const paymentPopupData = {
       productId: selectedInventory.inventory_id,

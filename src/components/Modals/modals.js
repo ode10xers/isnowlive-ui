@@ -115,7 +115,7 @@ const getSessionInventoryDetails = async (inventoryId) => {
   return null;
 };
 
-const generateCustomButtonsForSessionModals = async (username, inventoryDetails) => (
+const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
   <div className={styles.mt20}>
     <Row justify="end" gutter={10}>
       {inventoryDetails && (
@@ -195,7 +195,7 @@ export const showPurchasePassAndBookSessionSuccessModal = async (passOrderId, in
           We have <Text strong> used 1 credit </Text> to book this class for you.
         </Paragraph>
         <Paragraph>
-          You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -226,7 +226,7 @@ export const showBookSessionWithPassSuccessModal = async (passOrderId, inventory
           <Text strong> {userPass?.pass_name || ''}. </Text>
         </Paragraph>
         <Paragraph>
-          You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -252,7 +252,7 @@ export const showBookSingleSessionSuccessModal = async (inventoryId) => {
     content: (
       <>
         <Paragraph>
-          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+          We have sent you a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -285,7 +285,7 @@ export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
           to get this video for you.
         </Paragraph>
         <Paragraph>
-          You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
@@ -314,7 +314,7 @@ export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
           <Text strong> {userPass?.pass_name || ''}. </Text>
         </Paragraph>
         <Paragraph>
-          You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -343,7 +343,7 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
           You have purchased the video <Text strong> {userVideo?.title || ''} </Text>
         </Paragraph>
         <Paragraph>
-          We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
+          We have sent you a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
@@ -365,7 +365,7 @@ export const showCoursePurchaseSuccessModal = () => {
     content: (
       <>
         <Paragraph>
-          You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
@@ -404,120 +404,10 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
     title: titleText,
     content: (
       <Paragraph>
-        It seems you have already <Text strong> {contentText} </Text>, please check your dashboard.
+        It seems you have already <Text strong> {contentText}</Text>, please check your dashboard.
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
     onOk: () => (window.location.href = generateUrl(getUsernameFromUrl()) + Routes.attendeeDashboard.rootPath),
-  });
-};
-
-//TODO: Refactor this to be usable for other product types OR split it for each flow
-// Calls to these two function below should now use separate implementations (above functions)
-export const showBookingSuccessModal = (
-  userEmail,
-  userPass = null,
-  isContinuedFlow = false,
-  userDidPayment = false,
-  targetDomainName,
-  orderDetails = null
-) => {
-  let redirectDomainName = targetDomainName;
-  if (!redirectDomainName) {
-    redirectDomainName = window.location.hostname.split('.')[0] || 'app';
-  }
-
-  Modal.success({
-    width: 480,
-    closable: true,
-    maskClosable: false,
-    title: 'Registration Successful',
-    content: (
-      <>
-        {isContinuedFlow ? (
-          userDidPayment ? (
-            //* Purchase Pass & Immediately Book Class
-            <>
-              <Paragraph>
-                You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-              </Paragraph>
-              <Paragraph>
-                We have <Text strong> used 1 credit </Text>
-                to book this class for you.
-              </Paragraph>
-              <Paragraph>
-                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-                from <Text strong> friends@passion.do. </Text>
-              </Paragraph>
-              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-            </>
-          ) : (
-            //* Book class from previously purchased Pass
-            <>
-              <Paragraph>
-                We have booked this session using 1 credit from your pass
-                <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
-              </Paragraph>
-              <Paragraph>
-                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-                from <Text strong> friends@passion.do. </Text>
-              </Paragraph>
-              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-            </>
-          )
-        ) : userPass ? (
-          //* Purchase Individual Pass without Booking Class
-          <>
-            <Paragraph>
-              You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-            </Paragraph>
-            <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
-          </>
-        ) : (
-          //* Book Class without Pass
-          <>
-            <Paragraph>
-              We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
-              <Text strong> friends@passion.do. </Text>
-            </Paragraph>
-            <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-          </>
-        )}
-        <div className={styles.mt20}>
-          <Row justify="end" gutter={10}>
-            {(isContinuedFlow || !userPass) && orderDetails && (
-              <Col>
-                <div>
-                  <AddToCalendarButton
-                    type="button"
-                    buttonText="Add to Cal"
-                    eventData={{
-                      ...orderDetails,
-                      page_url: `${generateUrlFromUsername(
-                        orderDetails?.username || orderDetails?.creator_username || redirectDomainName
-                      )}/e/${orderDetails.inventory_id}`,
-                    }}
-                  />
-                </div>
-              </Col>
-            )}
-            <Col>
-              <Button
-                type="primary"
-                block
-                onClick={() =>
-                  (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath)
-                }
-              >
-                Go To Dashboard
-              </Button>
-            </Col>
-          </Row>
-        </div>
-      </>
-    ),
-    okButtonProps: { style: { display: 'none' } },
-    okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };

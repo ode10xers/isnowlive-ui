@@ -273,7 +273,7 @@ const SessionDetails = ({ match, history }) => {
         payment_source: paymentSource.GATEWAY,
       };
 
-      buyVideo(payload, userEmail);
+      buyVideo(payload);
       setSelectedVideo(null);
     } else if (selectedPass) {
       const usersPass = getUserPurchasedPass(false);
@@ -412,19 +412,23 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const buyVideo = async (payload, userEmail) => {
+  const buyVideo = async (payload) => {
     try {
       const { status, data } = await apis.videos.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
         if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.video_order_id,
-            order_type: orderType.VIDEO,
-          });
+          return {
+            ...data,
+            payment_order_id: data.video_order_id,
+            payment_order_type: orderType.VIDEO,
+          };
         } else {
-          setIsLoading(false);
           showPurchaseSingleVideoSuccessModal(data.video_order_id);
+
+          return null;
         }
       }
     } catch (error) {
@@ -435,6 +439,8 @@ const SessionDetails = ({ match, history }) => {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
   const onFinish = async (values) => {
