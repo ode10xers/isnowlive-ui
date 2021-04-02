@@ -17,7 +17,9 @@ import {
   showAlreadyBookedModal,
   showSuccessModal,
   showErrorModal,
-  showVideoPurchaseSuccessModal,
+  showPurchasePassAndGetVideoSuccessModal,
+  showGetVideoWithPassSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -260,7 +262,7 @@ const VideoDetails = ({ match }) => {
             showSuccessModal('Video Purchase Successful', modalContent);
             setSelectedPass(null);
           } else {
-            showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
+            showPurchaseSingleVideoSuccessModal(data.video_order_id);
           }
         }
       }
@@ -268,7 +270,7 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
@@ -294,7 +296,7 @@ const VideoDetails = ({ match }) => {
           });
 
           if (isAPISuccess(followUpGetVideo.status)) {
-            showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
+            showPurchasePassAndGetVideoSuccessModal(data.pass_order_id);
             setIsLoading(false);
           }
         }
@@ -302,7 +304,7 @@ const VideoDetails = ({ match }) => {
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
@@ -314,7 +316,7 @@ const VideoDetails = ({ match }) => {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
+        showGetVideoWithPassSuccessModal(payload.source_id);
         setIsLoading(false);
       }
     } catch (error) {
@@ -322,7 +324,7 @@ const VideoDetails = ({ match }) => {
       message.error(error.response?.data?.message || 'Something went wrong');
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }

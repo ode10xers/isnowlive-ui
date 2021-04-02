@@ -7,7 +7,7 @@ import apis from 'apis';
 import VideoCard from 'components/VideoCard';
 import PurchaseModal from 'components/PurchaseModal';
 import Loader from 'components/Loader';
-import { showAlreadyBookedModal, showErrorModal, showVideoPurchaseSuccessModal } from 'components/Modals/modals';
+import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource, productType } from 'utils/helper';
 
@@ -70,7 +70,7 @@ const PublicVideoList = ({ username = null, videos }) => {
           };
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
+          showPurchaseSingleVideoSuccessModal(data.video_order_id);
 
           return {
             ...data,
@@ -83,7 +83,7 @@ const PublicVideoList = ({ username = null, videos }) => {
       setIsLoading(false);
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }

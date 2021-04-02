@@ -33,9 +33,11 @@ import dateUtil from 'utils/date';
 import styles from './style.module.scss';
 import {
   showErrorModal,
-  showBookingSuccessModal,
+  showBookSessionWithPassSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
+  showBookSingleSessionSuccessModal,
   showAlreadyBookedModal,
-  showVideoPurchaseSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
@@ -262,19 +264,6 @@ const SessionDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
-
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-      return null;
-    }
-  };
-
   const handleOrder = async (userEmail) => {
     // setIsLoading(true);
 
@@ -329,7 +318,6 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        console.log('Reached till Payment');
         if (data.payment_required) {
           const resData = initiatePaymentForOrder({
             order_id: data.order_id,
@@ -338,9 +326,7 @@ const SessionDetails = ({ match, history }) => {
 
           return resData;
         } else {
-          const orderDetails = await getAttendeeOrderDetails(data.order_id);
-
-          showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
+          showBookSingleSessionSuccessModal(payload.inventory_id);
           setIsLoading(false);
         }
       }
@@ -351,9 +337,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
   };
@@ -363,11 +349,13 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await buyPass(payload);
 
       if (isAPISuccess(status) && data) {
+        const inventoryId = parseInt(selectedInventory.inventory_id);
+
         if (data.payment_required) {
           initiatePaymentForOrder({
             order_id: data.pass_order_id,
             order_type: orderType.PASS,
-            inventory_id: parseInt(selectedInventory.inventory_id),
+            inventory_id: inventoryId,
           });
         } else {
           // If user (for some reason) buys a free pass (if any exists)
@@ -375,7 +363,7 @@ const SessionDetails = ({ match, history }) => {
 
           // Normally wouldn't trigger
           const followUpBooking = await bookClass({
-            inventory_id: parseInt(selectedInventory.inventory_id),
+            inventory_id: inventoryId,
             user_timezone_offset: new Date().getTimezoneOffset(),
             user_timezone: getCurrentLongTimezone(),
             payment_source: paymentSource.PASS,
@@ -383,9 +371,7 @@ const SessionDetails = ({ match, history }) => {
           });
 
           if (isAPISuccess(followUpBooking.status)) {
-            const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
-
-            showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
+            showPurchasePassAndBookSessionSuccessModal(data.pass_order_id, inventoryId);
             setIsLoading(false);
           }
         }
@@ -397,9 +383,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
   };
@@ -409,9 +395,7 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        const orderDetails = await getAttendeeOrderDetails(data.order_id);
-
-        showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
+        showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
         setIsLoading(false);
       }
     } catch (error) {
@@ -421,9 +405,9 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
   };
@@ -440,13 +424,13 @@ const SessionDetails = ({ match, history }) => {
           });
         } else {
           setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
+          showPurchaseSingleVideoSuccessModal(data.video_order_id);
         }
       }
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }

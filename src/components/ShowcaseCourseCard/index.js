@@ -8,7 +8,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import PurchaseModal from 'components/PurchaseModal';
-import { showCourseBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { showCoursePurchaseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
@@ -115,7 +115,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         } else {
           setIsLoading(false);
 
-          showCourseBookingSuccessModal(userEmail, username);
+          showCoursePurchaseSuccessModal();
           setSelectedCourse(null);
           return null;
         }
@@ -131,7 +131,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         error?.response?.status === 500 &&
         error?.response?.data?.message === 'user already has a confirmed order for this course'
       ) {
-        showAlreadyBookedModal(productType.COURSE, username);
+        showAlreadyBookedModal(productType.COURSE);
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }

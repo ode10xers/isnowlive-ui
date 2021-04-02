@@ -145,6 +145,7 @@ const CalendarSessions = () => {
           ...data,
           payment_order_type: orderType.CLASS,
           payment_order_id: data.order_id,
+          inventory_id: selectedInventory.inventory_id,
         };
       }
     } catch (error) {
@@ -155,9 +156,9 @@ const CalendarSessions = () => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, profileUsername);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, profileUsername);
+        showAlreadyBookedModal(productType.PASS);
       }
 
       return null;

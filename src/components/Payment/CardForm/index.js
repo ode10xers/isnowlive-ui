@@ -1,14 +1,12 @@
 import React, { useMemo, useState } from 'react';
 
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { Button, Row, Col, message } from 'antd';
+import { Button, Row, Col } from 'antd';
 
-import apis from 'apis';
-
-import { showCourseBookingSuccessModal, showBookingSuccessModal } from 'components/Modals/modals';
+import { showCoursePurchaseSuccessModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
-import { orderType, isAPISuccess } from 'utils/helper';
+import { orderType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -95,18 +93,18 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
     }
   };
 
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
+  // const getAttendeeOrderDetails = async (orderId) => {
+  //   try {
+  //     const { status, data } = await apis.session.getAttendeeUpcomingSession();
 
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-      return null;
-    }
-  };
+  //     if (isAPISuccess(status) && data) {
+  //       return data.find((orderDetails) => orderDetails.order_id === orderId);
+  //     }
+  //   } catch (error) {
+  //     message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
+  //     return null;
+  //   }
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -154,14 +152,12 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, form }) => {
             order_type: orderResponse.payment_order_type,
           });
 
-          const username = window.location.hostname.split('.')[0];
           // TODO: Need to move all this post verification stuff to other place
           if (verifyOrderRes === orderType.COURSE) {
-            showCourseBookingSuccessModal(userDetails.email, username);
+            showCoursePurchaseSuccessModal();
           } else {
             // Temporary logic for showing confirmation for Single Session Booking
-            const orderDetails = await getAttendeeOrderDetails(orderResponse.payment_order_id);
-            showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
+            showBookSingleSessionSuccessModal(orderResponse.inventory_id);
           }
 
           onAfterPayment();

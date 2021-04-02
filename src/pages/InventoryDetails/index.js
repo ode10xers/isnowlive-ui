@@ -32,7 +32,9 @@ import dateUtil from 'utils/date';
 import styles from './style.module.scss';
 import {
   showErrorModal,
-  showBookingSuccessModal,
+  showBookSingleSessionSuccessModal,
+  showBookSessionWithPassSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
   showAlreadyBookedModal,
   showSetNewPasswordModal,
   sendNewPasswordEmail,
@@ -64,7 +66,6 @@ const InventoryDetails = ({ match, history }) => {
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
-  const [username, setUsername] = useState(null);
 
   const getDetails = useCallback(
     async (inventory_id) => {
@@ -77,7 +78,6 @@ const InventoryDetails = ({ match, history }) => {
           setSession(inventoryDetails);
 
           const creatorUsername = inventoryDetails.creator_username || window.location.hostname.split('.')[0];
-          setUsername(creatorUsername);
 
           const creatorDetailsResponse = await apis.user.getProfileByUsername(creatorUsername);
           if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
@@ -244,25 +244,14 @@ const InventoryDetails = ({ match, history }) => {
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
-
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
-      }
-    } catch (error) {
-      console.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-      return null;
-    }
-  };
-
   const createOrder = async (userEmail) => {
     setCreateFollowUpOrder(null);
+    const inventoryId = parseInt(match.params.inventory_id);
+
     try {
       // Default payload if user book single class
       let payload = {
-        inventory_id: parseInt(match.params.inventory_id),
+        inventory_id: inventoryId,
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
@@ -307,7 +296,7 @@ const InventoryDetails = ({ match, history }) => {
               // If user (for some reason) buys a free pass (if any exists)
               // we then immediately followUp the Booking Process
               const followUpBooking = await bookClass({
-                inventory_id: parseInt(match.params.inventory_id),
+                inventory_id: inventoryId,
                 user_timezone_offset: new Date().getTimezoneOffset(),
                 user_timezone: getCurrentLongTimezone(),
                 payment_source: paymentSource.PASS,
@@ -315,21 +304,15 @@ const InventoryDetails = ({ match, history }) => {
               });
 
               if (isAPISuccess(followUpBooking.status)) {
-                const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
-
-                showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
+                showPurchasePassAndBookSessionSuccessModal(data.pass_order_id, inventoryId);
                 setIsLoading(false);
               }
             } else {
-              const orderDetails = await getAttendeeOrderDetails(data.order_id);
-
-              showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
+              showBookSessionWithPassSuccessModal(payload.source_id, inventoryId);
               setIsLoading(false);
             }
           } else {
-            const orderDetails = await getAttendeeOrderDetails(data.order_id);
-
-            showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
+            showBookSingleSessionSuccessModal(inventoryId);
             setIsLoading(false);
           }
         }
@@ -341,9 +324,9 @@ const InventoryDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
   };

@@ -12,7 +12,7 @@ import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
 import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
 
@@ -91,7 +91,7 @@ const PublicPassList = ({ username, passes }) => {
             payment_order_id: data.pass_order_id,
           };
         } else {
-          showBookingSuccessModal(userEmail, selectedPass, false, false, username);
+          showPurchasePassSuccessModal(data.pass_order_id);
 
           return {
             ...data,
@@ -104,7 +104,7 @@ const PublicPassList = ({ username, passes }) => {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
       return null;
     }
