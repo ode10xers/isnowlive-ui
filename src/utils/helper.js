@@ -8,6 +8,8 @@ const {
 
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
+export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
+
 export const generateQueryString = (data) => {
   return Object.entries(data)
     .map(([key, val]) => `${key}=${val}`)

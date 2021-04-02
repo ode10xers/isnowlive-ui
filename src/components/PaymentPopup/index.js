@@ -27,7 +27,8 @@ const PaymentPopup = () => {
   const [couponApplied, setCouponApplied] = useState(false);
   const [showCouponField, setShowCouponField] = useState(false);
 
-  const { itemList, productId, productType } = paymentPopupData || { itemList: [], productId: null, productType: null };
+  const { itemList = [], productId = null, productType = null, paymentInstrumentDetails = null } =
+    paymentPopupData || {};
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
 
   useEffect(() => {
@@ -91,8 +92,10 @@ const PaymentPopup = () => {
 
   const closePaymentPopup = () => {
     setCouponCode('');
-    setDiscountedPrice(null);
     setCouponApplied(false);
+    setCouponErrorText(null);
+    setDiscountedPrice(null);
+    setIsApplyingCoupon(false);
 
     //TODO: Might also want to trigger clearing the CardElement from stripe here if required
     // But if we're showing the saved cards for the user, it won't be required
@@ -118,6 +121,29 @@ const PaymentPopup = () => {
     closePaymentPopup();
   };
 
+  const generatePaymentInstrumentDetails = () => {
+    if (!paymentInstrumentDetails) {
+      return null;
+    }
+
+    let textContent = '';
+
+    if (paymentInstrumentDetails.type === 'PASS') {
+      textContent = `Will be booked using your pass ${paymentInstrumentDetails.name}`;
+    }
+
+    //TODO: Will also add text when subscription can be used as payment instrument later
+
+    return (
+      <Text strong className={styles.blueText}>
+        {' '}
+        {textContent}{' '}
+      </Text>
+    );
+  };
+
+  const isFree = () => (discountedPrice ? discountedPrice === 0 : totalPrice === 0);
+
   return (
     <Modal
       visible={paymentPopupVisible}
@@ -137,8 +163,7 @@ const PaymentPopup = () => {
               <List.Item
                 actions={[
                   <Text strong>
-                    {' '}
-                    {item?.currency?.toUpperCase()} {item?.price}{' '}
+                    {item?.currency?.toUpperCase()} {item?.price}
                   </Text>,
                 ]}
               >
@@ -148,6 +173,7 @@ const PaymentPopup = () => {
                 />
               </List.Item>
             )}
+            footer={generatePaymentInstrumentDetails()}
           />
         </Col>
         <Col xs={24} className={styles.topBorder}>
@@ -173,14 +199,16 @@ const PaymentPopup = () => {
                   </Text>
                 ))}
             </Col>
-            <Col xs={24}>
-              <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
-                {showCouponField ? `Don't use ` : 'Use '} a coupon
-              </Button>
-            </Col>
+            {totalPrice > 0 && (
+              <Col xs={24}>
+                <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
+                  {showCouponField ? `Don't use ` : 'Use '} a coupon
+                </Button>
+              </Col>
+            )}
           </Row>
         </Col>
-        {showCouponField && (
+        {showCouponField && totalPrice > 0 && (
           <Col xs={24} className={styles.topBorder}>
             <Row justify="start">
               <Col xs={24} md={14} lg={12}>
@@ -208,7 +236,8 @@ const PaymentPopup = () => {
           <Row gutter={[8, 10]} justify="center">
             <Col xs={24}>
               <PaymentCard
-                btnProps={{ text: 'Buy', disableCondition: false }}
+                btnProps={{ text: isFree() ? 'Get' : 'Buy', disableCondition: false }}
+                isFree={isFree()}
                 onBeforePayment={handleInitiatePayment}
                 onAfterPayment={handleAfterPayment}
                 form={null}

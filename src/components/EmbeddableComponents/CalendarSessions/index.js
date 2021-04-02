@@ -6,7 +6,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
 import PurchaseModal from 'components/PurchaseModal';
-import { showAlreadyBookedModal } from 'components/Modals/modals';
+import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
 import { generateUrlFromUsername, isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -17,7 +17,7 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './styles.scss';
 
 const {
-  formatDate: { toLocaleTime },
+  formatDate: { toLocaleTime, toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
@@ -113,8 +113,6 @@ const CalendarSessions = () => {
     setPurchaseModalVisible(false);
   };
 
-  // User Email is only passed for the modals, but for now we can ignore it
-  // The modal can get the email from local storaage, so I'll remove it from here later
   const createOrder = async (couponCode = '') => {
     // Currently discount engine has not been implemented for session
     // however this form of createOrder will be what is used to accomodate
@@ -141,13 +139,21 @@ const CalendarSessions = () => {
 
       if (isAPISuccess(status) && data) {
         setIsSessionLoading(false);
+        // Keeping inventory_id since it's needed in confirmation modal
+        const inventoryId = selectedInventory.inventory_id;
         setSelectedInventory(null);
 
-        return {
-          ...data,
-          payment_order_type: orderType.CLASS,
-          payment_order_id: data.order_id,
-        };
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_type: orderType.CLASS,
+            payment_order_id: data.order_id,
+            inventory_id: inventoryId,
+          };
+        } else {
+          showBookSingleSessionSuccessModal(inventoryId);
+          return null;
+        }
       }
     } catch (error) {
       setIsSessionLoading(false);
@@ -157,9 +163,9 @@ const CalendarSessions = () => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, profileUsername);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, profileUsername);
+        showAlreadyBookedModal(productType.PASS);
       }
 
       return null;
@@ -172,7 +178,7 @@ const CalendarSessions = () => {
       return;
     }
 
-    const desc = '';
+    const desc = toLongDateWithTime(selectedInventory.start_time);
 
     const paymentPopupData = {
       productId: selectedInventory.inventory_id,

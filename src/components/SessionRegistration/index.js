@@ -9,7 +9,6 @@ import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons'
 import Routes from 'routes';
 
 import Table from 'components/Table';
-// import PaymentCard from 'components/Payment/PaymentCard';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';

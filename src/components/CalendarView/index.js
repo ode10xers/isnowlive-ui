@@ -26,12 +26,11 @@ const CalendarView = ({
   defaultDate = new Date(),
   updateCalendarDate = false,
 }) => {
-
   const [viewDate, setViewDate] = useState(new Date());
 
   const onCalendarNavigate = (...props) => {
     setViewDate(props[0]);
-  }
+  };
 
   useEffect(() => {
     if (updateCalendarDate) {

@@ -3,7 +3,6 @@ import { Row, Col, Typography, Space, Divider, Card, Button, Tag, message } from
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 
-// import config from 'config';
 import apis from 'apis';
 
 import CreatorProfile from 'components/CreatorProfile';
@@ -17,7 +16,9 @@ import {
   showAlreadyBookedModal,
   showSuccessModal,
   showErrorModal,
-  showVideoPurchaseSuccessModal,
+  showPurchasePassAndGetVideoSuccessModal,
+  showGetVideoWithPassSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -32,9 +33,9 @@ import {
   reservedDomainName,
 } from 'utils/helper';
 
-import styles from './style.module.scss';
+import { useGlobalContext } from 'services/globalContext';
 
-const stripePromise = null;
+import styles from './style.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
 const {
@@ -42,6 +43,8 @@ const {
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -52,7 +55,7 @@ const VideoDetails = ({ match }) => {
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
-  const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
+  // const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [username, setUsername] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
@@ -186,17 +189,17 @@ const VideoDetails = ({ match }) => {
     //eslint-disable-next-line
   }, [match.params.video_id]);
 
-  useEffect(() => {
-    if (shouldFollowUpGetVideo) {
-      const userDetails = getLocalUserDetails();
-      handleOrder(userDetails.email);
-    }
-    //eslint-disable-next-line
-  }, [userPasses]);
+  // useEffect(() => {
+  //   if (shouldFollowUpGetVideo) {
+  //     const userDetails = getLocalUserDetails();
+  //     showConfirmPaymentPopup(userDetails.email);
+  //   }
+  //   //eslint-disable-next-line
+  // }, [userPasses]);
 
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
-  const getUserPurchasedPass = async (getDefault = false) => {
+  const getUserPurchasedPass = (getDefault = false) => {
     if (userPasses.length) {
       if (selectedPass && !getDefault) {
         return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
@@ -208,42 +211,22 @@ const VideoDetails = ({ match }) => {
     return null;
   };
 
-  const initiatePaymentForOrder = async (payload) => {
+  const buySingleVideo = async (payload, couponCode = '') => {
     setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
-  const buySingleVideo = async (userEmail, payload) => {
     try {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.video_order_id,
-            order_type: orderType.VIDEO,
-          });
-        } else {
-          setIsLoading(false);
+        setIsLoading(false);
 
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_id: data.video_order_id,
+            payment_order_type: orderType.VIDEO,
+          };
+        } else {
           // This popup will only show up in very edge cases
           if (selectedPass) {
             const modalContent = (
@@ -260,33 +243,46 @@ const VideoDetails = ({ match }) => {
             showSuccessModal('Video Purchase Successful', modalContent);
             setSelectedPass(null);
           } else {
-            showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
+            showPurchaseSingleVideoSuccessModal(data.video_order_id);
           }
+
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
-  const buyPassAndGetVideo = async (userEmail, payload) => {
+  const buyPassAndGetVideo = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await apis.passes.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
         if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.pass_order_id,
-            order_type: orderType.PASS,
-            video_id: video.external_id,
-          });
+          return {
+            ...data,
+            payment_order_id: data.pass_order_id,
+            payment_order_type: orderType.PASS,
+            follow_up_booking_info: {
+              productType: 'VIDEO',
+              productId: video.external_id,
+            },
+          };
         } else {
+          // It's a free pass, so we immediately book the video after this
           const followUpGetVideo = await purchaseVideo({
             video_id: video.external_id,
             payment_source: paymentSource.PASS,
@@ -294,83 +290,142 @@ const VideoDetails = ({ match }) => {
           });
 
           if (isAPISuccess(followUpGetVideo.status)) {
-            showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
+            showPurchasePassAndGetVideoSuccessModal(data.pass_order_id);
             setIsLoading(false);
           }
+
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
-  const buyVideoUsingPass = async (userEmail, payload) => {
+  const buyVideoUsingPass = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
+        showGetVideoWithPassSuccessModal(payload.source_id);
         setIsLoading(false);
+        return null;
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
-  const handleOrder = async (userEmail) => {
-    setIsLoading(true);
+  const showConfirmPaymentPopup = async () => {
+    // if (!shouldFollowUpGetVideo) {
+    //   if (getLocalUserDetails() && userPasses.length <= 0) {
+    //     setShouldFollowUpGetVideo(true);
+    //     getUsablePassesForUser(match.params.video_id);
+    //     return;
+    //   }
+    // } else {
+    //   setShouldFollowUpGetVideo(false);
+    // }
 
-    if (!shouldFollowUpGetVideo) {
-      if (getLocalUserDetails() && userPasses.length <= 0) {
-        setShouldFollowUpGetVideo(true);
-        getUsablePassesForUser(match.params.video_id);
-        return;
-      }
-    } else {
-      setShouldFollowUpGetVideo(false);
-    }
+    //TODO: Try with edge case of loggedout user trying to buy a pass that has been purchased in their acc
+    const videoDesc = `Can be watched up to ${video.watch_limit} times, valid for ${video.validity} days`;
 
     //Handling edge case, buy free video using pass
     //We redirect them to the buySingleVideo flow
     if (selectedPass && video?.price > 0) {
-      const usableUserPass = await getUserPurchasedPass(false);
+      const usableUserPass = getUserPurchasedPass(false);
 
       if (usableUserPass) {
+        const paymentPopupData = {
+          productId: video.external_id,
+          productType: 'VIDEO',
+          itemList: [
+            {
+              name: video.title,
+              description: videoDesc,
+              currency: video.currency,
+              price: 0,
+            },
+          ],
+          paymentInstrumentDetails: {
+            type: 'PASS',
+            name: usableUserPass.pass_name,
+          },
+        };
+
         const payload = {
           video_id: video.external_id,
           payment_source: paymentSource.PASS,
           source_id: usableUserPass.pass_order_id,
         };
 
-        buyVideoUsingPass(userEmail, payload);
+        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideoUsingPass(payload, couponCode));
       } else {
+        const paymentPopupData = {
+          productId: selectedPass.external_id,
+          productType: 'PASS',
+          itemList: [
+            {
+              name: selectedPass.name,
+              description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
+              currency: selectedPass.currency,
+              price: selectedPass.price,
+            },
+            {
+              name: video.title,
+              description: videoDesc,
+              currency: video.currency,
+              price: 0,
+            },
+          ],
+        };
+
         const payload = {
           pass_id: selectedPass.id,
           price: selectedPass.price,
           currency: selectedPass.currency.toLowerCase(),
         };
 
-        buyPassAndGetVideo(userEmail, payload);
+        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndGetVideo(payload, couponCode));
       }
     } else {
+      const paymentPopupData = {
+        productId: video.external_id,
+        productType: 'VIDEO',
+        itemList: [
+          {
+            name: video.title,
+            description: videoDesc,
+            currency: video.currency,
+            price: video.price,
+          },
+        ],
+      };
+
       const payload = {
         video_id: video.external_id,
         payment_source: paymentSource.GATEWAY,
       };
 
-      buySingleVideo(userEmail, payload);
+      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleVideo(payload, couponCode));
     }
   };
 
@@ -529,7 +584,7 @@ const VideoDetails = ({ match }) => {
                 <PurchaseModal
                   visible={showPurchaseVideoModal}
                   closeModal={closePurchaseModal}
-                  createOrder={handleOrder}
+                  createOrder={showConfirmPaymentPopup}
                 />
                 <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
                   <Col xs={24} className={styles.showcaseCardContainer}>

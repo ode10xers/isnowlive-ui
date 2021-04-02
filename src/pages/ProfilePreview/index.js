@@ -236,7 +236,7 @@ const ProfilePreview = ({ username = null }) => {
     getPassesDetails,
     getVideosDetails,
     getCoursesDetails,
-    getCalendarSessionDetails
+    getCalendarSessionDetails,
   ]);
 
   const getDefaultTabToShow = useCallback(() => {
@@ -415,20 +415,20 @@ const ProfilePreview = ({ username = null }) => {
                             calendarView={calendarView}
                           />
                         ) : (
-                            <Empty />
-                          )}
+                          <Empty />
+                        )}
                       </Loader>
                     ) : (
-                        <Tabs defaultActiveKey={0}>
-                          {['Upcoming Sessions'].map((item, index) => (
-                            <Tabs.TabPane tab={item} key={index}>
-                              <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-                                <Sessions username={username} sessions={sessions} />
-                              </Loader>
-                            </Tabs.TabPane>
-                          ))}
-                        </Tabs>
-                      )}
+                      <Tabs defaultActiveKey={0}>
+                        {['Upcoming Sessions'].map((item, index) => (
+                          <Tabs.TabPane tab={item} key={index}>
+                            <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+                              <Sessions username={username} sessions={sessions} />
+                            </Loader>
+                          </Tabs.TabPane>
+                        ))}
+                      </Tabs>
+                    )}
                   </Col>
                 </Row>
               </Tabs.TabPane>

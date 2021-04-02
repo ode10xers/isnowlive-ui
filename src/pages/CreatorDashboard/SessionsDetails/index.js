@@ -173,11 +173,7 @@ const SessionsDetails = ({ match }) => {
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
-              <Button
-                className={styles.headButton}
-                icon={<CopyOutlined />}
-                onClick={() => copyToClipboard(publicUrl)}
-              >
+              <Button className={styles.headButton} icon={<CopyOutlined />} onClick={() => copyToClipboard(publicUrl)}>
                 Copy Page Link
               </Button>
             </Col>

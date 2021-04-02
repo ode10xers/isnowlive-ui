@@ -12,7 +12,7 @@ import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
 import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
 
@@ -67,7 +67,7 @@ const PublicPassList = ({ username, passes }) => {
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     if (!selectedPass) {
       showErrorModal('Something went wrong', 'Invalid Pass ID');
       return null;
@@ -83,6 +83,7 @@ const PublicPassList = ({ username, passes }) => {
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
+        setSelectedPass(null);
 
         if (data.payment_required) {
           return {
@@ -91,20 +92,15 @@ const PublicPassList = ({ username, passes }) => {
             payment_order_id: data.pass_order_id,
           };
         } else {
-          showBookingSuccessModal(userEmail, selectedPass, false, false, username);
-
-          return {
-            ...data,
-            payment_order_type: orderType.PASS,
-            payment_order_id: data.pass_order_id,
-          };
+          showPurchasePassSuccessModal(data.pass_order_id);
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
       return null;
     }
