@@ -45,6 +45,7 @@ const CalendarSessions = () => {
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
+  const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
 
   const profileUsername = window.location.hostname.split('.')[0] || '';
 
@@ -55,6 +56,7 @@ const CalendarSessions = () => {
 
   const onViewChange = (e) => {
     setCalendarView(e);
+    setExplicitUpdateCalendarDate(false);
   };
 
   const getSessionCountByDate = (allEvents) => {
@@ -209,8 +211,9 @@ const CalendarSessions = () => {
 
       const onMobileDateCellClick = (e) => {
         const [y, m, d] = event.session_date.split('-');
-        setCalendarDate(new Date(y, m - 1, d));
+        // setCalendarDate(new Date(y, m - 1, d));
         setCalendarView('day');
+        setExplicitUpdateCalendarDate({ date: new Date(y, m - 1, d) });
         e.stopPropagation();
       };
 
@@ -275,6 +278,7 @@ const CalendarSessions = () => {
           }}
           step={40}
           defaultDate={calendarDate}
+          updateCalendarDate={explicitUpdateCalendarDate}
         />
       ) : (
         <Empty />
