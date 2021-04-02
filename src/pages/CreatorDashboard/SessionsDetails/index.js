@@ -16,7 +16,7 @@ import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
 import dateUtil from 'utils/date';
-import { generateUrlFromUsername, isAPISuccess, getDuration, copyPageLinkToClipboard } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import FileUpload from 'components/FileUpload';
@@ -176,7 +176,7 @@ const SessionsDetails = ({ match }) => {
               <Button
                 className={styles.headButton}
                 icon={<CopyOutlined />}
-                onClick={() => copyPageLinkToClipboard(publicUrl)}
+                onClick={() => copyToClipboard(publicUrl)}
               >
                 Copy Page Link
               </Button>

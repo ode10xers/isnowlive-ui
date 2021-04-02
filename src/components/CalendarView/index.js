@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -25,7 +25,19 @@ const CalendarView = ({
   step = 60,
   defaultDate = new Date(),
 }) => {
-  let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
+
+  const [viewDate, setViewDate] = useState(new Date());
+
+  const onCalendarNavigate = (...props) => {
+    setViewDate(props[0]);
+  }
+
+  useEffect(() => {
+    setViewDate(defaultDate);
+  }, [defaultDate]);
+
+
+  let views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
   return (
     <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
       <Calendar
@@ -48,7 +60,8 @@ const CalendarView = ({
         }
         drilldownView="week"
         components={customComponents}
-        // date={defaultDate}
+        date={viewDate}
+        onNavigate={onCalendarNavigate}
       />
     </div>
   );
