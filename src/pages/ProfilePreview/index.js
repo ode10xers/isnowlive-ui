@@ -201,6 +201,24 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  const getCalendarSessionDetails = useCallback(async () => {
+    try {
+      let profileUsername = '';
+      if (username) {
+        profileUsername = username;
+      } else {
+        profileUsername = getLocalUserDetails().username;
+      }
+      const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
+      const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
+      if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
+        setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
+      }
+    } catch (error) {
+      message.error('Failed to load user session details');
+    }
+  }, [username]);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnDashboard(true);
@@ -210,6 +228,7 @@ const ProfilePreview = ({ username = null }) => {
     getPassesDetails();
     getVideosDetails();
     getCoursesDetails();
+    getCalendarSessionDetails();
   }, [
     history.location.pathname,
     getProfileDetails,
@@ -217,6 +236,7 @@ const ProfilePreview = ({ username = null }) => {
     getPassesDetails,
     getVideosDetails,
     getCoursesDetails,
+    getCalendarSessionDetails,
   ]);
 
   const getDefaultTabToShow = useCallback(() => {
@@ -308,28 +328,8 @@ const ProfilePreview = ({ username = null }) => {
     window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
-  const handleViewChange = async (e) => {
+  const handleViewChange = (e) => {
     setView(e.target.value);
-    if (e.target.value === 'calendar') {
-      try {
-        setIsSessionLoading(true);
-        let profileUsername = '';
-        if (username) {
-          profileUsername = username;
-        } else {
-          profileUsername = getLocalUserDetails().username;
-        }
-        const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
-        const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
-        if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
-          setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
-          setIsSessionLoading(false);
-        }
-      } catch (error) {
-        setIsSessionLoading(false);
-        message.error('Failed to load user session details');
-      }
-    }
   };
 
   const onViewChange = (e) => {

@@ -24,6 +24,7 @@ const CalendarView = ({
   customComponents = {},
   step = 60,
   defaultDate = new Date(),
+  updateCalendarDate = false,
 }) => {
   const [viewDate, setViewDate] = useState(new Date());
 
@@ -32,8 +33,11 @@ const CalendarView = ({
   };
 
   useEffect(() => {
-    setViewDate(defaultDate);
-  }, [defaultDate]);
+    if (updateCalendarDate) {
+      setViewDate(updateCalendarDate.date);
+      updateCalendarDate = false;
+    }
+  }, [updateCalendarDate]);
 
   let views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
   return (
@@ -56,7 +60,7 @@ const CalendarView = ({
         tooltipAccessor={(e) =>
           `${e.name} - ${toShortTimeWithPeriod(e.start_time)} - ${toShortTimeWithPeriod(e.end_time)}`
         }
-        drilldownView="week"
+        drilldownView={isMobileDevice ? 'day' : 'week'}
         components={customComponents}
         date={viewDate}
         onNavigate={onCalendarNavigate}
