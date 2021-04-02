@@ -153,11 +153,7 @@ const PassDetails = ({ match, history }) => {
         } else {
           showPurchasePassSuccessModal(data.pass_order_id);
 
-          return {
-            ...data,
-            payment_order_type: orderType.PASS,
-            payment_order_id: data.pass_order_id,
-          };
+          return null;
         }
       }
     } catch (error) {

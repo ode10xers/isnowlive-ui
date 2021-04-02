@@ -53,7 +53,7 @@ const PublicVideoList = ({ username = null, videos }) => {
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     try {
       const payload = {
         video_id: selectedVideo?.external_id,
@@ -62,6 +62,9 @@ const PublicVideoList = ({ username = null, videos }) => {
 
       const { status, data } = await apis.videos.createOrderForUser(payload);
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        setSelectedVideo(null);
+
         if (data.payment_required) {
           return {
             ...data,
@@ -69,14 +72,9 @@ const PublicVideoList = ({ username = null, videos }) => {
             payment_order_type: orderType.VIDEO,
           };
         } else {
-          setIsLoading(false);
           showPurchaseSingleVideoSuccessModal(data.video_order_id);
 
-          return {
-            ...data,
-            payment_order_id: data.video_order_id,
-            payment_order_type: orderType.VIDEO,
-          };
+          return null;
         }
       }
     } catch (error) {
@@ -87,9 +85,9 @@ const PublicVideoList = ({ username = null, videos }) => {
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
-
-      return null;
     }
+
+    return null;
   };
 
   const openPurchaseModal = () => {

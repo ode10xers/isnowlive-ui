@@ -13,7 +13,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isValidFile, isAPISuccess, orderType, courseType, productType } from 'utils/helper';
+import { isValidFile, isAPISuccess, orderType, courseType, productType, paymentSource } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -28,7 +28,7 @@ const {
 const noop = () => {};
 
 //TODO: Compare to LiveCourseCard, if similar then refactor
-const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = null }) => {
+const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
   const history = useHistory();
 
   const { showPaymentPopup } = useGlobalContext();
@@ -87,7 +87,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
       return;
@@ -102,10 +102,13 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
-        payment_source: 'PAYMENT_GATEWAY', // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
+        payment_source: paymentSource.GATEWAY, // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
       });
 
       if (isAPISuccess(status) && data) {
+        setSelectedCourse(null);
+        setIsLoading(false);
+
         if (data.payment_required) {
           return {
             ...data,
@@ -113,10 +116,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
             payment_order_id: data.course_order_id,
           };
         } else {
-          setIsLoading(false);
-
           showCoursePurchaseSuccessModal();
-          setSelectedCourse(null);
           return null;
         }
       }

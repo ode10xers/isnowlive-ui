@@ -67,7 +67,7 @@ const PublicPassList = ({ username, passes }) => {
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     if (!selectedPass) {
       showErrorModal('Something went wrong', 'Invalid Pass ID');
       return null;
@@ -83,6 +83,7 @@ const PublicPassList = ({ username, passes }) => {
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
+        setSelectedPass(null);
 
         if (data.payment_required) {
           return {
@@ -92,12 +93,7 @@ const PublicPassList = ({ username, passes }) => {
           };
         } else {
           showPurchasePassSuccessModal(data.pass_order_id);
-
-          return {
-            ...data,
-            payment_order_type: orderType.PASS,
-            payment_order_id: data.pass_order_id,
-          };
+          return null;
         }
       }
     } catch (error) {
