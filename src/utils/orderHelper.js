@@ -1,5 +1,13 @@
 import apis from 'apis';
-import { isAPISuccess } from 'utils/helper';
+
+import {
+  showPurchasePassAndGetVideoSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
+  showAlreadyBookedModal,
+  showErrorModal,
+} from 'components/Modals/modals';
+
+import { isAPISuccess, productType } from 'utils/helper';
 
 // These functions are for fetching the product details
 // that is required to be shown in the confirmation modals
@@ -51,4 +59,40 @@ export const getSessionInventoryDetails = async (inventoryId) => {
   }
 
   return null;
+};
+
+export const followUpGetVideo = async (payload) => {
+  try {
+    // Continue to book the video after Pass Purchase is successful
+    const followUpGetVideo = await apis.videos.createOrderForUser(payload);
+
+    if (isAPISuccess(followUpGetVideo.status)) {
+      showPurchasePassAndGetVideoSuccessModal(payload.source_id);
+    }
+  } catch (error) {
+    if (error.response?.data?.message === 'user already has a confirmed order for this video') {
+      showAlreadyBookedModal(productType.VIDEO);
+    } else {
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  }
+};
+
+export const followUpBookSession = async (payload) => {
+  try {
+    //Continue to book the class after Pass Purchase is successful
+    const followUpBooking = await apis.session.createOrderForUser(payload);
+
+    if (isAPISuccess(followUpBooking.status)) {
+      showPurchasePassAndBookSessionSuccessModal(payload.source_id, payload.inventory_id);
+    }
+  } catch (error) {
+    if (
+      error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+    ) {
+      showAlreadyBookedModal(productType.CLASS);
+    } else {
+      showErrorModal('Something went wrong', error.response?.data?.message);
+    }
+  }
 };

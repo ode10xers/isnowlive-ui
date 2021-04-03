@@ -72,7 +72,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
   const [isSessionLoading, setIsSessionLoading] = useState(true);
-  const [view, setView] = useState('list');
+  const [view, setView] = useState('calendar');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -474,10 +474,14 @@ const ProfilePreview = ({ username = null }) => {
                       All event times shown below are in your local time zone ({getCurrentLongTimezone()})
                     </Text>
                   </Col>
-                  <Col span={24} className={styles.mt10}>
-                    <Radio.Group value={view} onChange={handleViewChange}>
-                      <Radio.Button value="list">List View</Radio.Button>
-                      <Radio.Button value="calendar">Calendar View</Radio.Button>
+                  <Col span={24} className={styles.mt20}>
+                    <Radio.Group value={view} onChange={handleViewChange} buttonStyle="solid">
+                      <Radio.Button className={styles.orangeRadio} value="list">
+                        List View
+                      </Radio.Button>
+                      <Radio.Button className={styles.orangeRadio} value="calendar">
+                        Calendar View
+                      </Radio.Button>
                     </Radio.Group>
                   </Col>
                   <Col span={24}>

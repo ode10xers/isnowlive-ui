@@ -5,8 +5,16 @@ import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 import apis from 'apis';
 
 import PaymentCard from 'components/Payment/PaymentCard';
+import {
+  showCoursePurchaseSuccessModal,
+  showBookSingleSessionSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
+  showPurchasePassSuccessModal,
+} from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import dateUtil from 'utils/date';
+import { orderType, paymentSource, isAPISuccess } from 'utils/helper';
+import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -15,6 +23,9 @@ import styles from './styles.module.scss';
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
 const { Text, Title } = Typography;
+const {
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
+} = dateUtil;
 
 const PaymentPopup = () => {
   const {
@@ -80,13 +91,6 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(false);
   };
 
-  const handleInitiatePayment = async () => {
-    const appliedCouponCode = couponApplied ? couponCode : '';
-    const result = await paymentPopupCallback(appliedCouponCode);
-
-    return result ? result : null;
-  };
-
   const closePaymentPopup = () => {
     setCouponCode('');
     setCouponApplied(false);
@@ -108,9 +112,60 @@ const PaymentPopup = () => {
     setShowCouponField(!showCouponField);
   };
 
-  const handleAfterPayment = () => {
-    // We can move the post verifications here by passing the
-    // required information for showing confirmations
+  const handleBeforePayment = async () => {
+    const appliedCouponCode = couponApplied ? couponCode : '';
+    const result = await paymentPopupCallback(appliedCouponCode);
+
+    return result ? result : null;
+  };
+
+  const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
+    if (orderResponse) {
+      if (verifyOrderRes === orderType.PASS) {
+        /*
+          In pass order, there can be follow up bookings
+          If a follow up booking is required, orderResponse 
+          will contain the required info in follow_up_booking_info
+        */
+
+        const followUpBookingInfo = orderResponse.follow_up_booking_info;
+
+        if (followUpBookingInfo) {
+          if (followUpBookingInfo.productType === 'VIDEO') {
+            const payload = {
+              video_id: followUpBookingInfo.productId,
+              payment_source: paymentSource.PASS,
+              source_id: orderResponse.payment_order_id,
+            };
+
+            await followUpGetVideo(payload);
+          } else if (followUpBookingInfo.productType === 'SESSION') {
+            const payload = {
+              inventory_id: followUpBookingInfo.productId,
+              user_timezone_offset: new Date().getTimezoneOffset(),
+              user_timezone_location: getTimezoneLocation(),
+              user_timezone: getCurrentLongTimezone(),
+              payment_source: paymentSource.PASS,
+              source_id: orderResponse.payment_order_id,
+            };
+
+            await followUpBookSession(payload);
+          }
+        } else {
+          // If no followup booking info is attached, then it's only a simple pass purchase
+          showPurchasePassSuccessModal(orderResponse.payment_order_id);
+        }
+      } else if (verifyOrderRes === orderType.COURSE) {
+        showCoursePurchaseSuccessModal();
+      } else if (verifyOrderRes === orderType.CLASS) {
+        // Showing confirmation for Single Session Booking
+        // inventory_id is attached for session orders
+        showBookSingleSessionSuccessModal(orderResponse.inventory_id);
+      } else if (verifyOrderRes === orderType.VIDEO) {
+        // Showing confirmation for Single Session Booking
+        showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
+      }
+    }
 
     closePaymentPopup();
   };
@@ -244,9 +299,8 @@ const PaymentPopup = () => {
               <PaymentCard
                 btnProps={{ text: isFree() ? 'Get' : 'Buy', disableCondition: false }}
                 isFree={isFree()}
-                onBeforePayment={handleInitiatePayment}
+                onBeforePayment={handleBeforePayment}
                 onAfterPayment={handleAfterPayment}
-                form={null}
               />
             </Col>
             <Col xs={14}>

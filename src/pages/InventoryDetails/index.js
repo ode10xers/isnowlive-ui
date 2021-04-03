@@ -202,7 +202,7 @@ const InventoryDetails = ({ match, history }) => {
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
-        showPaymentPopup();
+        showConfirmPaymentPopup();
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {

@@ -6,7 +6,7 @@ import Routes from 'routes';
 
 import { getLocalUserDetails } from 'utils/storage';
 import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
-import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/getOrderDetails';
+import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
