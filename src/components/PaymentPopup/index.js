@@ -82,7 +82,9 @@ const PaymentPopup = () => {
 
   const handleInitiatePayment = async () => {
     const appliedCouponCode = couponApplied ? couponCode : '';
-    return await paymentPopupCallback(appliedCouponCode);
+    const result = await paymentPopupCallback(appliedCouponCode);
+
+    return result ? result : null;
   };
 
   const closePaymentPopup = () => {
@@ -91,9 +93,6 @@ const PaymentPopup = () => {
     setCouponErrorText(null);
     setDiscountedPrice(null);
     setIsApplyingCoupon(false);
-
-    //TODO: Might also want to trigger clearing the CardElement from stripe here if required
-    // But if we're showing the saved cards for the user, it won't be required
 
     hidePaymentPopup();
   };

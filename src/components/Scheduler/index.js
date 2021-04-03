@@ -425,7 +425,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   };
 
   const handleCustomTimeChange = (field, value, timeString) => {
-    console.log(`Setting ${field}`, timeString);
     let tempCustomTime = { ...customTime };
 
     if (field === 'start_time') {
@@ -434,8 +433,6 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     } else {
       tempCustomTime.end_time = value;
     }
-
-    console.log(tempCustomTime);
 
     setCustomTime(tempCustomTime);
   };

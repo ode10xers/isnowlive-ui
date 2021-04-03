@@ -20,8 +20,6 @@ import dateUtil from 'utils/date';
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 import { orderType, paymentSource, productType, isAPISuccess } from 'utils/helper';
 
-import { useGlobalContext } from 'services/globalContext';
-
 import styles from './styles.module.scss';
 import classNames from 'classnames';
 
@@ -76,10 +74,6 @@ const useOptions = () => {
 const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) => {
   const { text = 'PAY' } = btnProps;
 
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
   const stripe = useStripe();
   const elements = useElements();
   const options = useOptions();
@@ -95,18 +89,14 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
         setup_future_usage: 'off_session',
       });
 
-      console.log('SavedCardCheckout', result);
       if (result.error) {
-        console.log('SavedCardCheckout Error', result.error.message);
         return false;
       } else {
         if (result.paymentIntent) {
-          console.log('SavedCardCheckout Success', result.paymentIntent);
           return true;
         }
       }
     } catch (e) {
-      console.log('SavedCardCheckout Error', e);
       return false;
     }
   };
@@ -172,7 +162,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
         const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, cardEl);
 
         if (paymentRes) {
-          console.log('userDetails', userDetails);
           const verifyOrderRes = await verifyPaymentForOrder({
             order_id: orderResponse.payment_order_id,
             transaction_id: paymentSessionRes.transaction_id,

@@ -531,7 +531,6 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const onFinish = async (values) => {
-    console.log('calling onFinish', values);
     try {
       // setIsLoading(true);
       // setIncorrectPassword(false);
