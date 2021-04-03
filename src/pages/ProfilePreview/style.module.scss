@@ -1,5 +1,14 @@
 @import '../../styles/variables.scss';
 
+.ant-radio-group-solid {
+  .ant-radio-button-wrapper-checked {
+    z-index: 1;
+    color: map-get($map: $colors, $key: 'White');
+    background: map-get($map: $colors, $key: 'Pumpkin');
+    border-color: map-get($map: $colors, $key: 'Pumpkin');
+  }
+}
+
 .button {
   margin-right: 20px;
 }

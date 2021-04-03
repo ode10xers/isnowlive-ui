@@ -18,9 +18,10 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
   const [calendarView, setCalendarView] = useState('month');
   const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
 
-  const redirectToSessionsPage = (session) => {
+  // Reworked this to redirect to Inventory Page as per Rahul's request
+  const redirectToInventoryPage = (session) => {
     const baseUrl = generateUrlFromUsername(session.creator_username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
+    window.open(`${baseUrl}/e/${session.inventory_id}`);
   };
 
   const onViewChange = (e) => {
@@ -54,7 +55,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
           <div
             className="custom-event-container custom-month-event-container"
             style={{ border: `2px solid ${borderColor}` }}
-            onClick={() => redirectToSessionsPage(event)}
+            onClick={() => redirectToInventoryPage(event)}
           >
             <span className="event-title">{event.name}</span>
             <span className="event-time">{toLocaleTime(event.start_time)}</span>
@@ -81,7 +82,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
           <div className="event-title">{event.name}</div>
           <div className="event-time">{`${toLocaleTime(event.start_time)} - ${toLocaleTime(event.end_time)}`}</div>
           <div className="event-tags-container">{event.group && <span className="group-pill">Group</span>}</div>
-          <button onClick={(e) => onBookClick(e)} className="book-btn">
+          <button onClick={(e) => onBookClick(e)} className="book-btn" disabled={event.isPast}>
             Book
           </button>
         </div>
@@ -92,7 +93,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
   return (
     <CalendarView
       inventories={calendarSessions}
-      onSelectInventory={redirectToSessionsPage}
+      onSelectInventory={redirectToInventoryPage}
       onViewChange={onViewChange}
       calendarView={calendarView}
       classes={['custom-calendar-view']}
