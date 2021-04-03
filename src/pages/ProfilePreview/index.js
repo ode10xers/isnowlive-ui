@@ -26,7 +26,15 @@ import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
 import PurchaseModal from 'components/PurchaseModal';
 
-import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode, paymentSource, orderType, productType } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  courseType,
+  isAPISuccess,
+  parseEmbedCode,
+  paymentSource,
+  orderType,
+  productType,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
@@ -322,7 +330,7 @@ const ProfilePreview = ({ username = null }) => {
 
   const onEventBookClick = (event) => {
     showPurchaseModal(event);
-  }
+  };
 
   const showPurchaseModal = (inventory) => {
     setSelectedInventory(inventory);
@@ -354,7 +362,6 @@ const ProfilePreview = ({ username = null }) => {
   const handleViewChange = (e) => {
     setView(e.target.value);
   };
-
 
   const closePurchaseModal = () => {
     setSelectedInventory(null);

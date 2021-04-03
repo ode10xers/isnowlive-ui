@@ -13,7 +13,6 @@ const {
   formatDate: { toLocaleTime },
 } = dateUtil;
 
-
 // This component may be eliminated but adding it for now as have limited time
 const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClick }) => {
   const [calendarView, setCalendarView] = useState('month');
@@ -88,7 +87,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
         </div>
       );
     }
-  }
+  };
 
   return (
     <CalendarView
