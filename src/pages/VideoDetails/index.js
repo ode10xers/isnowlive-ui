@@ -362,12 +362,12 @@ const VideoDetails = ({ match }) => {
               name: video.title,
               description: videoDesc,
               currency: video.currency,
-              price: 0,
+              price: video.price,
             },
           ],
           paymentInstrumentDetails: {
             type: 'PASS',
-            name: usableUserPass.pass_name,
+            ...usableUserPass,
           },
         };
 

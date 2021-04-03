@@ -220,9 +220,9 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
 
   return (
     <>
-      {!isFree && (
-        <Row>
-          <Col xs={24} className={styles.inlineCardForm}>
+      <Row justify="center">
+        {!isFree && (
+          <Col xs={20} className={styles.inlineCardForm}>
             <CardElement
               options={options}
               onChange={(event) => {
@@ -234,17 +234,16 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
               }}
             />
           </Col>
-        </Row>
-      )}
-      <Row justify="center" className={styles.mt30}>
-        <Col xs={24} md={12} lg={8}>
+        )}
+
+        <Col xs={4}>
           <Button
             block
             size="middle"
             type="primary"
             disabled={!isFree && isButtonDisabled}
             onClick={handleSubmit}
-            className={classNames(styles.greenBtn, isButtonDisabled ? styles.disabledBtn : undefined)}
+            className={classNames(styles.greenBtn, !isFree && isButtonDisabled ? styles.disabledBtn : undefined)}
             loading={isSubmitting}
           >
             {text}

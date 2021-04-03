@@ -294,7 +294,7 @@ const SessionDetails = ({ match, history }) => {
           ],
           paymentInstrumentDetails: {
             type: 'PASS',
-            name: usersPass.pass_name,
+            ...usersPass,
           },
         };
 

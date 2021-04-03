@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 
 import apis from 'apis';
 
@@ -12,11 +12,13 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
+const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
+
 const { Text, Title } = Typography;
 
 const PaymentPopup = () => {
   const {
-    state: { userDetails, paymentPopupVisible, paymentPopupCallback, paymentPopupData },
+    state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData },
     hidePaymentPopup,
   } = useGlobalContext();
 
@@ -80,14 +82,7 @@ const PaymentPopup = () => {
 
   const handleInitiatePayment = async () => {
     const appliedCouponCode = couponApplied ? couponCode : '';
-
-    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
-
-    if (result) {
-      return result;
-    } else {
-      return null;
-    }
+    return await paymentPopupCallback(appliedCouponCode);
   };
 
   const closePaymentPopup = () => {
@@ -129,7 +124,12 @@ const PaymentPopup = () => {
     let textContent = '';
 
     if (paymentInstrumentDetails.type === 'PASS') {
-      textContent = `Will be booked using your pass ${paymentInstrumentDetails.name}`;
+      const passDetails = paymentInstrumentDetails;
+      textContent = `Will use ${passDetails.pass_name} to book this ${
+        passDetails.limited
+          ? `and you'll be left with ${passDetails.classes_remaining}/${passDetails.class_count} credits`
+          : ''
+      }`;
     }
 
     //TODO: Will also add text when subscription can be used as payment instrument later
@@ -193,6 +193,13 @@ const PaymentPopup = () => {
                       {itemList[0].currency?.toUpperCase()} {discountedPrice}
                     </Text>
                   </>
+                ) : paymentInstrumentDetails ? (
+                  <>
+                    <Text delete className={styles.discounted}>
+                      {itemList[0].currency?.toUpperCase()} {totalPrice}
+                    </Text>{' '}
+                    <Text>{itemList[0].currency?.toUpperCase()} 0</Text>
+                  </>
                 ) : (
                   <Text>
                     {itemList[0].currency?.toUpperCase()} {totalPrice}
@@ -242,6 +249,9 @@ const PaymentPopup = () => {
                 onAfterPayment={handleAfterPayment}
                 form={null}
               />
+            </Col>
+            <Col xs={14}>
+              <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
             </Col>
           </Row>
         </Col>
