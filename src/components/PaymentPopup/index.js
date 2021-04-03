@@ -142,7 +142,7 @@ const PaymentPopup = () => {
     );
   };
 
-  const isFree = () => (discountedPrice ? discountedPrice === 0 : totalPrice === 0);
+  const isFree = () => (discountedPrice ? discountedPrice === 0 : paymentInstrumentDetails || totalPrice === 0);
 
   return (
     <Modal
@@ -206,7 +206,7 @@ const PaymentPopup = () => {
                   </Text>
                 ))}
             </Col>
-            {totalPrice > 0 && (
+            {!paymentInstrumentDetails && totalPrice > 0 && (
               <Col xs={24}>
                 <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
                   {showCouponField ? `Don't use ` : 'Use '} a coupon
