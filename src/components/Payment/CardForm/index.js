@@ -8,12 +8,15 @@ import apis from 'apis';
 import {
   showCoursePurchaseSuccessModal,
   showBookSingleSessionSuccessModal,
-  showErrorModal,
-  showAlreadyBookedModal,
-  showPurchasePassAndGetVideoSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
   showPurchasePassSuccessModal,
+  showPurchasePassAndGetVideoSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
+  showAlreadyBookedModal,
+  showErrorModal,
 } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 import { orderType, paymentSource, productType, isAPISuccess } from 'utils/helper';
 
@@ -21,6 +24,10 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 import classNames from 'classnames';
+
+const {
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
+} = dateUtil;
 
 // Additional CardOptions Reference:
 // https://stripe.com/docs/stripe-js/react#customization-and-styling
@@ -121,6 +128,25 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
     }
   };
 
+  const followUpBookSession = async (payload) => {
+    try {
+      //Continue to book the class after Pass Purchase is successful
+      const followUpBooking = await apis.session.createOrderForUser(payload);
+
+      if (isAPISuccess(followUpBooking.status)) {
+        showPurchasePassAndBookSessionSuccessModal(payload.source_id, payload.inventory_id);
+      }
+    } catch (error) {
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(productType.CLASS);
+      } else {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -135,9 +161,8 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
 
     const orderResponse = form ? await onBeforePayment(form.getFieldsValue()) : await onBeforePayment();
 
-    // TODO: Handle the case where payment is not required
-    // if payment is not required, orderResponse will be null
-    if (orderResponse) {
+    // The case below is when payment is required
+    if (orderResponse && orderResponse.payment_required) {
       const paymentSessionRes = await createPaymentSessionForOrder({
         order_id: orderResponse.payment_order_id,
         order_type: orderResponse.payment_order_type,
@@ -147,20 +172,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
         const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, cardEl);
 
         if (paymentRes) {
-          // const windowHost = window.location.host;
-          // const urlToRedirect = `${windowHost}/stripe/payment/success?order_id=${orderResponse.payment_order_id}&transaction_id=${
-          //   paymentSessionRes.transaction_id
-          //   }&order_type=${orderResponse.payment_order_type}`;
-
-          //   if (history) {
-          //     history.push(`/stripe/payment/success?order_id=${orderResponse.payment_order_id}&transaction_id=${
-          //       paymentSessionRes.transaction_id
-          //       }&order_type=${orderResponse.payment_order_type}`
-          //     );
-          //   } else {
-          //     window.location = urlToRedirect;
-          //   }
-
           console.log('userDetails', userDetails);
           const verifyOrderRes = await verifyPaymentForOrder({
             order_id: orderResponse.payment_order_id,
@@ -175,14 +186,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
               In pass order, there can be follow up bookings
               If a follow up booking is required, orderResponse 
               will contain the required info in follow_up_booking_info
-              The example below is for follow up purchasing video
-
-              follow_up_booking_info: {
-                productType: 'VIDEO',
-                productId: video.external_id,
-              }
-
-              more details on other flows can be found in pages/PaymentVerification
             */
 
             const followUpBookingInfo = orderResponse.follow_up_booking_info;
@@ -196,6 +199,17 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
                 };
 
                 await followUpGetVideo(payload);
+              } else if (followUpBookingInfo.productType === 'SESSION') {
+                const payload = {
+                  inventory_id: followUpBookingInfo.productId,
+                  user_timezone_offset: new Date().getTimezoneOffset(),
+                  user_timezone_location: getTimezoneLocation(),
+                  user_timezone: getCurrentLongTimezone(),
+                  payment_source: paymentSource.PASS,
+                  source_id: orderResponse.payment_order_id,
+                };
+
+                await followUpBookSession(payload);
               }
             } else {
               // If no followup booking info is attached, then it's only a simple pass purchase
@@ -204,53 +218,56 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree, form }) =
           } else if (verifyOrderRes === orderType.COURSE) {
             showCoursePurchaseSuccessModal();
           } else if (verifyOrderRes === orderType.CLASS) {
-            // Temporary logic for showing confirmation for Single Session Booking
+            // Showing confirmation for Single Session Booking
             // inventory_id is attached for session orders
             showBookSingleSessionSuccessModal(orderResponse.inventory_id);
+          } else if (verifyOrderRes === orderType.VIDEO) {
+            // Showing confirmation for Single Session Booking
+            showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
           }
-
-          onAfterPayment();
         } else {
-          alert('error in payment');
+          showErrorModal('Something went wrong', 'Failed to confirm payment with card details');
         }
+      } else {
+        showErrorModal('Something went wrong', 'Failed to create payment session');
       }
     }
+
+    onAfterPayment();
     setIsSubmitting(false);
   };
 
   return (
-    <>
-      <Row justify="center">
-        {!isFree && (
-          <Col xs={20} className={styles.inlineCardForm}>
-            <CardElement
-              options={options}
-              onChange={(event) => {
-                if (event.complete) {
-                  setIsButtonDisabled(false);
-                } else {
-                  setIsButtonDisabled(true);
-                }
-              }}
-            />
-          </Col>
-        )}
-
-        <Col xs={4}>
-          <Button
-            block
-            size="middle"
-            type="primary"
-            disabled={!isFree && isButtonDisabled}
-            onClick={handleSubmit}
-            className={classNames(styles.greenBtn, !isFree && isButtonDisabled ? styles.disabledBtn : undefined)}
-            loading={isSubmitting}
-          >
-            {text}
-          </Button>
+    <Row justify="center">
+      {!isFree && (
+        <Col xs={20} className={styles.inlineCardForm}>
+          <CardElement
+            options={options}
+            onChange={(event) => {
+              if (event.complete) {
+                setIsButtonDisabled(false);
+              } else {
+                setIsButtonDisabled(true);
+              }
+            }}
+          />
         </Col>
-      </Row>
-    </>
+      )}
+
+      <Col xs={!isFree ? 4 : 6}>
+        <Button
+          block
+          size="middle"
+          type="primary"
+          disabled={!isFree && isButtonDisabled}
+          onClick={handleSubmit}
+          className={classNames(styles.greenBtn, !isFree && isButtonDisabled ? styles.disabledBtn : undefined)}
+          loading={isSubmitting}
+        >
+          {text}
+        </Button>
+      </Col>
+    </Row>
   );
 };
 
