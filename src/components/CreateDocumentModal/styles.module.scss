@@ -1,15 +1,10 @@
 @import '../../styles/variables.scss';
 
-.numericInput {
-  width: 100% !important;
-}
-
 .modalActionRow {
   margin-top: 10px;
 }
 
-.helpTextWrapper {
-  text-align: center;
-  align-self: center;
-  font-size: 16px;
+.filenameButton {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+  font-weight: bold !important;
 }
