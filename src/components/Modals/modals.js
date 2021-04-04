@@ -5,7 +5,8 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl, isAPISuccess } from 'utils/helper';
+import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
@@ -61,58 +62,6 @@ export const showSetNewPasswordModal = (email) => {
     cancelText: 'Talk to us',
     onCancel: () => openFreshChatWidget(),
   });
-};
-
-// These functions are for fetching the product details
-// that is required to be shown in the confirmation modals
-// using the product's order ID or their specific ID
-const getUserPassOrderDetails = async (passOrderId) => {
-  try {
-    const { status, data } = await apis.passes.getAttendeePasses();
-
-    if (isAPISuccess(status) && data) {
-      const foundPassOrder = data.active.find((passOrder) => passOrder.pass_order_id === passOrderId);
-
-      return foundPassOrder || null;
-    }
-  } catch (error) {
-    console.error('Failed to fetch user pass order details');
-    console.error(error?.response?.data?.message);
-  }
-
-  return null;
-};
-
-const getUserVideoOrderDetails = async (videoOrderId) => {
-  try {
-    const { status, data } = await apis.videos.getAttendeeVideos();
-
-    if (isAPISuccess(status) && data) {
-      const foundVideoOrder = data.active.find((videoOrder) => videoOrder.video_order_id === videoOrderId);
-
-      return foundVideoOrder || null;
-    }
-  } catch (error) {
-    console.error('Failed to fetch user video order details');
-    console.error(error?.response?.data?.message);
-  }
-
-  return null;
-};
-
-const getSessionInventoryDetails = async (inventoryId) => {
-  try {
-    const { status, data } = await apis.session.getPublicInventoryById(inventoryId);
-
-    if (isAPISuccess(status) && data) {
-      return data;
-    }
-  } catch (error) {
-    console.error('Failed to fetch user video order details');
-    console.error(error?.response?.data?.message);
-  }
-
-  return null;
 };
 
 const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (

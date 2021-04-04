@@ -41,7 +41,7 @@
       .event-title {
         font-size: 14px;
         margin: 5px 0 8px;
-        color: #595959;
+        color: #000;
         line-height: 16px;
         height: 30px;
         overflow: hidden;
@@ -50,7 +50,7 @@
       .event-time {
         font-size: 12px;
         margin-bottom: 5px;
-        color: #595959;
+        color: #000;
         line-height: 14px;
       }
       .event-tags-container {
@@ -67,33 +67,31 @@
         width: 100%;
         text-align: center;
         padding: 5px;
-        background: #ffffff;
-        color: #000;
+        background: #1890ff;
+        color: #fff;
         margin-bottom: 8px;
-        border: 1px solid #f0f0f0;
+        border: 1px solid #1890ff;
         border-radius: 2px;
         cursor: pointer;
         pointer-events: auto;
         &:focus {
-          border: 1px solid #f0f0f0;
+          border: 1px solid #1890ff;
         }
       }
 
       &.past-event {
-        background-color: #aaaaaa;
-        opacity: 0.6;
-        color: #000;
+        background-color: rgba(240,240,240, 0.5);
+        color: #aaaaaa;
         cursor: initial;
 
         .event-title,
         .event-time {
-          color: #000;
+          color: #888888;
+          
         }
 
         .book-btn {
-          color: #fff;
-          background-color: #aaaaaa;
-          border: 1px solid #f0f0f0;
+          opacity: 0.8;
         }
       }
     }

@@ -187,7 +187,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   return (
     <div>
       <Modal visible={visible} centered={true} onCancel={() => closeModal(true)} footer={null}>
-        <Loader loading={isLoading} size="large" text={showSignIn ? 'Signing you in...' : 'Creating account...'}>
+        <Loader loading={isLoading} size="large">
           <Form
             form={form}
             labelAlign="left"

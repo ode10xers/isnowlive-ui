@@ -68,17 +68,12 @@ function App() {
   const { isWidget } = parseQueryString(location.search);
 
   useEffect(() => {
-    if (cookieConsent && !isWidget) {
-      initMixPanel();
-    }
-  }, [cookieConsent, isWidget]);
-
-  useEffect(() => {
     if (!isWidget) {
       initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
         initFreshChatWidget(userDetails);
+        initMixPanel();
       }
     }
   }, [userDetails, cookieConsent, isWidget]);

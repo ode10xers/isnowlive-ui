@@ -18,23 +18,17 @@ const ExternalSiteSettings = () => {
   const [selectedWidget, setSelectedWidget] = useState(widgetComponentsName['CALENDAR'].value);
 
   const generateWidgetText = useCallback(() => {
-    return `<iframe src="${widgetLink}" width="100%" height="700px" />`;
+    return `<iframe title="Passion.do Widget Container" src="${widgetLink}" width="100%" class="${styles.passionWidgetContainer}" />`;
   }, [widgetLink]);
 
   useEffect(() => {
     const generatedWidgetLink = generateWidgetLink(selectedWidget);
     setWidgetLink(generatedWidgetLink);
-    console.log(generatedWidgetLink);
   }, [selectedWidget]);
 
-  const handleSelectWidgetComponentChange = (val) => {
-    console.log(val);
-    setSelectedWidget(val);
-  };
+  const handleSelectWidgetComponentChange = (val) => setSelectedWidget(val);
 
-  const copyWidgetSnippet = () => {
-    copyToClipboard(generateWidgetText());
-  };
+  const copyWidgetSnippet = () => copyToClipboard(generateWidgetText());
 
   return (
     <div className={styles.box}>

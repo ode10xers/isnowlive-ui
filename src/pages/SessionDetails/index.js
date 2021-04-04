@@ -294,7 +294,7 @@ const SessionDetails = ({ match, history }) => {
           ],
           paymentInstrumentDetails: {
             type: 'PASS',
-            name: usersPass.pass_name,
+            ...usersPass,
           },
         };
 
@@ -531,7 +531,6 @@ const SessionDetails = ({ match, history }) => {
   };
 
   const onFinish = async (values) => {
-    console.log('calling onFinish', values);
     try {
       // setIsLoading(true);
       // setIncorrectPassword(false);

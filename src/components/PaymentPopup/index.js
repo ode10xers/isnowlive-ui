@@ -1,22 +1,35 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
 
 import apis from 'apis';
 
 import PaymentCard from 'components/Payment/PaymentCard';
+import {
+  showCoursePurchaseSuccessModal,
+  showBookSingleSessionSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
+  showPurchasePassSuccessModal,
+} from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import dateUtil from 'utils/date';
+import { orderType, paymentSource, isAPISuccess } from 'utils/helper';
+import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
+const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
+
 const { Text, Title } = Typography;
+const {
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
+} = dateUtil;
 
 const PaymentPopup = () => {
   const {
-    state: { userDetails, paymentPopupVisible, paymentPopupCallback, paymentPopupData },
+    state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData },
     hidePaymentPopup,
   } = useGlobalContext();
 
@@ -78,27 +91,12 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(false);
   };
 
-  const handleInitiatePayment = async () => {
-    const appliedCouponCode = couponApplied ? couponCode : '';
-
-    const result = await paymentPopupCallback(userDetails.email, appliedCouponCode);
-
-    if (result) {
-      return result;
-    } else {
-      return null;
-    }
-  };
-
   const closePaymentPopup = () => {
     setCouponCode('');
     setCouponApplied(false);
     setCouponErrorText(null);
     setDiscountedPrice(null);
     setIsApplyingCoupon(false);
-
-    //TODO: Might also want to trigger clearing the CardElement from stripe here if required
-    // But if we're showing the saved cards for the user, it won't be required
 
     hidePaymentPopup();
   };
@@ -114,9 +112,60 @@ const PaymentPopup = () => {
     setShowCouponField(!showCouponField);
   };
 
-  const handleAfterPayment = () => {
-    // We can move the post verifications here by passing the
-    // required information for showing confirmations
+  const handleBeforePayment = async () => {
+    const appliedCouponCode = couponApplied ? couponCode : '';
+    const result = await paymentPopupCallback(appliedCouponCode);
+
+    return result ? result : null;
+  };
+
+  const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
+    if (orderResponse) {
+      if (verifyOrderRes === orderType.PASS) {
+        /*
+          In pass order, there can be follow up bookings
+          If a follow up booking is required, orderResponse 
+          will contain the required info in follow_up_booking_info
+        */
+
+        const followUpBookingInfo = orderResponse.follow_up_booking_info;
+
+        if (followUpBookingInfo) {
+          if (followUpBookingInfo.productType === 'VIDEO') {
+            const payload = {
+              video_id: followUpBookingInfo.productId,
+              payment_source: paymentSource.PASS,
+              source_id: orderResponse.payment_order_id,
+            };
+
+            await followUpGetVideo(payload);
+          } else if (followUpBookingInfo.productType === 'SESSION') {
+            const payload = {
+              inventory_id: followUpBookingInfo.productId,
+              user_timezone_offset: new Date().getTimezoneOffset(),
+              user_timezone_location: getTimezoneLocation(),
+              user_timezone: getCurrentLongTimezone(),
+              payment_source: paymentSource.PASS,
+              source_id: orderResponse.payment_order_id,
+            };
+
+            await followUpBookSession(payload);
+          }
+        } else {
+          // If no followup booking info is attached, then it's only a simple pass purchase
+          showPurchasePassSuccessModal(orderResponse.payment_order_id);
+        }
+      } else if (verifyOrderRes === orderType.COURSE) {
+        showCoursePurchaseSuccessModal();
+      } else if (verifyOrderRes === orderType.CLASS) {
+        // Showing confirmation for Single Session Booking
+        // inventory_id is attached for session orders
+        showBookSingleSessionSuccessModal(orderResponse.inventory_id);
+      } else if (verifyOrderRes === orderType.VIDEO) {
+        // Showing confirmation for Single Session Booking
+        showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
+      }
+    }
 
     closePaymentPopup();
   };
@@ -129,7 +178,12 @@ const PaymentPopup = () => {
     let textContent = '';
 
     if (paymentInstrumentDetails.type === 'PASS') {
-      textContent = `Will be booked using your pass ${paymentInstrumentDetails.name}`;
+      const passDetails = paymentInstrumentDetails;
+      textContent = `Will use ${passDetails.pass_name} to book this ${
+        passDetails.limited
+          ? `and you'll be left with ${passDetails.classes_remaining}/${passDetails.class_count} credits`
+          : ''
+      }`;
     }
 
     //TODO: Will also add text when subscription can be used as payment instrument later
@@ -142,7 +196,7 @@ const PaymentPopup = () => {
     );
   };
 
-  const isFree = () => (discountedPrice ? discountedPrice === 0 : totalPrice === 0);
+  const isFree = () => (discountedPrice ? discountedPrice === 0 : paymentInstrumentDetails || totalPrice === 0);
 
   return (
     <Modal
@@ -193,13 +247,20 @@ const PaymentPopup = () => {
                       {itemList[0].currency?.toUpperCase()} {discountedPrice}
                     </Text>
                   </>
+                ) : paymentInstrumentDetails ? (
+                  <>
+                    <Text delete className={styles.discounted}>
+                      {itemList[0].currency?.toUpperCase()} {totalPrice}
+                    </Text>{' '}
+                    <Text>{itemList[0].currency?.toUpperCase()} 0</Text>
+                  </>
                 ) : (
                   <Text>
                     {itemList[0].currency?.toUpperCase()} {totalPrice}
                   </Text>
                 ))}
             </Col>
-            {totalPrice > 0 && (
+            {!paymentInstrumentDetails && totalPrice > 0 && (
               <Col xs={24}>
                 <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
                   {showCouponField ? `Don't use ` : 'Use '} a coupon
@@ -238,10 +299,12 @@ const PaymentPopup = () => {
               <PaymentCard
                 btnProps={{ text: isFree() ? 'Get' : 'Buy', disableCondition: false }}
                 isFree={isFree()}
-                onBeforePayment={handleInitiatePayment}
+                onBeforePayment={handleBeforePayment}
                 onAfterPayment={handleAfterPayment}
-                form={null}
               />
+            </Col>
+            <Col xs={14}>
+              <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
             </Col>
           </Row>
         </Col>

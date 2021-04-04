@@ -118,7 +118,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
   },
   {
-    order: 10,
+    order: 11,
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,

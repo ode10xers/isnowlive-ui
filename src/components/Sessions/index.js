@@ -43,7 +43,6 @@ const Sessions = ({ sessions, username }) => {
       }
     });
 
-    console.log(formattedSessions);
     setReformattedSessions(formattedSessions);
   }, [sessions, username]);
 

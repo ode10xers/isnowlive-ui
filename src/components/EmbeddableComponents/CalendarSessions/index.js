@@ -67,7 +67,7 @@ const CalendarSessions = () => {
 
   const onEventBookClick = (event) => {
     showPurchaseModal(event);
-  }
+  };
 
   const closePurchaseModal = () => {
     setSelectedInventory(null);

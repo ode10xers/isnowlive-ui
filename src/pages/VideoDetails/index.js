@@ -55,7 +55,7 @@ const VideoDetails = ({ match }) => {
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
-  // const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
+  const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [username, setUsername] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
@@ -189,13 +189,12 @@ const VideoDetails = ({ match }) => {
     //eslint-disable-next-line
   }, [match.params.video_id]);
 
-  // useEffect(() => {
-  //   if (shouldFollowUpGetVideo) {
-  //     const userDetails = getLocalUserDetails();
-  //     showConfirmPaymentPopup(userDetails.email);
-  //   }
-  //   //eslint-disable-next-line
-  // }, [userPasses]);
+  useEffect(() => {
+    if (shouldFollowUpGetVideo) {
+      showConfirmPaymentPopup();
+    }
+    //eslint-disable-next-line
+  }, [userPasses]);
 
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
@@ -335,23 +334,22 @@ const VideoDetails = ({ match }) => {
   };
 
   const showConfirmPaymentPopup = async () => {
-    // if (!shouldFollowUpGetVideo) {
-    //   if (getLocalUserDetails() && userPasses.length <= 0) {
-    //     setShouldFollowUpGetVideo(true);
-    //     getUsablePassesForUser(match.params.video_id);
-    //     return;
-    //   }
-    // } else {
-    //   setShouldFollowUpGetVideo(false);
-    // }
+    if (!shouldFollowUpGetVideo) {
+      if (getLocalUserDetails() && userPasses.length <= 0) {
+        setShouldFollowUpGetVideo(true);
+        getUsablePassesForUser(match.params.video_id);
+        return;
+      }
+    } else {
+      setShouldFollowUpGetVideo(false);
+    }
 
-    //TODO: Try with edge case of loggedout user trying to buy a pass that has been purchased in their acc
     const videoDesc = `Can be watched up to ${video.watch_limit} times, valid for ${video.validity} days`;
 
     //Handling edge case, buy free video using pass
     //We redirect them to the buySingleVideo flow
     if (selectedPass && video?.price > 0) {
-      const usableUserPass = getUserPurchasedPass(false);
+      const usableUserPass = getUserPurchasedPass(true);
 
       if (usableUserPass) {
         const paymentPopupData = {
@@ -362,12 +360,12 @@ const VideoDetails = ({ match }) => {
               name: video.title,
               description: videoDesc,
               currency: video.currency,
-              price: 0,
+              price: video.price,
             },
           ],
           paymentInstrumentDetails: {
             type: 'PASS',
-            name: usableUserPass.pass_name,
+            ...usableUserPass,
           },
         };
 
@@ -575,121 +573,118 @@ const VideoDetails = ({ match }) => {
 
   return (
     <div className={styles.mt50}>
-      <Loader loading={isLoading} size="large" text="Loading video details">
-        <Row gutter={[8, 24]}>
-          <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
-          <Col xs={24}>
-            {video && (
-              <>
-                <PurchaseModal
-                  visible={showPurchaseVideoModal}
-                  closeModal={closePurchaseModal}
-                  createOrder={showConfirmPaymentPopup}
-                />
-                <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+      <Row gutter={[8, 24]}>
+        <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
+        <Col xs={24}>
+          {video && (
+            <>
+              <PurchaseModal
+                visible={showPurchaseVideoModal}
+                closeModal={closePurchaseModal}
+                createOrder={showConfirmPaymentPopup}
+              />
+
+              <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+                <Loader loading={isLoading} size="large" text="Loading video details">
                   <Col xs={24} className={styles.showcaseCardContainer}>
                     <VideoCard video={video} buyable={false} hoverable={false} showDetailsBtn={false} showDesc={true} />
                   </Col>
+                </Loader>
 
-                  {video.is_course ? (
-                    courses?.length > 0 && (
-                      <div className={classNames(styles.mb50, styles.mt20)}>
-                        <Row gutter={[8, 16]}>
-                          <Col xs={24}>
-                            <Title level={5}> This video can only be purchased via this course </Title>
-                          </Col>
-                          <Col xs={24}>
-                            <ShowcaseCourseCard
-                              courses={courses}
-                              onCardClick={(course) => redirectToCourseDetails(course)}
-                              username={username}
-                            />
-                          </Col>
-                        </Row>
-                      </div>
-                    )
-                  ) : (
-                    <>
-                      {(!getLocalUserDetails() || userPasses.length <= 0) && (
-                        <Col xs={24} className={styles.p20}>
-                          <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                            <Row gutter={[8, 16]} align="center">
-                              <Col xs={24} md={16} xl={18}>
-                                <Row gutter={8}>
-                                  <Col xs={24}>
-                                    <Title className={styles.blueText} level={3}>
-                                      {video?.title}
-                                    </Title>
-                                  </Col>
-                                  <Col xs={24}>
-                                    <Space size={isMobileDevice ? 'small' : 'middle'}>
-                                      <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                        {`Validity ${video?.validity} Days`}
-                                      </Text>
-                                      <Divider type="vertical" />
-                                      <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                        {video?.price === 0
-                                          ? 'Free video'
-                                          : ` ${video?.currency.toUpperCase()} ${video?.price}`}
-                                      </Text>
-                                    </Space>
-                                  </Col>
-                                </Row>
-                              </Col>
-                              <Col xs={24} md={8} xl={6}>
-                                <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                                  {video?.price === 0 ? 'Get' : 'Buy'} This Video
-                                </Button>
-                              </Col>
-                            </Row>
-                          </Card>
-                        </Col>
-                      )}
-
-                      {(userPasses?.length > 0 || availablePassesForVideo?.length > 0) && (
-                        <>
-                          <Col xs={24} className={styles.mt10}>
-                            <Title level={3} className={styles.ml20}>
-                              {getLocalUserDetails() && userPasses.length > 0
-                                ? 'Buy using your pass'
-                                : availablePassesForVideo?.length > 0
-                                ? 'Buy a pass and this video'
-                                : ''}
-                            </Title>
-                          </Col>
-
-                          <Col xs={24} className={styles.passListContainer}>
-                            {getLocalUserDetails() && userPasses?.length > 0
-                              ? userPasses?.map((pass) => renderPassCards(pass, true))
-                              : availablePassesForVideo?.map((pass) => renderPassCards(pass, false))}
-                          </Col>
-                        </>
-                      )}
-
-                      {video.sessions?.length > 0 && (
+                {video.is_course ? (
+                  courses?.length > 0 && (
+                    <div className={classNames(styles.mb50, styles.mt20)}>
+                      <Row gutter={[8, 16]}>
                         <Col xs={24}>
-                          <Row gutter={[8, 8]}>
-                            <Col xs={24}>
-                              <Text className={styles.ml20}> Related to these class(es) </Text>
+                          <Title level={5}> This video can only be purchased via this course </Title>
+                        </Col>
+                        <Col xs={24}>
+                          <ShowcaseCourseCard
+                            courses={courses}
+                            onCardClick={(course) => redirectToCourseDetails(course)}
+                            username={username}
+                          />
+                        </Col>
+                      </Row>
+                    </div>
+                  )
+                ) : (
+                  <>
+                    {(!getLocalUserDetails() || userPasses.length <= 0) && (
+                      <Col xs={24} className={styles.p20}>
+                        <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                          <Row gutter={[8, 16]} align="center">
+                            <Col xs={24} md={16} xl={18}>
+                              <Row gutter={8}>
+                                <Col xs={24}>
+                                  <Title className={styles.blueText} level={3}>
+                                    {video?.title}
+                                  </Title>
+                                </Col>
+                                <Col xs={24}>
+                                  <Space size={isMobileDevice ? 'small' : 'middle'}>
+                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                      {`Validity ${video?.validity} Days`}
+                                    </Text>
+                                    <Divider type="vertical" />
+                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                      {video?.price === 0
+                                        ? 'Free video'
+                                        : ` ${video?.currency.toUpperCase()} ${video?.price}`}
+                                    </Text>
+                                  </Space>
+                                </Col>
+                              </Row>
                             </Col>
-                            <Col xs={24}>
-                              <SessionCards
-                                username={username}
-                                sessions={video.sessions}
-                                shouldFetchInventories={true}
-                              />
+                            <Col xs={24} md={8} xl={6}>
+                              <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
+                                {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                              </Button>
                             </Col>
                           </Row>
+                        </Card>
+                      </Col>
+                    )}
+
+                    {(userPasses?.length > 0 || availablePassesForVideo?.length > 0) && (
+                      <>
+                        <Col xs={24} className={styles.mt10}>
+                          <Title level={3} className={styles.ml20}>
+                            {getLocalUserDetails() && userPasses.length > 0
+                              ? 'Buy using your pass'
+                              : availablePassesForVideo?.length > 0
+                              ? 'Buy a pass and this video'
+                              : ''}
+                          </Title>
                         </Col>
-                      )}
-                    </>
-                  )}
-                </Row>
-              </>
-            )}
-          </Col>
-        </Row>
-      </Loader>
+
+                        <Col xs={24} className={styles.passListContainer}>
+                          {getLocalUserDetails() && userPasses?.length > 0
+                            ? userPasses?.map((pass) => renderPassCards(pass, true))
+                            : availablePassesForVideo?.map((pass) => renderPassCards(pass, false))}
+                        </Col>
+                      </>
+                    )}
+
+                    {video.sessions?.length > 0 && (
+                      <Col xs={24}>
+                        <Row gutter={[8, 8]}>
+                          <Col xs={24}>
+                            <Text className={styles.ml20}> Related to these class(es) </Text>
+                          </Col>
+                          <Col xs={24}>
+                            <SessionCards username={username} sessions={video.sessions} shouldFetchInventories={true} />
+                          </Col>
+                        </Row>
+                      </Col>
+                    )}
+                  </>
+                )}
+              </Row>
+            </>
+          )}
+        </Col>
+      </Row>
     </div>
   );
 };

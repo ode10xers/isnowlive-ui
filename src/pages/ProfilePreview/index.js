@@ -26,7 +26,15 @@ import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
 import PurchaseModal from 'components/PurchaseModal';
 
-import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode, paymentSource, orderType, productType } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  courseType,
+  isAPISuccess,
+  parseEmbedCode,
+  paymentSource,
+  orderType,
+  productType,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
@@ -64,7 +72,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
   const [isSessionLoading, setIsSessionLoading] = useState(true);
-  const [view, setView] = useState('list');
+  const [view, setView] = useState('calendar');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -97,18 +105,14 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  const getProfileUsername = useCallback(() => (username ? username : getLocalUserDetails().username), [username]);
+
   const getSessionDetails = useCallback(
     async (type) => {
       setIsSessionLoading(true);
 
       try {
-        let profileUsername = '';
-        if (username) {
-          profileUsername = username;
-        } else {
-          profileUsername = getLocalUserDetails().username;
-        }
-        const { status, data } = await apis.user.getSessionsByUsername(profileUsername, type);
+        const { status, data } = await apis.user.getSessionsByUsername(getProfileUsername(), type);
         if (isAPISuccess(status) && data) {
           setSessions(data);
           setIsSessionLoading(false);
@@ -118,20 +122,13 @@ const ProfilePreview = ({ username = null }) => {
         console.error('Failed to load user session details');
       }
     },
-    [username]
+    [getProfileUsername]
   );
 
   const getPassesDetails = useCallback(async () => {
     setIsPassesLoading(true);
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
+      const profileUsername = getProfileUsername();
       const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (isAPISuccess(status) && data) {
@@ -158,20 +155,12 @@ const ProfilePreview = ({ username = null }) => {
       setIsPassesLoading(false);
       console.error('Failed to load pass details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
 
   const getVideosDetails = useCallback(async () => {
     setIsVideosLoading(true);
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
-      const { status, data } = await apis.videos.getVideosByUsername(profileUsername);
+      const { status, data } = await apis.videos.getVideosByUsername(getProfileUsername());
 
       if (isAPISuccess(status) && data) {
         setVideos(data);
@@ -181,20 +170,12 @@ const ProfilePreview = ({ username = null }) => {
       setIsVideosLoading(false);
       console.error('Failed to load video details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
 
   const getCoursesDetails = useCallback(async () => {
     setIsCoursesLoading(true);
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
-      const { status, data } = await apis.courses.getCoursesByUsername(profileUsername);
+      const { status, data } = await apis.courses.getCoursesByUsername(getProfileUsername());
 
       if (isAPISuccess(status) && data) {
         setLiveCourses(data.filter((course) => course.type === courseType.MIXED || course.type === 'live'));
@@ -207,16 +188,11 @@ const ProfilePreview = ({ username = null }) => {
       setIsCoursesLoading(false);
       console.error('Failed to load courses details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
 
   const getCalendarSessionDetails = useCallback(async () => {
     try {
-      let profileUsername = '';
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
+      const profileUsername = getProfileUsername();
       const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
       const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
@@ -236,7 +212,7 @@ const ProfilePreview = ({ username = null }) => {
     } catch (error) {
       message.error('Failed to load user session details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
@@ -322,24 +298,12 @@ const ProfilePreview = ({ username = null }) => {
 
   const onEventBookClick = (event) => {
     showPurchaseModal(event);
-  }
+  };
 
   const showPurchaseModal = (inventory) => {
     setSelectedInventory(inventory);
     setPurchaseModalVisible(true);
   };
-
-  // const handleChangeSessionTab = (key) => {
-  //   setIsSessionLoading(true);
-  //   setSelectedSessionTab(key);
-  //   if (parseInt(key) === 0) {
-  //     trackSimpleEvent(user.click.profile.upcomingSessionsTab);
-  //     getSessionDetails('upcoming');
-  //   } else {
-  //     trackSimpleEvent(user.click.profile.pastSessionsTab);
-  //     getSessionDetails('past');
-  //   }
-  // };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
     trackSimpleEvent(eventTag);
@@ -354,7 +318,6 @@ const ProfilePreview = ({ username = null }) => {
   const handleViewChange = (e) => {
     setView(e.target.value);
   };
-
 
   const closePurchaseModal = () => {
     setSelectedInventory(null);
@@ -511,10 +474,14 @@ const ProfilePreview = ({ username = null }) => {
                       All event times shown below are in your local time zone ({getCurrentLongTimezone()})
                     </Text>
                   </Col>
-                  <Col span={24} className={styles.mt10}>
-                    <Radio.Group value={view} onChange={handleViewChange}>
-                      <Radio.Button value="list">List View</Radio.Button>
-                      <Radio.Button value="calendar">Calendar View</Radio.Button>
+                  <Col span={24} className={styles.mt20}>
+                    <Radio.Group value={view} onChange={handleViewChange} buttonStyle="solid">
+                      <Radio.Button className={styles.orangeRadio} value="list">
+                        List View
+                      </Radio.Button>
+                      <Radio.Button className={styles.orangeRadio} value="calendar">
+                        Calendar View
+                      </Radio.Button>
                     </Radio.Group>
                   </Col>
                   <Col span={24}>

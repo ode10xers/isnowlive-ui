@@ -25,4 +25,4 @@ export function getSessionCountByDate(allEvents) {
     }
   });
   return eventsPerDay;
-};
+}

@@ -93,7 +93,7 @@ const InventoryDetails = ({ match, history }) => {
 
           const passesResponse = await apis.passes.getPassesBySessionId(inventoryDetails?.session_id);
 
-          if (isAPISuccess(passesResponse.response) && passesResponse.data) {
+          if (isAPISuccess(passesResponse.status) && passesResponse.data) {
             setAvailablePasses(passesResponse.data);
           } else {
             console.error('Failed to fetch pass related to inventory', passesResponse);
@@ -202,7 +202,7 @@ const InventoryDetails = ({ match, history }) => {
       if (data) {
         http.setAuthToken(data.auth_token);
         logIn(data, true);
-        showPaymentPopup();
+        showConfirmPaymentPopup();
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
@@ -240,7 +240,7 @@ const InventoryDetails = ({ match, history }) => {
           ],
           paymentInstrumentDetails: {
             type: 'PASS',
-            name: usersPass.pass_name,
+            ...usersPass,
           },
         };
 
@@ -322,13 +322,6 @@ const InventoryDetails = ({ match, history }) => {
         const inventoryId = session.inventory_id;
 
         if (data.payment_required) {
-          // const resData = initiatePaymentForOrder({
-          //   order_id: data.order_id,
-          //   order_type: orderType.CLASS,
-          // });
-
-          // return resData;
-
           return {
             ...data,
             payment_order_id: data.order_id,
@@ -367,11 +360,6 @@ const InventoryDetails = ({ match, history }) => {
         const inventoryId = parseInt(session.inventory_id);
 
         if (data.payment_required) {
-          // initiatePaymentForOrder({
-          //   order_id: data.pass_order_id,
-          //   order_type: orderType.PASS,
-          //   inventory_id: inventoryId,
-          // });
           return {
             ...data,
             payment_order_id: data.pass_order_id,
@@ -480,7 +468,7 @@ const InventoryDetails = ({ match, history }) => {
       } else if (!getLocalUserDetails()) {
         signupUser(values);
       } else {
-        showPaymentPopup();
+        showConfirmPaymentPopup();
       }
     } catch (error) {
       setIsLoading(false);
