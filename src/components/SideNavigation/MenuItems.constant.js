@@ -9,7 +9,7 @@ import {
   BookOutlined,
   SettingOutlined,
   PercentageOutlined,
-  // Html5Outlined,
+  Html5Outlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -117,14 +117,14 @@ export const creatorMenuItems = [
     mixPanelTag: creator.click.dashboard.settingsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
   },
-  // {
-  //   order: 11,
-  //   key: 'external_site_setting',
-  //   title: 'External Site Settings',
-  //   icon: <Html5Outlined />,
-  //   mixPanelTag: creator.click.dashboard.externalSiteSettingsNav,
-  //   path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
-  // },
+  {
+    order: 11,
+    key: 'external_site_setting',
+    title: 'External Site Settings',
+    icon: <Html5Outlined />,
+    mixPanelTag: creator.click.dashboard.externalSiteSettingsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
+  },
 ];
 
 export const attendeeMenuItems = [
