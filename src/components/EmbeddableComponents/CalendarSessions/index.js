@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { message, Empty } from 'antd';
+import { message, Empty, Typography, Row, Col } from 'antd';
 
 import apis from 'apis';
 
@@ -14,7 +14,10 @@ import dateUtil from 'utils/date';
 import { useGlobalContext } from 'services/globalContext';
 
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
+import styles from './style.module.scss';
+const logo = require('assets/images/Logo-passion-transparent.png');
 
+const { Text } = Typography;
 const {
   formatDate: { toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -170,11 +173,24 @@ const CalendarSessions = () => {
         createOrder={showConfirmPaymentPopup}
       />
       {calendarSession.length > 0 && readyToPaint ? (
-        <CalendarWrapper
-          calendarSessions={calendarSession}
-          sessionCountByDate={sessionCountByDate}
-          onEventBookClick={onEventBookClick}
-        />
+        <>
+          <Row>
+            <Col xs={14}>
+              <Text type="primary" strong>
+                All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+              </Text>
+            </Col>
+            <Col xs={10}>
+              <img src={logo} alt="Passion.do" className={styles.passionLogo} />
+            </Col>
+          </Row>
+
+          <CalendarWrapper
+            calendarSessions={calendarSession}
+            sessionCountByDate={sessionCountByDate}
+            onEventBookClick={onEventBookClick}
+          />
+        </>
       ) : (
         <Empty />
       )}
