@@ -132,4 +132,9 @@ export default {
     getCreatorCoupons: () => http.get('/secure/creator/coupons'),
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
   },
+  audiences: {
+    getCreatorAudiences: () => http.get('/secure/creator/audience'),
+    addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
+    deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
+  },
 };

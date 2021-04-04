@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import parse from 'emailjs-addressparser';
 
-import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm, Tooltip } from 'antd';
+import { CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
 import Table from 'components/Table';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+
+// import apis from 'apis';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -27,10 +29,11 @@ const Audiences = () => {
   const [emailListText, setEmailListText] = useState('');
   const [editableEmailList, setEditableEmailList] = useState([]);
 
-  const getAudienceList = useCallback(() => {
+  const getAudienceList = useCallback(async () => {
     setIsLoading(true);
     try {
       // TODO: Implement API Here
+      // const { status, data } = await apis.audiences.getCreatorAudiences();
       const { status, data } = {
         status: 200,
         data: [],
@@ -54,28 +57,6 @@ const Audiences = () => {
       setEmailListText('');
     }
   }, [selectedTab, getAudienceList]);
-
-  const audienceListColumns = [
-    {
-      title: 'Email Address',
-      dataIndex: 'email',
-      key: 'email',
-      width: isMobileDevice ? '180px' : '35%',
-    },
-    {
-      title: 'First Name',
-      dataIndex: 'first_name',
-      key: 'first_name',
-      width: isMobileDevice ? '120px' : '33%',
-    },
-    {
-      title: 'Last Name',
-      dataIndex: 'last_name',
-      key: 'last_name',
-      width: isMobileDevice ? '120px' : '32%',
-      render: (text, record) => record.last_name || '-',
-    },
-  ];
 
   const parseEmailInput = (value) => {
     setIsSubmitting(true);
@@ -103,6 +84,86 @@ const Audiences = () => {
 
   const removeFromEditableEmailList = (email) =>
     setEditableEmailList(editableEmailList.filter((emailData) => emailData.email !== email));
+
+  const saveAudiences = async (values) => {
+    setIsSubmitting(true);
+    const payload = Object.entries(values).map(([email, data]) => ({
+      email: email,
+      first_name: data.first_name,
+      last_name: data.last_name || '',
+    }));
+
+    try {
+      // const { status, data } = await apis.audiences.addAudienceList(payload);
+      const { status, data } = {
+        status: 200,
+        data: payload,
+      };
+
+      if (isAPISuccess(status) && data) {
+        showSuccessModal('Successfully imported audiences');
+        // temporary for showing UI
+        setAudienceList(data);
+      }
+    } catch (error) {
+      showErrorModal(error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsSubmitting(false);
+  };
+
+  const deleteAudience = (audience) => {
+    try {
+      // TODO: Confirm the API format
+      // const { status, data } = await apis.audiences.deleteAudienceFromList();
+      console.log(audience);
+    } catch (error) {
+      showErrorModal(error?.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const audienceListColumns = [
+    {
+      title: 'Email Address',
+      dataIndex: 'email',
+      key: 'email',
+      width: '30%',
+    },
+    {
+      title: 'First Name',
+      dataIndex: 'first_name',
+      key: 'first_name',
+      width: '25%',
+    },
+    {
+      title: 'Last Name',
+      dataIndex: 'last_name',
+      key: 'last_name',
+      width: '25%',
+      render: (text, record) => record.last_name || '-',
+    },
+    {
+      title: 'Actions',
+      width: '15%',
+      render: (record) => (
+        <Row gutter={[8, 8]} justify="end">
+          <Col xs={4}>
+            <Popconfirm
+              arrowPointAtCenter
+              icon={<DeleteOutlined />}
+              title={<Text> Are you sure you want to delete this audience? </Text>}
+              onConfirm={() => deleteAudience(record)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Tooltip title="Delete Audience">
+                <Button type="text" danger icon={<DeleteOutlined />} />
+              </Tooltip>
+            </Popconfirm>
+          </Col>
+        </Row>
+      ),
+    },
+  ];
 
   const editableEmailListColumns = [
     {
@@ -145,31 +206,7 @@ const Audiences = () => {
     },
   ];
 
-  const saveAudiences = (values) => {
-    setIsSubmitting(true);
-    const payload = Object.entries(values).map(([email, data]) => ({
-      email: email,
-      first_name: data.first_name,
-      last_name: data.last_name || '',
-    }));
-    console.log(payload);
-
-    try {
-      const { status, data } = {
-        status: 200,
-        data: payload,
-      };
-
-      if (isAPISuccess(status) && data) {
-        showSuccessModal('Successfully imported audiences');
-        // temporary for showing UI
-        setAudienceList(data);
-      }
-    } catch (error) {
-      showErrorModal(error?.response?.data?.message || 'Something went wrong.');
-    }
-    setIsSubmitting(false);
-  };
+  //TODO: Make Mobile UI for this
 
   return (
     <Row gutter={[16, 16]}>
