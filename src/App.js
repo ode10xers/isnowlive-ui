@@ -7,7 +7,7 @@ import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
-import parseQueryString from 'utils/parseQueryString';
+import { isWidgetUrl } from 'utils/widgets';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -64,8 +64,7 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
-  const location = window.location;
-  const { isWidget } = parseQueryString(location.search);
+  const isWidget = isWidgetUrl();
 
   useEffect(() => {
     if (!isWidget) {
