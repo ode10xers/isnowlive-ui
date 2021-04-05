@@ -13,7 +13,7 @@ export default function EmbeddablePage() {
     componentToLoad = <CalendarSessions />;
   } else if (widgetType === 'dashboard') {
     if (authCode) {
-      componentToLoad = <Dashboard token={authCode}/>;
+      componentToLoad = <Dashboard token={authCode} />;
     } else {
       return <p>Show Login Page as the token is not found</p>;
     }

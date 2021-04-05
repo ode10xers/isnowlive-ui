@@ -222,6 +222,13 @@ export const StripeAccountStatus = {
   CONNECTED: 'CONNECTED',
 };
 
+export const StripePaymentStatus = {
+  AWAITING_CAPTURE: 'AWAITING_CAPTURE',
+  AWAITING_METHOD: 'AWAITING_METHOD',
+  AUTHORIZATION_REQUIRED: 'AUTHORIZATION_REQUIRED',
+  SUCCESS: 'SUCCESS',
+};
+
 export const paymentSource = {
   GATEWAY: 'PAYMENT_GATEWAY',
   PASS: 'PASS',

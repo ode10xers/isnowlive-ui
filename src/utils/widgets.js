@@ -38,9 +38,7 @@ export const generateWidgetUrl = (userName, widgetToLoad, passAuthCodeInUrl = fa
 
   return (
     generateWidgetLink(widgetToLoad, userName) +
-    `${
-    passAuthCodeInUrl && authCode && authCode !== '' ? `&authCode=${authCode}` : ''
-    }`
+    `${passAuthCodeInUrl && authCode && authCode !== '' ? `&authCode=${authCode}` : ''}`
   );
 };
 
@@ -48,4 +46,4 @@ export const isWidgetUrl = () => {
   const location = window.location;
   const { isWidget } = parseQueryString(location.search);
   return isWidget === 'true';
-}
+};

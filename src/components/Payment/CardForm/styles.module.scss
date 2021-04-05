@@ -16,7 +16,6 @@
   border-radius: 0.25rem;
   background-color: map-get($map: $colors, $key: 'White');
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  // border: 1px solid rgba(191,203,218,0.25);
   border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
   box-shadow: 0 3px 8px map-get($map: $colors, $key: 'WhiteSmoke2');
   color: map-get($map: $colors, $key: 'Zeus');
