@@ -35,7 +35,11 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
       <Card
         bodyStyle={{ padding: '4px 2px' }}
         key={userCard.external_id}
-        className={classNames(styles.savedCardElement, disabled ? styles.disabled : undefined)}
+        className={classNames(
+          styles.savedCardElement,
+          disabled ? styles.disabled : undefined,
+          userCard.external_id === selectedCard?.external_id ? styles.selected : undefined
+        )}
         onClick={() => toggleSelectedCard(userCard)}
       >
         <Row gutter={8}>
@@ -53,8 +57,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               ? 'Uncheck to pay with some other card'
               : 'Check to pay with this card'}
           </Col>
-          <Col xs={3}>
-            {/* Brand Logo Here */}
+          <Col xs={3} className={styles.cardBrandWrapper}>
             <Image
               className={styles.cardBrandImage}
               preview={false}
@@ -62,10 +65,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               alt=""
             />
           </Col>
-          <Col xs={3}>
-            {/* Last 4 digits here */}
-            <Text> {userCard.last_digits} </Text>
-          </Col>
+          <Col xs={3}>{userCard.last_digits}</Col>
         </Row>
       </Card>
     );
