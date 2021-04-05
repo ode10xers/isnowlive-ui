@@ -37,7 +37,7 @@ const CalendarView = ({
     }
   }, [updateCalendarDate]);
 
-  let views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
+  const views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
   return (
     <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
       <Calendar

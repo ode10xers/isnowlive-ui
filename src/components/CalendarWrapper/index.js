@@ -5,6 +5,7 @@ import { generateUrlFromUsername } from 'utils/helper';
 
 import { generateLightColorHex, getBackgroundColorsForMobile } from './helper';
 import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 
 // eslint-disable-next-line
 import styles from './styles.scss';
@@ -15,7 +16,7 @@ const {
 
 // This component may be eliminated but adding it for now as have limited time
 const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClick }) => {
-  const [calendarView, setCalendarView] = useState('month');
+  const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'week');
   const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
 
   // Reworked this to redirect to Inventory Page as per Rahul's request
@@ -76,6 +77,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
         <div
           className={`custom-event-container custom-day-event-container ${event.isPast ? 'past-event' : ''}`}
           style={{ border: `2px solid ${borderColor}` }}
+          onClick={() => redirectToInventoryPage(event)}
         >
           <div className="event-title">{event.name}</div>
           <div className="event-time">{`${toLocaleTime(event.start_time)} - ${toLocaleTime(event.end_time)}`}</div>
