@@ -1,12 +1,16 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { Button, Row, Col } from 'antd';
+import { Button, Row, Col, message } from 'antd';
 
+import apis from 'apis';
+
+import SavedCards from 'components/Payment/SavedCards';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
+import { isAPISuccess, StripePaymentStatus } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -62,15 +66,37 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
   const options = useOptions();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [disableSavedCards, setDisableSavedCards] = useState(false);
+  const [savedUserCards, setSavedUserCards] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
 
-  const makePayment = async (secret, cardEl) => {
+  const fetchUserCards = useCallback(async () => {
     try {
-      const result = await stripe.confirmCardPayment(secret, {
-        payment_method: {
-          card: cardEl,
-        },
-        setup_future_usage: 'off_session',
-      });
+      const { status, data } = await apis.payment.getUserSavedCards();
+
+      if (isAPISuccess(status) && data) {
+        setSavedUserCards(data);
+      }
+    } catch (error) {
+      if (error?.response?.status !== 404) {
+        message.error('Failed fetching previously used payment methods');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isFree) {
+      fetchUserCards();
+    } else {
+      setSavedUserCards([]);
+      setSelectedCard(null);
+      setDisableSavedCards(false);
+    }
+  }, [isFree, fetchUserCards]);
+
+  const makePayment = async (secret, paymentPayload) => {
+    try {
+      const result = await stripe.confirmCardPayment(secret, paymentPayload);
 
       if (result.error) {
         return false;
@@ -100,47 +126,121 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
     let verifyOrderRes = null;
     // The case below is when payment is required
     if (orderResponse && orderResponse.payment_required) {
-      const paymentSessionRes = await createPaymentSessionForOrder({
-        order_id: orderResponse.payment_order_id,
-        order_type: orderResponse.payment_order_type,
-      });
+      if (!selectedCard) {
+        // Flow for when using new card
+        // We will take the card details and save in the BE
+        const paymentSessionRes = await createPaymentSessionForOrder({
+          order_id: orderResponse.payment_order_id,
+          order_type: orderResponse.payment_order_type,
+        });
 
-      if (paymentSessionRes) {
-        const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, cardEl);
-
-        if (paymentRes) {
-          verifyOrderRes = await verifyPaymentForOrder({
-            order_id: orderResponse.payment_order_id,
-            transaction_id: paymentSessionRes.transaction_id,
-            order_type: orderResponse.payment_order_type,
+        if (paymentSessionRes) {
+          const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, {
+            payment_method: {
+              card: cardEl,
+            },
+            setup_future_usage: 'off_session',
           });
+
+          if (paymentRes) {
+            verifyOrderRes = await verifyPaymentForOrder({
+              order_id: orderResponse.payment_order_id,
+              transaction_id: paymentSessionRes.transaction_id,
+              order_type: orderResponse.payment_order_type,
+            });
+          } else {
+            showErrorModal('Something went wrong', 'Failed to confirm payment with card details');
+          }
         } else {
-          showErrorModal('Something went wrong', 'Failed to confirm payment with card details');
+          showErrorModal('Something went wrong', 'Failed to create payment session');
         }
       } else {
-        showErrorModal('Something went wrong', 'Failed to create payment session');
+        // Flow for when using saved card
+        // The payload for createPaymentSession API will have additional info attached
+        const paymentSessionRes = await createPaymentSessionForOrder({
+          order_id: orderResponse.payment_order_id,
+          order_type: orderResponse.payment_order_type,
+          payment_method_id: selectedCard.external_id,
+          direct_charge: true,
+        });
+
+        if (paymentSessionRes) {
+          if (paymentSessionRes.status === StripePaymentStatus.AUTHORIZATION_REQUIRED) {
+            // If the status is AUTHORIZATION_REQUIRED, we need to re-auth
+            // The paymentSessionRes should contain the payment_method_id (beginning with pm_****)
+            // We use that to re-auth the card
+            const paymentRes = await makePayment(paymentSessionRes.payment_gateway_session_token, {
+              payment_method: paymentSessionRes.payment_method_id,
+            });
+
+            if (paymentRes) {
+              verifyOrderRes = await verifyPaymentForOrder({
+                order_id: orderResponse.payment_order_id,
+                transaction_id: paymentSessionRes.transaction_id,
+                order_type: orderResponse.payment_order_type,
+              });
+            } else {
+              showErrorModal('Something went wrong', 'Failed to confirm payment with card details');
+            }
+          } else {
+            // If the status is SUCCESS or AWAITING_CAPTURE
+            // We can directly hit the verification API
+            verifyOrderRes = await verifyPaymentForOrder({
+              order_id: orderResponse.payment_order_id,
+              transaction_id: paymentSessionRes.transaction_id,
+              order_type: orderResponse.payment_order_type,
+            });
+          }
+        } else {
+          showErrorModal('Something went wrong', 'Failed to create payment session');
+        }
       }
     }
 
+    setSelectedCard(null);
+    cardEl.clear();
     onAfterPayment(orderResponse, verifyOrderRes);
     setIsSubmitting(false);
   };
 
+  const changeSelectedCard = (userCard) => {
+    const cardEl = elements.getElement(CardElement);
+    cardEl.update({
+      disabled: userCard ? true : false,
+    });
+    setSelectedCard(userCard);
+  };
+
   return (
-    <Row gutter={[8, 16]} justify="center">
+    <Row gutter={[8, 8]} justify="center">
       {!isFree && (
-        <Col xs={24} className={styles.inlineCardForm}>
-          <CardElement
-            options={options}
-            onChange={(event) => {
-              if (event.complete) {
-                setIsButtonDisabled(false);
-              } else {
-                setIsButtonDisabled(true);
-              }
-            }}
-          />
-        </Col>
+        <>
+          {savedUserCards.length > 0 && (
+            <Col xs={24}>
+              <SavedCards
+                disabled={disableSavedCards}
+                userCards={savedUserCards}
+                selectedCard={selectedCard}
+                setSelectedCard={changeSelectedCard}
+              />
+            </Col>
+          )}
+          <Col xs={24} className={styles.inlineCardForm}>
+            <CardElement
+              options={options}
+              onChange={(event) => {
+                console.log(event.empty);
+                setDisableSavedCards(!event.empty);
+
+                if (event.complete) {
+                  setIsButtonDisabled(false);
+                } else {
+                  setIsButtonDisabled(true);
+                }
+              }}
+            />
+          </Col>
+        </>
       )}
 
       <Col xs={8} lg={6}>
@@ -148,9 +248,12 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
           block
           size="middle"
           type="primary"
-          disabled={!isFree && isButtonDisabled}
+          disabled={!isFree && isButtonDisabled && !selectedCard}
           onClick={handleSubmit}
-          className={classNames(styles.buyButton, !isFree && isButtonDisabled ? styles.disabledBtn : undefined)}
+          className={classNames(
+            styles.buyButton,
+            !isFree && isButtonDisabled && !selectedCard ? styles.disabledBtn : undefined
+          )}
           loading={isSubmitting}
         >
           {text}
