@@ -1,8 +1,12 @@
 @import '../../styles/variables.scss';
 
-.greenBtn {
-  background-color: map-get($map: $colors, $key: 'KellyGreen') !important;
-  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+.linkBtn {
+  padding: 0px !important;
+}
+
+.descriptionText {
+  @extend .greenText;
+  opacity: 0.8;
 }
 
 .topBorder {

@@ -25,21 +25,23 @@ const { Text, Paragraph, Title } = Typography;
 // can trigger the Modal and we need to 'reset' the value
 // of the object in the parent component (see SessionDetails)
 
-//TODO: Refactor this to use PaymentPopup as an intermediate flow
+//TODO: The logics here have been improved based on Rahul's feedback
+// Either also apply it into HeaderModal Component
+// Or merge it with HeaderModal and refactor them into one component
 const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const { logIn } = useGlobalContext();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
   const [currentUser, setCurrentUser] = useState(getLocalUserDetails());
-  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [showPasswordHelperText, setShowPasswordHelperText] = useState(false);
   const [showSignIn, setShowSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
 
   const toggleSignInState = () => {
     if (showSignIn) {
-      setShowPasswordField(false);
+      setShowPasswordHelperText(false);
     } else {
       form.setFieldsValue({
         ...form.getFieldsValue(),
@@ -73,10 +75,10 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   }, [form, currentUser, visible]);
 
   useEffect(() => {
-    if (showPasswordField && passwordInput.current) {
+    if (showPasswordHelperText && passwordInput.current) {
       passwordInput.current.focus();
     }
-  }, [showPasswordField]);
+  }, [showPasswordHelperText]);
 
   const signupUser = async (values) => {
     try {
@@ -94,9 +96,10 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
-        setShowPasswordField(true);
+        setShowPasswordHelperText(true);
         setCurrentUser(values);
-        message.info('Enter password to register session');
+        setShowSignIn(true);
+        message.info('You already have an account! Enter password to register session');
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
@@ -104,6 +107,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   };
 
   const onFinish = async (values) => {
+    setIsLoading(true);
     setIncorrectPassword(false);
     try {
       // check if user is login
@@ -126,8 +130,17 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
           }
         } catch (error) {
           if (error.response?.status === 403) {
-            setIncorrectPassword(true);
-            message.error('Incorrect email or password');
+            //TODO: Match the status code or message if BE changes it
+            if (
+              error.response?.data?.message ===
+              'unable to find user for email. Error: unable to find user with email: record not found'
+            ) {
+              toggleSignInState();
+              message.error('No account with that email exists! Sign up to create new account');
+            } else {
+              setIncorrectPassword(true);
+              message.error('Incorrect email or password');
+            }
           } else {
             message.error(error.response?.data?.message || 'Something went wrong');
           }
@@ -141,6 +154,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
+    setIsLoading(false);
   };
 
   const onFinishFailed = ({ errorFields }) => {
@@ -173,7 +187,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   return (
     <div>
       <Modal visible={visible} centered={true} onCancel={() => closeModal(true)} footer={null}>
-        <Loader loading={isLoading}>
+        <Loader loading={isLoading} size="large">
           <Form
             form={form}
             labelAlign="left"
@@ -196,17 +210,17 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                       name="first_name"
                       rules={validationRules.nameValidation}
                     >
-                      <Input placeholder="First Name" disabled={showPasswordField} />
+                      <Input placeholder="First Name" disabled={showPasswordHelperText} />
                     </Form.Item>
                     <Form.Item className={styles.lastNameInput} name="last_name" rules={validationRules.nameValidation}>
-                      <Input placeholder="Last Name" disabled={showPasswordField} />
+                      <Input placeholder="Last Name" disabled={showPasswordHelperText} />
                     </Form.Item>
                   </Form.Item>
                 )}
                 <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                  <Input placeholder="Enter your email" disabled={!showSignIn && showPasswordField} />
+                  <Input placeholder="Enter your email" />
                 </Form.Item>
-                {(showSignIn || showPasswordField) && (
+                {showSignIn && (
                   <>
                     <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
                       <Input.Password placeholder="Enter your password" />
@@ -218,11 +232,11 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                         </div>
                       </Form.Item>
                     )}
-                    {!showSignIn && (
+                    {showPasswordHelperText && (
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.passwordHelpText}>
                           <Text>
-                            You already have an account, but if you haven't set your password, please
+                            You already have an account, but if you haven't set your password, please{' '}
                             <Text className={styles.linkBtn} onClick={() => handleSetNewPassword()}>
                               set a new password
                             </Text>

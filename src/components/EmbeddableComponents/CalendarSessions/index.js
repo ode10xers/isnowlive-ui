@@ -1,80 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { message, Empty } from 'antd';
+import { message, Empty, Typography, Row, Col } from 'antd';
 
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import CalendarView from 'components/CalendarView';
+import CalendarWrapper from 'components/CalendarWrapper';
+import PurchaseModal from 'components/PurchaseModal';
+import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
+import { isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
 import dateUtil from 'utils/date';
 
-// eslint-disable-next-line
-import styles from './styles.scss';
+import { useGlobalContext } from 'services/globalContext';
 
+import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
+import styles from './style.module.scss';
+const logo = require('assets/images/Logo-passion-transparent.png');
+
+const { Text } = Typography;
 const {
-  formatDate: { toLocaleTime },
+  formatDate: { toLongDateWithTime },
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-function generateLightColorHex() {
-  let color = '#';
-  for (let i = 0; i < 3; i++)
-    color += ('0' + Math.floor(((1 + Math.random()) * Math.pow(16, 2)) / 2).toString(16)).slice(-2);
-  return color;
-}
-
-function getDarkColor() {
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += Math.floor(Math.random() * 10);
-  }
-  return color;
-}
-
 const CalendarSessions = () => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [calendarSession, setCalendarSession] = useState([]);
-  const [calendarView, setCalendarView] = useState('month');
   const [readyToPaint, setReadyToPaint] = useState(false);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
-  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState(null);
 
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername('ellianto' || session.username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
-  };
+  const profileUsername = window.location.hostname.split('.')[0] || '';
 
-  const onViewChange = (e) => {
-    setCalendarView(e);
-  };
-
-  const getSessionCountByDate = (allEvents) => {
-    const eventsPerDay = {};
-    setReadyToPaint(false);
-    allEvents.forEach((event) => {
-      if (eventsPerDay[event.session_date]) {
-        const tempVal = eventsPerDay[event.session_date];
-        if (!tempVal.includes(event.inventory_id)) {
-          const updatedVal = [...tempVal, event.inventory_id];
-          eventsPerDay[event.session_date] = updatedVal;
-        }
-      } else {
-        eventsPerDay[event.session_date] = [event.inventory_id];
-      }
-    });
-    return eventsPerDay;
-  };
-
-  const getCalendarSessions = async (e) => {
+  const getCalendarSessions = async (username) => {
     try {
       setIsSessionLoading(true);
-      const profileUsername = window.location.hostname.split('.')[0] || '';
-      const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
-      const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
+      const UpcomingRes = await apis.user.getSessionsByUsername(username, 'upcoming');
+      const PastRes = await apis.user.getSessionsByUsername(username, 'past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
+        setReadyToPaint(false);
         const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
         setSessionCountByDate(res);
-        setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
+        setCalendarSession([
+          ...UpcomingRes.data.map((upcomingSessions) => ({
+            ...upcomingSessions,
+            isPast: false,
+          })),
+          ...PastRes.data.map((pastSessions) => ({
+            ...pastSessions,
+            isPast: true,
+          })),
+        ]);
         setReadyToPaint(true);
         setIsSessionLoading(false);
       }
@@ -84,88 +63,134 @@ const CalendarSessions = () => {
     }
   };
 
-  useEffect(() => {
-    getCalendarSessions();
-    // eslint-disable-next-line
-  }, []);
+  const showPurchaseModal = (inventory) => {
+    setSelectedInventory(inventory);
+    setPurchaseModalVisible(true);
+  };
 
-  function Event(props) {
-    const onBookClick = (e) => {
-      e.stopPropagation();
+  const onEventBookClick = (event) => {
+    showPurchaseModal(event);
+  };
 
-      alert('clicked event with id ' + event.inventory_id);
-    };
+  const closePurchaseModal = () => {
+    setSelectedInventory(null);
+    setPurchaseModalVisible(false);
+  };
 
-    const { event } = props;
+  const createOrder = async (couponCode = '') => {
+    // Currently discount engine has not been implemented for session
+    // however this form of createOrder will be what is used to accomodate
+    // the new Payment Popup
 
-    const borderColor = generateLightColorHex();
+    // Some front end checks to prevent the logic below from breaking
+    if (!selectedInventory) {
+      message.error('Invalid session schedule selected');
+      return null;
+    }
 
-    if (calendarView === 'month' || calendarView === 'agenda') {
-      const totalSessionThisDay = sessionCountByDate[event?.session_date] || 0;
+    setIsSessionLoading(true);
 
-      const onMobileDateCellClick = (e) => {
-        const [y, m, d] = event.session_date.split('-');
-        setCalendarDate(new Date(y, m - 1, d));
-        setCalendarView('day');
-        e.stopPropagation();
+    try {
+      const payload = {
+        inventory_id: selectedInventory.inventory_id,
+        user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone_location: getTimezoneLocation(),
+        user_timezone: getCurrentLongTimezone(),
+        payment_source: paymentSource.GATEWAY,
       };
 
-      const bgColor = getDarkColor();
+      const { status, data } = await apis.session.createOrderForUser(payload);
 
-      return (
-        <>
-          <div
-            className="custom-event-container custom-month-event-container"
-            style={{ border: `2px solid ${borderColor}` }}
-          >
-            <span className="event-title">{event.name}</span>
-            <span className="event-time">{toLocaleTime(event.start_time)}</span>
-          </div>
-          <div
-            className="custom-event-month-container-mb"
-            style={{ background: `${bgColor}` }}
-            onClick={onMobileDateCellClick}
-          >
-            {totalSessionThisDay.length}
-          </div>
-        </>
-      );
+      if (isAPISuccess(status) && data) {
+        setIsSessionLoading(false);
+        // Keeping inventory_id since it's needed in confirmation modal
+        const inventoryId = selectedInventory.inventory_id;
+        setSelectedInventory(null);
+
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_type: orderType.CLASS,
+            payment_order_id: data.order_id,
+            inventory_id: inventoryId,
+          };
+        } else {
+          showBookSingleSessionSuccessModal(inventoryId);
+          return null;
+        }
+      }
+    } catch (error) {
+      setIsSessionLoading(false);
+
+      message.error(error.response?.data?.message || 'Something went wrong');
+
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(productType.CLASS);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(productType.PASS);
+      }
+
+      return null;
+    }
+  };
+
+  const showConfirmPaymentPopup = () => {
+    if (!selectedInventory) {
+      message.error('Invalid session schedule selected');
+      return;
     }
 
-    if (calendarView === 'week' || calendarView === 'day') {
-      return (
-        <div
-          className="custom-event-container custom-day-event-container"
-          style={{
-            border: `2px solid ${borderColor}`,
-          }}
-        >
-          <div className="event-title">{event.name}</div>
-          <div className="event-time">{`${toLocaleTime(event.start_time)} - ${toLocaleTime(event.end_time)}`}</div>
-          <div className="event-tags-container">{event.group && <span className="group-pill">Group</span>}</div>
-          <button onClick={(e) => onBookClick(e)} className="book-btn">
-            Book
-          </button>
-        </div>
-      );
-    }
-  }
+    const desc = toLongDateWithTime(selectedInventory.start_time);
+
+    const paymentPopupData = {
+      productId: selectedInventory.inventory_id,
+      productType: 'SESSION',
+      itemList: [
+        {
+          name: selectedInventory.name,
+          description: desc,
+          currency: selectedInventory.currency,
+          price: selectedInventory.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
+  };
+
+  useEffect(() => {
+    getCalendarSessions(profileUsername);
+    // eslint-disable-next-line
+  }, [profileUsername]);
 
   return (
     <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+      <PurchaseModal
+        visible={purchaseModalVisible}
+        closeModal={closePurchaseModal}
+        createOrder={showConfirmPaymentPopup}
+      />
       {calendarSession.length > 0 && readyToPaint ? (
-        <CalendarView
-          inventories={calendarSession}
-          onSelectInventory={redirectToSessionsPage}
-          onViewChange={onViewChange}
-          calendarView={calendarView}
-          classes={['custom-calendar-view']}
-          customComponents={{
-            event: Event,
-          }}
-          step={30}
-          defaultDate={calendarDate}
-        />
+        <>
+          <Row>
+            <Col xs={14}>
+              <Text type="primary" strong>
+                All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+              </Text>
+            </Col>
+            <Col xs={10}>
+              <img src={logo} alt="Passion.do" className={styles.passionLogo} />
+            </Col>
+          </Row>
+
+          <CalendarWrapper
+            calendarSessions={calendarSession}
+            sessionCountByDate={sessionCountByDate}
+            onEventBookClick={onEventBookClick}
+          />
+        </>
       ) : (
         <Empty />
       )}

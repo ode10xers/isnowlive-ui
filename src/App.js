@@ -7,7 +7,7 @@ import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
-import parseQueryString from 'utils/parseQueryString';
+import { isWidgetUrl } from 'utils/widgets';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -64,24 +64,18 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
-  const location = window.location;
-  const { isWidget } = parseQueryString(location.search);
-
-  useEffect(() => {}, []);
+  const isWidget = isWidgetUrl();
 
   useEffect(() => {
-    if (cookieConsent) {
-      initMixPanel();
-    }
-  }, [cookieConsent]);
+    if (!isWidget) {
+      initializeFreshChat(userDetails, cookieConsent);
 
-  useEffect(() => {
-    initializeFreshChat(userDetails, cookieConsent);
-
-    if (cookieConsent) {
-      initFreshChatWidget(userDetails);
+      if (cookieConsent) {
+        initFreshChatWidget(userDetails);
+        initMixPanel();
+      }
     }
-  }, [userDetails, cookieConsent]);
+  }, [userDetails, cookieConsent, isWidget]);
 
   useEffect(() => {
     if (!isWidget) {
@@ -114,7 +108,12 @@ function App() {
   }, [isWidget]);
 
   if (isWidget) {
-    return <EmbeddablePage />;
+    return (
+      <>
+        <PaymentPopup />
+        <EmbeddablePage />
+      </>
+    );
   }
 
   if (!isReadyToLoad) {

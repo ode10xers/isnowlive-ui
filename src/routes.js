@@ -41,6 +41,7 @@ const Routes = {
     courses: '/courses',
     coupons: '/coupons',
     accountSettings: '/settings',
+    externalSiteSettings: '/widgets',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
