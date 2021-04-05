@@ -12,6 +12,8 @@ import { showErrorModal } from 'components/Modals/modals';
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 import { isAPISuccess, StripePaymentStatus } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
 // Additional CardOptions Reference:
@@ -60,6 +62,9 @@ const useOptions = () => {
 // It can be used to bypass button disable condition, hide the card form, etc
 const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
   const { text = 'PAY' } = btnProps;
+  const {
+    state: { paymentPopupVisible },
+  } = useGlobalContext();
 
   const stripe = useStripe();
   const elements = useElements();
@@ -84,15 +89,20 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
     }
   }, []);
 
+  // Here we need to refetch the user cards if the payment popup is closed
+  // Might need to find a better implementation or place to put this
+
   useEffect(() => {
-    if (!isFree) {
-      fetchUserCards();
-    } else {
-      setSavedUserCards([]);
-      setSelectedCard(null);
-      setDisableSavedCards(false);
+    if (paymentPopupVisible) {
+      if (!isFree) {
+        fetchUserCards();
+      } else {
+        setSavedUserCards([]);
+        setSelectedCard(null);
+        setDisableSavedCards(false);
+      }
     }
-  }, [isFree, fetchUserCards]);
+  }, [isFree, fetchUserCards, paymentPopupVisible]);
 
   const makePayment = async (secret, paymentPayload) => {
     try {

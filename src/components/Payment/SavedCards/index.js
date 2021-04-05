@@ -54,7 +54,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
           </Col>
           <Col xs={16}>
             {selectedCard && selectedCard.external_id === userCard.external_id
-              ? 'Uncheck to pay with some other card'
+              ? 'Uncheck to pay with other card'
               : 'Check to pay with this card'}
           </Col>
           <Col xs={3} className={styles.cardBrandWrapper}>
