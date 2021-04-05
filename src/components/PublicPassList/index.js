@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import MobileDetect from 'mobile-detect';
-import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
+
+import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
@@ -11,20 +12,19 @@ import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import PurchaseModal from 'components/PurchaseModal';
 
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
 import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
 
-import config from 'config';
-import apis from 'apis';
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-
-const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Paragraph } = Typography;
 
 const PublicPassList = ({ username, passes }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -43,36 +43,34 @@ const PublicPassList = ({ username, passes }) => {
     setShowPurchaseModal(false);
   };
 
-  const initiatePaymentForOrder = async (orderDetails) => {
-    setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.pass_order_id,
-        order_type: orderType.PASS,
-      });
-
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
-  const createOrder = async (userEmail) => {
+  const showConfirmPaymentPopup = () => {
     if (!selectedPass) {
       showErrorModal('Something went wrong', 'Invalid Pass ID');
       return;
+    }
+
+    const desc = `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`;
+
+    const paymentPopupData = {
+      productId: selectedPass.external_id,
+      productType: 'PASS',
+      itemList: [
+        {
+          name: selectedPass.name,
+          description: desc,
+          currency: selectedPass.currency,
+          price: selectedPass.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
+  };
+
+  const createOrder = async (couponCode = '') => {
+    if (!selectedPass) {
+      showErrorModal('Something went wrong', 'Invalid Pass ID');
+      return null;
     }
 
     setIsLoading(true);
@@ -84,19 +82,27 @@ const PublicPassList = ({ username, passes }) => {
       });
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        setSelectedPass(null);
+
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          return {
+            ...data,
+            payment_order_type: orderType.PASS,
+            payment_order_id: data.pass_order_id,
+          };
         } else {
-          setIsLoading(false);
-          showBookingSuccessModal(userEmail, selectedPass, false, false, username);
+          showPurchasePassSuccessModal(data.pass_order_id);
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
+      return null;
     }
   };
 
@@ -289,7 +295,11 @@ const PublicPassList = ({ username, passes }) => {
 
   return (
     <div className={styles.box}>
-      <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+      <PurchaseModal
+        visible={showPurchaseModal}
+        closeModal={closePurchaseModal}
+        createOrder={showConfirmPaymentPopup}
+      />
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>

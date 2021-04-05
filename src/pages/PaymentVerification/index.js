@@ -5,11 +5,14 @@ import { message, Row } from 'antd';
 
 import Loader from 'components/Loader';
 import {
-  showBookingSuccessModal,
+  showBookSingleSessionSuccessModal,
+  showPurchasePassSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
   showErrorModal,
   showAlreadyBookedModal,
-  showVideoPurchaseSuccessModal,
-  showCourseBookingSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
+  showCoursePurchaseSuccessModal,
+  showPurchasePassAndGetVideoSuccessModal,
 } from 'components/Modals/modals';
 
 import apis from 'apis';
@@ -33,25 +36,10 @@ const PaymentVerification = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { order_id, transaction_id, order_type, inventory_id, video_id } = parseQueryString(location.search);
 
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
-
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-    }
-
-    return null;
-  };
-
   useEffect(() => {
     if (order_id && transaction_id) {
       const verifyPayment = async () => {
         setIsLoading(true);
-        const username = window.location.hostname.split('.')[0];
 
         try {
           const { status } = await apis.payment.verifyPaymentForOrder({
@@ -62,15 +50,11 @@ const PaymentVerification = () => {
 
           if (isAPISuccess(status)) {
             if (order_type === orderType.PASS) {
-              let usersPass = null;
-              const userPassResponse = await apis.passes.getAttendeePasses();
-              if (isAPISuccess(userPassResponse.status)) {
-                usersPass = userPassResponse.data.active.filter((userPass) => userPass.pass_order_id === order_id)[0];
-              } else {
-                showErrorModal('Something wrong happened', "Failed to fetch user's pass list");
-              }
+              // It's a pass purchase, but there are several possibilites after this
 
               if (inventory_id) {
+                // if inventory_id is present in query params
+                // it is the BUY PASS AND BOOK CLASS flow
                 try {
                   //Continue to book the class after Pass Purchase is successful
                   const followUpBooking = await apis.session.createOrderForUser({
@@ -83,28 +67,21 @@ const PaymentVerification = () => {
                   });
 
                   if (isAPISuccess(followUpBooking.status)) {
-                    const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
-
-                    showBookingSuccessModal(
-                      userDetails.email,
-                      { ...usersPass, name: usersPass.pass_name },
-                      true,
-                      true,
-                      username,
-                      orderDetails
-                    );
+                    showPurchasePassAndBookSessionSuccessModal(order_id, inventory_id);
                   }
                 } catch (error) {
                   if (
                     error.response?.data?.message ===
                     'It seems you have already booked this session, please check your dashboard'
                   ) {
-                    showAlreadyBookedModal(productType.CLASS, username);
+                    showAlreadyBookedModal(productType.CLASS);
                   } else {
                     showErrorModal('Something went wrong', error.response?.data?.message);
                   }
                 }
               } else if (video_id) {
+                // if video_id is present in query params
+                // it is the BUY PASS AND GET VIDEO flow
                 try {
                   // Continue to book the video after Pass Purchase is successful
                   const followUpGetVideo = await apis.videos.createOrderForUser({
@@ -114,44 +91,31 @@ const PaymentVerification = () => {
                   });
 
                   if (isAPISuccess(followUpGetVideo.status)) {
-                    showVideoPurchaseSuccessModal(
-                      userDetails.email,
-                      followUpGetVideo.data,
-                      { ...usersPass, name: usersPass.pass_name },
-                      true,
-                      true,
-                      username
-                    );
+                    showPurchasePassAndGetVideoSuccessModal(order_id);
                   }
                 } catch (error) {
                   if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-                    showAlreadyBookedModal(productType.VIDEO, username);
+                    showAlreadyBookedModal(productType.VIDEO);
                   } else {
                     showErrorModal('Something went wrong', error.response?.data?.message);
                   }
                 }
               } else {
-                showBookingSuccessModal(
-                  userDetails.email,
-                  { ...usersPass, name: usersPass.pass_name },
-                  false,
-                  false,
-                  username
-                );
+                // if both inventory_id and video_id is not present
+                // it is just a BUY PASS flow
+                showPurchasePassSuccessModal(order_id);
               }
             } else if (order_type === orderType.VIDEO) {
-              const { data } = await apis.videos.getAttendeeVideos();
-
-              if (data) {
-                const purchasedVideo = data.active.find((video) => video.video_order_id === order_id);
-                showVideoPurchaseSuccessModal(userDetails.email, purchasedVideo, null, false, true, username);
-              }
+              // it is a video purchase
+              showPurchaseSingleVideoSuccessModal(order_id);
             } else if (order_type === orderType.COURSE) {
-              showCourseBookingSuccessModal(userDetails.email, username);
+              // it is a course purchase
+              showCoursePurchaseSuccessModal();
             } else {
-              const orderDetails = await getAttendeeOrderDetails(order_id);
-
-              showBookingSuccessModal(userDetails.email, null, false, false, username, orderDetails);
+              // it is a session purchase
+              // We actually need the inventory_id here, but this page will
+              // not be used anymore so I'm leaving this here
+              showBookSingleSessionSuccessModal();
             }
           }
           setIsLoading(false);
