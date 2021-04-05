@@ -16,9 +16,8 @@ import {
   message,
   DatePicker,
   Modal,
-  Tooltip,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined, FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -26,7 +25,6 @@ import Routes from 'routes';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
-import FileUpload from 'components/FileUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
@@ -51,7 +49,7 @@ import {
 
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph, Link } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
@@ -88,7 +86,7 @@ const initialSession = {
   description: '',
   session_image_url: '',
   inventory: [],
-  document_url: '',
+  document_urls: [],
   beginning: moment().startOf('day').utc().format(),
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
@@ -104,7 +102,6 @@ const Session = ({ match, history }) => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
-  const [sessionDocumentUrl, setSessionDocumentUrl] = useState(null);
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
   const [isSessionFree, setIsSessionFree] = useState(false);
   const [currencyList, setCurrencyList] = useState(null);
@@ -118,6 +115,7 @@ const Session = ({ match, history }) => {
   const [stripeCurrency, setStripeCurrency] = useState(null);
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
+  const [creatorDocuments, setCreatorDocuments] = useState([]);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -178,9 +176,10 @@ const Session = ({ match, history }) => {
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
+            document_urls: data?.document_urls, //TODO: Adjust key based on BE Implementation
           });
           setSessionImageUrl(data.session_image_url);
-          setSessionDocumentUrl(data.document_url);
+          // setSessionDocumentUrl(data.document_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
@@ -204,6 +203,20 @@ const Session = ({ match, history }) => {
     },
     [form, history, isOnboarding, getCreatorStripeDetails]
   );
+
+  const getCreatorDocuments = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.documents.getCreatorDocuments();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorDocuments(data.data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch user documents');
+    }
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (match.path.includes('manage')) {
@@ -234,24 +247,25 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
+    getCreatorDocuments();
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails, getCreatorDocuments]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
     setSession({ ...session, session_image_url: imageUrl });
   };
 
-  const handleDocumentUrlUpload = (imageUrl) => {
-    setSessionDocumentUrl(imageUrl);
-    setSession({ ...session, document_url: imageUrl });
-  };
+  // const handleDocumentUrlUpload = (imageUrl) => {
+  //   setSessionDocumentUrl(imageUrl);
+  //   setSession({ ...session, document_url: imageUrl });
+  // };
 
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
+  // const normFile = (e) => {
+  //   if (Array.isArray(e)) {
+  //     return e;
+  //   }
+  //   return e && e.fileList;
+  // };
 
   const handleSessionCourseType = (e) => {
     setIsCourseSession(e.target.value === 'course');
@@ -527,7 +541,7 @@ const Session = ({ match, history }) => {
         prerequisites: values.prerequisites,
         session_image_url: sessionImageUrl || '',
         category: '',
-        document_url: sessionDocumentUrl || '',
+        document_url: values.document_urls || [], //TODO: Adjust key based on BE implementation
         recurring: isSessionRecurring,
         is_refundable: sessionRefundable,
         refund_before_hours: refundBeforeHours,
@@ -712,67 +726,23 @@ const Session = ({ match, history }) => {
           >
             <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
+
           <Form.Item
-            name="document_url"
-            {...(!isMobileDevice && profileFormTailLayout)}
-            valuePropName="fileList"
-            getValueFromEvent={normFile}
+            label="Attached Files"
+            id="document_urls"
+            name="document_urls"
+            rules={validationRules.arrayValidation}
           >
-            <Text>or upload a session pre-requisite document</Text>
-            <br />
-            <br />
-            <Row>
-              <Col>
-                <FileUpload
-                  name="document_url"
-                  value={sessionDocumentUrl}
-                  onChange={handleDocumentUrlUpload}
-                  listType="text"
-                  label="Upload a PDF file"
-                />
-              </Col>
-
-              {sessionDocumentUrl && (
-                <Col>
-                  <Button
-                    type="text"
-                    icon={<FilePdfOutlined />}
-                    size="middle"
-                    onClick={() => window.open(sessionDocumentUrl)}
-                    className={styles.filenameButton}
-                  >
-                    {sessionDocumentUrl.split('_').slice(-1)[0]}
-                  </Button>
-                  <Tooltip title="Remove this file">
-                    <Button
-                      type="text"
-                      size="middle"
-                      danger
-                      icon={<CloseCircleOutlined />}
-                      onClick={() => {
-                        setSessionDocumentUrl(null);
-                        setSession({ ...session, document_url: '' });
-                      }}
-                    />
-                  </Tooltip>
-                </Col>
-              )}
-
-              <Col>
-                <Paragraph>
-                  Uploading a document here will update the document in all its child sessions happening on a different
-                  date.
-                </Paragraph>
-                <Paragraph>
-                  To change the document on a specific date, please edit that date's session in the{' '}
-                  <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath}>
-                    {' '}
-                    Upcoming Sessions{' '}
-                  </Link>{' '}
-                  page after you have published the session.
-                </Paragraph>
-              </Col>
-            </Row>
+            <Select
+              showArrow
+              placeholder="Select documents you want to include in the session"
+              mode="multiple"
+              maxTagCount={3}
+              options={creatorDocuments.map((document) => ({
+                label: document.name,
+                value: document.url,
+              }))}
+            />
           </Form.Item>
 
           <Form.Item
