@@ -24,7 +24,7 @@ const getDashboardUrl = (userName = null) => {
   } else {
     return generateWidgetUrl(usernameValue, 'dashboard', true);
   }
-}
+};
 
 export const showErrorModal = (title, message = '') => {
   Modal.error({
@@ -93,11 +93,7 @@ const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
         </Col>
       )}
       <Col>
-        <Button
-          type="primary"
-          block
-          onClick={() => (window.location.href = getDashboardUrl(username))}
-        >
+        <Button type="primary" block onClick={() => (window.location.href = getDashboardUrl(username))}>
           Go To Dashboard
         </Button>
       </Col>

@@ -34,6 +34,7 @@ export default {
     },
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
+    getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
