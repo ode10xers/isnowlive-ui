@@ -42,6 +42,7 @@ const Routes = {
     coupons: '/coupons',
     accountSettings: '/settings',
     documents: '/documents',
+    externalSiteSettings: '/widgets',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',

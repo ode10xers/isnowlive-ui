@@ -20,6 +20,7 @@ import Courses from 'pages/CreatorDashboard/Courses';
 import Coupons from 'pages/CreatorDashboard/Coupons';
 import AccountSettings from 'pages/CreatorDashboard/AccountSettings';
 import Documents from 'pages/CreatorDashboard/Documents';
+import ExternalSiteSettings from 'pages/CreatorDashboard/ExternalSiteSettings';
 
 //TODO: Might want to refactor earning details page to be single component
 const CreatorDashboard = ({ match }) => {
@@ -44,6 +45,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.coupons} component={Coupons} />
       <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />
       <Route exact path={match.url + Routes.creatorDashboard.documents} component={Documents} />
+      <Route exact path={match.url + Routes.creatorDashboard.externalSiteSettings} component={ExternalSiteSettings} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>
   );
