@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Modal, Form, Button, Typography, Input, Tooltip } from 'antd';
+import { Row, Col, Modal, Form, Button, Input, Tooltip } from 'antd';
 import { FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
+
+import apis from 'apis';
 
 import Loader from 'components/Loader';
 import FileUpload from 'components/FileUpload';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
+import { isAPISuccess } from 'utils/helper';
 
 import { profileFormItemLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import { showErrorModal } from 'components/Modals/modals';
 
 // TODO: Modify and adjust when edit is available
 const CreateDocumentModal = ({ visible, closeModal }) => {
@@ -40,7 +43,7 @@ const CreateDocumentModal = ({ visible, closeModal }) => {
     form.validateFields(['file_url']);
   };
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     if (!fileUrl) {
       showErrorModal('Please upload the file before submitting!');
       return;
@@ -48,7 +51,21 @@ const CreateDocumentModal = ({ visible, closeModal }) => {
 
     setIsLoading(true);
 
-    console.log(values);
+    try {
+      const payload = {
+        name: values.file_name,
+        url: fileUrl,
+      };
+
+      const { status } = await apis.documents.createDocument(payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Document saved!');
+        closeModal(true);
+      }
+    } catch (error) {
+      showErrorModal('Failed to create document', error?.response?.data?.message || 'Something went wrong.');
+    }
 
     setIsLoading(false);
   };

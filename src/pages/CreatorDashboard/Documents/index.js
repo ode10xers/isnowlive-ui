@@ -3,6 +3,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Button, Typography, Tooltip, Card, Empty } from 'antd';
 import { DownloadOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
+import apis from 'apis';
+
 import Loader from 'components/Loader';
 import Table from 'components/Table';
 import CreateDocumentModal from 'components/CreateDocumentModal';
@@ -20,33 +22,13 @@ const Documents = () => {
   const [documents, setDocuments] = useState([]);
   const [createDocumentModalVisible, setCreateDocumentModalVisible] = useState(false);
 
-  const getCreatorDocuments = useCallback(() => {
+  const getCreatorDocuments = useCallback(async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement API Here
-      const { status, data } = {
-        status: 200,
-        data: [
-          {
-            id: 'scooby-dooby-doo',
-            name: 'Dummy document',
-            url: '',
-          },
-          {
-            id: 'yada-daby-doo',
-            name: 'Testing document',
-            url: '',
-          },
-          {
-            id: 'scooby-daba-doo',
-            name: 'Just Some document',
-            url: '',
-          },
-        ],
-      };
+      const { status, data } = await apis.documents.getCreatorDocuments();
 
       if (isAPISuccess(status) && data) {
-        setDocuments(data);
+        setDocuments(data.data);
       }
     } catch (error) {
       showErrorModal('Failed to fetch user documents', error?.response?.data?.message || 'Something went wrong.');
@@ -92,8 +74,6 @@ const Documents = () => {
       ),
     },
   ];
-
-  // TODO: Also prepare mobile UI
 
   const renderMobileDocumentItems = (document) => {
     const layout = (label, value) => (
