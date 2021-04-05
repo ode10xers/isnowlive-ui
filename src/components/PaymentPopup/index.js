@@ -181,7 +181,7 @@ const PaymentPopup = () => {
       const passDetails = paymentInstrumentDetails;
       textContent = `Will use ${passDetails.pass_name} to book this ${
         passDetails.limited
-          ? `and you'll be left with ${passDetails.classes_remaining}/${passDetails.class_count} credits`
+          ? `and you'll be left with ${passDetails.classes_remaining - 1}/${passDetails.class_count} credits`
           : ''
       }`;
     }
