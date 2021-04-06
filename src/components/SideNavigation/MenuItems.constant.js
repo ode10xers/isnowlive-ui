@@ -112,11 +112,25 @@ export const creatorMenuItems = [
   },
   {
     order: 10,
-    key: 'account_settings',
-    title: 'Account Settings',
+    key: 'site_settings',
+    title: 'Site Settings',
     icon: <SettingOutlined />,
-    mixPanelTag: creator.click.dashboard.settingsNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
+    children: [
+      {
+        order: 1,
+        key: 'account_settings',
+        title: 'Account Settings',
+        mixPanelTag: creator.click.dashboard.accountNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
+      },
+      {
+        order: 2,
+        key: 'legals_settings',
+        title: 'Terms and Conditions',
+        mixPanelTag: creator.click.dashboard.legalNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.legals,
+      },
+    ],
   },
   {
     order: 11,

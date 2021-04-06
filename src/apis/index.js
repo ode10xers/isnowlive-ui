@@ -137,4 +137,10 @@ export default {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
   },
+  legals: {
+    createLegals: (payload) => http.post('/secure/creator/legal', payload),
+    updateLegals: (payload) => http.patch('/secure/creator/legal', payload),
+    getCreatorLegals: () => http.get('/secure/creator/legal'),
+    getLegalsByCreatorUsername: (creatorUsername) => http.get(`/creator/${creatorUsername}/legal`),
+  },
 };

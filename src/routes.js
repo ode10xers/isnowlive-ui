@@ -41,6 +41,7 @@ const Routes = {
     courses: '/courses',
     coupons: '/coupons',
     accountSettings: '/settings',
+    legals: '/legals',
     documents: '/documents',
     externalSiteSettings: '/widgets',
   },
