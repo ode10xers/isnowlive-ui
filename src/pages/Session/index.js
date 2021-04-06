@@ -715,15 +715,11 @@ const Session = ({ match, history }) => {
             <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
 
-          <Form.Item
-            label="Attached Files"
-            id="document_urls"
-            name="document_urls"
-            rules={validationRules.arrayValidation}
-          >
+          <Form.Item label="Attached Files" id="document_urls" name="document_urls">
             <Select
+              className={styles.fileDropdown}
               showArrow
-              placeholder="Select documents you want to include in the session"
+              placeholder="Select documents you want to include"
               mode="multiple"
               maxTagCount={3}
               options={creatorDocuments.map((document) => ({

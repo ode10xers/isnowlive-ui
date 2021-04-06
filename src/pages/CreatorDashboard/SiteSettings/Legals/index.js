@@ -22,17 +22,17 @@ const tabData = [
   {
     key: 'waiver',
     name: 'Waiver Policy',
-    title: <Text strong> Waiver </Text>,
-  },
-  {
-    key: 'terms',
-    name: 'Terms and Conditions',
-    title: <Text strong> Terms and Conditions </Text>,
+    title: <Text strong> Waiver Policy </Text>,
   },
   {
     key: 'refund_policy',
     name: 'Refund Policy',
     title: <Text strong> Refund Policy </Text>,
+  },
+  {
+    key: 'terms',
+    name: 'Terms and Conditions',
+    title: <Text strong> Terms and Conditions </Text>,
   },
 ];
 

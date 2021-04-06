@@ -7,8 +7,9 @@ import apis from 'apis';
 import { generateUrlFromUsername, isAPISuccess, getUsernameFromUrl } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import classNames from 'classnames';
 
-const { Text, Paragraph, Link } = Typography;
+const { Paragraph, Link } = Typography;
 
 const creatorUsername = getUsernameFromUrl();
 
@@ -41,16 +42,12 @@ const TermsAndConditionsText = ({ shouldCheck = false, isChecked = false, setChe
 
   if (!shouldCheck) {
     return (
-      <Paragraph type="secondary">
-        By purchasing for this product, you agree to the{' '}
+      <Paragraph type="secondary" className={classNames(styles.textAlignCenter, styles.smallText)}>
+        By paying, you agree to the{' '}
         <Link href={`${generateUrlFromUsername(creatorUsername)}/terms`} target="_blank" underline>
           waiver & refund policy
         </Link>{' '}
-        set by{' '}
-        <Text strong underline>
-          {' '}
-          {creatorName}{' '}
-        </Text>
+        set by {creatorName}
       </Paragraph>
     );
   }
@@ -58,24 +55,21 @@ const TermsAndConditionsText = ({ shouldCheck = false, isChecked = false, setChe
   return (
     <div className={styles.tncWrapper}>
       <Checkbox defaultChecked={isChecked} onChange={(e) => setChecked(e.target.checked)}>
-        I agree to the{' '}
-        <Link href={`${generateUrlFromUsername(creatorUsername)}/terms`} target="_blank" underline>
-          waiver & refund policy
-        </Link>{' '}
-        set by{' '}
-        <Text strong underline>
-          {' '}
-          {creatorName}{' '}
-        </Text>{' '}
-        and acknowledge the{' '}
-        <Link href="https://passion.do/terms-and-conditions" target="_blank" underline>
-          terms of service
-        </Link>{' '}
-        and{' '}
-        <Link href="https://passion.do/privacy" target="_blank" underline>
-          privacy policy
-        </Link>{' '}
-        of passion.do
+        <Paragraph type="secondary" className={styles.smallText}>
+          I agree to the{' '}
+          <Link href={`${generateUrlFromUsername(creatorUsername)}/terms`} target="_blank" underline>
+            waiver & refund policy
+          </Link>{' '}
+          set by {creatorName} and the{' '}
+          <Link href="https://passion.do/terms-and-conditions" target="_blank" underline>
+            terms of service
+          </Link>{' '}
+          and{' '}
+          <Link href="https://passion.do/privacy" target="_blank" underline>
+            privacy policy
+          </Link>{' '}
+          of passion.do
+        </Paragraph>
       </Checkbox>
     </div>
   );

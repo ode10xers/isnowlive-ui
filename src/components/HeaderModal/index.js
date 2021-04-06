@@ -31,6 +31,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [legalsAgreed, setLegalsAgreed] = useState(false);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   useEffect(() => {
     if (showPasswordField && passwordInput.current) {
@@ -55,8 +56,8 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
 
   const signupUser = async (values) => {
     if (!legalsAgreed) {
-      showErrorModal('Please agree to the terms and conditions first!');
       setIsLoading(false);
+      setShowLegalsErrorMessage(true);
       return;
     }
 
@@ -157,7 +158,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={8}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
                   <Title level={4}>{`Sign ${signingIn ? 'In' : 'Up'} To Continue`}</Title>
@@ -216,6 +217,13 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                   </Form.Item>
                 )}
               </Col>
+              {showLegalsErrorMessage && (
+                <Col xs={24} className={styles.textAlignCenter}>
+                  <Text type="danger" className={styles.smallText}>
+                    To signup for an account you need to agree with the terms above
+                  </Text>
+                </Col>
+              )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 {!signingIn && (
                   <TermsAndConditionsText

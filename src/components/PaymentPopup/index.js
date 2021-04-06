@@ -295,8 +295,8 @@ const PaymentPopup = () => {
         )}
 
         <Col xs={24} className={styles.topBorder}>
-          <Row gutter={[8, 10]} justify="center">
-            <Col xs={24}>
+          <Row gutter={8} justify="center">
+            <Col xs={24} className={styles.mb10}>
               <PaymentCard
                 btnProps={{ text: isFree() ? 'Get' : 'Buy', disableCondition: false }}
                 isFree={isFree()}
@@ -304,11 +304,11 @@ const PaymentPopup = () => {
                 onAfterPayment={handleAfterPayment}
               />
             </Col>
-            <Col xs={24}>
-              <TermsAndConditionsText shouldCheck={false} />
-            </Col>
             <Col xs={14}>
               <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
+            </Col>
+            <Col xs={24} className={styles.tncText}>
+              <TermsAndConditionsText shouldCheck={false} />
             </Col>
           </Row>
         </Col>

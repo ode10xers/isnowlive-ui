@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Button, Select, message } from 'antd';
+import { Row, Col, Button, Select, Typography, message } from 'antd';
 
 import apis from 'apis';
 
@@ -9,6 +9,9 @@ import Loader from 'components/Loader';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import Routes from 'routes';
+
+const { Paragraph, Link } = Typography;
 
 const InventoryDocumentEditor = ({ onFinish, onCancel, sessionInventoryDocuments = [] }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +44,12 @@ const InventoryDocumentEditor = ({ onFinish, onCancel, sessionInventoryDocuments
   return (
     <Loader loading={isLoading} text="Fetching creator documents...">
       <Row gutter={[8, 8]}>
+        <Col xs={24}>
+          <Paragraph>
+            To add a doc first upload it in{' '}
+            <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents}> document section </Link>
+          </Paragraph>
+        </Col>
         <Col xs={24}>
           <Select
             showArrow

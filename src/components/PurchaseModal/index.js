@@ -40,6 +40,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [legalsAgreed, setLegalsAgreed] = useState(false);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   const toggleSignInState = () => {
     if (showSignIn) {
@@ -84,8 +85,8 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
 
   const signupUser = async (values) => {
     if (!legalsAgreed) {
-      showErrorModal('Please agree to the terms and conditions first!');
       setIsLoading(false);
+      setShowLegalsErrorMessage(true);
       return;
     }
 
@@ -117,6 +118,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const onFinish = async (values) => {
     setIsLoading(true);
     setIncorrectPassword(false);
+    setShowLegalsErrorMessage(false);
     try {
       // check if user is login
 
@@ -203,7 +205,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={8}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
                   <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
@@ -262,6 +264,13 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                   </Form.Item>
                 )}
               </Col>
+              {showLegalsErrorMessage && (
+                <Col xs={24}>
+                  <Text type="danger" className={styles.smallText}>
+                    To signup for an account you need to agree with the terms above
+                  </Text>
+                </Col>
+              )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 {!showSignIn && (
                   <TermsAndConditionsText
