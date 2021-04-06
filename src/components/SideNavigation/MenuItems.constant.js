@@ -126,7 +126,7 @@ export const creatorMenuItems = [
       {
         order: 2,
         key: 'legals_settings',
-        title: 'Terms and Conditions',
+        title: 'Waiver and Policies',
         mixPanelTag: creator.click.dashboard.legalNav,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.legals,
       },

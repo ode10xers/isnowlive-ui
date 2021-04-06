@@ -123,7 +123,7 @@ const Legals = () => {
     <div className={classNames(styles.box, styles.mt20)}>
       <Row gutter={[8, 16]}>
         <Col xs={24}>
-          <Title level={4}> Legals </Title>
+          <Title level={4}> Waiver and Policies </Title>
         </Col>
         <Col xs={24}>
           <Loader loading={isLoading} text="Loading legal data...">
