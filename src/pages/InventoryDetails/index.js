@@ -412,8 +412,8 @@ const InventoryDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
         setIsLoading(false);
+        showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
         return null;
       }
     } catch (error) {
@@ -466,8 +466,10 @@ const InventoryDetails = ({ match, history }) => {
           }
         }
       } else if (!getLocalUserDetails()) {
+        setIsLoading(false);
         signupUser(values);
       } else {
+        setIsLoading(false);
         showConfirmPaymentPopup();
       }
     } catch (error) {
