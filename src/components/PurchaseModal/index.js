@@ -9,6 +9,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess, scrollToErrorField } from 'utils/helper';
 
 import Loader from 'components/Loader';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import { showErrorModal, sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import http from 'services/http';
@@ -38,6 +39,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const [showSignIn, setShowSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [legalsAgreed, setLegalsAgreed] = useState(false);
 
   const toggleSignInState = () => {
     if (showSignIn) {
@@ -81,6 +83,12 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   }, [showPasswordHelperText]);
 
   const signupUser = async (values) => {
+    if (!legalsAgreed) {
+      showErrorModal('Please agree to the terms and conditions first!');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -255,6 +263,13 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                 )}
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
+                {!showSignIn && (
+                  <TermsAndConditionsText
+                    shouldCheck={true}
+                    isChecked={legalsAgreed}
+                    setChecked={(checked) => setLegalsAgreed(checked)}
+                  />
+                )}
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
                     Sign {showSignIn ? 'In' : 'Up'}

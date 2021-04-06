@@ -19,6 +19,7 @@ import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
@@ -302,6 +303,9 @@ const PaymentPopup = () => {
                 onBeforePayment={handleBeforePayment}
                 onAfterPayment={handleAfterPayment}
               />
+            </Col>
+            <Col xs={24}>
+              <TermsAndConditionsText shouldCheck={false} />
             </Col>
             <Col xs={14}>
               <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
