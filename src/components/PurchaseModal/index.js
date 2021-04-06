@@ -43,7 +43,6 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   const toggleSignInState = () => {
-    console.log('Called');
     setShowLegalsErrorMessage(false);
     if (showSignIn) {
       setShowPasswordHelperText(false);

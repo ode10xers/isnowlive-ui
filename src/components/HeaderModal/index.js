@@ -224,11 +224,13 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                 </Col>
               )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
-                <TermsAndConditionsText
-                  shouldCheck={true}
-                  isChecked={legalsAgreed}
-                  setChecked={(checked) => setLegalsAgreed(checked)}
-                />
+                {!signingIn && (
+                  <TermsAndConditionsText
+                    shouldCheck={true}
+                    isChecked={legalsAgreed}
+                    setChecked={(checked) => setLegalsAgreed(checked)}
+                  />
+                )}
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
                     Sign {signingIn ? 'In' : 'Up'}
