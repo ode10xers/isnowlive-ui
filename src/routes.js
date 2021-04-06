@@ -1,5 +1,6 @@
 const Routes = {
   root: '/',
+  legals: '/terms',
   login: '/login',
   signup: '/signup',
   adminLogin: '/admin',
