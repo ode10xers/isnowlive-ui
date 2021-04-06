@@ -26,7 +26,7 @@ import Share from 'components/Share';
 import InventoryDocumentEditor from './InventoryDocumentEditor';
 
 import dateUtil from 'utils/date';
-import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import {
@@ -120,13 +120,14 @@ const SessionsDetails = ({ match }) => {
 
   const isDisabled = session?.participants ? session?.participants.length > 0 : false;
 
-  const handleDocumentUrlUpload = async (payload) => {
+  const handleDocumentUrlUpload = async (documentUrls) => {
     try {
-      const { status, data } = await apis.session.updateSessionInventoryDocument(session.inventory_id, payload);
+      const { status } = await apis.session.updateSessionInventoryDocument(session.inventory_id, {
+        document_urls: documentUrls,
+      });
 
       if (isAPISuccess(status)) {
-        //TODO: Adjust key with BE Implementation
-        setSession({ ...session, document_urls: data });
+        setSession({ ...session, document_url: documentUrls });
         setIsEditingDocuments(false);
       }
     } catch (error) {
@@ -231,7 +232,9 @@ const SessionsDetails = ({ match }) => {
                   >
                     {isEditingDocuments ? (
                       <InventoryDocumentEditor
-                        sessionInventoryDocuments={session.document_urls}
+                        sessionInventoryDocuments={
+                          session?.document_url?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || []
+                        }
                         onFinish={handleDocumentUrlUpload}
                         onCancel={() => setIsEditingDocuments(false)}
                       />

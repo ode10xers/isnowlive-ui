@@ -10,11 +10,7 @@ import styles from './style.module.scss';
 const { Text } = Typography;
 
 const SessionInfo = ({ session }) => {
-  // TODO: Remove this once BE is implemented
-  const tempDocumentUrls = [
-    'https://dkfqbuenrrvge.cloudfront.net/document/V6bLQBuhqnHbFOnl_gdpr-for-dummies-beginners-guide-to-gdpr.pdf',
-    'https://dkfqbuenrrvge.cloudfront.net/document/mF4Q3gD31JgQTEQx_gdpr-for-dummies-beginners-guide-to-gdpr.pdf',
-  ];
+  const documentUrls = session?.document_url?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [];
 
   return (
     <Row justify="space-between" gutter={[8, 16]}>
@@ -50,18 +46,18 @@ const SessionInfo = ({ session }) => {
           </Button>
         </Col>
       )} */}
-      {tempDocumentUrls.length > 0 && (
+      {documentUrls.length > 0 && (
         <Col xs={24} lg={session?.is_course ? 16 : 8}>
           <Text className={styles.text} type="secondary">
             {!isMobileDevice && 'Session '}Pre-read file(s)
           </Text>
-          {tempDocumentUrls.length > 1 ? (
+          {documentUrls.length > 1 ? (
             <Popover
               title="Attached files"
               content={
                 <List
                   size="small"
-                  dataSource={tempDocumentUrls.filter((documentUrl) => isValidFile(documentUrl))}
+                  dataSource={documentUrls}
                   renderItem={(documentUrl) => (
                     <List.Item>
                       <Button
@@ -78,7 +74,7 @@ const SessionInfo = ({ session }) => {
               }
             >
               <Button type="link" className={styles.linkBtn}>
-                {tempDocumentUrls.length} files
+                {documentUrls.length} files
               </Button>
             </Popover>
           ) : (
@@ -86,9 +82,9 @@ const SessionInfo = ({ session }) => {
               className={styles.downloadButton}
               type="link"
               icon={<FilePdfOutlined />}
-              onClick={() => window.open(tempDocumentUrls[0])}
+              onClick={() => window.open(documentUrls[0])}
             >
-              {tempDocumentUrls[0].split('_').slice(-1)[0] || 'Download'}
+              {documentUrls[0].split('_').slice(-1)[0] || 'Download'}
             </Button>
           )}
         </Col>

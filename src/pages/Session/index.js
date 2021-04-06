@@ -36,6 +36,7 @@ import {
   isAPISuccess,
   scrollToErrorField,
   generateRandomColor,
+  isValidFile,
 } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -176,10 +177,9 @@ const Session = ({ match, history }) => {
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
-            document_urls: data?.document_urls, //TODO: Adjust key based on BE Implementation
+            document_urls: data?.document_url?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
           });
           setSessionImageUrl(data.session_image_url);
-          // setSessionDocumentUrl(data.document_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
@@ -254,18 +254,6 @@ const Session = ({ match, history }) => {
     setSessionImageUrl(imageUrl);
     setSession({ ...session, session_image_url: imageUrl });
   };
-
-  // const handleDocumentUrlUpload = (imageUrl) => {
-  //   setSessionDocumentUrl(imageUrl);
-  //   setSession({ ...session, document_url: imageUrl });
-  // };
-
-  // const normFile = (e) => {
-  //   if (Array.isArray(e)) {
-  //     return e;
-  //   }
-  //   return e && e.fileList;
-  // };
 
   const handleSessionCourseType = (e) => {
     setIsCourseSession(e.target.value === 'course');
@@ -541,7 +529,7 @@ const Session = ({ match, history }) => {
         prerequisites: values.prerequisites,
         session_image_url: sessionImageUrl || '',
         category: '',
-        document_url: values.document_urls || [], //TODO: Adjust key based on BE implementation
+        document_urls: values.document_urls || [],
         recurring: isSessionRecurring,
         is_refundable: sessionRefundable,
         refund_before_hours: refundBeforeHours,

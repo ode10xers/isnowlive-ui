@@ -8,6 +8,8 @@ import Loader from 'components/Loader';
 
 import { isAPISuccess } from 'utils/helper';
 
+import styles from './styles.module.scss';
+
 const InventoryDocumentEditor = ({ onFinish, onCancel, sessionInventoryDocuments = [] }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [creatorDocuments, setCreatorDocuments] = useState([]);
@@ -45,6 +47,7 @@ const InventoryDocumentEditor = ({ onFinish, onCancel, sessionInventoryDocuments
             placeholder="Select documents you want to include in the session"
             mode="multiple"
             maxTagCount="responsive"
+            className={styles.documentDropdown}
             value={selectedDocuments}
             onChange={(val) => setSelectedDocuments(val)}
             options={creatorDocuments.map((document) => ({
