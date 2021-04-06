@@ -67,7 +67,7 @@ const Legals = () => {
         form.setFieldsValue(legalResponseData);
       }
     } catch (error) {
-      if (error?.response?.status === 500 && error?.response?.data?.message === 'no legal documents found for user') {
+      if (error?.response?.status === 404 && error?.response?.data?.message === 'no legal documents found for user') {
         // If no legal docs found for user, set legal data as null
         // Also pass silently
         form.resetFields();
