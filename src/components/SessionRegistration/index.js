@@ -16,6 +16,7 @@ import { generateUrlFromUsername, scrollToErrorField } from 'utils/helper';
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 
 const { Title, Text, Paragraph } = Typography;
 const { Item } = Form;
@@ -46,10 +47,14 @@ const SessionRegistration = ({
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [legalsAccepted, setLegalsAccepted] = useState(false);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   useEffect(() => {
     if (user) {
       form.setFieldsValue(user);
+      setLegalsAccepted(true);
+      setShowLegalsErrorMessage(false);
     }
   }, [user, form]);
 
@@ -450,6 +455,17 @@ const SessionRegistration = ({
     );
   };
 
+  const handleFormSubmit = (values) => {
+    setShowLegalsErrorMessage(false);
+
+    if (!legalsAccepted) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
+
+    onFinish(values);
+  };
+
   return (
     <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
@@ -476,7 +492,7 @@ const SessionRegistration = ({
             form={form}
             labelAlign="left"
             {...sessionRegistrationformLayout}
-            onFinish={onFinish}
+            onFinish={handleFormSubmit}
             onFinishFailed={onFinishFailed}
           >
             {!user && (
@@ -525,6 +541,23 @@ const SessionRegistration = ({
                 </Item>
               </>
             )}
+
+            <Row gutter={[8, 8]}>
+              {showLegalsErrorMessage && (
+                <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
+                  <Text type="danger" className={styles.smallText}>
+                    To proceed, you need to check the checkbox below
+                  </Text>
+                </Col>
+              )}
+              <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAccepted}
+                  setChecked={(checked) => setLegalsAccepted(checked)}
+                />
+              </Col>
+            </Row>
 
             <Item {...sessionRegistrationTailLayout}>
               {user ? (

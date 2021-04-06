@@ -9,6 +9,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { isAPISuccess, scrollToErrorField } from 'utils/helper';
 
 import Loader from 'components/Loader';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import { showErrorModal, sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import http from 'services/http';
@@ -38,11 +39,16 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const [showSignIn, setShowSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [legalsAgreed, setLegalsAgreed] = useState(true);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   const toggleSignInState = () => {
+    setShowLegalsErrorMessage(false);
     if (showSignIn) {
       setShowPasswordHelperText(false);
+      setLegalsAgreed(false);
     } else {
+      setLegalsAgreed(true);
       form.setFieldsValue({
         ...form.getFieldsValue(),
         first_name: '',
@@ -63,7 +69,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
         if (!currentUser) {
           setCurrentUser(user);
         }
-
+        setLegalsAgreed(true);
         form.setFieldsValue(user);
         closeModal();
         createOrder(user.email);
@@ -107,8 +113,15 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   };
 
   const onFinish = async (values) => {
-    setIsLoading(true);
+    setShowLegalsErrorMessage(false);
     setIncorrectPassword(false);
+
+    if (!legalsAgreed) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       // check if user is login
 
@@ -195,7 +208,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={8}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
                   <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
@@ -254,7 +267,19 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                   </Form.Item>
                 )}
               </Col>
+              {showLegalsErrorMessage && (
+                <Col xs={24}>
+                  <Text type="danger" className={styles.smallText}>
+                    To proceed, you need to check the checkbox below
+                  </Text>
+                </Col>
+              )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAgreed}
+                  setChecked={(checked) => setLegalsAgreed(checked)}
+                />
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
                     Sign {showSignIn ? 'In' : 'Up'}

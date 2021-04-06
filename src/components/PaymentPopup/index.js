@@ -19,6 +19,7 @@ import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
@@ -294,8 +295,8 @@ const PaymentPopup = () => {
         )}
 
         <Col xs={24} className={styles.topBorder}>
-          <Row gutter={[8, 10]} justify="center">
-            <Col xs={24}>
+          <Row gutter={8} justify="center">
+            <Col xs={24} className={styles.mb10}>
               <PaymentCard
                 btnProps={{ text: isFree() ? 'Get' : 'Buy', disableCondition: false }}
                 isFree={isFree()}
@@ -305,6 +306,9 @@ const PaymentPopup = () => {
             </Col>
             <Col xs={14}>
               <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
+            </Col>
+            <Col xs={24} className={styles.tncText}>
+              <TermsAndConditionsText shouldCheck={false} />
             </Col>
           </Row>
         </Col>

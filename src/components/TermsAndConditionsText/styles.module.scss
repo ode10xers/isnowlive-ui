@@ -1,0 +1,11 @@
+@import '../../styles/variables.scss';
+
+.smallText {
+  font-size: 8px;
+  display: inline;
+
+  a {
+    color: rgba(0, 0, 0, 0.75) !important;
+    text-decoration-color: rgba(0, 0, 0, 0.75) !important;
+  }
+}

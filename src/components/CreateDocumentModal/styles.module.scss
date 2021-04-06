@@ -1,0 +1,10 @@
+@import '../../styles/variables.scss';
+
+.modalActionRow {
+  margin-top: 10px;
+}
+
+.filenameButton {
+  color: map-get($colors, $key: 'KellyGreen') !important;
+  font-weight: bold !important;
+}

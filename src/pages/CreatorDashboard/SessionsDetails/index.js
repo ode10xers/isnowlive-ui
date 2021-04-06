@@ -15,18 +15,19 @@ import { useHistory } from 'react-router-dom';
 import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
-import dateUtil from 'utils/date';
-import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
+import Routes from 'routes';
 
-import FileUpload from 'components/FileUpload';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import ParticipantsList from 'components/ParticipantsList';
 import Share from 'components/Share';
-import Routes from 'routes';
+import InventoryDocumentEditor from './InventoryDocumentEditor';
+
+import dateUtil from 'utils/date';
+import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 import {
   mixPanelEventTags,
@@ -49,16 +50,14 @@ const SessionsDetails = ({ match }) => {
   const [session, setSession] = useState(null);
   const [isPastSession, setIsPastSession] = useState(false);
   const [publicUrl, setPublicUrl] = useState(null);
-  const [inventoryDocumentUrl, setInventoryDocumentUrl] = useState(null);
+  const [isEditingDocuments, setIsEditingDocuments] = useState(false);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
     try {
       const { data } = await apis.session.getPrivateInventoryById(inventory_id);
       if (data) {
         setSession(data);
-        if (data.document_url) {
-          setInventoryDocumentUrl(data.document_url);
-        }
+
         if (getTimeDiff(data.end_time, moment(), 'days') < 0) {
           setIsPastSession(true);
         }
@@ -121,15 +120,15 @@ const SessionsDetails = ({ match }) => {
 
   const isDisabled = session?.participants ? session?.participants.length > 0 : false;
 
-  const handleDocumentUrlUpload = async (imageUrl) => {
+  const handleDocumentUrlUpload = async (documentUrls) => {
     try {
       const { status } = await apis.session.updateSessionInventoryDocument(session.inventory_id, {
-        document_url: imageUrl,
+        document_urls: documentUrls,
       });
 
       if (isAPISuccess(status)) {
-        setInventoryDocumentUrl(imageUrl);
-        setSession({ ...session, document_url: imageUrl });
+        setSession({ ...session, document_urls: documentUrls });
+        setIsEditingDocuments(false);
       }
     } catch (error) {
       message.error('Failed to update session event document');
@@ -231,14 +230,20 @@ const SessionsDetails = ({ match }) => {
                       offset: session?.is_course ? 8 : 16,
                     }}
                   >
-                    <FileUpload
-                      name="inventory_document_url"
-                      value={inventoryDocumentUrl}
-                      onChange={handleDocumentUrlUpload}
-                      listType="text"
-                      label={inventoryDocumentUrl ? 'Change document' : 'Upload a PDF file'}
-                      isEdit={Boolean(inventoryDocumentUrl)}
-                    />
+                    {isEditingDocuments ? (
+                      <InventoryDocumentEditor
+                        sessionInventoryDocuments={
+                          session?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || []
+                        }
+                        onFinish={handleDocumentUrlUpload}
+                        onCancel={() => setIsEditingDocuments(false)}
+                      />
+                    ) : (
+                      <Button icon={<EditOutlined />} onClick={() => setIsEditingDocuments(true)}>
+                        Change document
+                      </Button>
+                    )}
+
                     <Paragraph type="danger" className={styles.uploadHelpText}>
                       This will change the document for{' '}
                       <Text strong type="danger">
