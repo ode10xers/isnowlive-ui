@@ -9,7 +9,7 @@ import { isMobileDevice } from 'utils/device';
 import styles from './styles.module.scss';
 import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 
-const { Title } = Typography;
+const { Title, Link } = Typography;
 
 const HostDetails = ({ host }) => {
   const [showMore, setShowMore] = useState(false);
@@ -25,9 +25,9 @@ const HostDetails = ({ host }) => {
     }, 200);
   }, [host]);
 
-  const redirectToCreatorProfile = () => {
+  const generateCreatorProfileLink = () => {
     const creatorUsername = host?.username || getUsernameFromUrl();
-    window.location.href = generateUrlFromUsername(creatorUsername);
+    return generateUrlFromUsername(creatorUsername);
   };
 
   return (
@@ -44,16 +44,20 @@ const HostDetails = ({ host }) => {
             height={isMobileDevice ? 80 : 120}
             src={host?.profile_image_url ? host?.profile_image_url : 'error'}
             fallback={DefaultImage()}
-            onClick={() => redirectToCreatorProfile()}
+            onClick={() => {
+              window.location.href = generateCreatorProfileLink();
+            }}
           />
         </Col>
         <Col xs={24}>
-          <Title className={styles.creatorName} level={4} onClick={() => redirectToCreatorProfile()}>
+          <Link underline className={styles.creatorName} href={generateCreatorProfileLink()}>
             {host?.first_name} {host?.last_name}
-          </Title>
-          <Title level={5} className={styles.fullProfile} onClick={() => redirectToCreatorProfile()}>
+          </Link>
+        </Col>
+        <Col xs={24}>
+          <Link underline className={styles.fullProfile} href={generateCreatorProfileLink()}>
             Full Profile
-          </Title>
+          </Link>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           {showMore ? (
