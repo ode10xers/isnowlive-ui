@@ -177,7 +177,7 @@ const Session = ({ match, history }) => {
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
-            document_urls: data?.document_url?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
+            document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
           });
           setSessionImageUrl(data.session_image_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);

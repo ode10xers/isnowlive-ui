@@ -10,7 +10,7 @@ import styles from './style.module.scss';
 const { Text } = Typography;
 
 const SessionInfo = ({ session }) => {
-  const documentUrls = session?.document_url?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [];
+  const documentUrls = session?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [];
 
   return (
     <Row justify="space-between" gutter={[8, 16]}>

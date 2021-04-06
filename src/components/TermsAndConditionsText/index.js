@@ -54,7 +54,7 @@ const TermsAndConditionsText = ({ shouldCheck = false, isChecked = false, setChe
 
   return (
     <div className={styles.tncWrapper}>
-      <Checkbox defaultChecked={isChecked} onChange={(e) => setChecked(e.target.checked)}>
+      <Checkbox checked={isChecked} onChange={(e) => setChecked(e.target.checked)}>
         <Paragraph type="secondary" className={styles.smallText}>
           I agree to the{' '}
           <Link href={`${generateUrlFromUsername(creatorUsername)}/terms`} target="_blank" underline>

@@ -39,13 +39,17 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   const [showSignIn, setShowSignIn] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
-  const [legalsAgreed, setLegalsAgreed] = useState(false);
+  const [legalsAgreed, setLegalsAgreed] = useState(true);
   const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   const toggleSignInState = () => {
+    console.log('Called');
+    setShowLegalsErrorMessage(false);
     if (showSignIn) {
       setShowPasswordHelperText(false);
+      setLegalsAgreed(false);
     } else {
+      setLegalsAgreed(true);
       form.setFieldsValue({
         ...form.getFieldsValue(),
         first_name: '',
@@ -66,7 +70,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
         if (!currentUser) {
           setCurrentUser(user);
         }
-
+        setLegalsAgreed(true);
         form.setFieldsValue(user);
         closeModal();
         createOrder(user.email);
@@ -84,12 +88,6 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   }, [showPasswordHelperText]);
 
   const signupUser = async (values) => {
-    if (!legalsAgreed) {
-      setIsLoading(false);
-      setShowLegalsErrorMessage(true);
-      return;
-    }
-
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -116,9 +114,15 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
   };
 
   const onFinish = async (values) => {
-    setIsLoading(true);
-    setIncorrectPassword(false);
     setShowLegalsErrorMessage(false);
+    setIncorrectPassword(false);
+
+    if (!legalsAgreed) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       // check if user is login
 
@@ -267,18 +271,16 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
               {showLegalsErrorMessage && (
                 <Col xs={24}>
                   <Text type="danger" className={styles.smallText}>
-                    To signup for an account you need to agree with the terms above
+                    To proceed, you need to check the checkbox below
                   </Text>
                 </Col>
               )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
-                {!showSignIn && (
-                  <TermsAndConditionsText
-                    shouldCheck={true}
-                    isChecked={legalsAgreed}
-                    setChecked={(checked) => setLegalsAgreed(checked)}
-                  />
-                )}
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAgreed}
+                  setChecked={(checked) => setLegalsAgreed(checked)}
+                />
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
                     Sign {showSignIn ? 'In' : 'Up'}

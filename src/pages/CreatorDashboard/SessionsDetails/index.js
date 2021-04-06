@@ -127,7 +127,7 @@ const SessionsDetails = ({ match }) => {
       });
 
       if (isAPISuccess(status)) {
-        setSession({ ...session, document_url: documentUrls });
+        setSession({ ...session, document_urls: documentUrls });
         setIsEditingDocuments(false);
       }
     } catch (error) {
@@ -233,7 +233,7 @@ const SessionsDetails = ({ match }) => {
                     {isEditingDocuments ? (
                       <InventoryDocumentEditor
                         sessionInventoryDocuments={
-                          session?.document_url?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || []
+                          session?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || []
                         }
                         onFinish={handleDocumentUrlUpload}
                         onCancel={() => setIsEditingDocuments(false)}

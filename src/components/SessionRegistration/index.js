@@ -53,6 +53,8 @@ const SessionRegistration = ({
   useEffect(() => {
     if (user) {
       form.setFieldsValue(user);
+      setLegalsAccepted(true);
+      setShowLegalsErrorMessage(false);
     }
   }, [user, form]);
 
@@ -508,25 +510,6 @@ const SessionRegistration = ({
               <Input placeholder="Enter your email" disabled={user} />
             </Item>
 
-            {!showPasswordField && (
-              <Row gutter={[8, 8]}>
-                {showLegalsErrorMessage && (
-                  <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
-                    <Text type="danger" className={styles.smallText}>
-                      To signup for an account you need to agree with the terms above
-                    </Text>
-                  </Col>
-                )}
-                <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
-                  <TermsAndConditionsText
-                    shouldCheck={true}
-                    isChecked={legalsAccepted}
-                    setChecked={(checked) => setLegalsAccepted(checked)}
-                  />
-                </Col>
-              </Row>
-            )}
-
             {showPasswordField && (
               <>
                 <Item
@@ -558,6 +541,23 @@ const SessionRegistration = ({
                 </Item>
               </>
             )}
+
+            <Row gutter={[8, 8]}>
+              {showLegalsErrorMessage && (
+                <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
+                  <Text type="danger" className={styles.smallText}>
+                    To proceed, you need to check the checkbox below
+                  </Text>
+                </Col>
+              )}
+              <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAccepted}
+                  setChecked={(checked) => setLegalsAccepted(checked)}
+                />
+              </Col>
+            </Row>
 
             <Item {...sessionRegistrationTailLayout}>
               {user ? (

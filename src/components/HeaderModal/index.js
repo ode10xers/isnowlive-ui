@@ -30,7 +30,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
-  const [legalsAgreed, setLegalsAgreed] = useState(false);
+  const [legalsAgreed, setLegalsAgreed] = useState(signingIn);
   const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   useEffect(() => {
@@ -41,7 +41,8 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
 
   useEffect(() => {
     setIncorrectPassword(false);
-  }, [toggleSigningIn]);
+    setLegalsAgreed(signingIn);
+  }, [signingIn]);
 
   const signinUser = (data) => {
     http.setAuthToken(data.auth_token);
@@ -55,12 +56,6 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   };
 
   const signupUser = async (values) => {
-    if (!legalsAgreed) {
-      setIsLoading(false);
-      setShowLegalsErrorMessage(true);
-      return;
-    }
-
     setIsLoading(true);
     try {
       const { data } = await apis.user.signup({
@@ -84,8 +79,12 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   };
 
   const onFinish = async (values) => {
-    setIsLoading(true);
+    if (!legalsAgreed) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
 
+    setIsLoading(true);
     try {
       // check if user is login
 
@@ -220,18 +219,16 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
               {showLegalsErrorMessage && (
                 <Col xs={24} className={styles.textAlignCenter}>
                   <Text type="danger" className={styles.smallText}>
-                    To signup for an account you need to agree with the terms above
+                    To proceed, you need to check the checkbox below
                   </Text>
                 </Col>
               )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
-                {!signingIn && (
-                  <TermsAndConditionsText
-                    shouldCheck={true}
-                    isChecked={legalsAgreed}
-                    setChecked={(checked) => setLegalsAgreed(checked)}
-                  />
-                )}
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAgreed}
+                  setChecked={(checked) => setLegalsAgreed(checked)}
+                />
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
                     Sign {signingIn ? 'In' : 'Up'}
