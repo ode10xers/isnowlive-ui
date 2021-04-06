@@ -11,6 +11,7 @@ import { scrollToErrorField } from 'utils/helper';
 import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { signInFormLayout, signInTailLayout } from 'layouts/FormLayouts';
@@ -21,6 +22,8 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
+  const [legalsAccepted, setLegalsAccepted] = useState(true);
 
   const handleSetNewPassword = async () => {
     try {
@@ -33,6 +36,13 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
 
   const onFinish = async (values) => {
     setIncorrectPassword(false);
+    setShowLegalsErrorMessage(false);
+
+    if (!legalsAccepted) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
+
     if (user) {
       showErrorModal('You are already signed in!');
       return;
@@ -88,6 +98,20 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
                 <Text type="danger">Email or password you entered was incorrect, please try again</Text>
               </Form.Item>
             )}
+            {showLegalsErrorMessage && (
+              <Form.Item {...signInTailLayout}>
+                <Text type="danger" className={styles.smallText}>
+                  To proceed, you need to check the checkbox below
+                </Text>
+              </Form.Item>
+            )}
+            <Form.Item {...signInTailLayout}>
+              <TermsAndConditionsText
+                shouldCheck={true}
+                isChecked={legalsAccepted}
+                setChecked={(checked) => setLegalsAccepted(checked)}
+              />
+            </Form.Item>
             <Form.Item {...signInTailLayout}>
               <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
                 Set a new password

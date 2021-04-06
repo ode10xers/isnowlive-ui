@@ -37,6 +37,7 @@ import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
+import Legals from 'pages/Legals';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -157,6 +158,7 @@ function App() {
           <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
           <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
           <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
           <Route path={Routes.stripeAccountValidate}>
             <Redirect
               to={{

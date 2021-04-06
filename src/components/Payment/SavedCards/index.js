@@ -52,7 +52,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               <div className={styles.roundBtn} onClick={(e) => handleSelectCard(e, userCard)} />
             )}
           </Col>
-          <Col xs={16}>
+          <Col xs={15}>
             {selectedCard && selectedCard.external_id === userCard.external_id
               ? 'Uncheck to pay with other card'
               : 'Check to pay with this card'}
@@ -65,7 +65,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               alt=""
             />
           </Col>
-          <Col xs={3}>{userCard.last_digits}</Col>
+          <Col xs={4}>{userCard.last_digits}</Col>
         </Row>
       </Card>
     );

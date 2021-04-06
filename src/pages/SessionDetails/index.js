@@ -235,6 +235,7 @@ const SessionDetails = ({ match, history }) => {
         is_creator: false,
       });
       if (data) {
+        setIsLoading(false);
         http.setAuthToken(data.auth_token);
         logIn(data, true);
         showConfirmPaymentPopup();
@@ -374,13 +375,6 @@ const SessionDetails = ({ match, history }) => {
         const inventoryId = selectedInventory.inventory_id;
 
         if (data.payment_required) {
-          // const resData = initiatePaymentForOrder({
-          //   order_id: data.order_id,
-          //   order_type: orderType.CLASS,
-          // });
-
-          // return resData;
-
           return {
             ...data,
             payment_order_id: data.order_id,
@@ -419,11 +413,6 @@ const SessionDetails = ({ match, history }) => {
         const inventoryId = parseInt(selectedInventory.inventory_id);
 
         if (data.payment_required) {
-          // initiatePaymentForOrder({
-          //   order_id: data.pass_order_id,
-          //   order_type: orderType.PASS,
-          //   inventory_id: inventoryId,
-          // });
           return {
             ...data,
             payment_order_id: data.pass_order_id,
@@ -476,8 +465,8 @@ const SessionDetails = ({ match, history }) => {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
         setIsLoading(false);
+        showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
         return null;
       }
     } catch (error) {
@@ -532,8 +521,8 @@ const SessionDetails = ({ match, history }) => {
 
   const onFinish = async (values) => {
     try {
-      // setIsLoading(true);
-      // setIncorrectPassword(false);
+      setIsLoading(true);
+      setIncorrectPassword(false);
       // check if user is login
 
       // NOTE: Reason the check have getLocalUserDetails() and not currentUser
@@ -564,10 +553,11 @@ const SessionDetails = ({ match, history }) => {
           }
         }
       } else if (!getLocalUserDetails()) {
+        setIsLoading(false);
         signupUser(values);
       } else {
-        const resData = await showConfirmPaymentPopup();
-        return resData;
+        setIsLoading(false);
+        showConfirmPaymentPopup();
       }
     } catch (error) {
       setIsLoading(false);
