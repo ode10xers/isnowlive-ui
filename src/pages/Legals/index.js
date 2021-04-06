@@ -49,7 +49,7 @@ const Legals = () => {
         setCreatorLegalsData(data);
       }
     } catch (error) {
-      if (error?.response?.status === 500 && error?.response?.data?.message === 'no legal documents found for user') {
+      if (error?.response?.status === 404 && error?.response?.data?.message === 'no legal documents found for user') {
         // In the case where creator have not set it
         // We generate default T&C
         const creatorDetails = await getCreatorDetails();

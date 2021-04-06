@@ -268,7 +268,7 @@ const PurchaseModal = ({ visible, closeModal, createOrder }) => {
                 )}
               </Col>
               {showLegalsErrorMessage && (
-                <Col xs={24}>
+                <Col xs={24} className={styles.textAlignCenter}>
                   <Text type="danger" className={styles.smallText}>
                     To proceed, you need to check the checkbox below
                   </Text>
