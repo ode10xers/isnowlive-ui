@@ -58,6 +58,11 @@ const InventoryDocumentEditor = ({ onFinish, onCancel, sessionInventoryDocuments
             Save Changes
           </Button>
         </Col>
+        <Col xs={24}>
+          <Button block onClick={() => onCancel()}>
+            Cancel
+          </Button>
+        </Col>
       </Row>
     </Loader>
   );
