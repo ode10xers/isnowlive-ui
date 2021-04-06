@@ -7,6 +7,7 @@ import DefaultImage from '../Icons/DefaultImage/index';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 
 const { Title } = Typography;
 
@@ -24,6 +25,11 @@ const HostDetails = ({ host }) => {
     }, 200);
   }, [host]);
 
+  const redirectToCreatorProfile = () => {
+    const creatorUsername = host?.username || getUsernameFromUrl();
+    window.location.href = generateUrlFromUsername(creatorUsername);
+  };
+
   return (
     <div className={styles.box}>
       <Row>
@@ -38,19 +44,16 @@ const HostDetails = ({ host }) => {
             height={isMobileDevice ? 80 : 120}
             src={host?.profile_image_url ? host?.profile_image_url : 'error'}
             fallback={DefaultImage()}
+            onClick={() => redirectToCreatorProfile()}
           />
         </Col>
-        <Col
-          flex="auto"
-          className={styles.pl10}
-          style={{
-            height: isMobileDevice ? 80 : 120,
-          }}
-        >
-          <Title className={styles.mt10} level={4}>
+        <Col xs={24}>
+          <Title className={styles.creatorName} level={4} onClick={() => redirectToCreatorProfile()}>
             {host?.first_name} {host?.last_name}
           </Title>
-          <Title level={5}>Full Profile</Title>
+          <Title level={5} className={styles.fullProfile} onClick={() => redirectToCreatorProfile()}>
+            Full Profile
+          </Title>
         </Col>
         <Col xs={24} md={24} className={styles.mt10}>
           {showMore ? (
