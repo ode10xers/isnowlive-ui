@@ -242,7 +242,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
             <CardElement
               options={options}
               onChange={(event) => {
-                console.log(event.empty);
                 setDisableSavedCards(!event.empty);
 
                 if (event.complete) {

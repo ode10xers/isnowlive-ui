@@ -90,9 +90,6 @@ const Legals = () => {
 
   const publishLegalData = async (legalDataKey, legalDataName) => {
     setIsLoading(true);
-
-    console.log(form.getFieldValue(legalDataKey));
-
     const payload = {
       ...legalData,
       [legalDataKey]: form.getFieldValue(legalDataKey),
