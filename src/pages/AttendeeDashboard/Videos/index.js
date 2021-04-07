@@ -98,7 +98,7 @@ const Videos = () => {
           <Title level={4}> Videos </Title>
         </Col>
         <Col xs={24}>
-          <Collapse>
+          <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Active </Title>} key="Active">
               {activeVideos.length ? (
                 <Loader loading={isLoading} size="large" text="Loading Active Videos">

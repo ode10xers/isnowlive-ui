@@ -168,7 +168,7 @@ const CourseList = () => {
           <Title level={4}> My Courses </Title>
         </Col>
         <Col xs={24}>
-          <Collapse>
+          <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Active Courses </Title>} key="Active">
               {isMobileDevice ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
