@@ -27,7 +27,6 @@ const {
 
 const noop = () => {};
 
-//TODO: Compare to LiveCourseCard, if similar then refactor
 const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
   const history = useHistory();
 

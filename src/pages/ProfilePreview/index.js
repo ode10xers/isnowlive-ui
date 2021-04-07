@@ -19,7 +19,7 @@ import apis from 'apis';
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
-import PublicCourseList from 'components/PublicCourseList';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarWrapper from 'components/CalendarWrapper';
@@ -300,11 +300,6 @@ const ProfilePreview = ({ username = null }) => {
     showAuthModal(event);
   };
 
-  const showAuthModal = (inventory) => {
-    setSelectedInventory(inventory);
-    setAuthModalVisible(true);
-  };
-
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
     trackSimpleEvent(eventTag);
 
@@ -317,6 +312,18 @@ const ProfilePreview = ({ username = null }) => {
 
   const handleViewChange = (e) => {
     setView(e.target.value);
+  };
+
+  const redirectToCourseDetails = (course) => {
+    if (course?.id) {
+      const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
+      window.open(`${baseUrl}/c/${course?.id}`);
+    }
+  };
+
+  const showAuthModal = (inventory) => {
+    setSelectedInventory(inventory);
+    setAuthModalVisible(true);
   };
 
   const closeAuthModal = () => {
@@ -568,14 +575,26 @@ const ProfilePreview = ({ username = null }) => {
                   {liveCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
-                        <PublicCourseList username={username} courses={liveCourses} />
+                        <div className={styles.p10}>
+                          <ShowcaseCourseCard
+                            username={username}
+                            courses={liveCourses}
+                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                          />
+                        </div>
                       </Loader>
                     </Tabs.TabPane>
                   )}
                   {videoCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
-                        <PublicCourseList username={username} courses={videoCourses} />
+                        <div className={styles.p10}>
+                          <ShowcaseCourseCard
+                            username={username}
+                            courses={videoCourses}
+                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                          />
+                        </div>
                       </Loader>
                     </Tabs.TabPane>
                   )}
