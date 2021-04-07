@@ -193,7 +193,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
                           <Text strong className={styles.blueText}>
-                            {course?.currency?.toUpperCase()} {course?.price}
+                            {course.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}
                           </Text>
                         </Col>
                       </Row>

@@ -196,7 +196,7 @@ const PassDetails = ({ match, history }) => {
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {`${pass?.price} ${pass?.currency.toUpperCase()}`}
+                                {pass?.price > 0 ? `${pass?.price} ${pass?.currency.toUpperCase()}` : 'Free'}
                               </Text>
                             </Space>
                           </Col>

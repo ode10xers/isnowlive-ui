@@ -145,7 +145,7 @@ const ManageSessions = () => {
       dataIndex: 'price',
       key: 'price',
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: 'Type',

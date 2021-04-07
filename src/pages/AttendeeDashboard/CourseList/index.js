@@ -93,7 +93,7 @@ const CourseList = () => {
       key: 'price',
       dataIndex: 'price',
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: '',
@@ -150,12 +150,7 @@ const CourseList = () => {
             'Duration',
             <Text>{`${toShortDateWithYear(item?.start_date)} - ${toShortDateWithYear(item?.end_date)}`}</Text>
           )}
-          {layout(
-            'Price',
-            <Text>
-              {item?.currency?.toUpperCase()} {item?.price}
-            </Text>
-          )}
+          {layout('Price', <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>)}
         </div>
       </Card>
     );

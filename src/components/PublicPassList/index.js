@@ -162,7 +162,7 @@ const PublicPassList = ({ username, passes }) => {
       align: 'left',
       sortOrder: 'descend',
       width: '13%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => (record.price > 0 ? `${record.price} ${record.currency.toUpperCase()}` : 'Free'),
     },
     {
       title: (
