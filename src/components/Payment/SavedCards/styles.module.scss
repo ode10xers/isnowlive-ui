@@ -22,6 +22,12 @@
     box-shadow: 0 3px 8px map-get($map: $colors, $key: 'WhiteSmoke2');
   }
 
+  .helpTextWrapper {
+    @media screen and (max-width: 579px) {
+      font-size: 12px;
+    }
+  }
+
   .radioWrapper {
     text-align: -webkit-center;
   

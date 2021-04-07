@@ -207,8 +207,11 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
       }
     }
 
+    if (cardEl) {
+      cardEl.clear();
+    }
+
     setSelectedCard(null);
-    cardEl.clear();
     onAfterPayment(orderResponse, verifyOrderRes);
     setIsSubmitting(false);
   };

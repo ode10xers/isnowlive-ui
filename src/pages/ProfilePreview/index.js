@@ -24,7 +24,7 @@ import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 
 import {
   generateUrlFromUsername,
@@ -87,7 +87,7 @@ const ProfilePreview = ({ username = null }) => {
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
-  const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+  const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
 
   const getProfileDetails = useCallback(async () => {
@@ -297,12 +297,12 @@ const ProfilePreview = ({ username = null }) => {
   };
 
   const onEventBookClick = (event) => {
-    showPurchaseModal(event);
+    showAuthModal(event);
   };
 
-  const showPurchaseModal = (inventory) => {
+  const showAuthModal = (inventory) => {
     setSelectedInventory(inventory);
-    setPurchaseModalVisible(true);
+    setAuthModalVisible(true);
   };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
@@ -319,9 +319,9 @@ const ProfilePreview = ({ username = null }) => {
     setView(e.target.value);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setSelectedInventory(null);
-    setPurchaseModalVisible(false);
+    setAuthModalVisible(false);
   };
 
   const createOrder = async (couponCode = '') => {
@@ -409,10 +409,10 @@ const ProfilePreview = ({ username = null }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
-      <PurchaseModal
+      <AuthModal
         visible={purchaseModalVisible}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={showConfirmPaymentPopup}
       />
       {isOnDashboard && (
         <Row>

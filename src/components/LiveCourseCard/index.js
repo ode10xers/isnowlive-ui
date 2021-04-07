@@ -15,7 +15,7 @@ const {
 
 const noop = () => {};
 
-const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurchaseModal = noop }) => {
+const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showAuthModal = noop }) => {
   return (
     <Card
       hoverable={true}
@@ -64,7 +64,7 @@ const LiveCourseCard = ({ course, onCardClick = noop, buyable = false, showPurch
             type="primary"
             onClick={(e) => {
               e.stopPropagation();
-              showPurchaseModal(course);
+              showAuthModal(course);
             }}
           >
             Buy
