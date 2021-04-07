@@ -521,8 +521,8 @@ const Session = ({ match, history }) => {
     try {
       setIsLoading(true);
       const data = {
-        price: values.price || 0,
-        currency: values.currency?.toLowerCase() || stripeCurrency || 'SGD',
+        price: isSessionFree ? 0 : values.price || 0,
+        currency: values.currency?.toLowerCase() || stripeCurrency.toLowerCase() || 'sgd',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
@@ -795,28 +795,30 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            {!isSessionFree && (
-              <>
-                <Form.Item name="currency" label="Currency" rules={validationRules.requiredValidation}>
-                  <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
-                    {currencyList &&
-                      Object.entries(currencyList).map(([key, value], i) => (
-                        <Option value={key} key={key}>
-                          ({key}) {value}
-                        </Option>
-                      ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  {...(!isMobileDevice && profileFormTailLayout)}
-                  name="price"
-                  extra="Set your price"
-                  rules={validationRules.requiredValidation}
-                >
-                  <InputNumber min={1} placeholder="Amount" />
-                </Form.Item>
-              </>
-            )}
+            <Form.Item
+              name="currency"
+              label="Currency"
+              rules={validationRules.requiredValidation}
+              hidden={isSessionFree}
+            >
+              <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
+                {currencyList &&
+                  Object.entries(currencyList).map(([key, value], i) => (
+                    <Option value={key} key={key}>
+                      ({key}) {value}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              {...(!isMobileDevice && profileFormTailLayout)}
+              name="price"
+              extra="Set your price"
+              rules={validationRules.requiredValidation}
+              hidden={isSessionFree}
+            >
+              <InputNumber min={1} placeholder="Amount" />
+            </Form.Item>
 
             {!isSessionFree && (
               <Form.Item
