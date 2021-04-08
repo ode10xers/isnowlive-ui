@@ -2,9 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, Tag, message } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
 import apis from 'apis';
 
 import CreatorProfile from 'components/CreatorProfile';
@@ -13,12 +11,14 @@ import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import {
   showAlreadyBookedModal,
   showSuccessModal,
   showErrorModal,
-  showVideoPurchaseSuccessModal,
+  showPurchasePassAndGetVideoSuccessModal,
+  showGetVideoWithPassSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -33,9 +33,9 @@ import {
   reservedDomainName,
 } from 'utils/helper';
 
-import styles from './style.module.scss';
+import { useGlobalContext } from 'services/globalContext';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+import styles from './style.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
 const {
@@ -43,6 +43,8 @@ const {
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
@@ -154,7 +156,7 @@ const VideoDetails = ({ match }) => {
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setShowPurchaseVideoModal(false);
   };
 
@@ -189,15 +191,14 @@ const VideoDetails = ({ match }) => {
 
   useEffect(() => {
     if (shouldFollowUpGetVideo) {
-      const userDetails = getLocalUserDetails();
-      handleOrder(userDetails.email);
+      showConfirmPaymentPopup();
     }
     //eslint-disable-next-line
   }, [userPasses]);
 
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
-  const getUserPurchasedPass = async (getDefault = false) => {
+  const getUserPurchasedPass = (getDefault = false) => {
     if (userPasses.length) {
       if (selectedPass && !getDefault) {
         return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
@@ -209,42 +210,22 @@ const VideoDetails = ({ match }) => {
     return null;
   };
 
-  const initiatePaymentForOrder = async (payload) => {
+  const buySingleVideo = async (payload, couponCode = '') => {
     setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
 
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
-  const buySingleVideo = async (userEmail, payload) => {
     try {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.video_order_id,
-            order_type: orderType.VIDEO,
-          });
-        } else {
-          setIsLoading(false);
+        setIsLoading(false);
 
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_id: data.video_order_id,
+            payment_order_type: orderType.VIDEO,
+          };
+        } else {
           // This popup will only show up in very edge cases
           if (selectedPass) {
             const modalContent = (
@@ -261,33 +242,46 @@ const VideoDetails = ({ match }) => {
             showSuccessModal('Video Purchase Successful', modalContent);
             setSelectedPass(null);
           } else {
-            showVideoPurchaseSuccessModal(userEmail, video, null, false, false, username);
+            showPurchaseSingleVideoSuccessModal(data.video_order_id);
           }
+
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
-  const buyPassAndGetVideo = async (userEmail, payload) => {
+  const buyPassAndGetVideo = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await apis.passes.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
         if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.pass_order_id,
-            order_type: orderType.PASS,
-            video_id: video.external_id,
-          });
+          return {
+            ...data,
+            payment_order_id: data.pass_order_id,
+            payment_order_type: orderType.PASS,
+            follow_up_booking_info: {
+              productType: 'VIDEO',
+              productId: video.external_id,
+            },
+          };
         } else {
+          // It's a free pass, so we immediately book the video after this
           const followUpGetVideo = await purchaseVideo({
             video_id: video.external_id,
             payment_source: paymentSource.PASS,
@@ -295,44 +289,51 @@ const VideoDetails = ({ match }) => {
           });
 
           if (isAPISuccess(followUpGetVideo.status)) {
-            showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
+            showPurchasePassAndGetVideoSuccessModal(data.pass_order_id);
             setIsLoading(false);
           }
+
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
-  const buyVideoUsingPass = async (userEmail, payload) => {
+  const buyVideoUsingPass = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        showVideoPurchaseSuccessModal(userEmail, video, selectedPass, true, false, username);
+        showGetVideoWithPassSuccessModal(payload.source_id);
         setIsLoading(false);
+        return null;
       }
     } catch (error) {
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong');
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
-  const handleOrder = async (userEmail) => {
-    setIsLoading(true);
-
+  const showConfirmPaymentPopup = async () => {
     if (!shouldFollowUpGetVideo) {
       if (getLocalUserDetails() && userPasses.length <= 0) {
         setShouldFollowUpGetVideo(true);
@@ -343,35 +344,86 @@ const VideoDetails = ({ match }) => {
       setShouldFollowUpGetVideo(false);
     }
 
+    const videoDesc = `Can be watched up to ${video.watch_limit} times, valid for ${video.validity} days`;
+
     //Handling edge case, buy free video using pass
     //We redirect them to the buySingleVideo flow
     if (selectedPass && video?.price > 0) {
-      const usableUserPass = await getUserPurchasedPass(false);
+      const usableUserPass = getUserPurchasedPass(true);
 
       if (usableUserPass) {
+        const paymentPopupData = {
+          productId: video.external_id,
+          productType: 'VIDEO',
+          itemList: [
+            {
+              name: video.title,
+              description: videoDesc,
+              currency: video.currency,
+              price: video.price,
+            },
+          ],
+          paymentInstrumentDetails: {
+            type: 'PASS',
+            ...usableUserPass,
+          },
+        };
+
         const payload = {
           video_id: video.external_id,
           payment_source: paymentSource.PASS,
           source_id: usableUserPass.pass_order_id,
         };
 
-        buyVideoUsingPass(userEmail, payload);
+        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideoUsingPass(payload, couponCode));
       } else {
+        const paymentPopupData = {
+          productId: selectedPass.external_id,
+          productType: 'PASS',
+          itemList: [
+            {
+              name: selectedPass.name,
+              description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
+              currency: selectedPass.currency,
+              price: selectedPass.price,
+            },
+            {
+              name: video.title,
+              description: videoDesc,
+              currency: video.currency,
+              price: 0,
+            },
+          ],
+        };
+
         const payload = {
           pass_id: selectedPass.id,
           price: selectedPass.price,
           currency: selectedPass.currency.toLowerCase(),
         };
 
-        buyPassAndGetVideo(userEmail, payload);
+        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndGetVideo(payload, couponCode));
       }
     } else {
+      const paymentPopupData = {
+        productId: video.external_id,
+        productType: 'VIDEO',
+        itemList: [
+          {
+            name: video.title,
+            description: videoDesc,
+            currency: video.currency,
+            price: video.price,
+          },
+        ],
+      };
+
       const payload = {
         video_id: video.external_id,
         payment_source: paymentSource.GATEWAY,
       };
 
-      buySingleVideo(userEmail, payload);
+      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleVideo(payload, couponCode));
     }
   };
 
@@ -521,115 +573,118 @@ const VideoDetails = ({ match }) => {
 
   return (
     <div className={styles.mt50}>
-      <Loader loading={isLoading} size="large" text="Loading video details">
-        <Row gutter={[8, 24]}>
-          <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
-          <Col xs={24}>
-            {video && (
-              <>
-                <PurchaseModal
-                  visible={showPurchaseVideoModal}
-                  closeModal={closePurchaseModal}
-                  createOrder={handleOrder}
-                />
-                <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+      <Row gutter={[8, 24]}>
+        <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
+        <Col xs={24}>
+          {video && (
+            <>
+              <AuthModal
+                visible={showPurchaseVideoModal}
+                closeModal={closeAuthModal}
+                onLoggedInCallback={showConfirmPaymentPopup}
+              />
+
+              <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
+                <Loader loading={isLoading} size="large" text="Loading video details">
                   <Col xs={24} className={styles.showcaseCardContainer}>
                     <VideoCard video={video} buyable={false} hoverable={false} showDetailsBtn={false} showDesc={true} />
                   </Col>
+                </Loader>
 
-                  {video.is_course ? (
-                    courses?.length > 0 && (
-                      <div className={classNames(styles.mb50, styles.mt20)}>
-                        <Row gutter={[8, 16]}>
-                          <Col xs={24}>
-                            <Title level={5}> This video can only be purchased via this course </Title>
-                          </Col>
-                          <Col xs={24}>
-                            <ShowcaseCourseCard
-                              courses={courses}
-                              onCardClick={(course) => redirectToCourseDetails(course)}
-                              username={username}
-                            />
-                          </Col>
-                        </Row>
-                      </div>
-                    )
-                  ) : (
-                    <>
-                      {(!getLocalUserDetails() || userPasses.length <= 0) && (
-                        <Col xs={24} className={styles.p20}>
-                          <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                            <Row gutter={[8, 16]} align="center">
-                              <Col xs={24} md={16} xl={18}>
-                                <Row gutter={8}>
-                                  <Col xs={24}>
-                                    <Title className={styles.blueText} level={3}>
-                                      {video?.title}
-                                    </Title>
-                                  </Col>
-                                  <Col xs={24}>
-                                    <Space size={isMobileDevice ? 'small' : 'middle'}>
-                                      <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                        {`Validity ${video?.validity} Days`}
-                                      </Text>
-                                      <Divider type="vertical" />
-                                      <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                        {video?.price === 0
-                                          ? 'Free video'
-                                          : ` ${video?.currency.toUpperCase()} ${video?.price}`}
-                                      </Text>
-                                    </Space>
-                                  </Col>
-                                </Row>
-                              </Col>
-                              <Col xs={24} md={8} xl={6}>
-                                <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                                  {video?.price === 0 ? 'Get' : 'Buy'} This Video
-                                </Button>
-                              </Col>
-                            </Row>
-                          </Card>
-                        </Col>
-                      )}
-
-                      <Col xs={24} className={styles.mt10}>
-                        <Title level={3} className={styles.ml20}>
-                          {getLocalUserDetails() && userPasses.length > 0
-                            ? 'Buy using your pass'
-                            : 'Buy a pass and this video'}
-                        </Title>
-                      </Col>
-
-                      <Col xs={24} className={styles.passListContainer}>
-                        {getLocalUserDetails() && userPasses.length > 0
-                          ? userPasses.map((pass) => renderPassCards(pass, true))
-                          : availablePassesForVideo.map((pass) => renderPassCards(pass, false))}
-                      </Col>
-
-                      {video.sessions?.length > 0 && (
+                {video.is_course ? (
+                  courses?.length > 0 && (
+                    <div className={classNames(styles.mb50, styles.mt20)}>
+                      <Row gutter={[8, 16]}>
                         <Col xs={24}>
-                          <Row gutter={[8, 8]}>
-                            <Col xs={24}>
-                              <Text className={styles.ml20}> Related to these class(es) </Text>
+                          <Title level={5}> This video can only be purchased via this course </Title>
+                        </Col>
+                        <Col xs={24}>
+                          <ShowcaseCourseCard
+                            courses={courses}
+                            onCardClick={(course) => redirectToCourseDetails(course)}
+                            username={username}
+                          />
+                        </Col>
+                      </Row>
+                    </div>
+                  )
+                ) : (
+                  <>
+                    {(!getLocalUserDetails() || userPasses.length <= 0) && (
+                      <Col xs={24} className={styles.p20}>
+                        <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                          <Row gutter={[8, 16]} align="center">
+                            <Col xs={24} md={16} xl={18}>
+                              <Row gutter={8}>
+                                <Col xs={24}>
+                                  <Title className={styles.blueText} level={3}>
+                                    {video?.title}
+                                  </Title>
+                                </Col>
+                                <Col xs={24}>
+                                  <Space size={isMobileDevice ? 'small' : 'middle'}>
+                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                      {`Validity ${video?.validity} Days`}
+                                    </Text>
+                                    <Divider type="vertical" />
+                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                      {video?.price === 0
+                                        ? 'Free video'
+                                        : ` ${video?.currency.toUpperCase()} ${video?.price}`}
+                                    </Text>
+                                  </Space>
+                                </Col>
+                              </Row>
                             </Col>
-                            <Col xs={24}>
-                              <SessionCards
-                                username={username}
-                                sessions={video.sessions}
-                                shouldFetchInventories={true}
-                              />
+                            <Col xs={24} md={8} xl={6}>
+                              <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
+                                {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                              </Button>
                             </Col>
                           </Row>
+                        </Card>
+                      </Col>
+                    )}
+
+                    {(userPasses?.length > 0 || availablePassesForVideo?.length > 0) && (
+                      <>
+                        <Col xs={24} className={styles.mt10}>
+                          <Title level={3} className={styles.ml20}>
+                            {getLocalUserDetails() && userPasses.length > 0
+                              ? 'Buy using your pass'
+                              : availablePassesForVideo?.length > 0
+                              ? 'Buy a pass and this video'
+                              : ''}
+                          </Title>
                         </Col>
-                      )}
-                    </>
-                  )}
-                </Row>
-              </>
-            )}
-          </Col>
-        </Row>
-      </Loader>
+
+                        <Col xs={24} className={styles.passListContainer}>
+                          {getLocalUserDetails() && userPasses?.length > 0
+                            ? userPasses?.map((pass) => renderPassCards(pass, true))
+                            : availablePassesForVideo?.map((pass) => renderPassCards(pass, false))}
+                        </Col>
+                      </>
+                    )}
+
+                    {video.sessions?.length > 0 && (
+                      <Col xs={24}>
+                        <Row gutter={[8, 8]}>
+                          <Col xs={24}>
+                            <Text className={styles.ml20}> Related to these class(es) </Text>
+                          </Col>
+                          <Col xs={24}>
+                            <SessionCards username={username} sessions={video.sessions} shouldFetchInventories={true} />
+                          </Col>
+                        </Row>
+                      </Col>
+                    )}
+                  </>
+                )}
+              </Row>
+            </>
+          )}
+        </Col>
+      </Row>
     </div>
   );
 };

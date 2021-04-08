@@ -15,7 +15,7 @@ import Table from 'components/Table';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { copyPageLinkToClipboard, generateUrlFromUsername } from 'utils/helper';
+import { copyToClipboard, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -34,7 +34,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/c/${courseId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const toggleExpandAllPublished = () => {
@@ -113,7 +113,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       dataIndex: 'price',
       key: 'price',
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: published ? (
@@ -320,7 +320,10 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
         >
           {layout('Total Videos', <Text>{course.videos?.length} videos</Text>)}
           {layout('Duration', <Text> {course?.validity} days</Text>)}
-          {layout('Price', <Text>{`${course?.currency?.toUpperCase()} ${course?.price} `}</Text>)}
+          {layout(
+            'Price',
+            <Text>{course?.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}</Text>
+          )}
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course?.id) && (

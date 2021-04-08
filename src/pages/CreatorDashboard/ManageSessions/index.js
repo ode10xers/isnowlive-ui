@@ -17,7 +17,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-import { generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -116,7 +116,7 @@ const ManageSessions = () => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/s/${sessionId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   let sessionColumns = [
@@ -145,7 +145,7 @@ const ManageSessions = () => {
       dataIndex: 'price',
       key: 'price',
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: 'Type',

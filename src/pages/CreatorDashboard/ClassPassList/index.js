@@ -20,7 +20,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -204,7 +204,7 @@ const ClassPassList = () => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/p/${passId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const toggleExpandAll = () => {
@@ -267,7 +267,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${text}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: '',
@@ -444,7 +444,7 @@ const ClassPassList = () => {
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
+          {layout('Price', <Text>{pass.price > 0 ? `${pass.currency?.toUpperCase()} ${pass.price}` : 'Free'}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>

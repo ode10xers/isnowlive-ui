@@ -7,7 +7,7 @@ import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
-import parseQueryString from 'utils/parseQueryString';
+import { isWidgetUrl } from 'utils/widgets';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -37,6 +37,7 @@ import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
+import Legals from 'pages/Legals';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -64,24 +65,18 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
-  const location = window.location;
-  const { isWidget } = parseQueryString(location.search);
-
-  useEffect(() => {}, []);
+  const isWidget = isWidgetUrl();
 
   useEffect(() => {
-    if (cookieConsent) {
-      initMixPanel();
-    }
-  }, [cookieConsent]);
+    if (!isWidget) {
+      initializeFreshChat(userDetails, cookieConsent);
 
-  useEffect(() => {
-    initializeFreshChat(userDetails, cookieConsent);
-
-    if (cookieConsent) {
-      initFreshChatWidget(userDetails);
+      if (cookieConsent) {
+        initFreshChatWidget(userDetails);
+        initMixPanel();
+      }
     }
-  }, [userDetails, cookieConsent]);
+  }, [userDetails, cookieConsent, isWidget]);
 
   useEffect(() => {
     if (!isWidget) {
@@ -114,7 +109,12 @@ function App() {
   }, [isWidget]);
 
   if (isWidget) {
-    return <EmbeddablePage />;
+    return (
+      <>
+        <PaymentPopup />
+        <EmbeddablePage />
+      </>
+    );
   }
 
   if (!isReadyToLoad) {
@@ -158,6 +158,7 @@ function App() {
           <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
           <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
           <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
           <Route path={Routes.stripeAccountValidate}>
             <Redirect
               to={{

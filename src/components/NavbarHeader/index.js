@@ -7,7 +7,7 @@ import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 import apis from 'apis';
 import Routes from 'routes';
 
-import HeaderModal from 'components/HeaderModal';
+import AuthModal from 'components/AuthModal';
 
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
@@ -19,7 +19,7 @@ import styles from './style.module.scss';
 
 const { Text, Paragraph } = Typography;
 
-const NavbarHeader = ({ removePadding = false }) => {
+const NavbarHeader = () => {
   const history = useHistory();
   const location = useLocation();
 
@@ -75,19 +75,15 @@ const NavbarHeader = ({ removePadding = false }) => {
   const showSignInModal = () => {
     setAuthModalState('signIn');
     setAuthModalVisible(true);
+    setShowMobileMenu(false);
+    document.body.removeAttribute('style');
   };
 
   const showSignUpModal = () => {
     setAuthModalState('signUp');
     setAuthModalVisible(true);
-  };
-
-  const toggleAuthModalState = () => {
-    if (authModalState === 'signIn') {
-      setAuthModalState('signUp');
-    } else {
-      setAuthModalState('signIn');
-    }
+    setShowMobileMenu(false);
+    document.body.removeAttribute('style');
   };
 
   const isCreatorCheck = () => {
@@ -178,11 +174,11 @@ const NavbarHeader = ({ removePadding = false }) => {
 
   return (
     <div>
-      <HeaderModal
+      <AuthModal
         visible={!localUserDetails && authModalVisible}
         closeModal={() => setAuthModalVisible(false)}
-        signingIn={authModalState === 'signIn'}
-        toggleSigningIn={toggleAuthModalState}
+        showingSignIn={authModalState === 'signIn'}
+        onLoggedInCallback={() => redirectToDashboard()}
       />
       <Row className={styles.navbarWrapper}>
         <Col xs={24}>

@@ -6,6 +6,10 @@
   padding: 15px;
 }
 
+.smallText {
+  font-size: 11px;
+}
+
 .card {
   margin-top: 10px !important;
 }
@@ -61,6 +65,7 @@
   border-radius: 7px;
   border: solid 1px map-get($colors, 'NightRider');
 }
+
 .roundBtn:hover {
   border: solid 1px map-get($colors, 'DodgerBlue');
 }

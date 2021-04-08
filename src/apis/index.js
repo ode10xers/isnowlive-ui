@@ -34,6 +34,7 @@ export default {
     },
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
+    getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
@@ -137,5 +138,15 @@ export default {
     uploadAudienceCSVFile: () => http.post('/secure/creator/audience/upload'),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
+  },
+  documents: {
+    getCreatorDocuments: () => http.get('/secure/creator/documents'),
+    createDocument: (payload) => http.post('/secure/creator/documents', payload),
+  },
+  legals: {
+    createLegals: (payload) => http.post('/secure/creator/legal', payload),
+    updateLegals: (payload) => http.patch('/secure/creator/legal', payload),
+    getCreatorLegals: () => http.get('/secure/creator/legal'),
+    getLegalsByCreatorUsername: (creatorUsername) => http.get(`/creator/${creatorUsername}/legal`),
   },
 };

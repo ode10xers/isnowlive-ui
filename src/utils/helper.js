@@ -8,6 +8,8 @@ const {
 
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
+export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
+
 export const generateQueryString = (data) => {
   return Object.entries(data)
     .map(([key, val]) => `${key}=${val}`)
@@ -105,8 +107,8 @@ export const isAPISuccess = (statusCode) => {
 };
 
 export const isValidFile = (url) => {
-  const extenstion = url?.split('.')?.pop();
-  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf'].includes(extenstion)) {
+  const extension = url?.split('.')?.pop();
+  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf'].includes(extension)) {
     return true;
   }
   return false;
@@ -168,11 +170,11 @@ export const getPaymentStatus = (status) => {
   }
 };
 
-export const copyPageLinkToClipboard = (pageLink) => {
+export const copyToClipboard = (link) => {
   // Fallback method if navigator.clipboard is not supported
   if (!navigator.clipboard) {
     var textArea = document.createElement('textarea');
-    textArea.value = pageLink;
+    textArea.value = link;
 
     // Avoid scrolling to bottom
     textArea.style.top = '0';
@@ -187,22 +189,22 @@ export const copyPageLinkToClipboard = (pageLink) => {
       var successful = document.execCommand('copy');
 
       if (successful) {
-        message.success('Page link copied to clipboard!');
+        message.success('Copied to clipboard!');
       } else {
-        message.error('Failed to copy link to clipboard');
+        message.error('Failed to copy to clipboard');
       }
     } catch (err) {
-      message.error('Failed to copy link to clipboard');
+      message.error('Failed to copy to clipboard');
     }
 
     document.body.removeChild(textArea);
   } else {
-    navigator.clipboard.writeText(pageLink).then(
+    navigator.clipboard.writeText(link).then(
       function () {
-        message.success('Page link copied to clipboard!');
+        message.success('Copied to clipboard!');
       },
       function (err) {
-        message.error('Failed to copy link to clipboard');
+        message.error('Failed to copy to clipboard');
       }
     );
   }
@@ -218,6 +220,13 @@ export const StripeAccountStatus = {
   NOT_CONNECTED: 'NOT_CONNECTED',
   VERIFICATION_PENDING: 'VERIFICATION_PENDING',
   CONNECTED: 'CONNECTED',
+};
+
+export const StripePaymentStatus = {
+  AWAITING_CAPTURE: 'AWAITING_CAPTURE',
+  AWAITING_METHOD: 'AWAITING_METHOD',
+  AUTHORIZATION_REQUIRED: 'AUTHORIZATION_REQUIRED',
+  SUCCESS: 'SUCCESS',
 };
 
 export const paymentSource = {

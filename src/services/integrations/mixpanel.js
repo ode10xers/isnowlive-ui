@@ -17,9 +17,11 @@ export const mixPanelEventTags = {
         livestreamNav: '(Creator) LiveStream Nav Clicked',
         profileNav: '(Creator) Public Page Nav Clicked',
         paymentNav: '(Creator) Get Paid Nav Clicked',
-        settingsNav: '(Creator) Settings Nav Clicked',
-        accountNav: '(Creator) Account Nav Clicked',
         audiencesNav: '(Creator) Audiences Nav Clicked',
+        legalNav: '(Creator) Terms and Conditions Nav Clicked',
+        accountNav: '(Creator) Account Settings Nav Clicked',
+        documentsNav: '(Creator) Document Nav Clicked',
+        externalSiteSettingsNav: '(Creator) External Site Settings Nav Clicked',
       },
       sessions: {
         manage: {

@@ -1,0 +1,92 @@
+@import '../../../styles/variables.scss';
+
+.savedCardElement {
+  box-sizing: border-box;
+  height: 40px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 6px 4px;
+  border-radius: 0.25rem;
+  background-color: map-get($map: $colors, $key: 'White');
+  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+  box-shadow: 0 0px 0px map-get($map: $colors, $key: 'White');
+  cursor: pointer;
+
+  @media screen and (max-width: 569px) {
+    font-size: 12px;
+  }
+
+  &:hover {
+    border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+    transition: box-shadow 0.3s, border-color 0.3s, -webkit-box-shadow 0.3s;
+    box-shadow: 0 3px 8px map-get($map: $colors, $key: 'WhiteSmoke2');
+  }
+
+  .helpTextWrapper {
+    @media screen and (max-width: 579px) {
+      font-size: 12px;
+    }
+  }
+
+  .radioWrapper {
+    text-align: -webkit-center;
+  
+    .roundBtn {
+      margin-top: 5px;
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: solid 1px map-get($colors, 'NightRider');
+
+      @media screen and (max-width: 569px) {
+        width: 12px;
+        height: 12px;
+      }
+    }
+    
+    .roundBtn:hover {
+      border: solid 1px map-get($colors, 'DodgerBlue');
+    }
+  }
+
+  &.disabled {
+    &:hover {
+      border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+    }
+
+    opacity: 0.8;
+    cursor:not-allowed;
+    background-color: map-get($map: $colors, $key: 'White1');
+
+    .radioWrapper {
+      .roundBtn {
+        cursor: not-allowed;
+      }
+
+      .roundBtn:hover {
+        border: solid 1px map-get($colors, 'NightRider');
+      }
+    }
+  }
+
+  &.selected {
+    background-color: map-get($map: $colors, $key: 'DodgerBlue');
+    border-color: map-get($map: $colors, $key: 'DodgerBlue');
+    color: map-get($map: $colors, $key: 'White');
+  }
+
+  .cardBrandWrapper {
+    text-align: center;
+
+    .cardBrandImage {
+      border-radius: 4px;
+      background-color: map-get($map: $colors, $key: 'White');
+      padding: 4px;
+      margin-bottom: 4px;
+    }
+  }
+}
+
+
+

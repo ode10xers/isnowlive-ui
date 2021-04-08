@@ -1,0 +1,12 @@
+@import '../../../../styles/variables.scss';
+
+.legalTab {
+  background-color: map-get($map: $colors, $key: 'White');
+  padding: 8px;
+
+  .legalTextEditor {
+    border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
+    border-radius: 5px;
+    margin-top: 8px;
+  }
+}
