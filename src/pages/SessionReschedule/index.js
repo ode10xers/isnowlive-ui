@@ -25,7 +25,6 @@ const {
 } = dateUtil;
 
 const whiteColor = '#FFFFFF';
-//TODO: Add MixPanel Tracking later
 const SessionReschedule = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSessionLoading, setIsSessionLoading] = useState(true);

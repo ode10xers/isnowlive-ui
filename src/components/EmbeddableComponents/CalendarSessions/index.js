@@ -5,7 +5,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import CalendarWrapper from 'components/CalendarWrapper';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
@@ -30,7 +30,7 @@ const CalendarSessions = () => {
   const [calendarSession, setCalendarSession] = useState([]);
   const [readyToPaint, setReadyToPaint] = useState(false);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
-  const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+  const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
 
   const profileUsername = window.location.hostname.split('.')[0] || '';
@@ -63,18 +63,18 @@ const CalendarSessions = () => {
     }
   };
 
-  const showPurchaseModal = (inventory) => {
+  const showAuthModal = (inventory) => {
     setSelectedInventory(inventory);
-    setPurchaseModalVisible(true);
+    setAuthModalVisible(true);
   };
 
   const onEventBookClick = (event) => {
-    showPurchaseModal(event);
+    showAuthModal(event);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setSelectedInventory(null);
-    setPurchaseModalVisible(false);
+    setAuthModalVisible(false);
   };
 
   const createOrder = async (couponCode = '') => {
@@ -167,10 +167,10 @@ const CalendarSessions = () => {
 
   return (
     <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-      <PurchaseModal
+      <AuthModal
         visible={purchaseModalVisible}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={showConfirmPaymentPopup}
       />
       {calendarSession.length > 0 && readyToPaint ? (
         <>

@@ -207,8 +207,11 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
       }
     }
 
+    if (cardEl) {
+      cardEl.clear();
+    }
+
     setSelectedCard(null);
-    cardEl.clear();
     onAfterPayment(orderResponse, verifyOrderRes);
     setIsSubmitting(false);
   };
@@ -239,7 +242,6 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
             <CardElement
               options={options}
               onChange={(event) => {
-                console.log(event.empty);
                 setDisableSavedCards(!event.empty);
 
                 if (event.complete) {

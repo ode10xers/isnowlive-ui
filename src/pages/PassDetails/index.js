@@ -7,7 +7,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import CreatorProfile from 'components/CreatorProfile';
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
@@ -27,7 +27,7 @@ const PassDetails = ({ match, history }) => {
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [pass, setPass] = useState(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [username, setUsername] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
@@ -46,12 +46,12 @@ const PassDetails = ({ match, history }) => {
     }
   }, []);
 
-  const openPurchaseModal = () => {
-    setShowPurchaseModal(true);
+  const openAuthModal = () => {
+    setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
-    setShowPurchaseModal(false);
+  const closeAuthModal = () => {
+    setShowAuthModal(false);
   };
 
   const getPassDetails = useCallback(
@@ -169,11 +169,7 @@ const PassDetails = ({ match, history }) => {
   return (
     <div className={styles.mt50}>
       <Loader loading={isLoading} size="large" text="Loading pass details">
-        <PurchaseModal
-          visible={showPurchaseModal}
-          closeModal={closePurchaseModal}
-          createOrder={showConfirmPaymentPopup}
-        />
+        <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
         <Row gutter={[8, 24]}>
           <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
           <Col xs={24}>
@@ -200,14 +196,14 @@ const PassDetails = ({ match, history }) => {
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {`${pass?.price} ${pass?.currency.toUpperCase()}`}
+                                {pass?.price > 0 ? `${pass?.price} ${pass?.currency.toUpperCase()}` : 'Free'}
                               </Text>
                             </Space>
                           </Col>
                         </Row>
                       </Col>
                       <Col xs={24} md={6}>
-                        <Button block type="primary" onClick={() => openPurchaseModal()}>
+                        <Button block type="primary" onClick={() => openAuthModal()}>
                           Buy Pass
                         </Button>
                       </Col>

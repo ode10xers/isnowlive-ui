@@ -19,12 +19,12 @@ import apis from 'apis';
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
-import PublicCourseList from 'components/PublicCourseList';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
 import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 
 import {
   generateUrlFromUsername,
@@ -87,7 +87,7 @@ const ProfilePreview = ({ username = null }) => {
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [sessionCountByDate, setSessionCountByDate] = useState({});
-  const [purchaseModalVisible, setPurchaseModalVisible] = useState(false);
+  const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
 
   const getProfileDetails = useCallback(async () => {
@@ -297,12 +297,7 @@ const ProfilePreview = ({ username = null }) => {
   };
 
   const onEventBookClick = (event) => {
-    showPurchaseModal(event);
-  };
-
-  const showPurchaseModal = (inventory) => {
-    setSelectedInventory(inventory);
-    setPurchaseModalVisible(true);
+    showAuthModal(event);
   };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
@@ -319,9 +314,21 @@ const ProfilePreview = ({ username = null }) => {
     setView(e.target.value);
   };
 
-  const closePurchaseModal = () => {
+  const redirectToCourseDetails = (course) => {
+    if (course?.id) {
+      const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
+      window.open(`${baseUrl}/c/${course?.id}`);
+    }
+  };
+
+  const showAuthModal = (inventory) => {
+    setSelectedInventory(inventory);
+    setAuthModalVisible(true);
+  };
+
+  const closeAuthModal = () => {
     setSelectedInventory(null);
-    setPurchaseModalVisible(false);
+    setAuthModalVisible(false);
   };
 
   const createOrder = async (couponCode = '') => {
@@ -409,10 +416,10 @@ const ProfilePreview = ({ username = null }) => {
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
-      <PurchaseModal
+      <AuthModal
         visible={purchaseModalVisible}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={showConfirmPaymentPopup}
       />
       {isOnDashboard && (
         <Row>
@@ -568,14 +575,26 @@ const ProfilePreview = ({ username = null }) => {
                   {liveCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
-                        <PublicCourseList username={username} courses={liveCourses} />
+                        <div className={styles.p10}>
+                          <ShowcaseCourseCard
+                            username={username}
+                            courses={liveCourses}
+                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                          />
+                        </div>
                       </Loader>
                     </Tabs.TabPane>
                   )}
                   {videoCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
-                        <PublicCourseList username={username} courses={videoCourses} />
+                        <div className={styles.p10}>
+                          <ShowcaseCourseCard
+                            username={username}
+                            courses={videoCourses}
+                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                          />
+                        </div>
                       </Loader>
                     </Tabs.TabPane>
                   )}

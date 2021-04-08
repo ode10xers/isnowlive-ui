@@ -267,7 +267,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${text}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: '',
@@ -444,7 +444,7 @@ const ClassPassList = () => {
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
+          {layout('Price', <Text>{pass.price > 0 ? `${pass.currency?.toUpperCase()} ${pass.price}` : 'Free'}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>

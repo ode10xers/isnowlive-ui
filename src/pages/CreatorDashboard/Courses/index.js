@@ -84,7 +84,6 @@ const Courses = () => {
   const showSendEmailModal = (course) => {
     let userIdMap = new Map();
 
-    // TODO: Confirm whether COURSE can be bought repeatedly
     // This mapping is used to make sure the recipients sent to modal is unique
     if (course.buyers && course?.buyers?.length > 0) {
       course.buyers.forEach((buyer) => {

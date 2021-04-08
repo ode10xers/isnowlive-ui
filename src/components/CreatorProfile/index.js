@@ -22,6 +22,26 @@ import styles from './styles.module.scss';
 const { Title } = Typography;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  const renderCreatorName = () => {
+    const creatorName = `${profile?.first_name} ${profile?.last_name}`;
+
+    let headingLevel = 2;
+
+    if (isMobileDevice) {
+      headingLevel = 4;
+
+      if (creatorName.length > 15) {
+        headingLevel = 5;
+      }
+    } else {
+      if (creatorName.length > 15) {
+        headingLevel = 3;
+      }
+    }
+
+    return <Title level={headingLevel}>{creatorName}</Title>;
+  };
+
   return (
     <Row className={styles.imageWrapper} gutter={[8, 8]}>
       {showCoverImage && (
@@ -41,11 +61,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
       >
         <div className={styles.profileImage}>
           <Image preview={false} width={'100%'} src={profileImage || 'error'} fallback={DefaultImage()} />
-          <div className={styles.userName}>
-            <Title level={isMobileDevice ? 4 : 2}>
-              {profile?.first_name} {profile?.last_name}
-            </Title>
-          </div>
+          <div className={styles.userName}>{renderCreatorName()}</div>
           <div className={styles.shareButton}>
             <Share
               label="Share"

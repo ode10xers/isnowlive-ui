@@ -121,7 +121,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       dataIndex: 'price',
       key: 'price',
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: published ? (
@@ -337,7 +337,10 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
             </>
           )}
-          {layout('Price', <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}
+          {layout(
+            'Price',
+            <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
+          )}
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course.id) && (
