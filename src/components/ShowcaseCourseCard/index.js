@@ -7,7 +7,7 @@ import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import { showCoursePurchaseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 import DefaultImage from 'components/Icons/DefaultImage';
 
@@ -27,25 +27,24 @@ const {
 
 const noop = () => {};
 
-//TODO: Compare to LiveCourseCard, if similar then refactor
 const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
   const history = useHistory();
 
   const { showPaymentPopup } = useGlobalContext();
 
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
-  const openPurchaseModal = (course) => {
+  const openAuthModal = (course) => {
     setSelectedCourse(course);
-    setShowPurchaseModal(true);
+    setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setSelectedCourse(null);
-    setShowPurchaseModal(false);
+    setShowAuthModal(false);
   };
 
   useEffect(() => {
@@ -145,11 +144,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
         styles.showcaseCourseCardWrapper
       )}
     >
-      <PurchaseModal
-        visible={showPurchaseModal}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
-      />
+      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} text="Processing payment" size="large">
         <Row gutter={[8, 10]}>
           {courses?.length > 0 &&
@@ -197,7 +192,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
                           <Text strong className={styles.blueText}>
-                            {course?.currency?.toUpperCase()} {course?.price}
+                            {course.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}
                           </Text>
                         </Col>
                       </Row>
@@ -210,7 +205,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
                           type="primary"
                           onClick={(e) => {
                             e.stopPropagation();
-                            openPurchaseModal(course);
+                            openAuthModal(course);
                           }}
                         >
                           Buy Course

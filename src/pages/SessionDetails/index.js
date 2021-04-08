@@ -16,7 +16,7 @@ import HostDetails from 'components/HostDetails';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import VideoCard from 'components/VideoCard';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 
@@ -604,12 +604,12 @@ const SessionDetails = ({ match, history }) => {
     window.open(`${baseUrl}/c/${course?.id}`);
   };
 
-  const openPurchaseModal = (video) => {
+  const openAuthModal = (video) => {
     setSelectedVideo(video);
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = (resetSelectedVideo = false) => {
+  const closeAuthModal = (resetSelectedVideo = false) => {
     if (resetSelectedVideo) {
       setSelectedVideo(null);
     }
@@ -767,10 +767,10 @@ const SessionDetails = ({ match, history }) => {
           </Row>
           {sessionVideos?.length > 0 && (
             <>
-              <PurchaseModal
+              <AuthModal
                 visible={showPurchaseVideoModal}
-                closeModal={closePurchaseModal}
-                createOrder={showConfirmPaymentPopup}
+                closeModal={closeAuthModal}
+                onLoggedInCallback={showConfirmPaymentPopup}
               />
               <Row justify="space-between" className={styles.mt20}>
                 <Col xs={24}>
@@ -785,7 +785,7 @@ const SessionDetails = ({ match, history }) => {
                                   video={videoDetails}
                                   buyable={true}
                                   onCardClick={redirectToVideoPreview}
-                                  showPurchaseModal={openPurchaseModal}
+                                  showAuthModal={openAuthModal}
                                 />
                               </Col>
                             ))}

@@ -11,7 +11,7 @@ import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import {
   showAlreadyBookedModal,
   showSuccessModal,
@@ -156,7 +156,7 @@ const VideoDetails = ({ match }) => {
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setShowPurchaseVideoModal(false);
   };
 
@@ -578,10 +578,10 @@ const VideoDetails = ({ match }) => {
         <Col xs={24}>
           {video && (
             <>
-              <PurchaseModal
+              <AuthModal
                 visible={showPurchaseVideoModal}
-                closeModal={closePurchaseModal}
-                createOrder={showConfirmPaymentPopup}
+                closeModal={closeAuthModal}
+                onLoggedInCallback={showConfirmPaymentPopup}
               />
 
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>

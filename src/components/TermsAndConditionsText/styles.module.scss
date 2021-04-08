@@ -9,3 +9,11 @@
     text-decoration-color: rgba(0, 0, 0, 0.75) !important;
   }
 }
+
+.tncWrapper {
+  margin-bottom: 6px;
+
+  @media screen and (max-width: 579px) {
+    margin-bottom: 12px;
+  }
+}

@@ -10,7 +10,7 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
@@ -31,16 +31,16 @@ const PublicPassList = ({ username, passes }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const openPurchaseModal = (passId) => {
+  const openAuthModal = (passId) => {
     setSelectedPass(passes.filter((pass) => pass.id === passId)[0]);
-    setShowPurchaseModal(true);
+    setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setSelectedPass(null);
-    setShowPurchaseModal(false);
+    setShowAuthModal(false);
   };
 
   const showConfirmPaymentPopup = () => {
@@ -162,7 +162,7 @@ const PublicPassList = ({ username, passes }) => {
       align: 'left',
       sortOrder: 'descend',
       width: '13%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => (record.price > 0 ? `${record.price} ${record.currency.toUpperCase()}` : 'Free'),
     },
     {
       title: (
@@ -173,7 +173,7 @@ const PublicPassList = ({ username, passes }) => {
       align: 'right',
       render: (text, record) => (
         <Space size="small">
-          <Button type="primary" onClick={() => openPurchaseModal(record.id)}>
+          <Button type="primary" onClick={() => openAuthModal(record.id)}>
             Buy Pass
           </Button>
           {expandedRowKeys.includes(record.id) ? (
@@ -235,7 +235,7 @@ const PublicPassList = ({ username, passes }) => {
           className={styles.card}
           title={<Text>{pass.name}</Text>}
           actions={[
-            <Button type="primary" onClick={() => openPurchaseModal(pass.id)}>
+            <Button type="primary" onClick={() => openAuthModal(pass.id)}>
               Buy Pass
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
@@ -295,11 +295,7 @@ const PublicPassList = ({ username, passes }) => {
 
   return (
     <div className={styles.box}>
-      <PurchaseModal
-        visible={showPurchaseModal}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
-      />
+      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>

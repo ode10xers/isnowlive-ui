@@ -5,7 +5,7 @@ import { Row, Col } from 'antd';
 import apis from 'apis';
 
 import VideoCard from 'components/VideoCard';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
@@ -25,7 +25,7 @@ const PublicVideoList = ({ username = null, videos }) => {
   const handleSelectVideo = (video) => {
     if (video) {
       setSelectedVideo(video);
-      openPurchaseModal();
+      openAuthModal();
     }
   };
 
@@ -90,11 +90,11 @@ const PublicVideoList = ({ username = null, videos }) => {
     return null;
   };
 
-  const openPurchaseModal = () => {
+  const openAuthModal = () => {
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setShowPurchaseVideoModal(false);
   };
 
@@ -107,10 +107,10 @@ const PublicVideoList = ({ username = null, videos }) => {
 
   return (
     <div className={styles.box}>
-      <PurchaseModal
+      <AuthModal
         visible={showPurchaseVideoModal}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={showConfirmPaymentPopup}
       />
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
@@ -120,7 +120,7 @@ const PublicVideoList = ({ username = null, videos }) => {
                 video={video}
                 buyable={true}
                 onCardClick={() => redirectToVideoDetails(video)}
-                showPurchaseModal={() => handleSelectVideo(video)}
+                showAuthModal={() => handleSelectVideo(video)}
               />
             </Col>
           ))}

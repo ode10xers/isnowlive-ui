@@ -52,7 +52,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               <div className={styles.roundBtn} onClick={(e) => handleSelectCard(e, userCard)} />
             )}
           </Col>
-          <Col xs={15}>
+          <Col xs={15} className={styles.helpTextWrapper}>
             {selectedCard && selectedCard.external_id === userCard.external_id
               ? 'Uncheck to pay with other card'
               : 'Check to pay with this card'}
