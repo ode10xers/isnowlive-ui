@@ -51,6 +51,7 @@ const Audiences = () => {
       setIsSubmitting(false);
       setIsLoading(false);
       setEmailListText('');
+      setFeedbackText(null);
     }
   }, [selectedTab, getAudienceList]);
 
@@ -162,16 +163,14 @@ const Audiences = () => {
         <Row gutter={[8, 8]} justify="end">
           <Col xs={4}>
             <Popconfirm
-              arrowPointAtCenter
+              placement="topRight"
               icon={<DeleteOutlined />}
               title={<Text> Are you sure you want to delete this audience? </Text>}
               onConfirm={() => deleteAudience(record)}
               okText="Yes"
               cancelText="No"
             >
-              <Tooltip title="Delete Audience">
-                <Button type="text" danger icon={<DeleteOutlined />} />
-              </Tooltip>
+              <Button type="text" danger icon={<DeleteOutlined />} />
             </Popconfirm>
           </Col>
         </Row>
