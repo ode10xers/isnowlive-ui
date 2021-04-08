@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import parse from 'emailjs-addressparser';
 
-import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm, Tooltip } from 'antd';
-import { CloseOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm, Upload, message } from 'antd';
+import { CloseOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
 import Table from 'components/Table';
@@ -18,6 +18,54 @@ import styles from './styles.module.scss';
 
 const { TabPane } = Tabs;
 const { Title, Text, Paragraph } = Typography;
+
+const AudienceCSVFileUpload = ({ handleUploadSuccess }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const beforeUpload = (file) => {
+    // Current file limit: 200MB
+    const isValidFileSize = file.size / 1024 / 1024 < 200;
+
+    if (!isValidFileSize) {
+      message.error('The file you uploaded exceeds 200 MB!');
+    }
+
+    return isValidFileSize;
+  };
+
+  const handleAction = async (file) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const { status, data } = await apis.audiences.uploadAudienceCSVFile(formData);
+
+      if (isAPISuccess(status) && data) {
+        handleUploadSuccess(data);
+      }
+    } catch (error) {
+      showErrorModal('Failed to upload CSV email list', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  return (
+    <Upload
+      name="audienceCsv"
+      accept=".csv"
+      maxCount={1}
+      action={handleAction}
+      beforeUpload={beforeUpload}
+      showUploadList={false}
+    >
+      <Button block type="primary" loading={isLoading} icon={<UploadOutlined />}>
+        Upload a CSV email list
+      </Button>
+    </Upload>
+  );
+};
 
 const Audiences = () => {
   const [form] = Form.useForm();
@@ -90,8 +138,6 @@ const Audiences = () => {
   const removeFromEditableEmailList = (email) =>
     setEditableEmailList(editableEmailList.filter((emailData) => emailData.email !== email));
 
-  // TODO: add the failed ones back to the editable email list
-  // Also show feedback on how many emails successfully imported and stuff
   const saveAudiences = async (values) => {
     setIsSubmitting(true);
     const payload = {
@@ -110,8 +156,9 @@ const Audiences = () => {
           showSuccessModal('Successfully imported audiences');
         }
 
-        // TODO: Confirm where to show other modal if it's skipped or smth
-
+        // We show the failed ones to the editable email list
+        // That way the creator can make the changes and fix them
+        // and save them once it's fixed
         setEditableEmailList(data.data.failed);
         generateFeedbackText(data.count);
       }
@@ -133,6 +180,43 @@ const Audiences = () => {
       }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const onCSVUploadSuccess = (audienceResponse) => {
+    generateFeedbackText(audienceResponse.count);
+
+    if (audienceResponse.count.failed > 0) {
+      // In the case where any failed data exists
+      // We show the failed ones to the editable email list
+      // That way the creator can make the changes and fix them
+      // and save them once it's fixed
+      setEditableEmailList(audienceResponse.data.failed);
+
+      const modalContent = (
+        <Paragraph>
+          Some emails in the file you uploaded failed to be imported. You can see edit them in the table below and save
+          them again. Make sure to fill out the <Text strong> First Name </Text> as it is required for a successful
+          import. Emails that are already in your audience list will be skipped.
+        </Paragraph>
+      );
+
+      showErrorModal('Some emails failed to be imported', modalContent);
+    } else if (audienceResponse.count.success > 0) {
+      // In the case where any successful data exists
+
+      const modalContent =
+        audienceResponse.count.skipped > 0
+          ? 'Some emails might be skipped because they are already saved in your audience list'
+          : '';
+
+      showSuccessModal('Successfully imported email list', modalContent);
+    } else if (audienceResponse.count.skip > 0) {
+      // In the case where all emails are skipped
+      message.info('All emails detected in the file are skipped');
+    } else {
+      // In the case where no emails are detected (all count = 0)
+      message.error('No email detected in the file');
     }
   };
 
@@ -232,7 +316,7 @@ const Audiences = () => {
             <Row gutter={[16, 16]}>
               <Col xs={24}>
                 <Button type="primary" disabled={audienceList.length <= 0}>
-                  Send Email (not yet implemented)
+                  Send Email
                 </Button>
               </Col>
               <Col xs={24}>
@@ -254,7 +338,16 @@ const Audiences = () => {
                   </Col>
                 )}
                 <Col xs={24}>
-                  <Title level={5}> Input CSV Email List : Upload button here </Title>
+                  <Row gutter={[8, 8]}>
+                    <Col xs={12} md={6} lg={4}>
+                      {' '}
+                      <Title level={5}> Input CSV Email List : </Title>{' '}
+                    </Col>
+                    <Col xs={12} md={6} lg={4}>
+                      {' '}
+                      <AudienceCSVFileUpload handleUploadSuccess={onCSVUploadSuccess} />{' '}
+                    </Col>
+                  </Row>
                 </Col>
                 <Col xs={24} className={styles.mt20}>
                   <Title level={5}> Input Email List Manually </Title>
