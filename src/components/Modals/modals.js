@@ -369,6 +369,7 @@ export const showCoursePurchaseSuccessModal = () => {
 export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
   let titleText = 'Product already purchased';
   let contentText = 'purchased this product';
+  let targetSection = Routes.attendeeDashboard.defaultPath;
 
   switch (prodType) {
     case productType.CLASS:
@@ -378,10 +379,12 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
     case productType.PASS:
       titleText = 'Pass already purchased';
       contentText = 'purchased this pass';
+      targetSection = Routes.attendeeDashboard.passes;
       break;
     case productType.VIDEO:
       titleText = 'Video already purchased';
       contentText = 'purchased this video';
+      targetSection = Routes.attendeeDashboard.videos;
       break;
     default:
       titleText = 'Product already purchased';
@@ -400,10 +403,6 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
-        null,
-        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
-      )),
+    onOk: () => (window.location.href = getDashboardUrl(null, Routes.attendeeDashboard.rootPath + targetSection)),
   });
 };
