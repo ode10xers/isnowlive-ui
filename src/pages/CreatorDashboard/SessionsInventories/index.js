@@ -10,6 +10,8 @@ import {
   VideoCameraAddOutlined,
   InfoCircleOutlined,
   BookTwoTone,
+  MailOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -25,7 +27,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -33,6 +35,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { useGlobalContext } from 'services/globalContext';
 
 import Icons from 'assets/icons';
 
@@ -47,6 +50,8 @@ const { creator } = mixPanelEventTags;
 const whiteColor = '#FFFFFF';
 
 const SessionsInventories = ({ match }) => {
+  const { showSendEmailPopup } = useGlobalContext();
+
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
@@ -61,7 +66,7 @@ const SessionsInventories = ({ match }) => {
     try {
       const { data } =
         sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
-      if (data) {
+      if (data && data.length > 0) {
         const unfilteredSessions = data.map((i, index) => ({
           index,
           key: i?.inventory_id,
@@ -73,7 +78,8 @@ const SessionsInventories = ({ match }) => {
           time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
           start_time: i?.start_time,
           end_time: i?.end_time,
-          participants: i.num_participants,
+          num_participants: i.num_participants,
+          participants: i.participants,
           start_url: i.start_url,
           inventory_id: i?.inventory_id,
           session_id: i.session_id,
@@ -81,6 +87,7 @@ const SessionsInventories = ({ match }) => {
           color_code: i.color_code,
           is_published: i.is_published,
           is_course: i.is_course,
+          external_id: i.inventory_external_id,
         }));
 
         let filterByDateSessions = [];
@@ -103,6 +110,10 @@ const SessionsInventories = ({ match }) => {
         });
         setSessions(unfilteredSessions);
         setFilteredByDateSession(filterByDateSessions);
+
+        if (filterByDateSessions.length > 0) {
+          setExpandedRowKeys([filterByDateSessions[0].start_time]);
+        }
       }
       setIsLoading(false);
     } catch (error) {
@@ -113,6 +124,7 @@ const SessionsInventories = ({ match }) => {
 
   useEffect(() => {
     if (match?.params?.session_type) {
+      setExpandedRowKeys([]);
       setSessions([]);
       setIsLoading(true);
       if (match?.params?.session_type === 'past') {
@@ -123,6 +135,19 @@ const SessionsInventories = ({ match }) => {
       getStaffSession(match?.params?.session_type);
     }
   }, [match.params.session_type, getStaffSession]);
+
+  const showEmailPopup = (inventory) => {
+    // Since user cannot book past inventory, we only have one type here
+    // either active if upcoming or expired if past
+    showSendEmailPopup({
+      recipients: {
+        active: isPast ? [] : inventory.participants || [],
+        expired: isPast ? inventory.participants || [] : [],
+      },
+      productId: inventory.external_id,
+      productType: 'SESSION',
+    });
+  };
 
   const trackAndStartSession = (data) => {
     const eventTag = isMobileDevice
@@ -167,7 +192,7 @@ const SessionsInventories = ({ match }) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/e/${inventoryId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const emptyTableCell = {
@@ -200,7 +225,6 @@ const SessionsInventories = ({ match }) => {
       title: 'Session Name',
       dataIndex: 'name',
       key: 'name',
-      width: '25%',
       render: (text, record) => {
         if (record.is_date) {
           return {
@@ -235,42 +259,47 @@ const SessionsInventories = ({ match }) => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      width: '10%',
+      width: '78px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       key: 'duration',
-      width: '15%',
+      width: '90px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      width: '15%',
+      width: '165px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
       title: 'Participants',
-      key: 'participants',
-      dataIndex: 'participants',
-      width: '12%',
+      key: 'num_participants',
+      dataIndex: 'num_participants',
+      width: '110px',
       render: (text, record) =>
-        renderSimpleTableCell(record.is_date, `${record.participants || 0} / ${record.max_participants}`),
+        renderSimpleTableCell(record.is_date, `${record.num_participants || 0} / ${record.max_participants}`),
     },
     {
       title: 'Actions',
-      width: isPast ? '10%' : '25%',
+      width: isPast ? '100px' : '200px',
       render: (text, record) => {
         if (record.is_date) {
           return emptyTableCell;
         }
 
-        const isDisabled = record.participants > 0;
+        const isDisabled = record.num_participants > 0;
         return isPast ? (
           <Row justify="start">
+            <Col>
+              <Tooltip title="Send Customer Email">
+                <Button type="text" onClick={() => showEmailPopup(record)} icon={<MailOutlined />} />
+              </Tooltip>
+            </Col>
             <Col>
               <Tooltip title="Event Details">
                 <Button
@@ -285,12 +314,17 @@ const SessionsInventories = ({ match }) => {
         ) : (
           <Row justify="start" gutter={[8, 8]}>
             <Col md={24} lg={24} xl={4}>
-              <Tooltip title="Event Details">
+              <Tooltip title="Send Customer Email">
+                <Button type="text" onClick={() => showEmailPopup(record)} icon={<MailOutlined />} />
+              </Tooltip>
+            </Col>
+            <Col md={24} lg={24} xl={4}>
+              <Tooltip title="Edit Event Details">
                 <Button
                   type="link"
                   className={styles.detailsButton}
                   onClick={() => openSessionInventoryDetails(record)}
-                  icon={<InfoCircleOutlined />}
+                  icon={<EditOutlined />}
                 />
               </Tooltip>
             </Col>
@@ -372,7 +406,7 @@ const SessionsInventories = ({ match }) => {
   ];
 
   const renderSessionItem = (item) => {
-    const isCancelDisabled = item.participants > 0;
+    const isCancelDisabled = item.num_participants > 0;
 
     const layout = (label, value) => (
       <Row>
@@ -406,9 +440,18 @@ const SessionsInventories = ({ match }) => {
     );
 
     const actionButtons = [
-      <Tooltip title="Event Details">
-        <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
+      <Tooltip title="Send Customer Email">
+        <Button type="text" onClick={() => showEmailPopup(item)} icon={<MailOutlined />} />
       </Tooltip>,
+      isPast ? (
+        <Tooltip title="Event Details">
+          <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
+        </Tooltip>
+      ) : (
+        <Tooltip title="Edit Event Details">
+          <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<EditOutlined />} />
+        </Tooltip>
+      ),
       <Tooltip title="Copy Event Page Link">
         <Button type="text" onClick={() => copyInventoryLink(item.inventory_id)} icon={<CopyOutlined />} />
       </Tooltip>,
@@ -450,8 +493,7 @@ const SessionsInventories = ({ match }) => {
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
             onClick={() => openSessionInventoryDetails(item)}
           >
-            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
-            <Text>{item.name}</Text>
+            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>{' '}
             {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
           </div>
         }
@@ -460,9 +502,9 @@ const SessionsInventories = ({ match }) => {
         {layout('Duration', <Text>{item.duration}</Text>)}
         {layout('Time', <Text>{item.time}</Text>)}
         {layout(
-          isPast ? 'Registrations' : 'Attendees',
+          'Attendees',
           <Text>
-            {item.participants || 0} {'/'} {item.max_participants}
+            {item.num_participants || 0} {'/'} {item.max_participants}
           </Text>
         )}
       </Card>
@@ -559,7 +601,7 @@ const SessionsInventories = ({ match }) => {
                       <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
                     )}
                   </Loader>
-                ) : (
+                ) : filteredByDateSession.length > 0 ? (
                   <Table
                     sticky={true}
                     columns={dateColumns}
@@ -582,6 +624,8 @@ const SessionsInventories = ({ match }) => {
                       },
                     }}
                   />
+                ) : (
+                  <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
                 )}
               </>
             )}

@@ -4,6 +4,9 @@ import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
+// import { loadStripe } from "@stripe/stripe-js";
+
+// import config from 'config';
 
 const Context = createContext(null);
 
@@ -50,6 +53,30 @@ const reducer = (state, action) => {
         paymentPopupData: null,
         paymentPopupCallback: () => {},
       };
+    case 'SHOW_SEND_EMAIL_POPUP':
+      return {
+        ...state,
+        emailPopupVisible: true,
+        emailPopupData: action.payload,
+      };
+    case 'HIDE_SEND_EMAIL_POPUP':
+      return {
+        ...state,
+        emailPopupVisible: false,
+        emailPopupData: {
+          recipients: {
+            active: [],
+            expired: [],
+          },
+          productId: null,
+          productType: null,
+        },
+      };
+    case 'INIT_STRIPE':
+      return {
+        ...state,
+        stripePromise: action.payload,
+      };
     default:
       return state;
   }
@@ -64,6 +91,16 @@ const GlobalDataProvider = ({ children }) => {
     paymentPopupVisible: false,
     paymentPopupData: null,
     paymentPopupCallback: () => {},
+    emailPopupVisible: false,
+    emailPopupData: {
+      recipients: {
+        active: [],
+        expired: [],
+      },
+      productId: null,
+      productType: null,
+    },
+    // stripePromise: null,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -101,6 +138,14 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'HIDE_PAYMENT_POPUP' });
   }
 
+  function showSendEmailPopup(emailPopupData) {
+    dispatch({ type: 'SHOW_SEND_EMAIL_POPUP', payload: emailPopupData });
+  }
+
+  function hideSendEmailPopup() {
+    dispatch({ type: 'HIDE_SEND_EMAIL_POPUP' });
+  }
+
   function logOut(history, dontRedirect = false) {
     if (!dontRedirect) {
       history.push(Routes.login);
@@ -112,6 +157,11 @@ const GlobalDataProvider = ({ children }) => {
     resetMixPanel();
   }
 
+  // function initStripe() {
+  //   const stripePromise = null;
+  //   dispatch({ type: 'INIT_STRIPE', payload: stripePromise });
+  // }
+
   const value = {
     state,
     logOut,
@@ -121,6 +171,9 @@ const GlobalDataProvider = ({ children }) => {
     setCookieConsent,
     showPaymentPopup,
     hidePaymentPopup,
+    showSendEmailPopup,
+    hideSendEmailPopup,
+    // initStripe
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

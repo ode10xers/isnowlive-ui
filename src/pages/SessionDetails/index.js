@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Image, message, Typography, Tabs } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
 import Routes from 'routes';
 import apis from 'apis';
+
 import http from 'services/http';
+import { useGlobalContext } from 'services/globalContext';
+
 import Share from 'components/Share';
 import Loader from 'components/Loader';
 import SignInForm from 'components/SignInForm';
@@ -15,9 +16,10 @@ import HostDetails from 'components/HostDetails';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import VideoCard from 'components/VideoCard';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
+
 import { isMobileDevice } from 'utils/device';
 import {
   generateUrlFromUsername,
@@ -28,24 +30,24 @@ import {
   reservedDomainName,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { useGlobalContext } from 'services/globalContext';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
 import {
   showErrorModal,
-  showBookingSuccessModal,
+  showBookSessionWithPassSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
+  showBookSingleSessionSuccessModal,
   showAlreadyBookedModal,
-  showVideoPurchaseSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
-
 const { Title } = Typography;
 const {
+  formatDate: { toLongDateWithTime },
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
   timeCalculation: { isBeforeDate },
 } = dateUtil;
@@ -53,8 +55,8 @@ const {
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
-  const [course, setCourse] = useState(null);
   const [creator, setCreator] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -62,6 +64,7 @@ const SessionDetails = ({ match, history }) => {
     state: { userDetails },
     logIn,
     logOut,
+    showPaymentPopup,
   } = useGlobalContext();
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
@@ -69,51 +72,76 @@ const SessionDetails = ({ match, history }) => {
   const [availablePasses, setAvailablePasses] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
-  const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
+  const [createFollowUpOrder, setCreateFollowUpOrder] = useState(false);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
   const [sessionVideos, setSessionVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
-
-  const username = window.location.hostname.split('.')[0];
+  const [username, setUsername] = useState(null);
 
   const getDetails = useCallback(
     async (session_id) => {
       try {
-        const sessionDetails = await apis.session.getSessionDetails(session_id);
-        const userDetails = await apis.user.getProfileByUsername(username);
-        const passes = await apis.passes.getPassesBySessionId(session_id);
-        setSession({
-          ...sessionDetails.data,
-          inventory: sessionDetails.data.inventory.filter(
-            (inventory) => inventory.num_participants < sessionDetails.data.max_participants
-          ),
-        });
+        const sessionDetailsResponse = await apis.session.getSessionDetails(session_id);
 
-        if (sessionDetails.data.is_course) {
-          const courseDetails = await apis.courses.getCoursesBySessionId(session_id);
+        if (isAPISuccess(sessionDetailsResponse.status) && sessionDetailsResponse.data) {
+          const sessionDetails = sessionDetailsResponse.data;
 
-          setCourse(courseDetails.data[0]);
+          setSession({
+            ...sessionDetails,
+            inventory: sessionDetails.inventory.filter(
+              (inventory) => inventory.num_participants < sessionDetails.max_participants
+            ),
+          });
+
+          const latestInventories = sessionDetails.inventory
+            .filter((inventory) => isBeforeDate(inventory.end_time))
+            .filter((inventory) => inventory.num_participants < sessionDetails.max_participants)
+            .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
+          setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
+
+          setSessionVideos(sessionDetails.Videos || []);
+
+          const creatorUsername = sessionDetails.creator_username || window.location.hostname.split('.')[0];
+          setUsername(creatorUsername);
+          const creatorDetailsResponse = await apis.user.getProfileByUsername(creatorUsername);
+
+          if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
+            setCreator(creatorDetailsResponse.data);
+          } else {
+            console.error('Failed to fetch creator for session', creatorDetailsResponse);
+          }
+
+          if (sessionDetails.is_course) {
+            const courseDetailsResponse = await apis.courses.getCoursesBySessionId(session_id);
+
+            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
+              setCourses(courseDetailsResponse.data || []);
+            } else {
+              console.error('Failed to fetch courses for session', courseDetailsResponse);
+            }
+          }
+
+          const passesResponse = await apis.passes.getPassesBySessionId(session_id);
+
+          if (isAPISuccess(passesResponse.status) && passesResponse.data) {
+            setAvailablePasses(passesResponse.data);
+          } else {
+            console.error('Failed to fetch pass data for session', passesResponse);
+          }
+
+          setIsLoading(false);
+        } else {
+          console.error('Failed to fetch session data', sessionDetailsResponse);
         }
-
-        setCreator(userDetails.data);
-        setAvailablePasses(passes.data);
-        setIsLoading(false);
-        const latestInventories = sessionDetails.data.inventory
-          .filter((inventory) => isBeforeDate(inventory.end_time))
-          .filter((inventory) => inventory.num_participants < sessionDetails.data.max_participants)
-          .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
-        setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
-
-        setSessionVideos(sessionDetails.data.Videos);
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         history.push(Routes.root);
       }
     },
-    [history, username]
+    [history]
   );
 
   const getUsablePassesForUser = async () => {
@@ -154,7 +182,9 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.session_id) {
-      if (username && !reservedDomainName.includes(username)) {
+      const domainUsername = window.location.hostname.split('.')[0];
+
+      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getDetails(match.params.session_id);
       }
     } else {
@@ -179,7 +209,7 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (createFollowUpOrder) {
-      handleOrder(createFollowUpOrder);
+      showConfirmPaymentPopup();
     }
 
     //eslint-disable-next-line
@@ -205,9 +235,10 @@ const SessionDetails = ({ match, history }) => {
         is_creator: false,
       });
       if (data) {
+        setIsLoading(false);
         http.setAuthToken(data.auth_token);
         logIn(data, true);
-        handleOrder(values.email);
+        showConfirmPaymentPopup();
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
@@ -221,60 +252,53 @@ const SessionDetails = ({ match, history }) => {
     }
   };
 
-  const initiatePaymentForOrder = async (payload) => {
-    setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder(payload);
-
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-        }
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-    setIsLoading(false);
-  };
-
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const getAttendeeOrderDetails = async (orderId) => {
-    try {
-      const { status, data } = await apis.session.getAttendeeUpcomingSession();
-
-      if (isAPISuccess(status) && data) {
-        return data.find((orderDetails) => orderDetails.order_id === orderId);
-      }
-    } catch (error) {
-      message.error(error?.response?.data?.message || 'Failed to fetch attendee order details');
-    }
-
-    return null;
-  };
-
-  const handleOrder = (userEmail) => {
-    setIsLoading(true);
+  const showConfirmPaymentPopup = () => {
+    setCreateFollowUpOrder(false);
 
     if (selectedVideo) {
+      const paymentPopupData = {
+        productId: selectedVideo.external_id,
+        productType: 'VIDEO',
+        itemList: [
+          {
+            name: selectedVideo.title,
+            description: `Can be watched up to ${selectedVideo.watch_limit} times, valid for ${selectedVideo.validity} days`,
+            currency: selectedVideo.currency,
+            price: selectedVideo.price,
+          },
+        ],
+      };
+
       const payload = {
         video_id: selectedVideo.external_id,
         payment_source: paymentSource.GATEWAY,
       };
 
-      buyVideo(payload, userEmail);
-      setSelectedVideo(null);
+      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideo(payload, couponCode));
     } else if (selectedPass) {
       const usersPass = getUserPurchasedPass(false);
 
       if (usersPass) {
+        const paymentPopupData = {
+          productId: session.session_id,
+          productType: 'SESSION',
+          itemList: [
+            {
+              name: session.name,
+              description: toLongDateWithTime(selectedInventory.start_time),
+              currency: session.currency,
+              price: session.price,
+            },
+          ],
+          paymentInstrumentDetails: {
+            type: 'PASS',
+            ...usersPass,
+          },
+        };
+
         const payload = {
           inventory_id: parseInt(selectedInventory.inventory_id),
           user_timezone_offset: new Date().getTimezoneOffset(),
@@ -284,17 +308,49 @@ const SessionDetails = ({ match, history }) => {
           source_id: usersPass.pass_order_id,
         };
 
-        bookClassUsingPass(payload, userEmail);
+        showPaymentPopup(paymentPopupData, async (couponCode = '') => await bookClassUsingPass(payload, couponCode));
       } else {
+        const paymentPopupData = {
+          productId: selectedPass.external_id,
+          productType: 'PASS',
+          itemList: [
+            {
+              name: selectedPass.name,
+              description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
+              currency: selectedPass.currency,
+              price: selectedPass.price,
+            },
+            {
+              name: session.name,
+              description: toLongDateWithTime(selectedInventory.start_time),
+              currency: session.currency,
+              price: 0,
+            },
+          ],
+        };
+
         const payload = {
           pass_id: selectedPass.id,
           price: selectedPass.price,
           currency: selectedPass.currency.toLowerCase(),
         };
 
-        buyPassAndBookClass(payload, userEmail);
+        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndBookClass(payload, couponCode));
       }
     } else {
+      const paymentPopupData = {
+        productId: session.session_id,
+        productType: 'SESSION',
+        itemList: [
+          {
+            name: session.name,
+            description: toLongDateWithTime(selectedInventory.start_time),
+            currency: session.currency,
+            price: session.price,
+          },
+        ],
+      };
+
       // Default case, book single class;
       const payload = {
         inventory_id: parseInt(selectedInventory.inventory_id),
@@ -304,25 +360,30 @@ const SessionDetails = ({ match, history }) => {
         payment_source: paymentSource.GATEWAY,
       };
 
-      buySingleClass(payload, userEmail);
+      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleClass(payload, couponCode));
     }
   };
 
-  const buySingleClass = async (payload, userEmail) => {
+  const buySingleClass = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.order_id,
-            order_type: orderType.CLASS,
-          });
-        } else {
-          const orderDetails = await getAttendeeOrderDetails(data.order_id);
+        setIsLoading(false);
+        const inventoryId = selectedInventory.inventory_id;
 
-          showBookingSuccessModal(userEmail, null, false, false, username, orderDetails);
-          setIsLoading(false);
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_id: data.order_id,
+            payment_order_type: orderType.CLASS,
+            inventory_id: inventoryId,
+          };
+        } else {
+          showBookSingleSessionSuccessModal(inventoryId);
+          return null;
         }
       }
     } catch (error) {
@@ -332,31 +393,42 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
+
+    return null;
   };
 
-  const buyPassAndBookClass = async (payload, userEmail) => {
+  const buyPassAndBookClass = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await buyPass(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        const inventoryId = parseInt(selectedInventory.inventory_id);
+
         if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.pass_order_id,
-            order_type: orderType.PASS,
-            inventory_id: parseInt(selectedInventory.inventory_id),
-          });
+          return {
+            ...data,
+            payment_order_id: data.pass_order_id,
+            payment_order_type: orderType.PASS,
+            follow_up_booking_info: {
+              productType: 'SESSION',
+              productId: selectedInventory.inventory_id,
+            },
+          };
         } else {
           // If user (for some reason) buys a free pass (if any exists)
           // we then immediately followUp the Booking Process
 
           // Normally wouldn't trigger
           const followUpBooking = await bookClass({
-            inventory_id: parseInt(selectedInventory.inventory_id),
+            inventory_id: inventoryId,
             user_timezone_offset: new Date().getTimezoneOffset(),
             user_timezone: getCurrentLongTimezone(),
             payment_source: paymentSource.PASS,
@@ -364,11 +436,10 @@ const SessionDetails = ({ match, history }) => {
           });
 
           if (isAPISuccess(followUpBooking.status)) {
-            const orderDetails = await getAttendeeOrderDetails(followUpBooking.data.order_id);
-
-            showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
-            setIsLoading(false);
+            showPurchasePassAndBookSessionSuccessModal(data.pass_order_id, inventoryId);
           }
+
+          return null;
         }
       }
     } catch (error) {
@@ -378,22 +449,25 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
+
+    return null;
   };
 
-  const bookClassUsingPass = async (payload, userEmail) => {
+  const bookClassUsingPass = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await bookClass(payload);
 
       if (isAPISuccess(status) && data) {
-        const orderDetails = await getAttendeeOrderDetails(data.order_id);
-
-        showBookingSuccessModal(userEmail, selectedPass, true, false, username, orderDetails);
         setIsLoading(false);
+        showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
+        return null;
       }
     } catch (error) {
       setIsLoading(false);
@@ -402,36 +476,47 @@ const SessionDetails = ({ match, history }) => {
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
-        showAlreadyBookedModal(productType.CLASS, username);
+        showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       }
     }
+
+    return null;
   };
 
-  const buyVideo = async (payload, userEmail) => {
+  const buyVideo = async (payload, couponCode = '') => {
+    setIsLoading(true);
+
     try {
       const { status, data } = await apis.videos.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        setSelectedVideo(null);
+
         if (data.payment_required) {
-          initiatePaymentForOrder({
-            order_id: data.video_order_id,
-            order_type: orderType.VIDEO,
-          });
+          return {
+            ...data,
+            payment_order_id: data.video_order_id,
+            payment_order_type: orderType.VIDEO,
+          };
         } else {
-          setIsLoading(false);
-          showVideoPurchaseSuccessModal(userEmail, selectedVideo, null, false, false, username);
+          showPurchaseSingleVideoSuccessModal(data.video_order_id);
+
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+
+    return null;
   };
 
   const onFinish = async (values) => {
@@ -455,7 +540,7 @@ const SessionDetails = ({ match, history }) => {
             logIn(data, true);
             setCurrentUser(data);
             await getUsablePassesForUser();
-            setCreateFollowUpOrder(values.email);
+            setCreateFollowUpOrder(true);
           }
         } catch (error) {
           setIsLoading(false);
@@ -468,9 +553,11 @@ const SessionDetails = ({ match, history }) => {
           }
         }
       } else if (!getLocalUserDetails()) {
+        setIsLoading(false);
         signupUser(values);
       } else {
-        handleOrder(values.email);
+        setIsLoading(false);
+        showConfirmPaymentPopup();
       }
     } catch (error) {
       setIsLoading(false);
@@ -517,12 +604,12 @@ const SessionDetails = ({ match, history }) => {
     window.open(`${baseUrl}/c/${course?.id}`);
   };
 
-  const openPurchaseModal = (video) => {
+  const openAuthModal = (video) => {
     setSelectedVideo(video);
     setShowPurchaseVideoModal(true);
   };
 
-  const closePurchaseModal = (resetSelectedVideo = false) => {
+  const closeAuthModal = (resetSelectedVideo = false) => {
     if (resetSelectedVideo) {
       setSelectedVideo(null);
     }
@@ -592,11 +679,11 @@ const SessionDetails = ({ match, history }) => {
           )}
         </Col>
         <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
-          <HostDetails host={creator} />
+          {creator && <HostDetails host={creator} />}
         </Col>
       </Row>
-      {session?.is_course ? (
-        course && (
+      {session?.is_course && courses ? (
+        courses?.length > 0 && (
           <div className={classNames(styles.mb50, styles.mt20)}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
@@ -604,7 +691,7 @@ const SessionDetails = ({ match, history }) => {
               </Col>
               <Col xs={24}>
                 <ShowcaseCourseCard
-                  courses={[course]}
+                  courses={courses}
                   onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
                   username={username}
                 />
@@ -680,10 +767,10 @@ const SessionDetails = ({ match, history }) => {
           </Row>
           {sessionVideos?.length > 0 && (
             <>
-              <PurchaseModal
+              <AuthModal
                 visible={showPurchaseVideoModal}
-                closeModal={closePurchaseModal}
-                createOrder={handleOrder}
+                closeModal={closeAuthModal}
+                onLoggedInCallback={showConfirmPaymentPopup}
               />
               <Row justify="space-between" className={styles.mt20}>
                 <Col xs={24}>
@@ -698,7 +785,7 @@ const SessionDetails = ({ match, history }) => {
                                   video={videoDetails}
                                   buyable={true}
                                   onCardClick={redirectToVideoPreview}
-                                  showPurchaseModal={openPurchaseModal}
+                                  showAuthModal={openAuthModal}
                                 />
                               </Col>
                             ))}

@@ -66,7 +66,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
   useEffect(() => {
     adjustSession();
     //eslint-disable-next-line
-  }, []);
+  }, [sessions]);
 
   return (
     <div>

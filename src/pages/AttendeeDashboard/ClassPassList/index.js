@@ -64,6 +64,7 @@ const ClassPassList = () => {
             expired: false,
           }))
         );
+        setExpandedActiveRowKeys(data.active.length > 0 ? [data.active[0].pass_order_id] : []);
         setExpiredPasses(
           data.expired.map((pass, index) => ({
             index,
@@ -93,6 +94,7 @@ const ClassPassList = () => {
             expired: true,
           }))
         );
+        setExpandedExpiredRowKeys(data.expired.length > 0 ? [data.expired[0].pass_order_id] : []);
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message);
@@ -177,7 +179,7 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '18%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => (record.price > 0 ? `${record.price} ${record.currency.toUpperCase()}` : 'Free'),
     },
     {
       title: '',
@@ -272,7 +274,7 @@ const ClassPassList = () => {
             <Text>{pass.limited ? `${pass.classes_remaining}/${pass.class_count} Credits` : 'Unlimited Credits'}</Text>
           )}
           {layout('Expires On', <Text>{toShortDate(pass.expiry)}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout('Price', <Text>{pass.price > 0 ? `${pass.price} ${pass.currency.toUpperCase()}` : 'Free'}</Text>)}
         </Card>
         {((pass.expired && expandedExpiredRowKeys.includes(pass.pass_order_id)) ||
           expandedActiveRowKeys.includes(pass.pass_order_id)) && (
@@ -322,11 +324,11 @@ const ClassPassList = () => {
           <Title level={4}> Passes </Title>
         </Col>
         <Col xs={24}>
-          <Collapse>
+          <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Active Passes </Title>} key="Active">
               <Row gutter={8}>
-                <Col xs={24} md={16} lg={21}></Col>
-                <Col xs={24} md={8} lg={3}>
+                <Col xs={24} md={16} lg={19}></Col>
+                <Col xs={24} md={8} lg={5}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllActivePasses()}>
                     {expandedActiveRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
                   </Button>
@@ -356,8 +358,8 @@ const ClassPassList = () => {
             </Panel>
             <Panel header={<Title level={5}> Expired Passes </Title>} key="Expired">
               <Row gutter={8}>
-                <Col xs={24} md={16} lg={21}></Col>
-                <Col xs={24} md={8} lg={3}>
+                <Col xs={24} md={16} lg={19}></Col>
+                <Col xs={24} md={8} lg={5}>
                   <Button block shape="round" type="primary" onClick={() => toggleExpandAllExpiredPasses()}>
                     {expandedExpiredRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
                   </Button>

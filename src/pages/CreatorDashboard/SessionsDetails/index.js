@@ -3,28 +3,31 @@ import classNames from 'classnames';
 import { Row, Col, Typography, Button, Card, message, Popconfirm } from 'antd';
 import {
   ArrowLeftOutlined,
-  GlobalOutlined,
   VideoCameraOutlined,
   EditOutlined,
   MailOutlined,
   CloseCircleOutlined,
   DeleteOutlined,
+  CopyOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
-import dateUtil from 'utils/date';
-import { generateUrlFromUsername, isAPISuccess, getDuration } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
+import Routes from 'routes';
+
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import ParticipantsList from 'components/ParticipantsList';
 import Share from 'components/Share';
-import Routes from 'routes';
+import InventoryDocumentEditor from './InventoryDocumentEditor';
+
+import dateUtil from 'utils/date';
+import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 import {
   mixPanelEventTags,
@@ -38,7 +41,7 @@ import styles from './styles.module.scss';
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },
 } = dateUtil;
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { creator } = mixPanelEventTags;
 
 const SessionsDetails = ({ match }) => {
@@ -47,12 +50,14 @@ const SessionsDetails = ({ match }) => {
   const [session, setSession] = useState(null);
   const [isPastSession, setIsPastSession] = useState(false);
   const [publicUrl, setPublicUrl] = useState(null);
+  const [isEditingDocuments, setIsEditingDocuments] = useState(false);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
     try {
       const { data } = await apis.session.getPrivateInventoryById(inventory_id);
       if (data) {
         setSession(data);
+
         if (getTimeDiff(data.end_time, moment(), 'days') < 0) {
           setIsPastSession(true);
         }
@@ -115,6 +120,21 @@ const SessionsDetails = ({ match }) => {
 
   const isDisabled = session?.participants ? session?.participants.length > 0 : false;
 
+  const handleDocumentUrlUpload = async (documentUrls) => {
+    try {
+      const { status } = await apis.session.updateSessionInventoryDocument(session.inventory_id, {
+        document_urls: documentUrls,
+      });
+
+      if (isAPISuccess(status)) {
+        setSession({ ...session, document_urls: documentUrls });
+        setIsEditingDocuments(false);
+      }
+    } catch (error) {
+      message.error('Failed to update session event document');
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading session details">
       <Row gutter={8} justify="start" className={classNames(styles.mt20, styles.mb20)}>
@@ -152,12 +172,8 @@ const SessionsDetails = ({ match }) => {
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
-              <Button
-                className={styles.headButton}
-                icon={<GlobalOutlined />}
-                onClick={() => trackAndNavigate(publicUrl, creator.click.sessions.details.publicPage, true)}
-              >
-                Public Page
+              <Button className={styles.headButton} icon={<CopyOutlined />} onClick={() => copyToClipboard(publicUrl)}>
+                Copy Page Link
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
@@ -206,8 +222,44 @@ const SessionsDetails = ({ match }) => {
                 <div className={styles.mt20}>
                   <SessionInfo session={session} />
                 </div>
+                <Row className={styles.mt10}>
+                  <Col
+                    xs={24}
+                    lg={{
+                      span: 8,
+                      offset: session?.is_course ? 8 : 16,
+                    }}
+                  >
+                    {isEditingDocuments ? (
+                      <InventoryDocumentEditor
+                        sessionInventoryDocuments={
+                          session?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || []
+                        }
+                        onFinish={handleDocumentUrlUpload}
+                        onCancel={() => setIsEditingDocuments(false)}
+                      />
+                    ) : (
+                      <Button icon={<EditOutlined />} onClick={() => setIsEditingDocuments(true)}>
+                        Change document
+                      </Button>
+                    )}
+
+                    <Paragraph type="danger" className={styles.uploadHelpText}>
+                      This will change the document for{' '}
+                      <Text strong type="danger">
+                        {' '}
+                        THIS{' '}
+                      </Text>{' '}
+                      session only. To change the docs for all sessions click on the{' '}
+                      <Text strong type="danger">
+                        Edit Session
+                      </Text>{' '}
+                      button
+                    </Paragraph>
+                  </Col>
+                </Row>
               </Col>
-              <Col xs={24} lg={6}>
+              <Col xs={24} lg={{ span: 5, offset: 1 }}>
                 <Row gutter={[8, 8]}>
                   <Col xs={12} lg={24}>
                     <Button

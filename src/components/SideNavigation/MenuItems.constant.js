@@ -9,6 +9,8 @@ import {
   BookOutlined,
   SettingOutlined,
   PercentageOutlined,
+  FilePdfOutlined,
+  Html5Outlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -110,11 +112,41 @@ export const creatorMenuItems = [
   },
   {
     order: 10,
-    key: 'account_settings',
-    title: 'Account Settings',
+    key: 'site_settings',
+    title: 'Site Settings',
     icon: <SettingOutlined />,
-    mixPanelTag: creator.click.dashboard.settingsNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
+    children: [
+      {
+        order: 1,
+        key: 'account_settings',
+        title: 'Account Settings',
+        mixPanelTag: creator.click.dashboard.accountNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
+      },
+      {
+        order: 2,
+        key: 'legals_settings',
+        title: 'Waiver and Policies',
+        mixPanelTag: creator.click.dashboard.legalNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.legals,
+      },
+    ],
+  },
+  {
+    order: 11,
+    key: 'external_site_setting',
+    title: 'External Site Settings',
+    icon: <Html5Outlined />,
+    mixPanelTag: creator.click.dashboard.externalSiteSettingsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
+  },
+  {
+    order: 12,
+    key: 'documents',
+    title: 'Documents',
+    icon: <FilePdfOutlined />,
+    mixPanelTag: creator.click.dashboard.documentsNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
 ];
 

@@ -107,3 +107,23 @@
     }
   }
 }
+
+@media (max-width: 569px) {
+  .imageWrapper {
+    .profileImageWrapper {
+      height: 100px;
+      max-height: 100px;
+
+      .profileImage {
+        .userName {
+          left: 0px;
+          bottom: -48px;
+        }
+
+        .shareButton {
+          bottom: 10px;
+        }
+      }
+    }
+  }
+}

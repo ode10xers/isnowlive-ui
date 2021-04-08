@@ -4,14 +4,27 @@ import { Modal, Typography, Button, Row, Col } from 'antd';
 import apis from 'apis';
 import Routes from 'routes';
 
-import { generateUrl, productType, generateUrlFromUsername } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
+import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.modules.scss';
 import AddToCalendarButton from 'components/AddToCalendarButton';
+import { isWidgetUrl, generateWidgetUrl } from 'utils/widgets';
 
 const { Text, Paragraph } = Typography;
+
+const getDashboardUrl = (userName = null, targetPath = Routes.attendeeDashboard.rootPath) => {
+  const usernameValue = userName ? userName : getUsernameFromUrl();
+
+  if (!isWidgetUrl()) {
+    return generateUrl(usernameValue) + targetPath;
+  } else {
+    return generateWidgetUrl(usernameValue, 'dashboard', true);
+  }
+};
 
 export const showErrorModal = (title, message = '') => {
   Modal.error({
@@ -62,113 +75,301 @@ export const showSetNewPasswordModal = (email) => {
   });
 };
 
-//TODO: Refactor this to be usable for other product types OR split it for each product
-export const showBookingSuccessModal = (
-  userEmail,
-  userPass = null,
-  isContinuedFlow = false,
-  userDidPayment = false,
-  redirectDomainName = 'app',
-  orderDetails = null
-) => {
+const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
+  <div className={styles.mt20}>
+    <Row justify="end" gutter={10}>
+      {inventoryDetails && (
+        <Col>
+          <div>
+            <AddToCalendarButton
+              type="button"
+              buttonText="Add to Cal"
+              eventData={{
+                ...inventoryDetails,
+                page_url: `${generateUrlFromUsername(username)}/e/${inventoryDetails.inventory_id}`,
+              }}
+            />
+          </div>
+        </Col>
+      )}
+      <Col>
+        <Button
+          type="primary"
+          block
+          onClick={() =>
+            (window.location.href = getDashboardUrl(
+              username,
+              Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+            ))
+          }
+        >
+          Go To Dashboard
+        </Button>
+      </Col>
+    </Row>
+  </div>
+);
+
+// Currently separating the modal for each case/flow
+// Since the contents and required info will be different
+export const showPurchasePassSuccessModal = async (passOrderId) => {
+  const userPass = await getUserPassOrderDetails(passOrderId);
+
   Modal.success({
     width: 480,
     closable: true,
     maskClosable: false,
-    title: 'Registration Successful',
+    okText: 'Go To Dashboard',
+    title: 'Purchase Successful',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes
+      )),
     content: (
       <>
-        {isContinuedFlow ? (
-          userDidPayment ? (
-            //* Purchase Pass & Immediately Book Class
-            <>
-              <Paragraph>
-                You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-              </Paragraph>
-              <Paragraph>
-                We have <Text strong> used 1 credit </Text>
-                to book this class for you.
-              </Paragraph>
-              <Paragraph>
-                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-                from <Text strong> friends@passion.do. </Text>
-              </Paragraph>
-              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-            </>
-          ) : (
-            //* Book class from previously purchased Pass
-            <>
-              <Paragraph>
-                We have booked this session using 1 credit from your pass
-                <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
-              </Paragraph>
-              <Paragraph>
-                You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-                from <Text strong> friends@passion.do. </Text>
-              </Paragraph>
-              <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-            </>
-          )
-        ) : userPass ? (
-          //* Purchase Individual Pass without Booking Class
-          <>
-            <Paragraph>
-              You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-            </Paragraph>
-            <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
-          </>
-        ) : (
-          //* Book Class without Pass
-          <>
-            <Paragraph>
-              We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
-              <Text strong> friends@passion.do. </Text>
-            </Paragraph>
-            <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-          </>
-        )}
-        <div classname={styles.mt20}>
-          <Row justify="end" gutter={10}>
-            {(isContinuedFlow || !userPass) && orderDetails && (
-              <Col>
-                <div>
-                  <AddToCalendarButton
-                    type="button"
-                    buttonText="Add to Cal"
-                    eventData={{
-                      ...orderDetails,
-                      page_url: `${generateUrlFromUsername(
-                        orderDetails?.username || orderDetails?.creator_username
-                      )}/e/${orderDetails.inventory_id}`,
-                    }}
-                  />
-                </div>
-              </Col>
-            )}
-            <Col>
-              <Button
-                type="primary"
-                block
-                onClick={() =>
-                  (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath)
-                }
-              >
-                Go To Dashboard
-              </Button>
-            </Col>
-          </Row>
-        </div>
+        <Paragraph>
+          You have purchased the pass <Text strong> {userPass?.pass_name || ''} </Text>
+        </Paragraph>
+        <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
       </>
     ),
-    okButtonProps: { style: { display: 'none' } },
-    okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
   });
 };
 
-export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectDomainName = 'app') => {
+// For session modals, we want to show the AddToCalendar Button
+// For that we will hide the modal buttons and render our custom buttons
+export const showPurchasePassAndBookSessionSuccessModal = async (passOrderId, inventoryId) => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  const userPass = await getUserPassOrderDetails(passOrderId);
+  const inventoryDetails = await getSessionInventoryDetails(inventoryId);
+
+  Modal.success({
+    width: 480,
+    closable: true,
+    maskClosable: false,
+    okButtonProps: { style: { display: 'none' } },
+    title: 'Registration Successful',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+      )),
+    content: (
+      <>
+        <Paragraph>
+          You have purchased the pass <Text strong> {userPass?.pass_name || ''} </Text>
+        </Paragraph>
+        <Paragraph>
+          We have <Text strong> used 1 credit </Text> to book this class for you.
+        </Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {generateCustomButtonsForSessionModals(username, inventoryDetails)}
+      </>
+    ),
+  });
+};
+
+export const showBookSessionWithPassSuccessModal = async (passOrderId, inventoryId) => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  const userPass = await getUserPassOrderDetails(passOrderId);
+  const inventoryDetails = await getSessionInventoryDetails(inventoryId);
+
+  Modal.success({
+    width: 480,
+    closable: true,
+    maskClosable: false,
+    okButtonProps: { style: { display: 'none' } },
+    title: 'Registration Successful',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+      )),
+    content: (
+      <>
+        <Paragraph>
+          We have booked this session using 1 credit from your pass
+          <Text strong> {userPass?.pass_name || ''}. </Text>
+        </Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {generateCustomButtonsForSessionModals(username, inventoryDetails)}
+      </>
+    ),
+  });
+};
+
+export const showBookSingleSessionSuccessModal = async (inventoryId) => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  const inventoryDetails = await getSessionInventoryDetails(inventoryId);
+
+  Modal.success({
+    width: 480,
+    closable: true,
+    maskClosable: false,
+    okButtonProps: { style: { display: 'none' } },
+    title: 'Registration Successful',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        username,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+      )),
+    content: (
+      <>
+        <Paragraph>
+          We have sent you a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {generateCustomButtonsForSessionModals(username, inventoryDetails)}
+      </>
+    ),
+  });
+};
+
+export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
+  const userEmail = getLocalUserDetails().email;
+
+  const userPass = await getUserPassOrderDetails(passOrderId);
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Purchase successful',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
+      )),
+    content: (
+      <>
+        <Paragraph>
+          You have purchased the pass <Text strong> {userPass?.pass_name || ''} </Text>
+        </Paragraph>
+        <Paragraph>
+          We have <Text strong> used 1 credit </Text>
+          to get this video for you.
+        </Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
+  const userEmail = getLocalUserDetails().email;
+
+  const userPass = await getUserPassOrderDetails(passOrderId);
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Purchase successful',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
+      )),
+    content: (
+      <>
+        <Paragraph>
+          We have bought this video using 1 credit from your pass
+          <Text strong> {userPass?.pass_name || ''}. </Text>
+        </Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
+  const userEmail = getLocalUserDetails().email;
+
+  const userVideo = await getUserVideoOrderDetails(videoOrderId);
+
+  Modal.success({
+    width: 400,
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Video Purchased',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
+      )),
+    content: (
+      <>
+        <Paragraph>
+          You have purchased the video <Text strong> {userVideo?.title || ''} </Text>
+        </Paragraph>
+        <Paragraph>
+          We have sent you a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showCoursePurchaseSuccessModal = () => {
+  const userEmail = getLocalUserDetails().email;
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Course purchased',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
+      )),
+    content: (
+      <>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
   let titleText = 'Product already purchased';
   let contentText = 'purchased this product';
+  let targetSection = Routes.attendeeDashboard.defaultPath;
 
   switch (prodType) {
     case productType.CLASS:
@@ -178,10 +379,12 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectD
     case productType.PASS:
       titleText = 'Pass already purchased';
       contentText = 'purchased this pass';
+      targetSection = Routes.attendeeDashboard.passes;
       break;
     case productType.VIDEO:
       titleText = 'Video already purchased';
       contentText = 'purchased this video';
+      targetSection = Routes.attendeeDashboard.videos;
       break;
     default:
       titleText = 'Product already purchased';
@@ -196,103 +399,10 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT, redirectD
     title: titleText,
     content: (
       <Paragraph>
-        It seems you have already <Text strong> {contentText} </Text>, please check your dashboard
+        It seems you have already <Text strong> {contentText}</Text>, please check your dashboard.
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
-  });
-};
-
-export const showVideoPurchaseSuccessModal = (
-  userEmail,
-  video,
-  userPass = null,
-  isContinuedFlow = false,
-  userDidPayment = false,
-  redirectDomainName = 'app'
-) => {
-  let title = 'Video Purchased';
-  let modalContent = (
-    <>
-      <Paragraph>
-        You have purchased the video <Text strong> {video?.title} </Text>
-      </Paragraph>
-      <Paragraph>
-        We have sent you a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from
-        <Text strong> friends@passion.do. </Text>
-      </Paragraph>
-      <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
-    </>
-  );
-
-  if (isContinuedFlow) {
-    title = 'Video Purchased using Pass';
-
-    if (userDidPayment) {
-      modalContent = (
-        <>
-          <Paragraph>
-            You have purchased the pass <Text strong> {userPass?.name || userPass?.pass_name} </Text>
-          </Paragraph>
-          <Paragraph>
-            We have <Text strong> used 1 credit </Text>
-            to buy <Text strong> {video?.title} </Text> video for you.
-          </Paragraph>
-          <Paragraph>
-            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-            from <Text strong> friends@passion.do. </Text>
-          </Paragraph>
-          <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
-        </>
-      );
-    } else {
-      modalContent = (
-        <>
-          <Paragraph>
-            We have bought <Text strong> {video?.title} </Text> video using 1 credit from your pass
-            <Text strong> {userPass?.name || userPass?.pass_name}. </Text>
-          </Paragraph>
-          <Paragraph>
-            You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email
-            from <Text strong> friends@passion.do. </Text>
-          </Paragraph>
-          <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-        </>
-      );
-    }
-  }
-
-  Modal.success({
-    center: true,
-    closable: true,
-    maskClosable: false,
-    title: title,
-    content: modalContent,
-    okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
-  });
-};
-
-export const showCourseBookingSuccessModal = (userEmail, redirectDomainName = 'app') => {
-  let title = 'Course booked';
-  let modalContent = (
-    <>
-      <Paragraph>
-        You would have received a confirmation email on <Text strong> {userEmail} </Text>. Look out for an email from{' '}
-        <Text strong> friends@passion.do. </Text>
-      </Paragraph>
-      <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
-    </>
-  );
-
-  Modal.success({
-    center: true,
-    closable: true,
-    maskClosable: false,
-    title: title,
-    content: modalContent,
-    okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = generateUrl(redirectDomainName) + Routes.attendeeDashboard.rootPath),
+    onOk: () => (window.location.href = getDashboardUrl(null, Routes.attendeeDashboard.rootPath + targetSection)),
   });
 };

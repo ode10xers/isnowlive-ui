@@ -1,5 +1,6 @@
 const Routes = {
   root: '/',
+  legals: '/terms',
   login: '/login',
   signup: '/signup',
   adminLogin: '/admin',
@@ -41,6 +42,9 @@ const Routes = {
     courses: '/courses',
     coupons: '/coupons',
     accountSettings: '/settings',
+    legals: '/legals',
+    documents: '/documents',
+    externalSiteSettings: '/widgets',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',

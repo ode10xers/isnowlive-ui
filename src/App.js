@@ -7,6 +7,7 @@ import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { isAPISuccess } from 'utils/helper';
+import { isWidgetUrl } from 'utils/widgets';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -34,6 +35,9 @@ import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
 import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
+import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
+import EmbeddablePage from 'pages/EmbeddablePage';
+import Legals from 'pages/Legals';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -61,50 +65,57 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
-
-  useEffect(() => {}, []);
+  const isWidget = isWidgetUrl();
 
   useEffect(() => {
-    if (cookieConsent) {
-      initMixPanel();
+    if (!isWidget) {
+      initializeFreshChat(userDetails, cookieConsent);
+
+      if (cookieConsent) {
+        initFreshChatWidget(userDetails);
+        initMixPanel();
+      }
     }
-  }, [cookieConsent]);
+  }, [userDetails, cookieConsent, isWidget]);
 
   useEffect(() => {
-    initializeFreshChat(userDetails, cookieConsent);
-
-    if (cookieConsent) {
-      initFreshChatWidget(userDetails);
-    }
-  }, [userDetails, cookieConsent]);
-
-  useEffect(() => {
-    const getUserDetails = async () => {
-      try {
-        const { data, status } = await apis.user.getProfile();
-        if (isAPISuccess(status) && data) {
-          setUserAuthentication(true);
-          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
-          setTimeout(() => {
-            setIsReadyToLoad(true);
-          }, 100);
+    if (!isWidget) {
+      const getUserDetails = async () => {
+        try {
+          const { data, status } = await apis.user.getProfile();
+          if (isAPISuccess(status) && data) {
+            setUserAuthentication(true);
+            setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+            setTimeout(() => {
+              setIsReadyToLoad(true);
+            }, 100);
+          }
+        } catch (error) {
+          setUserAuthentication(false);
+          setUserDetails(null);
+          setIsReadyToLoad(true);
         }
-      } catch (error) {
+      };
+      const authToken = getAuthCookie();
+      if (authToken && authToken !== '') {
+        getUserDetails();
+      } else {
         setUserAuthentication(false);
         setUserDetails(null);
         setIsReadyToLoad(true);
       }
-    };
-    const authToken = getAuthCookie();
-    if (authToken && authToken !== '') {
-      getUserDetails();
-    } else {
-      setUserAuthentication(false);
-      setUserDetails(null);
-      setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
-  }, []);
+  }, [isWidget]);
+
+  if (isWidget) {
+    return (
+      <>
+        <PaymentPopup />
+        <EmbeddablePage />
+      </>
+    );
+  }
 
   if (!isReadyToLoad) {
     return <div>Loading...</div>;
@@ -113,6 +124,7 @@ function App() {
   return (
     <>
       <PaymentPopup />
+      <SendCustomerEmailModal />
       <Router>
         <Switch>
           <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
@@ -146,6 +158,7 @@ function App() {
           <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
           <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
           <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+          <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
           <Route path={Routes.stripeAccountValidate}>
             <Redirect
               to={{
