@@ -10,7 +10,7 @@
     <title>Do Your Passion | Turn your passion into your income</title>
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8MEXZ3978F"></script>
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-8MEXZ3978F"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag() {
@@ -19,20 +19,25 @@
       gtag('js', new Date());
 
       gtag('config', 'G-8MEXZ3978F');
-    </script>
+    </script> -->
     <!-- Google Analytics Snippet ENDS -->
 
     <!-- Google Tag Manager -->
     <script>
       (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
+        const debug = true;
+        // Added check to filter dev data
+        // Set the above debug to true to override check
+        if (debug || !(window.location.origin.includes('localhost') || window.location.origin.includes('stage'))) {        
+          w[l] = w[l] || [];
+          w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+          var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s),
+            dl = l != 'dataLayer' ? '&l=' + l : '';
+          j.async = true;
+          j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+          f.parentNode.insertBefore(j, f);
+        }
       })(window, document, 'script', 'dataLayer', 'GTM-NN4B2HG');
     </script>
     <!-- End Google Tag Manager -->
