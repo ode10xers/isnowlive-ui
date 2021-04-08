@@ -8,7 +8,7 @@ import Loader from 'components/Loader';
 import Table from 'components/Table';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-// import apis from 'apis';
+import apis from 'apis';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -28,19 +28,15 @@ const Audiences = () => {
   const [audienceList, setAudienceList] = useState([]);
   const [emailListText, setEmailListText] = useState('');
   const [editableEmailList, setEditableEmailList] = useState([]);
+  const [feedbackText, setFeedbackText] = useState(null);
 
   const getAudienceList = useCallback(async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement API Here
-      // const { status, data } = await apis.audiences.getCreatorAudiences();
-      const { status, data } = {
-        status: 200,
-        data: [],
-      };
+      const { status, data } = await apis.audiences.getCreatorAudiences();
 
       if (isAPISuccess(status) && data) {
-        setAudienceList(data);
+        setAudienceList(data.audiences);
       }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
@@ -50,7 +46,7 @@ const Audiences = () => {
 
   useEffect(() => {
     if (selectedTab === 'list') {
-      // getAudienceList();
+      getAudienceList();
     } else if (selectedTab === 'import') {
       setIsSubmitting(false);
       setIsLoading(false);
@@ -82,28 +78,41 @@ const Audiences = () => {
     setEditableEmailList([]);
   };
 
+  const generateFeedbackText = (count) => {
+    const successText = `${count.success} successful`;
+    const failedText = `${count.failed} failed`;
+    const skippedText = `${count.skip} skipped`;
+
+    setFeedbackText(`${successText}, ${failedText}, ${skippedText}`);
+  };
+
   const removeFromEditableEmailList = (email) =>
     setEditableEmailList(editableEmailList.filter((emailData) => emailData.email !== email));
 
+  // TODO: add the failed ones back to the editable email list
+  // Also show feedback on how many emails successfully imported and stuff
   const saveAudiences = async (values) => {
     setIsSubmitting(true);
-    const payload = Object.entries(values).map(([email, data]) => ({
-      email: email,
-      first_name: data.first_name,
-      last_name: data.last_name || '',
-    }));
+    const payload = {
+      data: Object.entries(values).map(([email, data]) => ({
+        email: email,
+        first_name: data.first_name,
+        last_name: data.last_name || '',
+      })),
+    };
 
     try {
-      // const { status, data } = await apis.audiences.addAudienceList(payload);
-      const { status, data } = {
-        status: 200,
-        data: payload,
-      };
+      const { status, data } = await apis.audiences.addAudienceList(payload);
 
       if (isAPISuccess(status) && data) {
-        showSuccessModal('Successfully imported audiences');
-        // temporary for showing UI
-        setAudienceList(data);
+        if (data.count.success > 0) {
+          showSuccessModal('Successfully imported audiences');
+        }
+
+        // TODO: Confirm where to show other modal if it's skipped or smth
+
+        setEditableEmailList(data.data.failed);
+        generateFeedbackText(data.count);
       }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
@@ -111,11 +120,16 @@ const Audiences = () => {
     setIsSubmitting(false);
   };
 
-  const deleteAudience = (audience) => {
+  const deleteAudience = async (audience) => {
     try {
-      // TODO: Confirm the API format
-      // const { status, data } = await apis.audiences.deleteAudienceFromList();
-      console.log(audience);
+      const { status } = await apis.audiences.deleteAudienceFromList({
+        id: [audience.id],
+      });
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Successfully removed audience');
+        getAudienceList();
+      }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
     }
@@ -235,6 +249,11 @@ const Audiences = () => {
           <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import List </Title>}>
             <Loader loading={isSubmitting}>
               <Row gutter={[16, 16]}>
+                {feedbackText && (
+                  <Col xs={24}>
+                    <Text strong> {feedbackText} </Text>
+                  </Col>
+                )}
                 <Col xs={24}>
                   <Title level={5}> Input CSV Email List : Upload button here </Title>
                 </Col>
@@ -247,6 +266,10 @@ const Audiences = () => {
                   <Paragraph>
                     Each of them needs to be separated by a comma, so you can input it like{' '}
                     <Text strong>"abc@xyz.com, xyz@def.co"</Text>
+                  </Paragraph>
+                  <Paragraph>
+                    An email may be skipped because it is already saved as an audience. An email might be failed to save
+                    because it is missing some data <Text strong> (first name is required) </Text>
                   </Paragraph>
                 </Col>
                 <Col xs={24}>
