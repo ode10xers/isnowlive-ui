@@ -70,6 +70,8 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         closeModal();
         onLoggedInCallback();
       }
+
+      setShowSignIn(showingSignIn);
     } else {
       document.body.style.overflow = 'auto';
     }
