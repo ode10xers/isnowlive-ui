@@ -16,6 +16,7 @@ import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
+import { pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Item } = Form;
 const { user } = mixPanelEventTags;
@@ -40,6 +41,9 @@ const SignUp = ({ history }) => {
         setIsLoading(false);
         mapUserToMixPanel(data);
         trackSuccessEvent(eventTag, { email: values.email });
+        pushToDataLayer('Creator Sign Up', {
+          email: data.email,
+        });
         history.push(Routes.profile);
       }
     } catch (error) {
