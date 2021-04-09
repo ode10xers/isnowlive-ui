@@ -26,6 +26,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Title, Text, Paragraph } = Typography;
 const { creator } = mixPanelEventTags;
@@ -65,6 +66,21 @@ const Profile = () => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
     try {
+      const localUserDetails = getLocalUserDetails();
+
+      if (!localUserDetails.is_creator) {
+        // TODO: Confirm response and behavior of conversion API
+        // We can probably use additional info from response
+        // or tracking conversion events
+        // We can also move hitting conversion API here
+
+        pushToDataLayer('Convert To Creator', {
+          email: localUserDetails.email,
+          first_name: localUserDetails.first_name,
+          last_name: localUserDetails.last_name,
+        });
+      }
+
       await apis.user.convertUserToCreator();
 
       const { status } = await apis.user.updateProfile(values);
@@ -72,7 +88,6 @@ const Profile = () => {
         setIsLoading(false);
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
-        const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         if (isOnboarding) {
