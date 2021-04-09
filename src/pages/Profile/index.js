@@ -69,9 +69,6 @@ const Profile = () => {
       const localUserDetails = getLocalUserDetails();
 
       if (!localUserDetails.is_creator) {
-        // TODO: Confirm response and behavior of conversion API
-        // We can probably use additional info from response
-        // or tracking conversion events
         // We can also move hitting conversion API here
 
         pushToDataLayer('Convert To Creator', {
