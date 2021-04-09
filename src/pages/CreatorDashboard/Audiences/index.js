@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import parse from 'emailjs-addressparser';
 
-import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm, Upload, message } from 'antd';
-import { CloseOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
+import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm, Upload, Tooltip, message } from 'antd';
+import { CloseOutlined, DeleteOutlined, MailOutlined, UploadOutlined } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
 import Table from 'components/Table';
@@ -67,13 +67,15 @@ const AudienceCSVFileUpload = ({ handleUploadSuccess }) => {
   );
 };
 
+// TODO: Implement Pagination when BE has implemented it
 const Audiences = () => {
   const [form] = Form.useForm();
 
   const [selectedTab, setSelectedTab] = useState('list');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [audienceList, setAudienceList] = useState([]);
+  const [selectedAudienceKeys, setSelectedAudienceKeys] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailListText, setEmailListText] = useState('');
   const [editableEmailList, setEditableEmailList] = useState([]);
   const [feedbackText, setFeedbackText] = useState(null);
@@ -108,14 +110,14 @@ const Audiences = () => {
     const alreadyExistsEmails = editableEmailList.map((emailData) => emailData.email);
 
     const parsedEmailList = parse(value)
-      .filter((parsedEmailData) => !alreadyExistsEmails.includes(parsedEmailData.address))
+      .filter((parsedEmailData) => parsedEmailData && !alreadyExistsEmails.includes(parsedEmailData.address))
       .map((emailData) => ({
         email: emailData.address,
         first_name: '',
         last_name: '',
       }));
 
-    setEditableEmailList([...editableEmailList, ...new Set(parsedEmailList)]);
+    setEditableEmailList([...editableEmailList, ...new Set(parsedEmailList)].map((val, idx) => ({ ...val, idx })));
 
     setEmailListText('');
 
@@ -136,13 +138,15 @@ const Audiences = () => {
   };
 
   const removeFromEditableEmailList = (email) =>
-    setEditableEmailList(editableEmailList.filter((emailData) => emailData.email !== email));
+    setEditableEmailList(
+      editableEmailList.filter((emailData) => emailData.email !== email).map((val, idx) => ({ ...val, idx }))
+    );
 
   const saveAudiences = async (values) => {
     setIsSubmitting(true);
     const payload = {
-      data: Object.entries(values).map(([email, data]) => ({
-        email: email,
+      data: Object.entries(values).map(([idx, data]) => ({
+        email: data.email,
         first_name: data.first_name,
         last_name: data.last_name || '',
       })),
@@ -168,21 +172,6 @@ const Audiences = () => {
     setIsSubmitting(false);
   };
 
-  const deleteAudience = async (audience) => {
-    try {
-      const { status } = await apis.audiences.deleteAudienceFromList({
-        id: [audience.id],
-      });
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Successfully removed audience');
-        getAudienceList();
-      }
-    } catch (error) {
-      showErrorModal(error?.response?.data?.message || 'Something went wrong.');
-    }
-  };
-
   const onCSVUploadSuccess = (audienceResponse) => {
     generateFeedbackText(audienceResponse.count);
 
@@ -191,7 +180,7 @@ const Audiences = () => {
       // We show the failed ones to the editable email list
       // That way the creator can make the changes and fix them
       // and save them once it's fixed
-      setEditableEmailList(audienceResponse.data.failed);
+      setEditableEmailList(audienceResponse.data.failed.map((val, idx) => ({ ...val, idx })));
 
       const modalContent = (
         <Paragraph>
@@ -220,6 +209,31 @@ const Audiences = () => {
     }
   };
 
+  const deleteAudience = async (audience) => {
+    try {
+      const { status } = await apis.audiences.deleteAudienceFromList({
+        id: [audience.id],
+      });
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Successfully removed audience');
+        getAudienceList();
+      }
+    } catch (error) {
+      showErrorModal(error?.response?.data?.message || 'Something went wrong.');
+    }
+  };
+
+  const onSelectAudienceRow = (selectedRowKeys, selectedRow) => {
+    console.log(selectedRow);
+    console.log(selectedRowKeys);
+    setSelectedAudienceKeys(selectedRowKeys);
+  };
+
+  const sendEmailsToAudiences = (audienceKeys) => {
+    console.log(audienceKeys);
+  };
+
   const audienceListColumns = [
     {
       title: 'Email Address',
@@ -244,18 +258,23 @@ const Audiences = () => {
       title: 'Actions',
       width: '15%',
       render: (record) => (
-        <Row gutter={[8, 8]} justify="end">
+        <Row gutter={[8, 8]}>
           <Col xs={4}>
             <Popconfirm
-              placement="topRight"
+              arrowPointAtCenter
               icon={<DeleteOutlined />}
               title={<Text> Are you sure you want to delete this audience? </Text>}
               onConfirm={() => deleteAudience(record)}
               okText="Yes"
               cancelText="No"
             >
-              <Button type="text" danger icon={<DeleteOutlined />} />
+              <Button block type="text" danger icon={<DeleteOutlined />} />
             </Popconfirm>
+          </Col>
+          <Col xs={4}>
+            <Tooltip title="Send email to this audience" arrowPointAtCenter>
+              <Button block type="link" icon={<MailOutlined />} onClick={() => sendEmailsToAudiences([record.id])} />
+            </Tooltip>
           </Col>
         </Row>
       ),
@@ -275,6 +294,16 @@ const Audiences = () => {
       dataIndex: 'email',
       key: 'email',
       width: isMobileDevice ? '180px' : '35%',
+      render: (text, record) => (
+        <Form.Item
+          noStyle
+          name={[record.idx, 'email']}
+          initialValue={record.email}
+          rules={validationRules.requiredValidation}
+        >
+          <Input />
+        </Form.Item>
+      ),
     },
     {
       title: (
@@ -286,7 +315,7 @@ const Audiences = () => {
       key: 'first_name',
       width: isMobileDevice ? '120px' : '30%',
       render: (text, record) => (
-        <Form.Item name={[record.email, 'first_name']} rules={validationRules.requiredValidation}>
+        <Form.Item noStyle name={[record.idx, 'first_name']} rules={validationRules.requiredValidation}>
           <Input />
         </Form.Item>
       ),
@@ -296,7 +325,7 @@ const Audiences = () => {
       key: 'last_name',
       width: isMobileDevice ? '120px' : '30%',
       render: (text, record) => (
-        <Form.Item name={[record.email, 'last_name']}>
+        <Form.Item noStyle name={[record.idx, 'last_name']}>
           <Input />
         </Form.Item>
       ),
@@ -305,6 +334,7 @@ const Audiences = () => {
 
   //TODO: Make Mobile UI for this
 
+  // TODO: Prepare pagination for this
   return (
     <Row gutter={[16, 16]}>
       <Col xs={24}>
@@ -315,16 +345,24 @@ const Audiences = () => {
           <TabPane key="list" tab={<Title level={5}> Audience List </Title>}>
             <Row gutter={[16, 16]}>
               <Col xs={24}>
-                <Button type="primary" disabled={audienceList.length <= 0}>
+                <Button
+                  type="primary"
+                  disabled={selectedAudienceKeys.length <= 0}
+                  onClick={() => sendEmailsToAudiences(selectedAudienceKeys)}
+                >
                   Send Email
                 </Button>
               </Col>
               <Col xs={24}>
                 <Table
+                  size="small"
                   loading={isLoading}
                   data={audienceList}
                   columns={audienceListColumns}
                   rowKey={(record) => record.email}
+                  rowSelection={{
+                    onChange: onSelectAudienceRow,
+                  }}
                 />
               </Col>
             </Row>
@@ -340,12 +378,10 @@ const Audiences = () => {
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
                     <Col xs={12} md={6} lg={4}>
-                      {' '}
-                      <Title level={5}> Input CSV Email List : </Title>{' '}
+                      <Title level={5}> Input CSV Email List : </Title>
                     </Col>
                     <Col xs={12} md={6} lg={4}>
-                      {' '}
-                      <AudienceCSVFileUpload handleUploadSuccess={onCSVUploadSuccess} />{' '}
+                      <AudienceCSVFileUpload handleUploadSuccess={onCSVUploadSuccess} />
                     </Col>
                   </Row>
                 </Col>
@@ -381,6 +417,7 @@ const Audiences = () => {
                       <Row gutter={[16, 16]} justify="center">
                         <Col xs={24}>
                           <Table
+                            size="small"
                             columns={editableEmailListColumns}
                             data={editableEmailList}
                             loading={isSubmitting}
