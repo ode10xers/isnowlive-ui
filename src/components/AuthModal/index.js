@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+
 import { Row, Col, Form, Input, Typography, Modal, Button, message } from 'antd';
 
 import apis from 'apis';
 
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, scrollToErrorField } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
 
 import Loader from 'components/Loader';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import { showErrorModal, sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import http from 'services/http';
@@ -18,41 +19,74 @@ import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLa
 
 import styles from './style.module.scss';
 
-const { Paragraph, Title, Text } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
-const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn }) => {
+// On special cases, closeModal will take a boolean input
+// These cases are for when there are multiple object that
+// can trigger the Modal and we need to 'reset' the value
+// of the object in the parent component (see SessionDetails)
+
+//TODO: Might want to refactor this to be generic modal (like PaymentPopup)
+const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallback }) => {
   const { logIn } = useGlobalContext();
-  const history = useHistory();
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
 
-  const [showPasswordField, setShowPasswordField] = useState(false);
+  const [currentUser, setCurrentUser] = useState(getLocalUserDetails());
+  const [showPasswordHelperText, setShowPasswordHelperText] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(showingSignIn);
   const [isLoading, setIsLoading] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [legalsAgreed, setLegalsAgreed] = useState(true);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
-  useEffect(() => {
-    if (showPasswordField && passwordInput.current) {
-      passwordInput.current.focus();
+  const toggleSignInState = () => {
+    setShowLegalsErrorMessage(false);
+    if (showSignIn) {
+      setShowPasswordHelperText(false);
+      setLegalsAgreed(false);
+    } else {
+      setLegalsAgreed(true);
+      form.setFieldsValue({
+        ...form.getFieldsValue(),
+        first_name: '',
+        last_name: '',
+        password: '',
+      });
     }
-  }, [showPasswordField]);
 
-  useEffect(() => {
     setIncorrectPassword(false);
-  }, [toggleSigningIn]);
-
-  const signinUser = (data) => {
-    http.setAuthToken(data.auth_token);
-    logIn(data, true);
-    message.success('You have logged in');
-
-    const user_type = data.is_creator ? 'creator' : 'attendee';
-    history.push(`/${user_type}/dashboard/sessions/upcoming`);
-    window.scrollTo(0, 0);
-    closeModal();
+    setShowSignIn(!showSignIn);
   };
 
+  useEffect(() => {
+    if (visible) {
+      document.body.style.overflow = 'hidden';
+      const user = getLocalUserDetails();
+      if (user) {
+        if (!currentUser) {
+          setCurrentUser(user);
+        }
+        setLegalsAgreed(true);
+        form.setFieldsValue(user);
+        closeModal();
+        onLoggedInCallback();
+      }
+
+      setShowSignIn(showingSignIn);
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    //eslint-disable-next-line
+  }, [form, currentUser, visible]);
+
+  useEffect(() => {
+    if (showPasswordHelperText && passwordInput.current) {
+      passwordInput.current.focus();
+    }
+  }, [showPasswordHelperText]);
+
   const signupUser = async (values) => {
-    setIsLoading(true);
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -61,22 +95,33 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
         is_creator: false,
       });
       if (data) {
-        signinUser(data);
+        http.setAuthToken(data.auth_token);
+        logIn(data, true);
+        closeModal();
+        onLoggedInCallback();
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {
-        setShowPasswordField(true);
-        message.info('Enter password to register session');
+        setShowPasswordHelperText(true);
+        setCurrentUser(values);
+        setShowSignIn(true);
+        message.info('You already have an account! Enter password to register session');
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
-    setIsLoading(false);
   };
 
   const onFinish = async (values) => {
-    setIsLoading(true);
+    setShowLegalsErrorMessage(false);
+    setIncorrectPassword(false);
 
+    if (!legalsAgreed) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       // check if user is login
 
@@ -90,29 +135,39 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
             email: values.email,
             password: values.password,
           });
-
           if (data) {
-            signinUser(data);
+            http.setAuthToken(data.auth_token);
+            logIn(data, true);
+            closeModal();
+            onLoggedInCallback();
           }
         } catch (error) {
           if (error.response?.status === 403) {
-            setIncorrectPassword(true);
-            message.error('Incorrect email or password');
+            //TODO: Match the status code or message if BE changes it
+            if (
+              error.response?.data?.message ===
+              'unable to find user for email. Error: unable to find user with email: record not found'
+            ) {
+              toggleSignInState();
+              message.error('No account with that email exists! Sign up to create new account');
+            } else {
+              setIncorrectPassword(true);
+              message.error('Incorrect email or password');
+            }
           } else {
             message.error(error.response?.data?.message || 'Something went wrong');
           }
         }
       } else if (!getLocalUserDetails()) {
         signupUser(values);
+      } else {
+        closeModal();
+        onLoggedInCallback();
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  };
-
-  const onFinishFailed = ({ errorFields }) => {
-    scrollToErrorField(errorFields);
   };
 
   const handleSetNewPassword = async () => {
@@ -140,41 +195,41 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
 
   return (
     <div>
-      <Modal visible={visible} centered={true} onCancel={() => closeModal()} footer={null}>
-        <Loader loading={isLoading}>
+      <Modal visible={visible} centered={true} onCancel={() => closeModal(true)} footer={null}>
+        <Loader loading={isLoading} size="large">
           <Form
             form={form}
             labelAlign="left"
             {...purchaseModalFormLayout}
             onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+            scrollToFirstError={true}
           >
-            <Row gutter={[8, 8]}>
+            <Row gutter={8}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
-                  <Title level={4}>{`Sign ${signingIn ? 'In' : 'Up'} To Continue`}</Title>
-                  {`Sign ${signingIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
+                  <Title level={4}>{`Sign ${showSignIn ? 'In' : 'Up'} To Continue`}</Title>
+                  {`Sign ${showSignIn ? 'In' : 'Up'} to manage all your purchases in your dashboard`}
                 </Paragraph>
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
-                {!signingIn && (
+                {!showSignIn && (
                   <Form.Item label="Name" className={styles.nameInputWrapper}>
                     <Form.Item
                       className={styles.firstNameInput}
                       name="first_name"
                       rules={validationRules.nameValidation}
                     >
-                      <Input placeholder="First Name" disabled={showPasswordField} />
+                      <Input placeholder="First Name" disabled={showPasswordHelperText} />
                     </Form.Item>
                     <Form.Item className={styles.lastNameInput} name="last_name" rules={validationRules.nameValidation}>
-                      <Input placeholder="Last Name" disabled={showPasswordField} />
+                      <Input placeholder="Last Name" disabled={showPasswordHelperText} />
                     </Form.Item>
                   </Form.Item>
                 )}
                 <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
-                  <Input placeholder="Enter your email" disabled={!signingIn && showPasswordField} />
+                  <Input placeholder="Enter your email" />
                 </Form.Item>
-                {(signingIn || showPasswordField) && (
+                {showSignIn && (
                   <>
                     <Form.Item label="Password" name="password" rules={validationRules.passwordValidation}>
                       <Input.Password placeholder="Enter your password" />
@@ -186,7 +241,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                         </div>
                       </Form.Item>
                     )}
-                    {!signingIn && (
+                    {showPasswordHelperText && (
                       <Form.Item {...purchaseModalTailLayout}>
                         <div className={styles.passwordHelpText}>
                           <Text>
@@ -200,7 +255,7 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                     )}
                   </>
                 )}
-                {signingIn && (
+                {showSignIn && (
                   <Form.Item {...purchaseModalCenterLayout}>
                     <Button className={styles.linkBtn} type="link" onClick={() => handleSetNewPassword()}>
                       Set a new password
@@ -208,16 +263,28 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
                   </Form.Item>
                 )}
               </Col>
+              {showLegalsErrorMessage && (
+                <Col xs={24} className={styles.textAlignCenter}>
+                  <Text type="danger" className={styles.smallText}>
+                    To proceed, you need to check the checkbox below
+                  </Text>
+                </Col>
+              )}
               <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAgreed}
+                  setChecked={(checked) => setLegalsAgreed(checked)}
+                />
                 <Form.Item {...purchaseModalCenterLayout}>
                   <Button block type="primary" htmlType="submit">
-                    Sign {signingIn ? 'In' : 'Up'}
+                    Sign {showSignIn ? 'In' : 'Up'}
                   </Button>
                 </Form.Item>
                 <Paragraph className={styles.textAlignCenter}>
-                  {signingIn ? "Don't" : 'Already'} have an account?{' '}
-                  <Button className={styles.linkBtn} type="link" onClick={() => toggleSigningIn()}>
-                    Sign {signingIn ? 'Up' : 'In'}
+                  {showSignIn ? "Don't" : 'Already'} have an account?{' '}
+                  <Button className={styles.linkBtn} type="link" onClick={() => toggleSignInState()}>
+                    Sign {showSignIn ? 'Up' : 'In'}
                   </Button>
                 </Paragraph>
               </Col>
@@ -229,4 +296,4 @@ const HeaderModal = ({ visible, closeModal, signingIn = true, toggleSigningIn })
   );
 };
 
-export default HeaderModal;
+export default AuthModal;

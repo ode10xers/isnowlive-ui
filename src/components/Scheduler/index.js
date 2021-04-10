@@ -1,8 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, Modal, Button, List, Row, Col, Checkbox, Badge, Select, Tooltip, Typography } from 'antd';
+import {
+  Calendar,
+  Modal,
+  Button,
+  List,
+  Row,
+  Col,
+  Checkbox,
+  Badge,
+  Select,
+  Tooltip,
+  Typography,
+  TimePicker,
+  message,
+} from 'antd';
 import moment from 'moment';
 import classNames from 'classnames';
-import { DeleteFilled } from '@ant-design/icons';
+import { DeleteFilled, SaveOutlined } from '@ant-design/icons';
 
 import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 import dateUtil from 'utils/date';
@@ -28,6 +42,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
   const [formDeletedIndex, setFormDeletedIndex] = useState([]);
   const isPannelChanged = useRef(false);
   const [disableDuplicateEndTime, setDisableDuplicateEndTime] = useState([]);
+  const [customTimePickerVisible, setCustomTimePickerVisible] = useState(false);
+  const [customTime, setCustomTime] = useState({
+    session_date: null,
+    start_time: null,
+    end_time: null,
+    num_participants: 0,
+  });
 
   useEffect(() => {
     if (slots) {
@@ -109,6 +130,13 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     setFormDeletedIndex([]);
     setOpenModal(false);
     setDayList(null);
+    setCustomTimePickerVisible(false);
+    setCustomTime({
+      session_date: null,
+      start_time: null,
+      end_time: null,
+      num_participants: 0,
+    });
   };
 
   const getSlotsList = (value) => {
@@ -386,6 +414,72 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
     setForm(tempForm);
   };
 
+  const toggleShowCustomTimePicker = () => {
+    setCustomTime({
+      session_date: null,
+      start_time: null,
+      end_time: null,
+      num_participants: 0,
+    });
+    setCustomTimePickerVisible(!customTimePickerVisible);
+  };
+
+  const handleCustomTimeChange = (field, value, timeString) => {
+    let tempCustomTime = { ...customTime };
+
+    if (field === 'start_time') {
+      tempCustomTime.start_time = value;
+      tempCustomTime.end_time = null;
+    } else {
+      tempCustomTime.end_time = value;
+    }
+
+    setCustomTime(tempCustomTime);
+  };
+
+  const applyCustomTime = () => {
+    // Make sure start and and time is not null
+    if (!customTime.start_time || !customTime.end_time) {
+      message.error('Please input start and end time');
+      return;
+    }
+
+    // Make sure start time is before end time
+    if (moment(customTime.start_time).isSameOrAfter(moment(customTime.end_time), 'minute')) {
+      message.error('Start time must be before end time');
+      return;
+    }
+
+    // Make sure the custom time does not duplicate existing time
+    const foundDuplicate = form.find(
+      (slot) =>
+        moment(slot.start_time).isSame(moment(customTime.start_time), 'minute') &&
+        moment(slot.end_time).isSame(moment(customTime.end_time), 'minute')
+    );
+
+    if (foundDuplicate) {
+      message.error('Duplicate time slot exists');
+      return;
+    }
+
+    customTime.session_date = moment(date).format();
+    customTime.start_time = moment(customTime.start_time).format();
+    customTime.end_time = moment(customTime.end_time).format();
+    customTime.num_participants = 0;
+
+    // push the custom time value
+    // Need to deepclone as react does not rerender on change state
+    let tempForm = JSON.parse(JSON.stringify(form));
+    tempForm.splice(-1, 0, customTime);
+    setForm(tempForm);
+    setCustomTime({
+      session_date: null,
+      start_time: null,
+      end_time: null,
+      num_participants: 0,
+    });
+  };
+
   return (
     <>
       <Calendar
@@ -508,6 +602,54 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
                 </Row>
               ))}
             </Col>
+            <Col xs={24} md={{ span: 18, offset: 3 }}>
+              <Button type="link" onClick={() => toggleShowCustomTimePicker()}>
+                {customTimePickerVisible ? 'Hide custom time settings' : 'Set custom time'}
+              </Button>
+            </Col>
+            {customTimePickerVisible && (
+              <Col xs={24} md={{ span: 18, offset: 3 }}>
+                <Row className={styles.m10}>
+                  <Col xs={11} md={11}>
+                    <TimePicker
+                      format="h:mm a"
+                      defaultOpenValue={moment('00:00:00', 'h:mm a')}
+                      value={customTime.start_time ? moment(customTime.start_time, 'h:mm a') : null}
+                      onChange={(value, timeString) => handleCustomTimeChange('start_time', value, timeString)}
+                      style={{ width: 120 }}
+                      use12Hours={true}
+                      placeholder="Select start time"
+                    />
+                  </Col>
+                  <Col xs={11} md={11}>
+                    <TimePicker
+                      format="h:mm a"
+                      defaultOpenValue={moment('00:00:00', 'h:mm a')}
+                      value={customTime.end_time ? moment(customTime.end_time, 'h:mm a') : null}
+                      onChange={(value, timeString) => handleCustomTimeChange('end_time', value, timeString)}
+                      style={{ width: 120 }}
+                      use12Hours={true}
+                      placeholder="Select end time"
+                    />
+                  </Col>
+                  <Col xs={2} md={2}>
+                    <Tooltip
+                      title="Click to save this custom time"
+                      visible={customTime.start_time && customTime.end_time}
+                    >
+                      <Button
+                        shape="circle"
+                        type="primary"
+                        ghost
+                        disabled={!(customTime.start_time && customTime.end_time)}
+                        onClick={() => applyCustomTime()}
+                        icon={<SaveOutlined />}
+                      />
+                    </Tooltip>
+                  </Col>
+                </Row>
+              </Col>
+            )}
           </Row>
 
           {recurring ? (

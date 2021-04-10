@@ -22,7 +22,7 @@ const {
 const noop = () => {};
 
 // This card will be used for 3 purposes
-// 1) Becomes a buyable card so the user can directly buy by clicking this card (buyable = true, also pass showPurchaseModal)
+// 1) Becomes a buyable card so the user can directly buy by clicking this card (buyable = true, also pass showAuthModal)
 // 2) Becomes a simple display card where the user cannot buy (buyable = false, can show details button or desc if needed)
 // 3) Used in attendee dashboard as video player and also show order details (showOrderDetails = true and send orderDetails)
 const VideoCard = ({
@@ -33,7 +33,7 @@ const VideoCard = ({
   showOrderDetails = false,
   orderDetails = null,
   onCardClick = noop,
-  showPurchaseModal = noop,
+  showAuthModal = noop,
   showDesc = false,
   showDetailsBtn = true,
 }) => {
@@ -163,7 +163,7 @@ const VideoCard = ({
                         type="primary"
                         onClick={(e) => {
                           e.stopPropagation();
-                          showPurchaseModal(video);
+                          showAuthModal(video);
                         }}
                       >
                         {video?.price === 0 ? 'Get' : 'Buy'}

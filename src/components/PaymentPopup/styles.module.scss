@@ -1,12 +1,17 @@
 @import '../../styles/variables.scss';
 
-.hidden {
-  display: none !important;
+.linkBtn {
+  padding: 0px !important;
 }
 
-.greenBtn {
-  background-color: map-get($map: $colors, $key: 'KellyGreen') !important;
-  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+.tncText {
+  text-align: center;
+  margin-top: -12px;
+}
+
+.descriptionText {
+  @extend .greenText;
+  opacity: 0.8;
 }
 
 .topBorder {

@@ -103,3 +103,11 @@ export const couponModalFormLayout = {
   labelCol: { span: 10 },
   wrapperCol: { span: 14 },
 };
+export const sendCustomerEmailFormLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
+export const sendCustomerEmailBodyFormLayout = {
+  labelCol: { span: 24 },
+  wrapperCol: { span: 24 },
+};

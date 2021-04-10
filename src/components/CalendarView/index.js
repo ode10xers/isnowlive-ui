@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -7,6 +7,7 @@ import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+
 import styles from './styles.module.scss';
 const localizer = momentLocalizer(moment);
 
@@ -22,8 +23,21 @@ const CalendarView = ({
   classes = [],
   customComponents = {},
   step = 60,
+  updateCalendarDate = false,
 }) => {
-  let views = isMobileDevice ? ['month', 'day', 'agenda'] : ['month', 'week', 'day', 'agenda'];
+  const [viewDate, setViewDate] = useState(new Date());
+
+  const onCalendarNavigate = (...props) => {
+    setViewDate(props[0]);
+  };
+
+  useEffect(() => {
+    if (updateCalendarDate) {
+      setViewDate(updateCalendarDate.date);
+    }
+  }, [updateCalendarDate]);
+
+  const views = ['month', isMobileDevice ? 'day' : 'week', 'agenda'];
   return (
     <div className={classNames(styles.calendarWrapper, styles.mt20, ...classes)}>
       <Calendar
@@ -44,7 +58,10 @@ const CalendarView = ({
         tooltipAccessor={(e) =>
           `${e.name} - ${toShortTimeWithPeriod(e.start_time)} - ${toShortTimeWithPeriod(e.end_time)}`
         }
+        drilldownView={isMobileDevice ? 'day' : 'week'}
         components={customComponents}
+        date={viewDate}
+        onNavigate={onCalendarNavigate}
       />
     </div>
   );

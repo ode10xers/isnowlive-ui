@@ -1,5 +1,23 @@
 @import '../../styles/variables.scss';
 
+.creatorName, .fullProfile {
+  cursor: pointer;
+
+  &:hover {
+    color: map-get($map: $colors, $key: 'DodgerBlue');
+  }
+}
+
+.creatorName {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.fullProfile {
+  font-size: 16px;
+  font-weight: 400;
+}
+
 .box {
   background: map-get($colors, 'White1');
   border-radius: 6px;
@@ -9,20 +27,26 @@
   position: absolute;
   border: 2px solid map-get($colors, 'White');
   border-radius: 4px;
+  cursor: pointer;
+
 }
 .profileImage {
   img {
     border-radius: 4px;
+    cursor: pointer;
   }
 }
 .profileImageSmall {
   position: absolute;
   border: 2px solid map-get($colors, 'White');
   border-radius: 4px;
+  cursor: pointer;
+
 }
 .profileImageSmall {
   img {
     border-radius: 4px;
+    cursor: pointer;
   }
 }
 .socialIcon {
@@ -35,7 +59,9 @@
   span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    background-color: map-get($map: $colors, $key: 'White1') !important;
   }
+  background-color: map-get($colors, 'White1') !important;
 
   max-height: 240px;
   overflow: hidden;
@@ -51,5 +77,8 @@
   span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background-color: map-get($colors, 'White1') !important;
+  
+
   }
 }

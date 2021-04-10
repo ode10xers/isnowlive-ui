@@ -1,34 +1,33 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Typography, Space, Divider, Card, Button, message } from 'antd';
 import classNames from 'classnames';
-import { loadStripe } from '@stripe/stripe-js';
 
-import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import CreatorProfile from 'components/CreatorProfile';
-
-import { showErrorModal, showAlreadyBookedModal, showBookingSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, reservedDomainName, orderType, productType } from 'utils/helper';
 
-import styles from './style.module.scss';
+import { useGlobalContext } from 'services/globalContext';
 
-const stripePromise = loadStripe(config.stripe.secretKey);
+import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
 const PassDetails = ({ match, history }) => {
+  const { showPaymentPopup } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [pass, setPass] = useState(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [username, setUsername] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
@@ -47,12 +46,12 @@ const PassDetails = ({ match, history }) => {
     }
   }, []);
 
-  const openPurchaseModal = () => {
-    setShowPurchaseModal(true);
+  const openAuthModal = () => {
+    setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
-    setShowPurchaseModal(false);
+  const closeAuthModal = () => {
+    setShowAuthModal(false);
   };
 
   const getPassDetails = useCallback(
@@ -104,36 +103,34 @@ const PassDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.pass_id]);
 
-  const initiatePaymentForOrder = async (orderDetails) => {
-    setIsLoading(true);
-    try {
-      const { data, status } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.pass_order_id,
-        order_type: orderType.PASS,
-      });
-
-      if (isAPISuccess(status) && data) {
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
-
-  const createOrder = async (userEmail) => {
+  const showConfirmPaymentPopup = () => {
     if (!pass) {
       showErrorModal('Something went wrong', 'Invalid Pass Selected');
       return;
+    }
+
+    const desc = `${pass.class_count} Credits, Valid for ${pass.validity} days`;
+
+    const paymentPopupData = {
+      productId: pass.external_id,
+      productType: 'PASS',
+      itemList: [
+        {
+          name: pass.name,
+          description: desc,
+          currency: pass.currency,
+          price: pass.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
+  };
+
+  const createOrder = async (userEmail, couponCode = '') => {
+    if (!pass) {
+      showErrorModal('Something went wrong', 'Invalid Pass Selected');
+      return null;
     }
 
     setIsLoading(true);
@@ -145,17 +142,24 @@ const PassDetails = ({ match, history }) => {
       });
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          return {
+            ...data,
+            payment_order_type: orderType.PASS,
+            payment_order_id: data.pass_order_id,
+          };
         } else {
-          setIsLoading(false);
-          showBookingSuccessModal(userEmail, pass, false, false, username);
+          showPurchasePassSuccessModal(data.pass_order_id);
+
+          return null;
         }
       }
     } catch (error) {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS, username);
+        showAlreadyBookedModal(productType.PASS);
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
@@ -165,7 +169,7 @@ const PassDetails = ({ match, history }) => {
   return (
     <div className={styles.mt50}>
       <Loader loading={isLoading} size="large" text="Loading pass details">
-        <PurchaseModal visible={showPurchaseModal} closeModal={closePurchaseModal} createOrder={createOrder} />
+        <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
         <Row gutter={[8, 24]}>
           <Col xs={24}>{profile && <CreatorProfile profile={profile} profileImage={profileImage} />}</Col>
           <Col xs={24}>
@@ -192,14 +196,14 @@ const PassDetails = ({ match, history }) => {
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {`${pass?.price} ${pass?.currency.toUpperCase()}`}
+                                {pass?.price > 0 ? `${pass?.price} ${pass?.currency.toUpperCase()}` : 'Free'}
                               </Text>
                             </Space>
                           </Col>
                         </Row>
                       </Col>
                       <Col xs={24} md={6}>
-                        <Button block type="primary" onClick={() => openPurchaseModal()}>
+                        <Button block type="primary" onClick={() => openAuthModal()}>
                           Buy Pass
                         </Button>
                       </Col>

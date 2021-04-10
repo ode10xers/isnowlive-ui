@@ -1,27 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
-import { loadStripe } from '@stripe/stripe-js';
 
 import { Row, Col, Image, Typography, Button, Tag, Card, message } from 'antd';
 
-import config from 'config';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import PurchaseModal from 'components/PurchaseModal';
-import { showCourseBookingSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import AuthModal from 'components/AuthModal';
+import { showCoursePurchaseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isValidFile, isAPISuccess, orderType, courseType, productType } from 'utils/helper';
+import { isValidFile, isAPISuccess, orderType, courseType, productType, paymentSource } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-
-const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text } = Typography;
 const {
@@ -31,25 +27,24 @@ const {
 
 const noop = () => {};
 
-//TODO: Compare to LiveCourseCard, if similar then refactor
-const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = null }) => {
+const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
   const history = useHistory();
 
   const { showPaymentPopup } = useGlobalContext();
 
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
 
-  const openPurchaseModal = (course) => {
+  const openAuthModal = (course) => {
     setSelectedCourse(course);
-    setShowPurchaseModal(true);
+    setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setSelectedCourse(null);
-    setShowPurchaseModal(false);
+    setShowAuthModal(false);
   };
 
   useEffect(() => {
@@ -58,35 +53,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
       setSelectedCourse(null);
     }
   }, [history]);
-
-  const initiatePaymentForOrder = async (orderDetails) => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.payment.createPaymentSessionForOrder({
-        order_id: orderDetails.course_order_id,
-        order_type: orderType.COURSE,
-      });
-
-      if (isAPISuccess(status) && data) {
-        setSelectedCourse(null);
-
-        const stripe = await stripePromise;
-
-        const result = await stripe.redirectToCheckout({
-          sessionId: data.payment_gateway_session_id,
-        });
-
-        if (result.error) {
-          message.error('Cannot initiate payment at this time, please try again...');
-          setIsLoading(false);
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-    }
-  };
 
   const showConfirmPaymentPopup = () => {
     if (!selectedCourse) {
@@ -106,6 +72,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
 
     const paymentPopupData = {
       productId: selectedCourse.id,
+      productType: 'COURSE',
       itemList: [
         {
           name: selectedCourse.name,
@@ -119,7 +86,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
     showPaymentPopup(paymentPopupData, createOrder, true);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
       return;
@@ -134,16 +101,22 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
+        payment_source: paymentSource.GATEWAY, // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
       });
 
       if (isAPISuccess(status) && data) {
-        if (data.payment_required) {
-          initiatePaymentForOrder(data);
-        } else {
-          setIsLoading(false);
+        setSelectedCourse(null);
+        setIsLoading(false);
 
-          showCourseBookingSuccessModal(userEmail, username);
-          setSelectedCourse(null);
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_type: orderType.COURSE,
+            payment_order_id: data.course_order_id,
+          };
+        } else {
+          showCoursePurchaseSuccessModal();
+          return null;
         }
       }
     } catch (error) {
@@ -157,7 +130,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         error?.response?.status === 500 &&
         error?.response?.data?.message === 'user already has a confirmed order for this course'
       ) {
-        showAlreadyBookedModal(productType.COURSE, username);
+        showAlreadyBookedModal(productType.COURSE);
       } else {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
@@ -171,11 +144,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
         styles.showcaseCourseCardWrapper
       )}
     >
-      <PurchaseModal
-        visible={showPurchaseModal}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
-      />
+      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} text="Processing payment" size="large">
         <Row gutter={[8, 10]}>
           {courses?.length > 0 &&
@@ -223,7 +192,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
                           <Text strong className={styles.blueText}>
-                            {course?.currency?.toUpperCase()} {course?.price}
+                            {course.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}
                           </Text>
                         </Col>
                       </Row>
@@ -236,7 +205,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop, username = nul
                           type="primary"
                           onClick={(e) => {
                             e.stopPropagation();
-                            openPurchaseModal(course);
+                            openAuthModal(course);
                           }}
                         >
                           Buy Course

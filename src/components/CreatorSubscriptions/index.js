@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Row, Col, List, message } from 'antd';
 
 import Loader from 'components/Loader';
-import PurchaseModal from 'components/PurchaseModal';
+import AuthModal from 'components/AuthModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 
@@ -13,7 +13,7 @@ import { generateBaseCreditsText } from 'utils/subscriptions';
 import { useGlobalContext } from 'services/globalContext';
 
 import apis from 'apis';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, orderType } from 'utils/helper';
 
 const {
   timezoneUtils: { getTimezoneLocation },
@@ -23,17 +23,17 @@ const CreatorSubscriptions = ({ subscriptions }) => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const openPurchaseModal = (subscription) => {
     setSelectedSubscription(subscription);
-    setShowPurchaseModal(true);
+    setShowAuthModal(true);
   };
 
   const closePurchaseModal = () => {
     setSelectedSubscription(null);
-    setShowPurchaseModal(false);
+    setShowAuthModal(false);
   };
 
   const showConfirmPaymentPopup = () => {
@@ -65,17 +65,8 @@ const CreatorSubscriptions = ({ subscriptions }) => {
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  //TODO: Integrate this once implemented
-  const initiatePaymentForOrder = async (orderDetails) => {
-    console.log(orderDetails);
-    message.success('Order created!');
-  };
-
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     setIsLoading(true);
-
-    console.log(couponCode);
-
     try {
       const payload = {
         subscription_id: selectedSubscription.external_id,
@@ -85,14 +76,23 @@ const CreatorSubscriptions = ({ subscriptions }) => {
       const { status, data } = await apis.subscriptions.createSubscriptionOrder(payload);
 
       if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        setSelectedSubscription(null);
+
         if (data.payment_required) {
-          initiatePaymentForOrder(data);
+          return {
+            ...data,
+            payment_order_type: orderType.SUBSCRIPTION,
+            payment_order_id: data.subscription_order_id,
+          };
         } else {
           //TODO: Confirm with Rahul about the content of confirmation popup
-          showSuccessModal('Subscription Purchased');
+          showSuccessModal('Subscription Purchased successfully');
+          return null;
         }
       }
     } catch (error) {
+      setIsLoading(false);
       if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {
         showErrorModal(
           'Discount Code Not Applicable',
@@ -103,7 +103,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
       }
     }
 
-    setIsLoading(false);
+    return null;
   };
 
   const renderShowcaseSubscriptionCards = (subscription) => (
@@ -114,11 +114,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
 
   return (
     <div>
-      <PurchaseModal
-        visible={showPurchaseModal}
-        closeModal={closePurchaseModal}
-        createOrder={showConfirmPaymentPopup}
-      />
+      <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} createOrder={showConfirmPaymentPopup} />
       <Loader loading={isLoading} text="Processing payment" size="large">
         <Row gutter={[8, 10]}>
           <Col xs={24}>

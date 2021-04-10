@@ -20,25 +20,38 @@ import apis from 'apis';
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
-import PublicCourseList from 'components/PublicCourseList';
 import CreatorSubscriptions from 'components/CreatorSubscriptions';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
-import CalendarView from 'components/CalendarView';
+import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
+import AuthModal from 'components/AuthModal';
 
-import { generateUrlFromUsername, courseType, isAPISuccess, parseEmbedCode } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  courseType,
+  isAPISuccess,
+  parseEmbedCode,
+  paymentSource,
+  orderType,
+  productType,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
+import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
+import { useGlobalContext } from 'services/globalContext';
+import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
 const {
-  timezoneUtils: { getCurrentLongTimezone },
+  formatDate: { toLongDateWithTime },
+  timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
 const productKeys = {
@@ -52,6 +65,7 @@ const productKeys = {
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
   const location = useLocation();
+  const { showPaymentPopup } = useGlobalContext();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
@@ -59,8 +73,7 @@ const ProfilePreview = ({ username = null }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
-  const [view, setView] = useState('list');
-  const [calendarView, setCalendarView] = useState('month');
+  const [view, setView] = useState('calendar');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);
@@ -77,6 +90,9 @@ const ProfilePreview = ({ username = null }) => {
   const [liveCourses, setLiveCourses] = useState([]);
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+  const [sessionCountByDate, setSessionCountByDate] = useState({});
+  const [purchaseModalVisible, setAuthModalVisible] = useState(false);
+  const [selectedInventory, setSelectedInventory] = useState(null);
 
   const [subscriptions, setSubscriptions] = useState([]);
   const [isSubscriptionsLoading, setIsSubscriptionsLoading] = useState(true);
@@ -96,18 +112,14 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
+  const getProfileUsername = useCallback(() => (username ? username : getLocalUserDetails().username), [username]);
+
   const getSessionDetails = useCallback(
     async (type) => {
       setIsSessionLoading(true);
 
       try {
-        let profileUsername = '';
-        if (username) {
-          profileUsername = username;
-        } else {
-          profileUsername = getLocalUserDetails().username;
-        }
-        const { status, data } = await apis.user.getSessionsByUsername(profileUsername, type);
+        const { status, data } = await apis.user.getSessionsByUsername(getProfileUsername(), type);
         if (isAPISuccess(status) && data) {
           setSessions(data);
           setIsSessionLoading(false);
@@ -117,20 +129,13 @@ const ProfilePreview = ({ username = null }) => {
         console.error('Failed to load user session details');
       }
     },
-    [username]
+    [getProfileUsername]
   );
 
   const getPassesDetails = useCallback(async () => {
     setIsPassesLoading(true);
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
+      const profileUsername = getProfileUsername();
       const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (isAPISuccess(status) && data) {
@@ -157,20 +162,12 @@ const ProfilePreview = ({ username = null }) => {
       setIsPassesLoading(false);
       console.error('Failed to load pass details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
 
   const getVideosDetails = useCallback(async () => {
     setIsVideosLoading(true);
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
-      const { status, data } = await apis.videos.getVideosByUsername(profileUsername);
+      const { status, data } = await apis.videos.getVideosByUsername(getProfileUsername());
 
       if (isAPISuccess(status) && data) {
         setVideos(data);
@@ -180,20 +177,12 @@ const ProfilePreview = ({ username = null }) => {
       setIsVideosLoading(false);
       console.error('Failed to load video details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
 
   const getCoursesDetails = useCallback(async () => {
     setIsCoursesLoading(true);
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
-      const { status, data } = await apis.courses.getCoursesByUsername(profileUsername);
+      const { status, data } = await apis.courses.getCoursesByUsername(getProfileUsername());
 
       if (isAPISuccess(status) && data) {
         setLiveCourses(data.filter((course) => course.type === courseType.MIXED || course.type === 'live'));
@@ -206,7 +195,31 @@ const ProfilePreview = ({ username = null }) => {
       setIsCoursesLoading(false);
       console.error('Failed to load courses details');
     }
-  }, [username]);
+  }, [getProfileUsername]);
+
+  const getCalendarSessionDetails = useCallback(async () => {
+    try {
+      const profileUsername = getProfileUsername();
+      const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
+      const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
+      if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
+        const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
+        setSessionCountByDate(res);
+        setCalendarSession([
+          ...UpcomingRes.data.map((upcomingSessions) => ({
+            ...upcomingSessions,
+            isPast: false,
+          })),
+          ...PastRes.data.map((pastSessions) => ({
+            ...pastSessions,
+            isPast: true,
+          })),
+        ]);
+      }
+    } catch (error) {
+      message.error('Failed to load user session details');
+    }
+  }, [getProfileUsername]);
 
   const getSubscriptionDetails = useCallback(async () => {
     setIsSubscriptionsLoading(true);
@@ -242,6 +255,7 @@ const ProfilePreview = ({ username = null }) => {
     getVideosDetails();
     getCoursesDetails();
     getSubscriptionDetails();
+    getCalendarSessionDetails();
   }, [
     history.location.pathname,
     getProfileDetails,
@@ -250,6 +264,7 @@ const ProfilePreview = ({ username = null }) => {
     getVideosDetails,
     getCoursesDetails,
     getSubscriptionDetails,
+    getCalendarSessionDetails,
   ]);
 
   const getDefaultTabToShow = useCallback(() => {
@@ -319,17 +334,9 @@ const ProfilePreview = ({ username = null }) => {
     setIsListLoading(false);
   };
 
-  // const handleChangeSessionTab = (key) => {
-  //   setIsSessionLoading(true);
-  //   setSelectedSessionTab(key);
-  //   if (parseInt(key) === 0) {
-  //     trackSimpleEvent(user.click.profile.upcomingSessionsTab);
-  //     getSessionDetails('upcoming');
-  //   } else {
-  //     trackSimpleEvent(user.click.profile.pastSessionsTab);
-  //     getSessionDetails('past');
-  //   }
-  // };
+  const onEventBookClick = (event) => {
+    showAuthModal(event);
+  };
 
   const trackAndNavigate = (destination, eventTag, newWindow = false) => {
     trackSimpleEvent(eventTag);
@@ -341,41 +348,117 @@ const ProfilePreview = ({ username = null }) => {
     }
   };
 
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(username || session.username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
+  const handleViewChange = (e) => {
+    setView(e.target.value);
   };
 
-  const handleViewChange = async (e) => {
-    setView(e.target.value);
-    if (e.target.value === 'calendar') {
-      try {
-        setIsSessionLoading(true);
-        let profileUsername = '';
-        if (username) {
-          profileUsername = username;
-        } else {
-          profileUsername = getLocalUserDetails().username;
-        }
-        const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
-        const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
-        if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
-          setCalendarSession([...UpcomingRes.data, ...PastRes.data]);
-          setIsSessionLoading(false);
-        }
-      } catch (error) {
-        setIsSessionLoading(false);
-        message.error('Failed to load user session details');
-      }
+  const redirectToCourseDetails = (course) => {
+    if (course?.id) {
+      const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
+      window.open(`${baseUrl}/c/${course?.id}`);
     }
   };
 
-  const onViewChange = (e) => {
-    setCalendarView(e);
+  const showAuthModal = (inventory) => {
+    setSelectedInventory(inventory);
+    setAuthModalVisible(true);
+  };
+
+  const closeAuthModal = () => {
+    setSelectedInventory(null);
+    setAuthModalVisible(false);
+  };
+
+  const createOrder = async (couponCode = '') => {
+    // Currently discount engine has not been implemented for session
+    // however this form of createOrder will be what is used to accomodate
+    // the new Payment Popup
+
+    // Some front end checks to prevent the logic below from breaking
+    if (!selectedInventory) {
+      message.error('Invalid session schedule selected');
+      return null;
+    }
+
+    setIsSessionLoading(true);
+
+    try {
+      const payload = {
+        inventory_id: selectedInventory.inventory_id,
+        user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone_location: getTimezoneLocation(),
+        user_timezone: getCurrentLongTimezone(),
+        payment_source: paymentSource.GATEWAY,
+      };
+
+      const { status, data } = await apis.session.createOrderForUser(payload);
+
+      if (isAPISuccess(status) && data) {
+        setIsSessionLoading(false);
+        // Keeping inventory_id since it's needed in confirmation modal
+        const inventoryId = selectedInventory.inventory_id;
+        setSelectedInventory(null);
+
+        if (data.payment_required) {
+          return {
+            ...data,
+            payment_order_type: orderType.CLASS,
+            payment_order_id: data.order_id,
+            inventory_id: inventoryId,
+          };
+        } else {
+          showBookSingleSessionSuccessModal(inventoryId);
+          return null;
+        }
+      }
+    } catch (error) {
+      setIsSessionLoading(false);
+
+      message.error(error.response?.data?.message || 'Something went wrong');
+
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(productType.CLASS);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(productType.PASS);
+      }
+
+      return null;
+    }
+  };
+
+  const showConfirmPaymentPopup = () => {
+    if (!selectedInventory) {
+      message.error('Invalid session schedule selected');
+      return;
+    }
+
+    const desc = toLongDateWithTime(selectedInventory.start_time);
+
+    const paymentPopupData = {
+      productId: selectedInventory.inventory_id,
+      productType: 'SESSION',
+      itemList: [
+        {
+          name: selectedInventory.name,
+          description: desc,
+          currency: selectedInventory.currency,
+          price: selectedInventory.price,
+        },
+      ],
+    };
+
+    showPaymentPopup(paymentPopupData, createOrder);
   };
 
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
+      <AuthModal
+        visible={purchaseModalVisible}
+        closeModal={closeAuthModal}
+        onLoggedInCallback={showConfirmPaymentPopup}
+      />
       {isOnDashboard && (
         <Row>
           <Col span={24}>
@@ -436,21 +519,24 @@ const ProfilePreview = ({ username = null }) => {
                       All event times shown below are in your local time zone ({getCurrentLongTimezone()})
                     </Text>
                   </Col>
-                  <Col span={24} className={styles.mt10}>
-                    <Radio.Group value={view} onChange={handleViewChange}>
-                      <Radio.Button value="list">List View</Radio.Button>
-                      <Radio.Button value="calendar">Calendar View</Radio.Button>
+                  <Col span={24} className={styles.mt20}>
+                    <Radio.Group value={view} onChange={handleViewChange} buttonStyle="solid">
+                      <Radio.Button className={styles.orangeRadio} value="list">
+                        List View
+                      </Radio.Button>
+                      <Radio.Button className={styles.orangeRadio} value="calendar">
+                        Calendar View
+                      </Radio.Button>
                     </Radio.Group>
                   </Col>
                   <Col span={24}>
                     {view === 'calendar' ? (
                       <Loader loading={isSessionLoading} size="large" text="Loading sessions">
                         {calendarSession.length > 0 ? (
-                          <CalendarView
-                            inventories={calendarSession}
-                            onSelectInventory={redirectToSessionsPage}
-                            onViewChange={onViewChange}
-                            calendarView={calendarView}
+                          <CalendarWrapper
+                            calendarSessions={calendarSession}
+                            sessionCountByDate={sessionCountByDate}
+                            onEventBookClick={onEventBookClick}
                           />
                         ) : (
                           <Empty />
@@ -527,14 +613,26 @@ const ProfilePreview = ({ username = null }) => {
                   {liveCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
-                        <PublicCourseList username={username} courses={liveCourses} />
+                        <div className={styles.p10}>
+                          <ShowcaseCourseCard
+                            username={username}
+                            courses={liveCourses}
+                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                          />
+                        </div>
                       </Loader>
                     </Tabs.TabPane>
                   )}
                   {videoCourses.length > 0 && (
                     <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
-                        <PublicCourseList username={username} courses={videoCourses} />
+                        <div className={styles.p10}>
+                          <ShowcaseCourseCard
+                            username={username}
+                            courses={videoCourses}
+                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
+                          />
+                        </div>
                       </Loader>
                     </Tabs.TabPane>
                   )}

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import classNames from 'classnames';
 import { Row, Col, Empty, Button } from 'antd';
 
 import SessionCards from 'components/SessionCards';
@@ -16,16 +17,12 @@ const Sessions = ({ sessions, username }) => {
   const showMore = () => {
     trackSimpleEvent(user.click.profile.showMore);
     if (sessionCount <= reformattedSessions.length) {
-      setSessionCount(sessionCount + 6);
+      const newSessionCount = sessionCount + 6;
+      setSessionCount(newSessionCount);
     }
   };
 
-  useEffect(() => {
-    reformatSessions();
-    //eslint-disable-next-line
-  }, []);
-
-  const reformatSessions = () => {
+  const reformatSessions = useCallback(() => {
     let formattedSessions = [];
 
     sessions.forEach((inventory) => {
@@ -47,15 +44,21 @@ const Sessions = ({ sessions, username }) => {
     });
 
     setReformattedSessions(formattedSessions);
-  };
+  }, [sessions, username]);
+
+  useEffect(() => {
+    reformatSessions();
+  }, [reformatSessions]);
+
+  const shownSessions = useMemo(() => reformattedSessions.slice(0, sessionCount), [reformattedSessions, sessionCount]);
 
   return (
     <Row justify="space-around">
       {reformattedSessions && reformattedSessions.length ? (
         <>
-          <SessionCards sessions={reformattedSessions.slice(0, sessionCount)} shouldFetchInventories={false} />
+          <SessionCards sessions={shownSessions} shouldFetchInventories={false} />
           {sessionCount < reformattedSessions.length && (
-            <Col span={24} className={styles.textAlignCenter}>
+            <Col span={24} className={classNames(styles.textAlignCenter, styles.mb50)}>
               <Button type="primary" onClick={() => showMore()}>
                 Show more
               </Button>

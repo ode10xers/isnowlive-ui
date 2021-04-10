@@ -23,6 +23,7 @@ export default {
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
     setCreatorUserPreferences: (payload) => http.patch('/secure/user/preferences', payload),
     getCreatorUserPreferences: () => http.get('/secure/user/preferences'),
+    sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
   },
   payment: {
     stripe: {
@@ -33,6 +34,7 @@ export default {
     },
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
+    getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
@@ -67,6 +69,8 @@ export default {
     submitZoomMeetingInfo: (inventoryId, payload) =>
       http.patch(`/secure/creator/inventories/id/${inventoryId}/zoom`, payload),
     getZoomMeetingInfo: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}/zoom`),
+    updateSessionInventoryDocument: (inventoryId, payload) =>
+      http.patch(`/secure/creator/inventories/id/${inventoryId}`, payload),
   },
   passes: {
     getPassById: (passId) => http.get(`/passes/${passId}`),
@@ -149,5 +153,15 @@ export default {
     publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
     unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
     getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders'),
+  },
+  documents: {
+    getCreatorDocuments: () => http.get('/secure/creator/documents'),
+    createDocument: (payload) => http.post('/secure/creator/documents', payload),
+  },
+  legals: {
+    createLegals: (payload) => http.post('/secure/creator/legal', payload),
+    updateLegals: (payload) => http.patch('/secure/creator/legal', payload),
+    getCreatorLegals: () => http.get('/secure/creator/legal'),
+    getLegalsByCreatorUsername: (creatorUsername) => http.get(`/creator/${creatorUsername}/legal`),
   },
 };

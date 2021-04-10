@@ -8,6 +8,7 @@ import {
   EditOutlined,
   CopyOutlined,
   EyeInvisibleOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -19,23 +20,97 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateUrlFromUsername, copyPageLinkToClipboard } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const {
   formatDate: { toDateAndTime },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 //TODO: Refactor this for overall same experience across all products
 const ClassPassList = () => {
+  const { showSendEmailPopup } = useGlobalContext();
+
   const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+
+  const showSendEmailModal = (pass) => {
+    let activeRecipients = [];
+    let expiredRecipients = [];
+    let userIdMap = new Map();
+
+    if (pass.buyers && pass.buyers?.length > 0) {
+      // Since pass can be repeatedly bought by the same user
+      // (after it expires), we put checks here
+      pass.buyers.forEach((buyer) => {
+        if (!userIdMap.has(buyer.external_id)) {
+          let isActive = isBeforeDate(buyer.expiry_date);
+          if (isActive) {
+            const foundBuyer = activeRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              activeRecipients.push(buyer);
+            }
+          } else {
+            const foundBuyer = expiredRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              expiredRecipients.push(buyer);
+            }
+          }
+
+          userIdMap.set(buyer.external_id, {
+            ...buyer,
+            isActive,
+          });
+        } else {
+          const mappedBuyer = userIdMap.get(buyer.external_id);
+
+          // If the user in the map is already active user
+          // that means it's the most up to date data
+          if (mappedBuyer.isActive) {
+            return;
+          }
+
+          // If the user in the map is expired user
+          // We check if the current data is an active
+          // if it is we update the data in the map
+          if (isBeforeDate(buyer.expiry_date)) {
+            userIdMap.set(buyer.external_id, {
+              ...buyer,
+              isActive: true,
+            });
+
+            // Move the buyer data from expired to active array
+            const foundBuyer = activeRecipients.find((recipient) => recipient.external_id === buyer.external_id);
+
+            if (!foundBuyer) {
+              activeRecipients.push(buyer);
+              expiredRecipients = expiredRecipients.filter((recipient) => recipient.external_id !== buyer.external_id);
+            }
+          }
+        }
+      });
+    }
+
+    showSendEmailPopup({
+      recipients: {
+        active: activeRecipients,
+        expired: expiredRecipients,
+      },
+      productId: pass?.external_id || null,
+      productType: 'PASS',
+    });
+  };
 
   const showCreatePassesModal = () => {
     setCreateModalVisible(true);
@@ -111,6 +186,7 @@ const ClassPassList = () => {
             videos: classPass.videos,
             buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
             color_code: classPass.color_code,
+            external_id: classPass.external_id,
           }))
         );
       }
@@ -129,7 +205,7 @@ const ClassPassList = () => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/p/${passId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const toggleExpandAll = () => {
@@ -192,13 +268,18 @@ const ClassPassList = () => {
       key: 'price',
       align: 'left',
       width: '10%',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${text}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: '',
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
+          <Col xs={24} md={4}>
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+            </Tooltip>
+          </Col>
           <Col xs={24} md={4}>
             <Tooltip title="Edit">
               <Button
@@ -323,6 +404,9 @@ const ClassPassList = () => {
             </div>
           }
           actions={[
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(pass)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -361,7 +445,7 @@ const ClassPassList = () => {
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
-          {layout('Price', <Text>{`${pass.currency?.toUpperCase()} ${pass.price}`}</Text>)}
+          {layout('Price', <Text>{pass.price > 0 ? `${pass.currency?.toUpperCase()} ${pass.price}` : 'Free'}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>

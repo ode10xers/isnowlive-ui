@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Tag, Collapse } from 'antd';
-import { CopyOutlined, EditTwoTone, DownOutlined, UpOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import {
+  MailOutlined,
+  CopyOutlined,
+  EditTwoTone,
+  DownOutlined,
+  UpOutlined,
+  EyeInvisibleOutlined,
+} from '@ant-design/icons';
 
 import Table from 'components/Table';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { copyPageLinkToClipboard, generateUrlFromUsername } from 'utils/helper';
+import { copyToClipboard, generateUrlFromUsername } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -19,7 +26,7 @@ const {
   formatDate: { toShortDateWithYear, toDateAndTime },
 } = dateUtil;
 
-const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse }) => {
+const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse, showSendEmailModal }) => {
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
   const [expandedSection, setExpandedSection] = useState([]);
@@ -28,7 +35,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/c/${courseId}`;
 
-    copyPageLinkToClipboard(pageLink);
+    copyToClipboard(pageLink);
   };
 
   const toggleExpandAllPublished = () => {
@@ -114,7 +121,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       dataIndex: 'price',
       key: 'price',
       width: '85px',
-      render: (text, record) => `${record.currency?.toUpperCase()} ${record.price}`,
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
       title: published ? (
@@ -129,8 +136,13 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       width: '250px',
       align: 'right',
       render: (text, record) => (
-        <Row gutter={8} justify="end">
-          <Col xs={4}>
+        <Row gutter={4} justify="end">
+          <Col xs={3}>
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+            </Tooltip>
+          </Col>
+          <Col xs={3}>
             <Tooltip title="Edit Course">
               <Button
                 block
@@ -140,12 +152,12 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               />
             </Tooltip>
           </Col>
-          <Col xs={4}>
+          <Col xs={3}>
             <Tooltip title="Copy Course Link">
               <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
             </Tooltip>
           </Col>
-          <Col xs={6}>
+          <Col xs={5}>
             {record.is_published ? (
               <Tooltip title="Hide Course">
                 <Button danger block type="link" onClick={() => unpublishCourse(record)}>
@@ -269,6 +281,9 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             </div>
           }
           actions={[
+            <Tooltip title="Send Customer Email">
+              <Button type="text" onClick={() => showSendEmailModal(course)} icon={<MailOutlined />} />
+            </Tooltip>,
             <Tooltip title="Edit">
               <Button
                 className={styles.detailsButton}
@@ -322,7 +337,10 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
               {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
             </>
           )}
-          {layout('Price', <Text>{`${course.currency?.toUpperCase()} ${course.price} `}</Text>)}
+          {layout(
+            'Price',
+            <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
+          )}
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course.id) && (

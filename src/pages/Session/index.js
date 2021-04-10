@@ -16,9 +16,8 @@ import {
   message,
   DatePicker,
   Modal,
-  Tooltip,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined, FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import apis from 'apis';
@@ -26,7 +25,6 @@ import Routes from 'routes';
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
-import FileUpload from 'components/FileUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
@@ -39,6 +37,7 @@ import {
   scrollToErrorField,
   generateRandomColor,
   productAccessOptions,
+  isValidFile,
 } from 'utils/helper';
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -89,7 +88,7 @@ const initialSession = {
   description: '',
   session_image_url: '',
   inventory: [],
-  document_url: '',
+  document_urls: [],
   beginning: moment().startOf('day').utc().format(),
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
   recurring: false,
@@ -105,7 +104,6 @@ const Session = ({ match, history }) => {
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
-  const [sessionDocumentUrl, setSessionDocumentUrl] = useState(null);
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
   const [isSessionFree, setIsSessionFree] = useState(false);
   const [currencyList, setCurrencyList] = useState(null);
@@ -119,6 +117,7 @@ const Session = ({ match, history }) => {
   const [stripeCurrency, setStripeCurrency] = useState(null);
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
+  const [creatorDocuments, setCreatorDocuments] = useState([]);
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -180,9 +179,9 @@ const Session = ({ match, history }) => {
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
             session_access_type: data?.access,
+            document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
           });
           setSessionImageUrl(data.session_image_url);
-          setSessionDocumentUrl(data.document_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
           setIsSessionFree(data?.price === 0 ? true : false);
           setIsSessionRecurring(data?.recurring);
@@ -206,6 +205,20 @@ const Session = ({ match, history }) => {
     },
     [form, history, isOnboarding, getCreatorStripeDetails]
   );
+
+  const getCreatorDocuments = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.documents.getCreatorDocuments();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorDocuments(data.data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch user documents');
+    }
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (match.path.includes('manage')) {
@@ -237,23 +250,12 @@ const Session = ({ match, history }) => {
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails]);
+    getCreatorDocuments();
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails, getCreatorDocuments]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
     setSession({ ...session, session_image_url: imageUrl });
-  };
-
-  const handleDocumentUrlUpload = (imageUrl) => {
-    setSessionDocumentUrl(imageUrl);
-    setSession({ ...session, document_url: imageUrl });
-  };
-
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
   };
 
   const handleSessionCourseType = (e) => {
@@ -522,15 +524,15 @@ const Session = ({ match, history }) => {
     try {
       setIsLoading(true);
       const data = {
-        price: values.price || 0,
-        currency: values.currency?.toLowerCase() || stripeCurrency || 'SGD',
+        price: isSessionFree ? 0 : values.price || 0,
+        currency: values.currency?.toLowerCase() || stripeCurrency.toLowerCase() || 'sgd',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
         prerequisites: values.prerequisites,
         session_image_url: sessionImageUrl || '',
         category: '',
-        document_url: sessionDocumentUrl || '',
+        document_urls: values.document_urls || [],
         recurring: isSessionRecurring,
         is_refundable: sessionRefundable,
         refund_before_hours: refundBeforeHours,
@@ -560,7 +562,6 @@ const Session = ({ match, history }) => {
           const updatedSessionResponse = await apis.session.update(session.session_id, data);
           if (isAPISuccess(updatedSessionResponse.status)) {
             trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
-            message.success('Session successfully updated.');
 
             Modal.confirm({
               icon: <CheckCircleOutlined />,
@@ -717,52 +718,19 @@ const Session = ({ match, history }) => {
           >
             <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
-          <Form.Item
-            name="document_url"
-            {...(!isMobileDevice && profileFormTailLayout)}
-            valuePropName="fileList"
-            getValueFromEvent={normFile}
-          >
-            <Text>or upload a session pre-requisite document</Text>
-            <br />
-            <br />
-            <Row>
-              <Col>
-                <FileUpload
-                  name="document_url"
-                  value={sessionDocumentUrl}
-                  onChange={handleDocumentUrlUpload}
-                  listType="text"
-                  label="Upload a PDF file"
-                />
-              </Col>
 
-              {sessionDocumentUrl && (
-                <Col>
-                  <Button
-                    type="text"
-                    icon={<FilePdfOutlined />}
-                    size="middle"
-                    onClick={() => window.open(sessionDocumentUrl)}
-                    className={styles.filenameButton}
-                  >
-                    {sessionDocumentUrl.split('_').slice(-1)[0]}
-                  </Button>
-                  <Tooltip title="Remove this file">
-                    <Button
-                      type="text"
-                      size="middle"
-                      danger
-                      icon={<CloseCircleOutlined />}
-                      onClick={() => {
-                        setSessionDocumentUrl(null);
-                        setSession({ ...session, document_url: '' });
-                      }}
-                    />
-                  </Tooltip>
-                </Col>
-              )}
-            </Row>
+          <Form.Item label="Attached Files" id="document_urls" name="document_urls">
+            <Select
+              className={styles.fileDropdown}
+              showArrow
+              placeholder="Select documents you want to include"
+              mode="multiple"
+              maxTagCount={3}
+              options={creatorDocuments.map((document) => ({
+                label: document.name,
+                value: document.url,
+              }))}
+            />
           </Form.Item>
 
           <Form.Item
@@ -850,28 +818,30 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            {!isSessionFree && (
-              <>
-                <Form.Item name="currency" label="Currency" rules={validationRules.requiredValidation}>
-                  <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
-                    {currencyList &&
-                      Object.entries(currencyList).map(([key, value], i) => (
-                        <Option value={key} key={key}>
-                          ({key}) {value}
-                        </Option>
-                      ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  {...(!isMobileDevice && profileFormTailLayout)}
-                  name="price"
-                  extra="Set your price"
-                  rules={validationRules.requiredValidation}
-                >
-                  <InputNumber min={1} placeholder="Amount" />
-                </Form.Item>
-              </>
-            )}
+            <Form.Item
+              name="currency"
+              label="Currency"
+              rules={validationRules.requiredValidation}
+              hidden={isSessionFree}
+            >
+              <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
+                {currencyList &&
+                  Object.entries(currencyList).map(([key, value], i) => (
+                    <Option value={key} key={key}>
+                      ({key}) {value}
+                    </Option>
+                  ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              {...(!isMobileDevice && profileFormTailLayout)}
+              name="price"
+              extra="Set your price"
+              rules={validationRules.requiredValidation}
+              hidden={isSessionFree}
+            >
+              <InputNumber min={1} placeholder="Amount" />
+            </Form.Item>
 
             {!isSessionFree && (
               <Form.Item

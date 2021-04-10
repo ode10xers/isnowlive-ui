@@ -16,6 +16,7 @@ import { generateUrlFromUsername, scrollToErrorField } from 'utils/helper';
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 
 const { Title, Text, Paragraph } = Typography;
 const { Item } = Form;
@@ -46,10 +47,14 @@ const SessionRegistration = ({
   const [form] = Form.useForm();
   const passwordInput = useRef(null);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [legalsAccepted, setLegalsAccepted] = useState(false);
+  const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
 
   useEffect(() => {
     if (user) {
       form.setFieldsValue(user);
+      setLegalsAccepted(true);
+      setShowLegalsErrorMessage(false);
     }
   }, [user, form]);
 
@@ -130,7 +135,7 @@ const SessionRegistration = ({
       key: 'validity',
       width: '15%',
       align: 'right',
-      render: (text, record) => `${record.validity} day`,
+      render: (text, record) => `${record.validity} days`,
     },
     {
       title: 'Price',
@@ -138,7 +143,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'left',
       width: '15%',
-      render: (text, record) => `${text} ${record.currency.toUpperCase()}`,
+      render: (text, record) => (parseInt(text) > 0 ? `${text} ${record.currency.toUpperCase()}` : 'Free'),
     },
     {
       title: 'Credit Count',
@@ -191,7 +196,7 @@ const SessionRegistration = ({
       dataIndex: 'classes_remaining',
       key: 'classes_remaining',
       width: '20%',
-      render: (text, record) => `${record.classes_remaining}/${record.class_count}`,
+      render: (text, record) => (record.limited ? `${record.classes_remaining}/${record.class_count}` : 'Unlimited'),
     },
     {
       title: 'Valid Till',
@@ -450,6 +455,17 @@ const SessionRegistration = ({
     );
   };
 
+  const handleFormSubmit = (values) => {
+    setShowLegalsErrorMessage(false);
+
+    if (!legalsAccepted) {
+      setShowLegalsErrorMessage(true);
+      return;
+    }
+
+    onFinish(values);
+  };
+
   return (
     <div className={classNames(styles.box, styles.p50, styles.mb20)}>
       <Row>
@@ -476,7 +492,7 @@ const SessionRegistration = ({
             form={form}
             labelAlign="left"
             {...sessionRegistrationformLayout}
-            onFinish={onFinish}
+            onFinish={handleFormSubmit}
             onFinishFailed={onFinishFailed}
           >
             {!user && (
@@ -525,6 +541,23 @@ const SessionRegistration = ({
                 </Item>
               </>
             )}
+
+            <Row gutter={[8, 8]}>
+              {showLegalsErrorMessage && (
+                <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
+                  <Text type="danger" className={styles.smallText}>
+                    To proceed, you need to check the checkbox below
+                  </Text>
+                </Col>
+              )}
+              <Col xs={24} md={{ offset: 6, span: 18 }} xl={{ offset: 4, span: 20 }}>
+                <TermsAndConditionsText
+                  shouldCheck={true}
+                  isChecked={legalsAccepted}
+                  setChecked={(checked) => setLegalsAccepted(checked)}
+                />
+              </Col>
+            </Row>
 
             <Item {...sessionRegistrationTailLayout}>
               {user ? (
@@ -608,11 +641,11 @@ const SessionRegistration = ({
             <Row className={styles.mt10}>
               {user && selectedInventory && selectedPass && userPasses.length > 0 && (
                 <Paragraph>
-                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for
+                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
                   <Text delete>
-                    {classDetails.price} {classDetails.currency.toUpperCase()}
+                    {classDetails?.price} {classDetails?.currency.toUpperCase()}
                   </Text>
-                  <Text strong> {`0 ${classDetails.currency.toUpperCase()}`} </Text> using your purchased pass
+                  <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased pass
                   <Text strong> {selectedPass.name} </Text>
                 </Paragraph>
               )}
@@ -620,9 +653,9 @@ const SessionRegistration = ({
 
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={8} md={8} xl={5}>
+                <Col xs={8} md={8} xl={6}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                    {user ? 'Buy' : 'Register'}
+                    {user && classDetails?.price > 0 && !(selectedPass && userPasses.length > 0) ? 'Buy' : 'Register'}
                   </Button>
                 </Col>
                 {!selectedInventory && (
