@@ -124,7 +124,7 @@ const Audiences = () => {
     const alreadyExistsEmails = editableEmailList.map((emailData) => emailData.email);
 
     const parsedEmailList = parse(value)
-      .filter((parsedEmailData) => parsedEmailData && !alreadyExistsEmails.includes(parsedEmailData.address))
+      .filter((parsedEmailData) => parsedEmailData.address && !alreadyExistsEmails.includes(parsedEmailData.address))
       .map((emailData) => ({
         email: emailData.address,
         first_name: '',
@@ -151,9 +151,9 @@ const Audiences = () => {
     setFeedbackText(`${successText}, ${failedText}, ${skippedText}`);
   };
 
-  const removeFromEditableEmailList = (email) =>
+  const removeFromEditableEmailList = (audience) =>
     setEditableEmailList(
-      editableEmailList.filter((emailData) => emailData.email !== email).map((val, idx) => ({ ...val, idx }))
+      editableEmailList.filter((emailData) => emailData.idx !== audience.idx).map((val, idx) => ({ ...val, idx }))
     );
 
   const saveAudiences = async (values) => {
@@ -299,7 +299,7 @@ const Audiences = () => {
       title: 'Remove',
       width: '64px',
       render: (record) => (
-        <Button danger type="link" onClick={() => removeFromEditableEmailList(record.email)} icon={<CloseOutlined />} />
+        <Button danger type="link" onClick={() => removeFromEditableEmailList(record)} icon={<CloseOutlined />} />
       ),
     },
     {
@@ -376,6 +376,45 @@ const Audiences = () => {
     );
   };
 
+  const renderMobileEditableAudienceCards = (audience) => {
+    return (
+      <Col xs={24} key={audience.idx}>
+        <Card
+          bordered
+          actions={[
+            <Popconfirm
+              arrowPointAtCenter
+              icon={<DeleteOutlined />}
+              title={<Text> Are you sure you want to cancel import of this audience? </Text>}
+              onConfirm={() => removeFromEditableEmailList(audience)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button danger type="primary">
+                Remove
+              </Button>
+            </Popconfirm>,
+          ]}
+        >
+          <Form.Item
+            name={[audience.idx, 'email']}
+            label="Email"
+            initialValue={audience.email}
+            rules={validationRules.requiredValidation}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item name={[audience.idx, 'first_name']} label="First Name" rules={validationRules.requiredValidation}>
+            <Input />
+          </Form.Item>
+          <Form.Item name={[audience.idx, 'last_name']} label="Last Name">
+            <Input />
+          </Form.Item>
+        </Card>
+      </Col>
+    );
+  };
+
   // TODO: Prepare pagination for this
   return (
     <Row gutter={[16, 16]}>
@@ -431,10 +470,10 @@ const Audiences = () => {
                 )}
                 <Col xs={24}>
                   <Row gutter={[8, 8]}>
-                    <Col xs={12} md={6} lg={4}>
+                    <Col xs={24} md={6} lg={4}>
                       <Title level={5}> Input CSV Email List : </Title>
                     </Col>
-                    <Col xs={12} md={6} lg={4}>
+                    <Col xs={24} md={6} lg={4}>
                       <AudienceCSVFileUpload handleUploadSuccess={onCSVUploadSuccess} />
                     </Col>
                   </Row>
@@ -470,16 +509,22 @@ const Audiences = () => {
                     <Form form={form} onFinish={saveAudiences} scrollToFirstError={true}>
                       <Row gutter={[16, 16]} justify="center">
                         <Col xs={24}>
-                          <Table
-                            size="small"
-                            columns={editableEmailListColumns}
-                            data={editableEmailList}
-                            loading={isSubmitting}
-                            rowKey={(record) => record.email}
-                          />
+                          {isMobileDevice ? (
+                            <Row gutter={[8, 8]} justify="center">
+                              {editableEmailList.length > 0 && editableEmailList.map(renderMobileEditableAudienceCards)}
+                            </Row>
+                          ) : (
+                            <Table
+                              size="small"
+                              columns={editableEmailListColumns}
+                              data={editableEmailList}
+                              loading={isSubmitting}
+                              rowKey={(record) => record.idx}
+                            />
+                          )}
                         </Col>
                         <Col xs={24}>
-                          <Row gutter={[16, 16]} justify="center">
+                          <Row gutter={[16, 16]}>
                             <Col xs={12} md={8} lg={6}>
                               <Popconfirm
                                 arrowPointAtCenter
@@ -488,7 +533,7 @@ const Audiences = () => {
                                 okText="Yes, clear them"
                                 cancelText="No, keep them"
                               >
-                                <Button disabled={editableEmailList.length <= 0}>Clear email list</Button>
+                                <Button disabled={editableEmailList.length <= 0}> Clear list</Button>
                               </Popconfirm>
                             </Col>
                             <Col xs={12} md={8} lg={6}>
