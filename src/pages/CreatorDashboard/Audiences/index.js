@@ -1,7 +1,21 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import parse from 'emailjs-addressparser';
 
-import { Row, Col, Tabs, Button, Typography, Input, Form, Popconfirm, Upload, Tooltip, message } from 'antd';
+import {
+  Row,
+  Col,
+  Tabs,
+  Button,
+  Typography,
+  Input,
+  Form,
+  Popconfirm,
+  Upload,
+  Tooltip,
+  Card,
+  message,
+  Empty,
+} from 'antd';
 import { CloseOutlined, DeleteOutlined, MailOutlined, UploadOutlined } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
@@ -74,7 +88,7 @@ const Audiences = () => {
   const [selectedTab, setSelectedTab] = useState('list');
   const [isLoading, setIsLoading] = useState(false);
   const [audienceList, setAudienceList] = useState([]);
-  const [selectedAudienceKeys, setSelectedAudienceKeys] = useState([]);
+  const [selectedAudienceKeys, setSelectedTargetAudience] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailListText, setEmailListText] = useState('');
   const [editableEmailList, setEditableEmailList] = useState([]);
@@ -226,8 +240,7 @@ const Audiences = () => {
 
   const onSelectAudienceRow = (selectedRowKeys, selectedRow) => {
     console.log(selectedRow);
-    console.log(selectedRowKeys);
-    setSelectedAudienceKeys(selectedRowKeys);
+    setSelectedTargetAudience(selectedRow);
   };
 
   const sendEmailsToAudiences = (audienceKeys) => {
@@ -235,28 +248,28 @@ const Audiences = () => {
   };
 
   const audienceListColumns = [
-    {
-      title: 'Email Address',
-      dataIndex: 'email',
-      key: 'email',
-      width: '30%',
-    },
+    // {
+    //   title: 'Email Address',
+    //   dataIndex: 'email',
+    //   key: 'email',
+    //   width: '30%',
+    // },
     {
       title: 'First Name',
       dataIndex: 'first_name',
       key: 'first_name',
-      width: '25%',
+      width: '45%',
     },
     {
       title: 'Last Name',
       dataIndex: 'last_name',
       key: 'last_name',
-      width: '25%',
+      width: '45%',
       render: (text, record) => record.last_name || '-',
     },
     {
       title: 'Actions',
-      width: '15%',
+      width: '10%',
       render: (record) => (
         <Row gutter={[8, 8]}>
           <Col xs={4}>
@@ -332,7 +345,36 @@ const Audiences = () => {
     },
   ];
 
-  //TODO: Make Mobile UI for this
+  const renderMobileAudienceCards = (audience) => {
+    return (
+      <Col xs={24} key={audience.id}>
+        <Card
+          title={
+            <Title level={5}>
+              {' '}
+              {audience.first_name} {audience.last_name || ''}{' '}
+            </Title>
+          }
+          bodyStyle={{ padding: 0 }}
+          actions={[
+            <Popconfirm
+              arrowPointAtCenter
+              icon={<DeleteOutlined />}
+              title={<Text> Are you sure you want to delete this audience? </Text>}
+              onConfirm={() => deleteAudience(audience)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button block type="text" danger icon={<DeleteOutlined />} />
+            </Popconfirm>,
+            <Tooltip title="Send email to this audience" arrowPointAtCenter>
+              <Button block type="link" icon={<MailOutlined />} onClick={() => sendEmailsToAudiences([audience])} />
+            </Tooltip>,
+          ]}
+        />
+      </Col>
+    );
+  };
 
   // TODO: Prepare pagination for this
   return (
@@ -354,16 +396,28 @@ const Audiences = () => {
                 </Button>
               </Col>
               <Col xs={24}>
-                <Table
-                  size="small"
-                  loading={isLoading}
-                  data={audienceList}
-                  columns={audienceListColumns}
-                  rowKey={(record) => record.email}
-                  rowSelection={{
-                    onChange: onSelectAudienceRow,
-                  }}
-                />
+                {isMobileDevice ? (
+                  <Loader loading={isLoading} size="large" text="Fetching audiences...">
+                    {audienceList.length > 0 ? (
+                      <Row gutter={[8, 8]} justify="center">
+                        {audienceList.map(renderMobileAudienceCards)}
+                      </Row>
+                    ) : (
+                      <Empty description="No audience found" />
+                    )}
+                  </Loader>
+                ) : (
+                  <Table
+                    size="small"
+                    loading={isLoading}
+                    data={audienceList}
+                    columns={audienceListColumns}
+                    rowKey={(record) => record.email}
+                    rowSelection={{
+                      onChange: onSelectAudienceRow,
+                    }}
+                  />
+                )}
               </Col>
             </Row>
           </TabPane>
