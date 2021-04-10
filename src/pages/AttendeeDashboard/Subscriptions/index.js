@@ -35,67 +35,7 @@ const Subscriptions = () => {
     setIsLoading(true);
 
     try {
-      //TODO: Implement API Here later
       const { status, data } = await apis.subscriptions.getAttendeeSubscriptions();
-
-      /*
-      //TODO: FE Needs info of the subscription to show
-      const { status, data } = {
-        status: 200,
-        data: [
-          //TODO: Mock data here
-          {
-            subscription_order_id: 'qWeRtYuIoP',
-            name: 'Mock membership name',
-            credits: {
-              SESSION: {
-                remaining: 3,
-                total: 10,
-              },
-              COURSE: {
-                remaining: 2,
-                total: 5,
-              },
-            },
-            details: {
-              currency: 'SGD',
-              external_id: 'yaba-daba-doo',
-              is_published: true,
-              name: 'Mock Subs',
-              price: 20,
-              validity: 30,
-              color_code: '#ff0000',
-              products: {
-                SESSION: {
-                  access_types: ['PUBLIC'],
-                  credits: 10,
-                  product_ids: ['abcd', 'defg'],
-                },
-                COURSE: {
-                  access_types: ['PUBLIC', 'MEMBERSHIP'],
-                  credits: 5,
-                  producd_ids: ['scooby', 'dooby', 'doo'],
-                },
-              },
-            },
-            redemption: [
-              {
-                type: 'SESSION',
-                name: 'Testing session name here',
-                date_of_purchase: '2021-03-13T12:11:25Z',
-              },
-              {
-                type: 'COURSE',
-                name: 'off Course',
-                date_of_purchase: '2021-03-07T08:41:25Z',
-              },
-            ],
-          },
-        ],
-      };
-
-      */
-      console.log(data);
       if (isAPISuccess(status) && data) {
         setSubscriptionOrders([]);
         setIsLoading(false);
@@ -151,8 +91,7 @@ const Subscriptions = () => {
 
     return (
       <Text>
-        {' '}
-        {remainingCredits}/{totalCredits} {isCourse ? 'Course' : 'Session or Video'} credits left{' '}
+        {remainingCredits}/{totalCredits} {isCourse ? 'Course' : 'Session or Video'} credits left
       </Text>
     );
   };

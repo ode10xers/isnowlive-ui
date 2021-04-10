@@ -47,8 +47,6 @@ const CourseDetails = ({ match, history }) => {
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
   const [username, setUsername] = useState(null);
 
-  // const username = location.state?.username || window.location.hostname.split('.')[0];
-
   const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
       const { data } = creatorUsername

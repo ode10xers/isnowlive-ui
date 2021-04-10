@@ -72,7 +72,6 @@ const PaymentPopup = () => {
     try {
       //TODO: Use productType here to adjust the payload
       // e.g. if productType === PASS it should be pass_id (match the BE implementation)
-      console.log(productType);
 
       const payload = {
         coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
@@ -189,14 +188,17 @@ const PaymentPopup = () => {
           ? `and you'll be left with ${passDetails.classes_remaining - 1}/${passDetails.class_count} credits`
           : ''
       }`;
-    }
+    } else if (paymentInstrumentDetails.type === 'SUBSCRIPTION') {
+      const subscriptionDetails = paymentInstrumentDetails;
 
-    //TODO: Will also add text when subscription can be used as payment instrument later
+      textContent = `Will use ${subscriptionDetails.subscription_name} to book this and you'll be left with ${
+        subscriptionDetails.products[productType].credits - subscriptionDetails.products[productType].credits_used
+      } - 1/${subscriptionDetails.products[productType].credits} credits to book other ${productType.toLowerCase()}`;
+    }
 
     return (
       <Text strong className={styles.blueText}>
-        {' '}
-        {textContent}{' '}
+        {textContent}
       </Text>
     );
   };

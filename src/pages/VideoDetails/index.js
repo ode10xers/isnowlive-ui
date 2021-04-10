@@ -156,7 +156,7 @@ const VideoDetails = ({ match }) => {
         const { status, data } = await apis.subscriptions.getUserSubscriptionForVideo(videoId);
 
         if (isAPISuccess(status) && data) {
-          setUserSubscriptions(data);
+          setUserSubscriptions(data.active);
         }
       }
     } catch (error) {
@@ -221,12 +221,21 @@ const VideoDetails = ({ match }) => {
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
   const getUserPurchasedPass = (getDefault = false) => {
-    if (userPasses.length) {
+    if (userPasses.length > 0) {
       if (selectedPass && !getDefault) {
         return userPasses.filter((userPass) => userPass.id === selectedPass.id)[0];
       }
 
       return userPasses[0];
+    }
+
+    return null;
+  };
+
+  const getUserPurchasedSubscription = () => {
+    if (userSubscriptions.length > 0) {
+      // TODO: For now return the first active subscription found
+      return userSubscriptions[0];
     }
 
     return null;
@@ -448,15 +457,35 @@ const VideoDetails = ({ match }) => {
         showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndGetVideo(payload, couponCode));
       }
     } else if (selectedSubscription && video?.price > 0) {
-      //TODO: Continue on this
       if (userSubscriptions.length > 0) {
-        const payload = {
-          video_id: video.external_id,
-          payment_source: paymentSource.SUBSCRIPTION,
-          source_id: selectedSubscription.subscription_order_id,
-        };
+        const usableUserSubscription = getUserPurchasedSubscription();
 
-        buyVideoUsingSubscription(payload);
+        if (usableUserSubscription) {
+          const payload = {
+            video_id: video.external_id,
+            payment_source: paymentSource.SUBSCRIPTION,
+            source_id: selectedSubscription.subscription_order_id,
+          };
+
+          const paymentPopupData = {
+            productId: video.external_id,
+            productType: 'VIDEO',
+            itemList: [
+              {
+                name: video.title,
+                description: videoDesc,
+                currency: video.currency,
+                price: video.price,
+              },
+            ],
+            paymentInstrumentDetails: {
+              type: 'SUBSCRIPTION',
+              ...usableUserSubscription,
+            },
+          };
+
+          showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription(payload));
+        }
       }
     } else {
       const paymentPopupData = {
