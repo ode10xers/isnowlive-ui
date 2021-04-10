@@ -38,6 +38,8 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
+import http from 'services/http';
+import parseQueryString from 'utils/parseQueryString';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -66,6 +68,8 @@ function App() {
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
   const isWidget = isWidgetUrl();
+  const location = window.location;
+  const { authCode, widgetType } = parseQueryString(location.search);
 
   useEffect(() => {
     if (!isWidget) {
@@ -104,21 +108,51 @@ function App() {
         setUserDetails(null);
         setIsReadyToLoad(true);
       }
+    } else if (isWidget && authCode && widgetType === 'dashboard') {
+      // fetch the authCode
+      http.setAuthToken(authCode);
+
+      const getUserDetails = async () => {
+        try {
+          const { data, status } = await apis.user.getProfile();
+          if (isAPISuccess(status) && data) {
+            setUserAuthentication(true);
+            setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+            setTimeout(() => {
+              setIsReadyToLoad(true);
+            }, 100);
+          }
+        } catch (error) {
+          setUserAuthentication(false);
+          setUserDetails(null);
+          setIsReadyToLoad(true);
+        }
+      };
+      const authToken = authCode;
+      if (authToken && authToken !== '') {
+        getUserDetails();
+      } else {
+        setUserAuthentication(false);
+        setUserDetails(null);
+        setIsReadyToLoad(true);
+      }
+    } else {
+      setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
   }, [isWidget]);
 
-  if (isWidget) {
+  if (!isReadyToLoad) {
+    return <div>Loading...</div>;
+  }
+
+  if (isWidget && isReadyToLoad && widgetType !== 'dashboard') {
     return (
       <>
         <PaymentPopup />
         <EmbeddablePage />
       </>
     );
-  }
-
-  if (!isReadyToLoad) {
-    return <div>Loading...</div>;
   }
 
   return (

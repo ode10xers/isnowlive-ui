@@ -105,13 +105,17 @@ const GlobalDataProvider = ({ children }) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  function logIn(userDetails, rememberUser) {
+  function logIn(userDetails, rememberUser, isWidget = false) {
     if (rememberUser) {
       localStorage.setItem('remember-user', JSON.stringify(userDetails.email));
     } else {
       localStorage.removeItem('remember-user');
     }
     setAuthCookie(userDetails.auth_token);
+    if (isWidget) {
+      // Inside iframe cookies are not accessible because of cross domain
+      localStorage.setItem('__passion_auth_code__', userDetails.auth_token);
+    }
     setUserDetails(userDetails);
     setUserAuthentication(true);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
