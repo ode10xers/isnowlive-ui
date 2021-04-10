@@ -34,7 +34,10 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
             <Col xs={24}>
               <Space size="small" direction="vertical" align="center" className={styles.includedProductsList}>
                 {generateIncludedProducts(subscription).map((productText) => (
-                  <Text strong> {productText} </Text>
+                  <Text key={productText} strong>
+                    {' '}
+                    {productText}{' '}
+                  </Text>
                 ))}
               </Space>
             </Col>

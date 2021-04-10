@@ -38,7 +38,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
 
   const showConfirmPaymentPopup = () => {
     if (!selectedSubscription) {
-      showErrorModal('Something went wrong', 'Invalid Course Selected');
+      showErrorModal('Something went wrong', 'Invalid Subscription Selected');
       return;
     }
 
@@ -52,6 +52,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
 
     const paymentPopupData = {
       productId: selectedSubscription.external_id,
+      productType: 'SUBSCRIPTION',
       itemList: [
         {
           name: selectedSubscription.name,
@@ -114,7 +115,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
 
   return (
     <div>
-      <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} createOrder={showConfirmPaymentPopup} />
+      <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} text="Processing payment" size="large">
         <Row gutter={[8, 10]}>
           <Col xs={24}>
