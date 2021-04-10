@@ -203,7 +203,7 @@ function App() {
           </Route>
         </Switch>
       </Router>
-      <CookieConsentPopup />
+      { !isWidget && <CookieConsentPopup /> }
     </>
   );
 }
