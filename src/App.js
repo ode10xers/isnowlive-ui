@@ -6,8 +6,11 @@ import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
+import { getAuthTokenFromLS } from 'services/localAuthToken';
+import http from 'services/http';
 import { isAPISuccess } from 'utils/helper';
 import { isWidgetUrl } from 'utils/widgets';
+import parseQueryString from 'utils/parseQueryString';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -38,8 +41,6 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
-import http from 'services/http';
-import parseQueryString from 'utils/parseQueryString';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -62,17 +63,27 @@ const PrivateRoute = ({ ...rest }) => {
 
 function App() {
   const {
-    state: { userDetails, cookieConsent },
+    state: { userDetails, cookieConsent, isIframeMode },
     setUserAuthentication,
     setUserDetails,
+    setIframeMode,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
   const isWidget = isWidgetUrl();
-  const location = window.location;
-  const { authCode, widgetType } = parseQueryString(location.search);
+  const windowLocation = window.location;
+  const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
   useEffect(() => {
-    if (!isWidget) {
+    if (isWidget) {
+      setIframeMode(true);
+    } else {
+      setIframeMode(false);
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
+    if (!isIframeMode) {
       initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
@@ -80,73 +91,61 @@ function App() {
         initMixPanel();
       }
     }
-  }, [userDetails, cookieConsent, isWidget]);
+  }, [userDetails, cookieConsent, isIframeMode]);
 
   useEffect(() => {
-    if (!isWidget) {
-      const getUserDetails = async () => {
-        try {
-          const { data, status } = await apis.user.getProfile();
-          if (isAPISuccess(status) && data) {
-            setUserAuthentication(true);
-            setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
-            setTimeout(() => {
-              setIsReadyToLoad(true);
-            }, 100);
-          }
-        } catch (error) {
-          setUserAuthentication(false);
-          setUserDetails(null);
-          setIsReadyToLoad(true);
+    const removeUserState = () => {
+      setUserAuthentication(false);
+      setUserDetails(null);
+      setIsReadyToLoad(true);
+    };
+
+    const getUserDetails = async () => {
+      try {
+        const { data, status } = await apis.user.getProfile();
+        if (isAPISuccess(status) && data) {
+          setUserAuthentication(true);
+          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+          setTimeout(() => {
+            setIsReadyToLoad(true);
+          }, 100);
         }
-      };
+      } catch (error) {
+        removeUserState();
+      }
+    };
+
+    if (!isIframeMode) {
       const authToken = getAuthCookie();
       if (authToken && authToken !== '') {
         getUserDetails();
       } else {
-        setUserAuthentication(false);
-        setUserDetails(null);
-        setIsReadyToLoad(true);
+        removeUserState();
       }
-    } else if (isWidget && authCode && widgetType === 'dashboard') {
-      // fetch the authCode
-      http.setAuthToken(authCode);
-
-      const getUserDetails = async () => {
-        try {
-          const { data, status } = await apis.user.getProfile();
-          if (isAPISuccess(status) && data) {
-            setUserAuthentication(true);
-            setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
-            setTimeout(() => {
-              setIsReadyToLoad(true);
-            }, 100);
-          }
-        } catch (error) {
-          setUserAuthentication(false);
-          setUserDetails(null);
-          setIsReadyToLoad(true);
-        }
-      };
-      const authToken = authCode;
-      if (authToken && authToken !== '') {
+    } else if (isIframeMode && authCode && widgetType === 'dashboard') {
+      if (authCode && authCode !== '') {
+        http.setAuthToken(authCode);
         getUserDetails();
       } else {
-        setUserAuthentication(false);
-        setUserDetails(null);
-        setIsReadyToLoad(true);
+        const tokenFromLS = getAuthTokenFromLS();
+        if (tokenFromLS) {
+          http.setAuthToken(tokenFromLS);
+          getUserDetails();
+        } else {
+          removeUserState();
+        }
       }
     } else {
       setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
-  }, [isWidget]);
+  }, [isIframeMode]);
 
   if (!isReadyToLoad) {
     return <div>Loading...</div>;
   }
 
-  if (isWidget && isReadyToLoad && widgetType !== 'dashboard') {
+  if (isWidget && isReadyToLoad && widgetType === 'calendar') {
     return (
       <>
         <PaymentPopup />
@@ -203,7 +202,7 @@ function App() {
           </Route>
         </Switch>
       </Router>
-      {!isWidget && <CookieConsentPopup />}
+      {!isIframeMode && <CookieConsentPopup />}
     </>
   );
 }

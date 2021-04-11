@@ -1,19 +1,19 @@
-import React from 'react'; //Needed for JSX
+import React from 'react';
 import { Modal, Typography, Button, Row, Col } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
+import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
 import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
+import { isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+import { getAuthCookie } from 'services/authCookie';
 
 import styles from './style.modules.scss';
-import AddToCalendarButton from 'components/AddToCalendarButton';
-import { isWidgetUrl } from 'utils/widgets';
-import { getAuthCookie } from 'services/authCookie';
 
 const { Text, Paragraph } = Typography;
 
