@@ -112,7 +112,7 @@ function App() {
       } else {
         removeUserState();
       }
-    } else if (isWidget && authCode && widgetType === 'dashboard') {
+    } else if (isWidget) {
       // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
       if (authCode && authCode !== '') {
         http.setAuthToken(authCode);
