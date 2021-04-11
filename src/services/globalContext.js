@@ -70,11 +70,6 @@ const reducer = (state, action) => {
           productType: null,
         },
       };
-    case 'SET_IFRAME_MODE':
-      return {
-        ...state,
-        isIframeMode: action.payload,
-      };
     default:
       return state;
   }
@@ -98,7 +93,6 @@ const GlobalDataProvider = ({ children }) => {
       productId: null,
       productType: null,
     },
-    isIframeMode: false,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -149,9 +143,6 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'HIDE_SEND_EMAIL_POPUP' });
   }
 
-  function setIframeMode(value) {
-    dispatch({ type: 'SET_IFRAME_MODE', payload: value });
-  }
 
   function logOut(history, dontRedirect = false) {
     if (!dontRedirect) {
@@ -175,7 +166,6 @@ const GlobalDataProvider = ({ children }) => {
     hidePaymentPopup,
     showSendEmailPopup,
     hideSendEmailPopup,
-    setIframeMode,
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

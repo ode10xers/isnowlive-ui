@@ -6,7 +6,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
-import { getAuthTokenFromLS } from 'services/localAuthToken';
+import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
 import { isAPISuccess } from 'utils/helper';
 import { isWidgetUrl } from 'utils/widgets';
@@ -63,10 +63,9 @@ const PrivateRoute = ({ ...rest }) => {
 
 function App() {
   const {
-    state: { userDetails, cookieConsent, isIframeMode },
+    state: { userDetails, cookieConsent },
     setUserAuthentication,
     setUserDetails,
-    setIframeMode,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
   const isWidget = isWidgetUrl();
@@ -74,16 +73,7 @@ function App() {
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
   useEffect(() => {
-    if (isWidget) {
-      setIframeMode(true);
-    } else {
-      setIframeMode(false);
-    }
-    // eslint-disable-next-line
-  }, []);
-
-  useEffect(() => {
-    if (!isIframeMode) {
+    if (!isWidget) {
       initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
@@ -91,7 +81,7 @@ function App() {
         initMixPanel();
       }
     }
-  }, [userDetails, cookieConsent, isIframeMode]);
+  }, [userDetails, cookieConsent, isWidget]);
 
   useEffect(() => {
     const removeUserState = () => {
@@ -115,16 +105,18 @@ function App() {
       }
     };
 
-    if (!isIframeMode) {
+    if (!isWidget) {
       const authToken = getAuthCookie();
       if (authToken && authToken !== '') {
         getUserDetails();
       } else {
         removeUserState();
       }
-    } else if (isIframeMode && authCode && widgetType === 'dashboard') {
+    } else if (isWidget && authCode && widgetType === 'dashboard') {
+      // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
       if (authCode && authCode !== '') {
         http.setAuthToken(authCode);
+        setAuthTokenInLS(authCode);
         getUserDetails();
       } else {
         const tokenFromLS = getAuthTokenFromLS();
@@ -139,7 +131,7 @@ function App() {
       setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
-  }, [isIframeMode]);
+  }, [isWidget]);
 
   if (!isReadyToLoad) {
     return <div>Loading...</div>;
@@ -202,7 +194,7 @@ function App() {
           </Route>
         </Switch>
       </Router>
-      {!isIframeMode && <CookieConsentPopup />}
+      {!isWidget && <CookieConsentPopup />}
     </>
   );
 }
