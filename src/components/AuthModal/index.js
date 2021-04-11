@@ -18,6 +18,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
+import { isWidgetUrl } from 'utils/widgets';
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -94,7 +95,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
       });
       if (data) {
         http.setAuthToken(data.auth_token);
-        logIn(data, true);
+        logIn(data, true, isWidgetUrl());
         closeModal();
         onLoggedInCallback();
       }
@@ -135,7 +136,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
           });
           if (data) {
             http.setAuthToken(data.auth_token);
-            logIn(data, true);
+            logIn(data, true, isWidgetUrl());
             closeModal();
             onLoggedInCallback();
           }
