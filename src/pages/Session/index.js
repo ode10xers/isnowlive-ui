@@ -301,9 +301,9 @@ const Session = ({ match, history }) => {
         setIsSessionFree(false);
       } else {
         Modal.confirm({
-          title: `The session cannot be paided untill you setup stripe account. Would you like to setup stripe account now?`,
-          okText: 'Yes, Setup stripe account now',
-          cancelText: 'No',
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
           onCancel: () => setFreeSession(),
           onOk: () => {
             history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
@@ -712,7 +712,7 @@ const Session = ({ match, history }) => {
           </Form.Item>
 
           {zoom_connected === ZoomAuthType.NOT_CONNECTED && (
-            <Form.Item {...(!isMobileDevice && profileFormTailLayout)}>
+            <Form.Item label={<Text type="danger"> Session hosting link </Text>}>
               <Button
                 type="primary"
                 icon={<VideoCameraOutlined />}
