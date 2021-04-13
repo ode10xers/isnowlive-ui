@@ -19,6 +19,7 @@ const AudienceList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [audienceList, setAudienceList] = useState([]);
   const [selectedAudiences, setSelectedAudiences] = useState([]);
+  const [emailRecipients, setEmailRecipients] = useState([]);
   const [sendEmailModalVisible, setSendEmailModalVisible] = useState(false);
 
   const [pageNumber, setPageNumber] = useState(1);
@@ -64,16 +65,13 @@ const AudienceList = () => {
     setSelectedAudiences(selectedRow);
   };
 
-  const showSendEmailModal = () => {
-    if (selectedAudiences.length > 0) {
-      setSendEmailModalVisible(true);
-    } else {
-      setSendEmailModalVisible(false);
-      showErrorModal('Please select some audiences first');
-    }
+  const showSendEmailModal = (recipients) => {
+    setEmailRecipients(recipients);
+    setSendEmailModalVisible(true);
   };
 
   const hideSendEmailModal = () => {
+    setEmailRecipients([]);
     setSendEmailModalVisible(false);
   };
 
@@ -116,15 +114,7 @@ const AudienceList = () => {
           </Col>
           <Col xs={4}>
             <Tooltip title="Send email to this audience" arrowPointAtCenter>
-              <Button
-                block
-                type="link"
-                icon={<MailOutlined />}
-                onClick={() => {
-                  setSelectedAudiences([record]);
-                  showSendEmailModal();
-                }}
-              />
+              <Button block type="link" icon={<MailOutlined />} onClick={() => showSendEmailModal([record])} />
             </Tooltip>
           </Col>
         </Row>
@@ -154,15 +144,7 @@ const AudienceList = () => {
               <Button block type="text" danger icon={<DeleteOutlined />} />
             </Popconfirm>,
             <Tooltip title="Send email to this audience" arrowPointAtCenter>
-              <Button
-                block
-                type="link"
-                icon={<MailOutlined />}
-                onClick={() => {
-                  setSelectedAudiences([audience]);
-                  showSendEmailModal();
-                }}
-              />
+              <Button block type="link" icon={<MailOutlined />} onClick={() => showSendEmailModal([audience])} />
             </Tooltip>,
           ]}
         />
@@ -175,11 +157,15 @@ const AudienceList = () => {
       <SendAudienceEmailModal
         visible={sendEmailModalVisible}
         closeModal={hideSendEmailModal}
-        recipients={selectedAudiences}
+        recipients={emailRecipients}
       />
       <Row gutter={[16, 16]}>
         <Col xs={24}>
-          <Button type="primary" disabled={selectedAudiences.length <= 0} onClick={() => showSendEmailModal()}>
+          <Button
+            type="primary"
+            disabled={selectedAudiences.length <= 0}
+            onClick={() => showSendEmailModal(selectedAudiences)}
+          >
             Send Email to selected audiences
           </Button>
         </Col>

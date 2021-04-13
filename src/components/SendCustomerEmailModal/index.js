@@ -139,7 +139,7 @@ const SendCustomerEmailModal = () => {
                 showSearch
                 placeholder="Select the recipients"
                 mode="multiple"
-                maxTagCount="responsive"
+                maxTagCount={3}
                 values={selectedRecipients}
                 optionLabelProp="label"
               >

@@ -117,11 +117,11 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
                 showSearch
                 placeholder="Select the recipients"
                 mode="multiple"
-                maxTagCount="responsive"
+                maxTagCount={3}
                 values={selectedRecipients}
                 onChange={(val) => setSelectedRecipients(val)}
                 options={validRecipients.map((recipient) => ({
-                  label: `${recipient.first_name} ${recipient.last_name || ''} (${recipient.email})`,
+                  label: `${recipient.first_name} ${recipient.last_name || ''}`,
                   value: recipient.id,
                 }))}
               />
