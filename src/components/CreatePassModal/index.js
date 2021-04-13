@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
 
 import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
@@ -61,6 +63,7 @@ const colorPickerChoices = [
 
 const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const [classes, setClasses] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -80,7 +83,6 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
 
       if (isAPISuccess(status) && data) {
         setClasses(data);
-        setCurrency(data[0].currency.toUpperCase());
       }
     } catch (error) {
       showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
@@ -104,6 +106,34 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
 
     setIsLoading(false);
   }, []);
+
+  const fetchCreatorCurrency = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.session.getCreatorBalance();
+
+      if (isAPISuccess(status) && data?.currency) {
+        setCurrency(data.currency.toUpperCase());
+      }
+    } catch (error) {
+      if (error.response?.data?.message === 'unable to fetch user payment details') {
+        Modal.confirm({
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid pass`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
+          onOk: () => {
+            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+          },
+        });
+      } else {
+        showErrorModal(
+          'Failed to fetch creator currency details',
+          error?.response?.data?.message || 'Something went wrong'
+        );
+      }
+    }
+    setIsLoading(false);
+  }, [history]);
 
   useEffect(() => {
     if (visible) {
@@ -132,10 +162,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         setCurrency('SGD');
       }
 
+      fetchCreatorCurrency();
       fetchAllClassesForCreator();
       fetchAllVideosForCreator();
     }
-  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, form]);
+  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, fetchCreatorCurrency, form]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
