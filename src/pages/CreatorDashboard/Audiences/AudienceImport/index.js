@@ -268,6 +268,8 @@ const AudienceImport = () => {
     );
   };
 
+  // TODO: Add filter and select for mobile
+
   return (
     <div>
       <Loader loading={isSubmitting}>
@@ -341,11 +343,14 @@ const AudienceImport = () => {
                           okText="Yes, clear them"
                           cancelText="No, keep them"
                         >
-                          <Button disabled={editableEmailList.length <= 0}> Clear list</Button>
+                          <Button block disabled={editableEmailList.length <= 0}>
+                            {' '}
+                            Clear list
+                          </Button>
                         </Popconfirm>
                       </Col>
                       <Col xs={12} md={8} lg={6}>
-                        <Button type="primary" htmlType="submit" disabled={editableEmailList.length <= 0}>
+                        <Button block type="primary" htmlType="submit" disabled={editableEmailList.length <= 0}>
                           Save Audiences
                         </Button>
                       </Col>

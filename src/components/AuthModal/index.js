@@ -86,6 +86,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
   }, [showPasswordHelperText]);
 
   const signupUser = async (values) => {
+    setIsLoading(true);
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -109,6 +110,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
+    setIsLoading(false);
   };
 
   const onFinish = async (values) => {
