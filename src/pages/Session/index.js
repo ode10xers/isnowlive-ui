@@ -17,9 +17,10 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
+import config from 'config';
 import apis from 'apis';
 import Routes from 'routes';
 import Section from 'components/Section';
@@ -37,10 +38,13 @@ import {
   scrollToErrorField,
   generateRandomColor,
   isValidFile,
+  ZoomAuthType,
 } from 'utils/helper';
-import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
+import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
+
+import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -117,6 +121,12 @@ const Session = ({ match, history }) => {
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
   const [creatorDocuments, setCreatorDocuments] = useState([]);
+
+  const {
+    state: {
+      userDetails: { zoom_connected = 'NOT_CONNECTED' },
+    },
+  } = useGlobalContext();
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -700,6 +710,18 @@ const Session = ({ match, history }) => {
               />
             </div>
           </Form.Item>
+
+          {zoom_connected === ZoomAuthType.NOT_CONNECTED && (
+            <Form.Item {...(!isMobileDevice && profileFormTailLayout)}>
+              <Button
+                type="primary"
+                icon={<VideoCameraOutlined />}
+                onClick={() => window.open(config.zoom.oAuthURL, '_self')}
+              >
+                Link your zoom
+              </Button>
+            </Form.Item>
+          )}
 
           <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Enter Session Name" />
