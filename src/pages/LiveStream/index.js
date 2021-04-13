@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Form, Typography, Button, Space, Row, Col, Input, message } from 'antd';
+import { VideoCameraOutlined } from '@ant-design/icons';
 
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
@@ -169,6 +170,7 @@ const LiveStream = () => {
                 <Button
                   type="primary"
                   className={styles.mt30}
+                  icon={<VideoCameraOutlined />}
                   onClick={() => {
                     connectZoomAccount();
                     trackSimpleEvent(creator.click.livestream.connectZoomAccount);

@@ -143,7 +143,6 @@ const GlobalDataProvider = ({ children }) => {
     dispatch({ type: 'HIDE_SEND_EMAIL_POPUP' });
   }
 
-
   function logOut(history, dontRedirect = false) {
     if (!dontRedirect) {
       history.push(Routes.login);
