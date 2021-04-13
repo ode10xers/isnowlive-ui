@@ -101,7 +101,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
         <Row gutter={[8, 16]}>
           <Col xs={24}>
             <Form.Item {...sendCustomerEmailFormLayout} label="Replies will be sent to">
-              <Text strong> {getLocalUserDetails().email} </Text>
+              <Text strong> {getLocalUserDetails()?.email} </Text>
             </Form.Item>
           </Col>
           <Col xs={24}>
