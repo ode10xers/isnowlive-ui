@@ -712,7 +712,7 @@ const Session = ({ match, history }) => {
           </Form.Item>
 
           {zoom_connected === ZoomAuthType.NOT_CONNECTED && (
-            <Form.Item {...(!isMobileDevice && profileFormTailLayout)}>
+            <Form.Item label={<Text type="danger"> Session hosting link </Text>}>
               <Button
                 type="primary"
                 icon={<VideoCameraOutlined />}
