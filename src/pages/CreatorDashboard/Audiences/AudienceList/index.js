@@ -177,7 +177,7 @@ const AudienceList = () => {
             disabled={selectedAudiences.length <= 0}
             onClick={() => showSendEmailModal(selectedAudiences)}
           >
-            Send Email to selected audiences
+            Send Email to recipients
           </Button>
         </Col>
         <Col xs={24}>
