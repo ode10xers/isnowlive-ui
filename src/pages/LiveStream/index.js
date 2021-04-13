@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, message } from 'antd';
 
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
@@ -29,7 +29,7 @@ const LiveStream = () => {
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
-  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.JWT);
+  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
   const [isLoading, setIsLoading] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const {
@@ -89,9 +89,10 @@ const LiveStream = () => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnboarding(false);
     }
-    if (zoom_connected !== ZoomAuthType.NOT_CONNECTED) {
-      setSelectedZoomOption(zoom_connected);
-    }
+    setSelectedZoomOption(ZoomAuthType.OAUTH);
+    // if (zoom_connected !== ZoomAuthType.NOT_CONNECTED) {
+    //   setSelectedZoomOption(zoom_connected);
+    // }
     if (zoom_connected === ZoomAuthType.JWT) {
       getZoomJWTDetails();
     }
@@ -143,17 +144,17 @@ const LiveStream = () => {
       <Section>
         <Title level={4}>Setup your Zoom</Title>
 
-        <Row className={styles.zoomOption}>
+        {/* <Row className={styles.zoomOption}>
           <label className={styles.accountSelectionLabel}>Ways to setup:</label>
           <Radio.Group onChange={(e) => setSelectedZoomOption(e.target.value)} value={selectedZoomOption}>
             <Radio value={ZoomAuthType.OAUTH}>Connect your Zoom account</Radio>
             <Radio value={ZoomAuthType.JWT}>Add your Zoom details</Radio>
           </Radio.Group>
-        </Row>
+        </Row> */}
 
         {selectedZoomOption === ZoomAuthType.OAUTH && (
           <Row align="center" className={styles.zoomConnectAccount}>
-            {zoom_connected === ZoomAuthType.OAUTH ? (
+            {zoom_connected === ZoomAuthType.OAUTH || zoom_connected === ZoomAuthType.JWT ? (
               <>
                 <Button type="primary" className={styles.success}>
                   Zoom account is connected
