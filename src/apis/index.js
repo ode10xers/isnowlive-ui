@@ -138,6 +138,7 @@ export default {
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
+    sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/post', payload),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),

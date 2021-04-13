@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Form, Modal, Tooltip, Input, Select, Typography, Button } from 'antd';
+import { Row, Col, Modal, Form, Input, Tooltip, Button, Select, Typography } from 'antd';
 import { FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import FileUpload from 'components/FileUpload';
 import TextEditor from 'components/TextEditor';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import FileUpload from 'components/FileUpload';
+import { showSuccessModal, showErrorModal } from 'components/Modals/modals';
 
-import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
+import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { sendCustomerEmailFormLayout, sendCustomerEmailBodyFormLayout } from 'layouts/FormLayouts';
-
-import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 
@@ -25,50 +23,32 @@ const formInitialValues = {
   subject: '',
 };
 
-const SendCustomerEmailModal = () => {
-  const {
-    state: { emailPopupVisible, emailPopupData },
-    hideSendEmailPopup,
-  } = useGlobalContext();
-
-  const { recipients, productId, productType } = emailPopupData;
-
+// The functionality is very similar to SendCustomerEmailModal
+// But the data is handled differently since Audience is a different entity
+// Also SendCustomerEmail requires some product information while this one does not
+const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
   const [form] = Form.useForm();
 
   const [submitting, setSubmitting] = useState(false);
-  const [validRecipients, setValidRecipients] = useState({
-    active: [],
-    expired: [],
-  });
+  const [validRecipients, setValidRecipients] = useState([]);
   const [selectedRecipients, setSelectedRecipients] = useState([]);
   const [emailDocumentUrl, setEmailDocumentUrl] = useState(null);
 
   useEffect(() => {
-    if (!emailPopupVisible || (recipients?.active?.length < 1 && recipients?.expired?.length < 1)) {
-      setSubmitting(false);
-      setValidRecipients({
-        active: [],
-        expired: [],
-      });
-      setSelectedRecipients([]);
-      setEmailDocumentUrl(null);
-
-      form.resetFields();
-    } else {
+    if (visible && recipients.length > 0) {
       setValidRecipients(recipients);
-      setSelectedRecipients([
-        ...recipients?.active?.map((user) => user.external_id),
-        ...recipients?.expired?.map((user) => user.external_id),
-      ]);
-
+      setSelectedRecipients(recipients.map((recipient) => recipient.id));
       form.setFieldsValue({
-        recipients: [
-          ...recipients?.active?.map((user) => user.external_id),
-          ...recipients?.expired?.map((user) => user.external_id),
-        ],
+        recipients: recipients.map((recipient) => recipient.id),
       });
+    } else {
+      form.resetFields();
+      setEmailDocumentUrl(null);
+      setSelectedRecipients([]);
+      setValidRecipients([]);
+      setSubmitting(false);
     }
-  }, [emailPopupVisible, recipients, form]);
+  }, [visible, form, recipients]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -82,19 +62,17 @@ const SendCustomerEmailModal = () => {
 
     try {
       const payload = {
-        product_id: productId,
-        product_type: productType,
         body: values.emailBody,
         subject: values.subject,
-        user_ids: selectedRecipients || values.recipients,
+        audiences: selectedRecipients || values.recipients,
         document_url: emailDocumentUrl || '',
       };
 
-      const { status } = await apis.user.sendProductEmailToCustomers(payload);
+      const { status } = await apis.audiences.sendEmailToAudiences(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Emails sent');
-        hideSendEmailPopup();
+        showSuccessModal('Emails sent successfully');
+        closeModal();
       }
     } catch (error) {
       showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
@@ -105,16 +83,16 @@ const SendCustomerEmailModal = () => {
 
   return (
     <Modal
-      title={<Title level={5}> Send email to customers </Title>}
-      visible={emailPopupVisible}
+      title={<Title level={5}> Send email to audiences </Title>}
+      visible={visible}
       centered={true}
-      onCancel={() => hideSendEmailPopup()}
+      onCancel={() => closeModal()}
       footer={null}
       width={640}
     >
       <Form
         layout="horizontal"
-        name="EmailForm"
+        name="emailForm"
         form={form}
         onFinish={handleFinish}
         scrollToFirstError={true}
@@ -141,31 +119,12 @@ const SendCustomerEmailModal = () => {
                 mode="multiple"
                 maxTagCount="responsive"
                 values={selectedRecipients}
-                optionLabelProp="label"
-              >
-                <Select.OptGroup
-                  label={<Text className={styles.optionSeparatorText}> Active User </Text>}
-                  key="Active User"
-                >
-                  {validRecipients?.active?.map((recipient) => (
-                    <Select.Option value={recipient.external_id} key={recipient.external_id} label={recipient.name}>
-                      {recipient.name}
-                    </Select.Option>
-                  ))}
-                  {validRecipients?.active?.length <= 0 && <Text disabled> No active user </Text>}
-                </Select.OptGroup>
-                <Select.OptGroup
-                  label={<Text className={styles.optionSeparatorText}> Expired User </Text>}
-                  key="Expired User"
-                >
-                  {validRecipients?.expired?.map((recipient) => (
-                    <Select.Option value={recipient.external_id} key={recipient.external_id} label={recipient.name}>
-                      {recipient.name}
-                    </Select.Option>
-                  ))}
-                  {validRecipients?.expired?.length <= 0 && <Text disabled> No expired user </Text>}
-                </Select.OptGroup>
-              </Select>
+                onChange={(val) => setSelectedRecipients(val)}
+                options={validRecipients.map((recipient) => ({
+                  label: `${recipient.first_name} ${recipient.last_name || ''} (${recipient.email})`,
+                  value: recipient.id,
+                }))}
+              />
             </Form.Item>
           </Col>
           <Col xs={24}>
@@ -230,7 +189,7 @@ const SendCustomerEmailModal = () => {
         </Row>
         <Row justify="end" align="center" gutter={16}>
           <Col xs={12} md={6}>
-            <Button block type="default" onClick={() => hideSendEmailPopup()} loading={submitting}>
+            <Button block type="default" onClick={() => closeModal()} loading={submitting}>
               Cancel
             </Button>
           </Col>
@@ -245,4 +204,4 @@ const SendCustomerEmailModal = () => {
   );
 };
 
-export default SendCustomerEmailModal;
+export default SendAudienceEmailModal;
