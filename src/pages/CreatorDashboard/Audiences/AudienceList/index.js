@@ -24,7 +24,7 @@ const AudienceList = () => {
 
   const [pageNumber, setPageNumber] = useState(1);
   const [canShowMore, setCanShowMore] = useState(false);
-  const totalItemsPerPage = 5;
+  const totalItemsPerPage = 10;
 
   const getAudienceList = useCallback(async (pageNumber, itemsPerPage) => {
     setIsLoading(true);
@@ -93,6 +93,7 @@ const AudienceList = () => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
+      render: (text, record) => `${record.type[0]}${record.type.slice(1).toLowerCase()}`,
       filters: [
         {
           text: 'Audiences',
