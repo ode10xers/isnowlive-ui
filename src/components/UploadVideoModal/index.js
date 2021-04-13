@@ -149,7 +149,7 @@ const UploadVideoModal = ({
     } catch (error) {
       if (error.response?.data?.message === 'unable to fetch user payment details') {
         Modal.confirm({
-          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid pass`,
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid video`,
           okText: 'Setup payment account',
           cancelText: 'Keep it free',
           onOk: () => {
