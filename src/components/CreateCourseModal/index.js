@@ -472,7 +472,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedCourse ? 'update' : 'create'} course`);
+      showErrorModal(
+        `Failed to ${editedCourse ? 'update' : 'create'} course`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setSubmitting(false);

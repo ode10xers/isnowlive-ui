@@ -223,7 +223,10 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedPass ? 'update' : 'create'} pass`);
+      showErrorModal(
+        `Failed to ${editedPass ? 'update' : 'create'} pass`,
+        error?.response?.data?.message || 'Something went wrong'
+      );
     }
 
     setIsSubmitting(false);

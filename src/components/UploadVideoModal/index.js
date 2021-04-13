@@ -185,7 +185,10 @@ const UploadVideoModal = ({
       } else {
         form.resetFields();
       }
-      fetchCreatorCurrency();
+
+      if (formPart === 1) {
+        fetchCreatorCurrency();
+      }
       fetchAllClassesForCreator();
     } else {
       document.body.style.overflow = 'auto';
@@ -252,7 +255,10 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedVideo ? 'update' : 'create'} video`);
+      showErrorModal(
+        `Failed to ${editedVideo ? 'update' : 'create'} video`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setIsSubmitting(false);
