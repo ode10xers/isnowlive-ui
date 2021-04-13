@@ -8,7 +8,7 @@ import AudienceList from './AudienceList';
 import styles from './styles.module.scss';
 
 const { TabPane } = Tabs;
-const { Title } = Typography;
+const { Title, Paragraph } = Typography;
 
 const Audiences = () => {
   const [selectedTab, setSelectedTab] = useState('list');
@@ -17,6 +17,15 @@ const Audiences = () => {
     <Row gutter={[16, 16]}>
       <Col xs={24}>
         <Title level={4}> Audiences </Title>
+      </Col>
+      <Col xs={24}>
+        <Paragraph>
+          A Member is a person who has an account on this site and has purchased at least 1 of your products.
+        </Paragraph>
+        <Paragraph>
+          An Audience is a person subscribed to your email list but does not have an account on this site and hence
+          hasn't bought any of your products yet.
+        </Paragraph>
       </Col>
       <Col xs={24}>
         <Tabs size="large" activeKey={selectedTab} onChange={setSelectedTab}>

@@ -76,24 +76,34 @@ const AudienceList = () => {
   };
 
   const audienceListColumns = [
-    // {
-    //   title: 'Email Address',
-    //   dataIndex: 'email',
-    //   key: 'email',
-    //   width: '30%',
-    // },
     {
       title: 'First Name',
       dataIndex: 'first_name',
       key: 'first_name',
-      width: '42%',
+      width: '32%',
     },
     {
       title: 'Last Name',
       dataIndex: 'last_name',
       key: 'last_name',
-      width: '42%',
+      width: '32%',
       render: (text, record) => record.last_name || '-',
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      filters: [
+        {
+          text: 'Audiences',
+          value: 'AUDIENCE',
+        },
+        {
+          text: 'Members',
+          value: 'MEMBER',
+        },
+      ],
+      onFilter: (value, record) => record.type === value,
     },
     {
       title: 'Actions',
