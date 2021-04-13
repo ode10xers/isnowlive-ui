@@ -53,7 +53,7 @@ const AudienceList = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Successfully removed audience');
-        getAudienceList(pageNumber, totalItemsPerPage);
+        setAudienceList(audienceList.filter((audienceData) => audienceData.id !== audience.id));
       }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
@@ -61,7 +61,6 @@ const AudienceList = () => {
   };
 
   const onSelectAudienceRow = (selectedRowKeys, selectedRow) => {
-    console.log(selectedRow);
     setSelectedAudiences(selectedRow);
   };
 
