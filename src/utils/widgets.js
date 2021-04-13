@@ -1,6 +1,5 @@
 import { generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { getAuthCookie } from 'services/authCookie';
 import parseQueryString from 'utils/parseQueryString';
 
 export const widgetComponentsName = {
@@ -22,24 +21,6 @@ export const generateWidgetLink = (widgetName, userNameValue = '') => {
     .join('&');
 
   return `${siteLink}?${queryParams}`;
-};
-
-export const generateWidgetUrl = (userName, widgetToLoad, passAuthCodeInUrl = false) => {
-  let authCode = null;
-  if (passAuthCodeInUrl) {
-    const authCodeFromCookie = getAuthCookie();
-    if (authCodeFromCookie && authCodeFromCookie !== '') {
-      authCode = authCodeFromCookie;
-    } else {
-      const userDetails = getLocalUserDetails();
-      authCode = userDetails?.auth_token;
-    }
-  }
-
-  return (
-    generateWidgetLink(widgetToLoad, userName) +
-    `${passAuthCodeInUrl && authCode && authCode !== '' ? `&authCode=${authCode}` : ''}`
-  );
 };
 
 export const isWidgetUrl = () => {

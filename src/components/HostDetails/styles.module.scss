@@ -1,6 +1,7 @@
 @import '../../styles/variables.scss';
 
-.creatorName, .fullProfile {
+.creatorName,
+.fullProfile {
   cursor: pointer;
 
   &:hover {
@@ -28,7 +29,6 @@
   border: 2px solid map-get($colors, 'White');
   border-radius: 4px;
   cursor: pointer;
-
 }
 .profileImage {
   img {
@@ -41,7 +41,6 @@
   border: 2px solid map-get($colors, 'White');
   border-radius: 4px;
   cursor: pointer;
-
 }
 .profileImageSmall {
   img {
@@ -77,8 +76,6 @@
   span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-      background-color: map-get($colors, 'White1') !important;
-  
-
+    background-color: map-get($colors, 'White1') !important;
   }
 }

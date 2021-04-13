@@ -929,10 +929,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     <Form.Item
                       id="price"
                       name="price"
-                      rules={validationRules.numberValidation('Please Input Course Price', 1, false)}
+                      rules={validationRules.numberValidation('Please Input Course Price', 0, false)}
                       noStyle
                     >
-                      <InputNumber min={1} placeholder="Course Price" className={styles.numericInput} />
+                      <InputNumber min={0} placeholder="Course Price" className={styles.numericInput} />
                     </Form.Item>
                   </Col>
                   <Col xs={4} className={styles.textAlignCenter}>
