@@ -53,7 +53,7 @@ const AudienceList = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Successfully removed audience');
-        getAudienceList();
+        getAudienceList(pageNumber, totalItemsPerPage);
       }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
