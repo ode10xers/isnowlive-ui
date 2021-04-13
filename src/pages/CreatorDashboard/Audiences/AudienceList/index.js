@@ -15,20 +15,24 @@ import SendAudienceEmailModal from 'components/SendAudienceEmailModal';
 
 const { Title, Text } = Typography;
 
-// TODO: Implement Pagination when BE has implemented it
 const AudienceList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [audienceList, setAudienceList] = useState([]);
   const [selectedAudiences, setSelectedAudiences] = useState([]);
   const [sendEmailModalVisible, setSendEmailModalVisible] = useState(false);
 
-  const getAudienceList = useCallback(async () => {
+  const [pageNumber, setPageNumber] = useState(1);
+  const [canShowMore, setCanShowMore] = useState(false);
+  const totalItemsPerPage = 5;
+
+  const getAudienceList = useCallback(async (pageNumber, itemsPerPage) => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.audiences.getCreatorAudiences();
+      const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage);
 
       if (isAPISuccess(status) && data) {
-        setAudienceList(data.audiences);
+        setAudienceList((audienceList) => [...audienceList, ...data.data]);
+        setCanShowMore(data.next_page);
       }
     } catch (error) {
       showErrorModal(error?.response?.data?.message || 'Something went wrong.');
@@ -37,8 +41,8 @@ const AudienceList = () => {
   }, []);
 
   useEffect(() => {
-    getAudienceList();
-  }, [getAudienceList]);
+    getAudienceList(pageNumber, totalItemsPerPage);
+  }, [getAudienceList, pageNumber, totalItemsPerPage]);
 
   const deleteAudience = async (audience) => {
     try {
@@ -176,7 +180,7 @@ const AudienceList = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <Button type="primary" disabled={selectedAudiences.length <= 0} onClick={() => showSendEmailModal()}>
-            Send Email
+            Send Email to selected audiences
           </Button>
         </Col>
         <Col xs={24}>
@@ -191,16 +195,31 @@ const AudienceList = () => {
               )}
             </Loader>
           ) : (
-            <Table
-              size="small"
-              loading={isLoading}
-              data={audienceList}
-              columns={audienceListColumns}
-              rowKey={(record) => record.id}
-              rowSelection={{
-                onChange: onSelectAudienceRow,
-              }}
-            />
+            <Row gutter={[8, 16]} justify="center">
+              <Col xs={24}>
+                <Table
+                  size="small"
+                  loading={isLoading}
+                  data={audienceList}
+                  columns={audienceListColumns}
+                  rowKey={(record) => record.id}
+                  rowSelection={{
+                    onChange: onSelectAudienceRow,
+                  }}
+                />
+              </Col>
+              <Col xs={8}>
+                <Button
+                  block
+                  type="default"
+                  loading={isLoading}
+                  disabled={!canShowMore}
+                  onClick={() => setPageNumber(pageNumber + 1)}
+                >
+                  Show more audience
+                </Button>
+              </Col>
+            </Row>
           )}
         </Col>
       </Row>
