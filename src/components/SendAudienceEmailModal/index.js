@@ -64,7 +64,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       const payload = {
         body: values.emailBody,
         subject: values.subject,
-        audiences: selectedRecipients || values.recipients,
+        audience_ids: selectedRecipients || values.recipients,
         document_url: emailDocumentUrl || '',
       };
 
