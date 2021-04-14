@@ -10,7 +10,7 @@ import {
   showBookSingleSessionSuccessModal,
   showPurchaseSingleVideoSuccessModal,
   showPurchasePassSuccessModal,
-  showSuccessModal,
+  showPurchaseSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -166,8 +166,7 @@ const PaymentPopup = () => {
         // Showing confirmation for Single Session Booking
         showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
       } else if (verifyOrderRes === orderType.SUBSCRIPTION) {
-        // TODO: Make a specific modal for this
-        showSuccessModal('Subscription purchased successfully!');
+        showPurchaseSubscriptionSuccessModal();
       }
     }
 
@@ -192,8 +191,8 @@ const PaymentPopup = () => {
       const subscriptionDetails = paymentInstrumentDetails;
 
       textContent = `Will use ${subscriptionDetails.subscription_name} to book this and you'll be left with ${
-        subscriptionDetails.products[productType].credits - subscriptionDetails.products[productType].credits_used
-      } - 1/${subscriptionDetails.products[productType].credits} credits to book other ${productType.toLowerCase()}`;
+        subscriptionDetails.products[productType].credits - subscriptionDetails.products[productType].credits_used - 1
+      }/${subscriptionDetails.products[productType].credits} credits`;
     }
 
     return (

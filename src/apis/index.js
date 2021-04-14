@@ -135,6 +135,8 @@ export default {
   },
   subscriptions: {
     createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
+    publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
+    unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
     updateSubscription: (subscriptionId, payload) =>
       http.patch(`/secure/creator/subscription/${subscriptionId}`, payload),
     getCreatorSubscriptions: (pageNo, perPage = 3) =>
@@ -150,8 +152,6 @@ export default {
     getUserSubscriptionForVideo: (videoId) => http.get(`/secure/customer/subscriptions/orders?video_id=${videoId}`),
     getUserSubscriptionForCourse: (courseId) => http.get(`/secure/customer/subscriptions/orders?course_id=${courseId}`),
     createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
-    publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
-    unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
     getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders'),
   },
   audiences: {

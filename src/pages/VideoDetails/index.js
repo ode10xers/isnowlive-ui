@@ -19,6 +19,7 @@ import {
   showPurchasePassAndGetVideoSuccessModal,
   showGetVideoWithPassSuccessModal,
   showPurchaseSingleVideoSuccessModal,
+  showGetVideoWithSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -54,11 +55,10 @@ const VideoDetails = ({ match }) => {
   const [availablePassesForVideo, setAvailablePassesForVideo] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
-  const [userSubscriptions, setUserSubscriptions] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
   const [username, setUsername] = useState(null);
-  const [selectedSubscription, setSelectedSubscription] = useState(null);
+  const [usableUserSubscription, setUsableUserSubscription] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
@@ -153,10 +153,28 @@ const VideoDetails = ({ match }) => {
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData) {
+        // TODO: Can put this as a generic helper
         const { status, data } = await apis.subscriptions.getUserSubscriptionForVideo(videoId);
 
         if (isAPISuccess(status) && data) {
-          setUserSubscriptions(data.active);
+          if (data.active.length > 0) {
+            // Choose a purchased subscription based on these conditions
+            // 1. Should be usable for Videos
+            // 2. Still have credits to purchase videos
+            // 3. This video can be purchased by this subscription
+            const usableSubscriptions =
+              data.active.filter(
+                (subscription) =>
+                  subscription.products['VIDEO'] &&
+                  subscription.products['VIDEO']?.credits > 0 &&
+                  subscription.products['VIDEO']?.product_ids?.includes(videoId)
+              ) || [];
+
+            // Set the first usable one
+            setUsableUserSubscription(usableSubscriptions.length > 0 ? usableSubscriptions[0] : null);
+          } else {
+            setUsableUserSubscription(null);
+          }
         }
       }
     } catch (error) {
@@ -206,8 +224,6 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
       message.error('Video details not found.');
     }
-
-    setSelectedSubscription(null);
     //eslint-disable-next-line
   }, [match.params.video_id]);
 
@@ -216,7 +232,7 @@ const VideoDetails = ({ match }) => {
       showConfirmPaymentPopup();
     }
     //eslint-disable-next-line
-  }, [userPasses]);
+  }, [shouldFollowUpGetVideo]);
 
   const purchaseVideo = async (payload) => await apis.videos.createOrderForUser(payload);
 
@@ -227,15 +243,6 @@ const VideoDetails = ({ match }) => {
       }
 
       return userPasses[0];
-    }
-
-    return null;
-  };
-
-  const getUserPurchasedSubscription = () => {
-    if (userSubscriptions.length > 0) {
-      // TODO: For now return the first active subscription found
-      return userSubscriptions[0];
     }
 
     return null;
@@ -369,8 +376,7 @@ const VideoDetails = ({ match }) => {
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
-        // TODO: Make a specific modal for this
-        showSuccessModal('Video Purchased using Subscription');
+        showGetVideoWithSubscriptionSuccessModal();
         setIsLoading(false);
       }
     } catch (error) {
@@ -387,9 +393,18 @@ const VideoDetails = ({ match }) => {
 
   const showConfirmPaymentPopup = async () => {
     if (!shouldFollowUpGetVideo) {
-      if (getLocalUserDetails() && userPasses.length <= 0) {
+      // If user logged in from AuthModal
+      // We fetch the usable subscriptions/pass info
+      if (getLocalUserDetails() && (userPasses.length <= 0 || !usableUserSubscription)) {
+        if (userPasses.length <= 0) {
+          await getUsablePassesForUser(match.params.video_id);
+        }
+
+        if (!usableUserSubscription) {
+          await getUsableSubscriptionForUser(match.params.video_id);
+        }
+
         setShouldFollowUpGetVideo(true);
-        getUsablePassesForUser(match.params.video_id);
         return;
       }
     } else {
@@ -398,96 +413,99 @@ const VideoDetails = ({ match }) => {
 
     const videoDesc = `Can be watched up to ${video.watch_limit} times, valid for ${video.validity} days`;
 
-    //Handling edge case, buy free video using pass
-    //We redirect them to the buySingleVideo flow
-    if (selectedPass && video?.price > 0) {
-      const usableUserPass = getUserPurchasedPass(true);
+    const usableUserPass = getUserPurchasedPass(true);
+    console.log(usableUserSubscription);
+    if (usableUserSubscription && video?.price > 0) {
+      // Get Video using Subscription
+      // If user have a subscription usable for purchasing this product
+      // We prioritize using that subscription
+      const payload = {
+        video_id: video.external_id,
+        payment_source: paymentSource.SUBSCRIPTION,
+        source_id: usableUserSubscription.subscription_order_id,
+      };
 
-      if (usableUserPass) {
-        const paymentPopupData = {
-          productId: video.external_id,
-          productType: 'VIDEO',
-          itemList: [
-            {
-              name: video.title,
-              description: videoDesc,
-              currency: video.currency,
-              price: video.price,
-            },
-          ],
-          paymentInstrumentDetails: {
-            type: 'PASS',
-            ...usableUserPass,
+      const paymentPopupData = {
+        productId: video.external_id,
+        productType: 'VIDEO',
+        itemList: [
+          {
+            name: video.title,
+            description: videoDesc,
+            currency: video.currency,
+            price: video.price,
           },
-        };
+        ],
+        paymentInstrumentDetails: {
+          type: 'SUBSCRIPTION',
+          ...usableUserSubscription,
+        },
+      };
 
-        const payload = {
-          video_id: video.external_id,
-          payment_source: paymentSource.PASS,
-          source_id: usableUserPass.pass_order_id,
-        };
+      showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription(payload));
+    } else if (usableUserPass && video?.price > 0) {
+      // Get Video using Pass
+      // If user have usable pass for this video
+      // We use the pass to get the video
+      // If video is a free one, we redirect them to
+      // Single video booking flow to prevent accidental credit usage
+      const paymentPopupData = {
+        productId: video.external_id,
+        productType: 'VIDEO',
+        itemList: [
+          {
+            name: video.title,
+            description: videoDesc,
+            currency: video.currency,
+            price: video.price,
+          },
+        ],
+        paymentInstrumentDetails: {
+          type: 'PASS',
+          ...usableUserPass,
+        },
+      };
 
-        showPaymentPopup(paymentPopupData, async () => await buyVideoUsingPass(payload));
-      } else {
-        const paymentPopupData = {
-          productId: selectedPass.external_id,
-          productType: 'PASS',
-          itemList: [
-            {
-              name: selectedPass.name,
-              description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
-              currency: selectedPass.currency,
-              price: selectedPass.price,
-            },
-            {
-              name: video.title,
-              description: videoDesc,
-              currency: video.currency,
-              price: 0,
-            },
-          ],
-        };
+      const payload = {
+        video_id: video.external_id,
+        payment_source: paymentSource.PASS,
+        source_id: usableUserPass.pass_order_id,
+      };
 
-        const payload = {
-          pass_id: selectedPass.id,
-          price: selectedPass.price,
-          currency: selectedPass.currency.toLowerCase(),
-        };
+      showPaymentPopup(paymentPopupData, async () => await buyVideoUsingPass(payload));
+    } else if (selectedPass && video?.price > 0) {
+      // Buy Pass and Get Video
+      // If user decide to buy pass along with video
+      // We first buy the pass, then followup book the video
+      const paymentPopupData = {
+        productId: selectedPass.external_id,
+        productType: 'PASS',
+        itemList: [
+          {
+            name: selectedPass.name,
+            description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
+            currency: selectedPass.currency,
+            price: selectedPass.price,
+          },
+          {
+            name: video.title,
+            description: videoDesc,
+            currency: video.currency,
+            price: 0,
+          },
+        ],
+      };
 
-        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndGetVideo(payload, couponCode));
-      }
-    } else if (selectedSubscription && video?.price > 0) {
-      if (userSubscriptions.length > 0) {
-        const usableUserSubscription = getUserPurchasedSubscription();
+      const payload = {
+        pass_id: selectedPass.id,
+        price: selectedPass.price,
+        currency: selectedPass.currency.toLowerCase(),
+      };
 
-        if (usableUserSubscription) {
-          const payload = {
-            video_id: video.external_id,
-            payment_source: paymentSource.SUBSCRIPTION,
-            source_id: selectedSubscription.subscription_order_id,
-          };
-
-          const paymentPopupData = {
-            productId: video.external_id,
-            productType: 'VIDEO',
-            itemList: [
-              {
-                name: video.title,
-                description: videoDesc,
-                currency: video.currency,
-                price: video.price,
-              },
-            ],
-            paymentInstrumentDetails: {
-              type: 'SUBSCRIPTION',
-              ...usableUserSubscription,
-            },
-          };
-
-          showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription(payload));
-        }
-      }
+      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndGetVideo(payload, couponCode));
     } else {
+      // Single Video Booking
+      // Will also trigger for free video
       const paymentPopupData = {
         productId: video.external_id,
         productType: 'VIDEO',
@@ -693,62 +711,133 @@ const VideoDetails = ({ match }) => {
                   )
                 ) : (
                   <>
-                    {(!getLocalUserDetails() || userPasses.length <= 0) && (
-                      <Col xs={24} className={styles.p20}>
-                        <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
-                          <Row gutter={[8, 16]} align="center">
-                            <Col xs={24} md={16} xl={18}>
-                              <Row gutter={8}>
-                                <Col xs={24}>
-                                  <Title className={styles.blueText} level={3}>
-                                    {video?.title}
-                                  </Title>
-                                </Col>
-                                <Col xs={24}>
-                                  <Space size={isMobileDevice ? 'small' : 'middle'}>
-                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                      {`Validity ${video?.validity} Days`}
-                                    </Text>
-                                    <Divider type="vertical" />
-                                    <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                      {video?.price === 0
-                                        ? 'Free video'
-                                        : ` ${video?.currency.toUpperCase()} ${video?.price}`}
-                                    </Text>
-                                  </Space>
-                                </Col>
-                              </Row>
-                            </Col>
-                            <Col xs={24} md={8} xl={6}>
-                              <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                                {video?.price === 0 ? 'Get' : 'Buy'} This Video
-                              </Button>
-                            </Col>
-                          </Row>
-                        </Card>
-                      </Col>
-                    )}
-
-                    {(userPasses?.length > 0 || availablePassesForVideo?.length > 0) && (
+                    {/* 
+                      If user has usable subscription
+                      We show the video card with price 0
+                      and with the subscription details
+                    */}
+                    {usableUserSubscription && (
                       <>
                         <Col xs={24} className={styles.mt10}>
                           <Title level={3} className={styles.ml20}>
-                            {getLocalUserDetails() && userPasses.length > 0
-                              ? 'Buy using your pass'
-                              : availablePassesForVideo?.length > 0
-                              ? 'Buy a pass and this video'
-                              : ''}
+                            Buy using your subscription
                           </Title>
                         </Col>
-
-                        <Col xs={24} className={styles.passListContainer}>
-                          {getLocalUserDetails() && userPasses?.length > 0
-                            ? userPasses?.map((pass) => renderPassCards(pass, true))
-                            : availablePassesForVideo?.map((pass) => renderPassCards(pass, false))}
+                        <Col xs={24} className={styles.p20}>
+                          <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                            <Row gutter={[8, 16]} align="center">
+                              <Col xs={24} md={16} xl={18}>
+                                <Row gutter={[8, 16]}>
+                                  <Col xs={24} className={styles.headerWrapper}>
+                                    <Row gutter={16}>
+                                      <Col xs={24} md={17} xl={19} className={styles.textAlignLeft}>
+                                        <Title level={5}> {usableUserSubscription?.subscription_name} </Title>
+                                      </Col>
+                                      <Col xs={24} md={7} xl={5} className={styles.passPriceText}>
+                                        <Title level={5}>
+                                          {usableUserSubscription?.currency.toUpperCase()} 0 <del>{video?.price}</del>
+                                        </Title>
+                                      </Col>
+                                    </Row>
+                                  </Col>
+                                  <Col xs={24}>
+                                    <Text className={styles.blueText} strong>
+                                      Credits :{' '}
+                                      {`${
+                                        usableUserSubscription?.products['VIDEO'].credits -
+                                        usableUserSubscription?.products['VIDEO'].credits_used
+                                      }/${usableUserSubscription?.products['VIDEO'].credits}`}
+                                    </Text>
+                                  </Col>
+                                </Row>
+                              </Col>
+                              <Col xs={24} md={8} xl={6}>
+                                <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
+                                  Buy This Video
+                                </Button>
+                              </Col>
+                            </Row>
+                          </Card>
                         </Col>
                       </>
                     )}
 
+                    {/* 
+                      If user have purchased a pass
+                      that can be used to get this video
+                      we show them here
+                    */}
+                    {userPasses?.length > 0 && !usableUserSubscription && (
+                      <>
+                        <Col xs={24} className={styles.mt10}>
+                          <Title level={3} className={styles.ml20}>
+                            Buy using your pass
+                          </Title>
+                        </Col>
+                        <Col xs={24} className={styles.passListContainer}>
+                          {userPasses?.map((pass) => renderPassCards(pass, true))}
+                        </Col>
+                      </>
+                    )}
+
+                    {/* 
+                      If user don't have usable pass/subscription
+                      (will also trigger in logged out state)
+                    */}
+                    {userPasses?.length <= 0 && !usableUserSubscription && (
+                      <>
+                        {/* Show normal buy card */}
+                        <Col xs={24} className={styles.p20}>
+                          <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                            <Row gutter={[8, 16]} align="center">
+                              <Col xs={24} md={16} xl={18}>
+                                <Row gutter={8}>
+                                  <Col xs={24}>
+                                    <Title className={styles.blueText} level={3}>
+                                      {video?.title}
+                                    </Title>
+                                  </Col>
+                                  <Col xs={24}>
+                                    <Space size={isMobileDevice ? 'small' : 'middle'}>
+                                      <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                        {`Validity ${video?.validity} Days`}
+                                      </Text>
+                                      <Divider type="vertical" />
+                                      <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
+                                        {video?.price === 0
+                                          ? 'Free video'
+                                          : ` ${video?.currency.toUpperCase()} ${video?.price}`}
+                                      </Text>
+                                    </Space>
+                                  </Col>
+                                </Row>
+                              </Col>
+                              <Col xs={24} md={8} xl={6}>
+                                <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
+                                  {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                                </Button>
+                              </Col>
+                            </Row>
+                          </Card>
+                        </Col>
+                        {/* Show passes that can be used to buy this */}
+                        {availablePassesForVideo?.length > 0 && (
+                          <>
+                            <Col xs={24} className={styles.mt10}>
+                              <Title level={3} className={styles.ml20}>
+                                Buy a pass and this video
+                              </Title>
+                            </Col>
+
+                            <Col xs={24} className={styles.passListContainer}>
+                              {availablePassesForVideo?.map((pass) => renderPassCards(pass, false))}
+                            </Col>
+                          </>
+                        )}
+                      </>
+                    )}
+
+                    {/* Upsellin section for sessions related to video */}
                     {video.sessions?.length > 0 && (
                       <Col xs={24}>
                         <Row gutter={[8, 8]}>

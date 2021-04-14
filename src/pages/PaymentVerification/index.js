@@ -26,6 +26,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
+// TODO: This page is no longer used, since in page payment is implemented
 const PaymentVerification = () => {
   const {
     state: { userDetails },
