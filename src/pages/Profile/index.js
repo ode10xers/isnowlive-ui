@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin, Modal } from 'antd';
 import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 
@@ -14,7 +14,7 @@ import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
 import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
-import { parseEmbedCode, scrollToErrorField, isAPISuccess } from 'utils/helper';
+import { parseEmbedCode, scrollToErrorField, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -27,7 +27,7 @@ import {
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
@@ -76,8 +76,76 @@ const Profile = () => {
         localUserDetails.profile_complete = true;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         if (isOnboarding) {
-          window.open(Routes.profilePreview);
-          history.push(Routes.livestream);
+          const newWindow = window.open(Routes.profilePreview);
+          newWindow.blur();
+          window.focus();
+          // history.push(Routes.livestream);
+          const userDetails = getLocalUserDetails();
+
+          const creatorUrl = generateUrlFromUsername(userDetails.username);
+          const modalRef = Modal.success({
+            width: 550,
+            okButtonProps: { style: { display: 'none' } },
+            title: 'Awesome! Your public website is ready',
+            content: (
+              <Row gutter={[8, 12]}>
+                <Col xs={24}>
+                  <Paragraph>
+                    You can now share your website{' '}
+                    <Link href={creatorUrl} target="_blank" copyable>
+                      {creatorUrl}
+                    </Link>{' '}
+                    on your social media or with your audience.
+                  </Paragraph>
+                  <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
+                </Col>
+                <Col xs={24}>
+                  <Row gutter={[8, 8]} justify="space-around">
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="primary"
+                        onClick={() => {
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, {
+                            onboarding: true,
+                          });
+                          modalRef.destroy();
+                        }}
+                      >
+                        Upload a Video
+                      </Button>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="primary"
+                        className={styles.greenBtn}
+                        onClick={() => {
+                          history.push(Routes.session);
+                          window.scrollTo(0, 0);
+                          modalRef.destroy();
+                        }}
+                      >
+                        Schedule a Session
+                      </Button>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="link"
+                        onClick={() => {
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath);
+                          modalRef.destroy();
+                        }}
+                      >
+                        I'll do these later
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            ),
+          });
         } else {
           history.push('/creator/dashboard/profile');
         }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Form, Typography, Button, Space, Row, Col, Input, message } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, Modal, message } from 'antd';
 import { VideoCameraOutlined } from '@ant-design/icons';
 
 import OnboardSteps from 'components/OnboardSteps';
@@ -32,7 +32,7 @@ const LiveStream = () => {
   const location = useLocation();
   const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOnboarding, setIsOnboarding] = useState(true);
+  const [isOnboarding, setIsOnboarding] = useState(false);
   const {
     state: {
       userDetails: { zoom_connected = 'NOT_CONNECTED' },
@@ -57,34 +57,45 @@ const LiveStream = () => {
 
   const verifyZoomProfile = useCallback(
     async (code) => {
+      setIsLoading(true);
       try {
         const { status } = await apis.user.authZoom(code);
         if (isAPISuccess(status)) {
           const localUserDetails = getLocalUserDetails();
           localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
           localStorage.setItem('user-details', JSON.stringify(localUserDetails));
-          message.success('Zoom successfully setup!');
+          // message.success('Zoom successfully setup!');
+          Modal.success({
+            centered: true,
+            okText: 'Great',
+            title: 'Zoom account successfully connected',
+            content: `We'll take care of creating and managing unique zoom meetings for all your sessions. So you can focus on what you love doing.`,
+            onOk: () => history.push(Routes.creatorDashboard.rootPath),
+            closable: true,
+          });
           // setTimeout is used for better user experince suggest by Rahul
-          setTimeout(() => {
-            if (isOnboarding) {
-              history.push(Routes.session);
-            } else {
-              history.push(Routes.creatorDashboard.rootPath);
-            }
-          }, 2000);
+          // setTimeout(() => {
+          // if (isOnboarding) {
+          //   history.push(Routes.session);
+          // } else {
+          //   history.push(Routes.creatorDashboard.rootPath);
+          // }
+          // }, 2000);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
       }
+      setIsLoading(false);
     },
-    [history, isOnboarding]
+    [history]
   );
 
   useEffect(() => {
     if (code) {
       verifyZoomProfile(code);
     }
-  }, [code, verifyZoomProfile]);
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {

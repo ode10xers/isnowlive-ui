@@ -16,7 +16,7 @@ import {
 
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess, ZoomAuthType } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
 import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
@@ -40,8 +40,8 @@ const Login = ({ history }) => {
         if (user.is_creator) {
           if (user.profile_complete === false) {
             history.push(Routes.profile);
-          } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
-            history.push(Routes.livestream);
+            // } else if (user.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
+            //   history.push(Routes.livestream);
           } else {
             history.push(Routes.creatorDashboard.rootPath);
           }

@@ -390,7 +390,7 @@ const Coupons = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          <Collapse>
+          <Collapse defaultActiveKey="Published">
             <Panel header={<Title level={5}> Published </Title>} key="Published">
               {coupons?.length ? (
                 isMobileDevice ? (

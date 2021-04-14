@@ -18,6 +18,6 @@ export default {
       'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
   },
   zoom: {
-    oAuthURL: `https://zoom.us/oauth/authorize?client_id=UZLBPDoXSZi2SSb_4_pBcQ&response_type=code&redirect_uri=https://app.stage.passion.do/creator/livestream`,
+    oAuthURL: `https://zoom.us/oauth/authorize?client_id=UZLBPDoXSZi2SSb_4_pBcQ&response_type=code&redirect_uri=https://app.stage.passion.do/creator/dashboard/livestream`,
   },
 };

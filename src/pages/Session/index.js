@@ -306,7 +306,9 @@ const Session = ({ match, history }) => {
           cancelText: 'Keep it free',
           onCancel: () => setFreeSession(),
           onOk: () => {
-            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            window.focus();
+            // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
       }
@@ -648,7 +650,7 @@ const Session = ({ match, history }) => {
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
-        <OnboardSteps current={2} />
+        <OnboardSteps current={1} />
       ) : (
         <Row>
           <Col span={24}>
@@ -718,7 +720,7 @@ const Session = ({ match, history }) => {
                 icon={<VideoCameraOutlined />}
                 onClick={() => window.open(config.zoom.oAuthURL, '_self')}
               >
-                Link your zoom
+                Connect your zoom account
               </Button>
             </Form.Item>
           )}
