@@ -16,7 +16,9 @@ import validationRules from 'utils/validation';
 
 import styles from './styles.module.scss';
 
-const { Title, Paragraph, Text } = Typography;
+const CSVFileTemplateLink = 'https://tinyurl.com/passionCSVTemplate';
+
+const { Title, Paragraph, Text, Link } = Typography;
 
 const AudienceCSVFileUpload = ({ handleUploadSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -187,17 +189,17 @@ const AudienceImport = () => {
       ),
     },
     {
-      title: 'Email Address',
+      title: (
+        <>
+          {' '}
+          Email Address<Text type="danger">*</Text>{' '}
+        </>
+      ),
       dataIndex: 'email',
       key: 'email',
       width: isMobileDevice ? '180px' : '35%',
       render: (text, record) => (
-        <Form.Item
-          noStyle
-          name={[record.idx, 'email']}
-          initialValue={record.email}
-          rules={validationRules.requiredValidation}
-        >
+        <Form.Item name={[record.idx, 'email']} initialValue={record.email} rules={validationRules.requiredValidation}>
           <Input />
         </Form.Item>
       ),
@@ -212,7 +214,7 @@ const AudienceImport = () => {
       key: 'first_name',
       width: isMobileDevice ? '120px' : '30%',
       render: (text, record) => (
-        <Form.Item noStyle name={[record.idx, 'first_name']} rules={validationRules.requiredValidation}>
+        <Form.Item name={[record.idx, 'first_name']} rules={validationRules.requiredValidation}>
           <Input />
         </Form.Item>
       ),
@@ -222,7 +224,7 @@ const AudienceImport = () => {
       key: 'last_name',
       width: isMobileDevice ? '120px' : '30%',
       render: (text, record) => (
-        <Form.Item noStyle name={[record.idx, 'last_name']}>
+        <Form.Item name={[record.idx, 'last_name']}>
           <Input />
         </Form.Item>
       ),
@@ -287,6 +289,15 @@ const AudienceImport = () => {
               <Col xs={24} md={6} lg={4}>
                 <AudienceCSVFileUpload handleUploadSuccess={onCSVUploadSuccess} />
               </Col>
+              <Col xs={24}>
+                <Paragraph>
+                  You can get the template file{' '}
+                  <Link href={CSVFileTemplateLink} target="_blank">
+                    {' '}
+                    here{' '}
+                  </Link>
+                </Paragraph>
+              </Col>
             </Row>
           </Col>
           <Col xs={24} className={styles.mt20}>
@@ -299,8 +310,13 @@ const AudienceImport = () => {
               <Text strong>"abc@xyz.com, xyz@def.co"</Text>
             </Paragraph>
             <Paragraph>
+              After that a table will show up so you can fill the remaining information regarding the audience, or
+              correct any mistakes in the email itself. Once you think it's done you can click on{' '}
+              <Text strong> Save Audiences </Text>
+            </Paragraph>
+            <Paragraph>
               An email may be skipped because it is already saved as an audience. An email might be failed to save
-              because it is missing some data <Text strong> (first name is required) </Text>
+              because it is missing some data.
             </Paragraph>
           </Col>
           <Col xs={24}>
