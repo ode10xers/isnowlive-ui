@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Form, Typography, Button, Space, Row, Col, Input, Radio, message } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, Modal, message } from 'antd';
+import { VideoCameraOutlined } from '@ant-design/icons';
 
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
@@ -29,9 +30,9 @@ const LiveStream = () => {
   const [form] = Form.useForm();
   const history = useHistory();
   const location = useLocation();
-  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.JWT);
+  const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOnboarding, setIsOnboarding] = useState(true);
+  const [isOnboarding, setIsOnboarding] = useState(false);
   const {
     state: {
       userDetails: { zoom_connected = 'NOT_CONNECTED' },
@@ -56,42 +57,54 @@ const LiveStream = () => {
 
   const verifyZoomProfile = useCallback(
     async (code) => {
+      setIsLoading(true);
       try {
         const { status } = await apis.user.authZoom(code);
         if (isAPISuccess(status)) {
           const localUserDetails = getLocalUserDetails();
           localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
           localStorage.setItem('user-details', JSON.stringify(localUserDetails));
-          message.success('Zoom successfully setup!');
+          // message.success('Zoom successfully setup!');
+          Modal.success({
+            centered: true,
+            okText: 'Great',
+            title: 'Zoom account successfully connected',
+            content: `We'll take care of creating and managing unique zoom meetings for all your sessions. So you can focus on what you love doing.`,
+            onOk: () => history.push(Routes.creatorDashboard.rootPath),
+            closable: true,
+          });
           // setTimeout is used for better user experince suggest by Rahul
-          setTimeout(() => {
-            if (isOnboarding) {
-              history.push(Routes.session);
-            } else {
-              history.push(Routes.creatorDashboard.rootPath);
-            }
-          }, 2000);
+          // setTimeout(() => {
+          // if (isOnboarding) {
+          //   history.push(Routes.session);
+          // } else {
+          //   history.push(Routes.creatorDashboard.rootPath);
+          // }
+          // }, 2000);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
       }
+      setIsLoading(false);
     },
-    [history, isOnboarding]
+    [history]
   );
 
   useEffect(() => {
     if (code) {
       verifyZoomProfile(code);
     }
-  }, [code, verifyZoomProfile]);
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnboarding(false);
     }
-    if (zoom_connected !== ZoomAuthType.NOT_CONNECTED) {
-      setSelectedZoomOption(zoom_connected);
-    }
+    setSelectedZoomOption(ZoomAuthType.OAUTH);
+    // if (zoom_connected !== ZoomAuthType.NOT_CONNECTED) {
+    //   setSelectedZoomOption(zoom_connected);
+    // }
     if (zoom_connected === ZoomAuthType.JWT) {
       getZoomJWTDetails();
     }
@@ -143,17 +156,17 @@ const LiveStream = () => {
       <Section>
         <Title level={4}>Setup your Zoom</Title>
 
-        <Row className={styles.zoomOption}>
+        {/* <Row className={styles.zoomOption}>
           <label className={styles.accountSelectionLabel}>Ways to setup:</label>
           <Radio.Group onChange={(e) => setSelectedZoomOption(e.target.value)} value={selectedZoomOption}>
             <Radio value={ZoomAuthType.OAUTH}>Connect your Zoom account</Radio>
             <Radio value={ZoomAuthType.JWT}>Add your Zoom details</Radio>
           </Radio.Group>
-        </Row>
+        </Row> */}
 
         {selectedZoomOption === ZoomAuthType.OAUTH && (
           <Row align="center" className={styles.zoomConnectAccount}>
-            {zoom_connected === ZoomAuthType.OAUTH ? (
+            {zoom_connected === ZoomAuthType.OAUTH || zoom_connected === ZoomAuthType.JWT ? (
               <>
                 <Button type="primary" className={styles.success}>
                   Zoom account is connected
@@ -168,6 +181,7 @@ const LiveStream = () => {
                 <Button
                   type="primary"
                   className={styles.mt30}
+                  icon={<VideoCameraOutlined />}
                   onClick={() => {
                     connectZoomAccount();
                     trackSimpleEvent(creator.click.livestream.connectZoomAccount);

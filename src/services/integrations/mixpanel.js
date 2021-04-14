@@ -17,6 +17,7 @@ export const mixPanelEventTags = {
         livestreamNav: '(Creator) LiveStream Nav Clicked',
         profileNav: '(Creator) Public Page Nav Clicked',
         paymentNav: '(Creator) Get Paid Nav Clicked',
+        audiencesNav: '(Creator) Audiences Nav Clicked',
         legalNav: '(Creator) Terms and Conditions Nav Clicked',
         accountNav: '(Creator) Account Settings Nav Clicked',
         documentsNav: '(Creator) Document Nav Clicked',

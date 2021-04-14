@@ -9,6 +9,7 @@ import {
   BookOutlined,
   SettingOutlined,
   PercentageOutlined,
+  AuditOutlined,
   FilePdfOutlined,
   Html5Outlined,
 } from '@ant-design/icons';
@@ -147,6 +148,14 @@ export const creatorMenuItems = [
     icon: <FilePdfOutlined />,
     mixPanelTag: creator.click.dashboard.documentsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
+  },
+  {
+    order: 11,
+    key: 'audiences',
+    title: 'Audiences',
+    icon: <AuditOutlined />,
+    mixPanelTag: creator.click.dashboard.audiencesNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,
   },
 ];
 

@@ -17,9 +17,10 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
+import config from 'config';
 import apis from 'apis';
 import Routes from 'routes';
 import Section from 'components/Section';
@@ -37,10 +38,13 @@ import {
   scrollToErrorField,
   generateRandomColor,
   isValidFile,
+  ZoomAuthType,
 } from 'utils/helper';
-import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
+import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
+
+import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -117,6 +121,12 @@ const Session = ({ match, history }) => {
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
   const [creatorDocuments, setCreatorDocuments] = useState([]);
+
+  const {
+    state: {
+      userDetails: { zoom_connected = 'NOT_CONNECTED' },
+    },
+  } = useGlobalContext();
 
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
@@ -291,12 +301,14 @@ const Session = ({ match, history }) => {
         setIsSessionFree(false);
       } else {
         Modal.confirm({
-          title: `The session cannot be paided untill you setup stripe account. Would you like to setup stripe account now?`,
-          okText: 'Yes, Setup stripe account now',
-          cancelText: 'No',
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
           onCancel: () => setFreeSession(),
           onOk: () => {
-            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            window.focus();
+            // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
       }
@@ -638,7 +650,7 @@ const Session = ({ match, history }) => {
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
-        <OnboardSteps current={2} />
+        <OnboardSteps current={1} />
       ) : (
         <Row>
           <Col span={24}>
@@ -700,6 +712,18 @@ const Session = ({ match, history }) => {
               />
             </div>
           </Form.Item>
+
+          {zoom_connected === ZoomAuthType.NOT_CONNECTED && (
+            <Form.Item label={<Text type="danger"> Session hosting link </Text>}>
+              <Button
+                type="primary"
+                icon={<VideoCameraOutlined />}
+                onClick={() => window.open(config.zoom.oAuthURL, '_self')}
+              >
+                Connect your zoom account
+              </Button>
+            </Form.Item>
+          )}
 
           <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Enter Session Name" />

@@ -18,6 +18,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
+import { isWidgetUrl } from 'utils/widgets';
 
 const { Text, Paragraph, Title } = Typography;
 
@@ -85,6 +86,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
   }, [showPasswordHelperText]);
 
   const signupUser = async (values) => {
+    setIsLoading(true);
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
@@ -94,7 +96,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
       });
       if (data) {
         http.setAuthToken(data.auth_token);
-        logIn(data, true);
+        logIn(data, true, isWidgetUrl());
         closeModal();
         onLoggedInCallback();
       }
@@ -108,6 +110,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
+    setIsLoading(false);
   };
 
   const onFinish = async (values) => {
@@ -135,7 +138,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
           });
           if (data) {
             http.setAuthToken(data.auth_token);
-            logIn(data, true);
+            logIn(data, true, isWidgetUrl());
             closeModal();
             onLoggedInCallback();
           }

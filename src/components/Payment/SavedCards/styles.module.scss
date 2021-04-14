@@ -30,7 +30,7 @@
 
   .radioWrapper {
     text-align: -webkit-center;
-  
+
     .roundBtn {
       margin-top: 5px;
       cursor: pointer;
@@ -44,7 +44,7 @@
         height: 12px;
       }
     }
-    
+
     .roundBtn:hover {
       border: solid 1px map-get($colors, 'DodgerBlue');
     }
@@ -56,7 +56,7 @@
     }
 
     opacity: 0.8;
-    cursor:not-allowed;
+    cursor: not-allowed;
     background-color: map-get($map: $colors, $key: 'White1');
 
     .radioWrapper {
@@ -87,6 +87,3 @@
     }
   }
 }
-
-
-

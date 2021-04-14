@@ -6,8 +6,11 @@ import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
+import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
+import http from 'services/http';
 import { isAPISuccess } from 'utils/helper';
 import { isWidgetUrl } from 'utils/widgets';
+import parseQueryString from 'utils/parseQueryString';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
@@ -66,6 +69,8 @@ function App() {
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
   const isWidget = isWidgetUrl();
+  const windowLocation = window.location;
+  const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
   useEffect(() => {
     if (!isWidget) {
@@ -79,46 +84,66 @@ function App() {
   }, [userDetails, cookieConsent, isWidget]);
 
   useEffect(() => {
-    if (!isWidget) {
-      const getUserDetails = async () => {
-        try {
-          const { data, status } = await apis.user.getProfile();
-          if (isAPISuccess(status) && data) {
-            setUserAuthentication(true);
-            setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
-            setTimeout(() => {
-              setIsReadyToLoad(true);
-            }, 100);
-          }
-        } catch (error) {
-          setUserAuthentication(false);
-          setUserDetails(null);
-          setIsReadyToLoad(true);
+    const removeUserState = () => {
+      setUserAuthentication(false);
+      setUserDetails(null);
+      setIsReadyToLoad(true);
+    };
+
+    const getUserDetails = async () => {
+      try {
+        const { data, status } = await apis.user.getProfile();
+        if (isAPISuccess(status) && data) {
+          setUserAuthentication(true);
+          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+          setTimeout(() => {
+            setIsReadyToLoad(true);
+          }, 100);
         }
-      };
+      } catch (error) {
+        removeUserState();
+      }
+    };
+
+    if (!isWidget) {
       const authToken = getAuthCookie();
       if (authToken && authToken !== '') {
         getUserDetails();
       } else {
-        setUserAuthentication(false);
-        setUserDetails(null);
-        setIsReadyToLoad(true);
+        removeUserState();
       }
+    } else if (isWidget) {
+      // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
+      if (authCode && authCode !== '') {
+        http.setAuthToken(authCode);
+        setAuthTokenInLS(authCode);
+        getUserDetails();
+      } else {
+        const tokenFromLS = getAuthTokenFromLS();
+        if (tokenFromLS) {
+          http.setAuthToken(tokenFromLS);
+          getUserDetails();
+        } else {
+          removeUserState();
+        }
+      }
+    } else {
+      setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
   }, [isWidget]);
 
-  if (isWidget) {
+  if (!isReadyToLoad) {
+    return <div>Loading...</div>;
+  }
+
+  if (isWidget && isReadyToLoad && widgetType === 'calendar') {
     return (
       <>
         <PaymentPopup />
         <EmbeddablePage />
       </>
     );
-  }
-
-  if (!isReadyToLoad) {
-    return <div>Loading...</div>;
   }
 
   return (
@@ -169,7 +194,7 @@ function App() {
           </Route>
         </Switch>
       </Router>
-      <CookieConsentPopup />
+      {!isWidget && <CookieConsentPopup />}
     </>
   );
 }

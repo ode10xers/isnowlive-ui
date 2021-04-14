@@ -133,6 +133,14 @@ export default {
     getCreatorCoupons: () => http.get('/secure/creator/coupons'),
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
   },
+  audiences: {
+    getCreatorAudiences: (pageNo, perPage) =>
+      http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
+    uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
+    addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
+    deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
+    sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
+  },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),

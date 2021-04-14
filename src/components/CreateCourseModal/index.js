@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 
@@ -7,6 +8,7 @@ import { BookTwoTone } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
@@ -72,6 +74,7 @@ const {
 
 const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const [courseClasses, setCourseClasses] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -131,13 +134,24 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setCurrency(data.currency.toUpperCase());
       }
     } catch (error) {
-      showErrorModal(
-        'Failed to fetch creator currency details',
-        error?.response?.data?.message || 'Something went wrong'
-      );
+      if (error.response?.data?.message === 'unable to fetch user payment details') {
+        Modal.confirm({
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid course`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
+          onOk: () => {
+            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+          },
+        });
+      } else {
+        showErrorModal(
+          'Failed to fetch creator currency details',
+          error?.response?.data?.message || 'Something went wrong'
+        );
+      }
     }
     setIsLoading(false);
-  }, []);
+  }, [history]);
 
   const getSelectedCourseClasses = useCallback(
     (selectedClassIds = []) => {
@@ -310,15 +324,15 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setHighestMaxParticipantCourseSession(null);
         // setIsSequentialVideos(false);
       }
+
+      fetchCreatorCurrency();
+
+      if (!isVideoModal) {
+        fetchAllCourseClassForCreator();
+      }
+
+      fetchAllVideosForCreator(isVideoModal);
     }
-
-    fetchCreatorCurrency();
-
-    if (!isVideoModal) {
-      fetchAllCourseClassForCreator();
-    }
-
-    fetchAllVideosForCreator(isVideoModal);
   }, [
     visible,
     editedCourse,
@@ -458,7 +472,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         closeModal(true);
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedCourse ? 'update' : 'create'} course`);
+      showErrorModal(
+        `Failed to ${editedCourse ? 'update' : 'create'} course`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setSubmitting(false);

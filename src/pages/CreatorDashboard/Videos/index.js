@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, Tooltip, Card, Image, Collapse, Empty, Popconfirm } from 'antd';
@@ -39,6 +40,7 @@ const {
 
 const Videos = () => {
   const { showSendEmailPopup } = useGlobalContext();
+  const location = useLocation();
 
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([]);
@@ -47,6 +49,8 @@ const Videos = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [formPart, setFormPart] = useState(1);
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
+
+  const isOnboarding = location.state ? location.state.onboarding || false : false;
 
   const showEmailModal = (video) => {
     let activeRecipients = [];
@@ -155,9 +159,13 @@ const Videos = () => {
   }, []);
 
   useEffect(() => {
+    if (isOnboarding) {
+      showUploadVideoModal();
+    }
+
     getVideosForCreator();
     //eslint-disable-next-line
-  }, []);
+  }, [isOnboarding]);
 
   const toggleExpandAll = () => {
     if (expandedRowKeys.length > 0) {
@@ -668,7 +676,7 @@ const Videos = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          <Collapse>
+          <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Published </Title>} key="Active">
               {videos.length ? (
                 <>
