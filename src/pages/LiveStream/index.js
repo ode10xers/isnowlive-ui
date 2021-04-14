@@ -112,6 +112,8 @@ const LiveStream = () => {
     }
   }, [history.location.pathname, zoom_connected, getZoomJWTDetails]);
 
+  // Currently, this logic (used in JWT flow) is not used
+  // Leaving this here in case we want to use it in the future
   const storeZoomCredentials = async (values) => {
     const eventTag = creator.click.livestream.submitZoomDetails;
     try {
@@ -141,7 +143,9 @@ const LiveStream = () => {
   };
 
   const connectZoomAccount = () => {
+    setIsLoading(true);
     window.open(config.zoom.oAuthURL, '_self');
+    setIsLoading(false);
   };
 
   return (

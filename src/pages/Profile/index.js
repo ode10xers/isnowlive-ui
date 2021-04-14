@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin, Modal } from 'antd';
-import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined, CopyOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 
 import Routes from 'routes';
@@ -90,13 +90,28 @@ const Profile = () => {
             content: (
               <Row gutter={[8, 12]}>
                 <Col xs={24}>
+                  <Paragraph>You can now share your website</Paragraph>
                   <Paragraph>
-                    You can now share your website{' '}
-                    <Link href={creatorUrl} target="_blank" copyable>
+                    <Link
+                      href={creatorUrl}
+                      target="_blank"
+                      copyable={{
+                        icon: [
+                          <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
+                            {' '}
+                            Copy{' '}
+                          </Button>,
+                          <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
+                            {' '}
+                            Copied!{' '}
+                          </Button>,
+                        ],
+                      }}
+                    >
                       {creatorUrl}
-                    </Link>{' '}
-                    on your social media or with your audience.
+                    </Link>
                   </Paragraph>
+                  <Paragraph>on your social media or with your audience.</Paragraph>
                   <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
                 </Col>
                 <Col xs={24}>
