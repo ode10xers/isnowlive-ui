@@ -6,7 +6,7 @@ import apis from 'apis';
 
 import PaymentCard from 'components/Payment/PaymentCard';
 import {
-  showCoursePurchaseSuccessModal,
+  showPurchaseSingleCourseSuccessModal,
   showBookSingleSessionSuccessModal,
   showPurchaseSingleVideoSuccessModal,
   showPurchasePassSuccessModal,
@@ -157,7 +157,7 @@ const PaymentPopup = () => {
           showPurchasePassSuccessModal(orderResponse.payment_order_id);
         }
       } else if (verifyOrderRes === orderType.COURSE) {
-        showCoursePurchaseSuccessModal();
+        showPurchaseSingleCourseSuccessModal();
       } else if (verifyOrderRes === orderType.CLASS) {
         // Showing confirmation for Single Session Booking
         // inventory_id is attached for session orders

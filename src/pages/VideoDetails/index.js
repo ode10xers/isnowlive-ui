@@ -126,6 +126,7 @@ const VideoDetails = ({ match }) => {
     //eslint-disable-next-line
   }, []);
 
+  // TODO: Consider refactoring like subscription below
   const getUsablePassesForUser = useCallback(async (videoId) => {
     try {
       const loggedInUserData = getLocalUserDetails();

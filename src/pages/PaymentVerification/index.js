@@ -11,7 +11,7 @@ import {
   showErrorModal,
   showAlreadyBookedModal,
   showPurchaseSingleVideoSuccessModal,
-  showCoursePurchaseSuccessModal,
+  showPurchaseSingleCourseSuccessModal,
   showPurchasePassAndGetVideoSuccessModal,
 } from 'components/Modals/modals';
 
@@ -111,7 +111,7 @@ const PaymentVerification = () => {
               showPurchaseSingleVideoSuccessModal(order_id);
             } else if (order_type === orderType.COURSE) {
               // it is a course purchase
-              showCoursePurchaseSuccessModal();
+              showPurchaseSingleCourseSuccessModal();
             } else {
               // it is a session purchase
               // We actually need the inventory_id here, but this page will

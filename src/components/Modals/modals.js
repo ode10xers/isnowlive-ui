@@ -357,7 +357,7 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
   });
 };
 
-export const showCoursePurchaseSuccessModal = () => {
+export const showPurchaseSingleCourseSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
 
   Modal.success({
