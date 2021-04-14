@@ -306,7 +306,10 @@ const Session = ({ match, history }) => {
           cancelText: 'Keep it free',
           onCancel: () => setFreeSession(),
           onOk: () => {
-            window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            const newWindow = window.open(
+              `${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`
+            );
+            newWindow.blur();
             window.focus();
             // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },

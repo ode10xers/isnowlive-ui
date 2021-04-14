@@ -74,15 +74,15 @@ const Profile = () => {
         message.success('Profile successfully updated.');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
+        localUserDetails.username = values.username;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         if (isOnboarding) {
           const newWindow = window.open(Routes.profilePreview);
           newWindow.blur();
           window.focus();
           // history.push(Routes.livestream);
-          const userDetails = getLocalUserDetails();
 
-          const creatorUrl = generateUrlFromUsername(userDetails.username);
+          const creatorUrl = generateUrlFromUsername(values.username);
           const modalRef = Modal.success({
             width: 550,
             okButtonProps: { style: { display: 'none' } },
