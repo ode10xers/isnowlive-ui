@@ -37,6 +37,7 @@ const LiveStream = () => {
     state: {
       userDetails: { zoom_connected = 'NOT_CONNECTED' },
     },
+    setUserDetails,
   } = useGlobalContext();
   const { code } = parseQueryString(location.search);
 
@@ -63,7 +64,8 @@ const LiveStream = () => {
         if (isAPISuccess(status)) {
           const localUserDetails = getLocalUserDetails();
           localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
-          localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+          setUserDetails(localUserDetails);
+          // localStorage.setItem('user-details', JSON.stringify(localUserDetails));
           // message.success('Zoom successfully setup!');
           Modal.success({
             centered: true,
@@ -87,7 +89,7 @@ const LiveStream = () => {
       }
       setIsLoading(false);
     },
-    [history]
+    [history, setUserDetails]
   );
 
   useEffect(() => {
