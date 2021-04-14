@@ -720,7 +720,7 @@ const Session = ({ match, history }) => {
                 icon={<VideoCameraOutlined />}
                 onClick={() => window.open(config.zoom.oAuthURL, '_self')}
               >
-                Link your zoom
+                Connect your zoom account
               </Button>
             </Form.Item>
           )}

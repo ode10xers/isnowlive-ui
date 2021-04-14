@@ -32,7 +32,7 @@ const LiveStream = () => {
   const location = useLocation();
   const [selectedZoomOption, setSelectedZoomOption] = useState(ZoomAuthType.OAUTH);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOnboarding, setIsOnboarding] = useState(true);
+  const [isOnboarding, setIsOnboarding] = useState(false);
   const {
     state: {
       userDetails: { zoom_connected = 'NOT_CONNECTED' },
@@ -57,6 +57,7 @@ const LiveStream = () => {
 
   const verifyZoomProfile = useCallback(
     async (code) => {
+      setIsLoading(true);
       try {
         const { status } = await apis.user.authZoom(code);
         if (isAPISuccess(status)) {
@@ -66,25 +67,27 @@ const LiveStream = () => {
           message.success('Zoom successfully setup!');
           // setTimeout is used for better user experince suggest by Rahul
           setTimeout(() => {
-            if (isOnboarding) {
-              history.push(Routes.session);
-            } else {
-              history.push(Routes.creatorDashboard.rootPath);
-            }
+            // if (isOnboarding) {
+            //   history.push(Routes.session);
+            // } else {
+            history.push(Routes.creatorDashboard.rootPath);
+            // }
           }, 2000);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
       }
+      setIsLoading(false);
     },
-    [history, isOnboarding]
+    [history]
   );
 
   useEffect(() => {
     if (code) {
       verifyZoomProfile(code);
     }
-  }, [code, verifyZoomProfile]);
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
