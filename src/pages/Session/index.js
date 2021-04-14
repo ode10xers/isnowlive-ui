@@ -39,6 +39,7 @@ import {
   generateRandomColor,
   isValidFile,
   ZoomAuthType,
+  generateUrlFromUsername,
 } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
 
@@ -53,6 +54,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
+import { getLocalUserDetails } from 'utils/storage';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -301,12 +303,14 @@ const Session = ({ match, history }) => {
         setIsSessionFree(false);
       } else {
         Modal.confirm({
-          title: `The session cannot be paided untill you setup stripe account. Would you like to setup stripe account now?`,
+          title: `The session cannot be paid until you setup stripe account. Would you like to setup stripe account now?`,
           okText: 'Yes, Setup stripe account now',
           cancelText: 'No',
           onCancel: () => setFreeSession(),
           onOk: () => {
-            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+            window.focus();
+            // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
       }
@@ -648,7 +652,7 @@ const Session = ({ match, history }) => {
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       {isOnboarding ? (
-        <OnboardSteps current={2} />
+        <OnboardSteps current={1} />
       ) : (
         <Row>
           <Col span={24}>
