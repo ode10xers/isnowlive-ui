@@ -329,7 +329,7 @@ const ManageSessions = () => {
   return (
     <div className={styles.box}>
       <Title level={4}>Manage Sessions</Title>
-      <Collapse>
+      <Collapse defaultActiveKey="Normal">
         <Panel header={<Title level={5}> Normal Sessions </Title>} key="Normal">
           {isMobileDevice ? (
             <Loader loading={isLoading} size="large" text="Loading sessions">

@@ -676,7 +676,7 @@ const Videos = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          <Collapse>
+          <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Published </Title>} key="Active">
               {videos.length ? (
                 <>
