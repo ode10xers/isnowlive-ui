@@ -29,7 +29,6 @@ const {
 const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCourse, showSendEmailModal }) => {
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
-  const [expandedSection, setExpandedSection] = useState([]);
 
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
@@ -355,7 +354,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
 
   return (
     <div>
-      <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
+      <Collapse defaultActiveKey="published">
         <Panel header={<Title level={5}> Published </Title>} key="published">
           {isMobileDevice ? (
             <Row gutter={[8, 16]}>

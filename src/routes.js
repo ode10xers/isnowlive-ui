@@ -43,6 +43,7 @@ const Routes = {
     subscriptions: '/subscriptions',
     coupons: '/coupons',
     accountSettings: '/settings',
+    audiences: '/audiences',
     legals: '/legals',
     documents: '/documents',
     externalSiteSettings: '/widgets',

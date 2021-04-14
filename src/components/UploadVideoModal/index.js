@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress } from 'antd';
 import Uppy from '@uppy/core';
@@ -9,16 +10,21 @@ import { BookTwoTone } from '@ant-design/icons';
 
 import config from 'config';
 import apis from 'apis';
+import Routes from 'routes';
+
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
-import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, productAccessOptions } from 'utils/helper';
 
+import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+
 import styles from './styles.module.scss';
+
 const { Text, Paragraph } = Typography;
 
 const videoTypes = {
@@ -52,6 +58,7 @@ const UploadVideoModal = ({
   shouldClone,
 }) => {
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const [classes, setClasses] = useState([]);
   const [currency, setCurrency] = useState('SGD');
@@ -123,7 +130,6 @@ const UploadVideoModal = ({
 
       if (data) {
         setClasses(data);
-        setCurrency(data[0].currency.toUpperCase() || 'SGD');
       }
     } catch (error) {
       showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
@@ -131,6 +137,34 @@ const UploadVideoModal = ({
 
     setIsLoading(false);
   }, []);
+
+  const fetchCreatorCurrency = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.session.getCreatorBalance();
+
+      if (isAPISuccess(status) && data?.currency) {
+        setCurrency(data.currency.toUpperCase());
+      }
+    } catch (error) {
+      if (error.response?.data?.message === 'unable to fetch user payment details') {
+        Modal.confirm({
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid video`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
+          onOk: () => {
+            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+          },
+        });
+      } else {
+        showErrorModal(
+          'Failed to fetch creator currency details',
+          error?.response?.data?.message || 'Something went wrong'
+        );
+      }
+    }
+    setIsLoading(false);
+  }, [history]);
 
   useEffect(() => {
     if (visible) {
@@ -153,6 +187,9 @@ const UploadVideoModal = ({
         form.resetFields();
       }
 
+      if (formPart === 1) {
+        fetchCreatorCurrency();
+      }
       fetchAllClassesForCreator();
     } else {
       document.body.style.overflow = 'auto';
@@ -164,7 +201,7 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, form, formPart]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
 
   const handleChangeLimitType = (priceType) => {
     const values = form.getFieldsValue();
@@ -220,7 +257,10 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
-      showErrorModal(`Failed to ${editedVideo ? 'update' : 'create'} video`);
+      showErrorModal(
+        `Failed to ${editedVideo ? 'update' : 'create'} video`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setIsSubmitting(false);
