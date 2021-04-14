@@ -16,8 +16,8 @@ const stepsList = [
   // },
   {
     id: 2,
-    title: 'Setup Session',
-    description: 'Create your first session',
+    title: 'Create Product',
+    description: 'Create your first product',
   },
 ];
 

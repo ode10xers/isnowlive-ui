@@ -14,7 +14,7 @@ import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
 import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
-import { parseEmbedCode, scrollToErrorField, isAPISuccess } from 'utils/helper';
+import { parseEmbedCode, scrollToErrorField, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
@@ -26,8 +26,9 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import Modal from 'antd/lib/modal/Modal';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
@@ -77,7 +78,58 @@ const Profile = () => {
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         if (isOnboarding) {
           window.open(Routes.profilePreview);
-          history.push(Routes.livestream);
+          window.focus();
+          // history.push(Routes.livestream);
+          const userDetails = getLocalUserDetails();
+
+          const creatorUrl = generateUrlFromUsername(userDetails.username);
+          Modal.success({
+            okButtonProps: { style: { display: 'none' } },
+            title: 'Awesome! Your public website is ready',
+            message: (
+              <Row gutter={[8, 12]}>
+                <Col xs={24}>
+                  <Paragraph>
+                    You can now share your website{' '}
+                    <Link href={creatorUrl} copyable>
+                      {' '}
+                      creatorUrl{' '}
+                    </Link>
+                    on your social media or with your audience.
+                  </Paragraph>
+                  <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
+                </Col>
+                <Col xs={24}>
+                  <Row gutter={[8, 8]} justify="space-around">
+                    <Col xs={9}>
+                      <Button
+                        block
+                        type="primary"
+                        onClick={() => history.push(Routes.creatorDashboard.videos, { onboarding: true })}
+                      >
+                        Upload a Video
+                      </Button>
+                    </Col>
+                    <Col xs={9}>
+                      <Button
+                        block
+                        type="primary"
+                        className={styles.greenBtn}
+                        onClick={() => history.push(Routes.session)}
+                      >
+                        Schedule a Session
+                      </Button>
+                    </Col>
+                    <Col xs={8}>
+                      <Button block type="link" onClick={() => history.push(Routes.creatorDashboard.defaultPath)}>
+                        I'll do these later
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            ),
+          });
         } else {
           history.push('/creator/dashboard/profile');
         }
