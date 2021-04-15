@@ -148,12 +148,13 @@ export default {
     getSubscriptionsForSession: (sessionId) => http.get(`/subscriptions?session_id=${sessionId}`),
     getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
     getSubscriptionsForCourse: (courseId) => http.get(`/subscriptions?course_id=${courseId}`),
-    getUserSubscriptionForSession: (sessionId) =>
-      http.get(`/secure/customer/subscriptions/orders?session_id=${sessionId}`),
-    getUserSubscriptionForVideo: (videoId) => http.get(`/secure/customer/subscriptions/orders?video_id=${videoId}`),
-    getUserSubscriptionForCourse: (courseId) => http.get(`/secure/customer/subscriptions/orders?course_id=${courseId}`),
     createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
-    getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders'),
+    getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders/'),
+    getUserSubscriptionForSession: (sessionId) =>
+      http.get(`/secure/customer/subscriptions/orders/?session_id=${sessionId}`),
+    getUserSubscriptionForVideo: (videoId) => http.get(`/secure/customer/subscriptions/orders/?video_id=${videoId}`),
+    getUserSubscriptionForCourse: (courseId) =>
+      http.get(`/secure/customer/subscriptions/orders/?course_id=${courseId}`),
   },
   audiences: {
     getCreatorAudiences: (pageNo, perPage) =>
