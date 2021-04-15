@@ -150,6 +150,7 @@ const VideoDetails = ({ match }) => {
   }, []);
 
   const getUsableSubscriptionForUser = useCallback(async (videoId) => {
+    setIsLoading(true);
     try {
       const loggedInUserData = getLocalUserDetails();
 
@@ -163,16 +164,15 @@ const VideoDetails = ({ match }) => {
             // 1. Should be usable for Videos
             // 2. Still have credits to purchase videos
             // 3. This video can be purchased by this subscription
-            const usableSubscriptions =
-              data.active.filter(
+            const usableSubscription =
+              data.active.find(
                 (subscription) =>
                   subscription.products['VIDEO'] &&
                   subscription.products['VIDEO']?.credits > 0 &&
                   subscription.products['VIDEO']?.product_ids?.includes(videoId)
-              ) || [];
+              ) || null;
 
-            // Set the first usable one
-            setUsableUserSubscription(usableSubscriptions.length > 0 ? usableSubscriptions[0] : null);
+            setUsableUserSubscription(usableSubscription);
           } else {
             setUsableUserSubscription(null);
           }
@@ -379,6 +379,7 @@ const VideoDetails = ({ match }) => {
       if (isAPISuccess(status) && data) {
         showGetVideoWithSubscriptionSuccessModal();
         setIsLoading(false);
+        return null;
       }
     } catch (error) {
       setIsLoading(false);
@@ -390,6 +391,7 @@ const VideoDetails = ({ match }) => {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
+    return null;
   };
 
   const showConfirmPaymentPopup = async () => {
@@ -415,7 +417,6 @@ const VideoDetails = ({ match }) => {
     const videoDesc = `Can be watched up to ${video.watch_limit} times, valid for ${video.validity} days`;
 
     const usableUserPass = getUserPurchasedPass(true);
-    console.log(usableUserSubscription);
     if (usableUserSubscription && video?.price > 0) {
       // Get Video using Subscription
       // If user have a subscription usable for purchasing this product

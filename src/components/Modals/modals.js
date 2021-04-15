@@ -442,6 +442,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
     closable: true,
     maskClosable: false,
     title: 'Registration successful',
+    okButtonProps: { style: { display: 'none' } },
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(

@@ -59,19 +59,18 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
         if (isAPISuccess(status) && data) {
           if (data.active.length > 0) {
             // Choose a purchased subscription based on these conditions
-            // 1. Should be usable for Videos
-            // 2. Still have credits to purchase videos
-            // 3. This video can be purchased by this subscription
-            const usableSubscriptions =
-              data.active.filter(
+            // 1. Should be usable for Courses
+            // 2. Still have credits to purchase courses
+            // 3. This course can be purchased by this subscription
+            const usableSubscription =
+              data.active.find(
                 (subscription) =>
                   subscription.products['COURSE'] &&
                   subscription.products['COURSE']?.credits > 0 &&
                   subscription.products['COURSE']?.product_ids?.includes(courseId)
-              ) || [];
+              ) || null;
 
-            // Set the first usable one
-            setUsableUserSubscription(usableSubscriptions.length > 0 ? usableSubscriptions[0] : null);
+            setUsableUserSubscription(usableSubscription);
           } else {
             setUsableUserSubscription(null);
           }
