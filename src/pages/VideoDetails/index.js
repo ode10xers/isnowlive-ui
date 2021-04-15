@@ -220,6 +220,11 @@ const VideoDetails = ({ match }) => {
         getVideoDetails(match.params.video_id);
         getAvailablePassesForVideo(match.params.video_id);
       }
+
+      if (getLocalUserDetails()) {
+        getUsablePassesForUser(match.params.video_id);
+        getUsableSubscriptionForUser(match.params.video_id);
+      }
     } else {
       setIsLoading(false);
       message.error('Video details not found.');
