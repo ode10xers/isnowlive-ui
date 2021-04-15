@@ -37,7 +37,7 @@ const Subscriptions = () => {
     try {
       const { status, data } = await apis.subscriptions.getAttendeeSubscriptions();
       if (isAPISuccess(status) && data) {
-        setSubscriptionOrders([]);
+        setSubscriptionOrders(data.active);
         setIsLoading(false);
       }
     } catch (error) {
@@ -81,12 +81,18 @@ const Subscriptions = () => {
     let totalCredits = 0;
 
     if (isCourse) {
-      remainingCredits = subscription?.credits['COURSE']?.remaining;
-      totalCredits = subscription?.credits['COURSE']?.total;
+      remainingCredits = subscription?.products['COURSE']?.credits - subscription?.products['COURSE']?.credits_used;
+      totalCredits = subscription?.products['COURSE']?.credits;
     } else {
       remainingCredits =
-        (subscription?.credits['SESSION']?.remaining || 0) + (subscription?.credits['VIDEO']?.remaining || 0);
-      totalCredits = (subscription?.credits['SESSION']?.total || 0) + (subscription?.credits['VIDEO']?.total || 0);
+        (subscription?.products['SESSION']
+          ? subscription?.products['SESSION']?.credits - subscription?.products['SESSION']?.credits_used
+          : 0) +
+        (subscription?.products['VIDEO']
+          ? subscription?.products['VIDEO']?.credits + subscription?.products['VIDEO']?.credits_used
+          : 0);
+      totalCredits =
+        (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
     }
 
     return (
@@ -148,14 +154,12 @@ const Subscriptions = () => {
   const subscriptionColumns = [
     {
       title: 'Subscription Name',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'subscription_name',
+      key: 'subscription_name',
       width: '200px',
     },
     {
       title: 'Status',
-      dataIndex: 'credits',
-      key: 'credits',
       width: '250px',
       render: (text, record) => (
         <Space size="small" direction="vertical" align="left">
@@ -213,7 +217,7 @@ const Subscriptions = () => {
   ];
 
   const renderSubscriptionDetails = (subscription) => {
-    const subscriptionDetails = subscription?.details;
+    const subscriptionDetails = subscription;
 
     return (
       <div>
