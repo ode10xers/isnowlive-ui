@@ -30,9 +30,10 @@ const Subscriptions = () => {
       let mappedSubscriptionData = [];
 
       if (isAPISuccess(status) && data.Data) {
-        mappedSubscriptionData = data.Data.map((subscription, idx) => ({ ...subscription, idx })).sort(
-          (a, b) => a.price - b.price
-        );
+        mappedSubscriptionData = data.Data.sort((a, b) => a.price - b.price).map((subscription, idx) => ({
+          ...subscription,
+          idx,
+        }));
       }
 
       if (mappedSubscriptionData.length < 3) {

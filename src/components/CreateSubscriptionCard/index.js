@@ -131,7 +131,9 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         subscriptionCredits: editedSubscription?.products['SESSION']
           ? editedSubscription?.products['SESSION'].credits
           : editedSubscription?.products['VIDEO'].credits,
-        includedProducts: Object.entries(editedSubscription?.products).map(([key, val]) => key),
+        includedProducts: Object.entries(editedSubscription?.products)
+          .map(([key, val]) => key)
+          .filter((key) => key !== 'COURSE'),
         includedSessionsType: editedSubscription?.products['SESSION']
           ? editedSubscription?.products['SESSION'].access_types || []
           : [],
@@ -254,10 +256,10 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
   };
 
   const handleIncludedSessionsTypeChange = (values) => {
-    const currSelectedSessions = sessions.filter((session) => selectedSessions.includes(session.external_id));
+    const currSelectedSessions = sessions.filter((session) => selectedSessions.includes(session.session_external_id));
     const filteredSelectedSessions = currSelectedSessions
       .filter((session) => values.includes(session.access))
-      .map((session) => session.external_id);
+      .map((session) => session.session_external_id);
     form.setFieldsValue({ ...form.getFieldsValue(), includedSessions: filteredSelectedSessions });
     setSelectedSessions(filteredSelectedSessions);
     setIncludedSessionsType(values);
@@ -455,7 +457,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                     includedSessionsType.length <= 0 ? 'Please select a session type first' : 'Select included sessions'
                   }
                   mode="multiple"
-                  maxTagCount="responsive"
+                  maxTagCount={1}
                   dropdownMatchSelectWidth={false}
                   value={selectedSessions}
                   disabled={!isSessionIncluded || includedSessionsType.length <= 0}
@@ -471,8 +473,8 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                         ?.filter((session) => session.access === 'PUBLIC')
                         .map((session) => (
                           <Select.Option
-                            value={session.external_id}
-                            key={session.external_id}
+                            value={session.session_external_id}
+                            key={session.session_external_id}
                             label={
                               <>
                                 {' '}
@@ -504,8 +506,8 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                         ?.filter((session) => session.access === 'MEMBERSHIP')
                         .map((session) => (
                           <Select.Option
-                            value={session.external_id}
-                            key={session.external_id}
+                            value={session.session_external_id}
+                            key={session.session_external_id}
                             label={
                               <>
                                 {' '}
@@ -561,7 +563,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                     includedVideosType.length <= 0 ? 'Please select a video type first' : 'Select included videos'
                   }
                   mode="multiple"
-                  maxTagCount="responsive"
+                  maxTagCount={1}
                   dropdownMatchSelectWidth={false}
                   value={selectedVideos}
                   onChange={(val) => setSelectedVideos(val)}
@@ -706,7 +708,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                     includedCoursesType.length <= 0 ? 'Please select a course type first' : 'Select included courses'
                   }
                   mode="multiple"
-                  maxTagCount="responsive"
+                  maxTagCount={1}
                   dropdownMatchSelectWidth={false}
                   value={selectedCourses}
                   onChange={(val) => setSelectedCourses(val)}
