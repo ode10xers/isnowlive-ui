@@ -19,7 +19,7 @@ import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
 import {
-  showErrorModal,
+  showBookSessionWithSubscriptionSuccessModal,
   showBookSingleSessionSuccessModal,
   showBookSessionWithPassSuccessModal,
   showPurchasePassAndBookSessionSuccessModal,
@@ -68,6 +68,7 @@ const InventoryDetails = ({ match, history }) => {
   const [availablePasses, setAvailablePasses] = useState([]);
   const [selectedPass, setSelectedPass] = useState(null);
   const [userPasses, setUserPasses] = useState([]);
+  const [usableUserSubscription, setUsableUserSubscription] = useState(null);
   const [createFollowUpOrder, setCreateFollowUpOrder] = useState(null);
   const [shouldSetDefaultPass, setShouldSetDefaultPass] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
@@ -113,6 +114,7 @@ const InventoryDetails = ({ match, history }) => {
   );
 
   const getUsablePassesForUser = async () => {
+    setIsLoading(true);
     try {
       const loggedInUserData = getLocalUserDetails();
 
@@ -128,8 +130,44 @@ const InventoryDetails = ({ match, history }) => {
         );
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
     }
+
+    setIsLoading(true);
+  };
+
+  const getUsableSubscriptionForUser = async () => {
+    setIsLoading(true);
+
+    try {
+      const loggedInUserData = getLocalUserDetails();
+      if (loggedInUserData && session) {
+        const { status, data } = await apis.subscriptions.getUserSubscriptionForSession(session.session_external_id);
+
+        if (isAPISuccess(status) && data) {
+          if (data.active.length > 0) {
+            // Choose a purchased subscription based on these conditions
+            // 1. Should be usable for Session
+            // 2. Still have credits to purchase sessions
+            // 3. This session can be purchased by this subscription
+            const usableSubscription =
+              data.active.find(
+                (subscription) =>
+                  subscription.products['SESSION'] &&
+                  subscription.products['SESSION']?.credits > 0 &&
+                  subscription.products['SESSION']?.product_ids?.includes(session.session_external_id)
+              ) || null;
+
+            setUsableUserSubscription(usableSubscription);
+          } else {
+            setUsableUserSubscription(null);
+          }
+        }
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed fetching usable subscription for user');
+    }
+    setIsLoading(false);
   };
 
   const getUserPurchasedPass = (getDefault = false) => {
@@ -165,9 +203,15 @@ const InventoryDetails = ({ match, history }) => {
 
   // Logic for when user lands in the page already logged in
   useEffect(() => {
-    if (session && getLocalUserDetails() && userPasses.length === 0) {
-      getUsablePassesForUser();
-      setShouldSetDefaultPass(true);
+    if (session && getLocalUserDetails()) {
+      if (userPasses.length === 0) {
+        getUsablePassesForUser();
+        setShouldSetDefaultPass(true);
+      }
+
+      if (!usableUserSubscription) {
+        getUsableSubscriptionForUser();
+      }
     }
     //eslint-disable-next-line
   }, [session]);
@@ -189,6 +233,11 @@ const InventoryDetails = ({ match, history }) => {
 
   useEffect(() => {
     setCurrentUser(getLocalUserDetails());
+
+    if (!userDetails) {
+      setUsableUserSubscription(null);
+      setUserPasses([]);
+    }
   }, [userDetails]);
 
   const signupUser = async (values) => {
@@ -222,7 +271,35 @@ const InventoryDetails = ({ match, history }) => {
   const showConfirmPaymentPopup = () => {
     setCreateFollowUpOrder(false);
 
-    if (selectedPass) {
+    if (usableUserSubscription) {
+      const payload = {
+        inventory_id: parseInt(match.params.inventory_id),
+        user_timezone_offset: new Date().getTimezoneOffset(),
+        user_timezone_location: getTimezoneLocation(),
+        user_timezone: getCurrentLongTimezone(),
+        payment_source: paymentSource.SUBSCRIPTION,
+        source_id: usableUserSubscription.subscription_order_id,
+      };
+
+      const paymentPopupData = {
+        productId: session.session_id,
+        productType: 'SESSION',
+        itemList: [
+          {
+            name: session.name,
+            description: toLongDateWithTime(session.start_time),
+            currency: session.currency,
+            price: session.price,
+          },
+        ],
+        paymentInstrumentDetails: {
+          type: 'SUBSCRIPTION',
+          ...usableUserSubscription,
+        },
+      };
+
+      showPaymentPopup(paymentPopupData, async () => await bookClassUsingSubscription(payload));
+    } else if (selectedPass) {
       const usersPass = getUserPurchasedPass(false);
 
       if (usersPass) {
@@ -253,7 +330,7 @@ const InventoryDetails = ({ match, history }) => {
           source_id: usersPass.pass_order_id,
         };
 
-        showPaymentPopup(paymentPopupData, async (couponCode = '') => await bookClassUsingPass(payload, couponCode));
+        showPaymentPopup(paymentPopupData, async () => await bookClassUsingPass(payload));
       } else {
         // Buy Pass and Book Class
         const paymentPopupData = {
@@ -405,7 +482,7 @@ const InventoryDetails = ({ match, history }) => {
     return null;
   };
 
-  const bookClassUsingPass = async (payload, couponCode = '') => {
+  const bookClassUsingPass = async (payload) => {
     setIsLoading(true);
 
     try {
@@ -414,6 +491,33 @@ const InventoryDetails = ({ match, history }) => {
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
         showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
+        return null;
+      }
+    } catch (error) {
+      setIsLoading(false);
+      message.error(error.response?.data?.message || 'Something went wrong');
+
+      if (
+        error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
+      ) {
+        showAlreadyBookedModal(productType.CLASS);
+      } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
+        showAlreadyBookedModal(productType.PASS);
+      }
+    }
+
+    return null;
+  };
+
+  const bookClassUsingSubscription = async (payload) => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await bookClass(payload);
+
+      if (isAPISuccess(status) && data) {
+        setIsLoading(false);
+        showBookSessionWithSubscriptionSuccessModal(payload.inventory_id);
         return null;
       }
     } catch (error) {
@@ -453,6 +557,7 @@ const InventoryDetails = ({ match, history }) => {
             logIn(data, true);
             setCurrentUser(data);
             await getUsablePassesForUser();
+            await getUsableSubscriptionForUser();
             setCreateFollowUpOrder(true);
           }
         } catch (error) {
@@ -502,6 +607,7 @@ const InventoryDetails = ({ match, history }) => {
     setCurrentUser(userDetails);
 
     if (userDetails) {
+      getUsableSubscriptionForUser();
       getUsablePassesForUser();
       setShouldSetDefaultPass(true);
     }
@@ -596,6 +702,7 @@ const InventoryDetails = ({ match, history }) => {
                 onFinish={onFinish}
                 onSetNewPassword={handleSendNewPasswordEmail}
                 availablePasses={availablePasses}
+                userSubscription={usableUserSubscription}
                 userPasses={userPasses}
                 setSelectedPass={setSelectedPass}
                 selectedPass={selectedPass}
