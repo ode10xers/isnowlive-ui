@@ -44,7 +44,10 @@ const {
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
-  const { showPaymentPopup } = useGlobalContext();
+  const {
+    showPaymentPopup,
+    state: { userDetails },
+  } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
@@ -128,6 +131,7 @@ const VideoDetails = ({ match }) => {
 
   // TODO: Consider refactoring like subscription below
   const getUsablePassesForUser = useCallback(async (videoId) => {
+    setIsLoading(true);
     try {
       const loggedInUserData = getLocalUserDetails();
       if (loggedInUserData) {
@@ -145,8 +149,8 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }, []);
 
   const getUsableSubscriptionForUser = useCallback(async (videoId) => {
@@ -180,8 +184,8 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed fetching usable membership for user');
-      setIsLoading(false);
     }
+    setIsLoading(false);
   }, []);
 
   const openPurchaseVideoModal = () => {
@@ -215,11 +219,6 @@ const VideoDetails = ({ match }) => {
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getVideoDetails(match.params.video_id);
         getAvailablePassesForVideo(match.params.video_id);
-
-        if (getLocalUserDetails()) {
-          getUsablePassesForUser(match.params.video_id);
-          getUsableSubscriptionForUser(match.params.video_id);
-        }
       }
     } else {
       setIsLoading(false);
@@ -227,6 +226,15 @@ const VideoDetails = ({ match }) => {
     }
     //eslint-disable-next-line
   }, [match.params.video_id]);
+
+  // This logic is for resetting the UI
+  // If the user logs out (e.g. from the header button)
+  useEffect(() => {
+    if (!userDetails) {
+      setUserPasses([]);
+      setUsableUserSubscription(null);
+    }
+  }, [userDetails]);
 
   useEffect(() => {
     if (shouldFollowUpGetVideo) {
