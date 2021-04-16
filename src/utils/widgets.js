@@ -7,7 +7,13 @@ export const widgetComponentsName = {
     value: 'calendar',
     label: 'Calendar',
   },
+  PASSES: {
+    value: 'passes',
+    label: 'Passes',
+  },
 };
+
+export const publishedWidgets = ['calendar', 'passes'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails().username;

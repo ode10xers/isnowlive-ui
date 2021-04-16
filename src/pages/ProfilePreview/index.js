@@ -25,6 +25,7 @@ import Loader from 'components/Loader';
 import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
 import AuthModal from 'components/AuthModal';
+import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import {
   generateUrlFromUsername,
@@ -37,13 +38,13 @@ import {
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
+import { formatPassesData } from 'utils/productsHelper';
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
 import { useGlobalContext } from 'services/globalContext';
-import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
@@ -132,23 +133,7 @@ const ProfilePreview = ({ username = null }) => {
       const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (isAPISuccess(status) && data) {
-        setPasses(
-          data.map((pass) => ({
-            ...pass,
-            sessions:
-              pass.sessions?.map((session) => ({
-                ...session,
-                key: `${pass.id}_${session.session_id}`,
-                username: profileUsername,
-              })) || [],
-            videos:
-              pass.videos?.map((video) => ({
-                ...video,
-                key: `${pass.id}_${video.external_id}`,
-                username: profileUsername,
-              })) || [],
-          }))
-        );
+        setPasses(formatPassesData(data, profileUsername));
         setIsPassesLoading(false);
       }
     } catch (error) {
