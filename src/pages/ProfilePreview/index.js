@@ -289,10 +289,6 @@ const ProfilePreview = ({ username = null }) => {
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
     setSelectedListTab(key);
-
-    // if (key === 'session') {
-    //   handleChangeSessionTab(selectedSessionTab);
-    // }
     setIsListLoading(false);
   };
 

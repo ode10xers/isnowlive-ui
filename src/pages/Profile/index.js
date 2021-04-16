@@ -1,26 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin } from 'antd';
-import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin, Modal } from 'antd';
+import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined, CopyOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 
 import Routes from 'routes';
 import apis from 'apis';
+
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
 import EMCode from 'components/EMCode';
+
 import validationRules from 'utils/validation';
-import { parseEmbedCode, scrollToErrorField, isAPISuccess } from 'utils/helper';
+import { parseEmbedCode, scrollToErrorField, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
 import { fetchCreatorCurrency } from 'utils/payment';
+
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 
-import styles from './style.module.scss';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -28,11 +30,15 @@ import {
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, customNullValue, pushToDataLayer } from 'services/integrations/googleTagManager';
+import { useGlobalContext } from 'services/globalContext';
 
-const { Title, Text, Paragraph } = Typography;
+import styles from './style.module.scss';
+
+const { Title, Text, Paragraph, Link } = Typography;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
+  const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
@@ -88,7 +94,10 @@ const Profile = () => {
         message.success('Profile successfully updated.');
         localUserDetails.profile_complete = true;
         localUserDetails.is_creator = true;
-        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+        localUserDetails.first_name = values.first_name;
+        localUserDetails.last_name = values.last_name;
+        localUserDetails.username = values.username;
+        setUserDetails(localUserDetails);
 
         pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
           creator_email: localUserDetails.email,
@@ -104,8 +113,90 @@ const Profile = () => {
         });
 
         if (isOnboarding) {
-          window.open(Routes.profilePreview);
-          history.push(Routes.livestream);
+          const newWindow = window.open(Routes.profilePreview);
+          newWindow.blur();
+          window.focus();
+          // history.push(Routes.livestream);
+
+          const creatorUrl = generateUrlFromUsername(values.username);
+          const modalRef = Modal.success({
+            width: 550,
+            okButtonProps: { style: { display: 'none' } },
+            title: 'Awesome! Your public website is ready',
+            content: (
+              <Row gutter={[8, 12]}>
+                <Col xs={24}>
+                  <Paragraph>You can now share your website</Paragraph>
+                  <Paragraph>
+                    <Link
+                      href={creatorUrl}
+                      target="_blank"
+                      copyable={{
+                        icon: [
+                          <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
+                            {' '}
+                            Copy{' '}
+                          </Button>,
+                          <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
+                            {' '}
+                            Copied!{' '}
+                          </Button>,
+                        ],
+                      }}
+                    >
+                      {creatorUrl}
+                    </Link>
+                  </Paragraph>
+                  <Paragraph>on your social media or with your audience.</Paragraph>
+                  <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
+                </Col>
+                <Col xs={24}>
+                  <Row gutter={[8, 8]} justify="space-around">
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="primary"
+                        onClick={() => {
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, {
+                            onboarding: true,
+                          });
+                          modalRef.destroy();
+                        }}
+                      >
+                        Upload a Video
+                      </Button>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="primary"
+                        className={styles.greenBtn}
+                        onClick={() => {
+                          history.push(Routes.session);
+                          window.scrollTo(0, 0);
+                          modalRef.destroy();
+                        }}
+                      >
+                        Schedule a Session
+                      </Button>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="link"
+                        onClick={() => {
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath);
+                          modalRef.destroy();
+                        }}
+                      >
+                        I'll do these later
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            ),
+          });
         } else {
           history.push('/creator/dashboard/profile');
         }

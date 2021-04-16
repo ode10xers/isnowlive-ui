@@ -1,6 +1,7 @@
 import React, { useReducer, useContext, createContext } from 'react';
 import Routes from 'routes';
 import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
+import { setAuthTokenInLS } from 'services/localAuthToken';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
@@ -74,11 +75,6 @@ const reducer = (state, action) => {
           productType: null,
         },
       };
-    case 'INIT_STRIPE':
-      return {
-        ...state,
-        stripePromise: action.payload,
-      };
     default:
       return state;
   }
@@ -102,18 +98,22 @@ const GlobalDataProvider = ({ children }) => {
       productId: null,
       productType: null,
     },
-    // stripePromise: null,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  function logIn(userDetails, rememberUser) {
+  function logIn(userDetails, rememberUser, isIframeMode = false) {
     if (rememberUser) {
       localStorage.setItem('remember-user', JSON.stringify(userDetails.email));
     } else {
       localStorage.removeItem('remember-user');
     }
-    setAuthCookie(userDetails.auth_token);
+    if (isIframeMode) {
+      // Inside iframe cookies are not accessible because of security issues so using local storage
+      setAuthTokenInLS(userDetails.auth_token);
+    } else {
+      setAuthCookie(userDetails.auth_token);
+    }
     setUserDetails(userDetails);
 
     if (userDetails.is_creator) {
@@ -174,11 +174,6 @@ const GlobalDataProvider = ({ children }) => {
     resetMixPanel();
   }
 
-  // function initStripe() {
-  //   const stripePromise = null;
-  //   dispatch({ type: 'INIT_STRIPE', payload: stripePromise });
-  // }
-
   const value = {
     state,
     logOut,
@@ -190,7 +185,6 @@ const GlobalDataProvider = ({ children }) => {
     hidePaymentPopup,
     showSendEmailPopup,
     hideSendEmailPopup,
-    // initStripe
   };
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

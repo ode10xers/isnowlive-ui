@@ -339,7 +339,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
   return (
     <div>
       {videoCourses?.length > 0 ? (
-        <Collapse>
+        <Collapse defaultActiveKey="published">
           <Panel header={<Title level={5}> Published </Title>} key="published">
             {isMobileDevice ? (
               <Row gutter={[8, 16]}>

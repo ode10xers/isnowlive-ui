@@ -1,18 +1,19 @@
-import React from 'react'; //Needed for JSX
+import React from 'react';
 import { Modal, Typography, Button, Row, Col } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
+import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
 import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
+import { isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
+import { getAuthCookie } from 'services/authCookie';
 
 import styles from './style.modules.scss';
-import AddToCalendarButton from 'components/AddToCalendarButton';
-import { isWidgetUrl, generateWidgetUrl } from 'utils/widgets';
 
 const { Text, Paragraph } = Typography;
 
@@ -22,7 +23,23 @@ const getDashboardUrl = (userName = null, targetPath = Routes.attendeeDashboard.
   if (!isWidgetUrl()) {
     return generateUrl(usernameValue) + targetPath;
   } else {
-    return generateWidgetUrl(usernameValue, 'dashboard', true);
+    let completeUrl = generateUrl(usernameValue) + targetPath;
+
+    let authCode = null;
+    const authCodeFromCookie = getAuthCookie();
+    if (authCodeFromCookie && authCodeFromCookie !== '') {
+      authCode = authCodeFromCookie;
+    } else {
+      const userDetails = getLocalUserDetails();
+      authCode = userDetails?.auth_token;
+    }
+
+    completeUrl =
+      completeUrl +
+      '?isWidget=true&widgetType=dashboard' +
+      `${authCode && authCode !== '' ? `&authCode=${authCode}` : ''}`;
+
+    return completeUrl;
   }
 };
 
