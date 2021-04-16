@@ -41,6 +41,7 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
+import { mapUserToPendo } from 'services/integrations/pendo';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -79,6 +80,10 @@ function App() {
       if (cookieConsent) {
         initFreshChatWidget(userDetails);
         initMixPanel();
+
+        if (userDetails) {
+          mapUserToPendo(userDetails);
+        }
       }
     }
   }, [userDetails, cookieConsent, isWidget]);
