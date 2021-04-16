@@ -2,6 +2,7 @@ export const gtmTriggerEvents = {
   CREATOR_SIGNUP: 'creator_signup',
   CREATOR_LOGIN: 'creator_login',
   CREATOR_PROFILE_COMPLETE: 'creator_profile_complete',
+  CREATOR_ZOOM_CONNECTED: 'creator_zoom_connected',
 };
 
 // Note: for nulls/undefined in the code, we will send "NA"

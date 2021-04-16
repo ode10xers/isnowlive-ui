@@ -22,6 +22,7 @@ import config from 'config';
 
 import styles from './style.module.scss';
 import parseQueryString from 'utils/parseQueryString';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Title, Link } = Typography;
 const { creator } = mixPanelEventTags;
@@ -65,6 +66,10 @@ const LiveStream = () => {
           const localUserDetails = getLocalUserDetails();
           localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
           setUserDetails(localUserDetails);
+
+          pushToDataLayer(gtmTriggerEvents.CREATOR_ZOOM_CONNECTED, {
+            creator_zoom_connected: ZoomAuthType.OAUTH,
+          });
           // localStorage.setItem('user-details', JSON.stringify(localUserDetails));
           // message.success('Zoom successfully setup!');
           Modal.success({
@@ -122,18 +127,31 @@ const LiveStream = () => {
       setIsLoading(false);
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
-        message.success('Zoom successfully setup!');
+        // message.success('Zoom successfully setup!');
         const localUserDetails = getLocalUserDetails();
         localUserDetails.zoom_connected = ZoomAuthType.JWT;
-        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+        setUserDetails(localUserDetails);
+        pushToDataLayer(gtmTriggerEvents.CREATOR_ZOOM_CONNECTED, {
+          creator_zoom_connected: ZoomAuthType.JWT,
+        });
+
+        Modal.success({
+          centered: true,
+          okText: 'Great',
+          title: 'Zoom account successfully connected',
+          content: `We'll take care of creating and managing unique zoom meetings for all your sessions. So you can focus on what you love doing.`,
+          onOk: () => history.push(Routes.creatorDashboard.rootPath),
+          closable: true,
+        });
+        // localStorage.setItem('user-details', JSON.stringify(localUserDetails));
         // setTimeout is used for better user experince suggest by Rahul
-        setTimeout(() => {
-          if (isOnboarding) {
-            history.push(Routes.session);
-          } else {
-            history.push(Routes.creatorDashboard.rootPath);
-          }
-        }, 2000);
+        // setTimeout(() => {
+        //   if (isOnboarding) {
+        //     history.push(Routes.session);
+        //   } else {
+        //     history.push(Routes.creatorDashboard.rootPath);
+        //   }
+        // }, 2000);
       }
     } catch (error) {
       setIsLoading(false);
