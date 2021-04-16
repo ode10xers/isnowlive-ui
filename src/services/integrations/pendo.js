@@ -12,14 +12,13 @@ export const mapUserToPendo = (userDetails) => {
     },
 
     account: {
-      id: userDetails.external_id, // Highly recommended
+      // id: userDetails.external_id, // Highly recommended
       // name:         // Optional
       // is_paying:    // Recommended if using Pendo Feedback
       // monthly_value:// Recommended if using Pendo Feedback
       // planLevel:    // Optional
       // planPrice:    // Optional
       // creationDate: // Optional
-
       // You can add any additional account level key-values here,
       // as long as it's not one of the above reserved names.
     },
