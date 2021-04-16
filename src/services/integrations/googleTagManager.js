@@ -6,6 +6,7 @@ export const gtmTriggerEvents = {
   CREATOR_PAYMENT_SETUP: 'creator_payment_setup',
   CREATOR_CREATE_SESSION: 'creator_create_session',
   CREATOR_CREATE_VIDEO: 'creator_create_video',
+  CREATOR_UPLOAD_VIDEO: 'creator_upload_video',
 };
 
 // Note: for nulls/undefined in the code, we will send "NA"
