@@ -16,8 +16,9 @@ import EMCode from 'components/EMCode';
 import validationRules from 'utils/validation';
 import { parseEmbedCode, scrollToErrorField, isAPISuccess } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
+import { fetchCreatorCurrency } from 'utils/payment';
+import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 import {
@@ -26,7 +27,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-import { pushToDataLayer } from 'services/integrations/googleTagManager';
+import { gtmTriggerEvents, customNullValue, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Title, Text, Paragraph } = Typography;
 const { creator } = mixPanelEventTags;
@@ -68,17 +69,17 @@ const Profile = () => {
     try {
       const localUserDetails = getLocalUserDetails();
 
+      await apis.user.convertUserToCreator();
+
       if (!localUserDetails.is_creator) {
-        // We can also move hitting conversion API here
+        // Happens when attendee converts to Creator
 
         pushToDataLayer('Convert To Creator', {
           email: localUserDetails.email,
-          first_name: localUserDetails.first_name,
-          last_name: localUserDetails.last_name,
+          first_name: values.first_name,
+          last_name: values.last_name,
         });
       }
-
-      await apis.user.convertUserToCreator();
 
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
@@ -86,7 +87,22 @@ const Profile = () => {
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
         localUserDetails.profile_complete = true;
+        localUserDetails.is_creator = true;
         localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+
+        pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
+          creator_email: localUserDetails.email,
+          creator_email_verified: localUserDetails.email_verified,
+          is_creator: localUserDetails.is_creator,
+          creator_first_name: values.first_name,
+          creator_last_name: values.last_name,
+          creator_username: values.username || customNullValue,
+          creator_profile_complete: localUserDetails.profile_complete,
+          creator_payment_account_status: localUserDetails.payment_account_status,
+          creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+          creator_zoom_connected: localUserDetails.zoom_connected,
+        });
+
         if (isOnboarding) {
           window.open(Routes.profilePreview);
           history.push(Routes.livestream);

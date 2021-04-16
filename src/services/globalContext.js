@@ -4,7 +4,8 @@ import { setAuthCookie, deleteAuthCookie } from 'services/authCookie';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
-import { pushToDataLayer } from './integrations/googleTagManager';
+import { fetchCreatorCurrency } from 'utils/payment';
+import { gtmTriggerEvents, customNullValue, pushToDataLayer } from './integrations/googleTagManager';
 // import { loadStripe } from "@stripe/stripe-js";
 
 // import config from 'config';
@@ -114,18 +115,21 @@ const GlobalDataProvider = ({ children }) => {
     }
     setAuthCookie(userDetails.auth_token);
     setUserDetails(userDetails);
-    pushToDataLayer('Login', {
-      email: userDetails.email,
-      first_name: userDetails.first_name,
-      last_name: userDetails.last_name,
-      phone_number: userDetails.phone,
-      location: userDetails.location,
-      username: userDetails.username,
-      is_creator: userDetails.is_creator,
-      profile_complete: userDetails.profile_complete,
-      payment_account_status: userDetails.payment_account_status,
-      zoom_connected: userDetails.zoom_connected,
-    });
+
+    if (userDetails.is_creator) {
+      pushToDataLayer(gtmTriggerEvents.CREATOR_LOGIN, {
+        creator_email: userDetails.email,
+        creator_email_verified: userDetails.email_verified,
+        is_creator: userDetails.is_creator,
+        creator_first_name: userDetails.first_name,
+        creator_last_name: userDetails.last_name,
+        creator_username: userDetails.username || customNullValue,
+        creator_profile_complete: userDetails.profile_complete,
+        creator_payment_account_status: userDetails.payment_account_status,
+        creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+        creator_zoom_connected: userDetails.zoom_connected,
+      });
+    }
     setUserAuthentication(true);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
   }
