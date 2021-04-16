@@ -20,3 +20,18 @@ export const pushToDataLayer = (eventName, eventData = {}) => {
     ...eventData,
   });
 };
+
+export const clearGTMUserAttributes = () => {
+  window.dataLayer.push({
+    creator_email: undefined,
+    creator_email_verified: undefined,
+    is_creator: undefined,
+    creator_first_name: undefined,
+    creator_last_name: undefined,
+    creator_username: undefined,
+    creator_profile_complete: undefined,
+    creator_payment_account_status: undefined,
+    creator_payment_currency: undefined,
+    creator_zoom_connected: undefined,
+  });
+};

@@ -6,7 +6,12 @@ import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
 import { fetchCreatorCurrency } from 'utils/payment';
-import { gtmTriggerEvents, customNullValue, pushToDataLayer } from './integrations/googleTagManager';
+import {
+  gtmTriggerEvents,
+  customNullValue,
+  pushToDataLayer,
+  clearGTMUserAttributes,
+} from './integrations/googleTagManager';
 // import { loadStripe } from "@stripe/stripe-js";
 
 // import config from 'config';
@@ -172,6 +177,7 @@ const GlobalDataProvider = ({ children }) => {
     localStorage.removeItem('user-details');
     deleteAuthCookie();
     resetMixPanel();
+    clearGTMUserAttributes();
   }
 
   const value = {
