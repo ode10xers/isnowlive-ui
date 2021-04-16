@@ -11,9 +11,13 @@ export const widgetComponentsName = {
     value: 'passes',
     label: 'Passes',
   },
+  VIDEOS: {
+    value: 'videos',
+    label: 'Videos',
+  },
 };
 
-export const publishedWidgets = ['calendar', 'passes'];
+export const publishedWidgets = ['calendar', 'passes', 'videos'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails().username;
