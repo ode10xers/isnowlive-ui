@@ -77,16 +77,6 @@ const Profile = () => {
 
       await apis.user.convertUserToCreator();
 
-      if (!localUserDetails.is_creator) {
-        // Happens when attendee converts to Creator
-
-        pushToDataLayer('Convert To Creator', {
-          email: localUserDetails.email,
-          first_name: values.first_name,
-          last_name: values.last_name,
-        });
-      }
-
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
         setIsLoading(false);

@@ -3,12 +3,19 @@ import { useLocation } from 'react-router-dom';
 import countryList from 'react-select-country-list';
 import { Select, Typography, Button, message, Row, Col } from 'antd';
 
+import apis from 'apis';
+
 import Section from 'components/Section';
+
+import Earnings from 'pages/CreatorDashboard/Earnings';
+
+import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
+import { fetchCreatorCurrency } from 'utils/payment';
+
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
-import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
-import apis from 'apis';
-import Earnings from 'pages/CreatorDashboard/Earnings';
+import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
 
@@ -24,6 +31,7 @@ const PaymentAccount = () => {
   const {
     state: {
       userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
+      setUserDetails,
     },
   } = useGlobalContext();
   const validateAccount = location?.state?.validateAccount;
@@ -75,6 +83,16 @@ const PaymentAccount = () => {
           if (isAPISuccess(status)) {
             message.success('Stripe Account Connected Succesfully!!');
             setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
+            const localUserDetails = getLocalUserDetails();
+            localUserDetails.payment_account_status = StripeAccountStatus.VERIFICATION_PENDING;
+            setUserDetails(localUserDetails);
+
+            // TODO: Test this, and check if validate API returns the Stripe Account status
+            // If we use that it will be a more reliable source of info
+            pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP, {
+              creator_payment_account_status: localUserDetails.payment_account_status,
+              creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+            });
           }
         } catch (error) {
           if (error.response?.data?.message !== 'unable to find payment credentials') {
@@ -84,7 +102,7 @@ const PaymentAccount = () => {
       };
       validateStripeAccount();
     }
-  }, [validateAccount, openStripeDashboard]);
+  }, [validateAccount, openStripeDashboard, setUserDetails]);
 
   const handleChange = (value) => {
     setSelectedCountry(value);
