@@ -5,6 +5,7 @@ import { setAuthTokenInLS } from 'services/localAuthToken';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
+import { mapUserToPendo } from './integrations/pendo';
 
 const Context = createContext(null);
 
@@ -111,6 +112,7 @@ const GlobalDataProvider = ({ children }) => {
     }
     setUserDetails(userDetails);
     setUserAuthentication(true);
+    mapUserToPendo(userDetails);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
   }
 
