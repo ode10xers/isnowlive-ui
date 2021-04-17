@@ -90,6 +90,7 @@ const Profile = () => {
         setUserDetails(localUserDetails);
 
         pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
+          creator_external_id: localUserDetails.external_id,
           creator_email: localUserDetails.email,
           creator_email_verified: localUserDetails.email_verified,
           is_creator: localUserDetails.is_creator,

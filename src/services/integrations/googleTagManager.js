@@ -28,6 +28,7 @@ export const pushToDataLayer = (eventName, eventData = {}) => {
 // That way the next events can have these user data accurately
 export const setGTMUserAttributes = async (userDetails) => {
   window.dataLayer.push({
+    creator_external_id: userDetails.external_id,
     creator_email: userDetails.email,
     creator_email_verified: userDetails.email_verified,
     is_creator: userDetails.is_creator,
@@ -45,6 +46,7 @@ export const setGTMUserAttributes = async (userDetails) => {
 // Need to test whether or not this is breaking stuffs
 export const clearGTMUserAttributes = () => {
   window.dataLayer.push({
+    creator_external_id: undefined,
     creator_email: undefined,
     creator_email_verified: undefined,
     is_creator: undefined,
@@ -60,6 +62,7 @@ export const clearGTMUserAttributes = () => {
 
 export const trackUserLoginInGTM = async (userDetails) => {
   pushToDataLayer(gtmTriggerEvents.CREATOR_LOGIN, {
+    creator_external_id: userDetails.external_id,
     creator_email: userDetails.email,
     creator_email_verified: userDetails.email_verified,
     is_creator: userDetails.is_creator,

@@ -109,9 +109,11 @@ const UploadVideoModal = ({
         </>
       );
 
-      pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
-        video_id: editedVideo?.external_id || customNullValue,
-      });
+      if (editedVideo && uploadingFlie) {
+        pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
+          video_id: editedVideo?.external_id || customNullValue,
+        });
+      }
     } else {
       showErrorModal(`Failed to upload video`);
     }

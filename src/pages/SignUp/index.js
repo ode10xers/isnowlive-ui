@@ -38,6 +38,7 @@ const SignUp = ({ history }) => {
       if (data) {
         pushToDataLayer(gtmTriggerEvents.CREATOR_SIGNUP, {
           creator_email: values.email,
+          creator_external_id: data.external_id,
         });
         http.setAuthToken(data.auth_token);
         logIn(data, true);
