@@ -3,6 +3,7 @@ import React from 'react';
 import CalendarSessions from '../../components/EmbeddableComponents/CalendarSessions';
 import Passes from '../../components/EmbeddableComponents/Passes';
 import Videos from '../../components/EmbeddableComponents/Videos';
+import Courses from '../../components/EmbeddableComponents/Courses';
 
 export default function EmbeddablePage({ widget }) {
   const profileUsername = window.location.hostname.split('.')[0] || '';
@@ -14,6 +15,8 @@ export default function EmbeddablePage({ widget }) {
     componentToLoad = <Passes profileUsername={profileUsername} />;
   } else if (widget === 'videos') {
     componentToLoad = <Videos profileUsername={profileUsername} />;
+  } else if (widget === 'courses') {
+    componentToLoad = <Courses profileUsername={profileUsername} />;
   }
 
   return <div style={{ padding: '20px' }}>{componentToLoad}</div>;

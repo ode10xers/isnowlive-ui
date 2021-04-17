@@ -1,3 +1,5 @@
+import { courseType } from "./helper";
+
 /* Products = all the sellable entity in our app - sessions, passes, courses etc
   This is the helper file to do different common things related to product here */
 
@@ -18,3 +20,11 @@ export const formatPassesData = (data, profileUsername) => {
       })) || [],
   }));
 };
+
+export const getLiveCoursesFromCourses = (data) => {
+  return data.filter((course) => course.type === courseType.MIXED || course.type === 'live');
+};
+
+export const getVideoCoursesFromCourses = (data) => {
+  return data.filter((course) => course.type === courseType.VIDEO_NON_SEQ || course.type === courseType.VIDEO_SEQ)
+}

@@ -38,13 +38,13 @@ import {
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
-import { formatPassesData } from 'utils/productsHelper';
+import { formatPassesData, getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { useGlobalContext } from 'services/globalContext';
 
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
@@ -163,10 +163,8 @@ const ProfilePreview = ({ username = null }) => {
       const { status, data } = await apis.courses.getCoursesByUsername(getProfileUsername());
 
       if (isAPISuccess(status) && data) {
-        setLiveCourses(data.filter((course) => course.type === courseType.MIXED || course.type === 'live'));
-        setVideoCourses(
-          data.filter((course) => course.type === courseType.VIDEO_NON_SEQ || course.type === courseType.VIDEO_SEQ)
-        );
+        setLiveCourses(getLiveCoursesFromCourses(data));
+        setVideoCourses(getVideoCoursesFromCourses(data));
         setIsCoursesLoading(false);
       }
     } catch (error) {
