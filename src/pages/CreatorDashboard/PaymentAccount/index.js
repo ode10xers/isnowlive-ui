@@ -96,6 +96,17 @@ const PaymentAccount = () => {
           }
         } catch (error) {
           if (error.response?.data?.message !== 'unable to find payment credentials') {
+            const localUserDetails = getLocalUserDetails();
+            localUserDetails.payment_account_status = StripeAccountStatus.VERIFICATION_PENDING;
+            setUserDetails(localUserDetails);
+
+            // TODO: Test this, and check if validate API returns the Stripe Account status
+            // If we use that it will be a more reliable source of info
+            pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP, {
+              creator_payment_account_status: localUserDetails.payment_account_status,
+              creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
+            });
+
             openStripeDashboard();
           }
         }
