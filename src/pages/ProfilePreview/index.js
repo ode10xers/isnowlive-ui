@@ -29,7 +29,6 @@ import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'compo
 
 import {
   generateUrlFromUsername,
-  courseType,
   isAPISuccess,
   parseEmbedCode,
   paymentSource,
