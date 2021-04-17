@@ -12,7 +12,7 @@ export const fetchCreatorCurrency = async () => {
       return data.currency;
     }
   } catch (error) {
-    message.error(error?.response?.data?.message || 'Something went wrong');
+    console.error(error?.response?.data?.message || 'Something went wrong');
   }
 
   return null;
