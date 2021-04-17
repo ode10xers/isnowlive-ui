@@ -38,6 +38,8 @@ const PaymentAccount = () => {
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
   const openStripeConnect = (url) => {
+    pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP);
+
     window.open(url, '_self');
   };
 
@@ -84,11 +86,6 @@ const PaymentAccount = () => {
             const localUserDetails = getLocalUserDetails();
             localUserDetails.payment_account_status = StripeAccountStatus.VERIFICATION_PENDING;
             setUserDetails(localUserDetails);
-
-            pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP, {
-              creator_payment_account_status: localUserDetails.payment_account_status,
-              creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
-            });
 
             message.success('Stripe Account Connected Succesfully!!');
             setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
