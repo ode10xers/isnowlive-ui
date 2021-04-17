@@ -98,7 +98,7 @@ const Profile = () => {
           creator_username: values.username || customNullValue,
           creator_profile_complete: localUserDetails.profile_complete,
           creator_payment_account_status: localUserDetails.payment_account_status,
-          creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+          creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
           creator_zoom_connected: localUserDetails.zoom_connected,
         });
 

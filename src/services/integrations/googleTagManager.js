@@ -26,7 +26,7 @@ export const pushToDataLayer = (eventName, eventData = {}) => {
 // This method is to push user attributes if the user lands
 // in the website already logged in
 // That way the next events can have these user data accurately
-export const setGTMUserAttributes = (userDetails) => {
+export const setGTMUserAttributes = async (userDetails) => {
   window.dataLayer.push({
     creator_email: userDetails.email,
     creator_email_verified: userDetails.email_verified,
@@ -36,7 +36,7 @@ export const setGTMUserAttributes = (userDetails) => {
     creator_username: userDetails.username || customNullValue,
     creator_profile_complete: userDetails.profile_complete,
     creator_payment_account_status: userDetails.payment_account_status,
-    creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+    creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
     creator_zoom_connected: userDetails.zoom_connected,
   });
 };
@@ -55,5 +55,20 @@ export const clearGTMUserAttributes = () => {
     creator_payment_account_status: undefined,
     creator_payment_currency: undefined,
     creator_zoom_connected: undefined,
+  });
+};
+
+export const trackUserLoginInGTM = async (userDetails) => {
+  pushToDataLayer(gtmTriggerEvents.CREATOR_LOGIN, {
+    creator_email: userDetails.email,
+    creator_email_verified: userDetails.email_verified,
+    is_creator: userDetails.is_creator,
+    creator_first_name: userDetails.first_name,
+    creator_last_name: userDetails.last_name,
+    creator_username: userDetails.username || customNullValue,
+    creator_profile_complete: userDetails.profile_complete,
+    creator_payment_account_status: userDetails.payment_account_status,
+    creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
+    creator_zoom_connected: userDetails.zoom_connected,
   });
 };

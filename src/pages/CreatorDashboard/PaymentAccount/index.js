@@ -91,7 +91,7 @@ const PaymentAccount = () => {
             // If we use that it will be a more reliable source of info
             pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP, {
               creator_payment_account_status: localUserDetails.payment_account_status,
-              creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+              creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
             });
           }
         } catch (error) {
