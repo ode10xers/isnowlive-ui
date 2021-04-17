@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Loader from 'components/Loader';
 import PublicVideoList from 'components/PublicVideoList';
