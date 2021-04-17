@@ -1,3 +1,5 @@
+import { fetchCreatorCurrency } from 'utils/payment';
+
 export const gtmTriggerEvents = {
   CREATOR_SIGNUP: 'creator_signup',
   CREATOR_LOGIN: 'creator_login',
@@ -21,6 +23,26 @@ export const pushToDataLayer = (eventName, eventData = {}) => {
   });
 };
 
+// This method is to push user attributes if the user lands
+// in the website already logged in
+// That way the next events can have these user data accurately
+export const setGTMUserAttributes = (userDetails) => {
+  window.dataLayer.push({
+    creator_email: userDetails.email,
+    creator_email_verified: userDetails.email_verified,
+    is_creator: userDetails.is_creator,
+    creator_first_name: userDetails.first_name,
+    creator_last_name: userDetails.last_name,
+    creator_username: userDetails.username || customNullValue,
+    creator_profile_complete: userDetails.profile_complete,
+    creator_payment_account_status: userDetails.payment_account_status,
+    creator_payment_currency: fetchCreatorCurrency() || customNullValue,
+    creator_zoom_connected: userDetails.zoom_connected,
+  });
+};
+
+// Method to clear user attributes from the data layer
+// Need to test whether or not this is breaking stuffs
 export const clearGTMUserAttributes = () => {
   window.dataLayer.push({
     creator_email: undefined,
