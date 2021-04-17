@@ -11,11 +11,10 @@ import Earnings from 'pages/CreatorDashboard/Earnings';
 
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { fetchCreatorCurrency } from 'utils/payment';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
-import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
 
