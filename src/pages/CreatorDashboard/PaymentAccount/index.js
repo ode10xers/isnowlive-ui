@@ -11,10 +11,11 @@ import Earnings from 'pages/CreatorDashboard/Earnings';
 
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
-import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
+import { gtmTriggerEvents, pushToDataLayer, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
 
@@ -37,8 +38,6 @@ const PaymentAccount = () => {
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
   const openStripeConnect = (url) => {
-    pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP);
-
     window.open(url, '_self');
   };
 
@@ -80,10 +79,16 @@ const PaymentAccount = () => {
     if (validateAccount) {
       const validateStripeAccount = async () => {
         try {
-          const { status } = await apis.payment.stripe.validate();
+          const { status, data } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
             const localUserDetails = getLocalUserDetails();
-            localUserDetails.payment_account_status = StripeAccountStatus.VERIFICATION_PENDING;
+            localUserDetails.payment_account_status =
+              data?.payment_account_status || StripeAccountStatus.VERIFICATION_PENDING;
+            console.log('Current User Details', localUserDetails);
+            pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP, {
+              creator_payment_account_status: localUserDetails.payment_account_status,
+              creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
+            });
             setUserDetails(localUserDetails);
 
             message.success('Stripe Account Connected Succesfully!!');
