@@ -72,12 +72,14 @@ const LiveStream = () => {
           });
           // localStorage.setItem('user-details', JSON.stringify(localUserDetails));
           // message.success('Zoom successfully setup!');
-          Modal.success({
+          Modal.confirm({
             centered: true,
-            okText: 'Great',
             title: 'Zoom account successfully connected',
             content: `We'll take care of creating and managing unique zoom meetings for all your sessions. So you can focus on what you love doing.`,
-            onOk: () => history.push(Routes.creatorDashboard.rootPath),
+            onOk: () => history.push(Routes.creatorDashboard.createSessions),
+            okText: 'Create Session',
+            onCancel: () => history.push(Routes.creatorDashboard.rootPath),
+            cancelText: 'Go to Dashboard',
             closable: true,
           });
           // setTimeout is used for better user experince suggest by Rahul

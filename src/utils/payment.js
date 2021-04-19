@@ -6,6 +6,8 @@ import { isAPISuccess } from 'utils/helper';
 
 export const fetchCreatorCurrency = async () => {
   try {
+    // TODO: user API now gives currency info
+    // Readjust codes that uses this API that can use the info from userDetails instead
     const { status, data } = await apis.session.getCreatorBalance();
 
     if (isAPISuccess(status) && data?.currency) {

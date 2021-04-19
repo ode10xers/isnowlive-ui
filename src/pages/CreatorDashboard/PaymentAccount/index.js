@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import countryList from 'react-select-country-list';
-import { Select, Typography, Button, message, Row, Col } from 'antd';
+import { Select, Typography, Button, message, Row, Col, Modal } from 'antd';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Section from 'components/Section';
 
@@ -24,6 +25,7 @@ const { creator } = mixPanelEventTags;
 
 const PaymentAccount = () => {
   const location = useLocation();
+  const history = useHistory();
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const countries = countryList().getData();
@@ -86,12 +88,24 @@ const PaymentAccount = () => {
         try {
           const { status, data } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
+            const paymentStatus = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
+
             const localUserDetails = getLocalUserDetails();
-            localUserDetails.payment_account_status = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
+            localUserDetails.payment_account_status = paymentStatus;
             setUserDetails(localUserDetails);
 
-            message.success('Stripe Account Connected Succesfully!!');
-            setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
+            Modal.confirm({
+              centered: true,
+              title: 'Stripe account successfully connected',
+              content: `Now you can start making paid products and earn money by selling them. You can now check your earnings in the "Get Paid" section of your dashboard.`,
+              onOk: () => history.push(Routes.creatorDashboard.createSessions),
+              okText: 'Create Session',
+              onCancel: () => history.push(Routes.creatorDashboard.rootPath),
+              cancelText: 'Go to Dashboard',
+              closable: true,
+            });
+
+            setPaymentConnected(paymentStatus);
           }
         } catch (error) {
           if (error.response?.data?.message !== 'unable to find payment credentials') {
@@ -101,6 +115,7 @@ const PaymentAccount = () => {
       };
       validateStripeAccount();
     }
+    //eslint-disable-next-line
   }, [validateAccount, openStripeDashboard, setUserDetails]);
 
   const handleChange = (value) => {
