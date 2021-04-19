@@ -488,6 +488,7 @@ const Earnings = () => {
     {
       name: 'Membership',
       key: 'subscription_id',
+      stateKey: 'subscriptions',
       redirectMethod: () => {}, //TODO: Add this,
       showMoreMethod: () => handleShowMore('subscriptions'),
     },

@@ -143,7 +143,8 @@ export default {
       http.get(`/secure/creator/subscription?page=${pageNo}&per_page=${perPage}`),
     getSubscriptionDetails: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}`),
     deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),
-    getSubscriptionEarnings: () => http.get('/secure/creator/payments/earnings/subscriptions'),
+    getSubscriptionEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/subscriptions?page_no=${pageNo}&per_page${perPage}`),
     getSubscriptionsByUsername: (creatorUsername) => http.get(`/subscriptions?creator_username=${creatorUsername}`),
     getSubscriptionsForSession: (sessionId) => http.get(`/subscriptions?session_id=${sessionId}`),
     getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
