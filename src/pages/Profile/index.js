@@ -86,7 +86,6 @@ const Profile = () => {
         localUserDetails.first_name = values.first_name;
         localUserDetails.last_name = values.last_name;
         localUserDetails.username = values.username;
-        setUserDetails(localUserDetails);
 
         pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
           creator_external_id: localUserDetails.external_id,
@@ -101,6 +100,8 @@ const Profile = () => {
           creator_payment_currency: localUserDetails.currency || customNullValue,
           creator_zoom_connected: localUserDetails.zoom_connected,
         });
+
+        setUserDetails(localUserDetails);
 
         if (isOnboarding) {
           const newWindow = window.open(Routes.profilePreview);

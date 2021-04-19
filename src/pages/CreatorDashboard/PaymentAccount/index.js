@@ -98,7 +98,7 @@ const PaymentAccount = () => {
               centered: true,
               title: 'Stripe account successfully connected',
               content: `Now you can start making paid products and earn money by selling them. You can now check your earnings in the "Get Paid" section of your dashboard.`,
-              onOk: () => history.push(Routes.creatorDashboard.createSessions),
+              onOk: () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions),
               okText: 'Create Session',
               onCancel: () => history.push(Routes.creatorDashboard.rootPath),
               cancelText: 'Go to Dashboard',

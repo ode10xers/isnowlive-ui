@@ -76,7 +76,7 @@ const LiveStream = () => {
             centered: true,
             title: 'Zoom account successfully connected',
             content: `We'll take care of creating and managing unique zoom meetings for all your sessions. So you can focus on what you love doing.`,
-            onOk: () => history.push(Routes.creatorDashboard.createSessions),
+            onOk: () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions),
             okText: 'Create Session',
             onCancel: () => history.push(Routes.creatorDashboard.rootPath),
             cancelText: 'Go to Dashboard',

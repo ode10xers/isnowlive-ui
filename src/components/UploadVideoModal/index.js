@@ -241,7 +241,6 @@ const UploadVideoModal = ({
 
       if (isAPISuccess(response.status)) {
         if (!editedVideo) {
-          // TODO: Test whether these are good source of truths
           pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_VIDEO, {
             video_name: response.data.title,
             video_price: response.data.price,
