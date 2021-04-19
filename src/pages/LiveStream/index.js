@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Form, Typography, Button, Space, Row, Col, Input, Modal, message } from 'antd';
-import { VideoCameraOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, VideoCameraOutlined } from '@ant-design/icons';
 
 import OnboardSteps from 'components/OnboardSteps';
 import Section from 'components/Section';
@@ -81,6 +81,7 @@ const LiveStream = () => {
             onCancel: () => history.push(Routes.creatorDashboard.rootPath),
             cancelText: 'Go to Dashboard',
             closable: true,
+            icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
           });
           // setTimeout is used for better user experince suggest by Rahul
           // setTimeout(() => {

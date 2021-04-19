@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import countryList from 'react-select-country-list';
 import { Select, Typography, Button, message, Row, Col, Modal } from 'antd';
+import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -103,6 +104,7 @@ const PaymentAccount = () => {
               onCancel: () => history.push(Routes.creatorDashboard.rootPath),
               cancelText: 'Go to Dashboard',
               closable: true,
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
             });
 
             setPaymentConnected(paymentStatus);
