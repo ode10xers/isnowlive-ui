@@ -11,11 +11,10 @@ import Earnings from 'pages/CreatorDashboard/Earnings';
 
 import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { fetchCreatorCurrency } from 'utils/payment';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
-import { gtmTriggerEvents, pushToDataLayer, customNullValue } from 'services/integrations/googleTagManager';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
 
@@ -39,6 +38,8 @@ const PaymentAccount = () => {
 
   const openStripeConnect = (url) => {
     window.open(url, '_self');
+
+    pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_INITIATED);
   };
 
   const relinkStripe = useCallback(async () => {
@@ -84,11 +85,6 @@ const PaymentAccount = () => {
             const localUserDetails = getLocalUserDetails();
             localUserDetails.payment_account_status =
               data?.payment_account_status || StripeAccountStatus.VERIFICATION_PENDING;
-            console.log('Current User Details', localUserDetails);
-            pushToDataLayer(gtmTriggerEvents.CREATOR_PAYMENT_SETUP, {
-              creator_payment_account_status: localUserDetails.payment_account_status,
-              creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
-            });
             setUserDetails(localUserDetails);
 
             message.success('Stripe Account Connected Succesfully!!');
