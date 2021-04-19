@@ -195,7 +195,9 @@ const Earnings = () => {
     getCreatorEarnings();
 
     if (payment_account_status === StripeAccountStatus.CONNECTED) {
-      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED);
+      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
+        creator_payment_account_status: payment_account_status,
+      });
     } else {
       pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_STATUS, {
         creator_payment_account_status: payment_account_status,

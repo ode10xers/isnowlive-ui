@@ -36,11 +36,15 @@ const PaymentAccount = () => {
   const validateAccount = location?.state?.validateAccount;
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
-  const openStripeConnect = (url) => {
-    window.open(url, '_self');
-
-    pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_INITIATED);
-  };
+  const openStripeConnect = useCallback(
+    (url) => {
+      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_INITIATED, {
+        creator_payment_account_status: payment_account_status,
+      });
+      window.open(url, '_self');
+    },
+    [payment_account_status]
+  );
 
   const relinkStripe = useCallback(async () => {
     try {
@@ -53,7 +57,7 @@ const PaymentAccount = () => {
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
-  }, []);
+  }, [openStripeConnect]);
 
   const openStripeDashboard = useCallback(async () => {
     try {
@@ -83,8 +87,7 @@ const PaymentAccount = () => {
           const { status, data } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
             const localUserDetails = getLocalUserDetails();
-            localUserDetails.payment_account_status =
-              data?.payment_account_status || StripeAccountStatus.VERIFICATION_PENDING;
+            localUserDetails.payment_account_status = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
             setUserDetails(localUserDetails);
 
             message.success('Stripe Account Connected Succesfully!!');

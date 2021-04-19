@@ -1,5 +1,3 @@
-import { fetchCreatorCurrency } from 'utils/payment';
-
 export const gtmTriggerEvents = {
   CREATOR_SIGNUP: 'creator_signup',
   CREATOR_LOGIN: 'creator_login',
@@ -39,7 +37,7 @@ export const setGTMUserAttributes = async (userDetails) => {
     creator_username: userDetails.username || customNullValue,
     creator_profile_complete: userDetails.profile_complete,
     creator_payment_account_status: userDetails.payment_account_status,
-    creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
+    creator_payment_currency: userDetails.currency || customNullValue,
     creator_zoom_connected: userDetails.zoom_connected,
   });
 };
@@ -73,7 +71,7 @@ export const trackUserLoginInGTM = async (userDetails) => {
     creator_username: userDetails.username || customNullValue,
     creator_profile_complete: userDetails.profile_complete,
     creator_payment_account_status: userDetails.payment_account_status,
-    creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
+    creator_payment_currency: userDetails.currency || customNullValue,
     creator_zoom_connected: userDetails.zoom_connected,
   });
 };

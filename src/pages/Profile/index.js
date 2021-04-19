@@ -19,7 +19,6 @@ import validationRules from 'utils/validation';
 import { parseEmbedCode, scrollToErrorField, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
-import { fetchCreatorCurrency } from 'utils/payment';
 
 import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 
@@ -99,7 +98,7 @@ const Profile = () => {
           creator_username: values.username || customNullValue,
           creator_profile_complete: localUserDetails.profile_complete,
           creator_payment_account_status: localUserDetails.payment_account_status,
-          creator_payment_currency: (await fetchCreatorCurrency()) || customNullValue,
+          creator_payment_currency: localUserDetails.currency || customNullValue,
           creator_zoom_connected: localUserDetails.zoom_connected,
         });
 
