@@ -6,7 +6,6 @@ import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
 import { trackUserLoginInGTM, clearGTMUserAttributes } from './integrations/googleTagManager';
-import { mapUserToPendo } from './integrations/pendo';
 
 const Context = createContext(null);
 
@@ -117,7 +116,6 @@ const GlobalDataProvider = ({ children }) => {
       trackUserLoginInGTM(userDetails);
     }
     setUserAuthentication(true);
-    mapUserToPendo(userDetails);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
   }
 
