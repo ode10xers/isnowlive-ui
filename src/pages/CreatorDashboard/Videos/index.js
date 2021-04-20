@@ -672,7 +672,7 @@ const Videos = () => {
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showUploadVideoModal()} icon={<CloudUploadOutlined />}>
-            Upload New Video
+            Add New Video
           </Button>
         </Col>
         <Col xs={24}>
