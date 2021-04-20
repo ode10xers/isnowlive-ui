@@ -1,4 +1,4 @@
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import parseQueryString from 'utils/parseQueryString';
 
@@ -24,7 +24,7 @@ export const widgetComponentsName = {
 export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
-  const username = userNameValue !== '' ? userNameValue : getLocalUserDetails().username;
+  const username = userNameValue !== '' ? userNameValue : getLocalUserDetails().username || getUsernameFromUrl();
   const siteLink = generateUrlFromUsername(username);
 
   const queryParams = Object.entries({
