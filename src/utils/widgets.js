@@ -24,7 +24,7 @@ export const widgetComponentsName = {
 export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
-  const username = userNameValue !== '' ? userNameValue : getLocalUserDetails().username || getUsernameFromUrl();
+  const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
   const siteLink = generateUrlFromUsername(username);
 
   const queryParams = Object.entries({
