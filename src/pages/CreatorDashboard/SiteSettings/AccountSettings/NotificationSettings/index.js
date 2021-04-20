@@ -16,7 +16,7 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
   const [submitting, setSubmitting] = useState(false);
   const [checkedEmailOptions, setCheckedEmailOptions] = useState([]);
 
-  const saveUserPreferences = async () => {
+  const saveCreatorNotificationSettings = async () => {
     setSubmitting(true);
     try {
       const payload = {
@@ -26,11 +26,14 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
       const { status } = await apis.user.setCreatorEmailPreferences(payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('User Preferences Updated Successfully');
+        showSuccessModal('User Notification Preferences Updated Successfully');
         fetchUserSettings();
       }
     } catch (error) {
-      showErrorModal('Failed updating user preferences', error.response?.data?.message || 'Something went wrong');
+      showErrorModal(
+        'Failed updating user notification preferences',
+        error.response?.data?.message || 'Something went wrong'
+      );
     }
 
     setSubmitting(false);
@@ -86,7 +89,13 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
       </Row>
       <Row justify="center">
         <Col xs={24} md={8} lg={4}>
-          <Button block type="primary" loading={submitting} onClick={saveUserPreferences} className={styles.saveBtn}>
+          <Button
+            block
+            type="primary"
+            loading={submitting}
+            onClick={saveCreatorNotificationSettings}
+            className={styles.saveBtn}
+          >
             Save Changes
           </Button>
         </Col>
