@@ -25,10 +25,10 @@ import Loader from 'components/Loader';
 import CalendarWrapper from 'components/CalendarWrapper';
 import CreatorProfile from 'components/CreatorProfile';
 import AuthModal from 'components/AuthModal';
+import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import {
   generateUrlFromUsername,
-  courseType,
   isAPISuccess,
   parseEmbedCode,
   paymentSource,
@@ -37,13 +37,13 @@ import {
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
+import { formatPassesData, getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
 import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 
 import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { useGlobalContext } from 'services/globalContext';
-import { showBookSingleSessionSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 const { Title, Text } = Typography;
 const { creator } = mixPanelEventTags;
@@ -132,23 +132,7 @@ const ProfilePreview = ({ username = null }) => {
       const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
 
       if (isAPISuccess(status) && data) {
-        setPasses(
-          data.map((pass) => ({
-            ...pass,
-            sessions:
-              pass.sessions?.map((session) => ({
-                ...session,
-                key: `${pass.id}_${session.session_id}`,
-                username: profileUsername,
-              })) || [],
-            videos:
-              pass.videos?.map((video) => ({
-                ...video,
-                key: `${pass.id}_${video.external_id}`,
-                username: profileUsername,
-              })) || [],
-          }))
-        );
+        setPasses(formatPassesData(data, profileUsername));
         setIsPassesLoading(false);
       }
     } catch (error) {
@@ -178,10 +162,8 @@ const ProfilePreview = ({ username = null }) => {
       const { status, data } = await apis.courses.getCoursesByUsername(getProfileUsername());
 
       if (isAPISuccess(status) && data) {
-        setLiveCourses(data.filter((course) => course.type === courseType.MIXED || course.type === 'live'));
-        setVideoCourses(
-          data.filter((course) => course.type === courseType.VIDEO_NON_SEQ || course.type === courseType.VIDEO_SEQ)
-        );
+        setLiveCourses(getLiveCoursesFromCourses(data));
+        setVideoCourses(getVideoCoursesFromCourses(data));
         setIsCoursesLoading(false);
       }
     } catch (error) {
