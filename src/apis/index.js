@@ -21,8 +21,9 @@ export default {
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     convertUserToCreator: () => http.post('/secure/user/convert'),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
-    setCreatorUserPreferences: (payload) => http.patch('/secure/user/preferences', payload),
-    getCreatorUserPreferences: () => http.get('/secure/user/preferences'),
+    setCreatorEmailPreferences: (payload) => http.put('/secure/creator/settings', payload),
+    upsertCreatorUserTags: (payload) => http.put('/secure/creator/settings/tags', payload),
+    getCreatorUserPreferences: () => http.get('/secure/creator/settings'),
     sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
   },
   payment: {
