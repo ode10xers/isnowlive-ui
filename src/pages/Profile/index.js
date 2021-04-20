@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin, Modal } from 'antd';
+import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin, Modal, Collapse } from 'antd';
 import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined, CopyOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import parse from 'html-react-parser';
 
@@ -28,6 +28,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 const { Title, Text, Paragraph, Link } = Typography;
+const { Panel } = Collapse;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
@@ -355,7 +356,87 @@ const Profile = () => {
           </Form.Item>
         </Section>
 
-        {/* =========ONLINE PRESENCE==== */}
+        <Section>
+          <Collapse>
+            {/* =========ONLINE PRESENCE==== */}
+            <Panel header={<Title level={5}>2. Your other web links (Optional)</Title>} key="web_links">
+              <p className={styles.subtext}>Let people know where else to follow you on the internet</p>
+
+              <Form.Item label="Website" name={['profile', 'social_media_links', 'website']}>
+                <Input placeholder="Your website link" />
+              </Form.Item>
+
+              <Form.Item label="Facebook" name={['profile', 'social_media_links', 'facebook_link']}>
+                <Input placeholder="Facebook profile link" />
+              </Form.Item>
+
+              <Form.Item label="Twitter" name={['profile', 'social_media_links', 'twitter_link']}>
+                <Input placeholder="Twitter profile link" />
+              </Form.Item>
+
+              <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
+                <Input placeholder="Instagram profile link" />
+              </Form.Item>
+
+              <Form.Item label="LinkedIn" name={['profile', 'social_media_links', 'linkedin_link']}>
+                <Input placeholder="LinkedIn profile link" />
+              </Form.Item>
+            </Panel>
+
+            {/* ========TESTIMONIALS======== */}
+            <Panel
+              header={<Title level={5}>3. Social testimonials from customers (Optional)</Title>}
+              key="testimonials"
+            >
+              <p className={styles.subtext}>
+                Get the embed code (not the normal link) from Instagram, Facebook, LinkedIn, Twitter, or any other
+                social media and see the preview once you add it
+              </p>
+
+              <Form.Item label="Embed code" name="testimonials">
+                <Input.TextArea rows={4} placeholder="Please input your short bio" />
+              </Form.Item>
+              <Form.Item {...profileFormTailLayout}>
+                <Row>
+                  <Col xs={24}>
+                    <Button className={styles.mb10} onClick={() => addTestimonial()}>
+                      <PlusOutlined /> Add
+                    </Button>
+                  </Col>
+                </Row>
+              </Form.Item>
+
+              <Form.Item {...(!isMobileDevice && profileTestimonialTailLayout)}>
+                <Row>
+                  {testimonials?.map((item, index) => (
+                    <Col xs={24} md={24} lg={12} key={index}>
+                      {item && item.length ? (
+                        <Card
+                          title="Preview"
+                          bordered={false}
+                          extra={
+                            <DeleteOutlined
+                              onClick={() => {
+                                trackSimpleEvent(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
+                                setTestimonials(testimonials.filter((_, i) => i !== index));
+                              }}
+                            />
+                          }
+                          className={styles.card}
+                          bodyStyle={{ padding: '0px', height: '600px', overflowY: 'scroll' }} // styles.cardbody is not working here
+                        >
+                          <EMCode>{parseEmbedCode(parse(item))}</EMCode>
+                        </Card>
+                      ) : null}
+                    </Col>
+                  ))}
+                </Row>
+              </Form.Item>
+            </Panel>
+          </Collapse>
+        </Section>
+        {/*}
+
         <Section>
           <Title level={4}>2. Online Presence</Title>
           <p className={styles.subtext}>Let people know where else to follow you on social media</p>
@@ -381,7 +462,6 @@ const Profile = () => {
           </Form.Item>
         </Section>
 
-        {/* ========TESTIMONIALS======== */}
         <Section>
           <Title level={4}>3. Testimonials</Title>
           <p className={styles.subtext}>Embed social media posts to add social proof on your public page</p>
@@ -427,6 +507,7 @@ const Profile = () => {
           </Form.Item>
         </Section>
 
+*/}
         {/* ====PREVIEW AND PUBLISH====== */}
         <Section>
           <Row justify="center">
