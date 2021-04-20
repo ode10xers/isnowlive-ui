@@ -5,6 +5,7 @@ import { setAuthTokenInLS } from 'services/localAuthToken';
 import { getLocalUserDetails } from 'utils/storage';
 import { resetMixPanel } from 'services/integrations/mixpanel';
 import { getCookieConsentValue } from 'react-cookie-consent';
+import { trackUserLoginInGTM, clearGTMUserAttributes } from './integrations/googleTagManager';
 
 const Context = createContext(null);
 
@@ -110,6 +111,10 @@ const GlobalDataProvider = ({ children }) => {
       setAuthCookie(userDetails.auth_token);
     }
     setUserDetails(userDetails);
+
+    if (userDetails.is_creator) {
+      trackUserLoginInGTM(userDetails);
+    }
     setUserAuthentication(true);
     dispatch({ type: 'LOG_IN', payload: { userDetails } });
   }
@@ -152,6 +157,7 @@ const GlobalDataProvider = ({ children }) => {
     localStorage.removeItem('user-details');
     deleteAuthCookie();
     resetMixPanel();
+    clearGTMUserAttributes();
   }
 
   const value = {

@@ -53,6 +53,8 @@ import {
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
 
+import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
+
 import styles from './style.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
@@ -603,6 +605,15 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
+            // TODO: Check what happens to currency when NOT_CONNECTED user creates free session
+            pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_SESSION, {
+              session_name: newSessionResponse.data.name,
+              session_price: newSessionResponse.data.price,
+              session_currency: newSessionResponse.data.currency || customNullValue,
+              session_id: newSessionResponse.data.session_external_id,
+              session_creator_username: newSessionResponse.data.creator_username,
+            });
+
             trackSuccessEvent(eventTagObject.submitNewSession, { form_values: values });
 
             Modal.confirm({

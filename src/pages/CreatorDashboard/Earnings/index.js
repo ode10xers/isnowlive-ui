@@ -21,6 +21,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const cashIcon = require('assets/images/cash.png');
 const checkIcon = require('assets/images/check.png');
@@ -196,7 +197,17 @@ const Earnings = () => {
   useEffect(() => {
     getCreatorBalance();
     getCreatorEarnings();
-  }, [getCreatorBalance, getCreatorEarnings]);
+
+    if (payment_account_status === StripeAccountStatus.CONNECTED) {
+      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
+        creator_payment_account_status: payment_account_status,
+      });
+    } else {
+      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_STATUS, {
+        creator_payment_account_status: payment_account_status,
+      });
+    }
+  }, [getCreatorBalance, getCreatorEarnings, payment_account_status]);
 
   const confirmPayout = async () => {
     const eventTag = creator.click.payment.requestPayout;
