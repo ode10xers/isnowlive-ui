@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Tabs, Typography } from "antd";
+import { Tabs, Typography } from 'antd';
 
 import Loader from 'components/Loader';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
@@ -13,7 +13,6 @@ import styles from './style.module.scss';
 const { Title } = Typography;
 
 const Courses = ({ profileUsername }) => {
-
   const [liveCourses, setLiveCourses] = useState([]);
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
@@ -26,7 +25,6 @@ const Courses = ({ profileUsername }) => {
   };
 
   useEffect(() => {
-
     const getCoursesDetails = async () => {
       setIsCoursesLoading(true);
       try {
@@ -41,18 +39,13 @@ const Courses = ({ profileUsername }) => {
         setIsCoursesLoading(false);
         console.error('Failed to load courses details');
       }
-    }
+    };
 
     getCoursesDetails();
-
-  }, [profileUsername])
+  }, [profileUsername]);
 
   return (
-    <Tabs
-      defaultActiveKey={
-        liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''
-      }
-    >
+    <Tabs defaultActiveKey={liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''}>
       <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
         <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
           <div className={styles.p10}>
@@ -76,9 +69,7 @@ const Courses = ({ profileUsername }) => {
         </Loader>
       </Tabs.TabPane>
     </Tabs>
-  )
-
-
-}
+  );
+};
 
 export default Courses;
