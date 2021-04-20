@@ -67,7 +67,7 @@ const AccountSettings = () => {
                 </div>
               }
             >
-              <TagSettings userTags={accountSettings.tags} />
+              <TagSettings fetchUserSettings={getCreatorUserSettings} userTags={accountSettings.tags} />
             </TabPane>
           </Tabs>
         )}
