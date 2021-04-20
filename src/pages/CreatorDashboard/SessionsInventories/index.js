@@ -285,8 +285,12 @@ const SessionsInventories = ({ match }) => {
         renderSimpleTableCell(record.is_date, `${record.num_participants || 0} / ${record.max_participants}`),
     },
     {
-      title: 'Actions',
-      width: isPast ? '100px' : '200px',
+      title: (
+        <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
+          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ),
+      width: '200px',
       render: (text, record) => {
         if (record.is_date) {
           return emptyTableCell;
@@ -539,11 +543,6 @@ const SessionsInventories = ({ match }) => {
               <Radio.Button value="list">List</Radio.Button>
               <Radio.Button value="calendar">Calendar</Radio.Button>
             </Radio.Group>
-          </Col>
-          <Col xs={24} md={6} lg={4}>
-            <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-              {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-            </Button>
           </Col>
 
           <Col xs={24}>
