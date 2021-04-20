@@ -41,6 +41,7 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
+import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -79,6 +80,9 @@ function App() {
       if (cookieConsent) {
         initFreshChatWidget(userDetails);
         initMixPanel();
+        if (userDetails) {
+          setGTMUserAttributes(userDetails);
+        }
       }
     }
   }, [userDetails, cookieConsent, isWidget]);
