@@ -23,7 +23,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-const CalendarSessions = () => {
+const CalendarSessions = ({ profileUsername }) => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -32,8 +32,6 @@ const CalendarSessions = () => {
   const [sessionCountByDate, setSessionCountByDate] = useState({});
   const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
-
-  const profileUsername = window.location.hostname.split('.')[0] || '';
 
   const getCalendarSessions = async (username) => {
     try {

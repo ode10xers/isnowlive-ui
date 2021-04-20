@@ -16,6 +16,7 @@ import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Item } = Form;
 const { user } = mixPanelEventTags;
@@ -35,6 +36,10 @@ const SignUp = ({ history }) => {
         is_creator: true,
       });
       if (data) {
+        pushToDataLayer(gtmTriggerEvents.CREATOR_SIGNUP, {
+          creator_email: values.email,
+          creator_external_id: data.external_id,
+        });
         http.setAuthToken(data.auth_token);
         logIn(data, true);
         setIsLoading(false);

@@ -9,7 +9,7 @@ import { getAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
 import { isAPISuccess } from 'utils/helper';
-import { isWidgetUrl } from 'utils/widgets';
+import { isWidgetUrl, publishedWidgets } from 'utils/widgets';
 import parseQueryString from 'utils/parseQueryString';
 
 import DefaultLayout from 'layouts/DefaultLayout';
@@ -41,6 +41,7 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
+import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -79,6 +80,9 @@ function App() {
       if (cookieConsent) {
         initFreshChatWidget(userDetails);
         initMixPanel();
+        if (userDetails) {
+          setGTMUserAttributes(userDetails);
+        }
       }
     }
   }, [userDetails, cookieConsent, isWidget]);
@@ -137,11 +141,11 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  if (isWidget && isReadyToLoad && widgetType === 'calendar') {
+  if (isWidget && isReadyToLoad && publishedWidgets.includes(widgetType)) {
     return (
       <>
         <PaymentPopup />
-        <EmbeddablePage />
+        <EmbeddablePage widget={widgetType} />
       </>
     );
   }

@@ -1,22 +1,22 @@
 import React from 'react';
 
 import CalendarSessions from '../../components/EmbeddableComponents/CalendarSessions';
-import Dashboard from '../../components/EmbeddableComponents/Dashboard';
-import parseQueryString from 'utils/parseQueryString';
+import Passes from '../../components/EmbeddableComponents/Passes';
+import Videos from '../../components/EmbeddableComponents/Videos';
+import Courses from '../../components/EmbeddableComponents/Courses';
 
-export default function EmbeddablePage() {
-  const location = window.location;
-  const { widgetType, authCode } = parseQueryString(location.search);
+export default function EmbeddablePage({ widget }) {
+  const profileUsername = window.location.hostname.split('.')[0] || '';
 
   let componentToLoad = null;
-  if (widgetType === 'calendar') {
-    componentToLoad = <CalendarSessions />;
-  } else if (widgetType === 'dashboard') {
-    if (authCode) {
-      componentToLoad = <Dashboard token={authCode} />;
-    } else {
-      return <p>Show Login Page as the token is not found</p>;
-    }
+  if (widget === 'calendar') {
+    componentToLoad = <CalendarSessions profileUsername={profileUsername} />;
+  } else if (widget === 'passes') {
+    componentToLoad = <Passes profileUsername={profileUsername} />;
+  } else if (widget === 'videos') {
+    componentToLoad = <Videos profileUsername={profileUsername} />;
+  } else if (widget === 'courses') {
+    componentToLoad = <Courses profileUsername={profileUsername} />;
   }
 
   return <div style={{ padding: '20px' }}>{componentToLoad}</div>;

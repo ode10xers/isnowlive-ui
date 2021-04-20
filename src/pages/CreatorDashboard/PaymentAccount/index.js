@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import countryList from 'react-select-country-list';
-import { Select, Typography, Button, message, Row, Col } from 'antd';
+import { Select, Typography, Button, message, Row, Col, Modal } from 'antd';
+import { CheckCircleTwoTone } from '@ant-design/icons';
+
+import apis from 'apis';
+import Routes from 'routes';
 
 import Section from 'components/Section';
+
+import Earnings from 'pages/CreatorDashboard/Earnings';
+
+import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
+
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
-import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
-import apis from 'apis';
-import Earnings from 'pages/CreatorDashboard/Earnings';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
 
@@ -18,20 +26,28 @@ const { creator } = mixPanelEventTags;
 
 const PaymentAccount = () => {
   const location = useLocation();
+  const history = useHistory();
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const countries = countryList().getData();
   const {
     state: {
       userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
+      setUserDetails,
     },
   } = useGlobalContext();
   const validateAccount = location?.state?.validateAccount;
   const [paymentConnected, setPaymentConnected] = useState(payment_account_status);
 
-  const openStripeConnect = (url) => {
-    window.open(url, '_self');
-  };
+  const openStripeConnect = useCallback(
+    (url) => {
+      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_INITIATED, {
+        creator_payment_account_status: payment_account_status,
+      });
+      window.open(url, '_self');
+    },
+    [payment_account_status]
+  );
 
   const relinkStripe = useCallback(async () => {
     try {
@@ -44,7 +60,7 @@ const PaymentAccount = () => {
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
-  }, []);
+  }, [openStripeConnect]);
 
   const openStripeDashboard = useCallback(async () => {
     try {
@@ -71,10 +87,27 @@ const PaymentAccount = () => {
     if (validateAccount) {
       const validateStripeAccount = async () => {
         try {
-          const { status } = await apis.payment.stripe.validate();
+          const { status, data } = await apis.payment.stripe.validate();
           if (isAPISuccess(status)) {
-            message.success('Stripe Account Connected Succesfully!!');
-            setPaymentConnected(StripeAccountStatus.VERIFICATION_PENDING);
+            const paymentStatus = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
+
+            const localUserDetails = getLocalUserDetails();
+            localUserDetails.payment_account_status = paymentStatus;
+            setUserDetails(localUserDetails);
+
+            Modal.confirm({
+              centered: true,
+              title: 'Stripe account successfully connected',
+              content: `Now you can start making paid products and earn money by selling them. You can now check your earnings in the "Get Paid" section of your dashboard.`,
+              onOk: () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions),
+              okText: 'Create Session',
+              onCancel: () => history.push(Routes.creatorDashboard.rootPath),
+              cancelText: 'Go to Dashboard',
+              closable: true,
+              icon: <CheckCircleTwoTone twoToneColor="#52c41a" />,
+            });
+
+            setPaymentConnected(paymentStatus);
           }
         } catch (error) {
           if (error.response?.data?.message !== 'unable to find payment credentials') {
@@ -84,7 +117,8 @@ const PaymentAccount = () => {
       };
       validateStripeAccount();
     }
-  }, [validateAccount, openStripeDashboard]);
+    //eslint-disable-next-line
+  }, [validateAccount, openStripeDashboard, setUserDetails]);
 
   const handleChange = (value) => {
     setSelectedCountry(value);
