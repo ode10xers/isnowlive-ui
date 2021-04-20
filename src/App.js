@@ -42,6 +42,7 @@ import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
+import { mapUserToPendo } from 'services/integrations/pendo';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -80,8 +81,9 @@ function App() {
       if (cookieConsent) {
         initFreshChatWidget(userDetails);
         initMixPanel();
-        if (userDetails) {
+        if (userDetails && userDetails.is_creator) {
           setGTMUserAttributes(userDetails);
+          mapUserToPendo(userDetails);
         }
       }
     }
