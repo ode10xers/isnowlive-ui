@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
+import { clearGTMUserAttributes } from './integrations/googleTagManager';
 
 const UNAUTHORIZED = 401;
 
@@ -22,6 +23,7 @@ class HttpService {
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
+          clearGTMUserAttributes();
           window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
         }
         return Promise.reject(error);

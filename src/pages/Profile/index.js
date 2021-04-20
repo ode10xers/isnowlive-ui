@@ -7,31 +7,38 @@ import parse from 'html-react-parser';
 
 import Routes from 'routes';
 import apis from 'apis';
+
 import Section from 'components/Section';
 import Loader from 'components/Loader';
 import OnboardSteps from 'components/OnboardSteps';
 import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
 import EMCode from 'components/EMCode';
+
 import validationRules from 'utils/validation';
 import { parseEmbedCode, scrollToErrorField, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
 import { isMobileDevice } from 'utils/device';
 
-import styles from './style.module.scss';
+import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
+
 import {
   mixPanelEventTags,
   trackSimpleEvent,
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { gtmTriggerEvents, customNullValue, pushToDataLayer } from 'services/integrations/googleTagManager';
+import { useGlobalContext } from 'services/globalContext';
+
+import styles from './style.module.scss';
 
 const { Title, Text, Paragraph, Link } = Typography;
 const { Panel } = Collapse;
 const { creator } = mixPanelEventTags;
 
 const Profile = () => {
+  const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
@@ -66,6 +73,8 @@ const Profile = () => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
     try {
+      const localUserDetails = getLocalUserDetails();
+
       await apis.user.convertUserToCreator();
 
       const { status } = await apis.user.updateProfile(values);
@@ -73,10 +82,28 @@ const Profile = () => {
         setIsLoading(false);
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
-        const localUserDetails = getLocalUserDetails();
         localUserDetails.profile_complete = true;
+        localUserDetails.is_creator = true;
+        localUserDetails.first_name = values.first_name;
+        localUserDetails.last_name = values.last_name;
         localUserDetails.username = values.username;
-        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
+
+        pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
+          creator_external_id: localUserDetails.external_id,
+          creator_email: localUserDetails.email,
+          creator_email_verified: localUserDetails.email_verified,
+          is_creator: localUserDetails.is_creator,
+          creator_first_name: values.first_name,
+          creator_last_name: values.last_name,
+          creator_username: values.username || customNullValue,
+          creator_profile_complete: localUserDetails.profile_complete,
+          creator_payment_account_status: localUserDetails.payment_account_status,
+          creator_payment_currency: localUserDetails.currency || customNullValue,
+          creator_zoom_connected: localUserDetails.zoom_connected,
+        });
+
+        setUserDetails(localUserDetails);
+
         if (isOnboarding) {
           const newWindow = window.open(Routes.profilePreview);
           newWindow.blur();

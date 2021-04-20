@@ -24,6 +24,8 @@ import { isAPISuccess } from 'utils/helper';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
+import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
+import { getLocalUserDetails } from 'utils/storage';
 
 const { Text, Paragraph } = Typography;
 
@@ -106,6 +108,12 @@ const UploadVideoModal = ({
           <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
         </>
       );
+
+      if (editedVideo && uploadingFlie) {
+        pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
+          video_id: editedVideo?.external_id || customNullValue,
+        });
+      }
     } else {
       showErrorModal(`Failed to upload video`);
     }
@@ -232,6 +240,16 @@ const UploadVideoModal = ({
         : await apis.videos.createVideo(data);
 
       if (isAPISuccess(response.status)) {
+        if (!editedVideo) {
+          pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_VIDEO, {
+            video_name: response.data.title,
+            video_price: response.data.price,
+            video_id: response.data.external_id,
+            video_creator_username: getLocalUserDetails().username,
+            video_currency: response.data.currency || customNullValue,
+          });
+        }
+
         if (response.data) {
           updateEditedVideo(response.data);
 

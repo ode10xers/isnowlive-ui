@@ -48,7 +48,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
   };
 
   useEffect(() => {
-    if (history.location.pathname.includes('dashboard')) {
+    if (history && history.location.pathname.includes('dashboard')) {
       setIsOnAttendeeDashboard(true);
       setSelectedCourse(null);
     }
