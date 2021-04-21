@@ -44,18 +44,14 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMembersList = useCallback(async (pageNumber, itemsPerPage, overwrite = false) => {
+  const fetchCreatorMembersList = useCallback(async (pageNumber, itemsPerPage) => {
     setIsLoading(true);
 
     try {
       const { status, data } = await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage);
 
       if (isAPISuccess(status) && data) {
-        if (overwrite) {
-          setMembersList(data.data);
-        } else {
-          setMembersList((memberList) => [...memberList, ...data.data]);
-        }
+        setMembersList((memberList) => [...memberList, ...data.data]);
         setCanShowMore(data.next_page);
       }
     } catch (error) {
@@ -64,6 +60,20 @@ const MembersList = () => {
 
     setIsLoading(false);
   }, []);
+
+  const updateMemberTag = (tagId) => {
+    const selectedMemberIndex = membersList.findIndex((member) => member.id === selectedMember.id);
+
+    if (selectedMemberIndex >= 0) {
+      const tempMembersList = membersList;
+      tempMembersList[selectedMemberIndex].tag = creatorMemberTags.find((tag) => tag.external_id === tagId) || {
+        name: '',
+        external_id: '',
+      };
+      setMembersList(tempMembersList);
+      setSelectedMember(null);
+    }
+  };
 
   useEffect(() => {
     fetchCreatorMemberTags();
@@ -81,17 +91,18 @@ const MembersList = () => {
     setIsLoading(true);
 
     try {
+      const selectedTagId = form.getFieldValue(selectedMember.id);
+
       const payload = {
         external_id: selectedMember.id,
-        tag_id: form.getFieldValue(selectedMember.id),
+        tag_id: selectedTagId,
       };
 
       const { status } = await apis.audiences.updateMemberTag(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('Member Tag updated successfully');
-        setSelectedMember(null);
-        fetchCreatorMembersList(pageNumber, totalItemsPerPage, true);
+        updateMemberTag(selectedTagId);
       }
     } catch (error) {
       showErrorModal('Failed updating member tag', error?.response?.data?.message || 'Something went wrong');
