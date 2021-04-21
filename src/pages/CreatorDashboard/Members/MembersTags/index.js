@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Button, Typography, Popconfirm, List, Form, Input } from 'antd';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusCircleOutlined, TagsOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -13,33 +13,48 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const MembersTags = ({ fetchUserSettings, userTags = [] }) => {
+const MembersTags = ({ fetchUserSettings }) => {
   const [form] = Form.useForm();
 
   const [editing, setEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+        form.setFieldsValue({ newEntries: [], existingEntries: data.tags });
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, [form]);
 
   useEffect(() => {
-    if (editing) {
-      form.setFieldsValue({ newEntries: [] });
+    if (!editing) {
+      fetchCreatorMemberTags();
     }
-  }, [editing, userTags, form]);
+  }, [editing, fetchCreatorMemberTags]);
 
   const saveCreatorUserTags = async (values) => {
     setSubmitting(true);
 
-    console.log(values);
-
     try {
       const payload = {
-        tags: [...values.newEntries],
+        tags: [...values.existingEntries, ...values.newEntries],
       };
 
       const { status } = await apis.user.upsertCreatorUserTags(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('Member tags updated successfully');
-        fetchUserSettings();
+        setEditing(false);
       }
     } catch (error) {
       showErrorModal('Failed updating member tags ', error.response?.data?.message || 'Something went wrong');
@@ -49,7 +64,7 @@ const MembersTags = ({ fetchUserSettings, userTags = [] }) => {
   };
 
   return (
-    <div className={styles.memberTagsWrapper}>
+    <div className={styles.membersTagsWrapper}>
       {editing ? (
         <Form form={form} scrollToFirstError={true} onFinish={saveCreatorUserTags}>
           <Row gutter={[8, 8]}>
@@ -74,47 +89,50 @@ const MembersTags = ({ fetchUserSettings, userTags = [] }) => {
             </Col>
           </Row>
           <Row>
-            {/* {userTags.length > 0 && (
+            {creatorMemberTags.length > 0 && (
               <Form.List name="existingEntries">
-                {(fields, { add, remove }) => (
-                  <>
-                    {fields.map((field) => (
-                      <Col xs={24} key={fields.key}>
-                        <Form.Item {...field} name={[field.name, 'name']} label="Tag Name" rules={validationRules.requiredValidation}>
-                          <Input placeholder="Change the user tag here" />
+                {(fields, { add, remove }) =>
+                  fields.map((field) => (
+                    <Col xs={24} key={fields.key}>
+                      <Col xs={14}>
+                        <Form.Item
+                          {...field}
+                          name={[field.name, 'name']}
+                          label="Tag Name"
+                          rules={validationRules.requiredValidation}
+                        >
+                          <Input placeholder="Change the user tag here" maxLength={25} />
                         </Form.Item>
-                        <Form.Item hidden {...field} name={[field.name, 'external_id']} rules={validationRules.requiredValidation}>
+                      </Col>
+                      <Col xs={4}>
+                        <Form.Item
+                          hidden
+                          {...field}
+                          name={[field.name, 'external_id']}
+                          rules={validationRules.requiredValidation}
+                        >
                           <Input />
                         </Form.Item>
                       </Col>
-                    ))}
-                    <Form.Item>
-                      <Button
-                        type="dashed"
-                        onClick={() => add()}
-                        icon={<PlusOutlined />}
-                      >
-                        Add new tag
-                      </Button>
-                    </Form.Item>
-                  </>
-                )}
+                    </Col>
+                  ))
+                }
               </Form.List>
-            )} */}
+            )}
             <Form.List name="newEntries">
               {(fields, { add, remove }) => (
                 <>
                   {fields.map((field) => (
                     <Col xs={24} key={fields.key}>
                       <Row gutter={[8, 8]}>
-                        <Col xs={14} key={fields.key}>
+                        <Col xs={14}>
                           <Form.Item
                             {...field}
                             name={[field.name, 'name']}
                             label="New Tag Name"
                             rules={validationRules.requiredValidation}
                           >
-                            <Input placeholder="Type the new user tag here" />
+                            <Input placeholder="Type the new user tag here" maxLength={25} />
                           </Form.Item>
                         </Col>
                         {fields.length > 1 ? (
@@ -148,11 +166,14 @@ const MembersTags = ({ fetchUserSettings, userTags = [] }) => {
           <Col xs={24}>
             <List
               itemLayout="vertical"
-              dataSource={userTags}
+              size="large"
+              dataSource={creatorMemberTags}
+              loading={isLoading}
               locale={{ emptyText: 'No user tags found' }}
               rowKey={(record) => record.external_id}
               renderItem={(item) => (
                 <List.Item>
+                  <TagsOutlined />
                   <Text> {item.name} </Text>
                 </List.Item>
               )}

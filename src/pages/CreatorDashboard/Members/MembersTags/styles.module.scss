@@ -1,5 +1,10 @@
 @import '../../../../styles/variables.scss';
 
+.membersTagsWrapper {
+  @extend .box;
+  padding: 30px;
+}
+
 .deleteButton {
   position: relative;
   top: 4px;
