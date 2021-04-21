@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Button, Typography, Popconfirm, List, Form, Input } from 'antd';
-import { PlusOutlined, MinusCircleOutlined, TagsOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusCircleOutlined, TagsOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -13,7 +13,7 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const MembersTags = ({ fetchUserSettings }) => {
+const MembersTags = () => {
   const [form] = Form.useForm();
 
   const [editing, setEditing] = useState(false);
@@ -45,10 +45,32 @@ const MembersTags = ({ fetchUserSettings }) => {
   const saveCreatorUserTags = async (values) => {
     setSubmitting(true);
 
+    console.log(values);
+
     try {
-      const payload = {
-        tags: [...values.existingEntries, ...values.newEntries],
-      };
+      let payload = {};
+
+      if (values.existingEntries) {
+        // This case will happen when creator have existing tags
+        payload = {
+          tags: [...values.existingEntries, ...values.newEntries],
+        };
+      } else {
+        // This case is to handle when creator does not have tags at first
+        // We will also set the first entry of tag as the default
+        // This is required to prevent unwanted logic handling in BE
+        // as BE requires creators that have tags to also have a default tag set
+        if (values.newEntries.length > 0) {
+          values.newEntries[0]['is_default'] = true;
+          payload = {
+            tags: values.newEntries,
+          };
+        } else {
+          showErrorModal('Please add some tags first');
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const { status } = await apis.user.upsertCreatorUserTags(payload);
 
@@ -57,10 +79,36 @@ const MembersTags = ({ fetchUserSettings }) => {
         setEditing(false);
       }
     } catch (error) {
-      showErrorModal('Failed updating member tags ', error.response?.data?.message || 'Something went wrong');
+      showErrorModal('Failed updating member tags', error.response?.data?.message || 'Something went wrong');
     }
 
     setSubmitting(false);
+  };
+
+  const setDefaultTag = async (tagId) => {
+    setIsLoading(true);
+
+    try {
+      const diffTag = creatorMemberTags.find((tag) => tag.external_id === tagId);
+
+      if (!diffTag) {
+        showErrorModal('Invalid tag selected');
+        return;
+      }
+
+      diffTag.is_default = true;
+
+      const { status } = await apis.user.upsertCreatorUserTags({ tags: [diffTag] });
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Default tag updated');
+        fetchCreatorMemberTags();
+      }
+    } catch (error) {
+      showErrorModal('Failed to setting default tag', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -173,8 +221,23 @@ const MembersTags = ({ fetchUserSettings }) => {
               rowKey={(record) => record.external_id}
               renderItem={(item) => (
                 <List.Item>
-                  <TagsOutlined />
-                  <Text> {item.name} </Text>
+                  <Row gutter={[8, 8]}>
+                    <Col xs={24} md={12} lg={8}>
+                      <TagsOutlined />
+                      <Text> {item.name} </Text>
+                    </Col>
+                    <Col xs={24} md={12} lg={4}>
+                      {item.is_default ? (
+                        <Button type="text" className={styles.greenBtn} icon={<CheckCircleOutlined />} disabled>
+                          Default Tag
+                        </Button>
+                      ) : (
+                        <Button type="link" onClick={() => setDefaultTag(item.external_id)}>
+                          Set as default tag
+                        </Button>
+                      )}
+                    </Col>
+                  </Row>
                 </List.Item>
               )}
             />
