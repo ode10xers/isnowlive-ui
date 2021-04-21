@@ -74,7 +74,7 @@ const MembersTags = ({ fetchUserSettings }) => {
             <Col xs={12} lg={5}>
               <Popconfirm
                 title="Are you sure? All changes you made that are not saved will be lost."
-                onOk={() => setEditing(false)}
+                onConfirm={() => setEditing(false)}
                 okText="Yes"
               >
                 <Button block type="default" loading={submitting}>
