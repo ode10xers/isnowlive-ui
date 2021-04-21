@@ -12,6 +12,7 @@ import {
   AuditOutlined,
   FilePdfOutlined,
   Html5Outlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -89,6 +90,28 @@ export const creatorMenuItems = [
   },
   {
     order: 7,
+    key: 'members',
+    title: 'Members Dashboard',
+    icon: <TeamOutlined />,
+    children: [
+      {
+        order: 1,
+        key: 'members_list',
+        title: 'Members List',
+        mixPanelTag: creator.click.dashboard.membersListNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersList,
+      },
+      {
+        order: 2,
+        key: 'members_tags',
+        title: 'Members Tags',
+        mixPanelTag: creator.click.dashboard.membersTagsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags,
+      },
+    ],
+  },
+  {
+    order: 8,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -96,7 +119,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 8,
+    order: 9,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -104,7 +127,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 9,
+    order: 10,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -112,7 +135,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 10,
+    order: 11,
     key: 'site_settings',
     title: 'Site Settings',
     icon: <SettingOutlined />,
@@ -134,7 +157,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 11,
+    order: 12,
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,
@@ -142,7 +165,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
   },
   {
-    order: 12,
+    order: 13,
     key: 'documents',
     title: 'Documents',
     icon: <FilePdfOutlined />,
@@ -150,7 +173,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
   {
-    order: 11,
+    order: 14,
     key: 'audiences',
     title: 'Audiences',
     icon: <AuditOutlined />,

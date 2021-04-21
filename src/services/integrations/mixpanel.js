@@ -22,6 +22,8 @@ export const mixPanelEventTags = {
         accountNav: '(Creator) Account Settings Nav Clicked',
         documentsNav: '(Creator) Document Nav Clicked',
         externalSiteSettingsNav: '(Creator) External Site Settings Nav Clicked',
+        membersListNav: '(Creator) Member List Nav Clicked',
+        membersTagsNav: '(Creator) Member Tags Nav Clicked',
       },
       sessions: {
         manage: {
