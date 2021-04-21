@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { Tabs } from 'antd';
-import { BellOutlined, TagsOutlined } from '@ant-design/icons';
+import { BellOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import NotificationSettings from './NotificationSettings';
-import TagSettings from './TagSettings';
 import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -57,17 +56,6 @@ const AccountSettings = () => {
                 fetchUserSettings={getCreatorUserSettings}
                 checkedUserSettings={accountSettings.receive_mails ? ['receive_mails'] : []}
               />
-            </TabPane>
-            <TabPane
-              key="userTags"
-              tab={
-                <div className={styles.largeTabHeader}>
-                  <TagsOutlined />
-                  User Tags
-                </div>
-              }
-            >
-              <TagSettings fetchUserSettings={getCreatorUserSettings} userTags={accountSettings.tags} />
             </TabPane>
           </Tabs>
         )}

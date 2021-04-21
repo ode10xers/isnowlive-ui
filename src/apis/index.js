@@ -136,7 +136,7 @@ export default {
   },
   audiences: {
     getCreatorAudiences: (pageNo, perPage) =>
-      http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
+      http.get(`/secure/creator/audience?user_type=AUDIENCE&page_no=${pageNo}&per_page=${perPage}`),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
