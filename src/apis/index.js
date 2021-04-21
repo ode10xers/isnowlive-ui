@@ -135,12 +135,15 @@ export default {
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
   },
   audiences: {
+    getCreatorMembers: (pageNo, perPage) =>
+      http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}`),
     getCreatorAudiences: (pageNo, perPage) =>
       http.get(`/secure/creator/audience?user_type=AUDIENCE&page_no=${pageNo}&per_page=${perPage}`),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
+    updateMemberTag: (payload) => http.put('secure/creator/audience', payload),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
