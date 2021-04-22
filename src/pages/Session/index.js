@@ -17,7 +17,7 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined, TagOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import config from 'config';
@@ -29,6 +29,8 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import { showErrorModal } from 'components/Modals/modals';
+
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
 import {
@@ -103,6 +105,7 @@ const initialSession = {
   prerequisites: '',
   color_code: initialColor,
   is_course: false,
+  session_tag_type: 'everyone',
 };
 
 const Session = ({ match, history }) => {
@@ -124,12 +127,28 @@ const Session = ({ match, history }) => {
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
   const [creatorDocuments, setCreatorDocuments] = useState([]);
+  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const {
     state: {
       userDetails: { zoom_connected = 'NOT_CONNECTED' },
     },
   } = useGlobalContext();
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
 
   // Reworked the fetch currency mechanic
   const getCreatorCurrencyDetails = useCallback(
@@ -172,47 +191,6 @@ const Session = ({ match, history }) => {
     [form]
   );
 
-  /*
-  const getCreatorStripeDetails = useCallback(
-    async (sessionData = null) => {
-      try {
-        setIsLoading(true);
-        const { status, data } = await apis.session.getCreatorBalance();
-
-        if (isAPISuccess(status) && data) {
-          setStripeCurrency(data.currency.toUpperCase());
-          if (!sessionData) {
-            form.setFieldsValue({
-              ...form.getFieldsValue(),
-              price_type: 'Paid',
-              currency: data?.currency?.toUpperCase() || '',
-              price: 10,
-            });
-            setIsSessionFree(false);
-          }
-        }
-        setIsLoading(false);
-      } catch (error) {
-        if (error.response?.data?.message === 'unable to fetch user payment details') {
-          setStripeCurrency(null);
-          form.setFieldsValue({
-            ...form.getFieldsValue(),
-            price_type: 'Free',
-            price: 0,
-            currency: '',
-          });
-          setIsSessionFree(true);
-        } else {
-          message.error(error.response?.data?.message || 'Something went wrong.');
-        }
-        setIsLoading(false);
-      }
-    },
-    [form]
-  );
-
-  */
-
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
       try {
@@ -236,6 +214,8 @@ const Session = ({ match, history }) => {
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
+            session_tag_type: data?.tags?.length > 0 ? 'selected' : 'everyone',
+            selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
           });
           setSessionImageUrl(data.session_image_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
@@ -247,6 +227,7 @@ const Session = ({ match, history }) => {
           setColorCode(data?.color_code || whiteColor);
           setIsCourseSession(data?.is_course || false);
           setIsLoading(false);
+          setSelectedTagType(data?.tags?.length > 0 ? 'selected' : 'everyone');
           await getCreatorCurrencyDetails(data);
         }
       } catch (error) {
@@ -262,7 +243,7 @@ const Session = ({ match, history }) => {
     [form, history, isOnboarding, getCreatorCurrencyDetails]
   );
 
-  const getCreatorDocuments = useCallback(async () => {
+  const fetchCreatorDocuments = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.documents.getCreatorDocuments();
@@ -277,6 +258,9 @@ const Session = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
+    fetchCreatorMemberTags();
+    fetchCreatorDocuments();
+
     if (match.path.includes('manage')) {
       setIsOnboarding(false);
     }
@@ -299,14 +283,24 @@ const Session = ({ match, history }) => {
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
         session_course_type: 'normal',
+        session_tag_type: 'everyone',
+        selected_member_tags: [],
       });
       setIsLoading(false);
     }
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-    getCreatorDocuments();
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorCurrencyDetails, getCreatorDocuments]);
+  }, [
+    form,
+    location,
+    getSessionDetails,
+    match.params.id,
+    match.path,
+    getCreatorCurrencyDetails,
+    fetchCreatorDocuments,
+    fetchCreatorMemberTags,
+  ]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -320,6 +314,24 @@ const Session = ({ match, history }) => {
       form.setFieldsValue({ ...form.getFieldsValue(), type: 'Group', max_participants: 2 });
       setSession({ ...session, max_participants: 2 });
       setIsSessionTypeGroup(true);
+    }
+  };
+
+  const handleSessionTagType = (e) => {
+    if (creatorMemberTags.length > 0) {
+      setSelectedTagType(e.target.value);
+    } else {
+      form.setFieldsValue({ ...form.getFieldsValue(), session_tag_type: 'everyone' });
+      Modal.confirm({
+        title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
+        okText: 'Setup Member Tags',
+        cancelText: 'Cancel',
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags}`);
+          newWindow.blur();
+          window.focus();
+        },
+      });
     }
   };
 
@@ -600,6 +612,10 @@ const Session = ({ match, history }) => {
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
         is_course: isCourseSession,
+        tag_ids:
+          selectedTagType === 'everyone'
+            ? []
+            : values.selected_member_tags || session?.tags?.map((tag) => tag.external_id) || [],
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
@@ -833,6 +849,45 @@ const Session = ({ match, history }) => {
                 <Radio value="normal">Normal Session</Radio>
                 <Radio value="course">Course Session</Radio>
               </Radio.Group>
+            </Form.Item>
+          </>
+
+          {/* ---- Session Tag Type ---- */}
+          <>
+            <Form.Item
+              name="session_tag_type"
+              id="session_tag_type"
+              label="Bookable by member with Tag"
+              rules={validationRules.requiredValidation}
+              onChange={handleSessionTagType}
+            >
+              <Radio.Group>
+                <Radio value="everyone"> Everyone </Radio>
+                <Radio value="selected"> Selected Member Tags </Radio>
+              </Radio.Group>
+            </Form.Item>
+            <Form.Item
+              name="selected_member_tags"
+              id="selected_member_tags"
+              hidden={selectedTagType === 'everyone'}
+              {...(!isMobileDevice && profileFormTailLayout)}
+            >
+              <Select
+                showArrow
+                mode="multiple"
+                maxTagCount={3}
+                placeholder="Select a member tag"
+                disabled={selectedTagType === 'everyone'}
+                options={creatorMemberTags.map((tag) => ({
+                  label: (
+                    <>
+                      {' '}
+                      {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                    </>
+                  ),
+                  value: tag.external_id,
+                }))}
+              />
             </Form.Item>
           </>
 
