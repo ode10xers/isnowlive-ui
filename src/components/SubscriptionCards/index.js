@@ -23,8 +23,9 @@ const SubscriptionCards = ({
 
   const renderIncludedProductType = (accessTypes) => (
     <Row gutter={8}>
-      <Col xs={12}>{renderTickOrCross(accessTypes.includes('PUBLIC'))} Public </Col>
-      <Col xs={12}>{renderTickOrCross(accessTypes.includes('MEMBERSHIP'))} Members </Col>
+      <Col xs={24}> Temp Text </Col>
+      {/* <Col xs={12}>{renderTickOrCross(accessTypes.includes('PUBLIC'))} Public </Col>
+      <Col xs={12}>{renderTickOrCross(accessTypes.includes('MEMBERSHIP'))} Members </Col> */}
     </Row>
   );
 
