@@ -15,6 +15,7 @@ import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 const { Text } = Typography;
 
@@ -67,7 +68,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
 
   const [classes, setClasses] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [currency, setCurrency] = useState('SGD');
+  const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedClasses, setSelectedClasses] = useState([]);
@@ -107,16 +108,22 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorCurrency = useCallback(async () => {
+  const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.session.getCreatorBalance();
+      // const { status, data } = await apis.session.getCreatorBalance();
 
-      if (isAPISuccess(status) && data?.currency) {
-        setCurrency(data.currency.toUpperCase());
-      }
-    } catch (error) {
-      if (error.response?.data?.message === 'unable to fetch user payment details') {
+      // if (isAPISuccess(status) && data?.currency) {
+      //   setCurrency(data.currency.toUpperCase());
+      // }
+
+      const creatorCurrency = await fetchCreatorCurrency();
+
+      if (creatorCurrency) {
+        setCurrency(creatorCurrency);
+      } else {
+        setCurrency('');
+        form.setFieldsValue({ ...form.getFieldsValue(), price: 0 });
         Modal.confirm({
           title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid pass`,
           okText: 'Setup payment account',
@@ -125,15 +132,30 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
             history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
-      } else {
-        showErrorModal(
-          'Failed to fetch creator currency details',
-          error?.response?.data?.message || 'Something went wrong'
-        );
       }
+    } catch (error) {
+      // if (error.response?.data?.message === 'unable to fetch user payment details') {
+      //   Modal.confirm({
+      //     title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid pass`,
+      //     okText: 'Setup payment account',
+      //     cancelText: 'Keep it free',
+      //     onOk: () => {
+      //       history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+      //     },
+      //   });
+      // } else {
+      //   showErrorModal(
+      //     'Failed to fetch creator currency details',
+      //     error?.response?.data?.message || 'Something went wrong'
+      //   );
+      // }
+      showErrorModal(
+        'Failed to fetch creator currency details',
+        error?.response?.data?.message || 'Something went wrong'
+      );
     }
     setIsLoading(false);
-  }, [history]);
+  }, [history, form]);
 
   useEffect(() => {
     if (visible) {
@@ -145,10 +167,10 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
           passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
           classCount: editedPass.class_count,
           validity: editedPass.validity,
-          price: editedPass.price,
+          price: editedPass.currency ? editedPass.price : 0,
           color_code: editedPass.color_code || whiteColor,
         });
-        setCurrency(editedPass.currency.toUpperCase());
+        setCurrency(editedPass.currency.toUpperCase() || '');
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
         setSelectedVideos(editedPass.videos.filter((video) => video.price > 0).map((video) => video.external_id));
@@ -159,14 +181,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         setSelectedClasses([]);
         setSelectedVideos([]);
         setColorCode(initialColor);
-        setCurrency('SGD');
+        setCurrency('');
       }
 
-      fetchCreatorCurrency();
+      getCreatorCurrencyDetails();
       fetchAllClassesForCreator();
       fetchAllVideosForCreator();
     }
-  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, fetchCreatorCurrency, form]);
+  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, getCreatorCurrencyDetails, form]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
@@ -203,8 +225,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       }
 
       let data = {
-        currency: currency.toLowerCase(),
-        price: values.price,
+        currency: currency?.toLowerCase() || '',
+        price: currency ? values.price : 0, // Will be forced to 0 if currency is missing
         name: values.passName,
         validity: values.validity,
         session_ids: selectedClasses || values.classList || [],
@@ -294,7 +316,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.currency?.toUpperCase()} {session.price}
+                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -324,7 +346,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.currency?.toUpperCase()} {session.price}
+                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -394,7 +416,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                               {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {video.currency?.toUpperCase()} {video.price}
+                              {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -424,7 +446,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                               {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {video.currency?.toUpperCase()} {video.price}
+                              {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -462,7 +484,12 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                     label="Pass Price"
                     rules={validationRules.numberValidation('Please Input Pass Price', 0, false)}
                   >
-                    <InputNumber min={0} placeholder="Pass Price" className={styles.numericInput} />
+                    <InputNumber
+                      min={0}
+                      disabled={currency === ''}
+                      placeholder="Pass Price"
+                      className={styles.numericInput}
+                    />
                   </Form.Item>
                 </Col>
                 <Col xs={24}>

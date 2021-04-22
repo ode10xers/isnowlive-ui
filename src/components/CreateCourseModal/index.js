@@ -615,7 +615,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                       </Col>
                       <Col xs={7} className={styles.textAlignRight}>
                         <Text strong>
-                          {courseClass.currency?.toUpperCase()} {courseClass.price}
+                          {courseClass.price > 0
+                            ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
+                            : 'Free'}
                         </Text>
                       </Col>
                     </Row>
@@ -647,7 +649,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                       </Col>
                       <Col xs={7} className={styles.textAlignRight}>
                         <Text strong>
-                          {courseClass.currency?.toUpperCase()} {courseClass.price}
+                          {courseClass.price > 0
+                            ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
+                            : 'Free'}
                         </Text>
                       </Col>
                     </Row>
@@ -876,7 +880,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
                               <Text strong>
-                                {video.currency?.toUpperCase()} {video.price}
+                                {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
                               </Text>
                             </Col>
                           </Row>
@@ -909,7 +913,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
                               <Text strong>
-                                {video.currency?.toUpperCase()} {video.price}
+                                {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
                               </Text>
                             </Col>
                           </Row>

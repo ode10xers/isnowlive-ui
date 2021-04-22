@@ -400,7 +400,7 @@ const UploadVideoModal = ({
                               </Col>
                               <Col xs={7} className={styles.textAlignRight}>
                                 <Text strong>
-                                  {session.currency?.toUpperCase()} {session.price}
+                                  {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
                                 </Text>
                               </Col>
                             </Row>
@@ -432,7 +432,7 @@ const UploadVideoModal = ({
                               </Col>
                               <Col xs={7} className={styles.textAlignRight}>
                                 <Text strong>
-                                  {session.currency?.toUpperCase()} {session.price}
+                                  {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
                                 </Text>
                               </Col>
                             </Row>
