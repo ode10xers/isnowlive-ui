@@ -100,10 +100,28 @@ const LiveStream = () => {
     [history, setUserDetails]
   );
 
+  const fetchUpdatedUserDetails = async () => {
+    try {
+      const { status, data } = await apis.user.getProfile();
+
+      if (isAPISuccess(status) && data) {
+        setUserDetails(data);
+      }
+    } catch (error) {
+      console.error('Failed fetching user details', error);
+    }
+  };
+
   useEffect(() => {
     if (code) {
       verifyZoomProfile(code);
     }
+
+    const intervalId = setInterval(() => {
+      fetchUpdatedUserDetails();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
     //eslint-disable-next-line
   }, []);
 
@@ -201,9 +219,23 @@ const LiveStream = () => {
               </>
             ) : (
               <>
-                <p className={styles.textAlignCenter}>
-                  We will connect your Zoom Account. You will be taken to Zoom authorization page. You'll be taken back
-                  to this page.
+                <p>
+                  <ol>
+                    <li>
+                      Click on the blue "Connect my Zoom Account" button below to start linking your Zoom account with
+                      Passion.do.
+                    </li>
+                    <li>You will be taken to Zoom's login screen if you are not logged in already.</li>
+                    <li>
+                      You might need to login if you are not already and if you were logged in then you see a page where
+                      it lists down the permission our app needs to automate your Zoom meetings for you.
+                    </li>
+                    <li>
+                      Click on "Authorize" button on this page. You will be redirected back to your Passion.do account
+                      after this.
+                    </li>
+                    <li>You should now see that your Zoom is connected and the button is green.</li>
+                  </ol>
                 </p>
                 <Button
                   type="primary"
