@@ -3,8 +3,22 @@ import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, DatePicker, Modal, Tag, Checkbox } from 'antd';
-import { BookTwoTone } from '@ant-design/icons';
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Typography,
+  DatePicker,
+  Modal,
+  Tag,
+  Checkbox,
+  Radio,
+} from 'antd';
+import { BookTwoTone, TagOutlined } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
@@ -19,8 +33,9 @@ import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
+import { fetchCreatorCurrency } from 'utils/payment';
 
-import { courseModalFormLayout } from 'layouts/FormLayouts';
+import { courseModalFormLayout, courseModalTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
@@ -62,7 +77,9 @@ const colorPickerChoices = [
 const formInitialValues = {
   courseName: '',
   price: 10,
+  courseTagType: 'everyone',
   videoList: [],
+  selectedMemberTags: [],
 };
 
 const { Text, Title } = Typography;
@@ -78,7 +95,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
   const [courseClasses, setCourseClasses] = useState([]);
   const [videos, setVideos] = useState([]);
-  const [currency, setCurrency] = useState('SGD');
+  const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedCourseClass, setSelectedCourseClass] = useState([]);
@@ -90,6 +107,22 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const [highestMaxParticipantCourseSession, setHighestMaxParticipantCourseSession] = useState(null);
   const [selectedInventories, setSelectedInventories] = useState([]);
   // const [isSequentialVideos, setIsSequentialVideos] = useState(false);
+  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -125,33 +158,63 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorCurrency = useCallback(async () => {
+  const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
-    try {
-      const { status, data } = await apis.session.getCreatorBalance();
 
-      if (isAPISuccess(status) && data?.currency) {
-        setCurrency(data.currency.toUpperCase());
-      }
-    } catch (error) {
-      if (error.response?.data?.message === 'unable to fetch user payment details') {
+    try {
+      const creatorCurrency = await fetchCreatorCurrency();
+
+      if (creatorCurrency) {
+        setCurrency(creatorCurrency);
+      } else {
+        setCurrency('');
+        form.setFieldsValue({ ...form.getFieldsValue(), price: 0 });
         Modal.confirm({
-          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid course`,
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid pass`,
           okText: 'Setup payment account',
           cancelText: 'Keep it free',
           onOk: () => {
             history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
-      } else {
-        showErrorModal(
-          'Failed to fetch creator currency details',
-          error?.response?.data?.message || 'Something went wrong'
-        );
       }
+    } catch (error) {
+      showErrorModal(
+        'Failed to fetch creator currency details',
+        error?.response?.data?.message || 'Something went wrong'
+      );
     }
+
     setIsLoading(false);
-  }, [history]);
+  }, [form, history]);
+
+  // const fetchCreatorCurrency = useCallback(async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const { status, data } = await apis.session.getCreatorBalance();
+
+  //     if (isAPISuccess(status) && data?.currency) {
+  //       setCurrency(data.currency.toUpperCase());
+  //     }
+  //   } catch (error) {
+  //     if (error.response?.data?.message === 'unable to fetch user payment details') {
+  //       Modal.confirm({
+  //         title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid course`,
+  //         okText: 'Setup payment account',
+  //         cancelText: 'Keep it free',
+  //         onOk: () => {
+  //           history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+  //         },
+  //       });
+  //     } else {
+  //       showErrorModal(
+  //         'Failed to fetch creator currency details',
+  //         error?.response?.data?.message || 'Something went wrong'
+  //       );
+  //     }
+  //   }
+  //   setIsLoading(false);
+  // }, [history]);
 
   const getSelectedCourseClasses = useCallback(
     (selectedClassIds = []) => {
@@ -271,6 +334,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
   useEffect(() => {
     if (visible) {
+      fetchCreatorMemberTags();
+
+      if (!isVideoModal) {
+        fetchAllCourseClassForCreator();
+      }
+
       if (editedCourse) {
         if (isVideoModal) {
           form.setFieldsValue({
@@ -279,8 +348,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             validity: editedCourse?.validity,
             // video_type: editedCourse?.course_sequence ? 'sequential' : 'non_sequential',
             videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
-            price: editedCourse?.price,
+            price: editedCourse?.currency ? editedCourse?.price : 0,
             colorCode: editedCourse?.color_code || initialColor || whiteColor,
+            courseTagType: editedCourse?.tag?.length > 0 ? 'selected' : 'everyone',
+            selectedMemberTags: editedCourse?.tag?.map((tag) => tag.external_id) || [],
           });
 
           //setIsSequentialVideos(editedCourse.course_sequence || false);
@@ -296,8 +367,10 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             selectedCourseClass: editedCourse?.sessions?.map((courseSession) => courseSession.session_id),
             maxParticipants: editedCourse?.max_participants,
             videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
-            price: editedCourse?.price,
+            price: editedCourse?.currency ? editedCourse?.price : 0,
             colorCode: editedCourse?.color_code || initialColor || whiteColor,
+            courseTagType: editedCourse?.tag?.length > 0 ? 'selected' : 'everyone',
+            selectedMemberTags: editedCourse?.tag?.map((tag) => tag.external_id) || [],
           });
 
           setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
@@ -309,7 +382,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         }
 
         setSelectedVideos(editedCourse.videos?.map((courseVideo) => courseVideo.external_id));
-        setCurrency(editedCourse.currency?.toUpperCase() || 'SGD');
+        setCurrency(editedCourse.currency?.toUpperCase() || '');
         setCourseImageUrl(editedCourse.course_image_url);
         setColorCode(editedCourse.color_code || initialColor || whiteColor);
       } else {
@@ -317,7 +390,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setSelectedCourseClass([]);
         setSelectedVideos([]);
         setColorCode(initialColor);
-        setCurrency('SGD');
+        setCurrency('');
         setCourseStartDate(null);
         setCourseEndDate(null);
         setCourseImageUrl(null);
@@ -325,13 +398,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         // setIsSequentialVideos(false);
       }
 
-      fetchCreatorCurrency();
-
-      if (!isVideoModal) {
-        fetchAllCourseClassForCreator();
-      }
-
       fetchAllVideosForCreator(isVideoModal);
+      getCreatorCurrencyDetails();
     }
   }, [
     visible,
@@ -339,7 +407,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     isVideoModal,
     fetchAllCourseClassForCreator,
     fetchAllVideosForCreator,
-    fetchCreatorCurrency,
+    getCreatorCurrencyDetails,
+    fetchCreatorMemberTags,
     form,
   ]);
 
@@ -411,6 +480,25 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     }
   };
 
+  const handleCourseTagTypeChange = (e) => {
+    if (creatorMemberTags.length > 0) {
+      setSelectedTagType(e.target.value);
+    } else {
+      setSelectedTagType('everyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'everyone' });
+      Modal.confirm({
+        title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
+        okText: 'Setup Member Tags',
+        cancelText: 'Cancel',
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags}`);
+          newWindow.blur();
+          window.focus();
+        },
+      });
+    }
+  };
+
   const handleFinish = async (values) => {
     setSubmitting(true);
 
@@ -430,8 +518,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
         type: courseTypes.VIDEO_NON_SEQ.name.toUpperCase(),
-        price: values.price || 1,
-        currency: currency?.toLowerCase(),
+        price: currency ? values.price ?? 1 : 0,
+        currency: currency?.toLowerCase() || '',
+        tag_ids: selectedTagType === 'everyone' ? [] : values.selectedMemberTags || [],
         video_ids: processedVideosIDs,
         validity: values.validity || 1,
       };
@@ -451,8 +540,9 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
         type: courseTypes.MIXED.name.toUpperCase(),
-        price: values.price || 1,
-        currency: currency?.toLowerCase(),
+        price: currency ? values.price ?? 1 : 0,
+        currency: currency?.toLowerCase() || '',
+        tag_ids: selectedTagType === 'everyone' ? [] : values.selectedMemberTags || [],
         video_ids: selectedVideos || [],
         session_ids: selectedCourseClass,
         max_participants: values.maxParticipants || highestMaxParticipantCourseSession?.max_participants,
@@ -936,15 +1026,57 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                       rules={validationRules.numberValidation('Please Input Course Price', 0, false)}
                       noStyle
                     >
-                      <InputNumber min={0} placeholder="Course Price" className={styles.numericInput} />
+                      <InputNumber
+                        min={0}
+                        disabled={currency === ''}
+                        placeholder="Course Price"
+                        className={styles.numericInput}
+                      />
                     </Form.Item>
                   </Col>
                   <Col xs={4} className={styles.textAlignCenter}>
                     <Text strong className={styles.currencyWrapper}>
-                      {currency?.toUpperCase()}
+                      {currency?.toUpperCase() || ''}
                     </Text>
                   </Col>
                 </Row>
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                {...courseModalFormLayout}
+                name="courseTagType"
+                label="Bookable by member with Tag"
+                rules={validationRules.requiredValidation}
+                onChange={handleCourseTagTypeChange}
+              >
+                <Radio.Group>
+                  <Radio value="everyone"> Everyone </Radio>
+                  <Radio value="selected"> Selected Member Tags </Radio>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item
+                name="selectedMemberTags"
+                id="selectedMemberTags"
+                {...courseModalTailLayout}
+                hidden={selectedTagType === 'everyone'}
+              >
+                <Select
+                  showArrow
+                  mode="multiple"
+                  maxTagCount={2}
+                  placeholder="Select a member tag"
+                  disabled={selectedTagType === 'everyone'}
+                  options={creatorMemberTags.map((tag) => ({
+                    label: (
+                      <>
+                        {' '}
+                        {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                      </>
+                    ),
+                    value: tag.external_id,
+                  }))}
+                />
               </Form.Item>
             </Col>
             <Col xs={24}>

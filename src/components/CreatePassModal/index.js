@@ -13,9 +13,9 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 import styles from './styles.module.scss';
-import { fetchCreatorCurrency } from 'utils/payment';
 
 const { Text } = Typography;
 

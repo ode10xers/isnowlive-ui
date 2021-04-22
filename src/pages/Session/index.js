@@ -43,6 +43,7 @@ import {
   ZoomAuthType,
 } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -57,7 +58,6 @@ import {
 import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './style.module.scss';
-import { fetchCreatorCurrency } from 'utils/payment';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -321,6 +321,7 @@ const Session = ({ match, history }) => {
     if (creatorMemberTags.length > 0) {
       setSelectedTagType(e.target.value);
     } else {
+      setSelectedTagType('everyone');
       form.setFieldsValue({ ...form.getFieldsValue(), session_tag_type: 'everyone' });
       Modal.confirm({
         title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
