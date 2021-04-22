@@ -36,39 +36,39 @@ const NavbarHeader = () => {
     logOut,
   } = useGlobalContext();
 
-  const checkShouldShowPassLink = async (username) => {
+  const checkShouldShowPassLink = async () => {
     try {
-      const { status, data } = await apis.passes.getPassesByUsername(username);
+      const { status, data } = await apis.passes.getPassesByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowPassLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch pass for username');
+      console.error(error.response?.data?.message || 'Failed to fetch pass for creator');
     }
   };
 
-  const checkShouldShowVideoLink = async (username) => {
+  const checkShouldShowVideoLink = async () => {
     try {
-      const { status, data } = await apis.videos.getVideosByUsername(username);
+      const { status, data } = await apis.videos.getVideosByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowVideoLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch videos for username');
+      console.error(error.response?.data?.message || 'Failed to fetch videos for creator');
     }
   };
 
-  const checkShouldShowCourseLink = async (username) => {
+  const checkShouldShowCourseLink = async () => {
     try {
-      const { status, data } = await apis.courses.getCoursesByUsername(username);
+      const { status, data } = await apis.courses.getCoursesByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowCourseLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch courses for username');
+      console.error(error.response?.data?.message || 'Failed to fetch courses for creator');
     }
   };
 

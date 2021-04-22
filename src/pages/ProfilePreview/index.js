@@ -107,29 +107,26 @@ const ProfilePreview = ({ username = null }) => {
 
   const getProfileUsername = useCallback(() => (username ? username : getLocalUserDetails().username), [username]);
 
-  const getSessionDetails = useCallback(
-    async (type) => {
-      setIsSessionLoading(true);
+  const getSessionDetails = useCallback(async (type) => {
+    setIsSessionLoading(true);
 
-      try {
-        const { status, data } = await apis.user.getSessionsByUsername(getProfileUsername(), type);
-        if (isAPISuccess(status) && data) {
-          setSessions(data);
-          setIsSessionLoading(false);
-        }
-      } catch (error) {
+    try {
+      const { status, data } = await apis.user.getSessionsByUsername(type);
+      if (isAPISuccess(status) && data) {
+        setSessions(data);
         setIsSessionLoading(false);
-        console.error('Failed to load user session details');
       }
-    },
-    [getProfileUsername]
-  );
+    } catch (error) {
+      setIsSessionLoading(false);
+      console.error('Failed to load user session details');
+    }
+  }, []);
 
   const getPassesDetails = useCallback(async () => {
     setIsPassesLoading(true);
     try {
       const profileUsername = getProfileUsername();
-      const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
+      const { status, data } = await apis.passes.getPassesByUsername();
 
       if (isAPISuccess(status) && data) {
         setPasses(formatPassesData(data, profileUsername));
@@ -144,7 +141,7 @@ const ProfilePreview = ({ username = null }) => {
   const getVideosDetails = useCallback(async () => {
     setIsVideosLoading(true);
     try {
-      const { status, data } = await apis.videos.getVideosByUsername(getProfileUsername());
+      const { status, data } = await apis.videos.getVideosByUsername();
 
       if (isAPISuccess(status) && data) {
         setVideos(data);
@@ -154,12 +151,12 @@ const ProfilePreview = ({ username = null }) => {
       setIsVideosLoading(false);
       console.error('Failed to load video details');
     }
-  }, [getProfileUsername]);
+  }, []);
 
   const getCoursesDetails = useCallback(async () => {
     setIsCoursesLoading(true);
     try {
-      const { status, data } = await apis.courses.getCoursesByUsername(getProfileUsername());
+      const { status, data } = await apis.courses.getCoursesByUsername();
 
       if (isAPISuccess(status) && data) {
         setLiveCourses(getLiveCoursesFromCourses(data));
@@ -170,13 +167,12 @@ const ProfilePreview = ({ username = null }) => {
       setIsCoursesLoading(false);
       console.error('Failed to load courses details');
     }
-  }, [getProfileUsername]);
+  }, []);
 
   const getCalendarSessionDetails = useCallback(async () => {
     try {
-      const profileUsername = getProfileUsername();
-      const UpcomingRes = await apis.user.getSessionsByUsername(profileUsername, 'upcoming');
-      const PastRes = await apis.user.getSessionsByUsername(profileUsername, 'past');
+      const UpcomingRes = await apis.user.getSessionsByUsername('upcoming');
+      const PastRes = await apis.user.getSessionsByUsername('past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
         const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
         setSessionCountByDate(res);
@@ -194,7 +190,7 @@ const ProfilePreview = ({ username = null }) => {
     } catch (error) {
       message.error('Failed to load user session details');
     }
-  }, [getProfileUsername]);
+  }, []);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
