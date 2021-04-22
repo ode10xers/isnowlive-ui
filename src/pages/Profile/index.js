@@ -16,7 +16,7 @@ import TextEditor from 'components/TextEditor';
 import EMCode from 'components/EMCode';
 
 import validationRules from 'utils/validation';
-import { parseEmbedCode, scrollToErrorField, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { parseEmbedCode, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
 
@@ -105,12 +105,13 @@ const Profile = () => {
         setUserDetails(localUserDetails);
 
         if (isOnboarding) {
-          const newWindow = window.open(Routes.profilePreview);
+          const creatorUrl = generateUrlFromUsername(values.username);
+
+          const newWindow = window.open(creatorUrl + Routes.profilePreview);
           newWindow.blur();
           window.focus();
           // history.push(Routes.livestream);
 
-          const creatorUrl = generateUrlFromUsername(values.username);
           const modalRef = Modal.success({
             width: 550,
             okButtonProps: { style: { display: 'none' } },
@@ -268,10 +269,6 @@ const Profile = () => {
     }
   };
 
-  const onFinishFailed = ({ errorFields }) => {
-    scrollToErrorField(errorFields);
-  };
-
   const trackAndNavigate = (destination, eventTag) => {
     trackSimpleEvent(eventTag);
     history.push(destination);
@@ -306,7 +303,6 @@ const Profile = () => {
         form={form}
         {...profileFormItemLayout}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         labelAlign={isMobileDevice ? 'left' : 'right'}
         scrollToFirstError={true}
       >
@@ -315,27 +311,51 @@ const Profile = () => {
           <Title level={4}>1. Primary Information</Title>
           <Paragraph className={styles.mt10} type="secondary">
             This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
-            page and an a breif description to showcase yourself to your attendees.
+            page and an a brief description to showcase yourself to your attendees.
           </Paragraph>
           <div className={styles.imageWrapper}>
-            <ImageUpload
-              aspect={4}
-              className={classNames('avatar-uploader', styles.coverImage)}
+            <Form.Item
+              id="cover_image_url"
               name="cover_image_url"
-              onChange={onCoverImageUpload}
-              value={coverImage}
-              label="Cover Photo"
-            />
+              rules={validationRules.requiredValidation}
+              wrapperCol={{ span: 24 }}
+              className={styles.coverImageWrapper}
+            >
+              <ImageUpload
+                aspect={4}
+                className={classNames('avatar-uploader', styles.coverImage)}
+                name="cover_image_url"
+                onChange={onCoverImageUpload}
+                value={coverImage}
+                label={
+                  <>
+                    <Text type="danger">*</Text> Cover Photo{' '}
+                  </>
+                }
+              />
+            </Form.Item>
 
-            <ImageUpload
+            <Form.Item
+              id="profile_image_url"
               name="profile_image_url"
-              className={classNames('avatar-uploader', styles.profileImage)}
-              onChange={onProfileImageUpload}
-              value={profileImage}
-              label="Profile Photo"
-            />
+              rules={validationRules.requiredValidation}
+              wrapperCol={{ span: 24 }}
+              className={styles.profileImageWrapper}
+            >
+              <ImageUpload
+                name="profile_image_url"
+                className={classNames('avatar-uploader', styles.profileImage)}
+                onChange={onProfileImageUpload}
+                value={profileImage}
+                label={
+                  <>
+                    <Text type="danger">*</Text> Profile Photo{' '}
+                  </>
+                }
+              />
+            </Form.Item>
           </div>
-          <Form.Item label="Name" className={styles.nameInputWrapper}>
+          <Form.Item label="Name" required className={styles.nameInputWrapper}>
             <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
               <Input placeholder="First Name" />
             </Form.Item>
@@ -352,7 +372,7 @@ const Profile = () => {
             <TextEditor name={['profile', 'bio']} form={form} placeholder="  Please input your short bio" />
           </Form.Item>
 
-          <Form.Item label="Public URL">
+          <Form.Item label="Public URL" required>
             <Row align="middle" className={styles.alignUrl}>
               <Col>
                 <Form.Item name="username" rules={validationRules.publicUrlValidation} onBlur={handlePublicUrlChange}>
