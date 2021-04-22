@@ -8,14 +8,19 @@ export const mapUserToPendo = (userDetails) => {
   if (userDetails) {
     if (isDev) {
       // For Dev environments, only initializes for specific emails
+      // And with hardcoded external ID values
+      // This is to reserve MAU counts for Pendo
 
       if (userDetails.email.startsWith(allowedStageEmail)) {
-        console.log('Pendo Initialized on Stage Environment for ' + userDetails.email);
+        const hardcodedExternalId = 'e009a4ca-4052-4620-a196-afa9e04f66b0';
+        const hardcodedEmail = 'felicia.karissa7@gmail.com';
+        console.log('User logged in with email ' + userDetails.email);
+        console.log(`Pendo initialized using id ${hardcodedExternalId} with email ${hardcodedEmail}`);
 
         window.pendo.initialize({
           visitor: {
-            id: userDetails.external_id, // Required if user is logged in
-            email: userDetails.email, // Recommended if using Pendo Feedback, or NPS Email
+            id: hardcodedExternalId, // Required if user is logged in
+            email: hardcodedEmail, // Recommended if using Pendo Feedback, or NPS Email
             //full_name:                  // Recommended if using Pendo Feedback
             // role:         // Optional
 
@@ -24,7 +29,7 @@ export const mapUserToPendo = (userDetails) => {
           },
 
           account: {
-            id: userDetails.external_id, // Highly recommended
+            id: hardcodedExternalId, // Highly recommended
             // name:         // Optional
             // is_paying:    // Recommended if using Pendo Feedback
             // monthly_value:// Recommended if using Pendo Feedback
