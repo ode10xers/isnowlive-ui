@@ -304,7 +304,7 @@ const Profile = () => {
         {...profileFormItemLayout}
         onFinish={onFinish}
         labelAlign={isMobileDevice ? 'left' : 'right'}
-        scrollToFirstError={true}
+        onFinishFailed={() => window.scrollTo(0, 440)}
       >
         {/* ========PRIMARY INFO======== */}
         <Section>
