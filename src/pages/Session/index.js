@@ -372,6 +372,7 @@ const Session = ({ match, history }) => {
             );
             newWindow.blur();
             window.focus();
+            setFreeSession();
             // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });

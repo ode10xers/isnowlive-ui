@@ -188,34 +188,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     setIsLoading(false);
   }, [form, history]);
 
-  // const fetchCreatorCurrency = useCallback(async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const { status, data } = await apis.session.getCreatorBalance();
-
-  //     if (isAPISuccess(status) && data?.currency) {
-  //       setCurrency(data.currency.toUpperCase());
-  //     }
-  //   } catch (error) {
-  //     if (error.response?.data?.message === 'unable to fetch user payment details') {
-  //       Modal.confirm({
-  //         title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid course`,
-  //         okText: 'Setup payment account',
-  //         cancelText: 'Keep it free',
-  //         onOk: () => {
-  //           history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
-  //         },
-  //       });
-  //     } else {
-  //       showErrorModal(
-  //         'Failed to fetch creator currency details',
-  //         error?.response?.data?.message || 'Something went wrong'
-  //       );
-  //     }
-  //   }
-  //   setIsLoading(false);
-  // }, [history]);
-
   const getSelectedCourseClasses = useCallback(
     (selectedClassIds = []) => {
       if (courseClasses?.length <= 0 || selectedClassIds?.length <= 0) {
@@ -355,6 +327,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
           });
 
           //setIsSequentialVideos(editedCourse.course_sequence || false);
+          setSelectedTagType(editedCourse?.tag?.length > 0 ? 'selected' : 'everyone');
           setSelectedCourseClass([]);
           setCourseEndDate(null);
           setCourseStartDate(null);
@@ -373,6 +346,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             selectedMemberTags: editedCourse?.tag?.map((tag) => tag.external_id) || [],
           });
 
+          setSelectedTagType('everyone');
           setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
           setCourseStartDate(moment(editedCourse?.start_date));
           setCourseEndDate(moment(editedCourse?.end_date));

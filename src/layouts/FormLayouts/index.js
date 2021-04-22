@@ -21,19 +21,19 @@ export const formLayout = {
   labelCol: {
     xs: { span: 24 },
     md: { span: 10 },
-    xl: { span: 6 },
+    xl: { span: 8 },
   },
   wrapperCol: {
     xs: { span: 24 },
     md: { span: 14 },
-    xl: { span: 18 },
+    xl: { span: 16 },
   },
 };
 export const formTailLayout = {
   wrapperCol: {
     xs: { span: 24 },
     md: { span: 14, offset: 10 },
-    xl: { span: 18, offset: 6 },
+    xl: { span: 16, offset: 8 },
   },
 };
 export const sessionRegistrationformLayout = {

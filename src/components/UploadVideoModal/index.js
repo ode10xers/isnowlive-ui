@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
 
-import { BookTwoTone } from '@ant-design/icons';
+import { BookTwoTone, TagOutlined } from '@ant-design/icons';
 
 import config from 'config';
 import apis from 'apis';
@@ -20,6 +19,7 @@ import ImageUpload from 'components/ImageUpload';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
@@ -48,6 +48,8 @@ const formInitialValues = {
   price: 0,
   watch_limit: 0,
   video_course_type: 'normal',
+  videoTagType: 'everyone',
+  selectedMemberTags: [],
 };
 
 const UploadVideoModal = ({
@@ -60,10 +62,9 @@ const UploadVideoModal = ({
   shouldClone,
 }) => {
   const [form] = Form.useForm();
-  const history = useHistory();
 
   const [classes, setClasses] = useState([]);
-  const [currency, setCurrency] = useState('SGD');
+  const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
@@ -72,6 +73,9 @@ const UploadVideoModal = ({
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
   const [uploadingFlie, setuploadingFlie] = useState(null);
   const [isCourseVideo, setIsCourseVideo] = useState(false);
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [selectedTagType, setSelectedTagType] = useState('everyone');
+
   const uppy = useRef(null);
   uppy.current = new Uppy({
     meta: { type: 'avatar' },
@@ -130,6 +134,20 @@ const UploadVideoModal = ({
     console.log('Cancel All is called here');
   });
 
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
+
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
 
@@ -146,46 +164,47 @@ const UploadVideoModal = ({
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorCurrency = useCallback(async () => {
+  const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
-    try {
-      const { status, data } = await apis.session.getCreatorBalance();
 
-      if (isAPISuccess(status) && data?.currency) {
-        setCurrency(data.currency.toUpperCase());
+    try {
+      const creatorCurrency = await fetchCreatorCurrency();
+
+      if (creatorCurrency) {
+        setCurrency(creatorCurrency);
+      } else {
+        setCurrency('');
+        setFreeVideo();
       }
     } catch (error) {
-      if (error.response?.data?.message === 'unable to fetch user payment details') {
-        Modal.confirm({
-          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid video`,
-          okText: 'Setup payment account',
-          cancelText: 'Keep it free',
-          onOk: () => {
-            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
-          },
-        });
-      } else {
-        showErrorModal(
-          'Failed to fetch creator currency details',
-          error?.response?.data?.message || 'Something went wrong'
-        );
-      }
+      showErrorModal(
+        'Failed to fetch creator currency details',
+        error?.response?.data?.message || 'Something went wrong'
+      );
     }
+
     setIsLoading(false);
-  }, [history]);
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (visible) {
+      fetchCreatorMemberTags();
       document.body.style.overflow = 'hidden';
 
       if (editedVideo) {
         form.setFieldsValue({
           ...editedVideo,
+          price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
-          videoType: editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
+          videoType:
+            editedVideo.currency === '' || editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
           video_course_type: editedVideo.is_course ? 'course' : 'normal',
+          videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'everyone',
+          selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        setCurrency(editedVideo.currency.toUpperCase() || 'SGD');
+        setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'everyone');
+        setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
@@ -195,7 +214,7 @@ const UploadVideoModal = ({
       }
 
       if (formPart === 1) {
-        fetchCreatorCurrency();
+        getCreatorCurrencyDetails();
       }
       fetchAllClassesForCreator();
     } else {
@@ -206,17 +225,72 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
       setIsCourseVideo(false);
+      setSelectedTagType('everyone');
+      setCurrency('');
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
+  }, [
+    visible,
+    editedVideo,
+    fetchAllClassesForCreator,
+    getCreatorCurrencyDetails,
+    fetchCreatorMemberTags,
+    form,
+    formPart,
+  ]);
+
+  const setFreeVideo = () => {
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      videoType: videoTypes.FREE.name,
+      price: 0,
+    });
+    setVideoType(videoTypes.FREE.name);
+  };
 
   const handleChangeLimitType = (priceType) => {
-    const values = form.getFieldsValue();
-    form.setFieldsValue({
-      ...values,
-      price: priceType === videoTypes.FREE.name ? 0 : values.price || 10,
-    });
-    setVideoType(priceType);
+    if (currency === '') {
+      Modal.confirm({
+        title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
+        okText: 'Setup payment account',
+        cancelText: 'Keep it free',
+        onCancel: () => setFreeVideo(),
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+          newWindow.blur();
+          window.focus();
+          setFreeVideo();
+          // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+        },
+      });
+    } else {
+      const values = form.getFieldsValue();
+      form.setFieldsValue({
+        ...values,
+        videoType: priceType,
+        price: priceType === videoTypes.FREE.name ? 0 : values.price || 10,
+      });
+      setVideoType(priceType);
+    }
+  };
+
+  const handleVideoTagTypeChange = (e) => {
+    if (creatorMemberTags.length > 0) {
+      setSelectedTagType(e.target.value);
+    } else {
+      setSelectedTagType('everyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), videoTagType: 'everyone' });
+      Modal.confirm({
+        title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
+        okText: 'Setup Member Tags',
+        cancelText: 'Cancel',
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags}`);
+          newWindow.blur();
+          window.focus();
+        },
+      });
+    }
   };
 
   const handleFinish = async (values) => {
@@ -233,6 +307,7 @@ const UploadVideoModal = ({
         thumbnail_url: coverImageUrl,
         watch_limit: values.watch_limit,
         is_course: isCourseVideo,
+        tag_ids: selectedTagType === 'everyone' ? [] : values.selectedMemberTags || [],
       };
 
       const response = editedVideo
@@ -324,7 +399,7 @@ const UploadVideoModal = ({
       maskClosable={false}
       closable={formPart === 1}
       onCancel={() => closeModal(false)}
-      width={720}
+      width={780}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
@@ -477,19 +552,57 @@ const UploadVideoModal = ({
                   />
                 </Form.Item>
               </Col>
+              <Col xs={videoType === videoTypes.FREE.name ? 0 : 24}>
+                <Form.Item
+                  id="price"
+                  name="price"
+                  label={`Price (${currency.toUpperCase()})`}
+                  hidden={videoType === videoTypes.FREE.name}
+                  rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
+                >
+                  <InputNumber min={0} disabled={currency === ''} placeholder="Price" className={styles.numericInput} />
+                </Form.Item>
+              </Col>
 
-              {videoType !== videoTypes.FREE.name && (
-                <Col xs={24}>
-                  <Form.Item
-                    id="price"
-                    name="price"
-                    label={`Price (${currency.toUpperCase()})`}
-                    rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
-                  >
-                    <InputNumber min={0} placeholder="Price" className={styles.numericInput} />
-                  </Form.Item>
-                </Col>
-              )}
+              <Col xs={24}>
+                <Form.Item
+                  name="videoTagType"
+                  label="Bookable by member with Tag"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleVideoTagTypeChange}
+                >
+                  <Radio.Group>
+                    <Radio value="everyone"> Everyone </Radio>
+                    <Radio value="selected"> Selected Member Tags </Radio>
+                  </Radio.Group>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24}>
+                <Form.Item
+                  name="selectedMemberTags"
+                  id="selectedMemberTags"
+                  {...formTailLayout}
+                  hidden={selectedTagType === 'everyone'}
+                >
+                  <Select
+                    showArrow
+                    mode="multiple"
+                    maxTagCount={2}
+                    placeholder="Select a member tag"
+                    disabled={selectedTagType === 'everyone'}
+                    options={creatorMemberTags.map((tag) => ({
+                      label: (
+                        <>
+                          {' '}
+                          {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                        </>
+                      ),
+                      value: tag.external_id,
+                    }))}
+                  />
+                </Form.Item>
+              </Col>
 
               <Col xs={24}>
                 <Form.Item

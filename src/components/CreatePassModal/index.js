@@ -111,12 +111,6 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
     try {
-      // const { status, data } = await apis.session.getCreatorBalance();
-
-      // if (isAPISuccess(status) && data?.currency) {
-      //   setCurrency(data.currency.toUpperCase());
-      // }
-
       const creatorCurrency = await fetchCreatorCurrency();
 
       if (creatorCurrency) {
