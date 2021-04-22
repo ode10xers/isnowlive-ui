@@ -101,6 +101,7 @@ export default {
     updateVideo: (videoId, payload) => http.put(`/secure/creator/videos/${videoId}`, payload),
     deleteVideo: (videoId) => http.delete(`/secure/creator/videos/${videoId}`),
     uploadVideo: (videoId, payload) => http.post(`/secure/creator/videos/${videoId}/upload`, payload),
+    getVideoToken: (videoId) => http.get(`/secure/creator/videos/${videoId}/token`),
     cloneVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/clone`),
     unlinkVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unlink`),
     createOrderForUser: (payload) => http.post('/secure/customer/videos/orders', payload),
