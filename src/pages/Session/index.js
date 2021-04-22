@@ -55,6 +55,7 @@ import {
 import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './style.module.scss';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -86,7 +87,7 @@ const colorPickerChoices = [
 
 const initialSession = {
   price: 0,
-  currency: 'SGD',
+  currency: '',
   max_participants: 1,
   group: true,
   name: '',
@@ -130,18 +131,61 @@ const Session = ({ match, history }) => {
     },
   } = useGlobalContext();
 
+  // Reworked the fetch currency mechanic
+  const getCreatorCurrencyDetails = useCallback(
+    async (sessionData = null) => {
+      setIsLoading(true);
+      try {
+        const creatorCurrency = await fetchCreatorCurrency();
+
+        if (creatorCurrency) {
+          setStripeCurrency(creatorCurrency.toUpperCase());
+          if (!sessionData) {
+            form.setFieldsValue({
+              ...form.getFieldsValue(),
+              price_type: 'Paid',
+              currency: creatorCurrency.toUpperCase() || '',
+              price: 10,
+            });
+            setIsSessionFree(false);
+          } else {
+            form.setFieldsValue({
+              ...form.getFieldsValue(),
+              currency: creatorCurrency.toUpperCase() || sessionData.currency?.toUpperCase() || '',
+            });
+          }
+        } else {
+          setStripeCurrency(null);
+          form.setFieldsValue({
+            ...form.getFieldsValue(),
+            price_type: 'Free',
+            price: 0,
+            currency: '',
+          });
+          setIsSessionFree(true);
+        }
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
+      setIsLoading(false);
+    },
+    [form]
+  );
+
+  /*
   const getCreatorStripeDetails = useCallback(
     async (sessionData = null) => {
       try {
         setIsLoading(true);
         const { status, data } = await apis.session.getCreatorBalance();
+
         if (isAPISuccess(status) && data) {
           setStripeCurrency(data.currency.toUpperCase());
           if (!sessionData) {
             form.setFieldsValue({
               ...form.getFieldsValue(),
               price_type: 'Paid',
-              currency: data?.currency?.toUpperCase() || 'SGD',
+              currency: data?.currency?.toUpperCase() || '',
               price: 10,
             });
             setIsSessionFree(false);
@@ -155,7 +199,7 @@ const Session = ({ match, history }) => {
             ...form.getFieldsValue(),
             price_type: 'Free',
             price: 0,
-            currency: 'SGD',
+            currency: '',
           });
           setIsSessionFree(true);
         } else {
@@ -166,6 +210,8 @@ const Session = ({ match, history }) => {
     },
     [form]
   );
+
+  */
 
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
@@ -201,7 +247,7 @@ const Session = ({ match, history }) => {
           setColorCode(data?.color_code || whiteColor);
           setIsCourseSession(data?.is_course || false);
           setIsLoading(false);
-          await getCreatorStripeDetails(data);
+          await getCreatorCurrencyDetails(data);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -213,7 +259,7 @@ const Session = ({ match, history }) => {
         }
       }
     },
-    [form, history, isOnboarding, getCreatorStripeDetails]
+    [form, history, isOnboarding, getCreatorCurrencyDetails]
   );
 
   const getCreatorDocuments = useCallback(async () => {
@@ -243,7 +289,7 @@ const Session = ({ match, history }) => {
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
-      getCreatorStripeDetails();
+      getCreatorCurrencyDetails();
       form.setFieldsValue({
         ...form.getFieldsValue(),
         type: 'Group',
@@ -260,7 +306,7 @@ const Session = ({ match, history }) => {
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
     getCreatorDocuments();
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails, getCreatorDocuments]);
+  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorCurrencyDetails, getCreatorDocuments]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -539,7 +585,7 @@ const Session = ({ match, history }) => {
       setIsLoading(true);
       const data = {
         price: isSessionFree ? 0 : values.price || 0,
-        currency: values.currency?.toLowerCase() || stripeCurrency.toLowerCase() || 'sgd',
+        currency: values.currency?.toLowerCase() || stripeCurrency?.toLowerCase() || '',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
@@ -601,7 +647,6 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
-            // TODO: Check what happens to currency when NOT_CONNECTED user creates free session
             pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_SESSION, {
               session_name: newSessionResponse.data.name,
               session_price: newSessionResponse.data.price,
@@ -833,12 +878,7 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item
-              name="currency"
-              label="Currency"
-              rules={validationRules.requiredValidation}
-              hidden={isSessionFree}
-            >
+            <Form.Item name="currency" label="Currency" hidden={isSessionFree}>
               <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
                 {currencyList &&
                   Object.entries(currencyList).map(([key, value], i) => (
