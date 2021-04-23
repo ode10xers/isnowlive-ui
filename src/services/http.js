@@ -10,12 +10,12 @@ class HttpService {
   constructor() {
     this.baseURL = config.server.baseURL;
     this.authToken = getAuthCookie() || '';
-    // TODO: Check whether this is working correctly
+
     // Expected Behavior: Sends creator-username header when in username.passion.do
     // Sends empty string in the creator-username if the detected username is localhost/app
     const creatorUsername = getUsernameFromUrl();
-    console.log('HTTP **** Creator Username Detected in HTTP Service: ', creatorUsername);
     this.creatorUsername = reservedDomainName.includes(creatorUsername) ? '' : creatorUsername;
+    console.log('HTTP **** Creator Username Detected in HTTP Service: ', this.creatorUsername);
 
     this.axios = axios.create({
       baseURL: this.baseURL,
@@ -43,10 +43,18 @@ class HttpService {
   setAuthToken(authToken) {
     setAuthCookie(authToken);
     this.authToken = authToken;
+
+    // Expected Behavior: Sends creator-username header when in username.passion.do
+    // Sends empty string in the creator-username if the detected username is localhost/app
+    const creatorUsername = getUsernameFromUrl();
+    this.creatorUsername = reservedDomainName.includes(creatorUsername) ? '' : creatorUsername;
+    console.log('HTTP **** Creator Username Detected in HTTP Service: ', this.creatorUsername);
+
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
+        'creator-username': this.creatorUsername,
       },
     });
   }
