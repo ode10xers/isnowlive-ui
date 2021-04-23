@@ -27,6 +27,7 @@ const NavbarHeader = () => {
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [authModalState, setAuthModalState] = useState('signIn');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [shouldShowSessionLink, setShouldShowSessionLink] = useState(false);
   const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
   const [shouldShowVideoLink, setShouldShowVideoLink] = useState(false);
   const [shouldShowCourseLink, setShouldShowCourseLink] = useState(false);
@@ -35,6 +36,18 @@ const NavbarHeader = () => {
     state: { userDetails },
     logOut,
   } = useGlobalContext();
+
+  const checkShouldShowSessionLink = async () => {
+    try {
+      const { status, data } = await apis.user.getSessionsByUsername('upcoming');
+
+      if (isAPISuccess(status) && data) {
+        setShouldShowSessionLink(data.length > 0);
+      }
+    } catch (error) {
+      console.error(error.response?.data?.message || 'Failed to fetch upcoming session for creator');
+    }
+  };
 
   const checkShouldShowPassLink = async () => {
     try {
@@ -146,23 +159,21 @@ const NavbarHeader = () => {
     }
   };
 
-  useEffect(() => {
-    setLocalUserDetails(getLocalUserDetails());
-  }, [userDetails]);
-
   const username = window.location.hostname.split('.')[0];
 
   useEffect(() => {
     //For some reason, sometimes the modals locks the scrolling of <body>
     //This line here is to remove the style element of <body>
     document.body.removeAttribute('style');
+    setLocalUserDetails(getLocalUserDetails());
 
     if (username && !reservedDomainName.includes(username)) {
-      checkShouldShowPassLink(username);
-      checkShouldShowVideoLink(username);
-      checkShouldShowCourseLink(username);
+      checkShouldShowSessionLink();
+      checkShouldShowPassLink();
+      checkShouldShowVideoLink();
+      checkShouldShowCourseLink();
     }
-  }, [username]);
+  }, [username, userDetails]);
 
   if (reservedDomainName.includes(username)) {
     return null;
@@ -239,13 +250,15 @@ const NavbarHeader = () => {
                 <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
                   Site Home
                 </Menu.Item>
-                <Menu.Item
-                  key="Session"
-                  className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
-                  onClick={() => redirectToCreatorProfile('session')}
-                >
-                  Sessions
-                </Menu.Item>
+                {shouldShowSessionLink && (
+                  <Menu.Item
+                    key="Session"
+                    className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('session')}
+                  >
+                    Sessions
+                  </Menu.Item>
+                )}
                 {shouldShowPassLink && (
                   <Menu.Item
                     key="Pass"
@@ -418,13 +431,15 @@ const NavbarHeader = () => {
                       >
                         <span className={styles.menuLink}>Site Home</span>
                       </li>
-                      <li
-                        key="Creator Sessions"
-                        className={siteLinkActive('session') ? styles.active : undefined}
-                        onClick={() => redirectToCreatorProfile('session')}
-                      >
-                        <span className={styles.menuLink}>Sessions</span>
-                      </li>
+                      {shouldShowSessionLink && (
+                        <li
+                          key="Creator Sessions"
+                          className={siteLinkActive('session') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('session')}
+                        >
+                          <span className={styles.menuLink}>Sessions</span>
+                        </li>
+                      )}
                       {shouldShowPassLink && (
                         <li
                           key="Creator Passes"
