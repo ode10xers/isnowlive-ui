@@ -807,7 +807,9 @@ const Session = ({ match, history }) => {
             id="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="Please input description" />
+            <div>
+              <TextEditor name="description" form={form} placeholder="Please input description" />
+            </div>
           </Form.Item>
 
           <Form.Item label="Attached Files" id="document_urls" name="document_urls">

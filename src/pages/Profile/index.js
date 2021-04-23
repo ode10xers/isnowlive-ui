@@ -304,7 +304,7 @@ const Profile = () => {
         {...profileFormItemLayout}
         onFinish={onFinish}
         labelAlign={isMobileDevice ? 'left' : 'right'}
-        onFinishFailed={() => window.scrollTo(0, 440)}
+        scrollToFirstError={true}
       >
         {/* ========PRIMARY INFO======== */}
         <Section>
@@ -321,18 +321,20 @@ const Profile = () => {
               wrapperCol={{ span: 24 }}
               className={styles.coverImageWrapper}
             >
-              <ImageUpload
-                aspect={4}
-                className={classNames('avatar-uploader', styles.coverImage)}
-                name="cover_image_url"
-                onChange={onCoverImageUpload}
-                value={coverImage}
-                label={
-                  <>
-                    <Text type="danger">*</Text> Cover Photo{' '}
-                  </>
-                }
-              />
+              <div>
+                <ImageUpload
+                  aspect={4}
+                  className={classNames('avatar-uploader', styles.coverImage)}
+                  name="cover_image_url"
+                  onChange={onCoverImageUpload}
+                  value={coverImage}
+                  label={
+                    <>
+                      <Text type="danger">*</Text> Cover Photo{' '}
+                    </>
+                  }
+                />
+              </div>
             </Form.Item>
 
             <Form.Item
@@ -342,17 +344,19 @@ const Profile = () => {
               wrapperCol={{ span: 24 }}
               className={styles.profileImageWrapper}
             >
-              <ImageUpload
-                name="profile_image_url"
-                className={classNames('avatar-uploader', styles.profileImage)}
-                onChange={onProfileImageUpload}
-                value={profileImage}
-                label={
-                  <>
-                    <Text type="danger">*</Text> Profile Photo{' '}
-                  </>
-                }
-              />
+              <div>
+                <ImageUpload
+                  name="profile_image_url"
+                  className={classNames('avatar-uploader', styles.profileImage)}
+                  onChange={onProfileImageUpload}
+                  value={profileImage}
+                  label={
+                    <>
+                      <Text type="danger">*</Text> Profile Photo{' '}
+                    </>
+                  }
+                />
+              </div>
             </Form.Item>
           </div>
           <Form.Item label="Name" required className={styles.nameInputWrapper}>
