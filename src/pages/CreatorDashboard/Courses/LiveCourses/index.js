@@ -341,13 +341,10 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
           )}
         </Card>
-        {course.is_published
-          ? expandedPublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
-            )
-          : expandedUnpublishedRowKeys.includes(course.id) && (
-              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
-            )}
+        course.is_published ? expandedPublishedRowKeys.includes(course.id) && (
+        <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>) :
+        expandedUnpublishedRowKeys.includes(course.id) && (
+        <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>)
       </Col>
     );
   };

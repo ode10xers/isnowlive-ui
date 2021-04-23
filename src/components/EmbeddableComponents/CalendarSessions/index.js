@@ -33,11 +33,11 @@ const CalendarSessions = ({ profileUsername }) => {
   const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
 
-  const getCalendarSessions = async (username) => {
+  const getCalendarSessions = async () => {
     try {
       setIsSessionLoading(true);
-      const UpcomingRes = await apis.user.getSessionsByUsername(username, 'upcoming');
-      const PastRes = await apis.user.getSessionsByUsername(username, 'past');
+      const UpcomingRes = await apis.user.getSessionsByUsername('upcoming');
+      const PastRes = await apis.user.getSessionsByUsername('past');
       if (isAPISuccess(UpcomingRes.status) && isAPISuccess(PastRes.status)) {
         setReadyToPaint(false);
         const res = getSessionCountByDate([...UpcomingRes.data, ...PastRes.data]);
