@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress } from 'antd';
+import {
+  Row,
+  Col,
+  Modal,
+  Form,
+  Typography,
+  Radio,
+  Input,
+  InputNumber,
+  Select,
+  Button,
+  Progress,
+  TimePicker,
+} from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop } from '@uppy/react';
@@ -14,7 +27,6 @@ import Routes from 'routes';
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
-import ImageUpload from 'components/ImageUpload';
 
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
@@ -26,6 +38,7 @@ import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import styles from './styles.module.scss';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 import { getLocalUserDetails } from 'utils/storage';
+import moment from 'moment';
 
 const { Text, Paragraph } = Typography;
 
@@ -71,10 +84,14 @@ const UploadVideoModal = ({
   const [videoType, setVideoType] = useState(videoTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
-  const [uploadingFlie, setuploadingFlie] = useState(null);
+  const [uploadingFile, setUploadingFile] = useState(null);
   const [isCourseVideo, setIsCourseVideo] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [videoPreviewToken, setVideoPreviewToken] = useState(null);
+  const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
+  const [, setVideoLength] = useState(0);
+  const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
 
   const uppy = useRef(null);
   uppy.current = new Uppy({
@@ -91,8 +108,18 @@ const UploadVideoModal = ({
   });
 
   uppy.current.on('file-added', (file) => {
-    setuploadingFlie(file);
+    setUploadingFile(file);
     setIsLoading(true);
+
+    var blob = new Blob([file.data]), // create a blob of buffer
+      url = URL.createObjectURL(blob), // create o-URL of blob
+      video = document.createElement('video'); // create video element
+
+    video.preload = 'metadata'; // preload setting
+    video.addEventListener('loadedmetadata', function () {
+      setVideoLength(video.duration);
+    });
+    video.src = url;
   });
 
   uppy.current.on('progress', (result) => {
@@ -102,31 +129,24 @@ const UploadVideoModal = ({
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
-      showSuccessModal(
-        'Video Successfully Uploaded',
-        <>
-          <Paragraph>
-            We have received your video. It takes us about 10 minutes to process your video. Until then your video is
-            hidden.
-          </Paragraph>
-          <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
-        </>
-      );
-
-      if (editedVideo && uploadingFlie) {
-        pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
-          video_id: editedVideo?.external_id || customNullValue,
+      apis.videos
+        .getVideoToken(editedVideo.external_id)
+        .then((res) => {
+          setVideoPreviewToken(res.data.token);
+          setFormPart(3);
+        })
+        .catch((error) => {
+          console.log(error);
+          showErrorModal(`Failed to get video token`);
         });
-      }
     } else {
       showErrorModal(`Failed to upload video`);
     }
 
     setTimeout(() => {
       setVideoUploadPercent(0);
-      setuploadingFlie(null);
+      setUploadingFile(null);
       uppy.current = null;
-      closeModal(true);
     }, 500);
   });
 
@@ -329,19 +349,31 @@ const UploadVideoModal = ({
           updateEditedVideo(response.data);
 
           if (response.data.video_uid.length) {
-            closeModal(true);
+            apis.videos
+              .getVideoToken(editedVideo.external_id)
+              .then((res) => {
+                setVideoPreviewToken(res.data.token);
+                setFormPart(3);
+              })
+              .catch((error) => {
+                console.log(error);
+                showErrorModal(`Failed to get video token`);
+              });
           } else {
             setFormPart(2);
           }
         } else {
           if (editedVideo.video_uid.length) {
-            if (shouldClone) {
-              showSuccessModal('Video cloned successfully');
-            } else {
-              showSuccessModal('Video details updated successfully');
-            }
-
-            closeModal(true);
+            apis.videos
+              .getVideoToken(editedVideo.external_id)
+              .then((res) => {
+                setVideoPreviewToken(res.data.token);
+                setFormPart(3);
+              })
+              .catch((error) => {
+                console.log(error);
+                showErrorModal(`Failed to get video token`);
+              });
           } else {
             setFormPart(2);
           }
@@ -357,9 +389,70 @@ const UploadVideoModal = ({
     setIsSubmitting(false);
   };
 
-  const onCoverImageUpload = (imageUrl) => {
-    setCoverImageUrl(imageUrl);
-    form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
+  const onCoverImageUpload = async () => {
+    try {
+      setIsLoading(true);
+      let blob = await fetch(
+        `https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+          videoPreviewTime
+        )}&height=200&duration=15s`
+      ).then((res) => res.blob());
+
+      if (blob) {
+        const formData = new FormData();
+        formData.append('file', new File([blob], 'thumbnail.gif', { type: 'image/gif' }));
+        const { data } = await apis.user.uploadImage(formData);
+        if (data) {
+          apis.videos
+            .updateVideo(editedVideo.external_id, {
+              currency: currency.toLowerCase(),
+              title: editedVideo.title,
+              description: editedVideo.description,
+              price: videoType === videoTypes.FREE.name ? 0 : editedVideo.price,
+              validity: editedVideo.validity,
+              session_ids: selectedSessionIds || editedVideo.session_ids || [],
+              thumbnail_url: data,
+              watch_limit: editedVideo.watch_limit,
+              is_course: isCourseVideo,
+            })
+            .then(() => {
+              setIsLoading(false);
+              closeModal(true);
+
+              if (shouldClone) {
+                showSuccessModal('Video cloned successfully');
+              } else if (updateVideoDetails) {
+                showSuccessModal('Video details updated successfully');
+              } else {
+                showSuccessModal(
+                  'Video Successfully Uploaded',
+                  <>
+                    <Paragraph>
+                      We have received your video. It takes us about 10 minutes to process your video. Until then your
+                      video is hidden.
+                    </Paragraph>
+                    <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+                  </>
+                );
+                if (editedVideo && uploadingFile) {
+                  pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
+                    video_id: editedVideo?.external_id || customNullValue,
+                  });
+                }
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+              setIsLoading(false);
+              showErrorModal('Something went wrong!');
+            });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      showErrorModal('Something went wrong!');
+    }
   };
 
   const onCourseTypeChange = (e) => {
@@ -385,19 +478,38 @@ const UploadVideoModal = ({
   //   }
 
   //   setVideoUploadPercent(0);
-  //   setuploadingFlie(null);
+  //   setUploadingFile(null);
   //   uppy.current = null;
   //   closeModal(true);
   // };
 
+  const handleVideoPreviewTimeChange = (time, timeString) => {
+    setVideoPreviewTime(timeString.length > 0 ? timeString : '00:00:01');
+  };
+
+  const parseTimeString = (timeString) => {
+    let time = timeString.split(':');
+    return `${time[0] || 0}h${time[1] || 0}m${time[2] || 0}s`;
+  };
+
+  const modalTitle = () => {
+    if (formPart === 1) {
+      return 'Create Video Product';
+    } else if (formPart === 2) {
+      return 'Upload Video';
+    } else if (formPart === 3) {
+      return 'Set a preview thumbnail';
+    }
+  };
+
   return (
     <Modal
-      title={`${editedVideo ? 'Edit' : 'Upload New'} Video`}
+      title={modalTitle()}
       centered={true}
       visible={visible}
       footer={null}
       maskClosable={false}
-      closable={formPart === 1}
+      closable={[1, 3].includes(formPart)}
       onCancel={() => closeModal(false)}
       width={780}
     >
@@ -411,21 +523,6 @@ const UploadVideoModal = ({
             initialValues={formInitialValues}
           >
             <Row gutter={[8, 16]}>
-              <Col xs={24}>
-                <Form.Item id="thumbnail_url" name="thumbnail_url" wrapperCol={{ span: 24 }}>
-                  <div className={styles.imageWrapper}>
-                    <ImageUpload
-                      aspect={4}
-                      className={classNames('avatar-uploader', styles.coverImage)}
-                      name="thumbnail_url"
-                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                      onChange={onCoverImageUpload}
-                      value={coverImageUrl}
-                      label="Cover Image"
-                    />
-                  </div>
-                </Form.Item>
-              </Col>
               <Col xs={24}>
                 <Form.Item id="title" name="title" label="Title" rules={validationRules.requiredValidation}>
                   <Input placeholder="Enter title" maxLength={50} />
@@ -646,7 +743,7 @@ const UploadVideoModal = ({
         )}
         {formPart === 2 && (
           <div className={styles.videoUpload}>
-            <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFlie ? 'none' : 'auto' }}>
+            <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFile ? 'none' : 'auto' }}>
               <DragDrop
                 uppy={uppy.current}
                 locale={{
@@ -658,19 +755,57 @@ const UploadVideoModal = ({
               />
               {videoUploadPercent !== 0 && (
                 <>
-                  <Text>{uploadingFlie?.name}</Text>
+                  <Text>{uploadingFile?.name}</Text>
                   <Progress percent={videoUploadPercent} status="active" />
                 </>
               )}
             </div>
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFlie ? true : false}>
+                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFile ? true : false}>
                   Cancel
                 </Button>
               </Col>
             </Row>
           </div>
+        )}
+
+        {formPart === 3 && (
+          <Row justify="center" style={{ textAlign: 'center' }}>
+            <Col xs={24}>
+              {videoPreviewTime && (
+                <iframe
+                  key={videoPreviewTime}
+                  title={editedVideo?.title || ''}
+                  src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+                    videoPreviewTime
+                  )}&height=200&duration=15s`}
+                  style={{
+                    border: 'none',
+                    width: 400,
+                    height: 200,
+                  }}
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                ></iframe>
+              )}
+            </Col>
+            <Col xs={24} className={styles.mt20}>
+              We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
+            </Col>
+            <Col xs={24} className={styles.mt20}>
+              Select Time:{' '}
+              <TimePicker
+                showNow={false}
+                defaultValue={moment(videoPreviewTime, 'hh:mm:ss')}
+                onChange={handleVideoPreviewTimeChange}
+              />
+            </Col>
+            <Col xs={24} className={styles.mt20}>
+              <Button block type="default" onClick={() => onCoverImageUpload()}>
+                Submit
+              </Button>
+            </Col>
+          </Row>
         )}
       </Loader>
     </Modal>
