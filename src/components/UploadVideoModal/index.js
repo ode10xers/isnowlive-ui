@@ -235,6 +235,7 @@ const UploadVideoModal = ({
     if (editedVideo || formPart === 2) {
       setUpdateVideoDetails(true);
     }
+    // eslint-disable-next-line
   }, []);
 
   const handleChangeLimitType = (priceType) => {
