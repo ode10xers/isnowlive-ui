@@ -62,7 +62,10 @@ const productKeys = {
 const ProfilePreview = ({ username = null }) => {
   const history = useHistory();
   const location = useLocation();
-  const { showPaymentPopup } = useGlobalContext();
+  const {
+    state: { userDetails },
+    showPaymentPopup,
+  } = useGlobalContext();
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
@@ -210,6 +213,7 @@ const ProfilePreview = ({ username = null }) => {
     getVideosDetails,
     getCoursesDetails,
     getCalendarSessionDetails,
+    userDetails,
   ]);
 
   const getDefaultTabToShow = useCallback(() => {
@@ -431,12 +435,7 @@ const ProfilePreview = ({ username = null }) => {
 
         {/* =====TAB SELECT===== */}
         <Loader loading={isListLoading} size="large">
-          <Tabs
-            size="large"
-            defaultActiveKey={getDefaultTabToShow()}
-            activeKey={selectedListTab}
-            onChange={handleChangeListTab}
-          >
+          <Tabs size="large" activeKey={selectedListTab} onChange={handleChangeListTab}>
             {sessions.length > 0 && (
               <Tabs.TabPane
                 key={productKeys.SESSION}

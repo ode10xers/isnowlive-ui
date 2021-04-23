@@ -602,7 +602,7 @@ const InventoryDetails = ({ match, history }) => {
                 classDetails={session}
                 selectedInventory={session}
                 logOut={() => {
-                  logOut(history, true);
+                  logOut(history, false);
                   setCurrentUser(null);
                   setSelectedPass(null);
                   setUserPasses([]);
