@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
 
-import { BookTwoTone } from '@ant-design/icons';
+import { BookTwoTone, TagOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -38,6 +38,8 @@ const formInitialValues = {
   videoList: [],
   passType: passTypes.LIMITED.name,
   colorCode: initialColor,
+  passTagType: 'everyone',
+  selectedMemberTag: null,
 };
 
 const whiteColor = '#ffffff';
@@ -75,6 +77,24 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const [selectedVideos, setSelectedVideos] = useState([]);
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
   const [colorCode, setColorCode] = useState(initialColor);
+
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [selectedTag, setSelectedTag] = useState(null);
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -153,6 +173,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
 
   useEffect(() => {
     if (visible) {
+      fetchCreatorMemberTags();
+
       if (editedPass) {
         form.setFieldsValue({
           passName: editedPass.name,
@@ -163,7 +185,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
           validity: editedPass.validity,
           price: editedPass.currency ? editedPass.price : 0,
           color_code: editedPass.color_code || whiteColor,
+          passTagType: editedPass.tag?.external_id ? 'selected' : 'everyone',
+          selectedMemberTag: editedPass.tag?.external_id || null,
         });
+        setSelectedTagType(editedPass.tag?.external_id ? 'selected' : 'everyone');
+        setSelectedTag(editedPass.tag?.external_id || null);
         setCurrency(editedPass.currency.toUpperCase() || '');
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
@@ -176,13 +202,23 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         setSelectedVideos([]);
         setColorCode(initialColor);
         setCurrency('');
+        setSelectedTag(null);
+        setSelectedTagType('everyone');
       }
 
       getCreatorCurrencyDetails();
       fetchAllClassesForCreator();
       fetchAllVideosForCreator();
     }
-  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, getCreatorCurrencyDetails, form]);
+  }, [
+    visible,
+    editedPass,
+    fetchAllClassesForCreator,
+    fetchAllVideosForCreator,
+    fetchCreatorMemberTags,
+    getCreatorCurrencyDetails,
+    form,
+  ]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
@@ -195,6 +231,56 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
     form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
+  };
+
+  const handlePassTagTypeChange = (e) => {
+    if (creatorMemberTags.length > 0) {
+      setSelectedTagType(e.target.value);
+
+      if (e.target.value === 'everyone') {
+        setSelectedTag(null);
+        form.setFieldsValue({ ...form.getFieldsValue(), selectedMemberTag: null });
+      }
+    } else {
+      setSelectedTagType('everyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'everyone', selectedMemberTag: null });
+      Modal.confirm({
+        title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
+        okText: 'Setup Member Tags',
+        cancelText: 'Cancel',
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags}`);
+          newWindow.blur();
+          window.focus();
+        },
+      });
+    }
+  };
+
+  const onSelectedTagChange = (selectedTagExternalId) => {
+    console.log(selectedTagExternalId);
+    setSelectedTag(selectedTagExternalId ?? null);
+
+    // Need to also filter currencly selected sessions and passes based on tag type
+    if (selectedTagExternalId) {
+      const tempFormValues = form.getFieldsValue();
+
+      console.log(tempFormValues);
+
+      form.setFieldsValue({
+        ...tempFormValues,
+        classList:
+          classes
+            .filter((session) => tempFormValues.classList.includes(session.session_id))
+            .filter((session) => session.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
+            .map((session) => session.session_id) || [],
+        videoList:
+          videos
+            .filter((video) => tempFormValues.videoList.includes(video.external_id))
+            .filter((video) => video.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
+            .map((video) => video.external_id) || [],
+      });
+    }
   };
 
   const handleFinish = async (values) => {
@@ -228,6 +314,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
         limited: passTypes.LIMITED.name === passType,
         color_code: colorCode || whiteColor,
+        tag_id: selectedTagType === 'everyone' ? '' : values.selectedMemberTag ?? '',
       };
 
       const response = editedPass
@@ -274,6 +361,58 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
               <Form.Item
+                name="passTagType"
+                label="Bookable by member with Tag"
+                rules={validationRules.requiredValidation}
+                onChange={handlePassTagTypeChange}
+                style={{ marginBottom: 8 }}
+              >
+                <Radio.Group>
+                  <Radio value="everyone"> Everyone </Radio>
+                  <Radio value="selected"> Selected Member Tags </Radio>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item name="selectedMemberTag" id="selectedMemberTag" hidden={selectedTagType === 'everyone'}>
+                <Select
+                  showArrow
+                  allowClear
+                  placeholder="Select a member tag"
+                  disabled={selectedTagType === 'everyone'}
+                  onChange={onSelectedTagChange}
+                  options={creatorMemberTags.map((tag) => ({
+                    label: (
+                      <>
+                        {' '}
+                        {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                      </>
+                    ),
+                    value: tag.external_id,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row className={styles.classPassRow} gutter={[8, 16]}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                id="passType"
+                name="passType"
+                label="Pass Type"
+                extra={<Text className={styles.helpText}>Type of usage limit this pass will have</Text>}
+              >
+                <Radio.Group
+                  className="pass-type-radio"
+                  onChange={(e) => handleChangeLimitType(e.target.value)}
+                  value={passType}
+                  options={Object.values(passTypes).map((pType) => ({
+                    label: pType.label,
+                    value: pType.name,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={{ span: 11, offset: 1 }}>
+              <Form.Item
                 id="classList"
                 name="classList"
                 label="Apply to Class(es)"
@@ -281,6 +420,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
               >
                 <Select
                   showArrow
+                  allowClear
                   showSearch={false}
                   placeholder="Select your Class(es)"
                   mode="multiple"
@@ -295,6 +435,9 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   >
                     {classes
                       ?.filter((session) => session.is_active)
+                      .filter((session) =>
+                        !selectedTag ? true : session.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      )
                       .map((session) => (
                         <Select.Option
                           value={session.session_id}
@@ -325,6 +468,9 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   >
                     {classes
                       ?.filter((session) => !session.is_active)
+                      .filter((session) =>
+                        !selectedTag ? true : session.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      )
                       .map((session) => (
                         <Select.Option
                           value={session.session_id}
@@ -356,20 +502,15 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
               <Form.Item
-                id="passType"
-                name="passType"
-                label="Pass Type"
-                extra={<Text className={styles.helpText}>Type of usage limit this pass will have</Text>}
+                id="validity"
+                name="validity"
+                label="Pass Validity (days)"
+                extra={
+                  <Text className={styles.helpText}>The duration in days this pass will be usable after purchase</Text>
+                }
+                rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
               >
-                <Radio.Group
-                  className="pass-type-radio"
-                  onChange={(e) => handleChangeLimitType(e.target.value)}
-                  value={passType}
-                  options={Object.values(passTypes).map((pType) => ({
-                    label: pType.label,
-                    value: pType.name,
-                  }))}
-                />
+                <InputNumber min={1} placeholder="Pass Validity" className={styles.numericInput} />
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
@@ -381,6 +522,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
               >
                 <Select
                   showArrow
+                  allowClear
                   showSearch={false}
                   placeholder="Select your Video(s)"
                   mode="multiple"
@@ -395,6 +537,9 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   >
                     {videos
                       ?.filter((video) => video.is_published)
+                      .filter((video) =>
+                        !selectedTag ? true : video.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      )
                       .map((video) => (
                         <Select.Option
                           value={video.external_id}
@@ -425,6 +570,9 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   >
                     {videos
                       ?.filter((video) => !video.is_published)
+                      .filter((video) =>
+                        !selectedTag ? true : video.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      )
                       .map((video) => (
                         <Select.Option
                           value={video.external_id}
@@ -456,21 +604,6 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
               <Row>
-                <Col xs={24}>
-                  <Form.Item
-                    id="validity"
-                    name="validity"
-                    label="Pass Validity (days)"
-                    extra={
-                      <Text className={styles.helpText}>
-                        The duration in days this pass will be usable after purchase
-                      </Text>
-                    }
-                    rules={validationRules.numberValidation('Please Input Pass Validity', 1, false)}
-                  >
-                    <InputNumber min={1} placeholder="Pass Validity" className={styles.numericInput} />
-                  </Form.Item>
-                </Col>
                 <Col xs={24}>
                   <Form.Item
                     id="price"
