@@ -286,7 +286,7 @@ const NavbarHeader = () => {
                       <Text strong> Hi, {localUserDetails.first_name} </Text>
                     </Menu.Item>
                     <Menu.Item key="SignOut">
-                      <Button block danger type="default" onClick={() => logOut(history, true)}>
+                      <Button block danger type="default" onClick={() => logOut(history, false)}>
                         Sign Out
                       </Button>
                     </Menu.Item>
@@ -502,7 +502,7 @@ const NavbarHeader = () => {
                             <Text strong> Hi, {localUserDetails.first_name} </Text>
                           </Col>
                           <Col xs={24}>
-                            <Button block danger type="default" onClick={() => logOut(history, true)}>
+                            <Button block danger type="default" onClick={() => logOut(history, false)}>
                               Sign Out
                             </Button>
                           </Col>
