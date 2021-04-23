@@ -265,20 +265,25 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
     if (selectedTagExternalId) {
       const tempFormValues = form.getFieldsValue();
 
-      console.log(tempFormValues);
+      const refilteredClasses =
+        classes
+          .filter((session) => tempFormValues.classList.includes(session.session_id))
+          .filter((session) => session.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
+          .map((session) => session.session_id) || [];
+
+      const refilteredVideos =
+        videos
+          .filter((video) => tempFormValues.videoList.includes(video.external_id))
+          .filter((video) => video.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
+          .map((video) => video.external_id) || [];
+
+      setSelectedClasses(refilteredClasses);
+      setSelectedVideos(refilteredVideos);
 
       form.setFieldsValue({
         ...tempFormValues,
-        classList:
-          classes
-            .filter((session) => tempFormValues.classList.includes(session.session_id))
-            .filter((session) => session.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
-            .map((session) => session.session_id) || [],
-        videoList:
-          videos
-            .filter((video) => tempFormValues.videoList.includes(video.external_id))
-            .filter((video) => video.tags?.map((tag) => tag.external_id).includes(selectedTagExternalId) || false)
-            .map((video) => video.external_id) || [],
+        classList: refilteredClasses,
+        videoList: refilteredVideos,
       });
     }
   };

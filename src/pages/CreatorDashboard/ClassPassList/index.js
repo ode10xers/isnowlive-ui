@@ -186,6 +186,7 @@ const ClassPassList = () => {
             buyers: classPass.buyers.map((subs) => ({ ...subs, currency: classPass.currency.toUpperCase() })),
             color_code: classPass.color_code,
             external_id: classPass.external_id,
+            tag: classPass.tag,
           }))
         );
       }
