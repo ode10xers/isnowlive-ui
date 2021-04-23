@@ -80,6 +80,7 @@ class HttpService {
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
+        'creator-username': this.creatorUsername,
       },
       data: payload,
     });
