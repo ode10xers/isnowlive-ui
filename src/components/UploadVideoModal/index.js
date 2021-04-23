@@ -259,6 +259,13 @@ const UploadVideoModal = ({
     formPart,
   ]);
 
+  useEffect(() => {
+    if (editedVideo || formPart === 2) {
+      setUpdateVideoDetails(true);
+    }
+    // eslint-disable-next-line
+  }, []);
+
   const setFreeVideo = () => {
     form.setFieldsValue({
       ...form.getFieldsValue(),
