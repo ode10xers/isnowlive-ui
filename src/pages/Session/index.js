@@ -37,7 +37,6 @@ import {
   getCurrencyList,
   convertSchedulesToUTC,
   isAPISuccess,
-  scrollToErrorField,
   generateRandomColor,
   isValidFile,
   ZoomAuthType,
@@ -708,10 +707,6 @@ const Session = ({ match, history }) => {
     }
   };
 
-  const onFinishFailed = ({ errorFields }) => {
-    scrollToErrorField(errorFields);
-  };
-
   const handleCalenderPop = () => {
     if (isMobileDevice && document.getElementsByClassName('ant-picker-panels')[0]) {
       document.getElementsByClassName('ant-picker-panels')[0].style.display = 'block';
@@ -765,7 +760,6 @@ const Session = ({ match, history }) => {
         scrollToFirstError={true}
         {...profileFormItemLayout}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         labelAlign={isMobileDevice ? 'left' : 'right'}
       >
         {/* ========= SESSION INFORMATION ======== */}

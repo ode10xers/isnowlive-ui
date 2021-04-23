@@ -346,7 +346,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             selectedMemberTags: editedCourse?.tag?.map((tag) => tag.external_id) || [],
           });
 
-          setSelectedTagType('everyone');
+          setSelectedTagType(editedCourse?.tag?.length > 0 ? 'selected' : 'everyone');
           setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
           setCourseStartDate(moment(editedCourse?.start_date));
           setCourseEndDate(moment(editedCourse?.end_date));
@@ -369,6 +369,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setCourseEndDate(null);
         setCourseImageUrl(null);
         setHighestMaxParticipantCourseSession(null);
+        setSelectedTagType('everyone');
         // setIsSequentialVideos(false);
       }
 
