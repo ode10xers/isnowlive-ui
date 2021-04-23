@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse } from 'antd';
+import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse, Tag } from 'antd';
 import {
   MailOutlined,
   CopyOutlined,
@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 
 import Table from 'components/Table';
+import TagListPopup from 'components/TagListPopup';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -97,9 +98,17 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       },
     },
     {
+      title: 'Purchasable By',
+      key: 'tag',
+      dataIndex: 'tag',
+      width: '130px',
+      render: (text, record) => <TagListPopup tags={record.tag} />,
+    },
+    {
       title: 'Total Videos',
       width: '120px',
-      render: (text, record) => `${record?.videos?.length} Videos`,
+      render: (text, record) =>
+        record.videos?.length > 0 ? <Tag color="blue"> {record.videos?.length} videos </Tag> : null,
     },
     {
       title: 'Duration',
@@ -112,7 +121,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '85px',
+      width: '100px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
@@ -324,6 +333,7 @@ const VideoCourses = ({ videoCourses, showEditModal, publishCourse, unpublishCou
             'Price',
             <Text>{course?.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}</Text>
           )}
+          <TagListPopup tags={course.tag} mobileView={true} />
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course?.id) && (

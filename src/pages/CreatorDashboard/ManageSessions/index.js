@@ -10,6 +10,7 @@ import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
+import TagListPopup from 'components/TagListPopup';
 
 import {
   mixPanelEventTags,
@@ -141,10 +142,17 @@ const ManageSessions = () => {
       },
     },
     {
+      title: 'Purchasable By',
+      key: 'tags',
+      dataIndex: 'tags',
+      width: '130px',
+      render: (text, record) => <TagListPopup tags={record.tags} />,
+    },
+    {
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '85px',
+      width: '100px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
@@ -240,7 +248,7 @@ const ManageSessions = () => {
     const layout = (label, value) => (
       <Row>
         <Col span={9}>
-          <Text strong>{label}</Text>
+          <Text>{label}</Text>
         </Col>
         <Col span={15}>: {value}</Col>
       </Row>
@@ -250,6 +258,7 @@ const ManageSessions = () => {
       <Card
         key={item.session_id}
         className={styles.card}
+        bodyStyle={{ padding: '24px 16px' }}
         title={
           <div
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
@@ -322,6 +331,7 @@ const ManageSessions = () => {
             {item.total_bookings || 0} {'/'} {item.max_participants}
           </Text>
         )}
+        <TagListPopup tags={item.tags} mobileView={true} />
       </Card>
     );
   };

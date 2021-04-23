@@ -16,6 +16,7 @@ import apis from 'apis';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CreatePassModal from 'components/CreatePassModal';
+import TagListPopup from 'components/TagListPopup';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -229,7 +230,6 @@ const ClassPassList = () => {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '35%',
       render: (text, record) => {
         return {
           props: {
@@ -247,11 +247,18 @@ const ClassPassList = () => {
       },
     },
     {
+      title: 'Purchasable By',
+      dataIndex: 'tag',
+      key: 'tag',
+      width: '130px',
+      render: (text, record) => <TagListPopup tags={[record.tag].filter((tag) => tag.external_id)} />,
+    },
+    {
       title: 'Credit Count',
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
-      width: '15%',
+      width: '145px',
       render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credits'),
     },
     {
@@ -259,7 +266,7 @@ const ClassPassList = () => {
       dataIndex: 'validity',
       key: 'validity',
       align: 'center',
-      width: '12%',
+      width: '100px',
       render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
     },
     {
@@ -267,7 +274,7 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '10%',
+      width: '100px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
@@ -450,6 +457,7 @@ const ClassPassList = () => {
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
           {layout('Price', <Text>{pass.price > 0 ? `${pass.currency?.toUpperCase()} ${pass.price}` : 'Free'}</Text>)}
+          <TagListPopup tags={[pass.tag].filter((tag) => tag.external_id)} mobileView={true} />
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>

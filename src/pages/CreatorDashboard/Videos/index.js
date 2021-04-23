@@ -20,12 +20,14 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import { isMobileDevice } from 'utils/device';
-import { getLocalUserDetails } from 'utils/storage';
-import dateUtil from 'utils/date';
+import TagListPopup from 'components/TagListPopup';
 import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+
+import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
+import dateUtil from 'utils/date';
 import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -308,13 +310,20 @@ const Videos = () => {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      width: '30%',
+      width: '280px',
       render: (text, record) => (
         <>
           <Text> {record.title} </Text>
           {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
         </>
       ),
+    },
+    {
+      title: 'Purchasable By',
+      key: 'tags',
+      dataIndex: 'tags',
+      width: '130px',
+      render: (text, record) => <TagListPopup tags={record.tags} />,
     },
     {
       title: 'Validity',
@@ -329,7 +338,7 @@ const Videos = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '80px',
+      width: '100px',
       render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
     },
     {
@@ -713,6 +722,7 @@ const Videos = () => {
       <Col xs={24} key={video.external_id}>
         <Card
           className={styles.card}
+          bodyStyle={{ padding: '24px 16px' }}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${video?.color_code || '#FFF'}` }}>
               <Text>{video?.title}</Text> {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
@@ -731,6 +741,7 @@ const Videos = () => {
         >
           {layout('Validity', <Text>{`${video?.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
+          <TagListPopup tags={video?.tags} mobileView={true} />
         </Card>
         {video?.is_published
           ? expandedPublishedRowKeys.includes(video?.external_id) && (

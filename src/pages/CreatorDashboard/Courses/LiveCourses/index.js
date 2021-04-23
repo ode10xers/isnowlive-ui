@@ -11,6 +11,7 @@ import {
 } from '@ant-design/icons';
 
 import Table from 'components/Table';
+import TagListPopup from 'components/TagListPopup';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -97,6 +98,13 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       },
     },
     {
+      title: 'Purchasable By',
+      key: 'tag',
+      dataIndex: 'tag',
+      width: '130px',
+      render: (text, record) => <TagListPopup tags={record.tag} />,
+    },
+    {
       title: 'Duration',
       dataIndex: 'start_time',
       key: 'start_time',
@@ -107,7 +115,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       title: 'Course Content',
       dataIndex: 'inventory_ids',
       key: 'inventory_ids',
-      width: '140px',
+      width: '200px',
       render: (text, record) => (
         <>
           {record.inventory_ids?.length > 0 && <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>}
@@ -119,7 +127,7 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
       title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      width: '85px',
+      width: '100px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
@@ -340,11 +348,15 @@ const LiveCourses = ({ liveCourses, showEditModal, publishCourse, unpublishCours
             'Price',
             <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
           )}
+          <TagListPopup tags={course.tag} mobileView={true} />
         </Card>
-        course.is_published ? expandedPublishedRowKeys.includes(course.id) && (
-        <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>) :
-        expandedUnpublishedRowKeys.includes(course.id) && (
-        <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>)
+        {course.is_published
+          ? expandedPublishedRowKeys.includes(course.id) && (
+              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+            )
+          : expandedUnpublishedRowKeys.includes(course.id) && (
+              <Row className={styles.cardExpansion}>{course.buyers?.map(renderMobileSubscriberCards)}</Row>
+            )}
       </Col>
     );
   };
