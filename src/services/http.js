@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from 'config';
+import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
 import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
 import { clearGTMUserAttributes } from './integrations/googleTagManager';
 
@@ -9,10 +10,18 @@ class HttpService {
   constructor() {
     this.baseURL = config.server.baseURL;
     this.authToken = getAuthCookie() || '';
+
+    // Expected Behavior: Sends creator-username header when in username.passion.do
+    // Sends empty string in the creator-username if the detected username is localhost/app
+    const creatorUsername = getUsernameFromUrl();
+    this.creatorUsername = reservedDomainName.includes(creatorUsername) ? '' : creatorUsername;
+    console.log('HTTP **** Creator Username Detected in HTTP Service: ', this.creatorUsername);
+
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
+        'creator-username': this.creatorUsername,
       },
     });
 
@@ -34,10 +43,18 @@ class HttpService {
   setAuthToken(authToken) {
     setAuthCookie(authToken);
     this.authToken = authToken;
+
+    // Expected Behavior: Sends creator-username header when in username.passion.do
+    // Sends empty string in the creator-username if the detected username is localhost/app
+    const creatorUsername = getUsernameFromUrl();
+    this.creatorUsername = reservedDomainName.includes(creatorUsername) ? '' : creatorUsername;
+    console.log('HTTP **** Creator Username Detected in HTTP Service: ', this.creatorUsername);
+
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
+        'creator-username': this.creatorUsername,
       },
     });
   }
@@ -63,6 +80,7 @@ class HttpService {
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
+        'creator-username': this.creatorUsername,
       },
       data: payload,
     });

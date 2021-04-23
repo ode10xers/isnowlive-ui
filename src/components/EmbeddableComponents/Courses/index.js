@@ -28,7 +28,7 @@ const Courses = ({ profileUsername }) => {
     const getCoursesDetails = async () => {
       setIsCoursesLoading(true);
       try {
-        const { status, data } = await apis.courses.getCoursesByUsername(profileUsername);
+        const { status, data } = await apis.courses.getCoursesByUsername();
 
         if (isAPISuccess(status) && data) {
           setLiveCourses(getLiveCoursesFromCourses(data));
@@ -42,7 +42,7 @@ const Courses = ({ profileUsername }) => {
     };
 
     getCoursesDetails();
-  }, [profileUsername]);
+  }, []);
 
   return (
     <Tabs defaultActiveKey={liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''}>

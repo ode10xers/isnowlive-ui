@@ -45,7 +45,8 @@ const Videos = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
+  const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [formPart, setFormPart] = useState(1);
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
@@ -167,21 +168,39 @@ const Videos = () => {
     //eslint-disable-next-line
   }, [isOnboarding]);
 
-  const toggleExpandAll = () => {
-    if (expandedRowKeys.length > 0) {
-      setExpandedRowKeys([]);
+  const toggleExpandAllPublished = () => {
+    if (expandedPublishedRowKeys.length > 0) {
+      setExpandedPublishedRowKeys([]);
     } else {
-      setExpandedRowKeys(videos.map((video) => video.external_id));
+      setExpandedPublishedRowKeys(videos?.filter((video) => video.is_published).map((video) => video.external_id));
     }
   };
 
-  const expandRow = (rowKey) => {
-    const tempExpandedRowsArray = expandedRowKeys;
+  const expandRowPublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedPublishedRowKeys;
     tempExpandedRowsArray.push(rowKey);
-    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+    setExpandedPublishedRowKeys([...new Set(tempExpandedRowsArray)]);
   };
 
-  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
+  const collapseRowPublished = (rowKey) =>
+    setExpandedPublishedRowKeys(expandedPublishedRowKeys.filter((key) => key !== rowKey));
+
+  const toggleExpandAllUnpublished = () => {
+    if (expandedUnpublishedRowKeys.length > 0) {
+      setExpandedUnpublishedRowKeys([]);
+    } else {
+      setExpandedUnpublishedRowKeys(videos?.filter((video) => !video.is_published).map((video) => video.external_id));
+    }
+  };
+
+  const expandRowUnpublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedUnpublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedUnpublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRowUnpublished = (rowKey) =>
+    setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
   const publishVideo = async (videoId) => {
     setIsLoading(true);
@@ -258,7 +277,7 @@ const Videos = () => {
     setIsLoading(false);
   };
 
-  const videosColumns = [
+  const generateVideoColumns = (published) => [
     {
       title: '',
       dataIndex: 'thumbnail_url',
@@ -314,7 +333,15 @@ const Videos = () => {
       render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
     },
     {
-      title: '',
+      title: published ? (
+        <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
+          {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ) : (
+        <Button ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
+          {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ),
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
@@ -412,13 +439,23 @@ const Videos = () => {
             )}
           </Col>
           <Col xs={24} md={6}>
-            {expandedRowKeys.includes(record.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyer `} <UpOutlined />
+            {record.is_published ? (
+              expandedPublishedRowKeys.includes(record.external_id) ? (
+                <Button block type="link" onClick={() => collapseRowPublished(record.external_id)}>
+                  {record.buyers?.length || 0} Buyers <UpOutlined />
+                </Button>
+              ) : (
+                <Button block type="link" onClick={() => expandRowPublished(record.external_id)}>
+                  {record.buyers?.length || 0} Buyers <DownOutlined />
+                </Button>
+              )
+            ) : expandedUnpublishedRowKeys.includes(record.external_id) ? (
+              <Button block type="link" onClick={() => collapseRowUnpublished(record.external_id)}>
+                {record.buyers?.length || 0} Buyers <UpOutlined />
               </Button>
             ) : (
-              <Button type="link" onClick={() => expandRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyer`} <DownOutlined />
+              <Button block type="link" onClick={() => expandRowUnpublished(record.external_id)}>
+                {record.buyers?.length || 0} Buyers <DownOutlined />
               </Button>
             )}
           </Col>
@@ -549,10 +586,36 @@ const Videos = () => {
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video?.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(video?.external_id)} icon={<UpOutlined />} />
+            video?.is_published ? (
+              expandedPublishedRowKeys.includes(video?.external_id) ? (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => collapseRowPublished(video?.external_id)}
+                  icon={<UpOutlined />}
+                />
+              ) : (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => expandRowPublished(video?.external_id)}
+                  icon={<DownOutlined />}
+                />
+              )
+            ) : expandedUnpublishedRowKeys.includes(video?.external_id) ? (
+              <Button
+                block
+                type="link"
+                onClick={() => collapseRowUnpublished(video?.external_id)}
+                icon={<UpOutlined />}
+              />
             ) : (
-              <Button type="link" onClick={() => expandRow(video?.external_id)} icon={<DownOutlined />} />
+              <Button
+                block
+                type="link"
+                onClick={() => expandRowUnpublished(video?.external_id)}
+                icon={<DownOutlined />}
+              />
             ),
           ]
         : [
@@ -613,10 +676,36 @@ const Videos = () => {
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video?.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(video?.external_id)} icon={<UpOutlined />} />
+            video?.is_published ? (
+              expandedPublishedRowKeys.includes(video?.external_id) ? (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => collapseRowPublished(video?.external_id)}
+                  icon={<UpOutlined />}
+                />
+              ) : (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => expandRowPublished(video?.external_id)}
+                  icon={<DownOutlined />}
+                />
+              )
+            ) : expandedUnpublishedRowKeys.includes(video?.external_id) ? (
+              <Button
+                block
+                type="link"
+                onClick={() => collapseRowUnpublished(video?.external_id)}
+                icon={<UpOutlined />}
+              />
             ) : (
-              <Button type="link" onClick={() => expandRow(video?.external_id)} icon={<DownOutlined />} />
+              <Button
+                block
+                type="link"
+                onClick={() => expandRowUnpublished(video?.external_id)}
+                icon={<DownOutlined />}
+              />
             ),
           ];
 
@@ -643,9 +732,13 @@ const Videos = () => {
           {layout('Validity', <Text>{`${video?.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
         </Card>
-        {expandedRowKeys.includes(video?.external_id) && (
-          <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
-        )}
+        {video?.is_published
+          ? expandedPublishedRowKeys.includes(video?.external_id) && (
+              <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
+            )
+          : expandedUnpublishedRowKeys.includes(video?.external_id) && (
+              <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
+            )}
       </Col>
     );
   };
@@ -664,13 +757,8 @@ const Videos = () => {
         />
       )}
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={8} lg={14}>
+        <Col xs={24} md={14} lg={18}>
           <Title level={4}> Videos </Title>
-        </Col>
-        <Col xs={12} md={6} lg={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showUploadVideoModal()} icon={<CloudUploadOutlined />}>
@@ -690,7 +778,7 @@ const Videos = () => {
                     <Table
                       sticky={true}
                       size="small"
-                      columns={videosColumns}
+                      columns={generateVideoColumns(true)}
                       data={videos?.filter((video) => video?.is_published)}
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
@@ -698,7 +786,7 @@ const Videos = () => {
                         expandedRowRender: (record) => renderSubsciberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
-                        expandedRowKeys: expandedRowKeys,
+                        expandedRowKeys: expandedPublishedRowKeys,
                       }}
                     />
                   )}
@@ -720,7 +808,7 @@ const Videos = () => {
                     <Table
                       sticky={true}
                       size="small"
-                      columns={videosColumns}
+                      columns={generateVideoColumns(false)}
                       data={videos?.filter((video) => !video?.is_published)}
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
@@ -728,7 +816,7 @@ const Videos = () => {
                         expandedRowRender: (record) => renderSubsciberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
-                        expandedRowKeys: expandedRowKeys,
+                        expandedRowKeys: expandedUnpublishedRowKeys,
                       }}
                     />
                   )}

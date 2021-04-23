@@ -46,6 +46,8 @@ const Routes = {
     legals: '/legals',
     documents: '/documents',
     externalSiteSettings: '/widgets',
+    membersList: '/members/list',
+    membersTags: '/members/tag',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
