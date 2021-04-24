@@ -305,6 +305,11 @@ const UploadVideoModal = ({
                 showErrorModal(`Failed to get video token`);
               });
           } else {
+            if (uppy.current) {
+              uppy.current.getPlugin('Tus').setOptions({
+                endpoint: `${config.server.baseURL}/creator/videos/${response.data?.external_id}/upload`,
+              });
+            }
             setFormPart(2);
           }
         } else {
