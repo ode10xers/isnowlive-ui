@@ -94,7 +94,7 @@ const UploadVideoModal = ({
   uppy.current = new Uppy({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
-    autoProceed: true,
+    // autoProceed: true,
     logger: Uppy.debugLogger,
   });
 
@@ -119,6 +119,8 @@ const UploadVideoModal = ({
       setVideoLength(video.duration);
     });
     video.src = url;
+
+    uppy.current.upload();
   });
 
   uppy.current.on('progress', (result) => {
@@ -155,7 +157,6 @@ const UploadVideoModal = ({
     console.log('Cancel All is called here');
     setVideoUploadPercent(0);
     setUploadingFile(null);
-    uppy.current.reset();
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
