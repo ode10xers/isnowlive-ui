@@ -95,6 +95,7 @@ const UploadVideoModal = ({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
     autoProceed: true,
+    logger: Uppy.debugLogger,
   });
 
   uppy.current.use(Tus, {
@@ -143,12 +144,17 @@ const UploadVideoModal = ({
     setTimeout(() => {
       setVideoUploadPercent(0);
       setUploadingFile(null);
+      setIsLoading(false);
+
       uppy.current = null;
     }, 500);
   });
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
+    setVideoUploadPercent(0);
+    setUploadingFile(null);
+    uppy.current.reset();
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -416,6 +422,8 @@ const UploadVideoModal = ({
   //   closeModal(true);
   // };
 
+  const cancelUpload = () => uppy.current.cancelAll();
+
   const handleVideoPreviewTimeChange = (time, timeString) => {
     setVideoPreviewTime(timeString.length > 0 ? timeString : '00:00:01');
   };
@@ -655,11 +663,18 @@ const UploadVideoModal = ({
                 </>
               )}
             </div>
+
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFile ? true : false}>
-                  Cancel
-                </Button>
+                {uploadingFile ? (
+                  <Button block danger type="primary" onClick={() => cancelUpload()}>
+                    Cancel Upload
+                  </Button>
+                ) : (
+                  <Button block type="default" onClick={() => closeModal(true)}>
+                    Cancel
+                  </Button>
+                )}
               </Col>
             </Row>
           </div>
