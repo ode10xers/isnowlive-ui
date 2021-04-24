@@ -15,6 +15,7 @@ import {
   Progress,
   TimePicker,
   message,
+  Popconfirm,
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -444,6 +445,7 @@ const UploadVideoModal = ({
   };
 
   const cancelUpload = async () => {
+    setIsLoading(true);
     uppy.current.cancelAll();
 
     try {
@@ -455,6 +457,7 @@ const UploadVideoModal = ({
     } catch (error) {
       message.error(error.response?.data?.message || 'Failed to remove uploaded video');
     }
+    setIsLoading(false);
   };
 
   const handleVideoPreviewTimeChange = (time, timeString) => {
@@ -700,9 +703,18 @@ const UploadVideoModal = ({
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
                 {uploadingFile ? (
-                  <Button block danger type="primary" onClick={() => cancelUpload()}>
-                    Cancel Upload
-                  </Button>
+                  <Popconfirm
+                    arrowPointAtCenter
+                    title={<Text> Are you sure you want to cancel the video upload? </Text>}
+                    onConfirm={() => cancelUpload()}
+                    okText="Yes, Cancel the Upload"
+                    okButtonProps={{ danger: true, type: 'primary' }}
+                    cancelText="No"
+                  >
+                    <Button block danger type="primary">
+                      Cancel Upload
+                    </Button>
+                  </Popconfirm>
                 ) : (
                   <Button block type="default" onClick={() => closeModal(true)}>
                     Cancel
