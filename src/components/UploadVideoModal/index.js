@@ -127,30 +127,62 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  uppy.current.on('complete', (result) => {
-    if (result.successful.length) {
-      apis.videos
-        .getVideoToken(editedVideo.external_id)
-        .then((res) => {
-          setVideoPreviewToken(res.data.token);
-          setFormPart(3);
-        })
-        .catch((error) => {
-          console.log(error);
-          showErrorModal(`Failed to get video token`);
-        });
-    } else {
-      showErrorModal(`Failed to upload video`);
-    }
+  // Making this as a separate function
+  // That way we can update the event listener
+  // when editedVideo is actually ready
+  // much like how we update the Tus URL
+  const onUppyCompleteListener = useCallback(
+    (result) => {
+      if (result.successful.length) {
+        apis.videos
+          .getVideoToken(editedVideo.external_id)
+          .then((res) => {
+            setVideoPreviewToken(res.data.token);
+            setFormPart(3);
+          })
+          .catch((error) => {
+            console.log(error);
+            showErrorModal(`Failed to get video token`);
+          });
+      } else {
+        showErrorModal(`Failed to upload video`);
+      }
 
-    setTimeout(() => {
-      setVideoUploadPercent(0);
-      setUploadingFile(null);
-      setIsLoading(false);
+      setTimeout(() => {
+        setVideoUploadPercent(0);
+        setUploadingFile(null);
+        setIsLoading(false);
 
-      uppy.current = null;
-    }, 500);
-  });
+        uppy.current = null;
+      }, 500);
+      //eslint-disable-next-line
+    },[editedVideo]
+  );
+
+  // uppy.current.on('complete', (result) => {
+  //   if (result.successful.length) {
+  //     apis.videos
+  //       .getVideoToken(editedVideo.external_id)
+  //       .then((res) => {
+  //         setVideoPreviewToken(res.data.token);
+  //         setFormPart(3);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //         showErrorModal(`Failed to get video token`);
+  //       });
+  //   } else {
+  //     showErrorModal(`Failed to upload video`);
+  //   }
+
+  //   setTimeout(() => {
+  //     setVideoUploadPercent(0);
+  //     setUploadingFile(null);
+  //     setIsLoading(false);
+
+  //     uppy.current = null;
+  //   }, 500);
+  // });
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
@@ -223,6 +255,8 @@ const UploadVideoModal = ({
           uppy.current.getPlugin('Tus').setOptions({
             endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
           });
+
+          uppy.current.on('complete', onUppyCompleteListener);
         }
       } else {
         form.resetFields();
@@ -242,7 +276,7 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, onUppyCompleteListener, form, formPart]);
 
   useEffect(() => {
     if (editedVideo || formPart === 2) {
@@ -409,30 +443,6 @@ const UploadVideoModal = ({
   const onCourseTypeChange = (e) => {
     setIsCourseVideo(e.target.value === 'course');
   };
-
-  // Pending this feature
-  // const cancelUpload = async () => {
-  //   uppy.current.pauseAll();
-  //   uppy.current.cancelAll();
-  //   uppy.current.close();
-
-  //   if (editedVideo) {
-  //     try {
-  //       const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
-
-  //       if (isAPISuccess(status)) {
-  //         message.success('Video upload aborted');
-  //       }
-  //     } catch (error) {
-  //       message.error(error.response?.data?.message || 'Failed to remove uploaded video');
-  //     }
-  //   }
-
-  //   setVideoUploadPercent(0);
-  //   setUploadingFile(null);
-  //   uppy.current = null;
-  //   closeModal(true);
-  // };
 
   const cancelUpload = async () => {
     uppy.current.cancelAll();
