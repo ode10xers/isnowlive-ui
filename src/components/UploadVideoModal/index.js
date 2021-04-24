@@ -17,7 +17,7 @@ import {
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
-import { DragDrop } from '@uppy/react';
+import { DragDrop, useUppy } from '@uppy/react';
 
 import { BookTwoTone } from '@ant-design/icons';
 
@@ -91,11 +91,13 @@ const UploadVideoModal = ({
   const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
 
   const uppy = useRef(null);
-  uppy.current = new Uppy({
-    meta: { type: 'avatar' },
-    restrictions: { maxNumberOfFiles: 1 },
-    autoProceed: true,
-    logger: Uppy.debugLogger,
+  uppy.current = useUppy(() => {
+    return new Uppy({
+      meta: { type: 'avatar' },
+      restrictions: { maxNumberOfFiles: 1 },
+      autoProceed: true,
+      logger: Uppy.debugLogger,
+    });
   });
 
   uppy.current.use(Tus, {
