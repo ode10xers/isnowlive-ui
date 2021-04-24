@@ -94,7 +94,7 @@ const UploadVideoModal = ({
   uppy.current = new Uppy({
     meta: { type: 'avatar' },
     restrictions: { maxNumberOfFiles: 1 },
-    // autoProceed: true,
+    autoProceed: true,
     logger: Uppy.debugLogger,
   });
 
@@ -107,6 +107,11 @@ const UploadVideoModal = ({
   });
 
   uppy.current.on('file-added', (file) => {
+    uppy.current.on('progress', (result) => {
+      setIsLoading(false);
+      setVideoUploadPercent(result);
+    });
+
     setUploadingFile(file);
     setIsLoading(true);
 
@@ -119,14 +124,12 @@ const UploadVideoModal = ({
       setVideoLength(video.duration);
     });
     video.src = url;
-
-    uppy.current.upload();
   });
 
-  uppy.current.on('progress', (result) => {
-    setIsLoading(false);
-    setVideoUploadPercent(result);
-  });
+  // uppy.current.on('progress', (result) => {
+  //   setIsLoading(false);
+  //   setVideoUploadPercent(result);
+  // });
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
@@ -155,6 +158,9 @@ const UploadVideoModal = ({
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
+
+    uppy.current.off('progress');
+
     setVideoUploadPercent(0);
     setUploadingFile(null);
   });
