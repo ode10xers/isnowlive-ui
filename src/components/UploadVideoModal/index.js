@@ -97,23 +97,16 @@ const UploadVideoModal = ({
       restrictions: { maxNumberOfFiles: 1 },
       autoProceed: true,
       logger: Uppy.debugLogger,
+    }).use(Tus, {
+      endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+      resume: false,
+      autoRetry: false,
+      retryDelays: null,
+      chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
     });
-  });
-
-  uppy.current.use(Tus, {
-    endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
-    resume: false,
-    autoRetry: false,
-    retryDelays: null,
-    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
   });
 
   uppy.current.on('file-added', (file) => {
-    uppy.current.on('progress', (result) => {
-      setIsLoading(false);
-      setVideoUploadPercent(result);
-    });
-
     setUploadingFile(file);
     setIsLoading(true);
 
@@ -128,10 +121,10 @@ const UploadVideoModal = ({
     video.src = url;
   });
 
-  // uppy.current.on('progress', (result) => {
-  //   setIsLoading(false);
-  //   setVideoUploadPercent(result);
-  // });
+  uppy.current.on('progress', (result) => {
+    setIsLoading(false);
+    setVideoUploadPercent(result);
+  });
 
   uppy.current.on('complete', (result) => {
     if (result.successful.length) {
@@ -160,9 +153,6 @@ const UploadVideoModal = ({
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
-
-    uppy.current.off('progress');
-
     setVideoUploadPercent(0);
     setUploadingFile(null);
   });
@@ -227,6 +217,12 @@ const UploadVideoModal = ({
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
+
+        if (uppy.current) {
+          uppy.current.getPlugin('Tus').setOptions({
+            endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+          });
+        }
       } else {
         form.resetFields();
       }
