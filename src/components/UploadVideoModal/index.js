@@ -14,6 +14,7 @@ import {
   Button,
   Progress,
   TimePicker,
+  message,
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -433,7 +434,19 @@ const UploadVideoModal = ({
   //   closeModal(true);
   // };
 
-  const cancelUpload = () => uppy.current.cancelAll();
+  const cancelUpload = async () => {
+    uppy.current.cancelAll();
+
+    try {
+      const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+
+      if (isAPISuccess(status)) {
+        message.success('Video upload aborted');
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+    }
+  };
 
   const handleVideoPreviewTimeChange = (time, timeString) => {
     setVideoPreviewTime(timeString.length > 0 ? timeString : '00:00:01');
