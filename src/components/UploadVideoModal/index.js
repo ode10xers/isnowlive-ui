@@ -100,7 +100,8 @@ const UploadVideoModal = ({
 
   uppy.current.use(Tus, {
     endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
-    resume: true,
+    resume: false,
+    autoRetry: false,
     retryDelays: null,
     chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
   });
