@@ -127,37 +127,34 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  // Making this as a separate function
-  // That way we can update the event listener
-  // when editedVideo is actually ready
-  // much like how we update the Tus URL
-  const onUppyCompleteListener = useCallback(
-    (result) => {
-      if (result.successful.length) {
-        apis.videos
-          .getVideoToken(editedVideo.external_id)
-          .then((res) => {
-            setVideoPreviewToken(res.data.token);
-            setFormPart(3);
-          })
-          .catch((error) => {
-            console.log(error);
-            showErrorModal(`Failed to get video token`);
-          });
-      } else {
-        showErrorModal(`Failed to upload video`);
-      }
+  const setUppyCompleteListener = (external_id) => {
+    if (uppy.current) {
+      uppy.current.on('complete', (result) => {
+        if (result.successful.length) {
+          apis.videos
+            .getVideoToken(external_id)
+            .then((res) => {
+              setVideoPreviewToken(res.data.token);
+              setFormPart(3);
+            })
+            .catch((error) => {
+              console.log(error);
+              showErrorModal(`Failed to get video token`);
+            });
+        } else {
+          showErrorModal(`Failed to upload video`);
+        }
 
-      setTimeout(() => {
-        setVideoUploadPercent(0);
-        setUploadingFile(null);
-        setIsLoading(false);
+        setTimeout(() => {
+          setVideoUploadPercent(0);
+          setUploadingFile(null);
+          setIsLoading(false);
 
-        uppy.current = null;
-      }, 500);
-      //eslint-disable-next-line
-    },[editedVideo]
-  );
+          uppy.current = null;
+        }, 500);
+      });
+    }
+  };
 
   // uppy.current.on('complete', (result) => {
   //   if (result.successful.length) {
@@ -256,7 +253,7 @@ const UploadVideoModal = ({
             endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
           });
 
-          uppy.current.on('complete', onUppyCompleteListener);
+          setUppyCompleteListener(editedVideo.external_id);
         }
       } else {
         form.resetFields();
@@ -276,7 +273,8 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       uppy.current = null;
     };
-  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, onUppyCompleteListener, form, formPart]);
+    //eslint-disable-next-line
+  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
 
   useEffect(() => {
     if (editedVideo || formPart === 2) {
@@ -342,8 +340,9 @@ const UploadVideoModal = ({
           } else {
             if (uppy.current) {
               uppy.current.getPlugin('Tus').setOptions({
-                endpoint: `${config.server.baseURL}/creator/videos/${response.data?.external_id}/upload`,
+                endpoint: `${config.server.baseURL}/creator/videos/${response.data.external_id}/upload`,
               });
+              setUppyCompleteListener(response.data.external_id);
             }
             setFormPart(2);
           }
