@@ -96,3 +96,16 @@ export const followUpBookSession = async (payload) => {
     }
   }
 };
+
+export const getCreatorProfileByUsername = async (creatorUsername) => {
+  try {
+    const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
+
+    if (isAPISuccess(status) && data) {
+      return data;
+    }
+  } catch (error) {
+    console.error('Failed fetching creator details');
+  }
+  return null;
+};

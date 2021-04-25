@@ -12,7 +12,6 @@ import {
 import {
   // SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined,
   CheckCircleTwoTone,
-  CheckCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -284,9 +283,10 @@ const MembersList = () => {
             <Col xs={12}>Member Request:</Col>
             <Col xs={12}>
               {member.is_approved ? (
-                <Button block disabled type="primary" className={styles.greenBtn} icon={<CheckCircleOutlined />}>
-                  Joined
-                </Button>
+                <>
+                  {' '}
+                  <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
+                </>
               ) : (
                 <Button block type="primary" onClick={() => approveMemberRequest(member.external_id)}>
                   Allow

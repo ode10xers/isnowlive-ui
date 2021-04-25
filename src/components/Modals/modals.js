@@ -6,8 +6,19 @@ import Routes from 'routes';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
-import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
+import {
+  generateUrl,
+  productType,
+  generateUrlFromUsername,
+  getUsernameFromUrl,
+  reservedDomainName,
+} from 'utils/helper';
+import {
+  getUserPassOrderDetails,
+  getUserVideoOrderDetails,
+  getSessionInventoryDetails,
+  getCreatorProfileByUsername,
+} from 'utils/orderHelper';
 import { isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
@@ -422,4 +433,40 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
     okText: 'Go To Dashboard',
     onOk: () => (window.location.href = getDashboardUrl(null, Routes.attendeeDashboard.rootPath + targetSection)),
   });
+};
+
+export const showMemberUnapprovedJoinModal = async () => {
+  const creatorUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(creatorUsername)) {
+    // TODO: Edge case, confirm how to handle with Rahul
+    showErrorModal('Your account has not been approved by the creator you first signed up with');
+  } else {
+    const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
+
+    if (creatorProfileData) {
+      Modal.confirm({
+        center: true,
+        closable: true,
+        maskClosable: false,
+        title: `Thanks for joining ${creatorProfileData.first_name}'s community`,
+        content: (
+          <>
+            <Paragraph>
+              Unfortunately, you will need {creatorProfileData.first_name}'s approval before you can book and purchase
+              their product and it seems like they have not approved your account.
+            </Paragraph>
+            <Paragraph>
+              You can contact them via{' '}
+              <Text strong copyable>
+                {' '}
+                {creatorProfileData.email}{' '}
+              </Text>{' '}
+              to ask them so your account can get approved.
+            </Paragraph>
+          </>
+        ),
+      });
+    }
+  }
 };
