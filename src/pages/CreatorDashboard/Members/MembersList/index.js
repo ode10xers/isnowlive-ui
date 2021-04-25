@@ -133,12 +133,12 @@ const MembersList = () => {
   //   setIsLoading(false);
   // };
 
-  const approveMemberRequest = async (memberExternalId) => {
+  const approveMemberRequest = async (memberId) => {
     setIsLoading(true);
 
     try {
       const payload = {
-        external_id: memberExternalId,
+        external_id: memberId,
         is_approved: true,
       };
 
@@ -146,7 +146,7 @@ const MembersList = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Member join request approved!');
-        updateMemberApprovalStatus(memberExternalId);
+        updateMemberApprovalStatus(memberId);
       }
     } catch (error) {
       showErrorModal('Failed approving member request', error?.response?.data?.message || 'Something went wrong.');
@@ -181,7 +181,7 @@ const MembersList = () => {
             <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
           </>
         ) : (
-          <Button type="primary" onClick={() => approveMemberRequest(record.external_id)}>
+          <Button type="primary" onClick={() => approveMemberRequest(record.id)}>
             Allow
           </Button>
         ),
@@ -288,7 +288,7 @@ const MembersList = () => {
                   <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
                 </>
               ) : (
-                <Button block type="primary" onClick={() => approveMemberRequest(member.external_id)}>
+                <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
                   Allow
                 </Button>
               )}
