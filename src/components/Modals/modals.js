@@ -445,7 +445,7 @@ export const showMemberUnapprovedJoinModal = async () => {
     const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
 
     if (creatorProfileData) {
-      Modal.confirm({
+      Modal.info({
         center: true,
         closable: true,
         maskClosable: false,
@@ -457,10 +457,9 @@ export const showMemberUnapprovedJoinModal = async () => {
               their product and it seems like they have not approved your account.
             </Paragraph>
             <Paragraph>
-              You can contact them via{' '}
+              You can contact them via email{' '}
               <Text strong copyable>
-                {' '}
-                {creatorProfileData.email}{' '}
+                ({creatorProfileData.email})
               </Text>{' '}
               to ask them so your account can get approved.
             </Paragraph>
