@@ -12,6 +12,7 @@ import { clearGTMUserAttributes } from './integrations/googleTagManager';
 const UNAUTHORIZED = 401;
 // Will occur if a member that is not yet approved tries to access secure APIS
 const FORBIDDEN = 403;
+const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';
 
 class HttpService {
   constructor() {
@@ -35,16 +36,18 @@ class HttpService {
     this.axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        const { status } = error.response;
+        console.log(error.response);
+        const { status, data } = error.response;
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
           clearGTMUserAttributes();
           window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
-        } else if (status === FORBIDDEN) {
+        } else if (status === FORBIDDEN && data.message === UNAPPROVED_USER_ERROR_MESSAGE) {
           showMemberUnapprovedJoinModal();
+        } else {
+          return Promise.reject(error);
         }
-        return Promise.reject(error);
       }
     );
   }
@@ -66,6 +69,23 @@ class HttpService {
         'creator-username': this.creatorUsername,
       },
     });
+
+    this.axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const { status, data } = error.response;
+        if (status === UNAUTHORIZED) {
+          localStorage.removeItem('user-details');
+          deleteAuthCookie();
+          clearGTMUserAttributes();
+          window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
+        } else if (status === FORBIDDEN && data.message === UNAPPROVED_USER_ERROR_MESSAGE) {
+          showMemberUnapprovedJoinModal();
+        } else {
+          return Promise.reject(error);
+        }
+      }
+    );
   }
 
   get(url) {
