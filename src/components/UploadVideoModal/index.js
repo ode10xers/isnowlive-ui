@@ -16,7 +16,6 @@ import {
   TimePicker,
   message,
   Popconfirm,
-  Tooltip,
 } from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
@@ -29,7 +28,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, showCourseOptionsHelperModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 
 import validationRules from 'utils/validation';
@@ -615,34 +614,24 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item
-                  id="video_course_type"
-                  name="video_course_type"
-                  label="Video Course Type"
-                  rules={validationRules.requiredValidation}
-                  onChange={onCourseTypeChange}
-                >
-                  <Radio.Group className="video-type-radio">
-                    <Tooltip title="Marking a video as a Normal video allows your customers to buy this video alone as a one off purchase">
+                <Form.Item label="Video Course Type" required>
+                  <Form.Item
+                    id="video_course_type"
+                    name="video_course_type"
+                    className={styles.inlineFormItem}
+                    rules={validationRules.requiredValidation}
+                    onChange={onCourseTypeChange}
+                  >
+                    <Radio.Group className="video-type-radio">
                       <Radio value="normal"> Normal Video </Radio>
-                    </Tooltip>
-                    <Tooltip
-                      title={
-                        <>
-                          {' '}
-                          <Paragraph className={styles.whiteText}>
-                            Marking a video as a Course video prevents a customer from buying this video alone, they can
-                            only get it if they buy the whole course you add this video to.
-                          </Paragraph>{' '}
-                          <Paragraph className={styles.whiteText}>
-                            If you are in doubt, choose normal for now. You can always change this later.
-                          </Paragraph>{' '}
-                        </>
-                      }
-                    >
                       <Radio value="course"> Course Video </Radio>
-                    </Tooltip>
-                  </Radio.Group>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button type="link" onClick={() => showCourseOptionsHelperModal('video')}>
+                      Understanding the options
+                    </Button>
+                  </Form.Item>
                 </Form.Item>
               </Col>
               <Col xs={24}>

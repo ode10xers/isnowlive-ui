@@ -16,7 +16,6 @@ import {
   message,
   DatePicker,
   Modal,
-  Tooltip,
 } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import moment from 'moment';
@@ -30,6 +29,8 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import { showCourseOptionsHelperModal } from 'components/Modals/modals';
+
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
 import {
@@ -92,6 +93,7 @@ const initialSession = {
   name: '',
   description: '',
   session_image_url: '',
+  session_course_type: 'normal',
   inventory: [],
   document_urls: [],
   beginning: moment().startOf('day').utc().format(),
@@ -601,7 +603,6 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
-            // TODO: Check what happens to currency when NOT_CONNECTED user creates free session
             pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_SESSION, {
               session_name: newSessionResponse.data.name,
               session_price: newSessionResponse.data.price,
@@ -790,33 +791,24 @@ const Session = ({ match, history }) => {
 
           {/* ---- Session Course Type ---- */}
           <>
-            <Form.Item
-              name="session_course_type"
-              id="session_course_type"
-              label="Session Type"
-              rules={validationRules.requiredValidation}
-              onChange={handleSessionCourseType}
-            >
-              <Radio.Group>
-                <Tooltip title="Marking a session as a Normal session allows your customers to buy this session alone as a one off purchase">
+            <Form.Item label="Session Type" required>
+              <Form.Item
+                name="session_course_type"
+                id="session_course_type"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionCourseType}
+                className={styles.inlineFormItem}
+              >
+                <Radio.Group>
                   <Radio value="normal">Normal Session</Radio>
-                </Tooltip>
-                <Tooltip
-                  title={
-                    <>
-                      <Paragraph className={styles.whiteText}>
-                        Marking a session as a Course session prevents a customer from buying this session alone, they
-                        can only get it if they buy the whole course you add this session to.
-                      </Paragraph>{' '}
-                      <Paragraph className={styles.whiteText}>
-                        If you are in doubt, choose normal for now. You can always change this later.
-                      </Paragraph>{' '}
-                    </>
-                  }
-                >
                   <Radio value="course">Course Session</Radio>
-                </Tooltip>
-              </Radio.Group>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item className={styles.inlineFormItem}>
+                <Button type="link" onClick={() => showCourseOptionsHelperModal('session')}>
+                  Understanding the options
+                </Button>
+              </Form.Item>
             </Form.Item>
           </>
 

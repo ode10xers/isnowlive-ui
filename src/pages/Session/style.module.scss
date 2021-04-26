@@ -4,6 +4,11 @@
   max-width: 300px;
 }
 
+.inlineFormItem {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+}
+
 .imageWrapper {
   position: relative;
   height: 315px;
