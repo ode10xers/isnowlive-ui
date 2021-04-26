@@ -756,7 +756,7 @@ const UploadVideoModal = ({
               />
             </Col>
             <Col xs={24} className={styles.mt20}>
-              <Button block type="default" onClick={() => onCoverImageUpload()}>
+              <Button block type="primary" onClick={() => onCoverImageUpload()}>
                 Submit
               </Button>
             </Col>
