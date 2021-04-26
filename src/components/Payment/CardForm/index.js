@@ -10,7 +10,7 @@ import SavedCards from 'components/Payment/SavedCards';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
-import { isAPISuccess, StripePaymentStatus } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError, StripePaymentStatus } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -83,7 +83,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
         setSavedUserCards(data);
       }
     } catch (error) {
-      if (error?.response?.status !== 404) {
+      if (error?.response?.status !== 404 && !isUnapprovedUserError(error.response)) {
         message.error('Failed fetching previously used payment methods');
       }
     }
