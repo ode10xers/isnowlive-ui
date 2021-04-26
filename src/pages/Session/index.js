@@ -29,7 +29,7 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
-import { showErrorModal, showCourseOptionsHelperModal } from 'components/Modals/modals';
+import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
@@ -878,22 +878,29 @@ const Session = ({ match, history }) => {
 
           {/* ---- Session Tag Type ---- */}
           <>
-            <Form.Item
-              name="session_tag_type"
-              id="session_tag_type"
-              label="Bookable by member with Tag"
-              rules={validationRules.requiredValidation}
-              onChange={handleSessionTagType}
-            >
-              <Radio.Group>
-                <Radio value="anyone"> Anyone </Radio>
-                <Radio value="selected"> Selected Member Tags </Radio>
-              </Radio.Group>
+            <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
+              <Form.Item
+                name="session_tag_type"
+                id="session_tag_type"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionTagType}
+                className={styles.inlineFormItem}
+              >
+                <Radio.Group>
+                  <Radio value="anyone"> Anyone </Radio>
+                  <Radio value="selected"> Selected Member Tags </Radio>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item className={styles.inlineFormItem}>
+                <Button type="link" onClick={() => showTagOptionsHelperModal('sesison')}>
+                  Understanding the tag options
+                </Button>
+              </Form.Item>
             </Form.Item>
             <Form.Item
               name="selected_member_tags"
               id="selected_member_tags"
-              hidden={selectedTagType === 'anyone'}
+              hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
               {...(!isMobileDevice && profileFormTailLayout)}
             >
               <Select

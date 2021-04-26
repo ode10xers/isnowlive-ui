@@ -27,7 +27,7 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -860,7 +860,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
       visible={visible}
       footer={null}
       onCancel={() => closeModal(false)}
-      width={720}
+      width={800}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -1019,22 +1019,34 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             </Col>
             <Col xs={24}>
               <Form.Item
-                {...courseModalFormLayout}
-                name="courseTagType"
                 label="Bookable by member with Tag"
-                rules={validationRules.requiredValidation}
-                onChange={handleCourseTagTypeChange}
+                required
+                {...courseModalFormLayout}
+                hidden={creatorMemberTags.length === 0}
               >
-                <Radio.Group>
-                  <Radio value="anyone"> Anyone </Radio>
-                  <Radio value="selected"> Selected Member Tags </Radio>
-                </Radio.Group>
+                <Form.Item
+                  name="courseTagType"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleCourseTagTypeChange}
+                  className={styles.inlineFormItem}
+                >
+                  <Radio.Group>
+                    <Radio value="anyone"> Anyone </Radio>
+                    <Radio value="selected"> Selected Member Tags </Radio>
+                  </Radio.Group>
+                </Form.Item>
+                <Form.Item className={styles.inlineFormItem}>
+                  <Button type="link" onClick={() => showTagOptionsHelperModal('course')}>
+                    Understanding the tag options
+                  </Button>
+                </Form.Item>
               </Form.Item>
+
               <Form.Item
                 name="selectedMemberTags"
                 id="selectedMemberTags"
                 {...courseModalTailLayout}
-                hidden={selectedTagType === 'anyone'}
+                hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
               >
                 <Select
                   showArrow

@@ -3,13 +3,13 @@ import { useHistory } from 'react-router-dom';
 import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
 
-import { BookTwoTone, TagOutlined } from '@ant-design/icons';
+import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
@@ -347,7 +347,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       visible={visible}
       footer={null}
       onCancel={() => closeModal(false)}
-      width={720}
+      width={800}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -365,19 +365,28 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>
-              <Form.Item
-                name="passTagType"
-                label="Bookable by member with Tag"
-                rules={validationRules.requiredValidation}
-                onChange={handlePassTagTypeChange}
-                style={{ marginBottom: 8 }}
-              >
-                <Radio.Group>
-                  <Radio value="anyone"> Anyone </Radio>
-                  <Radio value="selected"> Selected Member Tags </Radio>
-                </Radio.Group>
+              <Form.Item required label="Bookable by member with Tag" hidden={creatorMemberTags.length === 0}>
+                <Form.Item
+                  name="passTagType"
+                  rules={validationRules.requiredValidation}
+                  onChange={handlePassTagTypeChange}
+                  style={{ marginBottom: 8 }}
+                  className={styles.inlineFormItem}
+                >
+                  <Radio.Group>
+                    <Radio value="anyone"> Anyone </Radio>
+                    <Radio value="selected"> Selected Member Tags </Radio>
+                  </Radio.Group>
+                </Form.Item>
+                <Form.Item className={styles.inlineFormItem}>
+                  <Button type="link" onClick={() => showTagOptionsHelperModal('pass')} icon={<InfoCircleOutlined />} />
+                </Form.Item>
               </Form.Item>
-              <Form.Item name="selectedMemberTag" id="selectedMemberTag" hidden={selectedTagType === 'anyone'}>
+              <Form.Item
+                name="selectedMemberTag"
+                id="selectedMemberTag"
+                hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
+              >
                 <Select
                   showArrow
                   allowClear

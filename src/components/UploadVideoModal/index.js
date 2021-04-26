@@ -27,7 +27,12 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal, showCourseOptionsHelperModal } from 'components/Modals/modals';
+import {
+  showErrorModal,
+  showSuccessModal,
+  showCourseOptionsHelperModal,
+  showTagOptionsHelperModal,
+} from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 
 import validationRules from 'utils/validation';
@@ -714,16 +719,23 @@ const UploadVideoModal = ({
               </Col>
 
               <Col xs={24}>
-                <Form.Item
-                  name="videoTagType"
-                  label="Bookable by member with Tag"
-                  rules={validationRules.requiredValidation}
-                  onChange={handleVideoTagTypeChange}
-                >
-                  <Radio.Group>
-                    <Radio value="anyone"> Anyone </Radio>
-                    <Radio value="selected"> Selected Member Tags </Radio>
-                  </Radio.Group>
+                <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
+                  <Form.Item
+                    name="videoTagType"
+                    rules={validationRules.requiredValidation}
+                    onChange={handleVideoTagTypeChange}
+                    className={styles.inlineFormItem}
+                  >
+                    <Radio.Group>
+                      <Radio value="anyone"> Anyone </Radio>
+                      <Radio value="selected"> Selected Member Tags </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button type="link" onClick={() => showTagOptionsHelperModal('video')}>
+                      Understanding the tag options
+                    </Button>
+                  </Form.Item>
                 </Form.Item>
               </Col>
 
@@ -732,7 +744,7 @@ const UploadVideoModal = ({
                   name="selectedMemberTags"
                   id="selectedMemberTags"
                   {...formTailLayout}
-                  hidden={selectedTagType === 'anyone'}
+                  hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
                 >
                   <Select
                     showArrow
