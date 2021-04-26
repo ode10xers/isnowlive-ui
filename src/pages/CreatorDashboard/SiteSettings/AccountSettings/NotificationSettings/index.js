@@ -25,7 +25,7 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
         member_requires_invite: checkedMemberOptions.includes('member_requires_invite'),
       };
 
-      const { status } = await apis.user.setCreatorEmailPreferences(payload);
+      const { status } = await apis.user.setCreatorUserPreferences(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('User Notification Preferences Updated Successfully');
@@ -43,7 +43,8 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
 
   useEffect(() => {
     if (checkedUserSettings) {
-      setCheckedEmailOptions(checkedUserSettings);
+      setCheckedEmailOptions(checkedUserSettings.receive_mails ? ['receive_mails'] : []);
+      setCheckedMemberOptions(checkedUserSettings.member_requires_invite ? ['member_requires_invite'] : []);
     }
   }, [checkedUserSettings]);
 

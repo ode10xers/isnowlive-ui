@@ -45,8 +45,6 @@ const MembersTags = () => {
   const saveCreatorUserTags = async (values) => {
     setSubmitting(true);
 
-    console.log(values);
-
     try {
       let payload = {};
 

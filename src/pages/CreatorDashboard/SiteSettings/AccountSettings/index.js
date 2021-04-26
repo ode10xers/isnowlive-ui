@@ -36,7 +36,8 @@ const AccountSettings = () => {
 
   useEffect(() => {
     getCreatorUserSettings();
-  }, [getCreatorUserSettings]);
+    //eslint-disable-next-line
+  }, []);
 
   return (
     <div className={classNames(styles.box, styles.settingsWrapper)}>
@@ -52,10 +53,7 @@ const AccountSettings = () => {
                 </div>
               }
             >
-              <NotificationSettings
-                fetchUserSettings={getCreatorUserSettings}
-                checkedUserSettings={accountSettings.receive_mails ? ['receive_mails'] : []}
-              />
+              <NotificationSettings fetchUserSettings={getCreatorUserSettings} checkedUserSettings={accountSettings} />
             </TabPane>
           </Tabs>
         )}

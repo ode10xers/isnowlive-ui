@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
 import { Row, Col, Button, Popconfirm, Tooltip, Typography, Card, Empty } from 'antd';
-import { DeleteOutlined, MailOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MailOutlined, FilterFilled } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
 import Table from 'components/Table';
@@ -88,29 +88,29 @@ const AudienceList = () => {
       width: '32%',
       render: (text, record) => record.last_name || '-',
     },
-    // {
-    //   title: 'Type',
-    //   dataIndex: 'type',
-    //   key: 'type',
-    //   render: (text, record) => `${record.type[0]}${record.type.slice(1).toLowerCase()}`,
-    //   filterIcon: (filtered) => (
-    //     <Tooltip defaultVisible={true} title="Click here to filter">
-    //       {' '}
-    //       <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#ff4d4f' }} />{' '}
-    //     </Tooltip>
-    //   ),
-    //   filters: [
-    //     {
-    //       text: 'Audiences',
-    //       value: 'AUDIENCE',
-    //     },
-    //     {
-    //       text: 'Members',
-    //       value: 'MEMBER',
-    //     },
-    //   ],
-    //   onFilter: (value, record) => record.type === value,
-    // },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      render: (text, record) => `${record.type[0]}${record.type.slice(1).toLowerCase()}`,
+      filterIcon: (filtered) => (
+        <Tooltip defaultVisible={true} title="Click here to filter">
+          {' '}
+          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#ff4d4f' }} />{' '}
+        </Tooltip>
+      ),
+      filters: [
+        {
+          text: 'Audiences',
+          value: 'AUDIENCE',
+        },
+        {
+          text: 'Members',
+          value: 'MEMBER',
+        },
+      ],
+      onFilter: (value, record) => record.type === value,
+    },
     {
       title: 'Actions',
       width: '15%',
