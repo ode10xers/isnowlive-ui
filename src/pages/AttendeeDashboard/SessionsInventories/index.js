@@ -161,7 +161,7 @@ const SessionsInventories = ({ match }) => {
       Modal.error({
         closable: true,
         maskClosable: true,
-        title: 'An Error Occured',
+        title: 'An Error Occurred',
         content: error.response?.data?.message || 'Something went wrong.',
       });
     }
