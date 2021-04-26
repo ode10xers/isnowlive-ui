@@ -7,7 +7,7 @@ import {
   showErrorModal,
 } from 'components/Modals/modals';
 
-import { isAPISuccess, productType } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError, productType } from 'utils/helper';
 
 // These functions are for fetching the product details
 // that is required to be shown in the confirmation modals
@@ -72,7 +72,7 @@ export const followUpGetVideo = async (payload) => {
   } catch (error) {
     if (error.response?.data?.message === 'user already has a confirmed order for this video') {
       showAlreadyBookedModal(productType.VIDEO);
-    } else {
+    } else if (!isUnapprovedUserError(error.response)) {
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
   }
@@ -91,8 +91,21 @@ export const followUpBookSession = async (payload) => {
       error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
     ) {
       showAlreadyBookedModal(productType.CLASS);
-    } else {
+    } else if (!isUnapprovedUserError(error.response)) {
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
   }
+};
+
+export const getCreatorProfileByUsername = async (creatorUsername) => {
+  try {
+    const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
+
+    if (isAPISuccess(status) && data) {
+      return data;
+    }
+  } catch (error) {
+    console.error('Failed fetching creator details');
+  }
+  return null;
 };

@@ -9,7 +9,14 @@ import AuthModal from 'components/AuthModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType, generateUrlFromUsername, paymentSource, productType } from 'utils/helper';
+import {
+  isAPISuccess,
+  orderType,
+  generateUrlFromUsername,
+  paymentSource,
+  productType,
+  isUnapprovedUserError,
+} from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -82,7 +89,7 @@ const PublicVideoList = ({ username = null, videos }) => {
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
