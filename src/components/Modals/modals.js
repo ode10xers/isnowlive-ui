@@ -452,16 +452,16 @@ export const showMemberUnapprovedJoinModal = async () => {
         title: `Thanks for joining ${creatorProfileData.first_name}'s community`,
         content: (
           <>
+            <Paragraph>We are excited to see you join {creatorProfileData.first_name}'s private community.</Paragraph>
             <Paragraph>
-              Unfortunately, you will need {creatorProfileData.first_name}'s approval before you can book and purchase
-              their product and it seems like they have not approved your account.
+              If you haven't spoken to {creatorProfileData.first_name} before joining, you'd need to drop an email on{' '}
+              <Text strong copyable>
+                {creatorProfileData.email}
+              </Text>{' '}
+              to start accessing any of their products.
             </Paragraph>
             <Paragraph>
-              You can contact them via email{' '}
-              <Text strong copyable>
-                ({creatorProfileData.email})
-              </Text>{' '}
-              to ask them so your account can get approved.
+              For any other help please reach out to us on the blue chat button at the bottom right corner.
             </Paragraph>
           </>
         ),
