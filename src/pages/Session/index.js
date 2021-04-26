@@ -29,13 +29,14 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
+import { showCourseOptionsHelperModal } from 'components/Modals/modals';
+
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
 import {
   getCurrencyList,
   convertSchedulesToUTC,
   isAPISuccess,
-  scrollToErrorField,
   generateRandomColor,
   isValidFile,
   ZoomAuthType,
@@ -56,7 +57,7 @@ import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/int
 
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
@@ -92,11 +93,12 @@ const initialSession = {
   name: '',
   description: '',
   session_image_url: '',
+  session_course_type: 'normal',
   inventory: [],
   document_urls: [],
   beginning: moment().startOf('day').utc().format(),
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
-  recurring: false,
+  recurring: true,
   is_refundable: true,
   refund_before_hours: 0,
   prerequisites: '',
@@ -114,7 +116,7 @@ const Session = ({ match, history }) => {
   const [currencyList, setCurrencyList] = useState(null);
   const [sessionRefundable, setSessionRefundable] = useState(true);
   const [refundBeforeHours, setRefundBeforeHours] = useState(24);
-  const [isSessionRecurring, setIsSessionRecurring] = useState(false);
+  const [isSessionRecurring, setIsSessionRecurring] = useState(true);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
   const [session, setSession] = useState(initialSession);
   const [deleteSlot, setDeleteSlot] = useState([]);
@@ -248,7 +250,7 @@ const Session = ({ match, history }) => {
         ...form.getFieldsValue(),
         type: 'Group',
         max_participants: 2,
-        recurring: false,
+        recurring: true,
         is_refundable: 'Yes',
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
@@ -330,12 +332,12 @@ const Session = ({ match, history }) => {
     }
   };
 
-  const changeSessionRecurrance = (isRecurring) => {
+  const changeSessionRecurrence = (isRecurring) => {
     setIsSessionRecurring(isRecurring);
     setRecurringDatesRanges([]);
   };
 
-  const handleSessionRecurrance = (e) => {
+  const handleSessionRecurrence = (e) => {
     const isRecurring = e.target.value === 'true';
 
     if (session.inventory.length > 0) {
@@ -357,9 +359,9 @@ const Session = ({ match, history }) => {
         okButtonProps: { type: 'default' },
         cancelText: 'Yes, Keep Slots',
         cancelButtonProps: { type: 'primary' },
-        onCancel: () => changeSessionRecurrance(isRecurring),
+        onCancel: () => changeSessionRecurrence(isRecurring),
         onOk: () => {
-          changeSessionRecurrance(isRecurring);
+          changeSessionRecurrence(isRecurring);
           // Mark created inventories for deletion
           session.inventory.forEach((inv) => {
             if (inv.inventory_id) {
@@ -372,7 +374,7 @@ const Session = ({ match, history }) => {
         },
       });
     } else {
-      changeSessionRecurrance(isRecurring);
+      changeSessionRecurrence(isRecurring);
     }
   };
 
@@ -601,7 +603,6 @@ const Session = ({ match, history }) => {
           const newSessionResponse = await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
-            // TODO: Check what happens to currency when NOT_CONNECTED user creates free session
             pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_SESSION, {
               session_name: newSessionResponse.data.name,
               session_price: newSessionResponse.data.price,
@@ -633,7 +634,7 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        message.error('Need at least 1 sesssion to publish');
+        message.error('Need at least 1 session to publish');
       }
     } catch (error) {
       setIsLoading(false);
@@ -643,10 +644,6 @@ const Session = ({ match, history }) => {
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
-  };
-
-  const onFinishFailed = ({ errorFields }) => {
-    scrollToErrorField(errorFields);
   };
 
   const handleCalenderPop = () => {
@@ -702,7 +699,6 @@ const Session = ({ match, history }) => {
         scrollToFirstError={true}
         {...profileFormItemLayout}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         labelAlign={isMobileDevice ? 'left' : 'right'}
       >
         {/* ========= SESSION INFORMATION ======== */}
@@ -750,10 +746,30 @@ const Session = ({ match, history }) => {
             id="description"
             rules={validationRules.requiredValidation}
           >
-            <TextEditor name="description" form={form} placeholder="Please input description" />
+            <div>
+              <TextEditor name="description" form={form} placeholder="Please input description" />
+            </div>
           </Form.Item>
 
-          <Form.Item label="Attached Files" id="document_urls" name="document_urls">
+          <Form.Item
+            label="Attached Files"
+            id="document_urls"
+            name="document_urls"
+            extra={
+              <Paragraph type="secondary">
+                Your documents uploaded in your{' '}
+                <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
+                  {' '}
+                  document drive{' '}
+                </Link>{' '}
+                will show up here. You can add a new doc in the{' '}
+                <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
+                  {' '}
+                  document drive{' '}
+                </Link>
+              </Paragraph>
+            }
+          >
             <Select
               className={styles.fileDropdown}
               showArrow
@@ -777,17 +793,24 @@ const Session = ({ match, history }) => {
 
           {/* ---- Session Course Type ---- */}
           <>
-            <Form.Item
-              name="session_course_type"
-              id="session_course_type"
-              label="Session Type"
-              rules={validationRules.requiredValidation}
-              onChange={handleSessionCourseType}
-            >
-              <Radio.Group>
-                <Radio value="normal">Normal Session</Radio>
-                <Radio value="course">Course Session</Radio>
-              </Radio.Group>
+            <Form.Item label="Session Type" required>
+              <Form.Item
+                name="session_course_type"
+                id="session_course_type"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionCourseType}
+                className={styles.inlineFormItem}
+              >
+                <Radio.Group>
+                  <Radio value="normal">Normal Session</Radio>
+                  <Radio value="course">Course Session</Radio>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item className={styles.inlineFormItem}>
+                <Button type="link" onClick={() => showCourseOptionsHelperModal('session')}>
+                  Understanding the options
+                </Button>
+              </Form.Item>
             </Form.Item>
           </>
 
@@ -803,7 +826,7 @@ const Session = ({ match, history }) => {
               <Radio.Group>
                 <Radio value="Group">Group</Radio>
                 <Radio disabled={isCourseSession} value="1-on-1">
-                  Individual (1-on-1)
+                  Private (1 individual)
                 </Radio>
               </Radio.Group>
             </Form.Item>
@@ -878,7 +901,7 @@ const Session = ({ match, history }) => {
                   {...(!isMobileDevice && profileFormItemLayout)}
                   label="Cancellable Before"
                   name="refund_before_hours"
-                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
+                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputted above"
                   rules={validationRules.requiredValidation}
                   onChange={handleRefundBeforeHoursChange}
                 >
@@ -910,9 +933,9 @@ const Session = ({ match, history }) => {
 
           <Form.Item
             name="recurring"
-            label="Session Recurrance"
+            label="Session Recurrence"
             rules={validationRules.requiredValidation}
-            onChange={handleSessionRecurrance}
+            onChange={handleSessionRecurrence}
           >
             <Radio.Group>
               <Radio value={false}>One Time Session</Radio>
