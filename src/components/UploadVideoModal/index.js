@@ -28,7 +28,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, showCourseOptionsHelperModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 
 import validationRules from 'utils/validation';
@@ -265,7 +265,8 @@ const UploadVideoModal = ({
       }
       fetchAllClassesForCreator();
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.removeAttribute('style');
+      document.body.classList.remove(['ant-scrolling-effect']);
     }
     return () => {
       setCoverImageUrl(null);
@@ -273,6 +274,8 @@ const UploadVideoModal = ({
       setVideoType(videoTypes.FREE.name);
       setIsCourseVideo(false);
       uppy.current = null;
+      document.body.classList.remove(['ant-scrolling-effect']);
+      document.body.removeAttribute('style');
     };
     //eslint-disable-next-line
   }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
@@ -488,7 +491,11 @@ const UploadVideoModal = ({
       maskClosable={false}
       closable={[1, 3].includes(formPart)}
       onCancel={() => closeModal(false)}
-      width={720}
+      width={800}
+      afterClose={() => {
+        document.body.classList.remove(['ant-scrolling-effect']);
+        document.body.removeAttribute('style');
+      }}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
@@ -516,7 +523,19 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item id="session_ids" name="session_ids" label="Related to Class(es)">
+                <Form.Item
+                  id="session_ids"
+                  name="session_ids"
+                  label="Related class(es) [for upselling]"
+                  extra={
+                    <Text className={styles.helpText}>
+                      This is an optional field. You can select any of your existing live sessions here to link this
+                      video to that live session. This helps you upsell this video on that live session’s page so that
+                      customers who can’t find a suitable time for your live session can instead buy your video and
+                      still learn while you still make a sale.
+                    </Text>
+                  }
+                >
                   <Select
                     showArrow
                     showSearch={false}
@@ -595,17 +614,24 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item
-                  id="video_course_type"
-                  name="video_course_type"
-                  label="Video Course Type"
-                  rules={validationRules.requiredValidation}
-                  onChange={onCourseTypeChange}
-                >
-                  <Radio.Group className="video-type-radio">
-                    <Radio value="normal"> Normal Video </Radio>
-                    <Radio value="course"> Course Video </Radio>
-                  </Radio.Group>
+                <Form.Item label="Video Course Type" required>
+                  <Form.Item
+                    id="video_course_type"
+                    name="video_course_type"
+                    className={styles.inlineFormItem}
+                    rules={validationRules.requiredValidation}
+                    onChange={onCourseTypeChange}
+                  >
+                    <Radio.Group className="video-type-radio">
+                      <Radio value="normal"> Normal Video </Radio>
+                      <Radio value="course"> Course Video </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button type="link" onClick={() => showCourseOptionsHelperModal('video')}>
+                      Understanding the options
+                    </Button>
+                  </Form.Item>
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -646,7 +672,9 @@ const UploadVideoModal = ({
                   name="validity"
                   label="Validity (days)"
                   extra={
-                    <Text className={styles.helpText}>The duration in days this will be usable after purchase</Text>
+                    <Text className={styles.helpText}>
+                      No. of days this video is viewable starting from the purchase date
+                    </Text>
                   }
                   rules={validationRules.numberValidation('Please Input Validity', 1, false)}
                 >
@@ -658,7 +686,11 @@ const UploadVideoModal = ({
                   id="watch_limit"
                   name="watch_limit"
                   label="Watch Count"
-                  extra={<Text className={styles.helpText}>Max number of time buyer can watch video</Text>}
+                  extra={
+                    <Text className={styles.helpText}>
+                      Maximum number of time a buyer can watch this video within the validity period
+                    </Text>
+                  }
                 >
                   <InputNumber min={1} placeholder="Watch Count" className={styles.numericInput} />
                 </Form.Item>
@@ -756,7 +788,7 @@ const UploadVideoModal = ({
               />
             </Col>
             <Col xs={24} className={styles.mt20}>
-              <Button block type="default" onClick={() => onCoverImageUpload()}>
+              <Button block type="primary" onClick={() => onCoverImageUpload()}>
                 Submit
               </Button>
             </Col>

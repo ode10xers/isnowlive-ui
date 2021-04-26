@@ -473,3 +473,26 @@ export const showMemberUnapprovedJoinModal = async () => {
     }
   }
 };
+
+export const showCourseOptionsHelperModal = (productName = 'session') => {
+  Modal.info({
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'Understanding the options',
+    width: 640,
+    content: (
+      <>
+        <Paragraph>
+          Marking a {productName} as a Normal {productName} allows your customers to buy this {productName} alone as a
+          one off purchase.
+        </Paragraph>
+        <Paragraph>
+          Marking a {productName} as a Course {productName} prevents a customer from buying this {productName} alone,
+          they can only get it if they buy the whole course you add this {productName} to.
+        </Paragraph>
+        <Paragraph>If you are in doubt, choose normal for now. You can always change this later.</Paragraph>
+      </>
+    ),
+  });
+};
