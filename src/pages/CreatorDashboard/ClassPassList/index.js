@@ -270,7 +270,11 @@ const ClassPassList = () => {
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {
-      title: '',
+      title: (
+        <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
+          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ),
       align: 'right',
       render: (text, record) => (
         <Row gutter={8}>
@@ -457,13 +461,8 @@ const ClassPassList = () => {
     <div className={styles.box}>
       <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={8} lg={14}>
+        <Col xs={12} md={8} lg={18}>
           <Title level={4}> Passes </Title>
-        </Col>
-        <Col xs={12} md={6} lg={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showCreatePassesModal()} icon={<PlusCircleOutlined />}>

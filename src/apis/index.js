@@ -21,8 +21,8 @@ export default {
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     convertUserToCreator: () => http.post('/secure/user/convert'),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
-    setCreatorUserPreferences: (payload) => http.patch('/secure/user/preferences', payload),
-    getCreatorUserPreferences: () => http.get('/secure/user/preferences'),
+    setCreatorUserPreferences: (payload) => http.put('/secure/creator/settings', payload),
+    getCreatorUserPreferences: () => http.get('/secure/creator/settings'),
     sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
   },
   payment: {
@@ -101,6 +101,7 @@ export default {
     updateVideo: (videoId, payload) => http.put(`/secure/creator/videos/${videoId}`, payload),
     deleteVideo: (videoId) => http.delete(`/secure/creator/videos/${videoId}`),
     uploadVideo: (videoId, payload) => http.post(`/secure/creator/videos/${videoId}/upload`, payload),
+    getVideoToken: (videoId) => http.get(`/secure/creator/videos/${videoId}/token`),
     cloneVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/clone`),
     unlinkVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unlink`),
     createOrderForUser: (payload) => http.post('/secure/customer/videos/orders', payload),
@@ -136,10 +137,13 @@ export default {
   audiences: {
     getCreatorAudiences: (pageNo, perPage) =>
       http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
+    getCreatorMembers: (pageNo, perPage) =>
+      http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}`),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
+    approveCreatorMemberRequest: (payload) => http.put('/secure/creator/audience', payload),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),

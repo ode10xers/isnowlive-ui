@@ -8,6 +8,7 @@ import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { isUnapprovedUserError } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -34,7 +35,9 @@ const Videos = () => {
         setExpiredVideos(data.expired);
       }
     } catch (error) {
-      showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Failed fetching videos', error.response?.data?.message || 'Something went wrong');
+      }
     }
     setIsLoading(false);
   }, []);

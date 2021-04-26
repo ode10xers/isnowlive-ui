@@ -180,11 +180,11 @@ const Coupons = () => {
     },
     {
       title: published ? (
-        <Button shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
+        <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
           {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
         </Button>
       ) : (
-        <Button shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
+        <Button ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
           {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
         </Button>
       ),
@@ -397,7 +397,7 @@ const Coupons = () => {
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
-                        <Button block shape="round" type="primary" onClick={() => toggleExpandAllPublished()}>
+                        <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
                           {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
                         </Button>
                       </Col>
@@ -430,7 +430,7 @@ const Coupons = () => {
                   <Loader loading={isLoading} size="large" text="Loading coupons">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
-                        <Button block shape="round" type="primary" onClick={() => toggleExpandAllUnpublished()}>
+                        <Button block ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
                           {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
                         </Button>
                       </Col>

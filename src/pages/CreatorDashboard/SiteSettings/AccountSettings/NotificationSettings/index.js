@@ -17,6 +17,7 @@ const NotificationSettings = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [checkedEmailOptions, setCheckedEmailOptions] = useState([]);
+  const [checkedMemberOptions, setCheckedMemberOptions] = useState([]);
 
   const getCreatorNotificationPreferences = useCallback(async () => {
     setIsLoading(true);
@@ -24,15 +25,8 @@ const NotificationSettings = () => {
       const { status, data } = await apis.user.getCreatorUserPreferences();
 
       if (isAPISuccess(status) && data) {
-        let checkedKeys = [];
-
-        Object.entries(data).forEach(([key, value]) => {
-          if (value) {
-            checkedKeys.push(key.toString());
-          }
-        });
-
-        setCheckedEmailOptions(checkedKeys);
+        setCheckedEmailOptions(data.receive_mails ? ['receive_mails'] : []);
+        setCheckedMemberOptions(data.member_requires_invite ? ['member_requires_invite'] : []);
       }
     } catch (error) {
       showErrorModal('Failed to fetch user preferences', error.response?.data?.message || 'Something went wrong');
@@ -46,6 +40,7 @@ const NotificationSettings = () => {
     try {
       const payload = {
         receive_mails: checkedEmailOptions.includes('receive_mails'),
+        member_requires_invite: checkedMemberOptions.includes('member_requires_invite'),
       };
 
       const { status } = await apis.user.setCreatorUserPreferences(payload);
@@ -70,6 +65,13 @@ const NotificationSettings = () => {
     {
       label: generateLabel('booking confirmations'),
       value: 'receive_mails',
+    },
+  ];
+
+  const memberOptions = [
+    {
+      label: 'New members need approval to join',
+      value: 'member_requires_invite',
     },
   ];
 
@@ -104,6 +106,28 @@ const NotificationSettings = () => {
                   </div>
                 </Col>
               </Row>
+            </div>
+          </Col>
+        </Row>
+        <Row gutter={[8, 24]} className={styles.memberSettingsWrapper}>
+          <Col span={24} className={styles.textAlignLeft}>
+            <Title level={3}> Member Settings </Title>
+          </Col>
+          <Col span={24}>
+            <div className={styles.optionWrapper}>
+              <Checkbox.Group
+                name="member_options"
+                value={checkedMemberOptions}
+                onChange={(values) => setCheckedMemberOptions(values)}
+              >
+                <Row gutter={[8, 8]}>
+                  {memberOptions.map((memberOption) => (
+                    <Col span={24}>
+                      <Checkbox value={memberOption.value}>{memberOption.label}</Checkbox>
+                    </Col>
+                  ))}
+                </Row>
+              </Checkbox.Group>
             </div>
           </Col>
         </Row>

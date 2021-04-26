@@ -28,6 +28,7 @@ import {
   orderType,
   productType,
   reservedDomainName,
+  isUnapprovedUserError,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
@@ -136,7 +137,9 @@ const SessionDetails = ({ match, history }) => {
           console.error('Failed to fetch session data', sessionDetailsResponse);
         }
       } catch (error) {
-        message.error(error.response?.data?.message || 'Something went wrong.');
+        if (!isUnapprovedUserError(error.response)) {
+          message.error(error.response?.data?.message || 'Something went wrong.');
+        }
         setIsLoading(false);
         history.push(Routes.root);
       }
@@ -162,7 +165,9 @@ const SessionDetails = ({ match, history }) => {
         }
       }
     } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+      }
     }
   };
 
@@ -246,7 +251,7 @@ const SessionDetails = ({ match, history }) => {
         setShowPasswordField(true);
         setCurrentUser(values);
         message.info('Enter password to register session');
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
@@ -388,9 +393,9 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-
-      if (
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      } else if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
@@ -444,9 +449,9 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-
-      if (
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      } else if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
@@ -471,9 +476,9 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
-
-      if (
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      } else if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
@@ -511,7 +516,7 @@ const SessionDetails = ({ match, history }) => {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
@@ -545,10 +550,10 @@ const SessionDetails = ({ match, history }) => {
         } catch (error) {
           setIsLoading(false);
 
-          if (error.response?.status === 403) {
+          if (error.response?.status === 403 && error.response?.data?.message === 'invalid password passed') {
             setIncorrectPassword(true);
             message.error('Incorrect email or password');
-          } else {
+          } else if (!isUnapprovedUserError(error.response)) {
             message.error(error.response?.data?.message || 'Something went wrong');
           }
         }
@@ -561,7 +566,9 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
     }
   };
 

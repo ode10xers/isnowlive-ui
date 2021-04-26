@@ -7,7 +7,7 @@ import apis from 'apis';
 import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
-import { scrollToErrorField } from 'utils/helper';
+import { isUnapprovedUserError, scrollToErrorField } from 'utils/helper';
 import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
@@ -60,10 +60,10 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
         hideSignInForm();
       }
     } catch (error) {
-      if (error.response?.status === 403) {
+      if (error.response?.status === 403 && error.response?.data?.message === 'invalid password passed') {
         setIncorrectPassword(true);
         message.error('Incorrect email or password');
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
