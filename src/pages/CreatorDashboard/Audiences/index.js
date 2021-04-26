@@ -16,7 +16,7 @@ const Audiences = () => {
   return (
     <Row gutter={[16, 16]}>
       <Col xs={24}>
-        <Title level={4}> Audiences </Title>
+        <Title level={4}> Audience & Members </Title>
       </Col>
       <Col xs={24}>
         <Paragraph>
@@ -29,7 +29,7 @@ const Audiences = () => {
       </Col>
       <Col xs={24}>
         <Tabs size="large" activeKey={selectedTab} onChange={setSelectedTab}>
-          <TabPane key="list" tab={<Title level={5}> Audience List </Title>}>
+          <TabPane key="list" tab={<Title level={5}> Audience & Member List </Title>}>
             <AudienceList />
           </TabPane>
           <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import List </Title>}>

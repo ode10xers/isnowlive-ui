@@ -12,6 +12,7 @@ import {
   generateUrlFromUsername,
   getUsernameFromUrl,
   reservedDomainName,
+  generateMailToLink,
 } from 'utils/helper';
 import {
   getUserPassOrderDetails,
@@ -439,13 +440,12 @@ export const showMemberUnapprovedJoinModal = async () => {
   const creatorUsername = getUsernameFromUrl();
 
   if (reservedDomainName.includes(creatorUsername)) {
-    // TODO: Edge case, confirm how to handle with Rahul
-    showErrorModal('Your account has not been approved by the creator you first signed up with');
+    showErrorModal('Something went wrong');
   } else {
     const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
 
     if (creatorProfileData) {
-      Modal.info({
+      Modal.confirm({
         center: true,
         closable: true,
         maskClosable: false,
@@ -465,6 +465,10 @@ export const showMemberUnapprovedJoinModal = async () => {
             </Paragraph>
           </>
         ),
+        okText: `Email ${creatorProfileData.first_name}`,
+        cancelText: 'Chat with us',
+        onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
+        onCancel: () => openFreshChatWidget(),
       });
     }
   }

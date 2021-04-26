@@ -22,6 +22,11 @@ export const generateQueryString = (data) => {
     .join('&');
 };
 
+export const generateMailToLink = (creatorProfileData) => {
+  const passionEmail = 'friends@passion.do';
+  return `mailto:${creatorProfileData.email}?cc=${passionEmail}&subject=I%20would%20like%20to%20join%20your%20community&body=Hi%20${creatorProfileData.first_name}`;
+};
+
 const appendScript = (src, charset) => {
   const script = document.createElement('script');
   script.src = src;
