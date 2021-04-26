@@ -248,7 +248,7 @@ const Session = ({ match, history }) => {
         ...form.getFieldsValue(),
         type: 'Group',
         max_participants: 2,
-        recurring: false,
+        recurring: true,
         is_refundable: 'Yes',
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
