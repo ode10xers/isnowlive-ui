@@ -6,6 +6,12 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+// Will occur if a member that is not yet approved tries to access secure APIS
+const FORBIDDEN = 403;
+const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';
+export const isUnapprovedUserError = (errorResponse) =>
+  errorResponse.status === FORBIDDEN && errorResponse.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
+
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';

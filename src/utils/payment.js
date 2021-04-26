@@ -2,7 +2,7 @@ import { message } from 'antd';
 
 import apis from 'apis';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 export const fetchCreatorCurrency = async () => {
   try {
@@ -28,7 +28,9 @@ export const createPaymentSessionForOrder = async (payload) => {
       return data;
     }
   } catch (error) {
-    message.error(error.response?.data?.message || 'Something went wrong');
+    if (!isUnapprovedUserError(error.response)) {
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
     return null;
   }
 };
@@ -43,7 +45,9 @@ export const verifyPaymentForOrder = async (payload) => {
       return order_type;
     }
   } catch (error) {
-    message.error(error.response?.data?.message || 'Something went wrong.');
+    if (!isUnapprovedUserError(error.response)) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
     return null;
   }
 };

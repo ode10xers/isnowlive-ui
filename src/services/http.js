@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
+import { getUsernameFromUrl, isUnapprovedUserError, reservedDomainName } from 'utils/helper';
 
 import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
 
@@ -10,9 +10,6 @@ import { showMemberUnapprovedJoinModal } from 'components/Modals/modals';
 import { clearGTMUserAttributes } from './integrations/googleTagManager';
 
 const UNAUTHORIZED = 401;
-// Will occur if a member that is not yet approved tries to access secure APIS
-const FORBIDDEN = 403;
-const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';
 
 class HttpService {
   constructor() {
@@ -36,18 +33,17 @@ class HttpService {
     this.axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.log(error.response);
-        const { status, data } = error.response;
+        const { status } = error.response;
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
           clearGTMUserAttributes();
           window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
-        } else if (status === FORBIDDEN && data.message === UNAPPROVED_USER_ERROR_MESSAGE) {
+        } else if (isUnapprovedUserError(error.response)) {
           showMemberUnapprovedJoinModal();
-        } else {
-          return Promise.reject(error);
         }
+
+        return Promise.reject(error);
       }
     );
   }
@@ -73,17 +69,17 @@ class HttpService {
     this.axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        const { status, data } = error.response;
+        const { status } = error.response;
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
           clearGTMUserAttributes();
           window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
-        } else if (status === FORBIDDEN && data.message === UNAPPROVED_USER_ERROR_MESSAGE) {
+        } else if (isUnapprovedUserError(error.response)) {
           showMemberUnapprovedJoinModal();
-        } else {
-          return Promise.reject(error);
         }
+
+        return Promise.reject(error);
       }
     );
   }
