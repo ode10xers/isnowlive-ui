@@ -12,7 +12,7 @@ import CreatorProfile from 'components/CreatorProfile';
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, orderType, productType } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, orderType, productType, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -160,7 +160,7 @@ const PassDetails = ({ match, history }) => {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }

@@ -167,7 +167,7 @@ export const creatorMenuItems = [
   {
     order: 13,
     key: 'documents',
-    title: 'Documents',
+    title: 'Document Drive',
     icon: <FilePdfOutlined />,
     mixPanelTag: creator.click.dashboard.documentsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
@@ -175,7 +175,7 @@ export const creatorMenuItems = [
   {
     order: 14,
     key: 'audiences',
-    title: 'Audiences',
+    title: 'Newsletter',
     icon: <AuditOutlined />,
     mixPanelTag: creator.click.dashboard.audiencesNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,

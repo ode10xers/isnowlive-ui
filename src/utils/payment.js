@@ -2,8 +2,8 @@ import { message } from 'antd';
 
 import apis from 'apis';
 
-import { isAPISuccess } from 'utils/helper';
-import { getLocalUserDetails } from './storage';
+import { getLocalUserDetails } from 'utils/storage';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 // User API now also gives currency info
 // This function will fetch the creator currency from
@@ -45,7 +45,9 @@ export const createPaymentSessionForOrder = async (payload) => {
       return data;
     }
   } catch (error) {
-    message.error(error.response?.data?.message || 'Something went wrong');
+    if (!isUnapprovedUserError(error.response)) {
+      message.error(error.response?.data?.message || 'Something went wrong');
+    }
     return null;
   }
 };
@@ -60,7 +62,9 @@ export const verifyPaymentForOrder = async (payload) => {
       return order_type;
     }
   } catch (error) {
-    message.error(error.response?.data?.message || 'Something went wrong.');
+    if (!isUnapprovedUserError(error.response)) {
+      message.error(error.response?.data?.message || 'Something went wrong.');
+    }
     return null;
   }
 };

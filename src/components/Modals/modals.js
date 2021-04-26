@@ -6,8 +6,20 @@ import Routes from 'routes';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrl, productType, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
-import { getUserPassOrderDetails, getUserVideoOrderDetails, getSessionInventoryDetails } from 'utils/orderHelper';
+import {
+  generateUrl,
+  productType,
+  generateUrlFromUsername,
+  getUsernameFromUrl,
+  reservedDomainName,
+  generateMailToLink,
+} from 'utils/helper';
+import {
+  getUserPassOrderDetails,
+  getUserVideoOrderDetails,
+  getSessionInventoryDetails,
+  getCreatorProfileByUsername,
+} from 'utils/orderHelper';
 import { isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
@@ -421,5 +433,66 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
     ),
     okText: 'Go To Dashboard',
     onOk: () => (window.location.href = getDashboardUrl(null, Routes.attendeeDashboard.rootPath + targetSection)),
+  });
+};
+
+export const showMemberUnapprovedJoinModal = async () => {
+  const creatorUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(creatorUsername)) {
+    showErrorModal('Something went wrong');
+  } else {
+    const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
+
+    if (creatorProfileData) {
+      Modal.confirm({
+        center: true,
+        closable: true,
+        maskClosable: false,
+        title: `Thanks for joining ${creatorProfileData.first_name}'s community`,
+        content: (
+          <>
+            <Paragraph>We are excited to see you join {creatorProfileData.first_name}'s private community.</Paragraph>
+            <Paragraph>
+              If you haven't spoken to {creatorProfileData.first_name} before joining, you'd need to drop an email on{' '}
+              <Text strong copyable>
+                {creatorProfileData.email}
+              </Text>{' '}
+              to start accessing any of their products.
+            </Paragraph>
+            <Paragraph>
+              For any other help please reach out to us on the blue chat button at the bottom right corner.
+            </Paragraph>
+          </>
+        ),
+        okText: `Email ${creatorProfileData.first_name}`,
+        cancelText: 'Chat with us',
+        onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
+        onCancel: () => openFreshChatWidget(),
+      });
+    }
+  }
+};
+
+export const showCourseOptionsHelperModal = (productName = 'session') => {
+  Modal.info({
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'Understanding the options',
+    width: 640,
+    content: (
+      <>
+        <Paragraph>
+          Marking a {productName} as a Normal {productName} allows your customers to buy this {productName} alone as a
+          one off purchase.
+        </Paragraph>
+        <Paragraph>
+          Marking a {productName} as a Course {productName} prevents a customer from buying this {productName} alone,
+          they can only get it if they buy the whole course you add this {productName} to.
+        </Paragraph>
+        <Paragraph>If you are in doubt, choose normal for now. You can always change this later.</Paragraph>
+      </>
+    ),
   });
 };

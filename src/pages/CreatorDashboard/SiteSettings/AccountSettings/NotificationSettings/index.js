@@ -15,12 +15,14 @@ const { Title } = Typography;
 const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
   const [submitting, setSubmitting] = useState(false);
   const [checkedEmailOptions, setCheckedEmailOptions] = useState([]);
+  const [checkedMemberOptions, setCheckedMemberOptions] = useState([]);
 
   const saveCreatorNotificationSettings = async () => {
     setSubmitting(true);
     try {
       const payload = {
         receive_mails: checkedEmailOptions.includes('receive_mails'),
+        member_requires_invite: checkedMemberOptions.includes('member_requires_invite'),
       };
 
       const { status } = await apis.user.setCreatorEmailPreferences(payload);
@@ -54,6 +56,13 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
     },
   ];
 
+  const memberOptions = [
+    {
+      label: 'New members need approval to join',
+      value: 'member_requires_invite',
+    },
+  ];
+
   return (
     <div>
       <Row gutter={[8, 24]} className={styles.notificationSettingsWrapper}>
@@ -84,6 +93,28 @@ const NotificationSettings = ({ checkedUserSettings, fetchUserSettings }) => {
                 </div>
               </Col>
             </Row>
+          </div>
+        </Col>
+      </Row>
+      <Row gutter={[8, 24]} className={styles.memberSettingsWrapper}>
+        <Col span={24} className={styles.textAlignLeft}>
+          <Title level={3}> Member Settings </Title>
+        </Col>
+        <Col span={24}>
+          <div className={styles.optionWrapper}>
+            <Checkbox.Group
+              name="member_options"
+              value={checkedMemberOptions}
+              onChange={(values) => setCheckedMemberOptions(values)}
+            >
+              <Row gutter={[8, 8]}>
+                {memberOptions.map((memberOption) => (
+                  <Col span={24}>
+                    <Checkbox value={memberOption.value}>{memberOption.label}</Checkbox>
+                  </Col>
+                ))}
+              </Row>
+            </Checkbox.Group>
           </div>
         </Col>
       </Row>

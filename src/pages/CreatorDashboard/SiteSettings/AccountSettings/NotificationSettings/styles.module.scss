@@ -4,9 +4,14 @@
   .sectionWrapper {
     padding-left: 20px;
   }
+}
 
-  .saveBtn {
-    margin-left: auto;
-    margin-right: auto;
-  }
+.membersSettingsWrapper {
+  @extend .notificationSettingsWrapper;
+  margin-top: 20px;
+}
+
+.saveBtn {
+  margin-left: auto;
+  margin-right: auto;
 }

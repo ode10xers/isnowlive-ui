@@ -135,10 +135,11 @@ const Videos = () => {
     setSelectedVideo(null);
     setShouldCloneVideo(false);
     setFormPart(1);
+    document.body.classList.remove(['ant-scrolling-effect']);
+    document.body.removeAttribute('style');
     if (shouldRefresh) {
       getVideosForCreator();
     }
-    document.body.style.overflow = 'auto';
   };
 
   const getVideosForCreator = useCallback(async () => {
@@ -285,7 +286,7 @@ const Videos = () => {
       dataIndex: 'thumbnail_url',
       key: 'thumbnail_url',
       align: 'center',
-      width: '125px',
+      width: '180px',
       render: (text, record) => {
         return {
           props: {
@@ -297,8 +298,8 @@ const Videos = () => {
             <Image
               src={record.thumbnail_url || 'error'}
               alt={record.title}
-              height={50}
-              width={100}
+              height={78}
+              width={150}
               fallback={DefaultImage()}
               className={styles.thumbnailImage}
             />
@@ -353,7 +354,7 @@ const Videos = () => {
       ),
       align: 'right',
       render: (text, record) => (
-        <Row gutter={8}>
+        <Row gutter={4}>
           <Col xs={24} md={2}>
             <Tooltip title="Send Customer Email">
               <Button type="text" onClick={() => showEmailModal(record)} icon={<MailOutlined />} />
@@ -756,17 +757,15 @@ const Videos = () => {
 
   return (
     <div className={styles.box}>
-      {createModalVisible && (
-        <UploadVideoModal
-          formPart={formPart}
-          setFormPart={setFormPart}
-          visible={createModalVisible}
-          closeModal={hideUploadVideoModal}
-          editedVideo={selectedVideo}
-          updateEditedVideo={setSelectedVideo}
-          shouldClone={shouldCloneVideo}
-        />
-      )}
+      <UploadVideoModal
+        formPart={formPart}
+        setFormPart={setFormPart}
+        visible={createModalVisible}
+        closeModal={hideUploadVideoModal}
+        editedVideo={selectedVideo}
+        updateEditedVideo={setSelectedVideo}
+        shouldClone={shouldCloneVideo}
+      />
       <Row gutter={[8, 24]}>
         <Col xs={24} md={14} lg={18}>
           <Title level={4}> Videos </Title>
@@ -788,7 +787,6 @@ const Videos = () => {
                   ) : (
                     <Table
                       sticky={true}
-                      size="small"
                       columns={generateVideoColumns(true)}
                       data={videos?.filter((video) => video?.is_published)}
                       loading={isLoading}

@@ -14,7 +14,7 @@ import AuthModal from 'components/AuthModal';
 
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess, orderType, productType } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess, isUnapprovedUserError, orderType, productType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -98,9 +98,10 @@ const PublicPassList = ({ username, passes }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
       return null;
     }

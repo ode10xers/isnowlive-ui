@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Row, Col, Button, Form, Select, Typography, Card, Empty, Tooltip } from 'antd';
-import { SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined } from '@ant-design/icons';
+import { SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -75,6 +75,16 @@ const MembersList = () => {
     }
   };
 
+  const updateMemberApprovalStatus = (externalId) => {
+    const selectedMemberIndex = membersList.findIndex((member) => member.id === externalId);
+
+    if (selectedMemberIndex >= 0) {
+      const tempMembersList = membersList;
+      tempMembersList[selectedMemberIndex].is_approved = true;
+      setMembersList(tempMembersList);
+    }
+  };
+
   useEffect(() => {
     fetchCreatorMemberTags();
   }, [fetchCreatorMemberTags]);
@@ -107,6 +117,26 @@ const MembersList = () => {
     } catch (error) {
       showErrorModal('Failed updating member tag', error?.response?.data?.message || 'Something went wrong');
     }
+  };
+
+  const approveMemberRequest = async (memberId) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        external_id: memberId,
+        is_approved: true,
+      };
+
+      const { status } = await apis.audiences.approveCreatorMemberRequest(payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Member join request approved!');
+        updateMemberApprovalStatus(memberId);
+      }
+    } catch (error) {
+      showErrorModal('Failed approving member request', error?.response?.data?.message || 'Something went wrong.');
+    }
 
     setIsLoading(false);
   };
@@ -116,14 +146,31 @@ const MembersList = () => {
       title: 'First Name',
       dataIndex: 'first_name',
       key: 'first_name',
-      width: '32%',
+      width: '22%',
     },
     {
       title: 'Last Name',
       dataIndex: 'last_name',
       key: 'last_name',
-      width: '32%',
+      width: '22%',
       render: (text, record) => record.last_name || '-',
+    },
+    {
+      title: 'Member Request',
+      dataIndex: 'is_approved',
+      key: 'is_approved',
+      width: '32%',
+      render: (text, record) =>
+        record.is_approved ? (
+          <>
+            {' '}
+            <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
+          </>
+        ) : (
+          <Button type="primary" onClick={() => approveMemberRequest(record.id)}>
+            Allow
+          </Button>
+        ),
     },
     {
       title: 'Tag',
@@ -192,7 +239,6 @@ const MembersList = () => {
     },
   ];
 
-  // TODO: Test and Fix/improve mobile UI Later
   const renderMobileMembersCard = (member) => {
     return (
       <Col xs={24} key={member.id}>
@@ -219,6 +265,21 @@ const MembersList = () => {
                 ]
           }
         >
+          <Row gutter={[8, 8]}>
+            <Col xs={12}>Member Request:</Col>
+            <Col xs={12}>
+              {member.is_approved ? (
+                <>
+                  {' '}
+                  <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
+                </>
+              ) : (
+                <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
+                  Allow
+                </Button>
+              )}
+            </Col>
+          </Row>
           <Row gutter={[8, 8]}>
             <Col xs={4}>Tag :</Col>
             <Col xs={20}>

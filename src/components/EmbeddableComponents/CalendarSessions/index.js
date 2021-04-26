@@ -8,7 +8,7 @@ import CalendarWrapper from 'components/CalendarWrapper';
 import AuthModal from 'components/AuthModal';
 import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType, productType, paymentSource } from 'utils/helper';
+import { isAPISuccess, orderType, productType, paymentSource, isUnapprovedUserError } from 'utils/helper';
 import dateUtil from 'utils/date';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -120,14 +120,14 @@ const CalendarSessions = ({ profileUsername }) => {
     } catch (error) {
       setIsSessionLoading(false);
 
-      message.error(error.response?.data?.message || 'Something went wrong');
-
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
 
       return null;

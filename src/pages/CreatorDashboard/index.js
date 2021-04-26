@@ -51,6 +51,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.audiences} component={Audiences} />
       <Route exact path={match.url + Routes.creatorDashboard.legals} component={Legals} />
       <Route exact path={match.url + Routes.creatorDashboard.documents} component={Documents} />
+      <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
       <Route exact path={match.url + Routes.creatorDashboard.externalSiteSettings} component={ExternalSiteSettings} />
       <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
       <Route exact path={match.url + Routes.creatorDashboard.membersTags} component={MembersTags} />
