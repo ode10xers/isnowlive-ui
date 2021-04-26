@@ -132,10 +132,11 @@ const Videos = () => {
     setSelectedVideo(null);
     setShouldCloneVideo(false);
     setFormPart(1);
+    document.body.classList.remove(['ant-scrolling-effect']);
+    document.body.removeAttribute('style');
     if (shouldRefresh) {
       getVideosForCreator();
     }
-    document.body.style.overflow = 'auto';
   };
 
   const getVideosForCreator = useCallback(async () => {
@@ -652,17 +653,15 @@ const Videos = () => {
 
   return (
     <div className={styles.box}>
-      {createModalVisible && (
-        <UploadVideoModal
-          formPart={formPart}
-          setFormPart={setFormPart}
-          visible={createModalVisible}
-          closeModal={hideUploadVideoModal}
-          editedVideo={selectedVideo}
-          updateEditedVideo={setSelectedVideo}
-          shouldClone={shouldCloneVideo}
-        />
-      )}
+      <UploadVideoModal
+        formPart={formPart}
+        setFormPart={setFormPart}
+        visible={createModalVisible}
+        closeModal={hideUploadVideoModal}
+        editedVideo={selectedVideo}
+        updateEditedVideo={setSelectedVideo}
+        shouldClone={shouldCloneVideo}
+      />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={14}>
           <Title level={4}> Videos </Title>
