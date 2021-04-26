@@ -630,11 +630,11 @@ const UploadVideoModal = ({
                       title={
                         <>
                           {' '}
-                          <Paragraph>
+                          <Paragraph className={styles.whiteText}>
                             Marking a video as a Course video prevents a customer from buying this video alone, they can
                             only get it if they buy the whole course you add this video to.
                           </Paragraph>{' '}
-                          <Paragraph>
+                          <Paragraph className={styles.whiteText}>
                             If you are in doubt, choose normal for now. You can always change this later.
                           </Paragraph>{' '}
                         </>

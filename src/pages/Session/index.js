@@ -16,6 +16,7 @@ import {
   message,
   DatePicker,
   Modal,
+  Tooltip,
 } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import moment from 'moment';
@@ -35,7 +36,6 @@ import {
   getCurrencyList,
   convertSchedulesToUTC,
   isAPISuccess,
-  scrollToErrorField,
   generateRandomColor,
   isValidFile,
   ZoomAuthType,
@@ -56,7 +56,7 @@ import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/int
 
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const {
@@ -96,7 +96,7 @@ const initialSession = {
   document_urls: [],
   beginning: moment().startOf('day').utc().format(),
   expiry: moment().add(1, 'days').startOf('day').utc().format(),
-  recurring: false,
+  recurring: true,
   is_refundable: true,
   refund_before_hours: 0,
   prerequisites: '',
@@ -114,7 +114,7 @@ const Session = ({ match, history }) => {
   const [currencyList, setCurrencyList] = useState(null);
   const [sessionRefundable, setSessionRefundable] = useState(true);
   const [refundBeforeHours, setRefundBeforeHours] = useState(24);
-  const [isSessionRecurring, setIsSessionRecurring] = useState(false);
+  const [isSessionRecurring, setIsSessionRecurring] = useState(true);
   const [recurringDatesRanges, setRecurringDatesRanges] = useState([]);
   const [session, setSession] = useState(initialSession);
   const [deleteSlot, setDeleteSlot] = useState([]);
@@ -633,7 +633,7 @@ const Session = ({ match, history }) => {
         setIsLoading(false);
       } else {
         setIsLoading(false);
-        message.error('Need at least 1 sesssion to publish');
+        message.error('Need at least 1 session to publish');
       }
     } catch (error) {
       setIsLoading(false);
@@ -643,10 +643,6 @@ const Session = ({ match, history }) => {
       });
       message.error(error.response?.data?.message || 'Something went wrong.');
     }
-  };
-
-  const onFinishFailed = ({ errorFields }) => {
-    scrollToErrorField(errorFields);
   };
 
   const handleCalenderPop = () => {
@@ -702,7 +698,6 @@ const Session = ({ match, history }) => {
         scrollToFirstError={true}
         {...profileFormItemLayout}
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
         labelAlign={isMobileDevice ? 'left' : 'right'}
       >
         {/* ========= SESSION INFORMATION ======== */}
@@ -753,7 +748,25 @@ const Session = ({ match, history }) => {
             <TextEditor name="description" form={form} placeholder="Please input description" />
           </Form.Item>
 
-          <Form.Item label="Attached Files" id="document_urls" name="document_urls">
+          <Form.Item
+            label="Attached Files"
+            id="document_urls"
+            name="document_urls"
+            extra={
+              <Paragraph type="secondary">
+                Your documents uploaded in your{' '}
+                <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
+                  {' '}
+                  document drive{' '}
+                </Link>{' '}
+                will show up here. You can add a new doc in the{' '}
+                <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
+                  {' '}
+                  document drive{' '}
+                </Link>
+              </Paragraph>
+            }
+          >
             <Select
               className={styles.fileDropdown}
               showArrow
@@ -785,8 +798,24 @@ const Session = ({ match, history }) => {
               onChange={handleSessionCourseType}
             >
               <Radio.Group>
-                <Radio value="normal">Normal Session</Radio>
-                <Radio value="course">Course Session</Radio>
+                <Tooltip title="Marking a session as a Normal session allows your customers to buy this session alone as a one off purchase">
+                  <Radio value="normal">Normal Session</Radio>
+                </Tooltip>
+                <Tooltip
+                  title={
+                    <>
+                      <Paragraph className={styles.whiteText}>
+                        Marking a session as a Course session prevents a customer from buying this session alone, they
+                        can only get it if they buy the whole course you add this session to.
+                      </Paragraph>{' '}
+                      <Paragraph className={styles.whiteText}>
+                        If you are in doubt, choose normal for now. You can always change this later.
+                      </Paragraph>{' '}
+                    </>
+                  }
+                >
+                  <Radio value="course">Course Session</Radio>
+                </Tooltip>
               </Radio.Group>
             </Form.Item>
           </>
@@ -803,7 +832,7 @@ const Session = ({ match, history }) => {
               <Radio.Group>
                 <Radio value="Group">Group</Radio>
                 <Radio disabled={isCourseSession} value="1-on-1">
-                  Individual (1-on-1)
+                  Private (1 individual)
                 </Radio>
               </Radio.Group>
             </Form.Item>
