@@ -330,12 +330,12 @@ const Session = ({ match, history }) => {
     }
   };
 
-  const changeSessionRecurrance = (isRecurring) => {
+  const changeSessionRecurrence = (isRecurring) => {
     setIsSessionRecurring(isRecurring);
     setRecurringDatesRanges([]);
   };
 
-  const handleSessionRecurrance = (e) => {
+  const handleSessionRecurrence = (e) => {
     const isRecurring = e.target.value === 'true';
 
     if (session.inventory.length > 0) {
@@ -357,9 +357,9 @@ const Session = ({ match, history }) => {
         okButtonProps: { type: 'default' },
         cancelText: 'Yes, Keep Slots',
         cancelButtonProps: { type: 'primary' },
-        onCancel: () => changeSessionRecurrance(isRecurring),
+        onCancel: () => changeSessionRecurrence(isRecurring),
         onOk: () => {
-          changeSessionRecurrance(isRecurring);
+          changeSessionRecurrence(isRecurring);
           // Mark created inventories for deletion
           session.inventory.forEach((inv) => {
             if (inv.inventory_id) {
@@ -372,7 +372,7 @@ const Session = ({ match, history }) => {
         },
       });
     } else {
-      changeSessionRecurrance(isRecurring);
+      changeSessionRecurrence(isRecurring);
     }
   };
 
@@ -907,7 +907,7 @@ const Session = ({ match, history }) => {
                   {...(!isMobileDevice && profileFormItemLayout)}
                   label="Cancellable Before"
                   name="refund_before_hours"
-                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputed above"
+                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputted above"
                   rules={validationRules.requiredValidation}
                   onChange={handleRefundBeforeHoursChange}
                 >
@@ -939,9 +939,9 @@ const Session = ({ match, history }) => {
 
           <Form.Item
             name="recurring"
-            label="Session Recurrance"
+            label="Session Recurrence"
             rules={validationRules.requiredValidation}
-            onChange={handleSessionRecurrance}
+            onChange={handleSessionRecurrence}
           >
             <Radio.Group>
               <Radio value={false}>One Time Session</Radio>
