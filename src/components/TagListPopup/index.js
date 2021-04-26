@@ -24,14 +24,14 @@ const TagListPopup = ({ tags = [], mobileView = false }) => {
             </Popover>
           </Col>
         ) : (
-          <Col xs={13}>{tags.length > 0 ? tags[0].name : 'Everyone'}</Col>
+          <Col xs={13}>{tags.length > 0 ? tags[0].name : 'Anyone'}</Col>
         )}
       </Row>
     );
   }
 
   if (tags.length === 0) {
-    return 'Everyone';
+    return 'Anyone';
   }
 
   if (tags.length === 1) {

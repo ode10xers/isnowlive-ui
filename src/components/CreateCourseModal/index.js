@@ -77,7 +77,7 @@ const colorPickerChoices = [
 const formInitialValues = {
   courseName: '',
   price: 10,
-  courseTagType: 'everyone',
+  courseTagType: 'anyone',
   videoList: [],
   selectedMemberTags: [],
 };
@@ -107,7 +107,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const [highestMaxParticipantCourseSession, setHighestMaxParticipantCourseSession] = useState(null);
   const [selectedInventories, setSelectedInventories] = useState([]);
   // const [isSequentialVideos, setIsSequentialVideos] = useState(false);
-  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const fetchCreatorMemberTags = useCallback(async () => {
@@ -322,12 +322,12 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
             price: editedCourse?.currency ? editedCourse?.price : 0,
             colorCode: editedCourse?.color_code || initialColor || whiteColor,
-            courseTagType: editedCourse?.tag?.length > 0 ? 'selected' : 'everyone',
+            courseTagType: editedCourse?.tag?.length > 0 ? 'selected' : 'anyone',
             selectedMemberTags: editedCourse?.tag?.map((tag) => tag.external_id) || [],
           });
 
           //setIsSequentialVideos(editedCourse.course_sequence || false);
-          setSelectedTagType(editedCourse?.tag?.length > 0 ? 'selected' : 'everyone');
+          setSelectedTagType(editedCourse?.tag?.length > 0 ? 'selected' : 'anyone');
           setSelectedCourseClass([]);
           setCourseEndDate(null);
           setCourseStartDate(null);
@@ -342,11 +342,11 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
             videoList: editedCourse?.videos?.map((courseVideo) => courseVideo.external_id),
             price: editedCourse?.currency ? editedCourse?.price : 0,
             colorCode: editedCourse?.color_code || initialColor || whiteColor,
-            courseTagType: editedCourse?.tag?.length > 0 ? 'selected' : 'everyone',
+            courseTagType: editedCourse?.tag?.length > 0 ? 'selected' : 'anyone',
             selectedMemberTags: editedCourse?.tag?.map((tag) => tag.external_id) || [],
           });
 
-          setSelectedTagType(editedCourse?.tag?.length > 0 ? 'selected' : 'everyone');
+          setSelectedTagType(editedCourse?.tag?.length > 0 ? 'selected' : 'anyone');
           setSelectedCourseClass(editedCourse?.sessions?.map((courseSession) => courseSession.session_id));
           setCourseStartDate(moment(editedCourse?.start_date));
           setCourseEndDate(moment(editedCourse?.end_date));
@@ -369,7 +369,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         setCourseEndDate(null);
         setCourseImageUrl(null);
         setHighestMaxParticipantCourseSession(null);
-        setSelectedTagType('everyone');
+        setSelectedTagType('anyone');
         // setIsSequentialVideos(false);
       }
 
@@ -459,8 +459,8 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     if (creatorMemberTags.length > 0) {
       setSelectedTagType(e.target.value);
     } else {
-      setSelectedTagType('everyone');
-      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'everyone' });
+      setSelectedTagType('anyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'anyone' });
       Modal.confirm({
         title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
         okText: 'Setup Member Tags',
@@ -495,7 +495,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         type: courseTypes.VIDEO_NON_SEQ.name.toUpperCase(),
         price: currency ? values.price ?? 1 : 0,
         currency: currency?.toLowerCase() || '',
-        tag_ids: selectedTagType === 'everyone' ? [] : values.selectedMemberTags || [],
+        tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
         video_ids: processedVideosIDs,
         validity: values.validity || 1,
       };
@@ -517,7 +517,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
         type: courseTypes.MIXED.name.toUpperCase(),
         price: currency ? values.price ?? 1 : 0,
         currency: currency?.toLowerCase() || '',
-        tag_ids: selectedTagType === 'everyone' ? [] : values.selectedMemberTags || [],
+        tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
         video_ids: selectedVideos || [],
         session_ids: selectedCourseClass,
         max_participants: values.maxParticipants || highestMaxParticipantCourseSession?.max_participants,
@@ -693,7 +693,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
               )}
             </Select.OptGroup>
             <Select.OptGroup
-              label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
               key="Unpublished Sessions"
             >
               {courseClasses
@@ -956,7 +956,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
                     key="Unpublished Videos"
                   >
                     {videos
@@ -1026,7 +1026,7 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 onChange={handleCourseTagTypeChange}
               >
                 <Radio.Group>
-                  <Radio value="everyone"> Everyone </Radio>
+                  <Radio value="anyone"> Anyone </Radio>
                   <Radio value="selected"> Selected Member Tags </Radio>
                 </Radio.Group>
               </Form.Item>
@@ -1034,14 +1034,14 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
                 name="selectedMemberTags"
                 id="selectedMemberTags"
                 {...courseModalTailLayout}
-                hidden={selectedTagType === 'everyone'}
+                hidden={selectedTagType === 'anyone'}
               >
                 <Select
                   showArrow
                   mode="multiple"
                   maxTagCount={2}
                   placeholder="Select a member tag"
-                  disabled={selectedTagType === 'everyone'}
+                  disabled={selectedTagType === 'anyone'}
                   options={creatorMemberTags.map((tag) => ({
                     label: (
                       <>

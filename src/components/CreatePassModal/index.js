@@ -38,7 +38,7 @@ const formInitialValues = {
   videoList: [],
   passType: passTypes.LIMITED.name,
   colorCode: initialColor,
-  passTagType: 'everyone',
+  passTagType: 'anyone',
   selectedMemberTag: null,
 };
 
@@ -79,7 +79,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const [colorCode, setColorCode] = useState(initialColor);
 
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
-  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [selectedTag, setSelectedTag] = useState(null);
 
   const fetchCreatorMemberTags = useCallback(async () => {
@@ -185,10 +185,10 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
           validity: editedPass.validity,
           price: editedPass.currency ? editedPass.price : 0,
           color_code: editedPass.color_code || whiteColor,
-          passTagType: editedPass.tag?.external_id ? 'selected' : 'everyone',
+          passTagType: editedPass.tag?.external_id ? 'selected' : 'anyone',
           selectedMemberTag: editedPass.tag?.external_id || null,
         });
-        setSelectedTagType(editedPass.tag?.external_id ? 'selected' : 'everyone');
+        setSelectedTagType(editedPass.tag?.external_id ? 'selected' : 'anyone');
         setSelectedTag(editedPass.tag?.external_id || null);
         setCurrency(editedPass.currency.toUpperCase() || '');
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
@@ -203,7 +203,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         setColorCode(initialColor);
         setCurrency('');
         setSelectedTag(null);
-        setSelectedTagType('everyone');
+        setSelectedTagType('anyone');
       }
 
       getCreatorCurrencyDetails();
@@ -237,13 +237,13 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
     if (creatorMemberTags.length > 0) {
       setSelectedTagType(e.target.value);
 
-      if (e.target.value === 'everyone') {
+      if (e.target.value === 'anyone') {
         setSelectedTag(null);
         form.setFieldsValue({ ...form.getFieldsValue(), selectedMemberTag: null });
       }
     } else {
-      setSelectedTagType('everyone');
-      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'everyone', selectedMemberTag: null });
+      setSelectedTagType('anyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'anyone', selectedMemberTag: null });
       Modal.confirm({
         title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
         okText: 'Setup Member Tags',
@@ -319,7 +319,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
         class_count: passTypes.LIMITED.name === passType ? values.classCount || 10 : 1000,
         limited: passTypes.LIMITED.name === passType,
         color_code: colorCode || whiteColor,
-        tag_id: selectedTagType === 'everyone' ? '' : values.selectedMemberTag ?? '',
+        tag_id: selectedTagType === 'anyone' ? '' : values.selectedMemberTag ?? '',
       };
 
       const response = editedPass
@@ -373,16 +373,16 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                 style={{ marginBottom: 8 }}
               >
                 <Radio.Group>
-                  <Radio value="everyone"> Everyone </Radio>
+                  <Radio value="anyone"> Anyone </Radio>
                   <Radio value="selected"> Selected Member Tags </Radio>
                 </Radio.Group>
               </Form.Item>
-              <Form.Item name="selectedMemberTag" id="selectedMemberTag" hidden={selectedTagType === 'everyone'}>
+              <Form.Item name="selectedMemberTag" id="selectedMemberTag" hidden={selectedTagType === 'anyone'}>
                 <Select
                   showArrow
                   allowClear
                   placeholder="Select a member tag"
-                  disabled={selectedTagType === 'everyone'}
+                  disabled={selectedTagType === 'anyone'}
                   onChange={onSelectedTagChange}
                   options={creatorMemberTags.map((tag) => ({
                     label: (
@@ -468,7 +468,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
                     key="Unpublished Sessions"
                   >
                     {classes
@@ -570,7 +570,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
-                    label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                    label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
                     key="Unpublished Videos"
                   >
                     {videos

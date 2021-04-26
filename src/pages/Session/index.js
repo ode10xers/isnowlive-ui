@@ -105,7 +105,7 @@ const initialSession = {
   prerequisites: '',
   color_code: initialColor,
   is_course: false,
-  session_tag_type: 'everyone',
+  session_tag_type: 'anyone',
 };
 
 const Session = ({ match, history }) => {
@@ -127,7 +127,7 @@ const Session = ({ match, history }) => {
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
   const [creatorDocuments, setCreatorDocuments] = useState([]);
-  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const {
@@ -214,7 +214,7 @@ const Session = ({ match, history }) => {
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
-            session_tag_type: data?.tags?.length > 0 ? 'selected' : 'everyone',
+            session_tag_type: data?.tags?.length > 0 ? 'selected' : 'anyone',
             selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
           });
           setSessionImageUrl(data.session_image_url);
@@ -227,7 +227,7 @@ const Session = ({ match, history }) => {
           setColorCode(data?.color_code || whiteColor);
           setIsCourseSession(data?.is_course || false);
           setIsLoading(false);
-          setSelectedTagType(data?.tags?.length > 0 ? 'selected' : 'everyone');
+          setSelectedTagType(data?.tags?.length > 0 ? 'selected' : 'anyone');
           await getCreatorCurrencyDetails(data);
         }
       } catch (error) {
@@ -283,7 +283,7 @@ const Session = ({ match, history }) => {
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
         session_course_type: 'normal',
-        session_tag_type: 'everyone',
+        session_tag_type: 'anyone',
         selected_member_tags: [],
       });
       setIsLoading(false);
@@ -321,8 +321,8 @@ const Session = ({ match, history }) => {
     if (creatorMemberTags.length > 0) {
       setSelectedTagType(e.target.value);
     } else {
-      setSelectedTagType('everyone');
-      form.setFieldsValue({ ...form.getFieldsValue(), session_tag_type: 'everyone' });
+      setSelectedTagType('anyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), session_tag_type: 'anyone' });
       Modal.confirm({
         title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
         okText: 'Setup Member Tags',
@@ -615,7 +615,7 @@ const Session = ({ match, history }) => {
         color_code: values.color_code || colorCode || whiteColor,
         is_course: isCourseSession,
         tag_ids:
-          selectedTagType === 'everyone'
+          selectedTagType === 'anyone'
             ? []
             : values.selected_member_tags || session?.tags?.map((tag) => tag.external_id) || [],
       };
@@ -886,14 +886,14 @@ const Session = ({ match, history }) => {
               onChange={handleSessionTagType}
             >
               <Radio.Group>
-                <Radio value="everyone"> Everyone </Radio>
+                <Radio value="anyone"> Anyone </Radio>
                 <Radio value="selected"> Selected Member Tags </Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item
               name="selected_member_tags"
               id="selected_member_tags"
-              hidden={selectedTagType === 'everyone'}
+              hidden={selectedTagType === 'anyone'}
               {...(!isMobileDevice && profileFormTailLayout)}
             >
               <Select
@@ -901,7 +901,7 @@ const Session = ({ match, history }) => {
                 mode="multiple"
                 maxTagCount={3}
                 placeholder="Select a member tag"
-                disabled={selectedTagType === 'everyone'}
+                disabled={selectedTagType === 'anyone'}
                 options={creatorMemberTags.map((tag) => ({
                   label: (
                     <>

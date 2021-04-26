@@ -63,7 +63,7 @@ const formInitialValues = {
   price: 0,
   watch_limit: 0,
   video_course_type: 'normal',
-  videoTagType: 'everyone',
+  videoTagType: 'anyone',
   selectedMemberTags: [],
 };
 
@@ -89,7 +89,7 @@ const UploadVideoModal = ({
   const [uploadingFile, setUploadingFile] = useState(null);
   const [isCourseVideo, setIsCourseVideo] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
-  const [selectedTagType, setSelectedTagType] = useState('everyone');
+  const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
   const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
   const [, setVideoLength] = useState(0);
@@ -232,10 +232,10 @@ const UploadVideoModal = ({
           videoType:
             editedVideo.currency === '' || editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
           video_course_type: editedVideo.is_course ? 'course' : 'normal',
-          videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'everyone',
+          videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'everyone');
+        setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
@@ -266,7 +266,7 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
       setIsCourseVideo(false);
-      setSelectedTagType('everyone');
+      setSelectedTagType('anyone');
       setCurrency('');
       uppy.current = null;
       document.body.classList.remove(['ant-scrolling-effect']);
@@ -329,8 +329,8 @@ const UploadVideoModal = ({
     if (creatorMemberTags.length > 0) {
       setSelectedTagType(e.target.value);
     } else {
-      setSelectedTagType('everyone');
-      form.setFieldsValue({ ...form.getFieldsValue(), videoTagType: 'everyone' });
+      setSelectedTagType('anyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), videoTagType: 'anyone' });
       Modal.confirm({
         title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
         okText: 'Setup Member Tags',
@@ -358,7 +358,7 @@ const UploadVideoModal = ({
         thumbnail_url: coverImageUrl,
         watch_limit: values.watch_limit,
         is_course: isCourseVideo,
-        tag_ids: selectedTagType === 'everyone' ? [] : values.selectedMemberTags || [],
+        tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
       };
 
       const response = editedVideo
@@ -628,7 +628,7 @@ const UploadVideoModal = ({
                       )}
                     </Select.OptGroup>
                     <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
                       key="Unpublished Sessions"
                     >
                       {classes
@@ -721,7 +721,7 @@ const UploadVideoModal = ({
                   onChange={handleVideoTagTypeChange}
                 >
                   <Radio.Group>
-                    <Radio value="everyone"> Everyone </Radio>
+                    <Radio value="anyone"> Anyone </Radio>
                     <Radio value="selected"> Selected Member Tags </Radio>
                   </Radio.Group>
                 </Form.Item>
@@ -732,14 +732,14 @@ const UploadVideoModal = ({
                   name="selectedMemberTags"
                   id="selectedMemberTags"
                   {...formTailLayout}
-                  hidden={selectedTagType === 'everyone'}
+                  hidden={selectedTagType === 'anyone'}
                 >
                   <Select
                     showArrow
                     mode="multiple"
                     maxTagCount={2}
                     placeholder="Select a member tag"
-                    disabled={selectedTagType === 'everyone'}
+                    disabled={selectedTagType === 'anyone'}
                     options={creatorMemberTags.map((tag) => ({
                       label: (
                         <>
