@@ -215,8 +215,8 @@ const VideoCourses = ({
       }
 
       return initialColumns;
-      //eslint-disable-next-line
-    }, [creatorMemberTags]
+    }, //eslint-disable-next-line
+    [creatorMemberTags]
   );
 
   const buyersColumns = [

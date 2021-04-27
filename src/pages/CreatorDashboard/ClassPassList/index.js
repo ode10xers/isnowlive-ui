@@ -294,6 +294,7 @@ const ClassPassList = () => {
           </Button>
         ),
         align: 'right',
+        width: '340px',
         render: (text, record) => (
           <Row gutter={8}>
             <Col xs={24} md={4}>

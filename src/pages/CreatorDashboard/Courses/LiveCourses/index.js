@@ -84,7 +84,7 @@ const LiveCourses = ({
     setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
   const generateLiveCourseColumns = useCallback(
-(published) => {
+    (published) => {
       const initialColumns = [
         {
           title: 'Course Name',
@@ -222,8 +222,8 @@ const LiveCourses = ({
       }
 
       return initialColumns;
-      //eslint-disable-next-line
-    }, [creatorMemberTags]
+    }, //eslint-disable-next-line
+    [creatorMemberTags]
   );
 
   const buyersColumns = [
