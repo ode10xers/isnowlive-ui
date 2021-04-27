@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { message } from 'antd';
 import dateUtil from 'utils/date';
+import { getLocalUserDetails } from './storage';
 
 const {
   formatDate: { getTimeDiff },
@@ -15,6 +16,23 @@ export const isUnapprovedUserError = (errorResponse) =>
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
+
+export const getCreatorUsernameForHeader = () => {
+  const creatorUsername = getUsernameFromUrl();
+
+  const profilePreviewPathnames = ['/profile/preview', '/creator/dashboard/profile'];
+
+  if (profilePreviewPathnames.includes(window.location.pathname)) {
+    // For specific URLs we will use creator username from localStorage
+    return getLocalUserDetails().username;
+  } else if (!reservedDomainName.includes(creatorUsername)) {
+    // If username in URL is detected then use that
+    return creatorUsername;
+  } else {
+    // else don't send anything
+    return '';
+  }
+};
 
 export const generateQueryString = (data) => {
   return Object.entries(data)
