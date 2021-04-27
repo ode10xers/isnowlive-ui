@@ -785,16 +785,18 @@ const Videos = () => {
 
   return (
     <div className={styles.box}>
-      <UploadVideoModal
-        formPart={formPart}
-        setFormPart={setFormPart}
-        visible={createModalVisible}
-        closeModal={hideUploadVideoModal}
-        editedVideo={selectedVideo}
-        updateEditedVideo={setSelectedVideo}
-        shouldClone={shouldCloneVideo}
-        creatorMemberTags={creatorMemberTags}
-      />
+      {createModalVisible && (
+        <UploadVideoModal
+          formPart={formPart}
+          setFormPart={setFormPart}
+          visible={createModalVisible}
+          closeModal={hideUploadVideoModal}
+          editedVideo={selectedVideo}
+          updateEditedVideo={setSelectedVideo}
+          shouldClone={shouldCloneVideo}
+          creatorMemberTags={creatorMemberTags}
+        />
+      )}
       <Row gutter={[8, 24]}>
         <Col xs={24} md={14} lg={18}>
           <Title level={4}> Videos </Title>
