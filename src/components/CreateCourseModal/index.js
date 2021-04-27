@@ -89,7 +89,13 @@ const {
   formatDate: { toLocaleTime, toLocaleDate, toLongDateWithDay, toLongDateWithLongDay },
 } = dateUtil;
 
-const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
+const CreateCourseModal = ({
+  visible,
+  closeModal,
+  editedCourse = null,
+  isVideoModal = false,
+  creatorMemberTags = [],
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -108,21 +114,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
   const [selectedInventories, setSelectedInventories] = useState([]);
   // const [isSequentialVideos, setIsSequentialVideos] = useState(false);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
-  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
-
-  const fetchCreatorMemberTags = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
-
-      if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
-    }
-    setIsLoading(false);
-  }, []);
 
   const fetchAllCourseClassForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -306,8 +297,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
 
   useEffect(() => {
     if (visible) {
-      fetchCreatorMemberTags();
-
       if (!isVideoModal) {
         fetchAllCourseClassForCreator();
       }
@@ -383,7 +372,6 @@ const CreateCourseModal = ({ visible, closeModal, editedCourse = null, isVideoMo
     fetchAllCourseClassForCreator,
     fetchAllVideosForCreator,
     getCreatorCurrencyDetails,
-    fetchCreatorMemberTags,
     form,
   ]);
 

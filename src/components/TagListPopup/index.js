@@ -13,7 +13,7 @@ const TagListPopup = ({ tags = [], mobileView = false }) => {
           <Col xs={24}>
             <Popover
               trigger="click"
-              title="Purchasable by members with these tag"
+              title="Purchasable by members with these tags"
               content={
                 <List size="small" dataSource={tags} renderItem={(item) => <List.Item> {item.name} </List.Item>} />
               }
