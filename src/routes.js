@@ -42,11 +42,12 @@ const Routes = {
     courses: '/courses',
     coupons: '/coupons',
     accountSettings: '/settings',
-    audiences: '/audiences',
+    newsletter: '/newsletter',
     legals: '/legals',
     documents: '/documents',
     externalSiteSettings: '/widgets',
     membersList: '/members/list',
+    membersSettings: '/members/settings',
     membersTags: '/members/tag',
   },
   attendeeDashboard: {

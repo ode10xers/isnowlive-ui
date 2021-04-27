@@ -137,6 +137,7 @@ const MembersList = () => {
     } catch (error) {
       showErrorModal('Failed updating member tag', error?.response?.data?.message || 'Something went wrong');
     }
+    setIsLoading(false);
   };
 
   const approveMemberRequest = async (memberId) => {

@@ -24,7 +24,8 @@ import Legals from 'pages/CreatorDashboard/SiteSettings/Legals';
 import Documents from 'pages/CreatorDashboard/Documents';
 import ExternalSiteSettings from 'pages/CreatorDashboard/ExternalSiteSettings';
 import MembersList from 'pages/CreatorDashboard/Members/MembersList';
-import MembersTags from 'pages/CreatorDashboard/Members/MembersTags';
+import MembersTags from 'pages/CreatorDashboard/AdvancedSettings/MembersTags';
+import MemberSettings from 'pages/CreatorDashboard/AdvancedSettings/MembersSettings';
 
 //TODO: Might want to refactor earning details page to be single component
 const CreatorDashboard = ({ match }) => {
@@ -55,6 +56,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.externalSiteSettings} component={ExternalSiteSettings} />
       <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
       <Route exact path={match.url + Routes.creatorDashboard.membersTags} component={MembersTags} />
+      <Route exact path={match.url + Routes.creatorDashboard.membersSettings} component={MemberSettings} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>
   );
