@@ -27,6 +27,8 @@ const MembersList = () => {
   const totalItemsPerPage = 10;
 
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  // isPrivateCommunity will be true when the user settings 'member_requires_invite' is true
+  const [isPrivateCommunity, setIsPrivateCommunity] = useState(false);
 
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
@@ -61,6 +63,23 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorPrivateCommunityFlag = useCallback(async () => {
+    setIsLoading(false);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setIsPrivateCommunity(data.member_requires_invite);
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed fetching creator private community settings',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+    setIsLoading(false);
+  }, []);
+
   const updateMemberTag = (tagId) => {
     const selectedMemberIndex = membersList.findIndex((member) => member.id === selectedMember.id);
 
@@ -87,7 +106,8 @@ const MembersList = () => {
 
   useEffect(() => {
     fetchCreatorMemberTags();
-  }, [fetchCreatorMemberTags]);
+    fetchCreatorPrivateCommunityFlag();
+  }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
     fetchCreatorMembersList(pageNumber, totalItemsPerPage);
@@ -141,103 +161,131 @@ const MembersList = () => {
     setIsLoading(false);
   };
 
-  const membersListColumns = [
-    {
-      title: 'First Name',
-      dataIndex: 'first_name',
-      key: 'first_name',
-      width: '22%',
-    },
-    {
-      title: 'Last Name',
-      dataIndex: 'last_name',
-      key: 'last_name',
-      width: '22%',
-      render: (text, record) => record.last_name || '-',
-    },
-    {
-      title: 'Member Request',
-      dataIndex: 'is_approved',
-      key: 'is_approved',
-      width: '32%',
-      render: (text, record) =>
-        record.is_approved ? (
-          <>
-            {' '}
-            <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
-          </>
-        ) : (
-          <Button type="primary" onClick={() => approveMemberRequest(record.id)}>
-            Allow
-          </Button>
-        ),
-    },
-    {
-      title: 'Tag',
-      render: (text, record) =>
-        record.id === selectedMember?.id ? (
-          <Form.Item noStyle className={styles.tagDropdownContainer} name={record.id}>
-            <Select
-              className={styles.tagDropdownContainer}
-              placeholder="Select the member tag"
-              defaultValue={record.tag.external_id || null}
-              options={creatorMemberTags.map((tag) => ({
-                label: tag.name,
-                value: tag.external_id,
-              }))}
-            />
-          </Form.Item>
-        ) : (
-          <Text> {record.tag.name} </Text>
-        ),
-      filterIcon: (filtered) => (
-        <Tooltip defaultVisible={true} title="Click here to filter">
-          {' '}
-          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />{' '}
-        </Tooltip>
-      ),
-      filters: [
+  const generateMembersListColumns = useCallback(
+    () => {
+      const initialColumns = [
         {
-          text: 'Empty',
-          value: 'empty',
+          title: 'First Name',
+          dataIndex: 'first_name',
+          key: 'first_name',
         },
-        ...creatorMemberTags.map((tag) => ({
-          text: tag.name,
-          value: tag.external_id,
-        })),
-      ],
-      onFilter: (value, record) =>
-        value === 'empty' ? record.tag.external_id === '' : record.tag.external_id === value,
-    },
-    {
-      title: 'Actions',
-      width: '7%',
-      render: (record) => (
-        <Row gutter={[8, 8]} justify="end">
-          {record.id === selectedMember?.id ? (
-            <>
-              <Col xs={12}>
-                <Tooltip title="Save Member Tag">
-                  <Button block type="link" icon={<SaveOutlined />} onClick={() => updateSelectedMemberTag()} />
-                </Tooltip>
-              </Col>
-              <Col xs={12}>
-                <Tooltip title="Cancel Changes">
-                  <Button block type="link" icon={<CloseCircleOutlined />} onClick={() => setSelectedMember(null)} />
-                </Tooltip>
-              </Col>
-            </>
-          ) : (
-            <Col xs={24}>
-              <Tooltip title="Edit Member Tag">
-                <Button block type="link" icon={<EditOutlined />} onClick={() => setSelectedMember(record)} />
-              </Tooltip>
-            </Col>
-          )}
-        </Row>
-      ),
-    },
-  ];
+        {
+          title: 'Last Name',
+          dataIndex: 'last_name',
+          key: 'last_name',
+          render: (text, record) => record.last_name || '-',
+        },
+      ];
+
+      if (creatorMemberTags.length > 0) {
+        const tagColumnPosition = 2;
+
+        const tagColumnObject = {
+          title: 'Tag',
+          width: '180px',
+          render: (text, record) =>
+            record.id === selectedMember?.id ? (
+              <Form.Item noStyle className={styles.tagDropdownContainer} name={record.id}>
+                <Select
+                  className={styles.tagDropdownContainer}
+                  placeholder="Select the member tag"
+                  defaultValue={record.tag.external_id || null}
+                  options={creatorMemberTags.map((tag) => ({
+                    label: tag.name,
+                    value: tag.external_id,
+                  }))}
+                />
+              </Form.Item>
+            ) : (
+              <Text> {record.tag.name} </Text>
+            ),
+          filterIcon: (filtered) => (
+            <Tooltip defaultVisible={true} title="Click here to filter">
+              {' '}
+              <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />{' '}
+            </Tooltip>
+          ),
+          filters: [
+            {
+              text: 'Empty',
+              value: 'empty',
+            },
+            ...creatorMemberTags.map((tag) => ({
+              text: tag.name,
+              value: tag.external_id,
+            })),
+          ],
+          onFilter: (value, record) =>
+            value === 'empty' ? record.tag.external_id === '' : record.tag.external_id === value,
+        };
+
+        // Since currently actions are only related to tags, we will also show/hide
+        // it based on whether or not creator has tags
+        const actionsColumnObject = {
+          title: 'Actions',
+          width: '90px',
+          align: 'right',
+          render: (record) => (
+            <Row gutter={[8, 8]} justify="end">
+              {record.id === selectedMember?.id ? (
+                <>
+                  <Col xs={12}>
+                    <Tooltip title="Save Member Tag">
+                      <Button block type="link" icon={<SaveOutlined />} onClick={() => updateSelectedMemberTag()} />
+                    </Tooltip>
+                  </Col>
+                  <Col xs={12}>
+                    <Tooltip title="Cancel Changes">
+                      <Button
+                        block
+                        type="link"
+                        icon={<CloseCircleOutlined />}
+                        onClick={() => setSelectedMember(null)}
+                      />
+                    </Tooltip>
+                  </Col>
+                </>
+              ) : (
+                <Col xs={24}>
+                  <Tooltip title="Edit Member Tag">
+                    <Button block type="link" icon={<EditOutlined />} onClick={() => setSelectedMember(record)} />
+                  </Tooltip>
+                </Col>
+              )}
+            </Row>
+          ),
+        };
+
+        initialColumns.splice(tagColumnPosition, 0, tagColumnObject, actionsColumnObject);
+      }
+
+      if (isPrivateCommunity) {
+        // For this column we will put it in the last column, so we can use push()
+        const memberApprovalColumnObject = {
+          title: 'Member Request',
+          dataIndex: 'is_approved',
+          key: 'is_approved',
+          width: '150px',
+          render: (text, record) =>
+            record.is_approved ? (
+              <>
+                {' '}
+                <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
+              </>
+            ) : (
+              <Button type="primary" onClick={() => approveMemberRequest(record.id)}>
+                Allow
+              </Button>
+            ),
+        };
+
+        initialColumns.push(memberApprovalColumnObject);
+      }
+
+      return initialColumns;
+    }, //eslint-disable-next-line
+    [creatorMemberTags, isPrivateCommunity, selectedMember]
+  );
 
   const renderMobileMembersCard = (member) => {
     return (
@@ -265,41 +313,45 @@ const MembersList = () => {
                 ]
           }
         >
-          <Row gutter={[8, 8]}>
-            <Col xs={12}>Member Request:</Col>
-            <Col xs={12}>
-              {member.is_approved ? (
-                <>
-                  {' '}
-                  <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
-                </>
-              ) : (
-                <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
-                  Allow
-                </Button>
-              )}
-            </Col>
-          </Row>
-          <Row gutter={[8, 8]}>
-            <Col xs={4}>Tag :</Col>
-            <Col xs={20}>
-              {member.id === selectedMember?.id ? (
-                <Form.Item noStyle name={member.id}>
-                  <Select
-                    className={styles.tagDropdownContainer}
-                    placeholder="Select the member tag"
-                    defaultValue={member.tag.external_id || null}
-                    options={creatorMemberTags.map((tag) => ({
-                      label: tag.name,
-                      value: tag.external_id,
-                    }))}
-                  />
-                </Form.Item>
-              ) : (
-                <Text> {member.tag.name} </Text>
-              )}
-            </Col>
-          </Row>
+          {isPrivateCommunity && (
+            <Row gutter={[8, 8]}>
+              <Col xs={12}>Member Request:</Col>
+              <Col xs={12}>
+                {member.is_approved ? (
+                  <>
+                    {' '}
+                    <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
+                  </>
+                ) : (
+                  <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
+                    Allow
+                  </Button>
+                )}
+              </Col>
+            </Row>
+          )}
+          {creatorMemberTags.length > 0 && (
+            <Row gutter={[8, 8]}>
+              <Col xs={4}>Tag :</Col>
+              <Col xs={20}>
+                {member.id === selectedMember?.id ? (
+                  <Form.Item noStyle name={member.id}>
+                    <Select
+                      className={styles.tagDropdownContainer}
+                      placeholder="Select the member tag"
+                      defaultValue={member.tag.external_id || null}
+                      options={creatorMemberTags.map((tag) => ({
+                        label: tag.name,
+                        value: tag.external_id,
+                      }))}
+                    />
+                  </Form.Item>
+                ) : (
+                  <Text> {member.tag.name} </Text>
+                )}
+              </Col>
+            </Row>
+          )}
         </Card>
       </Col>
     );
@@ -330,7 +382,7 @@ const MembersList = () => {
                     size="small"
                     loading={isLoading}
                     data={membersList}
-                    columns={membersListColumns}
+                    columns={generateMembersListColumns()}
                     rowKey={(record) => record.id}
                   />
                 </Col>
