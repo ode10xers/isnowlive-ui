@@ -20,6 +20,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
+import { showErrorModal } from 'components/Modals/modals';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLocaleDate, toLongDateWithLongDay },
@@ -158,12 +159,9 @@ const SessionsInventories = ({ match }) => {
       getStaffSession(match?.params?.session_type);
     } catch (error) {
       trackFailedEvent(attendee.click.sessions.cancelOrder, error, { order_id: orderId });
-      Modal.error({
-        closable: true,
-        maskClosable: true,
-        title: 'An Error Occurred',
-        content: error.response?.data?.message || 'Something went wrong.',
-      });
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Failed to cancel order', error?.response?.data?.message || 'Something went wrong');
+      }
     }
   };
 

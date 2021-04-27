@@ -393,14 +393,14 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -449,14 +449,14 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -476,14 +476,14 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 

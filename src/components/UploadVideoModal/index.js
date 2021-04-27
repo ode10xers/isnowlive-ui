@@ -234,7 +234,7 @@ const UploadVideoModal = ({
 
         if (uppy.current) {
           uppy.current.getPlugin('Tus').setOptions({
-            endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+            endpoint: `${config.server.baseURL}/creator/videos/${editedVideo.external_id}/upload`,
           });
 
           setUppyCompleteListener(editedVideo.external_id);

@@ -70,7 +70,7 @@ const VideoDetails = ({ match }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      console.error('Failed to load profile details');
       setIsLoading(false);
     }
   }, []);
@@ -119,7 +119,7 @@ const VideoDetails = ({ match }) => {
         setAvailablePassesForVideo(data);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching available pass for video');
+      console.error(error.response?.data?.message || 'Failed fetching available pass for video');
       setIsLoading(false);
     }
     //eslint-disable-next-line
@@ -142,8 +142,11 @@ const VideoDetails = ({ match }) => {
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
       setIsLoading(false);
+
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
+      }
     }
   }, []);
 

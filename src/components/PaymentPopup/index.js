@@ -13,7 +13,7 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { orderType, paymentSource, isAPISuccess } from 'utils/helper';
+import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -86,8 +86,10 @@ const PaymentPopup = () => {
         setCouponApplied(true);
       }
     } catch (error) {
-      setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
-      setCouponApplied(false);
+      if (!isUnapprovedUserError(error.response)) {
+        setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
+        setCouponApplied(false);
+      }
     }
     setIsApplyingCoupon(false);
   };

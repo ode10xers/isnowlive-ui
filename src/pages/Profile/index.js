@@ -107,7 +107,7 @@ const Profile = () => {
         if (isOnboarding) {
           const creatorUrl = generateUrlFromUsername(values.username);
 
-          const newWindow = window.open(creatorUrl + Routes.profilePreview);
+          const newWindow = window.open(creatorUrl);
           newWindow.blur();
           window.focus();
           // history.push(Routes.livestream);

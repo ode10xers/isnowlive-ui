@@ -524,7 +524,7 @@ const Videos = () => {
     },
   ];
 
-  const renderSubsciberList = (record) => {
+  const renderSubscriberList = (record) => {
     return (
       <div className={styles.mb20}>
         <Table
@@ -821,7 +821,7 @@ const Videos = () => {
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
-                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandedRowRender: (record) => renderSubscriberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
                         expandedRowKeys: expandedPublishedRowKeys,
@@ -851,7 +851,7 @@ const Videos = () => {
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
-                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandedRowRender: (record) => renderSubscriberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
                         expandedRowKeys: expandedUnpublishedRowKeys,
