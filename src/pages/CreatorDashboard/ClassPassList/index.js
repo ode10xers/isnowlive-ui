@@ -485,7 +485,9 @@ const ClassPassList = () => {
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} days`}</Text>)}
           {layout('Price', <Text>{pass.price > 0 ? `${pass.currency?.toUpperCase()} ${pass.price}` : 'Free'}</Text>)}
-          <TagListPopup tags={[pass.tag].filter((tag) => tag.external_id)} mobileView={true} />
+          {creatorMemberTags.length > 0 && (
+            <TagListPopup tags={[pass.tag].filter((tag) => tag.external_id)} mobileView={true} />
+          )}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>

@@ -770,7 +770,7 @@ const Videos = () => {
         >
           {layout('Validity', <Text>{`${video?.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
-          <TagListPopup tags={video?.tags} mobileView={true} />
+          {creatorMemberTags.length > 0 && <TagListPopup tags={video?.tags} mobileView={true} />}
         </Card>
         {video?.is_published
           ? expandedPublishedRowKeys.includes(video?.external_id) && (

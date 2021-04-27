@@ -369,7 +369,7 @@ const LiveCourses = ({
             'Price',
             <Text>{course.price > 0 ? `${course.currency?.toUpperCase()} ${course.price}` : 'Free'}</Text>
           )}
-          <TagListPopup tags={course.tag} mobileView={true} />
+          {creatorMemberTags.length > 0 && <TagListPopup tags={course.tag} mobileView={true} />}
         </Card>
         {course.is_published
           ? expandedPublishedRowKeys.includes(course.id) && (

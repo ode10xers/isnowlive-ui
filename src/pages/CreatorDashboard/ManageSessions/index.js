@@ -372,7 +372,7 @@ const ManageSessions = () => {
             {item.total_bookings || 0} {'/'} {item.max_participants}
           </Text>
         )}
-        <TagListPopup tags={item.tags} mobileView={true} />
+        {creatorMemberTags.length > 0 && <TagListPopup tags={item.tags} mobileView={true} />}
       </Card>
     );
   };
