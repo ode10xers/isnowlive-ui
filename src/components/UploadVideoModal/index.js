@@ -80,6 +80,7 @@ const UploadVideoModal = ({
   editedVideo = null,
   updateEditedVideo,
   shouldClone,
+  creatorMemberTags = [],
 }) => {
   const [form] = Form.useForm();
 
@@ -93,7 +94,6 @@ const UploadVideoModal = ({
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
   const [uploadingFile, setUploadingFile] = useState(null);
   const [isCourseVideo, setIsCourseVideo] = useState(false);
-  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
   const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
@@ -171,20 +171,6 @@ const UploadVideoModal = ({
     setUploadingFile(null);
   });
 
-  const fetchCreatorMemberTags = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
-
-      if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
-    }
-    setIsLoading(false);
-  }, []);
-
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
 
@@ -226,7 +212,6 @@ const UploadVideoModal = ({
 
   useEffect(() => {
     if (visible) {
-      fetchCreatorMemberTags();
       document.body.style.overflow = 'hidden';
 
       if (editedVideo) {
@@ -278,15 +263,7 @@ const UploadVideoModal = ({
       document.body.removeAttribute('style');
     };
     //eslint-disable-next-line
-  }, [
-    visible,
-    editedVideo,
-    fetchAllClassesForCreator,
-    getCreatorCurrencyDetails,
-    fetchCreatorMemberTags,
-    form,
-    formPart,
-  ]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, getCreatorCurrencyDetails, form, formPart]);
 
   useEffect(() => {
     if (editedVideo || formPart === 2) {
