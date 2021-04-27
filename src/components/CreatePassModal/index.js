@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
+import { Row, Col, Tooltip, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button } from 'antd';
 import { TwitterPicker } from 'react-color';
 
 import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
@@ -64,7 +64,7 @@ const colorPickerChoices = [
   '#5030fd',
 ];
 
-const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
+const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMemberTags = [] }) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -78,23 +78,8 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
   const [passType, setPassType] = useState(passTypes.LIMITED.name);
   const [colorCode, setColorCode] = useState(initialColor);
 
-  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [selectedTag, setSelectedTag] = useState(null);
-
-  const fetchCreatorMemberTags = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
-
-      if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
-    }
-    setIsLoading(false);
-  }, []);
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -173,8 +158,6 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
 
   useEffect(() => {
     if (visible) {
-      fetchCreatorMemberTags();
-
       if (editedPass) {
         form.setFieldsValue({
           passName: editedPass.name,
@@ -210,15 +193,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
       fetchAllClassesForCreator();
       fetchAllVideosForCreator();
     }
-  }, [
-    visible,
-    editedPass,
-    fetchAllClassesForCreator,
-    fetchAllVideosForCreator,
-    fetchCreatorMemberTags,
-    getCreatorCurrencyDetails,
-    form,
-  ]);
+  }, [visible, editedPass, fetchAllClassesForCreator, fetchAllVideosForCreator, getCreatorCurrencyDetails, form]);
 
   const handleChangeLimitType = (passLimitType) => {
     form.setFieldsValue({
@@ -379,7 +354,13 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null }) => {
                   </Radio.Group>
                 </Form.Item>
                 <Form.Item className={styles.inlineFormItem}>
-                  <Button type="link" onClick={() => showTagOptionsHelperModal('pass')} icon={<InfoCircleOutlined />} />
+                  <Tooltip title="Understanding the tag options">
+                    <Button
+                      type="link"
+                      onClick={() => showTagOptionsHelperModal('pass')}
+                      icon={<InfoCircleOutlined />}
+                    />
+                  </Tooltip>
                 </Form.Item>
               </Form.Item>
               <Form.Item

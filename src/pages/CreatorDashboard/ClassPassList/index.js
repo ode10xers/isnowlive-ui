@@ -42,6 +42,7 @@ const ClassPassList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const showSendEmailModal = (pass) => {
     let activeRecipients = [];
@@ -197,8 +198,23 @@ const ClassPassList = () => {
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     getPassesForCreator();
+    fetchCreatorMemberTags();
     //eslint-disable-next-line
   }, []);
 
@@ -225,122 +241,133 @@ const ClassPassList = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
-  const passesColumns = [
-    {
-      title: 'Pass Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text, record) => {
-        return {
-          props: {
-            style: {
-              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
+  const generatePassesColumns = useCallback(() => {
+    const initialColumns = [
+      {
+        title: 'Pass Name',
+        dataIndex: 'name',
+        key: 'name',
+        render: (text, record) => {
+          return {
+            props: {
+              style: {
+                borderLeft: `6px solid ${record.color_code || '#FFF'}`,
+              },
             },
-          },
-          children: (
-            <>
-              <Text> {record.name} </Text>
-              {record.is_published ? null : <EyeInvisibleOutlined />}
-            </>
-          ),
-        };
+            children: (
+              <>
+                <Text> {record.name} </Text>
+                {record.is_published ? null : <EyeInvisibleOutlined />}
+              </>
+            ),
+          };
+        },
       },
-    },
-    {
-      title: 'Purchasable By',
-      dataIndex: 'tag',
-      key: 'tag',
-      width: '130px',
-      render: (text, record) => <TagListPopup tags={[record.tag].filter((tag) => tag.external_id)} />,
-    },
-    {
-      title: 'Credit Count',
-      dataIndex: 'class_count',
-      key: 'class_count',
-      align: 'right',
-      width: '145px',
-      render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credits'),
-    },
-    {
-      title: 'Validity',
-      dataIndex: 'validity',
-      key: 'validity',
-      align: 'center',
-      width: '100px',
-      render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
-    },
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-      align: 'left',
-      width: '100px',
-      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
-    },
-    {
-      title: (
-        <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
-          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-        </Button>
-      ),
-      align: 'right',
-      render: (text, record) => (
-        <Row gutter={8}>
-          <Col xs={24} md={4}>
-            <Tooltip title="Send Customer Email">
-              <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
-            </Tooltip>
-          </Col>
-          <Col xs={24} md={4}>
-            <Tooltip title="Edit">
-              <Button
-                className={styles.detailsButton}
-                type="text"
-                onClick={() => showEditPassesModal(record)}
-                icon={<EditOutlined />}
-              />
-            </Tooltip>
-          </Col>
-          <Col xs={24} md={4}>
-            <Tooltip title="Copy Pass Link">
-              <Button
-                type="text"
-                className={styles.detailsButton}
-                onClick={() => copyPassLink(record.id)}
-                icon={<CopyOutlined />}
-              />
-            </Tooltip>
-          </Col>
-          <Col xs={24} md={5}>
-            {record.is_published ? (
-              <Tooltip title="Hide Session">
-                <Button type="link" danger onClick={() => unpublishPass(record.id)}>
-                  Hide
-                </Button>
+      {
+        title: 'Credit Count',
+        dataIndex: 'class_count',
+        key: 'class_count',
+        align: 'right',
+        width: '145px',
+        render: (text, record) => (record.limited ? `${text} Credits` : 'Unlimited Credits'),
+      },
+      {
+        title: 'Validity',
+        dataIndex: 'validity',
+        key: 'validity',
+        align: 'center',
+        width: '100px',
+        render: (text, record) => `${text} day${parseInt(text) > 1 ? 's' : ''}`,
+      },
+      {
+        title: 'Price',
+        dataIndex: 'price',
+        key: 'price',
+        align: 'left',
+        width: '100px',
+        render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
+      },
+      {
+        title: (
+          <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
+            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          </Button>
+        ),
+        align: 'right',
+        render: (text, record) => (
+          <Row gutter={8}>
+            <Col xs={24} md={4}>
+              <Tooltip title="Send Customer Email">
+                <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
               </Tooltip>
-            ) : (
-              <Tooltip title="Unhide Session">
-                <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
-                  Show
-                </Button>
+            </Col>
+            <Col xs={24} md={4}>
+              <Tooltip title="Edit">
+                <Button
+                  className={styles.detailsButton}
+                  type="text"
+                  onClick={() => showEditPassesModal(record)}
+                  icon={<EditOutlined />}
+                />
               </Tooltip>
-            )}
-          </Col>
-          <Col xs={24} md={6}>
-            {expandedRowKeys.includes(record.id) ? (
-              <Button type="link" onClick={() => collapseRow(record.id)}>
-                {`${record.buyers.length} Buyers `} <UpOutlined />
-              </Button>
-            ) : (
-              <Button type="link" onClick={() => expandRow(record.id)}>
-                {`${record.buyers.length} Buyers `} <DownOutlined />
-              </Button>
-            )}
-          </Col>
-        </Row>
-      ),
-    },
-  ];
+            </Col>
+            <Col xs={24} md={4}>
+              <Tooltip title="Copy Pass Link">
+                <Button
+                  type="text"
+                  className={styles.detailsButton}
+                  onClick={() => copyPassLink(record.id)}
+                  icon={<CopyOutlined />}
+                />
+              </Tooltip>
+            </Col>
+            <Col xs={24} md={5}>
+              {record.is_published ? (
+                <Tooltip title="Hide Session">
+                  <Button type="link" danger onClick={() => unpublishPass(record.id)}>
+                    Hide
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Tooltip title="Unhide Session">
+                  <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
+                    Show
+                  </Button>
+                </Tooltip>
+              )}
+            </Col>
+            <Col xs={24} md={6}>
+              {expandedRowKeys.includes(record.id) ? (
+                <Button type="link" onClick={() => collapseRow(record.id)}>
+                  {`${record.buyers.length} Buyers `} <UpOutlined />
+                </Button>
+              ) : (
+                <Button type="link" onClick={() => expandRow(record.id)}>
+                  {`${record.buyers.length} Buyers `} <DownOutlined />
+                </Button>
+              )}
+            </Col>
+          </Row>
+        ),
+      },
+    ];
+
+    if (creatorMemberTags.length) {
+      const tagColumns = {
+        title: 'Purchasable By',
+        dataIndex: 'tag',
+        key: 'tag',
+        width: '130px',
+        render: (text, record) => <TagListPopup tags={[record.tag].filter((tag) => tag.external_id)} />,
+      };
+      const tagColumnPosition = 1;
+
+      initialColumns.splice(tagColumnPosition, 0, tagColumns);
+    }
+
+    return initialColumns;
+    //eslint-disable-next-line
+  }, [creatorMemberTags]);
 
   const buyersColumns = [
     {
@@ -468,7 +495,12 @@ const ClassPassList = () => {
 
   return (
     <div className={styles.box}>
-      <CreatePassModal visible={createModalVisible} closeModal={hideCreatePassesModal} editedPass={targetPass} />
+      <CreatePassModal
+        visible={createModalVisible}
+        closeModal={hideCreatePassesModal}
+        editedPass={targetPass}
+        creatorMemberTags={creatorMemberTags}
+      />
       <Row gutter={[8, 24]}>
         <Col xs={12} md={8} lg={18}>
           <Title level={4}> Passes </Title>
@@ -486,7 +518,7 @@ const ClassPassList = () => {
           ) : (
             <Table
               sticky={true}
-              columns={passesColumns}
+              columns={generatePassesColumns()}
               data={passes}
               loading={isLoading}
               rowKey={(record) => record.id}
