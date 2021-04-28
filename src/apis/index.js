@@ -25,6 +25,7 @@ export default {
     upsertCreatorUserTags: (payload) => http.put('/secure/creator/settings/tags', payload),
     getCreatorUserPreferences: () => http.get('/secure/creator/settings'),
     sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
+    confirmCreatorPaymentStatusUpdated: (payload) => http.put('/secure/creator/settings/ga', payload),
   },
   payment: {
     stripe: {

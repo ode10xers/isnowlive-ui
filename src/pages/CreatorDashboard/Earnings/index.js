@@ -44,9 +44,7 @@ const getEarningsAPIs = {
 const Earnings = () => {
   const history = useHistory();
   const {
-    state: {
-      userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
-    },
+    state: { userDetails },
   } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -190,20 +188,38 @@ const Earnings = () => {
     }
   };
 
+  const checkAndSendCreatorConversionEvent = useCallback(async () => {
+    const userState = userDetails;
+
+    if (userState.ga_data && userState.ga_data?.payment_verified === false) {
+      try {
+        const { status, data } = await apis.user.confirmCreatorPaymentStatusUpdated({
+          payment_verified: true,
+        });
+
+        if (isAPISuccess(status) && data) {
+          pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
+            creator_payment_account_status: userDetails.payment_account_status,
+          });
+        }
+      } catch (error) {
+        console.error(error?.response?.data?.message);
+      }
+    }
+  }, [userDetails]);
+
   useEffect(() => {
     getCreatorBalance();
     getCreatorEarnings();
 
-    if (payment_account_status === StripeAccountStatus.CONNECTED) {
-      pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
-        creator_payment_account_status: payment_account_status,
-      });
+    if (userDetails.payment_account_status === StripeAccountStatus.CONNECTED) {
+      checkAndSendCreatorConversionEvent();
     } else {
       pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_STATUS, {
-        creator_payment_account_status: payment_account_status,
+        creator_payment_account_status: userDetails.payment_account_status,
       });
     }
-  }, [getCreatorBalance, getCreatorEarnings, payment_account_status]);
+  }, [getCreatorBalance, getCreatorEarnings, checkAndSendCreatorConversionEvent, userDetails]);
 
   const confirmPayout = async () => {
     const eventTag = creator.click.payment.requestPayout;
@@ -291,11 +307,11 @@ const Earnings = () => {
         <Col xs={24}>
           <Button
             className={styles.mt10}
-            danger={payment_account_status === StripeAccountStatus.VERIFICATION_PENDING ? true : false}
+            danger={userDetails.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING ? true : false}
             type="primary"
             onClick={() => openStripeDashboard()}
           >
-            {payment_account_status === StripeAccountStatus.VERIFICATION_PENDING
+            {userDetails.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING
               ? 'Verify Bank Account'
               : 'Edit Bank Account'}
           </Button>
