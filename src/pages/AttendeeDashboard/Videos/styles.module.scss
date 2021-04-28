@@ -5,6 +5,11 @@
 }
 .coverImage {
   border-radius: 8px;
+  height: 100px;
+
+  @media screen and (max-width: 569px) {
+    height: 200px;
+  }
 }
 .videoItem {
   cursor: pointer;
