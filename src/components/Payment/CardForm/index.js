@@ -101,6 +101,10 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
         setSelectedCard(null);
         setDisableSavedCards(false);
       }
+    } else {
+      setSavedUserCards([]);
+      setSelectedCard(null);
+      setDisableSavedCards(false);
     }
   }, [isFree, fetchUserCards, paymentPopupVisible]);
 

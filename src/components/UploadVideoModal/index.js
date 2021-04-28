@@ -136,8 +136,14 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  const setUppyCompleteListener = (external_id) => {
+  const setUppyListeners = (external_id) => {
     if (uppy.current) {
+      // Set the upload URL
+      uppy.current.getPlugin('Tus').setOptions({
+        endpoint: `${config.server.baseURL}/creator/videos/${external_id}/upload`,
+      });
+
+      // Set the on complete listener
       uppy.current.on('complete', (result) => {
         if (result.successful.length) {
           apis.videos
@@ -153,6 +159,8 @@ const UploadVideoModal = ({
         } else {
           showErrorModal(`Failed to upload video`);
         }
+
+        uppy.current.reset();
 
         setTimeout(() => {
           setVideoUploadPercent(0);
@@ -232,13 +240,7 @@ const UploadVideoModal = ({
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
 
-        if (uppy.current) {
-          uppy.current.getPlugin('Tus').setOptions({
-            endpoint: `${config.server.baseURL}/creator/videos/${editedVideo.external_id}/upload`,
-          });
-
-          setUppyCompleteListener(editedVideo.external_id);
-        }
+        setUppyListeners(editedVideo.external_id);
       } else {
         form.resetFields();
       }
@@ -338,7 +340,7 @@ const UploadVideoModal = ({
         validity: values.validity,
         session_ids: selectedSessionIds || values.session_ids || [],
         thumbnail_url: coverImageUrl,
-        watch_limit: values.watch_limit,
+        watch_limit: values.watch_limit || 1,
         is_course: isCourseVideo,
         tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
       };
@@ -373,12 +375,7 @@ const UploadVideoModal = ({
                 showErrorModal(`Failed to get video token`);
               });
           } else {
-            if (uppy.current) {
-              uppy.current.getPlugin('Tus').setOptions({
-                endpoint: `${config.server.baseURL}/creator/videos/${response.data.external_id}/upload`,
-              });
-              setUppyCompleteListener(response.data.external_id);
-            }
+            setUppyListeners(response.data.external_id);
             setFormPart(2);
           }
         } else {
@@ -394,6 +391,7 @@ const UploadVideoModal = ({
                 showErrorModal(`Failed to get video token`);
               });
           } else {
+            setUppyListeners(editedVideo.external_id);
             setFormPart(2);
           }
         }
@@ -762,6 +760,7 @@ const UploadVideoModal = ({
                   id="watch_limit"
                   name="watch_limit"
                   label="Watch Count"
+                  rules={validationRules.numberValidation('Please Input Watch Count', 1, false)}
                   extra={
                     <Text className={styles.helpText}>
                       Maximum number of time a buyer can watch this video within the validity period
