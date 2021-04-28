@@ -193,11 +193,11 @@ const Earnings = () => {
 
     if (userState.ga_data && userState.ga_data?.payment_verified === false) {
       try {
-        const { status, data } = await apis.user.confirmCreatorPaymentStatusUpdated({
+        const { status } = await apis.user.confirmCreatorPaymentStatusUpdated({
           payment_verified: true,
         });
 
-        if (isAPISuccess(status) && data) {
+        if (isAPISuccess(status)) {
           pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
             creator_payment_account_status: userDetails.payment_account_status,
           });
