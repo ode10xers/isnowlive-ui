@@ -333,6 +333,12 @@ const Earnings = () => {
     }
   };
 
+  const openSubscriptionDetails = (item) => {
+    if (item?.subscription_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/subscription/${item.subscription_id}`);
+    }
+  };
+
   let sessionColumns = [
     {
       title: 'Session Name',
@@ -500,7 +506,7 @@ const Earnings = () => {
       name: 'Membership',
       key: 'subscription_id',
       stateKey: 'subscriptions',
-      redirectMethod: () => {}, //TODO: Add this,
+      redirectMethod: openSubscriptionDetails,
       showMoreMethod: () => handleShowMore('subscriptions'),
     },
   ];

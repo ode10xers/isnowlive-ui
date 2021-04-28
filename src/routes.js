@@ -37,6 +37,7 @@ const Routes = {
     passEarnings: '/payments/pass/:pass_id',
     videoEarnings: '/payments/video/:video_id',
     courseEarnings: '/payments/course/:course_id',
+    subscriptionEarnings: '/payments/subscription/:subscription_id',
     passes: '/passes',
     videos: '/videos',
     courses: '/courses',
