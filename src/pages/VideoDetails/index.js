@@ -41,6 +41,7 @@ import styles from './style.module.scss';
 const { Title, Text, Paragraph } = Typography;
 const {
   formatDate: { toLongDateWithDay },
+  timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
@@ -289,6 +290,7 @@ const VideoDetails = ({ match }) => {
             video_id: video.external_id,
             payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
+            user_timezone_location: getTimezoneLocation(),
           });
 
           if (isAPISuccess(followUpGetVideo.status)) {
@@ -375,6 +377,7 @@ const VideoDetails = ({ match }) => {
           video_id: video.external_id,
           payment_source: paymentSource.PASS,
           source_id: usableUserPass.pass_order_id,
+          user_timezone_location: getTimezoneLocation(),
         };
 
         showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideoUsingPass(payload, couponCode));
@@ -423,6 +426,7 @@ const VideoDetails = ({ match }) => {
       const payload = {
         video_id: video.external_id,
         payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
       };
 
       showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleVideo(payload, couponCode));

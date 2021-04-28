@@ -280,6 +280,7 @@ const SessionDetails = ({ match, history }) => {
       const payload = {
         video_id: selectedVideo.external_id,
         payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
       };
 
       showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideo(payload, couponCode));
@@ -435,6 +436,7 @@ const SessionDetails = ({ match, history }) => {
           const followUpBooking = await bookClass({
             inventory_id: inventoryId,
             user_timezone_offset: new Date().getTimezoneOffset(),
+            user_timezone_location: getTimezoneLocation(),
             user_timezone: getCurrentLongTimezone(),
             payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,

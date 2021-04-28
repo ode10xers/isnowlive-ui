@@ -88,6 +88,7 @@ const PaymentVerification = () => {
                     video_id: video_id,
                     payment_source: paymentSource.PASS,
                     source_id: order_id,
+                    user_timezone_location: getTimezoneLocation(),
                   });
 
                   if (isAPISuccess(followUpGetVideo.status)) {

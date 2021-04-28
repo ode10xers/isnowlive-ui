@@ -383,6 +383,7 @@ const InventoryDetails = ({ match, history }) => {
           const followUpBooking = await bookClass({
             inventory_id: inventoryId,
             user_timezone_offset: new Date().getTimezoneOffset(),
+            user_timezone_location: getTimezoneLocation(),
             user_timezone: getCurrentLongTimezone(),
             payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,

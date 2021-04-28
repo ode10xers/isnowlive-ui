@@ -139,6 +139,7 @@ const PaymentPopup = () => {
               video_id: followUpBookingInfo.productId,
               payment_source: paymentSource.PASS,
               source_id: orderResponse.payment_order_id,
+              user_timezone_location: getTimezoneLocation(),
             };
 
             await followUpGetVideo(payload);
