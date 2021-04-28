@@ -13,6 +13,7 @@ import {
   AuditOutlined,
   FilePdfOutlined,
   Html5Outlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -98,6 +99,21 @@ export const creatorMenuItems = [
   },
   {
     order: 8,
+    key: 'members',
+    title: 'Members Dashboard',
+    icon: <TeamOutlined />,
+    children: [
+      {
+        order: 1,
+        key: 'members_list',
+        title: 'Members List',
+        mixPanelTag: creator.click.dashboard.membersListNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersList,
+      },
+    ],
+  },
+  {
+    order: 9,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -105,7 +121,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 9,
+    order: 10,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -113,7 +129,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 10,
+    order: 11,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -121,7 +137,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 11,
+    order: 12,
     key: 'site_settings',
     title: 'Site Settings',
     icon: <SettingOutlined />,
@@ -143,7 +159,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 12,
+    order: 13,
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,
@@ -151,17 +167,17 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
   },
   {
-    order: 13,
+    order: 14,
     key: 'documents',
-    title: 'Documents',
+    title: 'Document Drive',
     icon: <FilePdfOutlined />,
     mixPanelTag: creator.click.dashboard.documentsNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
   {
-    order: 11,
+    order: 15,
     key: 'audiences',
-    title: 'Audiences',
+    title: 'Newsletter',
     icon: <AuditOutlined />,
     mixPanelTag: creator.click.dashboard.audiencesNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,

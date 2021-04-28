@@ -19,7 +19,15 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isValidFile, isAPISuccess, orderType, courseType, productType, paymentSource } from 'utils/helper';
+import {
+  isValidFile,
+  isAPISuccess,
+  orderType,
+  courseType,
+  productType,
+  paymentSource,
+  isUnapprovedUserError,
+} from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -239,7 +247,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
         error?.response?.data?.message === 'user already has a confirmed order for this course'
       ) {
         showAlreadyBookedModal(productType.COURSE);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }

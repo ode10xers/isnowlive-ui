@@ -1,10 +1,25 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import { Row, Col, Modal, Form, Typography, Radio, Input, InputNumber, Select, Button, Progress } from 'antd';
+import {
+  Row,
+  Col,
+  Modal,
+  Form,
+  Typography,
+  Radio,
+  Input,
+  InputNumber,
+  Select,
+  Button,
+  Progress,
+  TimePicker,
+  message,
+  Popconfirm,
+} from 'antd';
 import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
-import { DragDrop } from '@uppy/react';
+import { DragDrop, useUppy } from '@uppy/react';
 
 import { BookTwoTone } from '@ant-design/icons';
 
@@ -13,19 +28,19 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, showCourseOptionsHelperModal } from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
-import ImageUpload from 'components/ImageUpload';
 
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, productAccessOptions } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 import { getLocalUserDetails } from 'utils/storage';
+import moment from 'moment';
 
 const { Text, Paragraph } = Typography;
 
@@ -70,25 +85,42 @@ const UploadVideoModal = ({
   const [videoType, setVideoType] = useState(videoTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
-  const [uploadingFlie, setuploadingFlie] = useState(null);
+  const [uploadingFile, setUploadingFile] = useState(null);
   const [isCourseVideo, setIsCourseVideo] = useState(false);
-  const uppy = useRef(null);
-  uppy.current = new Uppy({
-    meta: { type: 'avatar' },
-    restrictions: { maxNumberOfFiles: 1 },
-    autoProceed: true,
-  });
+  const [videoPreviewToken, setVideoPreviewToken] = useState(null);
+  const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
+  const [, setVideoLength] = useState(0);
+  const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
 
-  uppy.current.use(Tus, {
-    endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
-    resume: true,
-    retryDelays: null,
-    chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
+  const uppy = useRef(null);
+  uppy.current = useUppy(() => {
+    return new Uppy({
+      meta: { type: 'avatar' },
+      restrictions: { maxNumberOfFiles: 1 },
+      autoProceed: true,
+      logger: Uppy.debugLogger,
+    }).use(Tus, {
+      endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+      resume: false,
+      autoRetry: false,
+      retryDelays: null,
+      chunkSize: 5 * 1024 * 1024, // Required a minimum chunk size of 5 MB, here we use 5 MB.
+    });
   });
 
   uppy.current.on('file-added', (file) => {
-    setuploadingFlie(file);
+    setUploadingFile(file);
     setIsLoading(true);
+
+    var blob = new Blob([file.data]), // create a blob of buffer
+      url = URL.createObjectURL(blob), // create o-URL of blob
+      video = document.createElement('video'); // create video element
+
+    video.preload = 'metadata'; // preload setting
+    video.addEventListener('loadedmetadata', function () {
+      setVideoLength(video.duration);
+    });
+    video.src = url;
   });
 
   uppy.current.on('progress', (result) => {
@@ -96,38 +128,64 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  uppy.current.on('complete', (result) => {
-    if (result.successful.length) {
-      showSuccessModal(
-        'Video Successfully Uploaded',
-        <>
-          <Paragraph>
-            We have received your video. It takes us about 10 minutes to process your video. Until then your video is
-            hidden.
-          </Paragraph>
-          <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
-        </>
-      );
+  const setUppyCompleteListener = (external_id) => {
+    if (uppy.current) {
+      uppy.current.on('complete', (result) => {
+        if (result.successful.length) {
+          apis.videos
+            .getVideoToken(external_id)
+            .then((res) => {
+              setVideoPreviewToken(res.data.token);
+              setFormPart(3);
+            })
+            .catch((error) => {
+              console.log(error);
+              showErrorModal(`Failed to get video token`);
+            });
+        } else {
+          showErrorModal(`Failed to upload video`);
+        }
 
-      if (editedVideo && uploadingFlie) {
-        pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
-          video_id: editedVideo?.external_id || customNullValue,
-        });
-      }
-    } else {
-      showErrorModal(`Failed to upload video`);
+        setTimeout(() => {
+          setVideoUploadPercent(0);
+          setUploadingFile(null);
+          setIsLoading(false);
+
+          uppy.current = null;
+        }, 500);
+      });
     }
+  };
 
-    setTimeout(() => {
-      setVideoUploadPercent(0);
-      setuploadingFlie(null);
-      uppy.current = null;
-      closeModal(true);
-    }, 500);
-  });
+  // uppy.current.on('complete', (result) => {
+  //   if (result.successful.length) {
+  //     apis.videos
+  //       .getVideoToken(editedVideo.external_id)
+  //       .then((res) => {
+  //         setVideoPreviewToken(res.data.token);
+  //         setFormPart(3);
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //         showErrorModal(`Failed to get video token`);
+  //       });
+  //   } else {
+  //     showErrorModal(`Failed to upload video`);
+  //   }
+
+  //   setTimeout(() => {
+  //     setVideoUploadPercent(0);
+  //     setUploadingFile(null);
+  //     setIsLoading(false);
+
+  //     uppy.current = null;
+  //   }, 500);
+  // });
 
   uppy.current.on('cancel-all', () => {
     console.log('Cancel All is called here');
+    setVideoUploadPercent(0);
+    setUploadingFile(null);
   });
 
   const fetchAllClassesForCreator = useCallback(async () => {
@@ -191,6 +249,14 @@ const UploadVideoModal = ({
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
+
+        if (uppy.current) {
+          uppy.current.getPlugin('Tus').setOptions({
+            endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
+          });
+
+          setUppyCompleteListener(editedVideo.external_id);
+        }
       } else {
         form.resetFields();
       }
@@ -200,7 +266,8 @@ const UploadVideoModal = ({
       }
       fetchAllClassesForCreator();
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.removeAttribute('style');
+      document.body.classList.remove(['ant-scrolling-effect']);
     }
     return () => {
       setCoverImageUrl(null);
@@ -208,8 +275,18 @@ const UploadVideoModal = ({
       setVideoType(videoTypes.FREE.name);
       setIsCourseVideo(false);
       uppy.current = null;
+      document.body.classList.remove(['ant-scrolling-effect']);
+      document.body.removeAttribute('style');
     };
+    //eslint-disable-next-line
   }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
+
+  useEffect(() => {
+    if (editedVideo || formPart === 2) {
+      setUpdateVideoDetails(true);
+    }
+    // eslint-disable-next-line
+  }, []);
 
   const handleChangeLimitType = (priceType) => {
     const values = form.getFieldsValue();
@@ -256,19 +333,37 @@ const UploadVideoModal = ({
           updateEditedVideo(response.data);
 
           if (response.data.video_uid.length) {
-            closeModal(true);
+            apis.videos
+              .getVideoToken(editedVideo.external_id)
+              .then((res) => {
+                setVideoPreviewToken(res.data.token);
+                setFormPart(3);
+              })
+              .catch((error) => {
+                console.log(error);
+                showErrorModal(`Failed to get video token`);
+              });
           } else {
+            if (uppy.current) {
+              uppy.current.getPlugin('Tus').setOptions({
+                endpoint: `${config.server.baseURL}/creator/videos/${response.data.external_id}/upload`,
+              });
+              setUppyCompleteListener(response.data.external_id);
+            }
             setFormPart(2);
           }
         } else {
           if (editedVideo.video_uid.length) {
-            if (shouldClone) {
-              showSuccessModal('Video cloned successfully');
-            } else {
-              showSuccessModal('Video details updated successfully');
-            }
-
-            closeModal(true);
+            apis.videos
+              .getVideoToken(editedVideo.external_id)
+              .then((res) => {
+                setVideoPreviewToken(res.data.token);
+                setFormPart(3);
+              })
+              .catch((error) => {
+                console.log(error);
+                showErrorModal(`Failed to get video token`);
+              });
           } else {
             setFormPart(2);
           }
@@ -284,49 +379,125 @@ const UploadVideoModal = ({
     setIsSubmitting(false);
   };
 
-  const onCoverImageUpload = (imageUrl) => {
-    setCoverImageUrl(imageUrl);
-    form.setFieldsValue({ ...form.getFieldsValue(), thumbnail_url: imageUrl });
+  const onCoverImageUpload = async () => {
+    try {
+      setIsLoading(true);
+      let blob = await fetch(
+        `https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+          videoPreviewTime
+        )}&height=200&duration=15s`
+      ).then((res) => res.blob());
+
+      if (blob) {
+        const formData = new FormData();
+        formData.append('file', new File([blob], 'thumbnail.gif', { type: 'image/gif' }));
+        const { data } = await apis.user.uploadImage(formData);
+        if (data) {
+          apis.videos
+            .updateVideo(editedVideo.external_id, {
+              currency: currency.toLowerCase(),
+              title: editedVideo.title,
+              description: editedVideo.description,
+              price: videoType === videoTypes.FREE.name ? 0 : editedVideo.price,
+              validity: editedVideo.validity,
+              session_ids: selectedSessionIds || editedVideo.session_ids || [],
+              thumbnail_url: data,
+              watch_limit: editedVideo.watch_limit,
+              is_course: isCourseVideo,
+            })
+            .then(() => {
+              setIsLoading(false);
+              closeModal(true);
+
+              if (shouldClone) {
+                showSuccessModal('Video cloned successfully');
+              } else if (updateVideoDetails) {
+                showSuccessModal('Video details updated successfully');
+              } else {
+                showSuccessModal(
+                  'Video Successfully Uploaded',
+                  <>
+                    <Paragraph>
+                      We have received your video. It takes us about 10 minutes to process your video. Until then your
+                      video is hidden.
+                    </Paragraph>
+                    <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+                  </>
+                );
+                if (editedVideo && uploadingFile) {
+                  pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
+                    video_id: editedVideo?.external_id || customNullValue,
+                  });
+                }
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+              setIsLoading(false);
+              showErrorModal('Something went wrong!');
+            });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      showErrorModal('Something went wrong!');
+    }
   };
 
   const onCourseTypeChange = (e) => {
     setIsCourseVideo(e.target.value === 'course');
   };
 
-  // Pending this feature
-  // const cancelUpload = async () => {
-  //   uppy.current.pauseAll();
-  //   uppy.current.cancelAll();
-  //   uppy.current.close();
+  const cancelUpload = async () => {
+    setIsLoading(true);
+    uppy.current.cancelAll();
 
-  //   if (editedVideo) {
-  //     try {
-  //       const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+    try {
+      const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
 
-  //       if (isAPISuccess(status)) {
-  //         message.success('Video upload aborted');
-  //       }
-  //     } catch (error) {
-  //       message.error(error.response?.data?.message || 'Failed to remove uploaded video');
-  //     }
-  //   }
+      if (isAPISuccess(status)) {
+        message.success('Video upload aborted');
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+    }
+    setIsLoading(false);
+  };
 
-  //   setVideoUploadPercent(0);
-  //   setuploadingFlie(null);
-  //   uppy.current = null;
-  //   closeModal(true);
-  // };
+  const handleVideoPreviewTimeChange = (time, timeString) => {
+    setVideoPreviewTime(timeString.length > 0 ? timeString : '00:00:01');
+  };
+
+  const parseTimeString = (timeString) => {
+    let time = timeString.split(':');
+    return `${time[0] || 0}h${time[1] || 0}m${time[2] || 0}s`;
+  };
+
+  const modalTitle = () => {
+    if (formPart === 1) {
+      return 'Create Video Product';
+    } else if (formPart === 2) {
+      return 'Upload Video';
+    } else if (formPart === 3) {
+      return 'Set a preview thumbnail';
+    }
+  };
 
   return (
     <Modal
-      title={`${editedVideo ? 'Edit' : 'Upload New'} Video`}
+      title={modalTitle()}
       centered={true}
       visible={visible}
       footer={null}
       maskClosable={false}
-      closable={formPart === 1}
+      closable={[1, 3].includes(formPart)}
       onCancel={() => closeModal(false)}
-      width={720}
+      width={800}
+      afterClose={() => {
+        document.body.classList.remove(['ant-scrolling-effect']);
+        document.body.removeAttribute('style');
+      }}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
@@ -338,21 +509,6 @@ const UploadVideoModal = ({
             initialValues={formInitialValues}
           >
             <Row gutter={[8, 16]}>
-              <Col xs={24}>
-                <Form.Item id="thumbnail_url" name="thumbnail_url" wrapperCol={{ span: 24 }}>
-                  <div className={styles.imageWrapper}>
-                    <ImageUpload
-                      aspect={4}
-                      className={classNames('avatar-uploader', styles.coverImage)}
-                      name="thumbnail_url"
-                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                      onChange={onCoverImageUpload}
-                      value={coverImageUrl}
-                      label="Cover Image"
-                    />
-                  </div>
-                </Form.Item>
-              </Col>
               <Col xs={24}>
                 <Form.Item id="title" name="title" label="Title" rules={validationRules.requiredValidation}>
                   <Input placeholder="Enter title" maxLength={50} />
@@ -369,7 +525,19 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item id="session_ids" name="session_ids" label="Related to Class(es)">
+                <Form.Item
+                  id="session_ids"
+                  name="session_ids"
+                  label="Related class(es) [for upselling]"
+                  extra={
+                    <Text className={styles.helpText}>
+                      This is an optional field. You can select any of your existing live sessions here to link this
+                      video to that live session. This helps you upsell this video on that live session’s page so that
+                      customers who can’t find a suitable time for your live session can instead buy your video and
+                      still learn while you still make a sale.
+                    </Text>
+                  }
+                >
                   <Select
                     showArrow
                     showSearch={false}
@@ -448,33 +616,24 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item
-                  id="video_access_type"
-                  name="video_access_type"
-                  label="Access Type"
-                  rules={validationRules.requiredValidation}
-                >
-                  <Radio.Group>
-                    {productAccessOptions.map((productAccess) => (
-                      <Radio value={productAccess.value} key={productAccess.value}>
-                        {productAccess.label}
-                      </Radio>
-                    ))}
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-              <Col xs={24}>
-                <Form.Item
-                  id="video_course_type"
-                  name="video_course_type"
-                  label="Video Course Type"
-                  rules={validationRules.requiredValidation}
-                  onChange={onCourseTypeChange}
-                >
-                  <Radio.Group className="video-type-radio">
-                    <Radio value="normal"> Normal Video </Radio>
-                    <Radio value="course"> Course Video </Radio>
-                  </Radio.Group>
+                <Form.Item label="Video Course Type" required>
+                  <Form.Item
+                    id="video_course_type"
+                    name="video_course_type"
+                    className={styles.inlineFormItem}
+                    rules={validationRules.requiredValidation}
+                    onChange={onCourseTypeChange}
+                  >
+                    <Radio.Group className="video-type-radio">
+                      <Radio value="normal"> Normal Video </Radio>
+                      <Radio value="course"> Course Video </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button type="link" onClick={() => showCourseOptionsHelperModal('video')}>
+                      Understanding the options
+                    </Button>
+                  </Form.Item>
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -515,7 +674,9 @@ const UploadVideoModal = ({
                   name="validity"
                   label="Validity (days)"
                   extra={
-                    <Text className={styles.helpText}>The duration in days this will be usable after purchase</Text>
+                    <Text className={styles.helpText}>
+                      No. of days this video is viewable starting from the purchase date
+                    </Text>
                   }
                   rules={validationRules.numberValidation('Please Input Validity', 1, false)}
                 >
@@ -527,8 +688,12 @@ const UploadVideoModal = ({
                   id="watch_limit"
                   name="watch_limit"
                   label="Watch Count"
-                  extra={<Text className={styles.helpText}>Max number of time buyer can watch video</Text>}
                   rules={validationRules.numberValidation('Please Input Watch Count', 1, false)}
+                  extra={
+                    <Text className={styles.helpText}>
+                      Maximum number of time a buyer can watch this video within the validity period
+                    </Text>
+                  }
                 >
                   <InputNumber min={1} placeholder="Watch Count" className={styles.numericInput} />
                 </Form.Item>
@@ -552,7 +717,7 @@ const UploadVideoModal = ({
         )}
         {formPart === 2 && (
           <div className={styles.videoUpload}>
-            <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFlie ? 'none' : 'auto' }}>
+            <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFile ? 'none' : 'auto' }}>
               <DragDrop
                 uppy={uppy.current}
                 locale={{
@@ -564,19 +729,73 @@ const UploadVideoModal = ({
               />
               {videoUploadPercent !== 0 && (
                 <>
-                  <Text>{uploadingFlie?.name}</Text>
+                  <Text>{uploadingFile?.name}</Text>
                   <Progress percent={videoUploadPercent} status="active" />
                 </>
               )}
             </div>
+
             <Row justify="center" className={styles.mt20}>
               <Col xs={12}>
-                <Button block type="default" onClick={() => closeModal(true)} disabled={uploadingFlie ? true : false}>
-                  Cancel
-                </Button>
+                {uploadingFile ? (
+                  <Popconfirm
+                    arrowPointAtCenter
+                    title={<Text> Are you sure you want to cancel the video upload? </Text>}
+                    onConfirm={() => cancelUpload()}
+                    okText="Yes, Cancel the Upload"
+                    okButtonProps={{ danger: true, type: 'primary' }}
+                    cancelText="No"
+                  >
+                    <Button block danger type="primary">
+                      Cancel Upload
+                    </Button>
+                  </Popconfirm>
+                ) : (
+                  <Button block type="default" onClick={() => closeModal(true)}>
+                    Cancel
+                  </Button>
+                )}
               </Col>
             </Row>
           </div>
+        )}
+
+        {formPart === 3 && (
+          <Row justify="center" style={{ textAlign: 'center' }}>
+            <Col xs={24}>
+              {videoPreviewTime && (
+                <iframe
+                  key={videoPreviewTime}
+                  title={editedVideo?.title || ''}
+                  src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+                    videoPreviewTime
+                  )}&height=200&duration=15s`}
+                  style={{
+                    border: 'none',
+                    width: 400,
+                    height: 200,
+                  }}
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                ></iframe>
+              )}
+            </Col>
+            <Col xs={24} className={styles.mt20}>
+              We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
+            </Col>
+            <Col xs={24} className={styles.mt20}>
+              Select Time:{' '}
+              <TimePicker
+                showNow={false}
+                defaultValue={moment(videoPreviewTime, 'hh:mm:ss')}
+                onChange={handleVideoPreviewTimeChange}
+              />
+            </Col>
+            <Col xs={24} className={styles.mt20}>
+              <Button block type="primary" onClick={() => onCoverImageUpload()}>
+                Submit
+              </Button>
+            </Col>
+          </Row>
         )}
       </Loader>
     </Modal>

@@ -6,6 +6,12 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+// Will occur if a member that is not yet approved tries to access secure APIS
+const FORBIDDEN = 403;
+const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';
+export const isUnapprovedUserError = (errorResponse) =>
+  errorResponse.status === FORBIDDEN && errorResponse.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
+
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
@@ -14,6 +20,11 @@ export const generateQueryString = (data) => {
   return Object.entries(data)
     .map(([key, val]) => `${key}=${val}`)
     .join('&');
+};
+
+export const generateMailToLink = (creatorProfileData) => {
+  const passionEmail = 'friends@passion.do';
+  return `mailto:${creatorProfileData.email}?cc=${passionEmail}&subject=I%20would%20like%20to%20join%20your%20community&body=Hi%20${creatorProfileData.first_name}`;
 };
 
 const appendScript = (src, charset) => {

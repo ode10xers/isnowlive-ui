@@ -32,6 +32,7 @@ import {
   paymentSource,
   productType,
   reservedDomainName,
+  isUnapprovedUserError,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -302,10 +303,9 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
@@ -352,7 +352,7 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
@@ -373,11 +373,10 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
         showAlreadyBookedModal(productType.VIDEO);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }

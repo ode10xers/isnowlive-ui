@@ -11,7 +11,7 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { getDuration, generateUrlFromUsername, generateQueryString } from 'utils/helper';
+import { getDuration, generateUrlFromUsername, generateQueryString, isUnapprovedUserError } from 'utils/helper';
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -99,11 +99,12 @@ const SessionsInventories = ({ match }) => {
           setExpandedRowKeys([filterByDateSessions[0].start_time]);
         }
       }
-      setIsLoading(false);
     } catch (error) {
-      message.error(error.response?.data?.message || 'Something went wrong.');
-      setIsLoading(false);
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
     }
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {

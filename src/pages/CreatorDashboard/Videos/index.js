@@ -133,10 +133,11 @@ const Videos = () => {
     setSelectedVideo(null);
     setShouldCloneVideo(false);
     setFormPart(1);
+    document.body.classList.remove(['ant-scrolling-effect']);
+    document.body.removeAttribute('style');
     if (shouldRefresh) {
       getVideosForCreator();
     }
-    document.body.style.overflow = 'auto';
   };
 
   const getVideosForCreator = useCallback(async () => {
@@ -265,7 +266,7 @@ const Videos = () => {
       dataIndex: 'thumbnail_url',
       key: 'thumbnail_url',
       align: 'center',
-      width: '125px',
+      width: '180px',
       render: (text, record) => {
         return {
           props: {
@@ -277,8 +278,8 @@ const Videos = () => {
             <Image
               src={record.thumbnail_url || 'error'}
               alt={record.title}
-              height={50}
-              width={100}
+              height={78}
+              width={150}
               fallback={DefaultImage()}
               className={styles.thumbnailImage}
             />
@@ -318,7 +319,7 @@ const Videos = () => {
       title: '',
       align: 'right',
       render: (text, record) => (
-        <Row gutter={8}>
+        <Row gutter={4}>
           <Col xs={24} md={2}>
             <Tooltip title="Send Customer Email">
               <Button type="text" onClick={() => showEmailModal(record)} icon={<MailOutlined />} />
@@ -673,7 +674,7 @@ const Videos = () => {
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showUploadVideoModal()} icon={<CloudUploadOutlined />}>
-            Upload New Video
+            Add New Video
           </Button>
         </Col>
         <Col xs={24}>
@@ -688,7 +689,6 @@ const Videos = () => {
                   ) : (
                     <Table
                       sticky={true}
-                      size="small"
                       columns={videosColumns}
                       data={videos?.filter((video) => video?.is_published)}
                       loading={isLoading}

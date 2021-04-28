@@ -36,6 +36,7 @@ import {
   paymentSource,
   orderType,
   productType,
+  isUnapprovedUserError,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
@@ -392,9 +393,9 @@ const ProfilePreview = ({ username = null }) => {
     } catch (error) {
       setIsSessionLoading(false);
 
-      message.error(error.response?.data?.message || 'Something went wrong');
-
-      if (
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      } else if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
