@@ -6,6 +6,7 @@ import { Row, Col, Typography, Button, Card, List, Popover } from 'antd';
 import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone } from '@ant-design/icons';
 
 import styles from './styles.module.scss';
+import TagListPopup from 'components/TagListPopup';
 
 const { Text } = Typography;
 const whiteColor = '#ffffff';
@@ -20,14 +21,6 @@ const SubscriptionCards = ({
 }) => {
   const renderTickOrCross = (isTrue) =>
     isTrue ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#bb2124" />;
-
-  const renderIncludedProductType = (accessTypes) => (
-    <Row gutter={8}>
-      <Col xs={24}> Temp Text </Col>
-      {/* <Col xs={12}>{renderTickOrCross(accessTypes.includes('PUBLIC'))} Public </Col>
-      <Col xs={12}>{renderTickOrCross(accessTypes.includes('MEMBERSHIP'))} Members </Col> */}
-    </Row>
-  );
 
   const renderProductListButton = (productName, productList, productNameKey = 'name') => (
     <Popover
@@ -62,6 +55,10 @@ const SubscriptionCards = ({
       className: undefined,
     },
     {
+      label: <TagListPopup tags={[subscription.tag].filter((tag) => tag.external_id)} />,
+      className: undefined,
+    },
+    {
       label: `${getBaseCreditsCount()} Credits/Month`,
       className: undefined,
     },
@@ -76,21 +73,9 @@ const SubscriptionCards = ({
     },
     {
       label: subscription.products['SESSION']
-        ? renderIncludedProductType(subscription.products['SESSION'].access_types)
-        : 'None',
-      className: subscription.products['SESSION'] ? undefined : styles.disabled,
-    },
-    {
-      label: subscription.products['SESSION']
         ? renderProductListButton('Sessions', subscription.product_details['SESSION'], 'name')
         : 'None',
       className: subscription.products['SESSION'] ? styles.buttonContainer : styles.disabled,
-    },
-    {
-      label: subscription.products['VIDEO']
-        ? renderIncludedProductType(subscription.products['VIDEO'].access_types)
-        : 'None',
-      className: subscription.products['VIDEO'] ? undefined : styles.disabled,
     },
     {
       label: subscription.products['VIDEO']
@@ -98,30 +83,24 @@ const SubscriptionCards = ({
         : 'None',
       className: subscription.products['VIDEO'] ? styles.buttonContainer : styles.disabled,
     },
-    {
-      label: (
-        <Row gutter={8} justify="center">
-          <Col xs={4}>{renderTickOrCross(subscription.products['COURSE'])}</Col>
-        </Row>
-      ),
-      className: subscription.products['COURSE'] ? undefined : styles.disabled,
-    },
-    {
-      label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/Month` : 'None',
-      className: subscription.products['COURSE'] ? undefined : styles.disabled,
-    },
-    {
-      label: subscription.products['COURSE']
-        ? renderIncludedProductType(subscription.products['COURSE'].access_types)
-        : 'None',
-      className: subscription.products['COURSE'] ? undefined : styles.disabled,
-    },
-    {
-      label: subscription.products['COURSE']
-        ? renderProductListButton('Courses', subscription.product_details['COURSE'], 'name')
-        : 'None',
-      className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
-    },
+    // {
+    //   label: (
+    //     <Row gutter={8} justify="center">
+    //       <Col xs={4}>{renderTickOrCross(subscription.products['COURSE'])}</Col>
+    //     </Row>
+    //   ),
+    //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
+    // },
+    // {
+    //   label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/Month` : 'None',
+    //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
+    // },
+    // {
+    //   label: subscription.products['COURSE']
+    //     ? renderProductListButton('Courses', subscription.product_details['COURSE'], 'name')
+    //     : 'None',
+    //   className: subscription.products['COURSE'] ? styles.buttonContainer : styles.disabled,
+    // },
   ];
 
   const renderCardData = (item) => (
@@ -144,13 +123,14 @@ const SubscriptionCards = ({
           Delete
         </Button>,
         subscription.is_published ? (
-          <Button danger type="link" onClick={() => unpublishSubscription(subscription.external_id)}>
+          <Button danger disabled={editing} type="link" onClick={() => unpublishSubscription(subscription.external_id)}>
             {' '}
             Hide{' '}
           </Button>
         ) : (
           <Button
-            className={styles.greenText}
+            className={editing ? undefined : styles.greenText}
+            disabled={editing}
             type="link"
             onClick={() => publishSubscription(subscription.external_id)}
           >

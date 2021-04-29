@@ -152,7 +152,12 @@ const SendCustomerEmailModal = () => {
                       {recipient.name}
                     </Select.Option>
                   ))}
-                  {validRecipients?.active?.length <= 0 && <Text disabled> No active user </Text>}
+                  {validRecipients?.active?.length <= 0 && (
+                    <Select.Option disabled value="no_active_user">
+                      {' '}
+                      <Text disabled> No active user </Text>{' '}
+                    </Select.Option>
+                  )}
                 </Select.OptGroup>
                 <Select.OptGroup
                   label={<Text className={styles.optionSeparatorText}> Expired User </Text>}
@@ -163,7 +168,12 @@ const SendCustomerEmailModal = () => {
                       {recipient.name}
                     </Select.Option>
                   ))}
-                  {validRecipients?.expired?.length <= 0 && <Text disabled> No expired user </Text>}
+                  {validRecipients?.expired?.length <= 0 && (
+                    <Select.Option disabled value="no_expired_user">
+                      {' '}
+                      <Text disabled> No expired user </Text>{' '}
+                    </Select.Option>
+                  )}
                 </Select.OptGroup>
               </Select>
             </Form.Item>

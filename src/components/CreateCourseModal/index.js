@@ -684,7 +684,9 @@ const CreateCourseModal = ({
                   </Select.Option>
                 ))}
               {courseClasses?.filter((courseClass) => courseClass.is_active).length <= 0 && (
-                <Text disabled> No published sessions </Text>
+                <Select.Option disabled value="no_published_session">
+                  <Text disabled> No published sessions </Text>
+                </Select.Option>
               )}
             </Select.OptGroup>
             <Select.OptGroup
@@ -718,7 +720,9 @@ const CreateCourseModal = ({
                   </Select.Option>
                 ))}
               {courseClasses?.filter((courseClass) => !courseClass.is_active).length <= 0 && (
-                <Text disabled> No unpublished sessions </Text>
+                <Select.Option disabled value="no_unpublished_session">
+                  <Text disabled> No unpublished sessions </Text>
+                </Select.Option>
               )}
             </Select.OptGroup>
           </Select>
@@ -947,7 +951,9 @@ const CreateCourseModal = ({
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => video.is_published).length <= 0 && (
-                      <Text disabled> No published video </Text>
+                      <Select.Option disabled value="no_published_video">
+                        <Text disabled> No published video </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
@@ -980,7 +986,9 @@ const CreateCourseModal = ({
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => !video.is_published).length <= 0 && (
-                      <Text disabled> No unpublished video </Text>
+                      <Select.Option disabled value="no_unpublished_video">
+                        <Text disabled> No unpublished video </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                 </Select>

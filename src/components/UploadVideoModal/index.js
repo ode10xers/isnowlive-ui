@@ -603,7 +603,9 @@ const UploadVideoModal = ({
                           </Select.Option>
                         ))}
                       {classes?.filter((session) => session.is_active).length <= 0 && (
-                        <Text disabled> No published sessions </Text>
+                        <Select.Option disabled value="no_published_session">
+                          <Text disabled> No published sessions </Text>
+                        </Select.Option>
                       )}
                     </Select.OptGroup>
                     <Select.OptGroup
@@ -635,7 +637,9 @@ const UploadVideoModal = ({
                           </Select.Option>
                         ))}
                       {classes?.filter((session) => !session.is_active).length <= 0 && (
-                        <Text disabled> No unpublished sessions </Text>
+                        <Select.Option disabled value="no_unpublished_session">
+                          <Text disabled> No unpublished sessions </Text>
+                        </Select.Option>
                       )}
                     </Select.OptGroup>
                   </Select>
