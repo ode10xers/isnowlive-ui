@@ -96,7 +96,7 @@ const AudienceList = () => {
       filterIcon: (filtered) => (
         <Tooltip defaultVisible={true} title="Click here to filter">
           {' '}
-          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#ff4d4f' }} />{' '}
+          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />{' '}
         </Tooltip>
       ),
       filters: [

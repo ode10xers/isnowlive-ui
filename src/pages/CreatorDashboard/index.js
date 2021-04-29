@@ -49,7 +49,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.courses} component={Courses} />
       <Route exact path={match.url + Routes.creatorDashboard.coupons} component={Coupons} />
       <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />
-      <Route exact path={match.url + Routes.creatorDashboard.audiences} component={Audiences} />
+      <Route exact path={match.url + Routes.creatorDashboard.newsletter} component={Audiences} />
       <Route exact path={match.url + Routes.creatorDashboard.legals} component={Legals} />
       <Route exact path={match.url + Routes.creatorDashboard.documents} component={Documents} />
       <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
