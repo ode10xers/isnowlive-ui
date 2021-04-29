@@ -233,7 +233,6 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
   };
 
   const onSelectedTagChange = (selectedTagExternalId) => {
-    console.log(selectedTagExternalId);
     setSelectedTag(selectedTagExternalId ?? null);
 
     // Need to also filter currencly selected sessions and passes based on tag type

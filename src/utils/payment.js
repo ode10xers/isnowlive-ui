@@ -26,6 +26,7 @@ export const fetchCreatorCurrency = async () => {
     // And update the user details in localStorage
     if (isAPISuccess(status) && data) {
       // TODO: this might cause inconsistency between context data and localStorage data
+      // since it's not possible to call for context here
       // Find better solution for this
       localStorage.setItem('user-details', JSON.stringify(data));
       return data.currency || null;

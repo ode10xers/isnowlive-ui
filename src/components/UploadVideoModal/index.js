@@ -174,7 +174,6 @@ const UploadVideoModal = ({
   };
 
   uppy.current.on('cancel-all', () => {
-    console.log('Cancel All is called here');
     setVideoUploadPercent(0);
     setUploadingFile(null);
   });

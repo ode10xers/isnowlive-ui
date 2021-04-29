@@ -240,7 +240,7 @@ const Earnings = () => {
     }
   };
 
-  const availabeForPayout = (
+  const availableForPayout = (
     <div className={styles.box1}>
       <Row>
         <Col xs={24}>
@@ -524,7 +524,7 @@ const Earnings = () => {
             {stripePaymentDashboard}
           </Col>
           <Col xs={24} lg={8}>
-            {availabeForPayout}
+            {availableForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>

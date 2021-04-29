@@ -190,8 +190,6 @@ const PaymentPopup = () => {
       }`;
     }
 
-    //TODO: Will also add text when subscription can be used as payment instrument later
-
     return (
       <Text strong className={styles.blueText}>
         {' '}
