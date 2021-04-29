@@ -479,7 +479,7 @@ export const showCourseOptionsHelperModal = (productName = 'session') => {
     centered: true,
     closable: true,
     maskClosable: true,
-    title: 'Understanding the options',
+    title: 'Understanding the course options',
     width: 640,
     content: (
       <>
@@ -492,6 +492,25 @@ export const showCourseOptionsHelperModal = (productName = 'session') => {
           they can only get it if they buy the whole course you add this {productName} to.
         </Paragraph>
         <Paragraph>If you are in doubt, choose normal for now. You can always change this later.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showTagOptionsHelperModal = (productName = 'session') => {
+  Modal.info({
+    centered: true,
+    closable: true,
+    maskClosable: true,
+    title: 'Understanding the tag options',
+    width: 640,
+    content: (
+      <>
+        <Paragraph>Selecting Anyone here will allow any of your customers to book this {productName}</Paragraph>
+        <Paragraph>
+          Marking this {productName} for “Selected Member Tags” will make it visible and purchasable only by the member
+          tags you have added here. You need to create your member tags first to be able to find them here.
+        </Paragraph>
       </>
     ),
   });

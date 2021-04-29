@@ -11,7 +11,7 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -36,7 +36,9 @@ const CourseList = () => {
         setCourseOrders(data);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error?.response?.data?.message || 'Failed to fetch course orders');
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something wrong happened', error?.response?.data?.message || 'Failed to fetch course orders');
+      }
     }
 
     setIsLoading(false);

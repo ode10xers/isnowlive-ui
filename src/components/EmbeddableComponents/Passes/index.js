@@ -13,7 +13,7 @@ const Passes = ({ profileUsername }) => {
     const getPasses = async () => {
       setIsPassesLoading(true);
       try {
-        const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
+        const { status, data } = await apis.passes.getPassesByUsername();
 
         if (isAPISuccess(status) && data) {
           setPasses(formatPassesData(data, profileUsername));

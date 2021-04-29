@@ -9,6 +9,7 @@ import AuthModal from 'components/AuthModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
 import {
   isAPISuccess,
   orderType,
@@ -21,6 +22,10 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+
+const {
+  timezoneUtils: { getTimezoneLocation },
+} = dateUtil;
 
 const PublicVideoList = ({ username = null, videos }) => {
   const { showPaymentPopup } = useGlobalContext();
@@ -65,6 +70,7 @@ const PublicVideoList = ({ username = null, videos }) => {
       const payload = {
         video_id: selectedVideo?.external_id,
         payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
       };
 
       const { status, data } = await apis.videos.createOrderForUser(payload);

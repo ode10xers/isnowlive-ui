@@ -13,7 +13,7 @@ const Videos = ({ profileUsername }) => {
     const getVideosDetails = async () => {
       setIsVideosLoading(true);
       try {
-        const { status, data } = await apis.videos.getVideosByUsername(profileUsername);
+        const { status, data } = await apis.videos.getVideosByUsername();
 
         if (isAPISuccess(status) && data) {
           setVideos(data);
@@ -25,7 +25,7 @@ const Videos = ({ profileUsername }) => {
       }
     };
     getVideosDetails();
-  }, [profileUsername]);
+  }, []);
 
   return (
     <Loader loading={isVideosLoading} size="large" text="Loading videos">

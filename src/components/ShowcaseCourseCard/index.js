@@ -109,7 +109,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
-        payment_source: paymentSource.GATEWAY, // TODO: Need to make payment_source value dynamic - PAYMENT_GATEWAY / SUBSCRIPTION
+        payment_source: paymentSource.GATEWAY,
       });
 
       if (isAPISuccess(status) && data) {
