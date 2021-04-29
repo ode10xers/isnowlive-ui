@@ -9,18 +9,17 @@ import AuthModal from 'components/AuthModal';
 import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
-import {
-  isAPISuccess,
-  orderType,
-  generateUrlFromUsername,
-  paymentSource,
-  productType,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import dateUtil from 'utils/date';
+import { redirectToVideosPage } from 'utils/redirect';
+import { isAPISuccess, orderType, paymentSource, productType, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+
+const {
+  timezoneUtils: { getTimezoneLocation },
+} = dateUtil;
 
 const PublicVideoList = ({ username = null, videos }) => {
   const { showPaymentPopup } = useGlobalContext();
@@ -65,6 +64,7 @@ const PublicVideoList = ({ username = null, videos }) => {
       const payload = {
         video_id: selectedVideo?.external_id,
         payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
       };
 
       const { status, data } = await apis.videos.createOrderForUser(payload);
@@ -105,13 +105,6 @@ const PublicVideoList = ({ username = null, videos }) => {
     setShowPurchaseVideoModal(false);
   };
 
-  const redirectToVideoDetails = (video) => {
-    if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
-      window.open(`${baseUrl}/v/${video?.external_id}`);
-    }
-  };
-
   return (
     <div className={styles.box}>
       <AuthModal
@@ -126,7 +119,7 @@ const PublicVideoList = ({ username = null, videos }) => {
               <VideoCard
                 video={video}
                 buyable={true}
-                onCardClick={() => redirectToVideoDetails(video)}
+                onCardClick={() => redirectToVideosPage(video)}
                 showAuthModal={() => handleSelectVideo(video)}
               />
             </Col>

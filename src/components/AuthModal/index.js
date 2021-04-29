@@ -12,7 +12,6 @@ import Loader from 'components/Loader';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import { showErrorModal, sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
 import { purchaseModalFormLayout, purchaseModalTailLayout, purchaseModalCenterLayout } from 'layouts/FormLayouts';
@@ -97,7 +96,6 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         is_creator: false,
       });
       if (data) {
-        http.setAuthToken(data.auth_token);
         logIn(data, true, isWidgetUrl());
         closeModal();
         onLoggedInCallback();
@@ -139,7 +137,6 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
             password: values.password,
           });
           if (data) {
-            http.setAuthToken(data.auth_token);
             logIn(data, true, isWidgetUrl());
             closeModal();
             onLoggedInCallback();

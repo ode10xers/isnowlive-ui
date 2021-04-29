@@ -20,13 +20,24 @@
   position: relative;
   height: 315px;
 }
+.coverImageWrapper {
+  text-align: right;
+}
+.profileImageWrapper {
+  position: relative;
+  
+  .ant-form-item-explain{
+    position: absolute;
+    bottom: -30px;
+  }
+}
 .coverImage > div {
   width: 100% !important;
   height: 300px !important;
 }
 .profileImage {
   position: absolute;
-  bottom: -30px;
+  bottom: -10px;
   left: 20px;
 }
 .subtext {

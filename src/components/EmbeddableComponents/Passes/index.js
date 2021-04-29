@@ -13,10 +13,10 @@ const Passes = ({ profileUsername }) => {
     const getPasses = async () => {
       setIsPassesLoading(true);
       try {
-        const { status, data } = await apis.passes.getPassesByUsername(profileUsername);
+        const { status, data } = await apis.passes.getPassesByUsername();
 
         if (isAPISuccess(status) && data) {
-          setPasses(formatPassesData(data, profileUsername));
+          setPasses(formatPassesData(data));
           setIsPassesLoading(false);
         }
       } catch (error) {
@@ -26,11 +26,11 @@ const Passes = ({ profileUsername }) => {
     };
 
     getPasses();
-  }, [profileUsername]);
+  }, []);
 
   return (
     <Loader loading={isPassesLoading} size="large" text="Loading passes">
-      <PublicPassList passes={passes} username={profileUsername} />
+      <PublicPassList passes={passes} />
     </Loader>
   );
 };

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Row, Col, message } from 'antd';
 
+import Routes from 'routes';
+import apis from 'apis';
+
 import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
@@ -8,15 +11,13 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
-import Routes from 'routes';
-import apis from 'apis';
-import http from 'services/http';
-import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 import validationRules from 'utils/validation';
 
+import { formLayout, formTailLayout } from 'layouts/FormLayouts';
+
 import styles from './style.module.scss';
-import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 const { Item } = Form;
 const { user } = mixPanelEventTags;
@@ -40,7 +41,6 @@ const SignUp = ({ history }) => {
           creator_email: values.email,
           creator_external_id: data.external_id,
         });
-        http.setAuthToken(data.auth_token);
         logIn(data, true);
         setIsLoading(false);
         mapUserToMixPanel(data);

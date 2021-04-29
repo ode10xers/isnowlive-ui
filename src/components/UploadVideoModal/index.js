@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import {
   Row,
@@ -21,19 +20,25 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop, useUppy } from '@uppy/react';
 
-import { BookTwoTone } from '@ant-design/icons';
+import { BookTwoTone, TagOutlined } from '@ant-design/icons';
 
 import config from 'config';
 import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal, showCourseOptionsHelperModal } from 'components/Modals/modals';
+import {
+  showErrorModal,
+  showSuccessModal,
+  showCourseOptionsHelperModal,
+  showTagOptionsHelperModal,
+} from 'components/Modals/modals';
 import TextEditor from 'components/TextEditor';
 
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
@@ -60,9 +65,11 @@ const formInitialValues = {
   description: '',
   classList: [],
   videoType: videoTypes.FREE.name,
-  price: 10,
-  video_access_type: 'PUBLIC',
+  price: 0,
+  watch_limit: 1,
   video_course_type: 'normal',
+  videoTagType: 'anyone',
+  selectedMemberTags: [],
 };
 
 const UploadVideoModal = ({
@@ -73,12 +80,12 @@ const UploadVideoModal = ({
   editedVideo = null,
   updateEditedVideo,
   shouldClone,
+  creatorMemberTags = [],
 }) => {
   const [form] = Form.useForm();
-  const history = useHistory();
 
   const [classes, setClasses] = useState([]);
-  const [currency, setCurrency] = useState('SGD');
+  const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
@@ -87,6 +94,7 @@ const UploadVideoModal = ({
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
   const [uploadingFile, setUploadingFile] = useState(null);
   const [isCourseVideo, setIsCourseVideo] = useState(false);
+  const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
   const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
   const [, setVideoLength] = useState(0);
@@ -128,8 +136,14 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  const setUppyCompleteListener = (external_id) => {
+  const setUppyListeners = (external_id) => {
     if (uppy.current) {
+      // Set the upload URL
+      uppy.current.getPlugin('Tus').setOptions({
+        endpoint: `${config.server.baseURL}/creator/videos/${external_id}/upload`,
+      });
+
+      // Set the on complete listener
       uppy.current.on('complete', (result) => {
         if (result.successful.length) {
           apis.videos
@@ -146,6 +160,8 @@ const UploadVideoModal = ({
           showErrorModal(`Failed to upload video`);
         }
 
+        uppy.current.reset();
+
         setTimeout(() => {
           setVideoUploadPercent(0);
           setUploadingFile(null);
@@ -157,33 +173,7 @@ const UploadVideoModal = ({
     }
   };
 
-  // uppy.current.on('complete', (result) => {
-  //   if (result.successful.length) {
-  //     apis.videos
-  //       .getVideoToken(editedVideo.external_id)
-  //       .then((res) => {
-  //         setVideoPreviewToken(res.data.token);
-  //         setFormPart(3);
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //         showErrorModal(`Failed to get video token`);
-  //       });
-  //   } else {
-  //     showErrorModal(`Failed to upload video`);
-  //   }
-
-  //   setTimeout(() => {
-  //     setVideoUploadPercent(0);
-  //     setUploadingFile(null);
-  //     setIsLoading(false);
-
-  //     uppy.current = null;
-  //   }, 500);
-  // });
-
   uppy.current.on('cancel-all', () => {
-    console.log('Cancel All is called here');
     setVideoUploadPercent(0);
     setUploadingFile(null);
   });
@@ -204,33 +194,28 @@ const UploadVideoModal = ({
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorCurrency = useCallback(async () => {
+  const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
-    try {
-      const { status, data } = await apis.session.getCreatorBalance();
 
-      if (isAPISuccess(status) && data?.currency) {
-        setCurrency(data.currency.toUpperCase());
+    try {
+      const creatorCurrency = await fetchCreatorCurrency();
+
+      if (creatorCurrency) {
+        setCurrency(creatorCurrency);
+      } else {
+        setCurrency('');
+        setFreeVideo();
       }
     } catch (error) {
-      if (error.response?.data?.message === 'unable to fetch user payment details') {
-        Modal.confirm({
-          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid video`,
-          okText: 'Setup payment account',
-          cancelText: 'Keep it free',
-          onOk: () => {
-            history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
-          },
-        });
-      } else {
-        showErrorModal(
-          'Failed to fetch creator currency details',
-          error?.response?.data?.message || 'Something went wrong'
-        );
-      }
+      showErrorModal(
+        'Failed to fetch creator currency details',
+        error?.response?.data?.message || 'Something went wrong'
+      );
     }
+
     setIsLoading(false);
-  }, [history]);
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (visible) {
@@ -239,30 +224,28 @@ const UploadVideoModal = ({
       if (editedVideo) {
         form.setFieldsValue({
           ...editedVideo,
+          price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
-          videoType: editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
-          video_access_type: editedVideo.access,
+          videoType:
+            editedVideo.currency === '' || editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
           video_course_type: editedVideo.is_course ? 'course' : 'normal',
+          videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
+          selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
-        setCurrency(editedVideo.currency.toUpperCase() || 'SGD');
+        setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
+        setCurrency(editedVideo.currency.toUpperCase() || '');
         setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
 
-        if (uppy.current) {
-          uppy.current.getPlugin('Tus').setOptions({
-            endpoint: `${config.server.baseURL}/creator/videos/${editedVideo?.external_id}/upload`,
-          });
-
-          setUppyCompleteListener(editedVideo.external_id);
-        }
+        setUppyListeners(editedVideo.external_id);
       } else {
         form.resetFields();
       }
 
       if (formPart === 1) {
-        fetchCreatorCurrency();
+        getCreatorCurrencyDetails();
       }
       fetchAllClassesForCreator();
     } else {
@@ -274,12 +257,14 @@ const UploadVideoModal = ({
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
       setIsCourseVideo(false);
+      setSelectedTagType('anyone');
+      setCurrency('');
       uppy.current = null;
       document.body.classList.remove(['ant-scrolling-effect']);
       document.body.removeAttribute('style');
     };
     //eslint-disable-next-line
-  }, [visible, editedVideo, fetchAllClassesForCreator, fetchCreatorCurrency, form, formPart]);
+  }, [visible, editedVideo, fetchAllClassesForCreator, getCreatorCurrencyDetails, form, formPart]);
 
   useEffect(() => {
     if (editedVideo || formPart === 2) {
@@ -288,13 +273,58 @@ const UploadVideoModal = ({
     // eslint-disable-next-line
   }, []);
 
-  const handleChangeLimitType = (priceType) => {
-    const values = form.getFieldsValue();
+  const setFreeVideo = () => {
     form.setFieldsValue({
-      ...values,
-      price: priceType === videoTypes.FREE.name ? 0 : values.price || 10,
+      ...form.getFieldsValue(),
+      videoType: videoTypes.FREE.name,
+      price: 0,
     });
-    setVideoType(priceType);
+    setVideoType(videoTypes.FREE.name);
+  };
+
+  const handleChangeLimitType = (priceType) => {
+    if (currency === '') {
+      Modal.confirm({
+        title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
+        okText: 'Setup payment account',
+        cancelText: 'Keep it free',
+        onCancel: () => setFreeVideo(),
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+          newWindow.blur();
+          window.focus();
+          setFreeVideo();
+          // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
+        },
+      });
+    } else {
+      const values = form.getFieldsValue();
+      form.setFieldsValue({
+        ...values,
+        videoType: priceType,
+        price: priceType === videoTypes.FREE.name ? 0 : values.price || 10,
+      });
+      setVideoType(priceType);
+    }
+  };
+
+  const handleVideoTagTypeChange = (e) => {
+    if (creatorMemberTags.length > 0) {
+      setSelectedTagType(e.target.value);
+    } else {
+      setSelectedTagType('anyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), videoTagType: 'anyone' });
+      Modal.confirm({
+        title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
+        okText: 'Setup Member Tags',
+        cancelText: 'Cancel',
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags}`);
+          newWindow.blur();
+          window.focus();
+        },
+      });
+    }
   };
 
   const handleFinish = async (values) => {
@@ -309,9 +339,9 @@ const UploadVideoModal = ({
         validity: values.validity,
         session_ids: selectedSessionIds || values.session_ids || [],
         thumbnail_url: coverImageUrl,
-        watch_limit: values.watch_limit,
+        watch_limit: values.watch_limit || 1,
         is_course: isCourseVideo,
-        access: values.video_access_type,
+        tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
       };
 
       const response = editedVideo
@@ -344,12 +374,7 @@ const UploadVideoModal = ({
                 showErrorModal(`Failed to get video token`);
               });
           } else {
-            if (uppy.current) {
-              uppy.current.getPlugin('Tus').setOptions({
-                endpoint: `${config.server.baseURL}/creator/videos/${response.data.external_id}/upload`,
-              });
-              setUppyCompleteListener(response.data.external_id);
-            }
+            setUppyListeners(response.data.external_id);
             setFormPart(2);
           }
         } else {
@@ -365,6 +390,7 @@ const UploadVideoModal = ({
                 showErrorModal(`Failed to get video token`);
               });
           } else {
+            setUppyListeners(editedVideo.external_id);
             setFormPart(2);
           }
         }
@@ -570,7 +596,7 @@ const UploadVideoModal = ({
                               </Col>
                               <Col xs={7} className={styles.textAlignRight}>
                                 <Text strong>
-                                  {session.currency?.toUpperCase()} {session.price}
+                                  {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
                                 </Text>
                               </Col>
                             </Row>
@@ -581,7 +607,7 @@ const UploadVideoModal = ({
                       )}
                     </Select.OptGroup>
                     <Select.OptGroup
-                      label={<Text className={styles.optionSeparatorText}> Hidden from everyone </Text>}
+                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
                       key="Unpublished Sessions"
                     >
                       {classes
@@ -602,7 +628,7 @@ const UploadVideoModal = ({
                               </Col>
                               <Col xs={7} className={styles.textAlignRight}>
                                 <Text strong>
-                                  {session.currency?.toUpperCase()} {session.price}
+                                  {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
                                 </Text>
                               </Col>
                             </Row>
@@ -654,19 +680,64 @@ const UploadVideoModal = ({
                   />
                 </Form.Item>
               </Col>
+              <Col xs={videoType === videoTypes.FREE.name ? 0 : 24}>
+                <Form.Item
+                  id="price"
+                  name="price"
+                  label={`Price (${currency.toUpperCase()})`}
+                  hidden={videoType === videoTypes.FREE.name}
+                  rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
+                >
+                  <InputNumber min={0} disabled={currency === ''} placeholder="Price" className={styles.numericInput} />
+                </Form.Item>
+              </Col>
 
-              {videoType !== videoTypes.FREE.name && (
-                <Col xs={24}>
+              <Col xs={24}>
+                <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
                   <Form.Item
-                    id="price"
-                    name="price"
-                    label={`Price (${currency.toUpperCase()})`}
-                    rules={validationRules.numberValidation('Please Input Video Price', 1, false)}
+                    name="videoTagType"
+                    rules={validationRules.requiredValidation}
+                    onChange={handleVideoTagTypeChange}
+                    className={styles.inlineFormItem}
                   >
-                    <InputNumber min={0} placeholder="Price" className={styles.numericInput} />
+                    <Radio.Group>
+                      <Radio value="anyone"> Anyone </Radio>
+                      <Radio value="selected"> Selected Member Tags </Radio>
+                    </Radio.Group>
                   </Form.Item>
-                </Col>
-              )}
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button type="link" onClick={() => showTagOptionsHelperModal('video')}>
+                      Understanding the tag options
+                    </Button>
+                  </Form.Item>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24}>
+                <Form.Item
+                  name="selectedMemberTags"
+                  id="selectedMemberTags"
+                  {...formTailLayout}
+                  hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
+                >
+                  <Select
+                    showArrow
+                    mode="multiple"
+                    maxTagCount={2}
+                    placeholder="Select a member tag"
+                    disabled={selectedTagType === 'anyone'}
+                    options={creatorMemberTags.map((tag) => ({
+                      label: (
+                        <>
+                          {' '}
+                          {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                        </>
+                      ),
+                      value: tag.external_id,
+                    }))}
+                  />
+                </Form.Item>
+              </Col>
 
               <Col xs={24}>
                 <Form.Item

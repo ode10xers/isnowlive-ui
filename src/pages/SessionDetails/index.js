@@ -6,7 +6,6 @@ import ReactHtmlParser from 'react-html-parser';
 import Routes from 'routes';
 import apis from 'apis';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
 import Share from 'components/Share';
@@ -19,8 +18,23 @@ import VideoCard from 'components/VideoCard';
 import AuthModal from 'components/AuthModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+import {
+  showErrorModal,
+  showBookSessionWithPassSuccessModal,
+  showPurchasePassAndBookSessionSuccessModal,
+  showBookSingleSessionSuccessModal,
+  showAlreadyBookedModal,
+  showPurchaseSingleVideoSuccessModal,
+  showSetNewPasswordModal,
+  showBookSessionWithSubscriptionSuccessModal,
+  sendNewPasswordEmail,
+} from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
+import { redirectToVideosPage } from 'utils/redirect';
 import {
   generateUrlFromUsername,
   isAPISuccess,
@@ -30,22 +44,8 @@ import {
   reservedDomainName,
   isUnapprovedUserError,
 } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
-import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
-import {
-  showErrorModal,
-  showBookSessionWithPassSuccessModal,
-  showPurchasePassAndBookSessionSuccessModal,
-  showBookSingleSessionSuccessModal,
-  showAlreadyBookedModal,
-  showPurchaseSingleVideoSuccessModal,
-  showBookSessionWithSubscriptionSuccessModal,
-  showSetNewPasswordModal,
-  sendNewPasswordEmail,
-} from 'components/Modals/modals';
-import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 const { Title } = Typography;
 const {
@@ -289,7 +289,6 @@ const SessionDetails = ({ match, history }) => {
       });
       if (data) {
         setIsLoading(false);
-        http.setAuthToken(data.auth_token);
         logIn(data, true);
         showConfirmPaymentPopup();
       }
@@ -328,6 +327,7 @@ const SessionDetails = ({ match, history }) => {
       const payload = {
         video_id: selectedVideo.external_id,
         payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
       };
 
       showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideo(payload, couponCode));
@@ -469,14 +469,14 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -511,6 +511,7 @@ const SessionDetails = ({ match, history }) => {
           const followUpBooking = await bookClass({
             inventory_id: inventoryId,
             user_timezone_offset: new Date().getTimezoneOffset(),
+            user_timezone_location: getTimezoneLocation(),
             user_timezone: getCurrentLongTimezone(),
             payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
@@ -525,14 +526,14 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -552,14 +553,14 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -644,7 +645,6 @@ const SessionDetails = ({ match, history }) => {
             password: values.password,
           });
           if (data) {
-            http.setAuthToken(data.auth_token);
             logIn(data, true);
             setCurrentUser(data);
             await getUsablePassesForUser();
@@ -704,16 +704,6 @@ const SessionDetails = ({ match, history }) => {
       getUsablePassesForUser();
       setShouldSetDefaultPass(true);
     }
-  };
-
-  const redirectToVideoPreview = (video) => {
-    const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
-    window.open(`${baseUrl}/v/${video?.external_id}`);
-  };
-
-  const redirectToCourseDetails = (course) => {
-    const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
-    window.open(`${baseUrl}/c/${course?.id}`);
   };
 
   const openAuthModal = (video) => {
@@ -802,11 +792,7 @@ const SessionDetails = ({ match, history }) => {
                 <Title level={5}> This session can only be attended by doing this course </Title>
               </Col>
               <Col xs={24}>
-                <ShowcaseCourseCard
-                  courses={courses}
-                  onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
-                  username={username}
-                />
+                <ShowcaseCourseCard courses={courses} username={username} />
               </Col>
             </Row>
           </div>
@@ -897,7 +883,7 @@ const SessionDetails = ({ match, history }) => {
                                 <VideoCard
                                   video={videoDetails}
                                   buyable={true}
-                                  onCardClick={redirectToVideoPreview}
+                                  onCardClick={redirectToVideosPage}
                                   showAuthModal={openAuthModal}
                                 />
                               </Col>

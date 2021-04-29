@@ -7,7 +7,6 @@ import ReactHtmlParser from 'react-html-parser';
 import Routes from 'routes';
 import apis from 'apis';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
 import Share from 'components/Share';
@@ -255,7 +254,6 @@ const InventoryDetails = ({ match, history }) => {
         is_creator: false,
       });
       if (data) {
-        http.setAuthToken(data.auth_token);
         logIn(data, true);
         showConfirmPaymentPopup();
       }
@@ -419,14 +417,14 @@ const InventoryDetails = ({ match, history }) => {
     } catch (error) {
       setIsLoading(false);
 
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -461,6 +459,7 @@ const InventoryDetails = ({ match, history }) => {
           const followUpBooking = await bookClass({
             inventory_id: inventoryId,
             user_timezone_offset: new Date().getTimezoneOffset(),
+            user_timezone_location: getTimezoneLocation(),
             user_timezone: getCurrentLongTimezone(),
             payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
@@ -475,14 +474,14 @@ const InventoryDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -502,14 +501,14 @@ const InventoryDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      } else if (
+      if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
       ) {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 
@@ -560,7 +559,6 @@ const InventoryDetails = ({ match, history }) => {
             password: values.password,
           });
           if (data) {
-            http.setAuthToken(data.auth_token);
             logIn(data, true);
             setCurrentUser(data);
             await getUsablePassesForUser();
@@ -718,7 +716,7 @@ const InventoryDetails = ({ match, history }) => {
                 classDetails={session}
                 selectedInventory={session}
                 logOut={() => {
-                  logOut(history, true);
+                  logOut(history, false);
                   setCurrentUser(null);
                   setSelectedPass(null);
                   setUserPasses([]);

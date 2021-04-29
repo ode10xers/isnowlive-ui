@@ -20,12 +20,14 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import { isMobileDevice } from 'utils/device';
-import { getLocalUserDetails } from 'utils/storage';
-import dateUtil from 'utils/date';
+import TagListPopup from 'components/TagListPopup';
 import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+
+import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
+import dateUtil from 'utils/date';
 import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -46,12 +48,28 @@ const Videos = () => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videos, setVideos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
+  const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [formPart, setFormPart] = useState(1);
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const isOnboarding = location.state ? location.state.onboarding || false : false;
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
 
   const showEmailModal = (video) => {
     let activeRecipients = [];
@@ -165,25 +183,44 @@ const Videos = () => {
       showUploadVideoModal();
     }
 
+    fetchCreatorMemberTags();
     getVideosForCreator();
     //eslint-disable-next-line
   }, [isOnboarding]);
 
-  const toggleExpandAll = () => {
-    if (expandedRowKeys.length > 0) {
-      setExpandedRowKeys([]);
+  const toggleExpandAllPublished = () => {
+    if (expandedPublishedRowKeys.length > 0) {
+      setExpandedPublishedRowKeys([]);
     } else {
-      setExpandedRowKeys(videos.map((video) => video.external_id));
+      setExpandedPublishedRowKeys(videos?.filter((video) => video.is_published).map((video) => video.external_id));
     }
   };
 
-  const expandRow = (rowKey) => {
-    const tempExpandedRowsArray = expandedRowKeys;
+  const expandRowPublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedPublishedRowKeys;
     tempExpandedRowsArray.push(rowKey);
-    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+    setExpandedPublishedRowKeys([...new Set(tempExpandedRowsArray)]);
   };
 
-  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
+  const collapseRowPublished = (rowKey) =>
+    setExpandedPublishedRowKeys(expandedPublishedRowKeys.filter((key) => key !== rowKey));
+
+  const toggleExpandAllUnpublished = () => {
+    if (expandedUnpublishedRowKeys.length > 0) {
+      setExpandedUnpublishedRowKeys([]);
+    } else {
+      setExpandedUnpublishedRowKeys(videos?.filter((video) => !video.is_published).map((video) => video.external_id));
+    }
+  };
+
+  const expandRowUnpublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedUnpublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedUnpublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRowUnpublished = (rowKey) =>
+    setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
   const publishVideo = async (videoId) => {
     setIsLoading(true);
@@ -260,174 +297,211 @@ const Videos = () => {
     setIsLoading(false);
   };
 
-  const videosColumns = [
-    {
-      title: '',
-      dataIndex: 'thumbnail_url',
-      key: 'thumbnail_url',
-      align: 'center',
-      width: '180px',
-      render: (text, record) => {
-        return {
-          props: {
-            style: {
-              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
-            },
+  const generateVideoColumns = useCallback(
+    (published) => {
+      const initialColumns = [
+        {
+          title: '',
+          dataIndex: 'thumbnail_url',
+          key: 'thumbnail_url',
+          align: 'center',
+          width: '180px',
+          render: (text, record) => {
+            return {
+              props: {
+                style: {
+                  borderLeft: `6px solid ${record.color_code || '#FFF'}`,
+                },
+              },
+              children: (
+                <Image
+                  src={record.thumbnail_url || 'error'}
+                  alt={record.title}
+                  height={78}
+                  width={150}
+                  fallback={DefaultImage()}
+                  className={styles.thumbnailImage}
+                />
+              ),
+            };
           },
-          children: (
-            <Image
-              src={record.thumbnail_url || 'error'}
-              alt={record.title}
-              height={78}
-              width={150}
-              fallback={DefaultImage()}
-              className={styles.thumbnailImage}
-            />
-          ),
-        };
-      },
-    },
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      width: '30%',
-      render: (text, record) => (
-        <>
-          <Text> {record.title} </Text>
-          {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
-        </>
-      ),
-    },
-    {
-      title: 'Validity',
-      dataIndex: 'validity',
-      key: 'validity',
-      align: 'center',
-      width: '90px',
-      render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
-    },
-    {
-      title: 'Price',
-      dataIndex: 'price',
-      key: 'price',
-      align: 'left',
-      width: '80px',
-      render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
-    },
-    {
-      title: '',
-      align: 'right',
-      render: (text, record) => (
-        <Row gutter={4}>
-          <Col xs={24} md={2}>
-            <Tooltip title="Send Customer Email">
-              <Button type="text" onClick={() => showEmailModal(record)} icon={<MailOutlined />} />
-            </Tooltip>
-          </Col>
-          <Col xs={24} md={2}>
-            <Tooltip title="Edit">
-              <Button
-                className={styles.detailsButton}
-                type="text"
-                onClick={() => showUploadVideoModal(record)}
-                icon={<EditTwoTone twoToneColor="#08979c" />}
-              />
-            </Tooltip>
-          </Col>
-          <Col xs={24} md={2}>
-            {record.status === 'UPLOAD_SUCCESS' ? (
-              <Tooltip title="Video uploaded">
-                <Button
-                  className={classNames(styles.detailsButton, styles.checkIcon)}
-                  type="text"
-                  icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
-                />
-              </Tooltip>
-            ) : (
-              <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
-                <Button
-                  className={styles.detailsButton}
-                  type="text"
-                  disabled={record.video_uid.length > 0 ? true : false}
-                  onClick={() => showUploadVideoModal(record, 2)}
-                  icon={<CloudUploadOutlined />}
-                />
-              </Tooltip>
-            )}
-          </Col>
-          {record.status === 'UPLOAD_SUCCESS' && (
+        },
+        {
+          title: 'Title',
+          dataIndex: 'title',
+          key: 'title',
+          width: '280px',
+          render: (text, record) => (
             <>
+              <Text> {record.title} </Text>
+              {record.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            </>
+          ),
+        },
+        {
+          title: 'Validity',
+          dataIndex: 'validity',
+          key: 'validity',
+          align: 'center',
+          width: '90px',
+          render: (text, record) => `${text} Day${parseInt(text) > 1 ? 's' : ''}`,
+        },
+        {
+          title: 'Price',
+          dataIndex: 'price',
+          key: 'price',
+          align: 'left',
+          width: '100px',
+          render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
+        },
+        {
+          title: published ? (
+            <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
+              {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          ) : (
+            <Button ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
+              {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          ),
+          align: 'right',
+          render: (text, record) => (
+            <Row gutter={4}>
               <Col xs={24} md={2}>
-                <Tooltip title="Clone Video">
+                <Tooltip title="Send Customer Email">
+                  <Button type="text" onClick={() => showEmailModal(record)} icon={<MailOutlined />} />
+                </Tooltip>
+              </Col>
+              <Col xs={24} md={2}>
+                <Tooltip title="Edit">
                   <Button
-                    type="text"
                     className={styles.detailsButton}
-                    onClick={() => cloneVideo(record)}
-                    icon={<ExportOutlined />}
+                    type="text"
+                    onClick={() => showUploadVideoModal(record)}
+                    icon={<EditTwoTone twoToneColor="#08979c" />}
                   />
                 </Tooltip>
               </Col>
-            </>
-          )}
-          <Col xs={24} md={2}>
-            <Popconfirm
-              title="Do you want to delete video?"
-              icon={<DeleteOutlined className={styles.danger} />}
-              okText="Yes"
-              cancelText="No"
-              onConfirm={() => deleteVideo(record.external_id)}
-            >
-              <Tooltip title="Delete Video">
-                <Button danger type="text" icon={<DeleteOutlined />} />
-              </Tooltip>
-            </Popconfirm>
-          </Col>
-          <Col xs={24} md={2}>
-            <Tooltip title="Copy Video Page Link">
-              <Button
-                type="text"
-                className={styles.detailsButton}
-                onClick={() => copyVideoPageLink(record.external_id)}
-                icon={<CopyOutlined />}
-              />
-            </Tooltip>
-          </Col>
-          <Col xs={24} md={6}>
-            {record.is_published ? (
-              <Tooltip title="Hide Video">
-                <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
-                  Hide
-                </Button>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Unhide Video">
-                <Button
-                  type="link"
-                  disabled={record.status === 'UPLOAD_SUCCESS' ? false : true}
-                  className={styles.successBtn}
-                  onClick={() => publishVideo(record.external_id)}
+              <Col xs={24} md={2}>
+                {record.status === 'UPLOAD_SUCCESS' ? (
+                  <Tooltip title="Video uploaded">
+                    <Button
+                      className={classNames(styles.detailsButton, styles.checkIcon)}
+                      type="text"
+                      icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+                    <Button
+                      className={styles.detailsButton}
+                      type="text"
+                      disabled={record.video_uid.length > 0 ? true : false}
+                      onClick={() => showUploadVideoModal(record, 2)}
+                      icon={<CloudUploadOutlined />}
+                    />
+                  </Tooltip>
+                )}
+              </Col>
+              {record.status === 'UPLOAD_SUCCESS' && (
+                <>
+                  <Col xs={24} md={2}>
+                    <Tooltip title="Clone Video">
+                      <Button
+                        type="text"
+                        className={styles.detailsButton}
+                        onClick={() => cloneVideo(record)}
+                        icon={<ExportOutlined />}
+                      />
+                    </Tooltip>
+                  </Col>
+                </>
+              )}
+              <Col xs={24} md={2}>
+                <Popconfirm
+                  title="Do you want to delete video?"
+                  icon={<DeleteOutlined className={styles.danger} />}
+                  okText="Yes"
+                  cancelText="No"
+                  onConfirm={() => deleteVideo(record.external_id)}
                 >
-                  Show
-                </Button>
-              </Tooltip>
-            )}
-          </Col>
-          <Col xs={24} md={6}>
-            {expandedRowKeys.includes(record.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyer `} <UpOutlined />
-              </Button>
-            ) : (
-              <Button type="link" onClick={() => expandRow(record.external_id)}>
-                {`${record?.buyers?.length || 0} Buyer`} <DownOutlined />
-              </Button>
-            )}
-          </Col>
-        </Row>
-      ),
-    },
-  ];
+                  <Tooltip title="Delete Video">
+                    <Button danger type="text" icon={<DeleteOutlined />} />
+                  </Tooltip>
+                </Popconfirm>
+              </Col>
+              <Col xs={24} md={2}>
+                <Tooltip title="Copy Video Page Link">
+                  <Button
+                    type="text"
+                    className={styles.detailsButton}
+                    onClick={() => copyVideoPageLink(record.external_id)}
+                    icon={<CopyOutlined />}
+                  />
+                </Tooltip>
+              </Col>
+              <Col xs={24} md={6}>
+                {record.is_published ? (
+                  <Tooltip title="Hide Video">
+                    <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
+                      Hide
+                    </Button>
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Unhide Video">
+                    <Button
+                      type="link"
+                      disabled={record.status === 'UPLOAD_SUCCESS' ? false : true}
+                      className={styles.successBtn}
+                      onClick={() => publishVideo(record.external_id)}
+                    >
+                      Show
+                    </Button>
+                  </Tooltip>
+                )}
+              </Col>
+              <Col xs={24} md={6}>
+                {record.is_published ? (
+                  expandedPublishedRowKeys.includes(record.external_id) ? (
+                    <Button block type="link" onClick={() => collapseRowPublished(record.external_id)}>
+                      {record.buyers?.length || 0} Buyers <UpOutlined />
+                    </Button>
+                  ) : (
+                    <Button block type="link" onClick={() => expandRowPublished(record.external_id)}>
+                      {record.buyers?.length || 0} Buyers <DownOutlined />
+                    </Button>
+                  )
+                ) : expandedUnpublishedRowKeys.includes(record.external_id) ? (
+                  <Button block type="link" onClick={() => collapseRowUnpublished(record.external_id)}>
+                    {record.buyers?.length || 0} Buyers <UpOutlined />
+                  </Button>
+                ) : (
+                  <Button block type="link" onClick={() => expandRowUnpublished(record.external_id)}>
+                    {record.buyers?.length || 0} Buyers <DownOutlined />
+                  </Button>
+                )}
+              </Col>
+            </Row>
+          ),
+        },
+      ];
+
+      if (creatorMemberTags.length > 0) {
+        const tagColumnPosition = 2;
+        const tagColumnObject = {
+          title: 'Purchasable By',
+          key: 'tags',
+          dataIndex: 'tags',
+          width: '130px',
+          render: (text, record) => <TagListPopup tags={record.tags} />,
+        };
+        initialColumns.splice(tagColumnPosition, 0, tagColumnObject);
+      }
+
+      return initialColumns;
+    }, //eslint-disable-next-line
+    [creatorMemberTags]
+  );
 
   const buyerColumns = [
     {
@@ -451,7 +525,7 @@ const Videos = () => {
     },
   ];
 
-  const renderSubsciberList = (record) => {
+  const renderSubscriberList = (record) => {
     return (
       <div className={styles.mb20}>
         <Table
@@ -551,10 +625,36 @@ const Videos = () => {
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video?.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(video?.external_id)} icon={<UpOutlined />} />
+            video?.is_published ? (
+              expandedPublishedRowKeys.includes(video?.external_id) ? (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => collapseRowPublished(video?.external_id)}
+                  icon={<UpOutlined />}
+                />
+              ) : (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => expandRowPublished(video?.external_id)}
+                  icon={<DownOutlined />}
+                />
+              )
+            ) : expandedUnpublishedRowKeys.includes(video?.external_id) ? (
+              <Button
+                block
+                type="link"
+                onClick={() => collapseRowUnpublished(video?.external_id)}
+                icon={<UpOutlined />}
+              />
             ) : (
-              <Button type="link" onClick={() => expandRow(video?.external_id)} icon={<DownOutlined />} />
+              <Button
+                block
+                type="link"
+                onClick={() => expandRowUnpublished(video?.external_id)}
+                icon={<DownOutlined />}
+              />
             ),
           ]
         : [
@@ -615,10 +715,36 @@ const Videos = () => {
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(video?.external_id) ? (
-              <Button type="link" onClick={() => collapseRow(video?.external_id)} icon={<UpOutlined />} />
+            video?.is_published ? (
+              expandedPublishedRowKeys.includes(video?.external_id) ? (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => collapseRowPublished(video?.external_id)}
+                  icon={<UpOutlined />}
+                />
+              ) : (
+                <Button
+                  block
+                  type="link"
+                  onClick={() => expandRowPublished(video?.external_id)}
+                  icon={<DownOutlined />}
+                />
+              )
+            ) : expandedUnpublishedRowKeys.includes(video?.external_id) ? (
+              <Button
+                block
+                type="link"
+                onClick={() => collapseRowUnpublished(video?.external_id)}
+                icon={<UpOutlined />}
+              />
             ) : (
-              <Button type="link" onClick={() => expandRow(video?.external_id)} icon={<DownOutlined />} />
+              <Button
+                block
+                type="link"
+                onClick={() => expandRowUnpublished(video?.external_id)}
+                icon={<DownOutlined />}
+              />
             ),
           ];
 
@@ -626,6 +752,7 @@ const Videos = () => {
       <Col xs={24} key={video.external_id}>
         <Card
           className={styles.card}
+          bodyStyle={{ padding: '24px 16px' }}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${video?.color_code || '#FFF'}` }}>
               <Text>{video?.title}</Text> {video?.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
@@ -644,10 +771,15 @@ const Videos = () => {
         >
           {layout('Validity', <Text>{`${video?.validity} days`}</Text>)}
           {layout('Price', <Text>{`${video?.price} ${video?.currency.toUpperCase()}`}</Text>)}
+          {creatorMemberTags.length > 0 && <TagListPopup tags={video?.tags} mobileView={true} />}
         </Card>
-        {expandedRowKeys.includes(video?.external_id) && (
-          <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
-        )}
+        {video?.is_published
+          ? expandedPublishedRowKeys.includes(video?.external_id) && (
+              <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
+            )
+          : expandedUnpublishedRowKeys.includes(video?.external_id) && (
+              <Row className={styles.cardExpansion}>{video?.buyers?.map(renderMobileBuyerCards)}</Row>
+            )}
       </Col>
     );
   };
@@ -662,15 +794,11 @@ const Videos = () => {
         editedVideo={selectedVideo}
         updateEditedVideo={setSelectedVideo}
         shouldClone={shouldCloneVideo}
+        creatorMemberTags={creatorMemberTags}
       />
       <Row gutter={[8, 24]}>
-        <Col xs={12} md={8} lg={14}>
+        <Col xs={24} md={14} lg={18}>
           <Title level={4}> Videos </Title>
-        </Col>
-        <Col xs={12} md={6} lg={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
         </Col>
         <Col xs={24} md={10} lg={6}>
           <Button block type="primary" onClick={() => showUploadVideoModal()} icon={<CloudUploadOutlined />}>
@@ -689,15 +817,15 @@ const Videos = () => {
                   ) : (
                     <Table
                       sticky={true}
-                      columns={videosColumns}
+                      columns={generateVideoColumns(true)}
                       data={videos?.filter((video) => video?.is_published)}
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
-                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandedRowRender: (record) => renderSubscriberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
-                        expandedRowKeys: expandedRowKeys,
+                        expandedRowKeys: expandedPublishedRowKeys,
                       }}
                     />
                   )}
@@ -719,15 +847,15 @@ const Videos = () => {
                     <Table
                       sticky={true}
                       size="small"
-                      columns={videosColumns}
+                      columns={generateVideoColumns(false)}
                       data={videos?.filter((video) => !video?.is_published)}
                       loading={isLoading}
                       rowKey={(record) => record.external_id}
                       expandable={{
-                        expandedRowRender: (record) => renderSubsciberList(record),
+                        expandedRowRender: (record) => renderSubscriberList(record),
                         expandRowByClick: true,
                         expandIconColumnIndex: -1,
-                        expandedRowKeys: expandedRowKeys,
+                        expandedRowKeys: expandedUnpublishedRowKeys,
                       }}
                     />
                   )}

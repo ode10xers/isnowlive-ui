@@ -13,6 +13,8 @@ import Table from 'components/Table';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { generateUrlFromUsername, scrollToErrorField } from 'utils/helper';
+import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
+
 import { sessionRegistrationformLayout, sessionRegistrationTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
@@ -207,16 +209,6 @@ const SessionRegistration = ({
       render: (text, record) => toShortDate(record.expiry),
     },
   ];
-
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session.username || window.location.hostname.split('.')[0] || 'app');
-    window.open(`${baseUrl}/s/${session?.session_id}`);
-  };
-
-  const redirectToVideosPage = (video) => {
-    const baseUrl = generateUrlFromUsername(video.username || window.location.hostname.split('.')[0] || 'app');
-    window.open(`${baseUrl}/v/${video?.external_id}`);
-  };
 
   const renderPassDetails = (record) => (
     <Row gutter={[8, 8]}>

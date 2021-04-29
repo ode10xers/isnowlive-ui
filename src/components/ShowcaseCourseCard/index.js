@@ -19,6 +19,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
+import { redirectToCoursesPage } from 'utils/redirect';
 import {
   isValidFile,
   isAPISuccess,
@@ -39,9 +40,7 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-const noop = () => {};
-
-const ShowcaseCourseCard = ({ courses = null, onCardClick = noop }) => {
+const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPage }) => {
   const history = useHistory();
 
   const {

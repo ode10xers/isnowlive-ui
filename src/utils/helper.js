@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { message } from 'antd';
 import dateUtil from 'utils/date';
+import { getLocalUserDetails } from './storage';
 
 const {
   formatDate: { getTimeDiff },
@@ -15,6 +16,26 @@ export const isUnapprovedUserError = (errorResponse) =>
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
+
+export const getCreatorUsernameForHeader = () => {
+  const creatorUsername = getUsernameFromUrl();
+  const localUserDetails = getLocalUserDetails();
+
+  const isCreatorInCreatorDashboard =
+    localUserDetails && localUserDetails.is_creator && window.location.pathname.indexOf('/creator/dashboard') >= 0;
+
+  // THis might break in case creator A accesses their dashboard with B's username in URL
+  if (isCreatorInCreatorDashboard) {
+    // For specific URLs we will use creator username from localStorage
+    return localUserDetails.username;
+  } else if (!reservedDomainName.includes(creatorUsername)) {
+    // If username in URL is detected then use that
+    return creatorUsername;
+  } else {
+    // else don't send anything
+    return '';
+  }
+};
 
 export const generateQueryString = (data) => {
   return Object.entries(data)

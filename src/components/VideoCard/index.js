@@ -7,7 +7,7 @@ import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './styles.module.scss';
 
@@ -37,15 +37,6 @@ const VideoCard = ({
   showDesc = false,
   showDetailsBtn = true,
 }) => {
-  const redirectToVideoDetails = () => {
-    if (video?.external_id) {
-      const username = window.location.hostname.split('.')[0];
-
-      const baseUrl = generateUrlFromUsername(video?.username || username || 'app');
-      window.open(`${baseUrl}/v/${video?.external_id}`);
-    }
-  };
-
   const renderVideoOrderDetails = () => {
     if (isMobileDevice) {
       return (
@@ -149,7 +140,7 @@ const VideoCard = ({
                         type="link"
                         onClick={(e) => {
                           e.stopPropagation();
-                          redirectToVideoDetails(video);
+                          redirectToVideosPage(video);
                         }}
                       >
                         Details

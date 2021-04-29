@@ -64,9 +64,9 @@ export const getSessionInventoryDetails = async (inventoryId) => {
 export const followUpGetVideo = async (payload) => {
   try {
     // Continue to book the video after Pass Purchase is successful
-    const followUpGetVideo = await apis.videos.createOrderForUser(payload);
+    const followUpPurchase = await apis.videos.createOrderForUser(payload);
 
-    if (isAPISuccess(followUpGetVideo.status)) {
+    if (isAPISuccess(followUpPurchase.status)) {
       showPurchasePassAndGetVideoSuccessModal(payload.source_id);
     }
   } catch (error) {

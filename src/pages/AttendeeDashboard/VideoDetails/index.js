@@ -15,7 +15,7 @@ import SessionCards from 'components/SessionCards';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal } from 'components/Modals/modals';
 
-import { isAPISuccess, reservedDomainName } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -35,18 +35,19 @@ const VideoDetails = ({ match }) => {
   const videoOrderDetails = location.state ? location.state.video_order : null;
 
   const getProfileDetails = useCallback(async (username) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
       if (isAPISuccess(status) && data) {
         setProfile(data);
         setProfileImage(data.profile_image_url);
-        setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
-      setIsLoading(false);
+      if (!isUnapprovedUserError(error.response)) {
+        message.error('Failed to load profile details');
+      }
     }
+    setIsLoading(false);
   }, []);
 
   const getVideoDetails = useCallback(
@@ -64,7 +65,8 @@ const VideoDetails = ({ match }) => {
         }
       } catch (error) {
         setIsLoading(false);
-        if (error?.response?.status !== 404) {
+
+        if (error?.response?.status !== 404 && !isUnapprovedUserError(error.response)) {
           message.error('Failed to load video details');
         } else {
           if (videoOrderDetails) {
@@ -84,11 +86,14 @@ const VideoDetails = ({ match }) => {
       if (isAPISuccess(status) && data) {
         setVideoToken(data.token);
       }
-      setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
-      showErrorModal('Failed to load video token. Either video is expired or you have reached viewing limit of video');
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal(
+          'Failed to load video token. Either video is expired or you have reached viewing limit of video'
+        );
+      }
     }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -176,11 +181,7 @@ const VideoDetails = ({ match }) => {
                       <Text className={styles.ml20}> Related to these class(es) </Text>
                     </Col>
                     <Col xs={24}>
-                      <SessionCards
-                        sessions={video?.sessions}
-                        shouldFetchInventories={true}
-                        username={video?.username || videoOrderDetails?.creator_username}
-                      />
+                      <SessionCards sessions={video?.sessions} shouldFetchInventories={true} />
                     </Col>
                   </Row>
                 </Col>

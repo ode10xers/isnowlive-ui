@@ -27,6 +27,21 @@ const Courses = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [targetCourse, setTargetCourse] = useState(null);
   const [isVideoModal, setIsVideoModal] = useState(false);
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
 
   const fetchAllCoursesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -73,12 +88,14 @@ const Courses = () => {
   };
 
   useEffect(() => {
+    fetchCreatorMemberTags();
     fetchAllCoursesForCreator();
-    //eslint-disable-next-line
-  }, [selectedListTab]);
+  }, [fetchCreatorMemberTags, fetchAllCoursesForCreator]);
 
   const handleChangeListTab = (key) => {
+    setIsLoading(true);
     setSelectedListTab(key);
+    setTimeout(() => setIsLoading(false), 700);
   };
 
   const showSendEmailModal = (course) => {
@@ -130,6 +147,7 @@ const Courses = () => {
         closeModal={hideCreateCourseModal}
         editedCourse={targetCourse}
         isVideoModal={isVideoModal}
+        creatorMemberTags={creatorMemberTags}
       />
       <Row gutter={[8, 8]}>
         <Col xs={24}>
@@ -152,6 +170,7 @@ const Courses = () => {
                   </Col>
                   <Col xs={24}>
                     <LiveCourses
+                      creatorMemberTags={creatorMemberTags}
                       liveCourses={courses.filter(
                         (course) => course.type === courseType.MIXED || course.type === 'live'
                       )}
@@ -174,6 +193,7 @@ const Courses = () => {
                   </Col>
                   <Col xs={24}>
                     <VideoCourses
+                      creatorMemberTags={creatorMemberTags}
                       videoCourses={courses.filter(
                         (course) => course.type === courseType.VIDEO_SEQ || course.type === courseType.VIDEO_NON_SEQ
                       )}

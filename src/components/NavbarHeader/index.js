@@ -38,63 +38,63 @@ const NavbarHeader = () => {
     logOut,
   } = useGlobalContext();
 
-  const checkShouldShowSessionLink = async (username) => {
+  const checkShouldShowSessionLink = async () => {
     try {
-      const { status, data } = await apis.user.getSessionsByUsername(username, 'upcoming');
+      const { status, data } = await apis.user.getSessionsByUsername('upcoming');
 
       if (isAPISuccess(status) && data) {
         setShouldShowSessionLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch upcoming sessions for username');
+      console.error(error.response?.data?.message || 'Failed to fetch upcoming session for creator');
     }
   };
 
-  const checkShouldShowPassLink = async (username) => {
+  const checkShouldShowPassLink = async () => {
     try {
-      const { status, data } = await apis.passes.getPassesByUsername(username);
+      const { status, data } = await apis.passes.getPassesByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowPassLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch pass for username');
+      console.error(error.response?.data?.message || 'Failed to fetch pass for creator');
     }
   };
 
-  const checkShouldShowVideoLink = async (username) => {
+  const checkShouldShowVideoLink = async () => {
     try {
-      const { status, data } = await apis.videos.getVideosByUsername(username);
+      const { status, data } = await apis.videos.getVideosByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowVideoLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch videos for username');
+      console.error(error.response?.data?.message || 'Failed to fetch videos for creator');
     }
   };
 
-  const checkShouldShowCourseLink = async (username) => {
+  const checkShouldShowCourseLink = async () => {
     try {
-      const { status, data } = await apis.courses.getCoursesByUsername(username);
+      const { status, data } = await apis.courses.getCoursesByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowCourseLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch courses for username');
+      console.error(error.response?.data?.message || 'Failed to fetch courses for creator');
     }
   };
 
-  const checkShouldShowSubscriptionLink = async (username) => {
+  const checkShouldShowSubscriptionLink = async () => {
     try {
-      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername(username);
+      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
 
       if (isAPISuccess(status) && data) {
         setShouldShowSubscriptionLink(data.length > 0);
       }
     } catch (error) {
-      console.error(error.response?.data?.message || 'Failed to fetch memberships for username');
+      console.error(error.response?.data?.message || 'Failed to fetch memberships for creator');
     }
   };
 
@@ -172,25 +172,22 @@ const NavbarHeader = () => {
     }
   };
 
-  useEffect(() => {
-    setLocalUserDetails(getLocalUserDetails());
-  }, [userDetails]);
-
   const username = window.location.hostname.split('.')[0];
 
   useEffect(() => {
     //For some reason, sometimes the modals locks the scrolling of <body>
     //This line here is to remove the style element of <body>
     document.body.removeAttribute('style');
+    setLocalUserDetails(getLocalUserDetails());
 
     if (username && !reservedDomainName.includes(username)) {
-      checkShouldShowSessionLink(username);
-      checkShouldShowPassLink(username);
-      checkShouldShowVideoLink(username);
-      checkShouldShowCourseLink(username);
-      checkShouldShowSubscriptionLink(username);
+      checkShouldShowSessionLink();
+      checkShouldShowPassLink();
+      checkShouldShowVideoLink();
+      checkShouldShowCourseLink();
+      checkShouldShowSubscriptionLink();
     }
-  }, [username]);
+  }, [username, userDetails]);
 
   if (reservedDomainName.includes(username)) {
     return null;
@@ -325,7 +322,7 @@ const NavbarHeader = () => {
                       <Text strong> Hi, {localUserDetails.first_name} </Text>
                     </Menu.Item>
                     <Menu.Item key="SignOut">
-                      <Button block danger type="default" onClick={() => logOut(history, true)}>
+                      <Button block danger type="default" onClick={() => logOut(history, false)}>
                         Sign Out
                       </Button>
                     </Menu.Item>
@@ -552,7 +549,7 @@ const NavbarHeader = () => {
                             <Text strong> Hi, {localUserDetails.first_name} </Text>
                           </Col>
                           <Col xs={24}>
-                            <Button block danger type="default" onClick={() => logOut(history, true)}>
+                            <Button block danger type="default" onClick={() => logOut(history, false)}>
                               Sign Out
                             </Button>
                           </Col>

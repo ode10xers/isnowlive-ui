@@ -14,6 +14,7 @@ import {
   FilePdfOutlined,
   Html5Outlined,
   TeamOutlined,
+  ControlOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -58,7 +59,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 3,
+    order: 2,
     key: 'passes',
     title: 'Pass',
     mixPanelTag: creator.click.dashboard.passesNav,
@@ -66,7 +67,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes,
   },
   {
-    order: 4,
+    order: 3,
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
@@ -74,7 +75,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
   },
   {
-    order: 5,
+    order: 4,
     key: 'courses',
     title: 'Courses',
     icon: <BookOutlined />,
@@ -82,7 +83,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses,
   },
   {
-    order: 6,
+    order: 5,
     key: 'subscriptions',
     title: 'Membership',
     icon: <ScheduleOutlined />,
@@ -90,7 +91,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
   },
   {
-    order: 7,
+    order: 6,
     key: 'coupons',
     title: 'Coupons',
     icon: <PercentageOutlined />,
@@ -98,7 +99,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.coupons,
   },
   {
-    order: 8,
+    order: 7,
     key: 'members',
     title: 'Members Dashboard',
     icon: <TeamOutlined />,
@@ -113,7 +114,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 9,
+    order: 8,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -121,7 +122,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 10,
+    order: 9,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -129,7 +130,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 11,
+    order: 10,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -137,7 +138,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 12,
+    order: 11,
     key: 'site_settings',
     title: 'Site Settings',
     icon: <SettingOutlined />,
@@ -159,7 +160,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 13,
+    order: 12,
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,
@@ -167,7 +168,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
   },
   {
-    order: 14,
+    order: 13,
     key: 'documents',
     title: 'Document Drive',
     icon: <FilePdfOutlined />,
@@ -175,12 +176,34 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
   {
-    order: 15,
-    key: 'audiences',
+    order: 14,
+    key: 'newsletter',
     title: 'Newsletter',
     icon: <AuditOutlined />,
-    mixPanelTag: creator.click.dashboard.audiencesNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,
+    mixPanelTag: creator.click.dashboard.newsletterNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.newsletter,
+  },
+  {
+    order: 15,
+    key: 'advanced_settings',
+    title: 'Advanced Settings',
+    icon: <ControlOutlined />,
+    children: [
+      {
+        order: 1,
+        key: 'members_settings',
+        title: 'Make site private',
+        mixPanelTag: creator.click.dashboard.membersSettingsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersSettings,
+      },
+      {
+        order: 2,
+        key: 'members_tags',
+        title: 'Members Tags',
+        mixPanelTag: creator.click.dashboard.membersTagsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags,
+      },
+    ],
   },
 ];
 

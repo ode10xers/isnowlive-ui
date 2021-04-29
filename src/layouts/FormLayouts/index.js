@@ -33,7 +33,7 @@ export const formTailLayout = {
   wrapperCol: {
     xs: { span: 24 },
     md: { span: 14, offset: 10 },
-    xl: { span: 18, offset: 6 },
+    xl: { span: 16, offset: 8 },
   },
 };
 export const sessionRegistrationformLayout = {
@@ -94,11 +94,13 @@ export const courseModalFormLayout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
+export const courseModalTailLayout = {
+  wrapperCol: { offset: 8, span: 16 },
+};
 export const subscriptionModalFormLayout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },
 };
-
 export const couponModalFormLayout = {
   labelCol: { span: 10 },
   wrapperCol: { span: 14 },

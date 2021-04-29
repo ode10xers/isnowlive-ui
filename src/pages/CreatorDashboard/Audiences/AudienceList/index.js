@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
 import { Row, Col, Button, Popconfirm, Tooltip, Typography, Card, Empty } from 'antd';
-import { DeleteOutlined, FilterFilled, MailOutlined } from '@ant-design/icons';
+import { DeleteOutlined, MailOutlined, FilterFilled } from '@ant-design/icons';
 
 import Loader from 'components/Loader';
 import Table from 'components/Table';
@@ -96,7 +96,7 @@ const AudienceList = () => {
       filterIcon: (filtered) => (
         <Tooltip defaultVisible={true} title="Click here to filter">
           {' '}
-          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#ff4d4f' }} />{' '}
+          <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />{' '}
         </Tooltip>
       ),
       filters: [

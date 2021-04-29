@@ -17,7 +17,7 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined, TagOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import config from 'config';
@@ -29,7 +29,7 @@ import ImageUpload from 'components/ImageUpload';
 import OnboardSteps from 'components/OnboardSteps';
 import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
-import { showCourseOptionsHelperModal } from 'components/Modals/modals';
+import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import dateUtil from 'utils/date';
@@ -38,11 +38,11 @@ import {
   convertSchedulesToUTC,
   isAPISuccess,
   generateRandomColor,
-  productAccessOptions,
   isValidFile,
   ZoomAuthType,
 } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
+import { fetchCreatorCurrency } from 'utils/payment';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -88,7 +88,7 @@ const colorPickerChoices = [
 
 const initialSession = {
   price: 0,
-  currency: 'SGD',
+  currency: '',
   max_participants: 1,
   group: true,
   name: '',
@@ -105,6 +105,7 @@ const initialSession = {
   prerequisites: '',
   color_code: initialColor,
   is_course: false,
+  session_tag_type: 'anyone',
 };
 
 const Session = ({ match, history }) => {
@@ -126,6 +127,8 @@ const Session = ({ match, history }) => {
   const [colorCode, setColorCode] = useState(initialColor || whiteColor);
   const [isCourseSession, setIsCourseSession] = useState(false);
   const [creatorDocuments, setCreatorDocuments] = useState([]);
+  const [selectedTagType, setSelectedTagType] = useState('anyone');
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const {
     state: {
@@ -133,39 +136,57 @@ const Session = ({ match, history }) => {
     },
   } = useGlobalContext();
 
-  const getCreatorStripeDetails = useCallback(
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Reworked the fetch currency mechanic
+  const getCreatorCurrencyDetails = useCallback(
     async (sessionData = null) => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        const { status, data } = await apis.session.getCreatorBalance();
-        if (isAPISuccess(status) && data) {
-          setStripeCurrency(data.currency.toUpperCase());
+        const creatorCurrency = await fetchCreatorCurrency();
+
+        if (creatorCurrency) {
+          setStripeCurrency(creatorCurrency.toUpperCase());
           if (!sessionData) {
             form.setFieldsValue({
               ...form.getFieldsValue(),
               price_type: 'Paid',
-              currency: data?.currency?.toUpperCase() || 'SGD',
+              currency: creatorCurrency.toUpperCase() || '',
               price: 10,
             });
             setIsSessionFree(false);
+          } else {
+            form.setFieldsValue({
+              ...form.getFieldsValue(),
+              currency: creatorCurrency.toUpperCase() || sessionData.currency?.toUpperCase() || '',
+            });
           }
-        }
-        setIsLoading(false);
-      } catch (error) {
-        if (error.response?.data?.message === 'unable to fetch user payment details') {
+        } else {
           setStripeCurrency(null);
           form.setFieldsValue({
             ...form.getFieldsValue(),
             price_type: 'Free',
             price: 0,
-            currency: 'SGD',
+            currency: '',
           });
           setIsSessionFree(true);
-        } else {
-          message.error(error.response?.data?.message || 'Something went wrong.');
         }
-        setIsLoading(false);
+      } catch (error) {
+        message.error(error.response?.data?.message || 'Something went wrong.');
       }
+      setIsLoading(false);
     },
     [form]
   );
@@ -194,6 +215,8 @@ const Session = ({ match, history }) => {
             session_course_type: data?.is_course ? 'course' : 'normal',
             session_access_type: data?.access,
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
+            session_tag_type: data?.tags?.length > 0 ? 'selected' : 'anyone',
+            selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
           });
           setSessionImageUrl(data.session_image_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
@@ -205,7 +228,8 @@ const Session = ({ match, history }) => {
           setColorCode(data?.color_code || whiteColor);
           setIsCourseSession(data?.is_course || false);
           setIsLoading(false);
-          await getCreatorStripeDetails(data);
+          setSelectedTagType(data?.tags?.length > 0 ? 'selected' : 'anyone');
+          await getCreatorCurrencyDetails(data);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -217,10 +241,10 @@ const Session = ({ match, history }) => {
         }
       }
     },
-    [form, history, isOnboarding, getCreatorStripeDetails]
+    [form, history, isOnboarding, getCreatorCurrencyDetails]
   );
 
-  const getCreatorDocuments = useCallback(async () => {
+  const fetchCreatorDocuments = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.documents.getCreatorDocuments();
@@ -235,6 +259,9 @@ const Session = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
+    fetchCreatorMemberTags();
+    fetchCreatorDocuments();
+
     if (match.path.includes('manage')) {
       setIsOnboarding(false);
     }
@@ -247,7 +274,7 @@ const Session = ({ match, history }) => {
         : toUtcEndOfDay(moment().add(1, 'month'));
       getSessionDetails(match.params.id, startDate, endDate);
     } else {
-      getCreatorStripeDetails();
+      getCreatorCurrencyDetails();
       form.setFieldsValue({
         ...form.getFieldsValue(),
         type: 'Group',
@@ -257,15 +284,24 @@ const Session = ({ match, history }) => {
         refund_before_hours: 0,
         color_code: initialColor || whiteColor,
         session_course_type: 'normal',
-        session_access_type: 'PUBLIC',
+        session_tag_type: 'anyone',
+        selected_member_tags: [],
       });
       setIsLoading(false);
     }
     getCurrencyList()
       .then((res) => setCurrencyList(res))
       .catch(() => message.error('Failed to load currency list'));
-    getCreatorDocuments();
-  }, [form, location, getSessionDetails, match.params.id, match.path, getCreatorStripeDetails, getCreatorDocuments]);
+  }, [
+    form,
+    location,
+    getSessionDetails,
+    match.params.id,
+    match.path,
+    getCreatorCurrencyDetails,
+    fetchCreatorDocuments,
+    fetchCreatorMemberTags,
+  ]);
 
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
@@ -279,6 +315,25 @@ const Session = ({ match, history }) => {
       form.setFieldsValue({ ...form.getFieldsValue(), type: 'Group', max_participants: 2 });
       setSession({ ...session, max_participants: 2 });
       setIsSessionTypeGroup(true);
+    }
+  };
+
+  const handleSessionTagType = (e) => {
+    if (creatorMemberTags.length > 0) {
+      setSelectedTagType(e.target.value);
+    } else {
+      setSelectedTagType('anyone');
+      form.setFieldsValue({ ...form.getFieldsValue(), session_tag_type: 'anyone' });
+      Modal.confirm({
+        title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
+        okText: 'Setup Member Tags',
+        cancelText: 'Cancel',
+        onOk: () => {
+          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags}`);
+          newWindow.blur();
+          window.focus();
+        },
+      });
     }
   };
 
@@ -318,6 +373,7 @@ const Session = ({ match, history }) => {
             );
             newWindow.blur();
             window.focus();
+            setFreeSession();
             // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
@@ -544,7 +600,7 @@ const Session = ({ match, history }) => {
       setIsLoading(true);
       const data = {
         price: isSessionFree ? 0 : values.price || 0,
-        currency: values.currency?.toLowerCase() || stripeCurrency.toLowerCase() || 'sgd',
+        currency: values.currency?.toLowerCase() || stripeCurrency?.toLowerCase() || '',
         max_participants: values.max_participants,
         name: values.name,
         description: values.description,
@@ -559,7 +615,10 @@ const Session = ({ match, history }) => {
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
         is_course: isCourseSession,
-        access: values.session_access_type,
+        tag_ids:
+          selectedTagType === 'anyone'
+            ? []
+            : values.selected_member_tags || session?.tags?.map((tag) => tag.external_id) || [],
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
@@ -818,22 +877,49 @@ const Session = ({ match, history }) => {
             </Form.Item>
           </>
 
-          {/* ---- Session Access Type ---- */}
+          {/* ---- Session Tag Type ---- */}
           <>
+            <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
+              <Form.Item
+                name="session_tag_type"
+                id="session_tag_type"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionTagType}
+                className={styles.inlineFormItem}
+              >
+                <Radio.Group>
+                  <Radio value="anyone"> Anyone </Radio>
+                  <Radio value="selected"> Selected Member Tags </Radio>
+                </Radio.Group>
+              </Form.Item>
+              <Form.Item className={styles.inlineFormItem}>
+                <Button type="link" onClick={() => showTagOptionsHelperModal('sesison')}>
+                  Understanding the tag options
+                </Button>
+              </Form.Item>
+            </Form.Item>
             <Form.Item
-              name="session_access_type"
-              id="session_access_type"
-              label="Access Type"
-              rules={validationRules.requiredValidation}
+              name="selected_member_tags"
+              id="selected_member_tags"
+              hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
+              {...(!isMobileDevice && profileFormTailLayout)}
             >
-              <Radio.Group>
-                {productAccessOptions.map((productAccess) => (
-                  <Radio value={productAccess.value} key={productAccess.key}>
-                    {' '}
-                    {productAccess.label}{' '}
-                  </Radio>
-                ))}
-              </Radio.Group>
+              <Select
+                showArrow
+                mode="multiple"
+                maxTagCount={3}
+                placeholder="Select a member tag"
+                disabled={selectedTagType === 'anyone'}
+                options={creatorMemberTags.map((tag) => ({
+                  label: (
+                    <>
+                      {' '}
+                      {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                    </>
+                  ),
+                  value: tag.external_id,
+                }))}
+              />
             </Form.Item>
           </>
 
@@ -879,12 +965,7 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item
-              name="currency"
-              label="Currency"
-              rules={validationRules.requiredValidation}
-              hidden={isSessionFree}
-            >
+            <Form.Item name="currency" label="Currency" hidden={isSessionFree}>
               <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
                 {currencyList &&
                   Object.entries(currencyList).map(([key, value], i) => (

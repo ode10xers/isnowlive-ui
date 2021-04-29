@@ -12,7 +12,8 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { isUnapprovedUserError } from 'utils/helper';
+import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 
 import styles from './styles.module.scss';
 
@@ -97,7 +98,9 @@ const ClassPassList = () => {
         setExpandedExpiredRowKeys(data.expired.length > 0 ? [data.expired[0].pass_order_id] : []);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something wrong happened', error.response?.data?.message);
+      }
     }
     setIsLoading(false);
   }, []);
@@ -105,16 +108,6 @@ const ClassPassList = () => {
   useEffect(() => {
     getPassesForAttendee();
   }, [getPassesForAttendee]);
-
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session?.username || 'app');
-    window.open(`${baseUrl}/s/${session?.session_id}`);
-  };
-
-  const redirectToVideosPage = (video) => {
-    const baseUrl = generateUrlFromUsername(video?.username || 'app');
-    window.open(`${baseUrl}/v/${video?.external_id}`);
-  };
 
   const toggleExpandAllActivePasses = () => {
     if (expandedActiveRowKeys.length > 0) {
