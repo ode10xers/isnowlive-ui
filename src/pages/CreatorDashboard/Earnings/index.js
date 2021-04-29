@@ -45,6 +45,7 @@ const Earnings = () => {
   const history = useHistory();
   const {
     state: { userDetails },
+    setUserDetails,
   } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -201,12 +202,14 @@ const Earnings = () => {
           pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
             creator_payment_account_status: userDetails.payment_account_status,
           });
+          userState.ga_data.payment_verified = true;
+          setUserDetails(userState);
         }
       } catch (error) {
         console.error(error?.response?.data?.message);
       }
     }
-  }, [userDetails]);
+  }, [userDetails, setUserDetails]);
 
   useEffect(() => {
     getCreatorBalance();
