@@ -4,7 +4,6 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
@@ -60,7 +59,6 @@ const Login = ({ history }) => {
       setIsLoading(true);
       const { data } = await apis.user.login(values);
       if (data) {
-        http.setAuthToken(data.auth_token);
         logIn(data, values.remember);
         identifyUserInMixPanel(data);
         trackSuccessEvent(eventTag, { email: values.email });

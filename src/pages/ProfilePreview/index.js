@@ -60,7 +60,7 @@ const productKeys = {
   COURSE: 'course',
 };
 
-const ProfilePreview = ({ username = null }) => {
+const ProfilePreview = ({ username = getLocalUserDetails().username || null }) => {
   const history = useHistory();
   const location = useLocation();
   const {
@@ -109,8 +109,6 @@ const ProfilePreview = ({ username = null }) => {
     }
   }, [username]);
 
-  const getProfileUsername = useCallback(() => (username ? username : getLocalUserDetails().username), [username]);
-
   const getSessionDetails = useCallback(async (type) => {
     setIsSessionLoading(true);
 
@@ -129,18 +127,17 @@ const ProfilePreview = ({ username = null }) => {
   const getPassesDetails = useCallback(async () => {
     setIsPassesLoading(true);
     try {
-      const profileUsername = getProfileUsername();
       const { status, data } = await apis.passes.getPassesByUsername();
 
       if (isAPISuccess(status) && data) {
-        setPasses(formatPassesData(data, profileUsername));
+        setPasses(formatPassesData(data));
         setIsPassesLoading(false);
       }
     } catch (error) {
       setIsPassesLoading(false);
       console.error('Failed to load pass details');
     }
-  }, [getProfileUsername]);
+  }, []);
 
   const getVideosDetails = useCallback(async () => {
     setIsVideosLoading(true);
@@ -291,13 +288,6 @@ const ProfilePreview = ({ username = null }) => {
 
   const handleViewChange = (e) => {
     setView(e.target.value);
-  };
-
-  const redirectToCourseDetails = (course) => {
-    if (course?.id) {
-      const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
-      window.open(`${baseUrl}/c/${course?.id}`);
-    }
   };
 
   const showAuthModal = (inventory) => {
@@ -506,7 +496,7 @@ const ProfilePreview = ({ username = null }) => {
                 <Row className={styles.mt20}>
                   <Col span={24}>
                     <Loader loading={isPassesLoading} size="large" text="Loading passes">
-                      <PublicPassList passes={passes} username={username} />
+                      <PublicPassList passes={passes} />
                     </Loader>
                   </Col>
                 </Row>
@@ -550,11 +540,7 @@ const ProfilePreview = ({ username = null }) => {
                     <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
                         <div className={styles.p10}>
-                          <ShowcaseCourseCard
-                            username={username}
-                            courses={liveCourses}
-                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
-                          />
+                          <ShowcaseCourseCard username={username} courses={liveCourses} />
                         </div>
                       </Loader>
                     </Tabs.TabPane>
@@ -563,11 +549,7 @@ const ProfilePreview = ({ username = null }) => {
                     <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
                       <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
                         <div className={styles.p10}>
-                          <ShowcaseCourseCard
-                            username={username}
-                            courses={videoCourses}
-                            onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
-                          />
+                          <ShowcaseCourseCard username={username} courses={videoCourses} />
                         </div>
                       </Loader>
                     </Tabs.TabPane>

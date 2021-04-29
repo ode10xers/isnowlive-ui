@@ -6,7 +6,6 @@ import ReactHtmlParser from 'react-html-parser';
 import Routes from 'routes';
 import apis from 'apis';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
 import Share from 'components/Share';
@@ -19,21 +18,7 @@ import VideoCard from 'components/VideoCard';
 import AuthModal from 'components/AuthModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
-
-import { isMobileDevice } from 'utils/device';
-import {
-  generateUrlFromUsername,
-  isAPISuccess,
-  paymentSource,
-  orderType,
-  productType,
-  reservedDomainName,
-  isUnapprovedUserError,
-} from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
-import dateUtil from 'utils/date';
-
-import styles from './style.module.scss';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import {
   showErrorModal,
   showBookSessionWithPassSuccessModal,
@@ -44,7 +29,22 @@ import {
   showSetNewPasswordModal,
   sendNewPasswordEmail,
 } from 'components/Modals/modals';
-import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+
+import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
+import { redirectToVideosPage } from 'utils/redirect';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  paymentSource,
+  orderType,
+  productType,
+  reservedDomainName,
+  isUnapprovedUserError,
+} from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const { Title } = Typography;
 const {
@@ -241,7 +241,6 @@ const SessionDetails = ({ match, history }) => {
       });
       if (data) {
         setIsLoading(false);
-        http.setAuthToken(data.auth_token);
         logIn(data, true);
         showConfirmPaymentPopup();
       }
@@ -543,7 +542,6 @@ const SessionDetails = ({ match, history }) => {
             password: values.password,
           });
           if (data) {
-            http.setAuthToken(data.auth_token);
             logIn(data, true);
             setCurrentUser(data);
             await getUsablePassesForUser();
@@ -601,16 +599,6 @@ const SessionDetails = ({ match, history }) => {
       getUsablePassesForUser();
       setShouldSetDefaultPass(true);
     }
-  };
-
-  const redirectToVideoPreview = (video) => {
-    const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
-    window.open(`${baseUrl}/v/${video?.external_id}`);
-  };
-
-  const redirectToCourseDetails = (course) => {
-    const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
-    window.open(`${baseUrl}/c/${course?.id}`);
   };
 
   const openAuthModal = (video) => {
@@ -699,11 +687,7 @@ const SessionDetails = ({ match, history }) => {
                 <Title level={5}> This session can only be attended by doing this course </Title>
               </Col>
               <Col xs={24}>
-                <ShowcaseCourseCard
-                  courses={courses}
-                  onCardClick={(targetCourse) => redirectToCourseDetails(targetCourse)}
-                  username={username}
-                />
+                <ShowcaseCourseCard courses={courses} username={username} />
               </Col>
             </Row>
           </div>
@@ -793,7 +777,7 @@ const SessionDetails = ({ match, history }) => {
                                 <VideoCard
                                   video={videoDetails}
                                   buyable={true}
-                                  onCardClick={redirectToVideoPreview}
+                                  onCardClick={redirectToVideosPage}
                                   showAuthModal={openAuthModal}
                                 />
                               </Col>

@@ -16,13 +16,11 @@ class HttpService {
     this.baseURL = config.server.baseURL;
     this.authToken = getAuthCookie() || '';
 
-    this.creatorUsername = getCreatorUsernameForHeader();
-
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
-        'creator-username': this.creatorUsername,
+        'creator-username': getCreatorUsernameForHeader(),
       },
     });
 
@@ -47,16 +45,11 @@ class HttpService {
   setAuthToken(authToken) {
     setAuthCookie(authToken);
     this.authToken = authToken;
-
-    // Expected Behavior: Sends creator-username header when in username.passion.do
-    // Sends empty string in the creator-username if the detected username is localhost/app
-    this.creatorUsername = getCreatorUsernameForHeader();
-
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
-        'creator-username': this.creatorUsername,
+        'creator-username': getCreatorUsernameForHeader(),
       },
     });
 
@@ -79,19 +72,43 @@ class HttpService {
   }
 
   get(url) {
-    return this.axios.get(url);
+    return this.axios.get(url, {
+      baseURL: this.baseURL,
+      headers: {
+        'auth-token': this.authToken,
+        'creator-username': getCreatorUsernameForHeader(),
+      },
+    });
   }
 
   post(url, payload) {
-    return this.axios.post(url, payload);
+    return this.axios.post(url, payload, {
+      baseURL: this.baseURL,
+      headers: {
+        'auth-token': this.authToken,
+        'creator-username': getCreatorUsernameForHeader(),
+      },
+    });
   }
 
   put(url, payload) {
-    return this.axios.put(url, payload);
+    return this.axios.put(url, payload, {
+      baseURL: this.baseURL,
+      headers: {
+        'auth-token': this.authToken,
+        'creator-username': getCreatorUsernameForHeader(),
+      },
+    });
   }
 
   patch(url, payload) {
-    return this.axios.patch(url, payload);
+    return this.axios.patch(url, payload, {
+      baseURL: this.baseURL,
+      headers: {
+        'auth-token': this.authToken,
+        'creator-username': getCreatorUsernameForHeader(),
+      },
+    });
   }
 
   delete(url, payload) {
@@ -99,7 +116,7 @@ class HttpService {
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
-        'creator-username': this.creatorUsername,
+        'creator-username': getCreatorUsernameForHeader(),
       },
       data: payload,
     });

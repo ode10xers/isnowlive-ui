@@ -19,12 +19,15 @@ export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] |
 
 export const getCreatorUsernameForHeader = () => {
   const creatorUsername = getUsernameFromUrl();
+  const localUserDetails = getLocalUserDetails();
 
-  const profilePreviewPathnames = ['/profile/preview', '/creator/dashboard/profile'];
+  const isCreatorInCreatorDashboard =
+    localUserDetails && localUserDetails.is_creator && window.location.pathname.indexOf('/creator/dashboard') >= 0;
 
-  if (profilePreviewPathnames.includes(window.location.pathname)) {
+  // THis might break in case creator A accesses their dashboard with B's username in URL
+  if (isCreatorInCreatorDashboard) {
     // For specific URLs we will use creator username from localStorage
-    return getLocalUserDetails().username;
+    return localUserDetails.username;
   } else if (!reservedDomainName.includes(creatorUsername)) {
     // If username in URL is detected then use that
     return creatorUsername;

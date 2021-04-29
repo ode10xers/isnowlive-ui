@@ -181,11 +181,7 @@ const VideoDetails = ({ match }) => {
                       <Text className={styles.ml20}> Related to these class(es) </Text>
                     </Col>
                     <Col xs={24}>
-                      <SessionCards
-                        sessions={video?.sessions}
-                        shouldFetchInventories={true}
-                        username={video?.username || videoOrderDetails?.creator_username}
-                      />
+                      <SessionCards sessions={video?.sessions} shouldFetchInventories={true} />
                     </Col>
                   </Row>
                 </Col>
