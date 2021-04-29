@@ -21,6 +21,21 @@ const Subscriptions = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
   const [targetSubscription, setTargetSubscription] = useState(null);
+  const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorUserPreferences();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
 
   const getCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
@@ -57,7 +72,8 @@ const Subscriptions = () => {
 
   useEffect(() => {
     getCreatorSubscriptions();
-  }, [getCreatorSubscriptions]);
+    fetchCreatorMemberTags();
+  }, [getCreatorSubscriptions, fetchCreatorMemberTags]);
 
   const publishSubscription = async (subscriptionId) => {
     setIsLoading(true);
@@ -175,6 +191,10 @@ const Subscriptions = () => {
       className: undefined,
     },
     {
+      label: 'Purchasable by',
+      className: undefined,
+    },
+    {
       label: 'Session or Video Credits/Month',
       className: undefined,
     },
@@ -183,37 +203,25 @@ const Subscriptions = () => {
       className: undefined,
     },
     {
-      label: 'Included Session Type',
-      className: undefined,
-    },
-    {
       label: 'Included Sessions',
-      className: undefined,
-    },
-    {
-      label: 'Included Video Type',
       className: undefined,
     },
     {
       label: 'Included Videos',
       className: undefined,
     },
-    {
-      label: 'Course Included?',
-      className: undefined,
-    },
-    {
-      label: 'Course Credits/Month',
-      className: undefined,
-    },
-    {
-      label: 'Included Course Type',
-      className: undefined,
-    },
-    {
-      label: 'Included Courses',
-      className: undefined,
-    },
+    // {
+    //   label: 'Course Included?',
+    //   className: undefined,
+    // },
+    // {
+    //   label: 'Course Credits/Month',
+    //   className: undefined,
+    // },
+    // {
+    //   label: 'Included Courses',
+    //   className: undefined,
+    // },
   ];
 
   const renderSubscriptionFields = (item) => (
@@ -230,6 +238,7 @@ const Subscriptions = () => {
         </Button>
       ) : !subscription.external_id || subscription.editing ? (
         <CreateSubscriptionCard
+          creatorMemberTags={creatorMemberTags || []}
           cancelChanges={() => setColumnState(subscription.idx, 'EMPTY')}
           saveChanges={() => setColumnState(subscription.idx, 'SAVED')}
           editedSubscription={targetSubscription}
