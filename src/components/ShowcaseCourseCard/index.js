@@ -155,21 +155,24 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
       ],
     };
 
-    if (usableUserSubscription) {
-      paymentPopupData = {
-        ...paymentPopupData,
-        paymentInstrumentDetails: {
-          type: 'SUBSCRIPTION',
-          ...usableUserSubscription,
-        },
-      };
+    // if (usableUserSubscription) {
+    //   paymentPopupData = {
+    //     ...paymentPopupData,
+    //     paymentInstrumentDetails: {
+    //       type: 'SUBSCRIPTION',
+    //       ...usableUserSubscription,
+    //     },
+    //   };
 
-      showPaymentPopup(paymentPopupData, buyCourseWithSubscription);
-    } else {
-      showPaymentPopup(paymentPopupData, buySingleCourse);
-    }
+    //   showPaymentPopup(paymentPopupData, buyCourseWithSubscription);
+    // } else {
+    //   showPaymentPopup(paymentPopupData, buySingleCourse);
+    // }
+
+    showPaymentPopup(paymentPopupData, buySingleCourse);
   };
 
+  //eslint-disable-next-line
   const buyCourseWithSubscription = async () => {
     setIsLoading(true);
     try {

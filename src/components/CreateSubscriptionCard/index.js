@@ -12,7 +12,7 @@ import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, productAccessOptions, generateRandomColor } from 'utils/helper';
+import { isAPISuccess, generateRandomColor } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -434,11 +434,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                 rules={isSessionIncluded ? validationRules.arrayValidation : undefined}
                 value={includedSessionsType}
               >
-                <Checkbox.Group
-                  disabled={!isSessionIncluded}
-                  options={productAccessOptions}
-                  onChange={handleIncludedSessionsTypeChange}
-                />
+                <Checkbox.Group disabled={!isSessionIncluded} onChange={handleIncludedSessionsTypeChange} />
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -541,11 +537,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                 rules={isVideoIncluded ? validationRules.arrayValidation : undefined}
                 value={includedVideosType}
               >
-                <Checkbox.Group
-                  disabled={!isVideoIncluded}
-                  options={productAccessOptions}
-                  onChange={handleIncludedVideosTypeChange}
-                />
+                <Checkbox.Group disabled={!isVideoIncluded} onChange={handleIncludedVideosTypeChange} />
               </Form.Item>
             </List.Item>
             <List.Item>
@@ -686,11 +678,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                 rules={isCourseIncluded ? validationRules.arrayValidation : undefined}
                 value={includedCoursesType}
               >
-                <Checkbox.Group
-                  disabled={!isCourseIncluded}
-                  options={productAccessOptions}
-                  onChange={handleIncludedCoursesTypeChange}
-                />
+                <Checkbox.Group disabled={!isCourseIncluded} onChange={handleIncludedCoursesTypeChange} />
               </Form.Item>
             </List.Item>
             <List.Item>

@@ -290,17 +290,6 @@ export const productType = {
   PRODUCT: 'Product', //As a default
 };
 
-export const productAccessOptions = [
-  {
-    value: 'PUBLIC',
-    label: 'Public',
-  },
-  {
-    value: 'MEMBERSHIP',
-    label: 'Members',
-  },
-];
-
 export const isoDayOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export const reservedDomainName = ['app', ...(process.env.NODE_ENV === 'development' ? ['localhost'] : [])];
