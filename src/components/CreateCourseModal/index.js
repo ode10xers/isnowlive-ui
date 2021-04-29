@@ -376,27 +376,32 @@ const CreateCourseModal = ({
   ]);
 
   useEffect(() => {
-    let highestMaxParticipantCourseSession = null;
-    let highestMaxParticipantCount = 0;
+    if (!editedCourse || editedCourse?.max_participants === 0) {
+      let highestMaxParticipantCourseSession = null;
+      let highestMaxParticipantCount = 0;
 
-    if (selectedCourseClass?.length > 0) {
-      const courseSessionsList = getSelectedCourseClasses(selectedCourseClass).filter(
-        (selectedClass) => selectedClass.is_course
-      );
+      if (selectedCourseClass?.length > 0) {
+        const courseSessionsList = getSelectedCourseClasses(selectedCourseClass).filter(
+          (selectedClass) => selectedClass.is_course
+        );
 
-      if (courseSessionsList.length > 0) {
-        courseSessionsList.forEach((courseSession) => {
-          if (courseSession.max_participants > highestMaxParticipantCount) {
-            highestMaxParticipantCount = courseSession.max_participants;
-            highestMaxParticipantCourseSession = courseSession;
-          }
-        });
+        if (courseSessionsList.length > 0) {
+          courseSessionsList.forEach((courseSession) => {
+            if (courseSession.max_participants > highestMaxParticipantCount) {
+              highestMaxParticipantCount = courseSession.max_participants;
+              highestMaxParticipantCourseSession = courseSession;
+            }
+          });
+        }
       }
-    }
 
-    setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
-    form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
-  }, [selectedCourseClass, getSelectedCourseClasses, form]);
+      setHighestMaxParticipantCourseSession(highestMaxParticipantCourseSession);
+      form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: highestMaxParticipantCount });
+    } else {
+      setHighestMaxParticipantCourseSession(editedCourse.max_participants);
+      form.setFieldsValue({ ...form.getFieldsValue(), maxParticipants: editedCourse.max_participants });
+    }
+  }, [selectedCourseClass, getSelectedCourseClasses, editedCourse, form]);
 
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
