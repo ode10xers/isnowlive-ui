@@ -5,7 +5,6 @@ import Routes from 'routes';
 import apis from 'apis';
 import validationRules from 'utils/validation';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
@@ -52,7 +51,6 @@ const AdminLogin = ({ history }) => {
           user_email: values.user_email,
           admin_email: values.email,
         });
-        http.setAuthToken(data.auth_token);
         logIn(data, false);
         setIsLoading(false);
         redirectBasedOnProfileCriteria(data);

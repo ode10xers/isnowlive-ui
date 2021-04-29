@@ -7,7 +7,6 @@ import ReactHtmlParser from 'react-html-parser';
 import Routes from 'routes';
 import apis from 'apis';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
 import Share from 'components/Share';
@@ -205,7 +204,6 @@ const InventoryDetails = ({ match, history }) => {
         is_creator: false,
       });
       if (data) {
-        http.setAuthToken(data.auth_token);
         logIn(data, true);
         showConfirmPaymentPopup();
       }
@@ -456,7 +454,6 @@ const InventoryDetails = ({ match, history }) => {
             password: values.password,
           });
           if (data) {
-            http.setAuthToken(data.auth_token);
             logIn(data, true);
             setCurrentUser(data);
             await getUsablePassesForUser();

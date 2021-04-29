@@ -4,18 +4,11 @@ import { Row, Col } from 'antd';
 
 import VideoCard from 'components/VideoCard';
 
-import { generateUrlFromUsername } from 'utils/helper';
+import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './styles.module.scss';
 
-const SimpleVideoCardsList = ({ username = null, passDetails, videos }) => {
-  const redirectToVideoDetails = (video) => {
-    if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
-      window.open(`${baseUrl}/v/${video?.external_id}`);
-    }
-  };
-
+const SimpleVideoCardsList = ({ passDetails, videos }) => {
   return (
     <div className={styles.videoListContainer}>
       <Row gutter={[16, 16]} justify="start">
@@ -25,7 +18,7 @@ const SimpleVideoCardsList = ({ username = null, passDetails, videos }) => {
               video={passVideo}
               buyable={false}
               hoverable={true}
-              onCardClick={() => redirectToVideoDetails(passVideo)}
+              onCardClick={() => redirectToVideosPage(passVideo)}
               showDetailsBtn={false}
             />
           </Col>

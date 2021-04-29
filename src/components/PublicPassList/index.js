@@ -14,7 +14,8 @@ import AuthModal from 'components/AuthModal';
 
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
-import { generateUrlFromUsername, isAPISuccess, isUnapprovedUserError, orderType, productType } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError, orderType, productType } from 'utils/helper';
+import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -22,7 +23,7 @@ import styles from './style.module.scss';
 
 const { Text, Paragraph } = Typography;
 
-const PublicPassList = ({ username, passes }) => {
+const PublicPassList = ({ passes }) => {
   const { showPaymentPopup } = useGlobalContext();
 
   const md = new MobileDetect(window.navigator.userAgent);
@@ -105,16 +106,6 @@ const PublicPassList = ({ username, passes }) => {
       }
       return null;
     }
-  };
-
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session.username || username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
-  };
-
-  const redirectToVideosPage = (video) => {
-    const baseUrl = generateUrlFromUsername(video.username || username || 'app');
-    window.open(`${baseUrl}/v/${video.external_id}`);
   };
 
   const toggleExpandAll = () => {
@@ -213,7 +204,7 @@ const PublicPassList = ({ username, passes }) => {
             </Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
-            <SimpleVideoCardsList username={username} passDetails={record} videos={record.videos} />
+            <SimpleVideoCardsList passDetails={record} videos={record.videos} />
           </Col>
         </>
       )}

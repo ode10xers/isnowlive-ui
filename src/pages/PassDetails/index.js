@@ -28,7 +28,6 @@ const PassDetails = ({ match, history }) => {
   const [profileImage, setProfileImage] = useState(null);
   const [pass, setPass] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [username, setUsername] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
@@ -77,7 +76,6 @@ const PassDetails = ({ match, history }) => {
           });
 
           const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
-          setUsername(creatorUsername);
           await getProfileDetails(creatorUsername);
           setIsLoading(false);
         }
@@ -218,7 +216,7 @@ const PassDetails = ({ match, history }) => {
                         <Text className={styles.ml20}> Applicable to below class(es) </Text>
                       </Col>
                       <Col xs={24}>
-                        <SessionCards sessions={pass.sessions} shouldFetchInventories={true} username={username} />
+                        <SessionCards sessions={pass.sessions} shouldFetchInventories={true} />
                       </Col>
                     </Row>
                   </Col>
@@ -231,7 +229,7 @@ const PassDetails = ({ match, history }) => {
                         <Text className={styles.ml20}> Videos purchasable with this pass </Text>
                       </Col>
                       <Col xs={24}>
-                        <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
+                        <SimpleVideoCardsList passDetails={pass} videos={pass.videos} />
                       </Col>
                     </Row>
                   </Col>
