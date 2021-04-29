@@ -41,6 +41,7 @@ import styles from './style.module.scss';
 const { Title, Text, Paragraph } = Typography;
 const {
   formatDate: { toLongDateWithDay },
+  timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
 const VideoDetails = ({ match }) => {
@@ -70,7 +71,7 @@ const VideoDetails = ({ match }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      console.error('Failed to load profile details');
       setIsLoading(false);
     }
   }, []);
@@ -119,7 +120,7 @@ const VideoDetails = ({ match }) => {
         setAvailablePassesForVideo(data);
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching available pass for video');
+      console.error(error.response?.data?.message || 'Failed fetching available pass for video');
       setIsLoading(false);
     }
     //eslint-disable-next-line
@@ -142,8 +143,11 @@ const VideoDetails = ({ match }) => {
         }
       }
     } catch (error) {
-      message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
       setIsLoading(false);
+
+      if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Failed fetching usable pass for user');
+      }
     }
   }, []);
 
@@ -286,6 +290,7 @@ const VideoDetails = ({ match }) => {
             video_id: video.external_id,
             payment_source: paymentSource.PASS,
             source_id: data.pass_order_id,
+            user_timezone_location: getTimezoneLocation(),
           });
 
           if (isAPISuccess(followUpGetVideo.status)) {
@@ -372,6 +377,7 @@ const VideoDetails = ({ match }) => {
           video_id: video.external_id,
           payment_source: paymentSource.PASS,
           source_id: usableUserPass.pass_order_id,
+          user_timezone_location: getTimezoneLocation(),
         };
 
         showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyVideoUsingPass(payload, couponCode));
@@ -420,6 +426,7 @@ const VideoDetails = ({ match }) => {
       const payload = {
         video_id: video.external_id,
         payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
       };
 
       showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleVideo(payload, couponCode));

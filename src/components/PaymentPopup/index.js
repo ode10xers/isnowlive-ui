@@ -13,7 +13,7 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { orderType, paymentSource, isAPISuccess } from 'utils/helper';
+import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -86,8 +86,10 @@ const PaymentPopup = () => {
         setCouponApplied(true);
       }
     } catch (error) {
-      setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
-      setCouponApplied(false);
+      if (!isUnapprovedUserError(error.response)) {
+        setCouponErrorText(<Text type="danger"> Invalid coupon entered </Text>);
+        setCouponApplied(false);
+      }
     }
     setIsApplyingCoupon(false);
   };
@@ -137,6 +139,7 @@ const PaymentPopup = () => {
               video_id: followUpBookingInfo.productId,
               payment_source: paymentSource.PASS,
               source_id: orderResponse.payment_order_id,
+              user_timezone_location: getTimezoneLocation(),
             };
 
             await followUpGetVideo(payload);
@@ -186,8 +189,6 @@ const PaymentPopup = () => {
           : ''
       }`;
     }
-
-    //TODO: Will also add text when subscription can be used as payment instrument later
 
     return (
       <Text strong className={styles.blueText}>

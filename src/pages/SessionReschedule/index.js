@@ -62,7 +62,7 @@ const SessionReschedule = () => {
   const getAvailableSessions = useCallback(async () => {
     setIsSessionLoading(true);
     try {
-      const { data } = await apis.session.getRescheduleableSessionsByPrice(username, parseInt(price));
+      const { data } = await apis.session.getRescheduleableSessionsByPrice(parseInt(price));
       if (data) {
         const unfilteredSessions = data.map((i, index) => ({
           index,
@@ -114,7 +114,7 @@ const SessionReschedule = () => {
       setIsSessionLoading(false);
       message.error(error.response?.data?.message || 'Failed to load user session details');
     }
-  }, [inventory_id, username, price]);
+  }, [inventory_id, price]);
 
   const handleSessionReschedule = async (newInventory) => {
     setIsLoading(true);

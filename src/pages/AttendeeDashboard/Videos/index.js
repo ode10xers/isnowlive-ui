@@ -65,10 +65,10 @@ const Videos = () => {
         }
       >
         <Row gutter={[10, 10]}>
-          <Col xs={24} md={12}>
-            <Image height={80} className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+          <Col xs={24} md={12} xl={8}>
+            <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
           </Col>
-          <Col xs={24} md={12}>
+          <Col xs={24} md={12} xl={16}>
             <Row>
               <Col xs={24}>
                 <Title level={4}>{video.title}</Title>

@@ -12,7 +12,7 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -97,7 +97,9 @@ const ClassPassList = () => {
         setExpandedExpiredRowKeys(data.expired.length > 0 ? [data.expired[0].pass_order_id] : []);
       }
     } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message);
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something wrong happened', error.response?.data?.message);
+      }
     }
     setIsLoading(false);
   }, []);

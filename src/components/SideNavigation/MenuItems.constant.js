@@ -13,6 +13,7 @@ import {
   FilePdfOutlined,
   Html5Outlined,
   TeamOutlined,
+  ControlOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -167,11 +168,33 @@ export const creatorMenuItems = [
   },
   {
     order: 14,
-    key: 'audiences',
+    key: 'newsletter',
     title: 'Newsletter',
     icon: <AuditOutlined />,
-    mixPanelTag: creator.click.dashboard.audiencesNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,
+    mixPanelTag: creator.click.dashboard.newsletterNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.newsletter,
+  },
+  {
+    order: 15,
+    key: 'advanced_settings',
+    title: 'Advanced Settings',
+    icon: <ControlOutlined />,
+    children: [
+      {
+        order: 1,
+        key: 'members_settings',
+        title: 'Make site private',
+        mixPanelTag: creator.click.dashboard.membersSettingsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersSettings,
+      },
+      {
+        order: 2,
+        key: 'members_tags',
+        title: 'Members Tags',
+        mixPanelTag: creator.click.dashboard.membersTagsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags,
+      },
+    ],
   },
 ];
 

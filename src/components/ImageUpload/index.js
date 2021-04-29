@@ -39,7 +39,6 @@ const ImageUpload = ({
       // const reducer = ImageBlobReduce();
       // const reducedImageFile = await reducer.toBlob(fileData.file, { max: 600 });
       // formData.append('file', new File([reducedImageFile], fileData.file.name, { lastModified: new Date() }));
-      console.log(fileData, fileData.file);
       formData.append('file', fileData.file);
       const { data } = await apis.user.uploadImage(formData);
       onChange(data);
