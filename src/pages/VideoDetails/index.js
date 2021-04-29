@@ -24,8 +24,8 @@ import {
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
+import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
 import {
-  generateUrlFromUsername,
   isAPISuccess,
   orderType,
   paymentSource,
@@ -76,40 +76,47 @@ const VideoDetails = ({ match }) => {
     }
   }, []);
 
+  const getCourseDetailsForVideo = useCallback(async (videoExternalid) => {
+    try {
+      const { status, data } = await apis.courses.getVideoCoursesByVideoId(videoExternalid);
+
+      if (isAPISuccess(status) && data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      console.error(
+        'Failed to fetch courses data for session',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+  }, []);
+
   const getVideoDetails = useCallback(
     async (videoId) => {
       try {
-        const videoDetailsResponse = await apis.videos.getVideoById(videoId);
+        const { status, data } = await apis.videos.getVideoById(videoId);
 
-        if (isAPISuccess(videoDetailsResponse.status) && videoDetailsResponse.data) {
-          setVideo(videoDetailsResponse.data);
+        if (isAPISuccess(status) && data) {
+          setVideo(data);
 
-          const creatorUsername = videoDetailsResponse.data.creator_username || window.location.hostname.split('.')[0];
+          const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
           setUsername(creatorUsername);
           await getProfileDetails(creatorUsername);
 
-          if (videoDetailsResponse.data.is_course) {
-            const courseDetailsResponse = await apis.courses.getVideoCoursesByVideoId(
-              videoDetailsResponse.data.external_id
-            );
-
-            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
-              setCourses(courseDetailsResponse.data);
-            } else {
-              console.error('Failed to fetch courses data for session', courseDetailsResponse);
-            }
+          if (data.is_course) {
+            getCourseDetailsForVideo(videoId);
           }
 
           setIsLoading(false);
         } else {
-          console.error('Failed to fetch video details', videoDetailsResponse);
+          console.error('Failed to fetch video details', status);
         }
       } catch (error) {
         setIsLoading(false);
         message.error('Failed to load class video details');
       }
     },
-    [getProfileDetails]
+    [getProfileDetails, getCourseDetailsForVideo]
   );
 
   const getAvailablePassesForVideo = useCallback(async (videoId) => {
@@ -433,21 +440,6 @@ const VideoDetails = ({ match }) => {
     }
   };
 
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
-  };
-
-  const redirectToVideosPage = (video) => {
-    const baseUrl = generateUrlFromUsername(username || video?.creator_username || 'app');
-    window.open(`${baseUrl}/v/${video.external_id}`);
-  };
-
-  const redirectToCourseDetails = (course) => {
-    const baseUrl = generateUrlFromUsername(username || course?.username || 'app');
-    window.open(`${baseUrl}/c/${course?.id}`);
-  };
-
   const renderPassCards = (pass, purchased = false) => (
     <Card className={styles.videoCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }} key={pass?.id}>
       <Row gutter={[16, 16]} align="center">
@@ -542,7 +534,7 @@ const VideoDetails = ({ match }) => {
                   </Col>
                 ) : (
                   <Col xs={24} className={styles.passClassListContainer}>
-                    <SessionCards username={username} sessions={pass?.sessions} shouldFetchInventories={true} />
+                    <SessionCards sessions={pass?.sessions} shouldFetchInventories={true} />
                   </Col>
                 )}
               </>
@@ -566,7 +558,7 @@ const VideoDetails = ({ match }) => {
                   </Col>
                 ) : (
                   <Col xs={24} className={styles.passVideoListContainer}>
-                    <SimpleVideoCardsList username={username} passDetails={pass} videos={pass.videos} />
+                    <SimpleVideoCardsList passDetails={pass} videos={pass.videos} />
                   </Col>
                 )}
               </>
@@ -605,11 +597,7 @@ const VideoDetails = ({ match }) => {
                           <Title level={5}> This video can only be purchased via this course </Title>
                         </Col>
                         <Col xs={24}>
-                          <ShowcaseCourseCard
-                            courses={courses}
-                            onCardClick={(course) => redirectToCourseDetails(course)}
-                            username={username}
-                          />
+                          <ShowcaseCourseCard courses={courses} username={username} />
                         </Col>
                       </Row>
                     </div>
@@ -679,7 +667,7 @@ const VideoDetails = ({ match }) => {
                             <Text className={styles.ml20}> Related to these class(es) </Text>
                           </Col>
                           <Col xs={24}>
-                            <SessionCards username={username} sessions={video.sessions} shouldFetchInventories={true} />
+                            <SessionCards sessions={video.sessions} shouldFetchInventories={true} />
                           </Col>
                         </Row>
                       </Col>

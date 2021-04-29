@@ -37,7 +37,7 @@ const Sessions = ({ sessions, username }) => {
           name: inventory.name,
           group: inventory.group,
           description: inventory.description,
-          username: username,
+          creator_username: username,
           inventory: [inventory],
         });
       }

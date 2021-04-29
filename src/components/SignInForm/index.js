@@ -4,7 +4,6 @@ import { Form, Row, Col, Input, Typography, Button, message } from 'antd';
 
 import apis from 'apis';
 
-import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
 
 import { isUnapprovedUserError, scrollToErrorField } from 'utils/helper';
@@ -55,7 +54,6 @@ const SignInForm = ({ user, hideSignInForm, onSetNewPassword }) => {
       });
 
       if (data) {
-        http.setAuthToken(data.auth_token);
         logIn(data, true);
         hideSignInForm();
       }

@@ -19,14 +19,8 @@ import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import {
-  isAPISuccess,
-  tagColors,
-  getRandomTagColor,
-  reservedDomainName,
-  generateUrlFromUsername,
-  courseType,
-} from 'utils/helper';
+import { redirectToVideosPage } from 'utils/redirect';
+import { isAPISuccess, tagColors, getRandomTagColor, reservedDomainName, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -111,13 +105,6 @@ const CourseDetails = ({ match, history }) => {
     }
     //eslint-disable-next-line
   }, [match.params.course_id]);
-
-  const redirectToVideoDetails = (video) => {
-    if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || video?.creator_username || 'app');
-      window.open(`${baseUrl}/v/${video?.external_id}`);
-    }
-  };
 
   const filterInventoryByCourseDate = (inventories) => {
     return inventories.filter(
@@ -257,7 +244,7 @@ const CourseDetails = ({ match, history }) => {
                   </Title>
                 </Col>
                 <Col xs={24}>
-                  <ShowcaseCourseCard courses={[course]} username={username} />
+                  <ShowcaseCourseCard courses={[course]} username={username} onCardClick={() => {}} />
                 </Col>
 
                 {courseSessions?.length > 0 && (
@@ -268,7 +255,7 @@ const CourseDetails = ({ match, history }) => {
                       </Title>
                     </Col>
                     <Col xs={24}>
-                      <SessionCards sessions={courseSessions} shouldFetchInventories={false} username={username} />
+                      <SessionCards sessions={courseSessions} shouldFetchInventories={false} />
                     </Col>
                     {course?.inventory_ids?.length > 0 && (
                       <Col xs={24}>
@@ -306,7 +293,7 @@ const CourseDetails = ({ match, history }) => {
                               <VideoCard
                                 video={video}
                                 buyable={false}
-                                onCardClick={() => redirectToVideoDetails(video)}
+                                onCardClick={() => redirectToVideosPage(video)}
                                 showDetailsBtn={false}
                               />
                             </Col>

@@ -10,7 +10,8 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 
 import dateUtil from 'utils/date';
-import { isValidFile, isoDayOfWeek, generateUrlFromUsername } from 'utils/helper';
+import { isValidFile, isoDayOfWeek } from 'utils/helper';
+import { redirectToSessionsPage } from 'utils/redirect';
 
 import styles from './styles.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -20,7 +21,7 @@ const {
   formatDate: { getISODayOfWeek },
 } = dateUtil;
 
-const SessionCards = ({ sessions, shouldFetchInventories = true, username = null }) => {
+const SessionCards = ({ sessions, shouldFetchInventories = true }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -56,11 +57,6 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, username = null
     );
 
     setIsLoading(false);
-  };
-
-  const redirectToSessionsPage = (session) => {
-    const baseUrl = generateUrlFromUsername(username || session.username || 'app');
-    window.open(`${baseUrl}/s/${session.session_id}`);
   };
 
   useEffect(() => {

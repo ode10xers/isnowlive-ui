@@ -10,14 +10,8 @@ import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import {
-  isAPISuccess,
-  orderType,
-  generateUrlFromUsername,
-  paymentSource,
-  productType,
-  isUnapprovedUserError,
-} from 'utils/helper';
+import { redirectToVideosPage } from 'utils/redirect';
+import { isAPISuccess, orderType, paymentSource, productType, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -111,13 +105,6 @@ const PublicVideoList = ({ username = null, videos }) => {
     setShowPurchaseVideoModal(false);
   };
 
-  const redirectToVideoDetails = (video) => {
-    if (video?.external_id) {
-      const baseUrl = generateUrlFromUsername(username || video?.username || 'app');
-      window.open(`${baseUrl}/v/${video?.external_id}`);
-    }
-  };
-
   return (
     <div className={styles.box}>
       <AuthModal
@@ -132,7 +119,7 @@ const PublicVideoList = ({ username = null, videos }) => {
               <VideoCard
                 video={video}
                 buyable={true}
-                onCardClick={() => redirectToVideoDetails(video)}
+                onCardClick={() => redirectToVideosPage(video)}
                 showAuthModal={() => handleSelectVideo(video)}
               />
             </Col>
