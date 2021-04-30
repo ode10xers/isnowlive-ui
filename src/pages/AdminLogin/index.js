@@ -67,7 +67,7 @@ const AdminLogin = ({ history }) => {
 
   // Logs out when accessing admin page
   useEffect(() => {
-    logOut(history, true);
+    logOut(history);
     //eslint-disable-next-line
   }, []);
 
