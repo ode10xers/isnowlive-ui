@@ -65,7 +65,7 @@ const DashboardHeader = () => {
 
   const trackAndLogOut = (eventTag) => {
     trackSimpleEvent(eventTag);
-    logOut(history);
+    logOut(history, true);
   };
 
   return (
