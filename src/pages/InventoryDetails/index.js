@@ -716,7 +716,7 @@ const InventoryDetails = ({ match, history }) => {
                 classDetails={session}
                 selectedInventory={session}
                 logOut={() => {
-                  logOut(history, false);
+                  logOut(history);
                   setCurrentUser(null);
                   setSelectedPass(null);
                   setUserPasses([]);

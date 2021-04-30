@@ -828,7 +828,7 @@ const SessionDetails = ({ match, history }) => {
                   selectedInventory={selectedInventory}
                   userSubscription={usableUserSubscription}
                   logOut={() => {
-                    logOut(history, true);
+                    logOut(history);
                     setCurrentUser(null);
                     setSelectedPass(null);
                     setUserPasses([]);
