@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import { Row, Col, List, message } from 'antd';
 
+import apis from 'apis';
+
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
@@ -9,11 +11,12 @@ import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 
 import dateUtil from 'utils/date';
 import { generateBaseCreditsText } from 'utils/subscriptions';
+import { isAPISuccess, orderType } from 'utils/helper';
+import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
 
-import apis from 'apis';
-import { isAPISuccess, orderType } from 'utils/helper';
+import styles from './styles.module.scss';
 
 const {
   timezoneUtils: { getTimezoneLocation },
@@ -119,6 +122,9 @@ const CreatorSubscriptions = ({ subscriptions }) => {
         <Row gutter={[8, 10]}>
           <Col xs={24}>
             <List
+              pagination={{ pageSize: isMobileDevice ? 1 : 3, position: 'top' }}
+              header={<div className={styles.p10}></div>}
+              rowKey={(record) => record.external_id}
               grid={{ gutter: 10, column: 3 }}
               dataSource={subscriptions}
               renderItem={renderShowcaseSubscriptionCards}
