@@ -3,28 +3,18 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Row, Col, Button, Typography, Space } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 
-import Table from 'components/Table';
+import apis from 'apis';
 
+import Table from 'components/Table';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
+import { generateBaseCreditsText } from 'utils/subscriptions';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
-import apis from 'apis';
 
 const { Title, Text } = Typography;
-
-//TODO: Might want to export to a helper file, since also used in CreatorSubscriptions
-const productTextMapping = {
-  SESSION: 'Sessions',
-  VIDEO: 'Videos',
-  COURSE: 'Courses',
-};
-
-const accessTypeTextMapping = {
-  PUBLIC: 'Public',
-  MEMBERSHIP: 'Membership',
-};
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState([]);
@@ -38,6 +28,9 @@ const Subscriptions = () => {
       const { status, data } = await apis.subscriptions.getAttendeeSubscriptions();
       if (isAPISuccess(status) && data) {
         setSubscriptionOrders(data.active);
+        if (data.active.length > 0) {
+          setExpandedRowKeys([data.active[0].subscription_order_id]);
+        }
         setIsLoading(false);
       }
     } catch (error) {
@@ -51,7 +44,6 @@ const Subscriptions = () => {
     setIsLoading(false);
   }, []);
 
-  //TODO: Implement when the API is done
   const cancelSubscription = (subscriptionOrderId) => {
     console.log(subscriptionOrderId);
   };
@@ -89,7 +81,7 @@ const Subscriptions = () => {
           ? subscription?.products['SESSION']?.credits - subscription?.products['SESSION']?.credits_used
           : 0) +
         (subscription?.products['VIDEO']
-          ? subscription?.products['VIDEO']?.credits + subscription?.products['VIDEO']?.credits_used
+          ? subscription?.products['VIDEO']?.credits - subscription?.products['VIDEO']?.credits_used
           : 0);
       totalCredits =
         (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
@@ -102,53 +94,7 @@ const Subscriptions = () => {
     );
   };
 
-  //TODO: Consider exporting to helper, since also used in CreatorSubscriptions
-  const generateBaseCreditsText = (subscription, isCourse = false) => {
-    let calculatedBaseCredits = 0;
-
-    if (isCourse) {
-      calculatedBaseCredits = subscription?.products['COURSE']?.credits || 0;
-    } else {
-      calculatedBaseCredits =
-        (subscription?.products['SESSION']?.credits || 0) + (subscription?.products['VIDEO']?.credits || 0);
-    }
-
-    return (
-      <div className={styles.baseCreditsText}>
-        {calculatedBaseCredits} {isCourse ? 'Course' : 'Session or Video'} credits / month
-      </div>
-    );
-  };
-
-  //TODO: Consider exporting to helper, since also used in CreatorSubscriptions
-  const generateIncludedProducts = (subscription, isCourse = false) => {
-    let productTexts = [];
-
-    if (isCourse) {
-      productTexts =
-        subscription?.products['COURSE']?.access_types?.map(
-          (accessType) => `${accessTypeTextMapping[accessType]} ${productTextMapping['COURSE']}`
-        ) || [];
-    } else {
-      const excludedProductKeys = ['COURSE'];
-      Object.entries(subscription?.products).forEach(([key, val]) => {
-        if (!excludedProductKeys.includes(key)) {
-          productTexts = [
-            ...productTexts,
-            ...val.access_types.map((accessType) => `${accessTypeTextMapping[accessType]} ${productTextMapping[key]}`),
-          ];
-        }
-      });
-    }
-
-    return (
-      <Space size="small" direction="vertical" align="left" className={styles.includedProductsList}>
-        {productTexts.map((productText) => (
-          <Text strong> {productText} </Text>
-        ))}
-      </Space>
-    );
-  };
+  const showProductsDetails = () => {};
 
   //TODO: Adjust the keys with the data format
   const subscriptionColumns = [
@@ -164,7 +110,7 @@ const Subscriptions = () => {
       render: (text, record) => (
         <Space size="small" direction="vertical" align="left">
           {generateRemainingCreditsText(record, false)}
-          {generateRemainingCreditsText(record, true)}
+          {record.products['COURSE'] && generateRemainingCreditsText(record, true)}
         </Space>
       ),
     },
@@ -216,6 +162,7 @@ const Subscriptions = () => {
     },
   ];
 
+  // TODO: Confirm do we want to show it like in ShowcaseSubscriptionCards
   const renderSubscriptionDetails = (subscription) => {
     const subscriptionDetails = subscription;
 
@@ -227,29 +174,44 @@ const Subscriptions = () => {
           </Col>
 
           <Col xs={24}>
+            <Text> Credits details: </Text>
+          </Col>
+
+          <Col xs={24} className={styles.subSection}>
             <Space align="left">
               <Row gutter={[8, 8]}>
                 <Col xs={24}>
-                  <Text strong> {generateBaseCreditsText(subscriptionDetails, false)} </Text>
+                  <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, false)}</div>
                 </Col>
-                <Col xs={24} className={styles.includeTextWrapper}>
-                  <Text disabled> Includes access to </Text>
-                </Col>
-                <Col xs={24}>{generateIncludedProducts(subscriptionDetails, false)}</Col>
               </Row>
               {subscriptionDetails.products['COURSE'] && (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
-                    <Text strong> {generateBaseCreditsText(subscriptionDetails, true)} </Text>
+                    <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, true)}</div>
                   </Col>
-                  <Col xs={24} className={styles.includeTextWrapper}>
-                    <Text disabled> Includes access to </Text>
-                  </Col>
-                  <Col xs={24}>{generateIncludedProducts(subscriptionDetails, true)}</Col>
                 </Row>
               )}
             </Space>
           </Col>
+
+          <Col xs={24}>
+            <Row gutter={[8, 4]}>
+              <Col xs={24}>
+                <Text> Usable for products: </Text>
+              </Col>
+              <Col xs={24} className={styles.subSection}>
+                <Space direction={isMobileDevice ? 'vertical' : 'horizontal'}>
+                  {Object.entries(subscription?.products).map(([key, val]) => (
+                    <Button onClick={() => showProductsDetails(key)} key={`${subscription?.external_id}_${key}`}>
+                      {' '}
+                      {val.product_ids.length} {key.toLowerCase()}s{' '}
+                    </Button>
+                  ))}
+                </Space>
+              </Col>
+            </Row>
+          </Col>
+
           <Col xs={24}>
             <Row gutter={[8, 8]}>
               <Col xs={24}>
