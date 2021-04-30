@@ -171,7 +171,7 @@ function App() {
           <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
           <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
           <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
-          <PrivateRoute layout={DefaultLayout} exact path={Routes.paymentRetry} component={PaymentRetry} />
+          <PrivateRoute layout={DefaultLayout} path={Routes.paymentRetry} component={PaymentRetry} />
           <PrivateRoute
             layout={DefaultLayout}
             exact
