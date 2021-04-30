@@ -40,18 +40,16 @@ const Subscriptions = () => {
   const getCreatorSubscriptions = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 3);
-
-      let mappedSubscriptionData = [];
+      //TODO: Since the API is paginated right now the temporary solution is to set per_page as 25
+      const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
 
       if (isAPISuccess(status) && data.Data) {
+        let mappedSubscriptionData = [];
         mappedSubscriptionData = data.Data.sort((a, b) => a.price - b.price).map((subscription, idx) => ({
           ...subscription,
           idx,
         }));
-      }
 
-      if (mappedSubscriptionData.length < 3) {
         const buttonData = mappedSubscriptionData.find((subscription) => subscription.external_id === null);
 
         if (!buttonData) {
@@ -61,9 +59,9 @@ const Subscriptions = () => {
             isButton: true,
           });
         }
-      }
 
-      setSubscriptions(mappedSubscriptionData);
+        setSubscriptions(mappedSubscriptionData);
+      }
     } catch (error) {
       showErrorModal('Failed to fetch memberships', error?.response?.data?.message || 'Something wrong happened');
     }
@@ -256,6 +254,34 @@ const Subscriptions = () => {
     </List.Item>
   );
 
+  const renderSubscriptionRows = () => {
+    let tempSubscriptions = Array.from(subscriptions);
+    let segmentedSubscriptions = [];
+
+    while (tempSubscriptions.length > 0) {
+      segmentedSubscriptions.push(tempSubscriptions.slice(0, 3));
+      tempSubscriptions.splice(0, 3);
+    }
+
+    return segmentedSubscriptions.map((segmentedSubs) => (
+      <Col xs={24} key={segmentedSubs[0].external_id || 'button'}>
+        <Row gutter={10} justify="start">
+          <Col xs={7} xl={6}>
+            <List
+              itemLayout="vertical"
+              size="large"
+              dataSource={subscriptionFields}
+              renderItem={renderSubscriptionFields}
+            />
+          </Col>
+          <Col xs={17} xl={18}>
+            <List grid={{ gutter: 8, column: 3 }} dataSource={segmentedSubs} renderItem={renderSubscriptionList} />
+          </Col>
+        </Row>
+      </Col>
+    ));
+  };
+
   return (
     <div className={styles.box}>
       <Row gutter={[8, 10]}>
@@ -264,19 +290,7 @@ const Subscriptions = () => {
         </Col>
         <Col xs={24}>
           <Loader size="large" loading={isLoading} text="Fetching memberships...">
-            <Row gutter={10} justify="start">
-              <Col xs={7} xl={6}>
-                <List
-                  itemLayout="vertical"
-                  size="large"
-                  dataSource={subscriptionFields}
-                  renderItem={renderSubscriptionFields}
-                />
-              </Col>
-              <Col xs={17} xl={18}>
-                <List grid={{ gutter: 8, column: 3 }} dataSource={subscriptions} renderItem={renderSubscriptionList} />
-              </Col>
-            </Row>
+            <Row gutter={[8, 8]}>{renderSubscriptionRows()}</Row>
           </Loader>
         </Col>
       </Row>
