@@ -702,7 +702,14 @@ const VideoDetails = ({ match }) => {
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
                 <Loader loading={isLoading} size="large" text="Loading video details">
                   <Col xs={24} className={styles.showcaseCardContainer}>
-                    <VideoCard video={video} buyable={false} hoverable={false} showDetailsBtn={false} showDesc={true} />
+                    <VideoCard
+                      video={video}
+                      buyable={false}
+                      hoverable={false}
+                      showDetailsBtn={false}
+                      showDesc={true}
+                      onCardClick={() => {}}
+                    />
                   </Col>
                 </Loader>
 

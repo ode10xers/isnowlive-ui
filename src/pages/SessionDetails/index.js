@@ -34,7 +34,6 @@ import {
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { redirectToVideosPage } from 'utils/redirect';
 import {
   generateUrlFromUsername,
   isAPISuccess,
@@ -880,12 +879,7 @@ const SessionDetails = ({ match, history }) => {
                           {sessionVideos?.length > 0 &&
                             sessionVideos?.map((videoDetails) => (
                               <Col xs={24} key={videoDetails.external_id}>
-                                <VideoCard
-                                  video={videoDetails}
-                                  buyable={true}
-                                  onCardClick={redirectToVideosPage}
-                                  showAuthModal={openAuthModal}
-                                />
+                                <VideoCard video={videoDetails} buyable={true} showAuthModal={openAuthModal} />
                               </Col>
                             ))}
                         </Row>

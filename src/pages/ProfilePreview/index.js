@@ -204,25 +204,17 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     setIsSubscriptionsLoading(true);
 
     try {
-      let profileUsername = '';
-
-      if (username) {
-        profileUsername = username;
-      } else {
-        profileUsername = getLocalUserDetails().username;
-      }
-
-      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername(profileUsername);
+      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
 
       if (isAPISuccess(status) && data) {
-        setSubscriptions(data);
+        setSubscriptions(data.sort((a, b) => a.price - b.price));
         setIsSubscriptionsLoading(false);
       }
     } catch (error) {
       setIsSubscriptionsLoading(false);
       console.error('Failed to load subscription details');
     }
-  }, [username]);
+  }, []);
 
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {

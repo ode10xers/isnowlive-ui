@@ -164,6 +164,7 @@ const VideoDetails = ({ match }) => {
             buyable={false}
             hoverable={false}
             showOrderDetails={true}
+            onCardClick={() => {}}
             orderDetails={videoOrderDetails}
             showDesc={true}
           />
