@@ -97,7 +97,7 @@ const Subscriptions = () => {
   const showProductsDetails = () => {};
 
   //TODO: Adjust the keys with the data format
-  const subscriptionColumns = [
+  const generateSubscriptionColumns = () => [
     {
       title: 'Subscription Name',
       dataIndex: 'subscription_name',
@@ -115,7 +115,11 @@ const Subscriptions = () => {
       ),
     },
     {
-      title: '',
+      title: (
+        <Button block ghost type="primary" onClick={() => toggleExpandAllRow()}>
+          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        </Button>
+      ),
       width: '200px',
       render: (text, record) => (
         <Row gutter={[8, 8]} justify="end">
@@ -234,17 +238,12 @@ const Subscriptions = () => {
   return (
     <div className={styles.box}>
       <Row gutter={[8, 8]}>
-        <Col xs={24} md={12} lg={16}>
+        <Col xs={24}>
           <Title level={4}> My Membership </Title>
-        </Col>
-        <Col xs={24} md={12} lg={8}>
-          <Button block type="primary" shape="round" onClick={() => toggleExpandAllRow()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-          </Button>
         </Col>
         <Col xs={24}>
           <Table
-            columns={subscriptionColumns}
+            columns={generateSubscriptionColumns()}
             data={subscriptionOrders}
             loading={isLoading}
             rowKey={(record) => record.subscription_order_id}
