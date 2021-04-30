@@ -19,7 +19,6 @@ import apis from 'apis';
 
 import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
-import { useGlobalContext } from 'services/globalContext';
 import { isAPISuccess, paymentSource, orderType, productType } from 'utils/helper';
 
 const {
@@ -28,10 +27,6 @@ const {
 
 // TODO: This page is no longer used, since in page payment is implemented
 const PaymentVerification = () => {
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
   const location = useLocation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
@@ -131,7 +126,7 @@ const PaymentVerification = () => {
       setIsLoading(false);
       showErrorModal('Something went wrong');
     }
-  }, [order_id, transaction_id, order_type, inventory_id, video_id, history, userDetails]);
+  }, [order_id, transaction_id, order_type, inventory_id, video_id, history]);
 
   return (
     <Row justify="center">

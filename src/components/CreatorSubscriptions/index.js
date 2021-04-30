@@ -4,7 +4,7 @@ import { Row, Col, List, message } from 'antd';
 
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 
 import dateUtil from 'utils/date';
@@ -87,8 +87,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
             payment_order_id: data.subscription_order_id,
           };
         } else {
-          //TODO: Confirm with Rahul about the content of confirmation popup
-          showSuccessModal('Subscription Purchased successfully');
+          showPurchaseSubscriptionSuccessModal();
           return null;
         }
       }

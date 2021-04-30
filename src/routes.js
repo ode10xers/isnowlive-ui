@@ -21,6 +21,7 @@ const Routes = {
   profilePreview: '/profile/preview',
   stripeAccountValidate: '/stripe/account/validate',
   stripePaymentSuccess: '/stripe/payment/success',
+  paymentRetry: '/payment/retry/:retry_token',
   creatorDashboard: {
     rootPath: '/creator/dashboard',
     defaultPath: '/sessions/upcoming',

@@ -32,6 +32,7 @@ import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
 import PaymentVerification from 'pages/PaymentVerification';
+import PaymentRetry from 'pages/PaymentRetry';
 import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
 import VideoDetails from 'pages/VideoDetails';
@@ -170,6 +171,7 @@ function App() {
           <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
           <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
           <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+          <PrivateRoute layout={DefaultLayout} exact path={Routes.paymentRetry} component={PaymentRetry} />
           <PrivateRoute
             layout={DefaultLayout}
             exact
