@@ -77,7 +77,7 @@ const PaymentRetry = ({ match }) => {
       setIsLoading(false);
       showErrorModal('Something went wrong');
     }
-  }, [match.params.retry_token, makePayment]);
+  }, [match, makePayment]);
 
   return (
     <Row justify="center">
