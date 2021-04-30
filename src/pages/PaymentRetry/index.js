@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useStripe } from '@stripe/react-stripe-js';
+import { useLocation } from 'react-router-dom';
+import { useStripe, Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 import { Row } from 'antd';
 
 import apis from 'apis';
+import config from 'config';
 
 import Loader from 'components/Loader';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
@@ -11,9 +14,12 @@ import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components
 import { isAPISuccess, orderType, StripePaymentStatus } from 'utils/helper';
 import { verifyPaymentForOrder } from 'utils/payment';
 
-const PaymentRetry = ({ match }) => {
+const PaymentRetry = () => {
+  const location = useLocation();
   const stripe = useStripe();
   const [isLoading, setIsLoading] = useState(false);
+
+  const retry_token = location.pathname.replace('/payment/retry/', '');
 
   const makePayment = useCallback(
     async (secret, paymentPayload) => {
@@ -35,15 +41,13 @@ const PaymentRetry = ({ match }) => {
   );
 
   useEffect(() => {
-    console.log(window.location);
-    console.log(match);
-    if (match.params.retry_token) {
+    if (retry_token) {
       const retryPayment = async () => {
         setIsLoading(true);
 
         try {
           const { status, data: paymentSessionData } = await apis.payment.retryPayment({
-            token: match.params.retry_token,
+            token: retry_token,
           });
 
           if (isAPISuccess(status) && paymentSessionData) {
@@ -77,7 +81,7 @@ const PaymentRetry = ({ match }) => {
       setIsLoading(false);
       showErrorModal('Something went wrong');
     }
-  }, [match, makePayment]);
+  }, [retry_token, makePayment]);
 
   return (
     <Row justify="center">
@@ -86,4 +90,19 @@ const PaymentRetry = ({ match }) => {
   );
 };
 
-export default PaymentRetry;
+const WrappedPaymentRetry = () => {
+  const stripePromise = loadStripe(config.stripe.secretKey);
+
+  if (!stripePromise) {
+    console.error('Failed to load stripe');
+    return null;
+  }
+
+  return (
+    <Elements stripe={stripePromise}>
+      <PaymentRetry />
+    </Elements>
+  );
+};
+
+export default WrappedPaymentRetry;
