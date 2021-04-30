@@ -51,20 +51,19 @@ const PaymentRetry = () => {
           });
 
           if (isAPISuccess(status) && paymentSessionData) {
-            // TODO: Confirm all the possible status
             if (paymentSessionData.status === StripePaymentStatus.AUTHORIZATION_REQUIRED) {
               const isPaymentSuccess = await makePayment(paymentSessionData.payment_gateway_session_token, {
                 payment_method: paymentSessionData.payment_method_id,
               });
 
               if (isPaymentSuccess) {
-                const verifyOrderResponse = await verifyPaymentForOrder({
+                const successfulOrderType = await verifyPaymentForOrder({
                   order_id: paymentSessionData.order_id,
                   transaction_id: paymentSessionData.transaction_id,
-                  order_type: orderType.SUBSCRIPTION, //TODO: Confirm that this flow will only be for subscriptions, since this is hard coded for now
+                  order_type: orderType.SUBSCRIPTION,
                 });
 
-                if (isAPISuccess(verifyOrderResponse.status)) {
+                if (successfulOrderType) {
                   showPurchaseSubscriptionSuccessModal();
                 }
               }
