@@ -35,9 +35,9 @@ const PaymentRetry = ({ match }) => {
   );
 
   useEffect(() => {
+    console.log(window.location);
+    console.log(match);
     if (match.params.retry_token) {
-      console.log(match.params.retry_token);
-
       const retryPayment = async () => {
         setIsLoading(true);
 
