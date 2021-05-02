@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Menu, Button } from 'antd';
+import { Menu } from 'antd';
 
 import Routes from 'routes';
 import { creatorMenuItems, attendeeMenuItems } from './MenuItems.constant';
@@ -30,24 +30,6 @@ const SideNavigation = () => {
 
   return (
     <Menu mode="inline" className={styles.sideNavMenu}>
-      <Item
-        key="sessionCTA"
-        onClick={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions)}
-      >
-        <Button block type="primary">
-          Create a Session
-        </Button>
-      </Item>
-      <Item
-        key="videoCTA"
-        onClick={() =>
-          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, { onboarding: true })
-        }
-      >
-        <Button block type="primary">
-          Add a Video
-        </Button>
-      </Item>
       {showMenu.map((navItem) =>
         navItem.children ? (
           <SubMenu key={navItem.key} title={navItem.title} icon={navItem.icon}>
@@ -57,6 +39,17 @@ const SideNavigation = () => {
               </Item>
             ))}
           </SubMenu>
+        ) : navItem.is_button ? (
+          <Item
+            key={navItem.key}
+            onClick={() =>
+              navItem.historyData.state
+                ? history.push(navItem.historyData.route, navItem.historyData.state)
+                : history.push(navItem.historyData.route)
+            }
+          >
+            {navItem.title}
+          </Item>
         ) : (
           <Item key={navItem.key} icon={navItem?.icon || null} onClick={() => trackAndNavigate(navItem)}>
             {navItem.title}

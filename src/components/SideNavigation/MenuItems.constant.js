@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from 'antd';
 import {
   TagsOutlined,
   VideoCameraOutlined,
@@ -24,6 +25,34 @@ const { creator, attendee } = mixPanelEventTags;
 export const creatorMenuItems = [
   {
     order: 1,
+    key: 'create_session_cta',
+    title: (
+      <Button block type="primary">
+        Create a Session
+      </Button>
+    ),
+    is_button: true,
+    historyData: {
+      route: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
+      state: undefined,
+    },
+  },
+  {
+    order: 2,
+    key: 'upload_video_cta',
+    title: (
+      <Button block type="primary">
+        Add a Video
+      </Button>
+    ),
+    is_button: true,
+    historyData: {
+      route: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
+      state: { onboarding: true },
+    },
+  },
+  {
+    order: 3,
     key: 'sessions',
     title: 'Sessions',
     icon: <VideoCameraOutlined />,
@@ -59,7 +88,8 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 2,
+    order: 4,
+    is_button: false,
     key: 'passes',
     title: 'Pass',
     mixPanelTag: creator.click.dashboard.passesNav,
@@ -67,7 +97,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes,
   },
   {
-    order: 3,
+    order: 5,
+    is_button: false,
     key: 'videos',
     title: 'Videos',
     icon: <PlayCircleOutlined />,
@@ -75,7 +106,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
   },
   {
-    order: 4,
+    order: 6,
+    is_button: false,
     key: 'courses',
     title: 'Courses',
     icon: <BookOutlined />,
@@ -83,7 +115,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses,
   },
   {
-    order: 5,
+    order: 7,
     key: 'subscriptions',
     title: 'Membership',
     icon: <ScheduleOutlined />,
@@ -91,7 +123,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
   },
   {
-    order: 6,
+    order: 8,
+    is_button: false,
     key: 'coupons',
     title: 'Coupons',
     icon: <PercentageOutlined />,
@@ -99,7 +132,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.coupons,
   },
   {
-    order: 7,
+    order: 9,
     key: 'members',
     title: 'Members Dashboard',
     icon: <TeamOutlined />,
@@ -114,7 +147,8 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 8,
+    order: 10,
+    is_button: false,
     key: 'livestream',
     title: 'Livestream',
     icon: <ToolOutlined />,
@@ -122,7 +156,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
   },
   {
-    order: 9,
+    order: 11,
+    is_button: false,
     key: 'public_page',
     title: 'Public Page',
     icon: <GlobalOutlined />,
@@ -130,7 +165,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
   },
   {
-    order: 10,
+    order: 12,
+    is_button: false,
     key: 'get_paid',
     title: 'Get Paid',
     icon: <DollarOutlined />,
@@ -138,7 +174,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 11,
+    order: 13,
     key: 'site_settings',
     title: 'Site Settings',
     icon: <SettingOutlined />,
@@ -160,7 +196,8 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 12,
+    order: 14,
+    is_button: false,
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,
@@ -168,7 +205,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
   },
   {
-    order: 13,
+    order: 15,
+    is_button: false,
     key: 'documents',
     title: 'Document Drive',
     icon: <FilePdfOutlined />,
@@ -176,7 +214,8 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
   {
-    order: 14,
+    order: 16,
+    is_button: false,
     key: 'newsletter',
     title: 'Newsletter',
     icon: <AuditOutlined />,
@@ -184,7 +223,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.newsletter,
   },
   {
-    order: 15,
+    order: 17,
     key: 'advanced_settings',
     title: 'Advanced Settings',
     icon: <ControlOutlined />,
