@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Button, Typography, Space, Drawer, Collapse, Popconfirm } from 'antd';
+import { Row, Col, Card, Button, Typography, Space, Drawer, Collapse, Popconfirm } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -17,7 +17,7 @@ import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 const {
   formatDate: { toLongDateWithDayTime },
@@ -25,7 +25,10 @@ const {
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState([]);
-  const [subscriptionOrders, setSubscriptionOrders] = useState([]);
+  const [subscriptionOrders, setSubscriptionOrders] = useState({
+    active: [],
+    expired: [],
+  });
   const [expandedActiveRowKeys, setExpandedActiveRowKeys] = useState([]);
   const [expandedExpiredRowKeys, setExpandedExpiredRowKeys] = useState([]);
 
@@ -152,14 +155,31 @@ const Subscriptions = () => {
     setIsLoading(false);
   }, [fetchSubscriptionUsageDetails]);
 
-  const cancelSubscription = async (subscriptionOrderId) => {
+  const cancelSubscription = async (subscriptionOrder) => {
+    if (subscriptionOrder.cancellation_date) {
+      showErrorModal(
+        'Subscription already cancelled',
+        'You cannot cancel this subscription as it is already cancelled.'
+      );
+      return;
+    }
+
     setIsLoading(true);
+    const subscriptionOrderId = subscriptionOrder.subscription_order_id;
 
     try {
       const { status } = await apis.subscriptions.cancelSubscriptionOrder(subscriptionOrderId);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Subscription has been cancelled!');
+        showSuccessModal(
+          'Subscription has been cancelled',
+          <>
+            <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
+            <Paragraph>
+              However you can still use it as long as it's not expired and there's still sufficient credits.
+            </Paragraph>
+          </>
+        );
         fetchUserSubscriptionOrders();
       }
     } catch (error) {
@@ -250,6 +270,13 @@ const Subscriptions = () => {
     }
   };
 
+  const renderRemainingCreditsForSubscription = (subscriptionOrder) => (
+    <Space size="small" direction="vertical" align="left">
+      {generateRemainingCreditsText(subscriptionOrder, false)}
+      {subscriptionOrder.products['COURSE'] && generateRemainingCreditsText(subscriptionOrder, true)}
+    </Space>
+  );
+
   const generateSubscriptionColumns = (active) => [
     {
       title: 'Subscription Name',
@@ -260,12 +287,7 @@ const Subscriptions = () => {
     {
       title: 'Status',
       width: '250px',
-      render: (text, record) => (
-        <Space size="small" direction="vertical" align="left">
-          {generateRemainingCreditsText(record, false)}
-          {record.products['COURSE'] && generateRemainingCreditsText(record, true)}
-        </Space>
-      ),
+      render: (text, record) => renderRemainingCreditsForSubscription(record),
     },
     {
       title: (
@@ -286,13 +308,22 @@ const Subscriptions = () => {
             <Col>
               <Popconfirm
                 arrowPointAtCenter
-                title={<Text> Are you sure about cancelling this subcription? </Text>}
-                onConfirm={() => cancelSubscription(record.subscription_order_id)}
+                title={
+                  <>
+                    {' '}
+                    <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
+                    <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
+                    <Paragraph>
+                      However you can still use it as long as it's not expired and there's still sufficient credits.
+                    </Paragraph>{' '}
+                  </>
+                }
+                onConfirm={() => cancelSubscription(record)}
                 okText="Yes, cancel this subscription"
                 okButtonProps={{ danger: true, type: 'primary' }}
                 cancelText="No"
               >
-                <Button danger type="link">
+                <Button danger type="link" disabled={Boolean(record.cancellation_date)}>
                   Cancel
                 </Button>
               </Popconfirm>
@@ -348,7 +379,27 @@ const Subscriptions = () => {
     },
   ];
 
-  const renderSubscriptionDetails = (subscription) => {
+  const renderMobileSubscriptionUsageList = (subscriptionUsageList) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={6}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={18}>: {value}</Col>
+      </Row>
+    );
+
+    return subscriptionUsageList.map((subscriptionUsage) => (
+      <Col xs={24} key={subscriptionUsage.order_id}>
+        <Card title={subscriptionUsage.name}>
+          {layout('Product', renderProductOrderType(subscriptionUsage.type))}
+          {layout('Buy Date', toLongDateWithDayTime(subscriptionUsage.booking_time))}
+        </Card>
+      </Col>
+    ));
+  };
+
+  const renderSubscriptionDetails = (subscription, isActive) => {
     const subscriptionDetails = subscription;
 
     return (
@@ -362,7 +413,7 @@ const Subscriptions = () => {
             <Text> Credits details: </Text>
           </Col>
 
-          <Col xs={24} className={styles.subSection}>
+          <Col xs={24} className={isMobileDevice ? undefined : styles.subSection}>
             <Space align="left">
               <Row gutter={[8, 8]}>
                 <Col xs={24}>
@@ -384,8 +435,8 @@ const Subscriptions = () => {
               <Col xs={24}>
                 <Text> Usable for products: </Text>
               </Col>
-              <Col xs={24} className={styles.subSection}>
-                <Space direction={isMobileDevice ? 'vertical' : 'horizontal'}>
+              <Col xs={24} className={isMobileDevice ? undefined : styles.subSection}>
+                <Space direction="horizontal">
                   {Object.entries(subscription?.products).map(([key, val]) => (
                     <Button
                       onClick={() => showProductsDetails(subscription, key)}
@@ -406,11 +457,17 @@ const Subscriptions = () => {
                 <Title level={5}> Usage History </Title>
               </Col>
               <Col xs={24}>
-                <Table
-                  columns={subscriptionUsageColumns}
-                  data={subscription.usage_details}
-                  rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
-                />
+                {isMobileDevice ? (
+                  <Row gutter={[8, 8]} justify="center">
+                    {renderMobileSubscriptionUsageList(subscription.usage_details, isActive)}
+                  </Row>
+                ) : (
+                  <Table
+                    columns={subscriptionUsageColumns}
+                    data={subscription.usage_details}
+                    rowKey={(record) => `${record.name}_${record.booking_time}`}
+                  />
+                )}
               </Col>
             </Row>
           </Col>
@@ -419,7 +476,83 @@ const Subscriptions = () => {
     );
   };
 
-  // TODO: Mobile UI For this
+  const generateMobileActionButtons = (subscriptionOrderDetails, isActive) => {
+    let buttonsArr = [];
+
+    if (isActive) {
+      buttonsArr.push(
+        <Popconfirm
+          arrowPointAtCenter
+          title={
+            <>
+              {' '}
+              <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
+              <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
+              <Paragraph>
+                However you can still use it as long as it's not expired and there's still sufficient credits.
+              </Paragraph>{' '}
+            </>
+          }
+          onConfirm={() => cancelSubscription(subscriptionOrderDetails)}
+          okText="Yes, cancel this subscription"
+          okButtonProps={{ danger: true, type: 'primary' }}
+          cancelText="No"
+        >
+          <Button danger type="link" disabled={Boolean(subscriptionOrderDetails.cancellation_date)}>
+            Cancel
+          </Button>
+        </Popconfirm>
+      );
+
+      buttonsArr.push(
+        expandedActiveRowKeys.includes(subscriptionOrderDetails.subscription_order_id) ? (
+          <Button type="link" onClick={() => collapseActiveRow(subscriptionOrderDetails.subscription_order_id)}>
+            Details <UpOutlined />
+          </Button>
+        ) : (
+          <Button type="link" onClick={() => expandActiveRow(subscriptionOrderDetails.subscription_order_id)}>
+            Details <DownOutlined />
+          </Button>
+        )
+      );
+    } else {
+      buttonsArr.push(
+        expandedExpiredRowKeys.includes(subscriptionOrderDetails.subscription_order_id) ? (
+          <Button type="link" onClick={() => collapseExpiredRow(subscriptionOrderDetails.subscription_order_id)}>
+            Details <UpOutlined />
+          </Button>
+        ) : (
+          <Button type="link" onClick={() => expandExpiredRow(subscriptionOrderDetails.subscription_order_id)}>
+            Details <DownOutlined />
+          </Button>
+        )
+      );
+    }
+
+    return buttonsArr;
+  };
+
+  const renderMobileSubscriptionOrderList = (subscriptionOrdersList, isActive) => {
+    return subscriptionOrdersList.map((subscriptionOrder) => (
+      <Col xs={24} key={subscriptionOrder.subscription_order_id}>
+        <Card
+          title={subscriptionOrder.subscription_name}
+          actions={generateMobileActionButtons(subscriptionOrder, isActive)}
+        >
+          <Row gutter={[8, 8]}>
+            <Col xs={12}>Remaining Credits:</Col>
+            <Col xs={24}>{renderRemainingCreditsForSubscription(subscriptionOrder)}</Col>
+          </Row>
+        </Card>
+        {((isActive && expandedActiveRowKeys.includes(subscriptionOrder.subscription_order_id)) ||
+          expandedExpiredRowKeys.includes(subscriptionOrder.subscription_order_id)) && (
+          <Row gutter={[8, 4]} justify="center">
+            {renderMobileSubscriptionUsageList(subscriptionOrder.usage_details)}
+          </Row>
+        )}
+      </Col>
+    ));
+  };
 
   return (
     <div className={styles.box}>
@@ -430,32 +563,64 @@ const Subscriptions = () => {
         <Col xs={24}>
           <Collapse defaultActiveKey="active">
             <Panel header={<Title level={5}> Active </Title>} key="active">
-              <Table
-                columns={generateSubscriptionColumns(true)}
-                data={subscriptionOrders.active}
-                loading={isLoading}
-                rowKey={(record) => record.subscription_order_id}
-                expandable={{
-                  expandedRowRender: renderSubscriptionDetails,
-                  expandRowByClick: true,
-                  expandIconColumnIndex: -1,
-                  expandedRowKeys: expandedActiveRowKeys,
-                }}
-              />
+              {isMobileDevice ? (
+                <Row gutter={[8, 8]}>
+                  <Col xs={24}>
+                    <Button block ghost type="primary" onClick={() => toggleExpandAllActiveRow()}>
+                      {expandedActiveRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                    </Button>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]} justify="center">
+                      {renderMobileSubscriptionOrderList(subscriptionOrders.active, true)}
+                    </Row>
+                  </Col>
+                </Row>
+              ) : (
+                <Table
+                  columns={generateSubscriptionColumns(true)}
+                  data={subscriptionOrders.active}
+                  loading={isLoading}
+                  rowKey={(record) => record.subscription_order_id}
+                  expandable={{
+                    expandedRowRender: (record) => renderSubscriptionDetails(record, true),
+                    expandRowByClick: true,
+                    expandIconColumnIndex: -1,
+                    expandedRowKeys: expandedActiveRowKeys,
+                  }}
+                />
+              )}
             </Panel>
             <Panel header={<Title level={5}> Expired </Title>} key="expired">
-              <Table
-                columns={generateSubscriptionColumns(false)}
-                data={subscriptionOrders.expired}
-                loading={isLoading}
-                rowKey={(record) => record.subscription_order_id}
-                expandable={{
-                  expandedRowRender: renderSubscriptionDetails,
-                  expandRowByClick: true,
-                  expandIconColumnIndex: -1,
-                  expandedRowKeys: expandedExpiredRowKeys,
-                }}
-              />
+              {isMobileDevice ? (
+                <Row gutter={[8, 8]}>
+                  <Col xs={24}>
+                    <Col xs={24}>
+                      <Button block ghost type="primary" onClick={() => toggleExpandAllExpiredRow()}>
+                        {expandedExpiredRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                      </Button>
+                    </Col>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[8, 8]} justify="center">
+                      {renderMobileSubscriptionOrderList(subscriptionOrders.expired, false)}
+                    </Row>
+                  </Col>
+                </Row>
+              ) : (
+                <Table
+                  columns={generateSubscriptionColumns(false)}
+                  data={subscriptionOrders.expired}
+                  loading={isLoading}
+                  rowKey={(record) => record.subscription_order_id}
+                  expandable={{
+                    expandedRowRender: (record) => renderSubscriptionDetails(record, false),
+                    expandRowByClick: true,
+                    expandIconColumnIndex: -1,
+                    expandedRowKeys: expandedExpiredRowKeys,
+                  }}
+                />
+              )}
             </Panel>
           </Collapse>
         </Col>
