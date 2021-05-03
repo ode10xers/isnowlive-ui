@@ -1,11 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Button, Typography, Space } from 'antd';
+import { Row, Col, Button, Typography, Space, Drawer, Collapse } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import Table from 'components/Table';
+import VideoCard from 'components/VideoCard';
+import SessionCards from 'components/SessionCards';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
@@ -15,11 +17,54 @@ import { isMobileDevice } from 'utils/device';
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState([]);
   const [subscriptionOrders, setSubscriptionOrders] = useState([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedActiveRowKeys, setExpandedActiveRowKeys] = useState([]);
+  const [expandedExpiredRowKeys, setExpandedExpiredRowKeys] = useState([]);
+
+  const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
+  const [selectedProductDetailsKey, setSelectedProductDetailsKey] = useState(null);
+  const [selectedSubscription, setSelectedSubscription] = useState(null);
+
+  const showProductsDetails = (subscription, productKey) => {
+    console.log(subscription);
+    setSelectedSubscription(subscription);
+    setSelectedProductDetailsKey(productKey);
+    setDetailsDrawerVisible(true);
+  };
+
+  const renderProductDetails = () => {
+    if (selectedSubscription) {
+      return selectedProductDetailsKey === 'SESSION' ? (
+        <SessionCards
+          sessions={selectedSubscription?.product_details['SESSION']}
+          shouldFetchInventories={true}
+          compactView={true}
+        />
+      ) : selectedProductDetailsKey === 'VIDEO' ? (
+        <Row gutter={[8, 8]} justify="center">
+          {selectedSubscription?.product_details['VIDEO'].map((video) => (
+            <Col xs={24} key={video.external_id}>
+              <VideoCard video={video} />
+            </Col>
+          ))}
+        </Row>
+      ) : (
+        <Text disabled> No product details to show </Text>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  const handleDrawerClose = (e) => {
+    setSelectedSubscription(null);
+    setSelectedProductDetailsKey(null);
+    setDetailsDrawerVisible(false);
+  };
 
   const fetchUserSubscriptionOrders = useCallback(async () => {
     setIsLoading(true);
@@ -27,9 +72,9 @@ const Subscriptions = () => {
     try {
       const { status, data } = await apis.subscriptions.getAttendeeSubscriptions();
       if (isAPISuccess(status) && data) {
-        setSubscriptionOrders(data.active);
+        setSubscriptionOrders(data);
         if (data.active.length > 0) {
-          setExpandedRowKeys([data.active[0].subscription_order_id]);
+          setExpandedActiveRowKeys([data.active[0].subscription_order_id]);
         }
         setIsLoading(false);
       }
@@ -52,21 +97,42 @@ const Subscriptions = () => {
     fetchUserSubscriptionOrders();
   }, [fetchUserSubscriptionOrders]);
 
-  const toggleExpandAllRow = () => {
-    if (expandedRowKeys.length > 0) {
-      setExpandedRowKeys([]);
+  const toggleExpandAllActiveRow = () => {
+    if (expandedActiveRowKeys.length > 0) {
+      setExpandedActiveRowKeys([]);
     } else {
-      setExpandedRowKeys(subscriptionOrders.map((subscriptionOrder) => subscriptionOrder.subscription_order_id));
+      setExpandedActiveRowKeys(
+        subscriptionOrders.active.map((subscriptionOrder) => subscriptionOrder.subscription_order_id)
+      );
     }
   };
 
-  const expandRow = (rowKey) => {
-    const tempExpandedRowsArray = expandedRowKeys;
+  const expandActiveRow = (rowKey) => {
+    const tempExpandedRowsArray = expandedActiveRowKeys;
     tempExpandedRowsArray.push(rowKey);
-    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+    setExpandedActiveRowKeys([...new Set(tempExpandedRowsArray)]);
   };
 
-  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
+  const collapseActiveRow = (rowKey) => setExpandedActiveRowKeys(expandedActiveRowKeys.filter((key) => key !== rowKey));
+
+  const toggleExpandAllExpiredRow = () => {
+    if (expandedExpiredRowKeys.length > 0) {
+      setExpandedExpiredRowKeys([]);
+    } else {
+      setExpandedExpiredRowKeys(
+        subscriptionOrders.expired.map((subscriptionOrder) => subscriptionOrder.subscription_order_id)
+      );
+    }
+  };
+
+  const expandExpiredRow = (rowKey) => {
+    const tempExpandedRowsArray = expandedExpiredRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedExpiredRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseExpiredRow = (rowKey) =>
+    setExpandedExpiredRowKeys(expandedExpiredRowKeys.filter((key) => key !== rowKey));
 
   const generateRemainingCreditsText = (subscription, isCourse = false) => {
     let remainingCredits = 0;
@@ -94,10 +160,7 @@ const Subscriptions = () => {
     );
   };
 
-  const showProductsDetails = () => {};
-
-  //TODO: Adjust the keys with the data format
-  const generateSubscriptionColumns = () => [
+  const generateSubscriptionColumns = (active) => [
     {
       title: 'Subscription Name',
       dataIndex: 'subscription_name',
@@ -116,28 +179,46 @@ const Subscriptions = () => {
     },
     {
       title: (
-        <Button block ghost type="primary" onClick={() => toggleExpandAllRow()}>
-          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        <Button
+          block
+          ghost
+          type="primary"
+          onClick={() => (active ? toggleExpandAllActiveRow() : toggleExpandAllExpiredRow())}
+        >
+          {(active && expandedActiveRowKeys.length > 0) || expandedExpiredRowKeys.length > 0 ? 'Collapse' : 'Expand'}{' '}
+          All
         </Button>
       ),
       width: '200px',
       render: (text, record) => (
         <Row gutter={[8, 8]} justify="end">
-          <Col>
-            <Button danger type="link" onClick={() => cancelSubscription(record.subscription_order_id)}>
-              Cancel
-            </Button>
-          </Col>
+          {active && (
+            <Col>
+              <Button danger type="link" onClick={() => cancelSubscription(record.subscription_order_id)}>
+                Cancel
+              </Button>
+            </Col>
+          )}
           <Col>
             <Button
               type="link"
               onClick={
-                expandedRowKeys.includes(record.subscription_order_id)
-                  ? () => collapseRow(record.subscription_order_id)
-                  : () => expandRow(record.subscription_order_id)
+                active
+                  ? expandedActiveRowKeys.includes(record.subscription_order_id)
+                    ? () => collapseActiveRow(record.subscription_order_id)
+                    : () => expandActiveRow(record.subscription_order_id)
+                  : expandedExpiredRowKeys.includes(record.subscription_order_id)
+                  ? () => collapseExpiredRow(record.subscription_order_id)
+                  : () => expandExpiredRow(record.subscription_order_id)
               }
             >
-              Details {expandedRowKeys.includes(record.subscription_order_id) ? <UpOutlined /> : <DownOutlined />}
+              Details{' '}
+              {(active && expandedActiveRowKeys.includes(record.subscription_order_id)) ||
+              expandedExpiredRowKeys.includes(record.subscription_order_id) ? (
+                <UpOutlined />
+              ) : (
+                <DownOutlined />
+              )}
             </Button>
           </Col>
         </Row>
@@ -166,7 +247,6 @@ const Subscriptions = () => {
     },
   ];
 
-  // TODO: Confirm do we want to show it like in ShowcaseSubscriptionCards
   const renderSubscriptionDetails = (subscription) => {
     const subscriptionDetails = subscription;
 
@@ -206,7 +286,10 @@ const Subscriptions = () => {
               <Col xs={24} className={styles.subSection}>
                 <Space direction={isMobileDevice ? 'vertical' : 'horizontal'}>
                   {Object.entries(subscription?.products).map(([key, val]) => (
-                    <Button onClick={() => showProductsDetails(key)} key={`${subscription?.external_id}_${key}`}>
+                    <Button
+                      onClick={() => showProductsDetails(subscription, key)}
+                      key={`${subscription?.external_id}_${key}`}
+                    >
                       {' '}
                       {val.product_ids.length} {key.toLowerCase()}s{' '}
                     </Button>
@@ -242,20 +325,46 @@ const Subscriptions = () => {
           <Title level={4}> My Membership </Title>
         </Col>
         <Col xs={24}>
-          <Table
-            columns={generateSubscriptionColumns()}
-            data={subscriptionOrders}
-            loading={isLoading}
-            rowKey={(record) => record.subscription_order_id}
-            expandable={{
-              expandedRowRender: renderSubscriptionDetails,
-              expandRowByClick: true,
-              expandIconColumnIndex: -1,
-              expandedRowKeys: expandedRowKeys,
-            }}
-          />
+          <Collapse defaultActiveKey="active">
+            <Panel header={<Title level={5}> Active </Title>} key="active">
+              <Table
+                columns={generateSubscriptionColumns(true)}
+                data={subscriptionOrders.active}
+                loading={isLoading}
+                rowKey={(record) => record.subscription_order_id}
+                expandable={{
+                  expandedRowRender: renderSubscriptionDetails,
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedActiveRowKeys,
+                }}
+              />
+            </Panel>
+            <Panel header={<Title level={5}> Expired </Title>} key="expired">
+              <Table
+                columns={generateSubscriptionColumns(false)}
+                data={subscriptionOrders.expired}
+                loading={isLoading}
+                rowKey={(record) => record.subscription_order_id}
+                expandable={{
+                  expandedRowRender: renderSubscriptionDetails,
+                  expandRowByClick: true,
+                  expandIconColumnIndex: -1,
+                  expandedRowKeys: expandedExpiredRowKeys,
+                }}
+              />
+            </Panel>
+          </Collapse>
         </Col>
       </Row>
+      <Drawer
+        title={`${selectedSubscription?.subscription_name} ${selectedProductDetailsKey?.toLowerCase()} details`}
+        onClose={handleDrawerClose}
+        visible={detailsDrawerVisible}
+        width={isMobileDevice ? 320 : 520}
+      >
+        {renderProductDetails()}
+      </Drawer>
     </div>
   );
 };
