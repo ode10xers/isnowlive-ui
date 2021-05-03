@@ -537,6 +537,13 @@ const NavbarHeader = () => {
                           >
                             <span className={styles.menuLink}>My Courses</span>
                           </li>
+                          <li
+                            key="Attendee Subscriptions"
+                            className={isActive('/attendee/dashboard/subscriptions') ? styles.active : undefined}
+                            onClick={() => redirectToDashboard('/subscriptions')}
+                          >
+                            <span className={styles.menuLink}>My Memberships</span>
+                          </li>
                         </>
                       )}
                     </ul>

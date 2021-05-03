@@ -539,7 +539,7 @@ const Subscriptions = () => {
           actions={generateMobileActionButtons(subscriptionOrder, isActive)}
         >
           <Row gutter={[8, 8]}>
-            <Col xs={12}>Remaining Credits:</Col>
+            <Col xs={24}>Remaining Credits:</Col>
             <Col xs={24}>{renderRemainingCreditsForSubscription(subscriptionOrder)}</Col>
           </Row>
         </Card>
