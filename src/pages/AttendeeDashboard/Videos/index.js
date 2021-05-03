@@ -65,10 +65,10 @@ const Videos = () => {
         }
       >
         <Row gutter={[10, 10]}>
-          <Col xs={24} md={12} xl={8}>
+          <Col xs={24} md={12} xl={10}>
             <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
           </Col>
-          <Col xs={24} md={12} xl={16}>
+          <Col xs={24} md={12} xl={14}>
             <Row>
               <Col xs={24}>
                 <Title level={4}>{video.title}</Title>
@@ -84,7 +84,12 @@ const Videos = () => {
               </Col>
               <Col xs={24}>
                 <Text type="secondary" className={styles.expiryText}>
-                  Available Till : {toLongDateWithDayTime(video.expiry)}
+                  Available from :
+                </Text>
+              </Col>
+              <Col xs={24}>
+                <Text type="secondary" className={styles.expiryText}>
+                  {toLongDateWithDayTime(video.beginning)} - {toLongDateWithDayTime(video.expiry)}
                 </Text>
               </Col>
             </Row>

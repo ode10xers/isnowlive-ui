@@ -42,7 +42,8 @@ const VideoCard = ({
       return (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
-            Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
+            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
+            {toLongDateWithDayTime(orderDetails.expiry)}
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
@@ -50,7 +51,7 @@ const VideoCard = ({
           </Text>
           <Divider className={classNames(styles.divider, styles.horizontal)} />
           <Text strong className={styles.blueText}>
-            You have watched {orderDetails.num_views} times
+            You've watched {orderDetails.num_views} times
           </Text>
         </Space>
       );
@@ -59,13 +60,14 @@ const VideoCard = ({
     return (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
-          Available Till : {toLongDateWithDayTime(orderDetails.expiry)}
+          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
+          {toLongDateWithDayTime(orderDetails.expiry)}
         </Title>
         <Title level={5} className={styles.blueText}>
           Allowed Watches : {orderDetails.watch_limit}
         </Title>
         <Title level={5} className={styles.blueText}>
-          You have watched {orderDetails.num_views} times
+          You've watched {orderDetails.num_views} times
         </Title>
       </Space>
     );
