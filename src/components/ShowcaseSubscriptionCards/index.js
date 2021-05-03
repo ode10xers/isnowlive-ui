@@ -120,7 +120,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
               }}
               onClick={() => openPurchaseModal(subscription)}
             >
-              Buy Subscription
+              Buy Membership
             </Button>
           </Col>
         </Row>
