@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, List, Modal } from 'antd';
+import { Row, Col, Button, Typography, List, Modal, Divider } from 'antd';
 
 import apis from 'apis';
 
@@ -264,21 +264,27 @@ const Subscriptions = () => {
     }
 
     return segmentedSubscriptions.map((segmentedSubs) => (
-      <Col xs={24} key={segmentedSubs[0].external_id || 'button'}>
-        <Row gutter={10} justify="start">
-          <Col xs={7} xl={6}>
-            <List
-              itemLayout="vertical"
-              size="large"
-              dataSource={subscriptionFields}
-              renderItem={renderSubscriptionFields}
-            />
-          </Col>
-          <Col xs={17} xl={18}>
-            <List grid={{ gutter: 8, column: 3 }} dataSource={segmentedSubs} renderItem={renderSubscriptionList} />
-          </Col>
-        </Row>
-      </Col>
+      <>
+        <Col xs={24} key={segmentedSubs[0].external_id || 'button'}>
+          <Row gutter={10} justify="start">
+            <Col xs={7} xl={6}>
+              <List
+                itemLayout="vertical"
+                size="large"
+                dataSource={subscriptionFields}
+                renderItem={renderSubscriptionFields}
+              />
+            </Col>
+            <Col xs={17} xl={18}>
+              <List grid={{ gutter: 8, column: 3 }} dataSource={segmentedSubs} renderItem={renderSubscriptionList} />
+            </Col>
+          </Row>
+        </Col>
+        <Col xs={24}>
+          {' '}
+          <Divider type="horizontal" />
+        </Col>
+      </>
     ));
   };
 

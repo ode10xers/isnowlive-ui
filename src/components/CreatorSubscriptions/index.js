@@ -12,7 +12,7 @@ import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 import dateUtil from 'utils/date';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { isAPISuccess, orderType } from 'utils/helper';
-import { isMobileDevice } from 'utils/device';
+// import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -122,10 +122,10 @@ const CreatorSubscriptions = ({ subscriptions }) => {
         <Row gutter={[8, 10]}>
           <Col xs={24}>
             <List
-              pagination={{ pageSize: isMobileDevice ? 1 : 3, position: 'top' }}
+              // pagination={{ pageSize: isMobileDevice ? 1 : 3, position: 'top' }}
               header={<div className={styles.p10}></div>}
               rowKey={(record) => record.external_id}
-              grid={{ gutter: 10, column: 3 }}
+              grid={{ gutter: 10, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }}
               dataSource={subscriptions}
               renderItem={renderShowcaseSubscriptionCards}
             />
