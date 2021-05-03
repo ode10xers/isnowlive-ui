@@ -267,7 +267,7 @@ const Subscriptions = () => {
       <>
         <Col xs={24} key={segmentedSubs[0].external_id || 'button'}>
           <Row gutter={10} justify="start">
-            <Col xs={7} xl={6}>
+            <Col xs={5}>
               <List
                 itemLayout="vertical"
                 size="large"
@@ -275,7 +275,7 @@ const Subscriptions = () => {
                 renderItem={renderSubscriptionFields}
               />
             </Col>
-            <Col xs={17} xl={18}>
+            <Col xs={19}>
               <List grid={{ gutter: 8, column: 3 }} dataSource={segmentedSubs} renderItem={renderSubscriptionList} />
             </Col>
           </Row>
