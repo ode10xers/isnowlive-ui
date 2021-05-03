@@ -297,7 +297,7 @@ export const attendeeMenuItems = [
   {
     order: 5,
     key: 'subscription',
-    title: 'Memberships',
+    title: 'Membership Subscriptions',
     icon: <ScheduleOutlined />,
     mixPanelTag: attendee.click.dashboard.subscriptionsNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions,

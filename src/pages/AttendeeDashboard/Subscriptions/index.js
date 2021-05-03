@@ -382,16 +382,16 @@ const Subscriptions = () => {
   const renderMobileSubscriptionUsageList = (subscriptionUsageList) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={6}>
+        <Col span={9}>
           <Text strong>{label}</Text>
         </Col>
-        <Col span={18}>: {value}</Col>
+        <Col span={15}>: {value}</Col>
       </Row>
     );
 
     return subscriptionUsageList.map((subscriptionUsage) => (
       <Col xs={24} key={subscriptionUsage.order_id}>
-        <Card title={subscriptionUsage.name}>
+        <Card title={subscriptionUsage.name} bodyStyle={{ padding: 10 }}>
           {layout('Product', renderProductOrderType(subscriptionUsage.type))}
           {layout('Buy Date', toLongDateWithDayTime(subscriptionUsage.booking_time))}
         </Card>
@@ -482,7 +482,6 @@ const Subscriptions = () => {
     if (isActive) {
       buttonsArr.push(
         <Popconfirm
-          arrowPointAtCenter
           title={
             <>
               {' '}
@@ -546,9 +545,9 @@ const Subscriptions = () => {
         </Card>
         {((isActive && expandedActiveRowKeys.includes(subscriptionOrder.subscription_order_id)) ||
           expandedExpiredRowKeys.includes(subscriptionOrder.subscription_order_id)) && (
-          <Row gutter={[8, 4]} justify="center">
-            {renderMobileSubscriptionUsageList(subscriptionOrder.usage_details)}
-          </Row>
+          <div className={styles.mobileSubscriptionDetailsWrapper}>
+            {renderSubscriptionDetails(subscriptionOrder, isActive)}
+          </div>
         )}
       </Col>
     ));
