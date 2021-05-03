@@ -322,6 +322,7 @@ const Subscriptions = () => {
                 okText="Yes, cancel this subscription"
                 okButtonProps={{ danger: true, type: 'primary' }}
                 cancelText="No"
+                disabled={Boolean(record.cancellation_date)}
               >
                 <Button danger type="link" disabled={Boolean(record.cancellation_date)}>
                   Cancel
@@ -496,6 +497,7 @@ const Subscriptions = () => {
           okText="Yes, cancel this subscription"
           okButtonProps={{ danger: true, type: 'primary' }}
           cancelText="No"
+          disabled={Boolean(subscriptionOrderDetails.cancellation_date)}
         >
           <Button danger type="link" disabled={Boolean(subscriptionOrderDetails.cancellation_date)}>
             Cancel
