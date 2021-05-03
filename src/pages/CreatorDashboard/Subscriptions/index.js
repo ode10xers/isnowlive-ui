@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, List, Modal, Divider } from 'antd';
+import { Row, Col, Button, Typography, List, Modal, Divider, Space } from 'antd';
 
 import apis from 'apis';
 
@@ -264,27 +264,19 @@ const Subscriptions = () => {
     }
 
     return segmentedSubscriptions.map((segmentedSubs) => (
-      <>
-        <Col xs={24} key={segmentedSubs[0].external_id || 'button'}>
-          <Row gutter={10} justify="start">
-            <Col xs={5}>
-              <List
-                itemLayout="vertical"
-                size="large"
-                dataSource={subscriptionFields}
-                renderItem={renderSubscriptionFields}
-              />
-            </Col>
-            <Col xs={19}>
-              <List grid={{ gutter: 8, column: 3 }} dataSource={segmentedSubs} renderItem={renderSubscriptionList} />
-            </Col>
-          </Row>
+      <Row gutter={10} justify="start" key={segmentedSubs[0].external_id || 'button'}>
+        <Col xs={5}>
+          <List
+            itemLayout="vertical"
+            size="large"
+            dataSource={subscriptionFields}
+            renderItem={renderSubscriptionFields}
+          />
         </Col>
-        <Col xs={24}>
-          {' '}
-          <Divider type="horizontal" />
+        <Col xs={19}>
+          <List grid={{ gutter: 8, column: 3 }} dataSource={segmentedSubs} renderItem={renderSubscriptionList} />
         </Col>
-      </>
+      </Row>
     ));
   };
 
@@ -296,7 +288,9 @@ const Subscriptions = () => {
         </Col>
         <Col xs={24}>
           <Loader size="large" loading={isLoading} text="Fetching memberships...">
-            <Row gutter={[8, 8]}>{renderSubscriptionRows()}</Row>
+            <Space split={<Divider type="horizontal" />} direction="vertical" className={styles.creatorMembershipList}>
+              {renderSubscriptionRows()}
+            </Space>
           </Loader>
         </Col>
       </Row>
