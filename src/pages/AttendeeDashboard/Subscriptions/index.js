@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Button, Typography, Space, Drawer, Collapse } from 'antd';
+import { Row, Col, Button, Typography, Space, Drawer, Collapse, Popconfirm } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -10,7 +10,8 @@ import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import dateUtil from 'utils/date';
+import { isAPISuccess, orderType } from 'utils/helper';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { isMobileDevice } from 'utils/device';
 
@@ -18,6 +19,9 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
+const {
+  formatDate: { toLongDateWithDayTime },
+} = dateUtil;
 
 const Subscriptions = () => {
   const [isLoading, setIsLoading] = useState([]);
@@ -65,13 +69,75 @@ const Subscriptions = () => {
     setDetailsDrawerVisible(false);
   };
 
+  // TODO: Can put this to a generic helper
+  const fetchSubscriptionUsageDetails = useCallback(async (data) => {
+    let subscriptionOrdersArr = data;
+
+    await Promise.all([
+      ...data.active.map(async (activeSubscriptionOrder, idx) => {
+        try {
+          const [sessionUsageResponse, videoUsageResponse] = await Promise.all([
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.CLASS,
+              activeSubscriptionOrder.subscription_order_id
+            ),
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.VIDEO,
+              activeSubscriptionOrder.subscription_order_id
+            ),
+          ]);
+
+          if (isAPISuccess(sessionUsageResponse.status) && isAPISuccess(videoUsageResponse.status)) {
+            subscriptionOrdersArr.active[idx]['usage_details'] = [
+              ...(sessionUsageResponse.data || []),
+              ...(videoUsageResponse.data || []),
+            ];
+          }
+        } catch (error) {
+          console.error(
+            'Failed to fetch subscription usage for active subscription ',
+            activeSubscriptionOrder.subscription_order_id
+          );
+        }
+      }),
+      ...data.expired.map(async (expiredSubscriptionOrder, idx) => {
+        try {
+          const [sessionUsageResponse, videoUsageResponse] = await Promise.all([
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.CLASS,
+              expiredSubscriptionOrder.subscription_order_id
+            ),
+            apis.subscriptions.getSubscriptionOrderUsageDetails(
+              orderType.VIDEO,
+              expiredSubscriptionOrder.subscription_order_id
+            ),
+          ]);
+
+          if (isAPISuccess(sessionUsageResponse.status) && isAPISuccess(videoUsageResponse.status)) {
+            subscriptionOrdersArr.expired[idx]['usage_details'] = [
+              ...(sessionUsageResponse.data || []),
+              ...(videoUsageResponse.data || []),
+            ];
+          }
+        } catch (error) {
+          console.error(
+            'Failed to fetch subscription usage for expired subscription ',
+            expiredSubscriptionOrder.subscription_order_id
+          );
+        }
+      }),
+    ]);
+
+    return subscriptionOrdersArr;
+  }, []);
+
   const fetchUserSubscriptionOrders = useCallback(async () => {
     setIsLoading(true);
 
     try {
       const { status, data } = await apis.subscriptions.getAttendeeSubscriptions();
       if (isAPISuccess(status) && data) {
-        setSubscriptionOrders(data);
+        setSubscriptionOrders(await fetchSubscriptionUsageDetails(data));
         if (data.active.length > 0) {
           setExpandedActiveRowKeys([data.active[0].subscription_order_id]);
         }
@@ -84,7 +150,7 @@ const Subscriptions = () => {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [fetchSubscriptionUsageDetails]);
 
   const cancelSubscription = async (subscriptionOrderId) => {
     setIsLoading(true);
@@ -173,6 +239,17 @@ const Subscriptions = () => {
     );
   };
 
+  const renderProductOrderType = (productOrderType) => {
+    switch (productOrderType) {
+      case orderType.CLASS:
+        return 'Session';
+      case orderType.VIDEO:
+        return 'Video';
+      default:
+        return '';
+    }
+  };
+
   const generateSubscriptionColumns = (active) => [
     {
       title: 'Subscription Name',
@@ -207,9 +284,18 @@ const Subscriptions = () => {
         <Row gutter={[8, 8]} justify="end">
           {active && (
             <Col>
-              <Button danger type="link" onClick={() => cancelSubscription(record.subscription_order_id)}>
-                Cancel
-              </Button>
+              <Popconfirm
+                arrowPointAtCenter
+                title={<Text> Are you sure about cancelling this subcription? </Text>}
+                onConfirm={() => cancelSubscription(record.subscription_order_id)}
+                okText="Yes, cancel this subscription"
+                okButtonProps={{ danger: true, type: 'primary' }}
+                cancelText="No"
+              >
+                <Button danger type="link">
+                  Cancel
+                </Button>
+              </Popconfirm>
             </Col>
           )}
           <Col>
@@ -245,6 +331,7 @@ const Subscriptions = () => {
       dataIndex: 'type',
       key: 'type',
       width: '100px',
+      render: renderProductOrderType,
     },
     {
       title: 'Product Name',
@@ -254,9 +341,10 @@ const Subscriptions = () => {
     },
     {
       title: 'Date of Purchase',
-      dataIndex: 'date_of_purchase',
-      key: 'date_of_purchase',
+      dataIndex: 'booking_time',
+      key: 'booking_time',
       width: '150px',
+      render: (text) => toLongDateWithDayTime(text),
     },
   ];
 
@@ -320,7 +408,7 @@ const Subscriptions = () => {
               <Col xs={24}>
                 <Table
                   columns={subscriptionUsageColumns}
-                  data={subscription.redemptions}
+                  data={subscription.usage_details}
                   rowKey={(record) => `${record.name}_${record.date_of_purchase}`}
                 />
               </Col>
@@ -330,6 +418,8 @@ const Subscriptions = () => {
       </div>
     );
   };
+
+  // TODO: Mobile UI For this
 
   return (
     <div className={styles.box}>
