@@ -8,7 +8,7 @@ import apis from 'apis';
 import Table from 'components/Table';
 import VideoCard from 'components/VideoCard';
 import SessionCards from 'components/SessionCards';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import { generateBaseCreditsText } from 'utils/subscriptions';
@@ -30,7 +30,6 @@ const Subscriptions = () => {
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const showProductsDetails = (subscription, productKey) => {
-    console.log(subscription);
     setSelectedSubscription(subscription);
     setSelectedProductDetailsKey(productKey);
     setDetailsDrawerVisible(true);
@@ -76,10 +75,8 @@ const Subscriptions = () => {
         if (data.active.length > 0) {
           setExpandedActiveRowKeys([data.active[0].subscription_order_id]);
         }
-        setIsLoading(false);
       }
     } catch (error) {
-      setIsLoading(false);
       showErrorModal(
         'Failed to fetch subscription orders',
         error?.response?.data?.message || 'Something wrong happened'
@@ -89,8 +86,24 @@ const Subscriptions = () => {
     setIsLoading(false);
   }, []);
 
-  const cancelSubscription = (subscriptionOrderId) => {
-    console.log(subscriptionOrderId);
+  const cancelSubscription = async (subscriptionOrderId) => {
+    setIsLoading(true);
+
+    try {
+      const { status } = await apis.subscriptions.cancelSubscriptionOrder(subscriptionOrderId);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Subscription has been cancelled!');
+        fetchUserSubscriptionOrders();
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed to cancel subscription order',
+        error?.response?.data?.message || 'Something wrong happened'
+      );
+    }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {

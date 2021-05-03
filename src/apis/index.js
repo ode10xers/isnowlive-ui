@@ -155,6 +155,12 @@ export default {
     getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
     getSubscriptionsForCourse: (courseId) => http.get(`/subscriptions?course_id=${courseId}`),
     createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
+    cancelSubscriptionOrder: (subscriptionOrderId) =>
+      http.post(`/secure/customer/subscriptions/orders/${subscriptionOrderId}/cancel`),
+    getSubscriptionOrderUsageDetails: (productOrderType, subscriptionOrderId) =>
+      http.get(
+        `/secure/customer/orders/universal?type=${productOrderType}&source=SUBSCRIPTION&source_id=${subscriptionOrderId}`
+      ),
     getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders/'),
     getUserSubscriptionForSession: (sessionId) =>
       http.get(`/secure/customer/subscriptions/orders/?session_id=${sessionId}`),
