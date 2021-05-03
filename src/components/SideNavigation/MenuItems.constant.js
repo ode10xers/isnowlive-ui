@@ -116,8 +116,9 @@ export const creatorMenuItems = [
   },
   {
     order: 7,
+    is_button: false,
     key: 'subscriptions',
-    title: 'Membership',
+    title: 'Membership Subscriptions',
     icon: <ScheduleOutlined />,
     mixPanelTag: creator.click.dashboard.coursesNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
