@@ -359,12 +359,28 @@ const UploadVideoModal = ({
           });
         }
 
-        if (response.data) {
-          updateEditedVideo(response.data);
+        updateEditedVideo(response.data);
 
+        if (response.data.video_uid.length) {
+          apis.videos
+            .getVideoToken(response.data.external_id)
+            .then((res) => {
+              setVideoPreviewToken(res.data.token);
+              setFormPart(3);
+            })
+            .catch((error) => {
+              console.log(error);
+              showErrorModal(`Failed to get video token`);
+            });
+        } else {
+          setUppyListeners(response.data.external_id);
+          setFormPart(2);
+        }
+        /*
+        if (response.data) {
           if (response.data.video_uid.length) {
             apis.videos
-              .getVideoToken(editedVideo.external_id)
+              .getVideoToken(response.data.external_id)
               .then((res) => {
                 setVideoPreviewToken(res.data.token);
                 setFormPart(3);
@@ -394,6 +410,7 @@ const UploadVideoModal = ({
             setFormPart(2);
           }
         }
+        */
       }
     } catch (error) {
       showErrorModal(
