@@ -12,7 +12,7 @@ import TagListPopup from 'components/TagListPopup';
 import { isMobileDevice } from 'utils/device';
 
 const { Text } = Typography;
-const defaultBorderColor = '#f0f0f0';
+const defaultBorderColor = '#eeeeee';
 
 const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} }) => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
@@ -52,7 +52,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
     <>
       <Card
         hoverable={true}
-        style={{ border: `1px solid ${subscription?.color_code || '#ffffff'}` }}
+        style={{ border: `1px solid ${subscription?.color_code || defaultBorderColor}` }}
         headStyle={{ textAlign: 'center', borderBottom: `1px solid ${subscription?.color_code || defaultBorderColor}` }}
         bodyStyle={{ textAlign: 'center' }}
         title={
@@ -78,9 +78,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
               </Col>
             </Row>
           </Col>
-          <Col xs={24}>
-            <Divider type="horizontal" />
-          </Col>
+          <Divider type="horizontal" className={styles.compactDivider} />
           <Col xs={24} className={styles.includedProductsWrapper}>
             <Row gutter={[8, 10]} justify="center">
               {Object.entries(subscription?.products).map(([key, val]) => (
@@ -93,9 +91,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
               ))}
             </Row>
           </Col>
-          <Col xs={24}>
-            <Divider type="horizontal" />
-          </Col>
+          <Divider type="horizontal" className={styles.compactDivider} />
           {/* <Col xs={24} className={styles.includedCoursesWrapper}>
             <Row gutter={[8, 10]} justify="center">
               <Col xs={24}>

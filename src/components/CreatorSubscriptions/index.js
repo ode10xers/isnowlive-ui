@@ -116,14 +116,13 @@ const CreatorSubscriptions = ({ subscriptions }) => {
   );
 
   return (
-    <div>
+    <div className={styles.p10}>
       <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} text="Processing payment" size="large">
         <Row gutter={[8, 10]}>
           <Col xs={24}>
             <List
               // pagination={{ pageSize: isMobileDevice ? 1 : 3, position: 'top' }}
-              header={<div className={styles.p10}></div>}
               rowKey={(record) => record.external_id}
               grid={{ gutter: 10, xs: 1, sm: 1, md: 2, lg: 3, xl: 3, xxl: 3 }}
               dataSource={subscriptions}

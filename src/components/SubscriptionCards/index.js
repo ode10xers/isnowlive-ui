@@ -3,13 +3,14 @@ import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, Card, List, Popover } from 'antd';
 
-import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone } from '@ant-design/icons';
+import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone, EditOutlined } from '@ant-design/icons';
 
-import styles from './styles.module.scss';
 import TagListPopup from 'components/TagListPopup';
 
+import styles from './styles.module.scss';
+
 const { Text } = Typography;
-const whiteColor = '#ffffff';
+const defaultBorderColor = '#eeeeee';
 
 const SubscriptionCards = ({
   subscription,
@@ -110,37 +111,54 @@ const SubscriptionCards = ({
   return (
     <Card
       hoverable={true}
-      style={{ border: `2px solid ${subscription.color_code || whiteColor}` }}
-      headStyle={{ textAlign: 'center', borderBottom: `2px solid ${subscription.color_code || whiteColor}` }}
+      style={{ border: `2px solid ${subscription.color_code || defaultBorderColor}` }}
+      headStyle={{ textAlign: 'center', borderBottom: `2px solid ${subscription.color_code || defaultBorderColor}` }}
       title={
         <div className={styles.subscriptionNameWrapper}>
           <Text strong> {subscription.name} </Text>
         </div>
       }
+      extra={
+        <Button
+          disabled={editing}
+          type="link"
+          onClick={() => editSubscription(subscription.external_id)}
+          icon={<EditOutlined />}
+        />
+      }
       bodyStyle={{ padding: '0px 10px' }}
       actions={[
-        <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.external_id)}>
-          Delete
-        </Button>,
-        subscription.is_published ? (
-          <Button danger disabled={editing} type="link" onClick={() => unpublishSubscription(subscription.external_id)}>
-            {' '}
-            Hide{' '}
-          </Button>
-        ) : (
-          <Button
-            className={editing ? undefined : styles.greenText}
-            disabled={editing}
-            type="link"
-            onClick={() => publishSubscription(subscription.external_id)}
-          >
-            {' '}
-            Show{' '}
-          </Button>
-        ),
-        <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.external_id)}>
-          Edit
-        </Button>,
+        // <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.external_id)}>
+        //   Delete
+        // </Button>,
+        <div className={styles.p10}>
+          {subscription.is_published ? (
+            <Button
+              block
+              danger
+              disabled={editing}
+              type="primary"
+              onClick={() => unpublishSubscription(subscription.external_id)}
+            >
+              {' '}
+              Hide{' '}
+            </Button>
+          ) : (
+            <Button
+              block
+              className={editing ? undefined : styles.greenBtn}
+              disabled={editing}
+              type="primary"
+              onClick={() => publishSubscription(subscription.external_id)}
+            >
+              {' '}
+              Show{' '}
+            </Button>
+          )}
+        </div>,
+        // <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.external_id)}>
+        //   Edit
+        // </Button>,
       ]}
     >
       <List size="large" itemLayout="vertical" dataSource={cardData} renderItem={renderCardData} rowKey="label" />
