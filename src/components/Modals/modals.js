@@ -69,6 +69,13 @@ export const showSuccessModal = (title, message = '') => {
   });
 };
 
+export const showWarningModal = (title, message = '') => {
+  Modal.warning({
+    title: title || 'Warning',
+    content: message,
+  });
+};
+
 export const sendNewPasswordEmail = async (email) => await apis.user.sendNewPasswordEmail({ email });
 
 export const showSetNewPasswordModal = (email) => {

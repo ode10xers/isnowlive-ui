@@ -5,10 +5,14 @@
 }
 .coverImage {
   border-radius: 8px;
-  height: 100px;
+  height: 100px !important;
+
+  @media screen and (max-width: 768px) {
+    height: 200px !important;
+  }
 
   @media screen and (max-width: 569px) {
-    height: 200px;
+    height: 120px !important;
   }
 }
 .videoItem {
