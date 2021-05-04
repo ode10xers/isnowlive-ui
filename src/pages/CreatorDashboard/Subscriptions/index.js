@@ -43,25 +43,27 @@ const Subscriptions = () => {
       //TODO: Since the API is paginated right now the temporary solution is to set per_page as 25
       const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
 
+      let mappedSubscriptionData = [];
       if (isAPISuccess(status) && data.Data) {
-        let mappedSubscriptionData = [];
         mappedSubscriptionData = data.Data.sort((a, b) => a.price - b.price).map((subscription, idx) => ({
           ...subscription,
           idx,
         }));
-
-        const buttonData = mappedSubscriptionData.find((subscription) => subscription.external_id === null);
-
-        if (!buttonData) {
-          mappedSubscriptionData.push({
-            idx: mappedSubscriptionData.length,
-            external_id: null,
-            isButton: true,
-          });
-        }
-
-        setSubscriptions(mappedSubscriptionData);
       }
+
+      const buttonData = mappedSubscriptionData.find((subscription) => subscription.external_id === null);
+
+      if (!buttonData) {
+        mappedSubscriptionData.push({
+          idx: mappedSubscriptionData.length,
+          external_id: null,
+          isButton: true,
+        });
+      }
+
+      console.log('MAPPED SUBS DATA', mappedSubscriptionData);
+
+      setSubscriptions(mappedSubscriptionData);
     } catch (error) {
       showErrorModal('Failed to fetch memberships', error?.response?.data?.message || 'Something wrong happened');
     }
@@ -255,13 +257,14 @@ const Subscriptions = () => {
   );
 
   const renderSubscriptionRows = () => {
-    let tempSubscriptions = Array.from(subscriptions);
+    let tempSubscriptions = JSON.parse(JSON.stringify(subscriptions));
     let segmentedSubscriptions = [];
 
     while (tempSubscriptions.length > 0) {
-      segmentedSubscriptions.push(tempSubscriptions.slice(0, 3));
-      tempSubscriptions.splice(0, 3);
+      segmentedSubscriptions.push(tempSubscriptions.splice(0, 3));
     }
+
+    console.log(segmentedSubscriptions);
 
     return segmentedSubscriptions.map((segmentedSubs) => (
       <Row gutter={10} justify="start" key={segmentedSubs[0].external_id || 'button'}>

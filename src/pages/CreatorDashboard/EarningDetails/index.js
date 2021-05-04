@@ -75,7 +75,6 @@ const EarningDetails = ({ match }) => {
   }, [productType, productId]);
 
   useEffect(() => {
-    console.log('In Generic Earning Details');
     if (productType && productId && productDetails[productType]) {
       getEarningData();
     } else {
