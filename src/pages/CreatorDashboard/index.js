@@ -9,13 +9,9 @@ import Session from 'pages/Session';
 import Profile from 'pages/Profile';
 import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
-import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
-import SessionEarnings from 'pages/CreatorDashboard/SessionEarnings';
 import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
-import PassEarnings from 'pages/CreatorDashboard/PassEarnings';
-import VideoEarnings from 'pages/CreatorDashboard/VideoEarnings';
-import CourseEarnings from 'pages/CreatorDashboard/CourseEarnings';
-import SubscriptionEarnings from 'pages/CreatorDashboard/SubscriptionEarnings';
+import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
+import EarningDetails from 'pages/CreatorDashboard/EarningDetails';
 import Videos from 'pages/CreatorDashboard/Videos';
 import Courses from 'pages/CreatorDashboard/Courses';
 import Subscriptions from 'pages/CreatorDashboard/Subscriptions';
@@ -29,7 +25,6 @@ import MembersList from 'pages/CreatorDashboard/Members/MembersList';
 import MembersTags from 'pages/CreatorDashboard/AdvancedSettings/MembersTags';
 import MemberSettings from 'pages/CreatorDashboard/AdvancedSettings/MembersSettings';
 
-//TODO: Might want to refactor earning details page to be single component
 const CreatorDashboard = ({ match }) => {
   return (
     <Switch>
@@ -42,11 +37,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.editProfile} component={Profile} />
       <Route exact path={match.url + Routes.creatorDashboard.livestream} component={LiveStream} />
       <Route exact path={match.url + Routes.creatorDashboard.paymentAccount} component={PaymentAccount} />
-      <Route exact path={match.url + Routes.creatorDashboard.sessionEarnings} component={SessionEarnings} />
-      <Route exact path={match.url + Routes.creatorDashboard.passEarnings} component={PassEarnings} />
-      <Route exact path={match.url + Routes.creatorDashboard.videoEarnings} component={VideoEarnings} />
-      <Route exact path={match.url + Routes.creatorDashboard.courseEarnings} component={CourseEarnings} />
-      <Route exact path={match.url + Routes.creatorDashboard.subscriptionEarnings} component={SubscriptionEarnings} />
+      <Route exact path={match.url + Routes.creatorDashboard.earningDetails} component={EarningDetails} />
       <Route exact path={match.url + Routes.creatorDashboard.passes} component={ClassPassList} />
       <Route exact path={match.url + Routes.creatorDashboard.videos} component={Videos} />
       <Route exact path={match.url + Routes.creatorDashboard.courses} component={Courses} />

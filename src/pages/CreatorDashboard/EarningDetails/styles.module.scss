@@ -1,4 +1,5 @@
 @import '../../../styles/variables.scss';
+
 .box2 {
   border: 1px solid map-get($colors, $key: 'Gainsboro');
   background: map-get($colors, $key: 'White') !important;

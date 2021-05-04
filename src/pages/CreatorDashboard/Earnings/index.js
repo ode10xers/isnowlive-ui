@@ -330,7 +330,7 @@ const Earnings = () => {
   const openSessionDetails = (item) => {
     trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
     if (item?.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/inventory/${item.inventory_id}`);
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/session/${item.inventory_id}`);
     }
   };
 
