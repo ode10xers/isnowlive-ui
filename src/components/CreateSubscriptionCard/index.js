@@ -440,14 +440,15 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                 >
                   <Radio.Group>
                     <Radio value="anyone"> Anyone </Radio>
-                    <Radio value="selected"> Selected Tag Only </Radio>
+                    <Radio value="selected"> Selected Tag </Radio>
                   </Radio.Group>
                 </Form.Item>
                 <Form.Item className={styles.inlineFormItem}>
                   <Tooltip title="Understanding the tag options">
                     <Button
+                      size="small"
                       type="link"
-                      onClick={() => showTagOptionsHelperModal('pass')}
+                      onClick={() => showTagOptionsHelperModal('subscription')}
                       icon={<InfoCircleOutlined />}
                     />
                   </Tooltip>

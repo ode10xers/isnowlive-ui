@@ -355,6 +355,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                 <Form.Item className={styles.inlineFormItem}>
                   <Tooltip title="Understanding the tag options">
                     <Button
+                      size="small"
                       type="link"
                       onClick={() => showTagOptionsHelperModal('pass')}
                       icon={<InfoCircleOutlined />}

@@ -61,8 +61,6 @@ const Subscriptions = () => {
         });
       }
 
-      console.log('MAPPED SUBS DATA', mappedSubscriptionData);
-
       setSubscriptions(mappedSubscriptionData);
     } catch (error) {
       showErrorModal('Failed to fetch memberships', error?.response?.data?.message || 'Something wrong happened');

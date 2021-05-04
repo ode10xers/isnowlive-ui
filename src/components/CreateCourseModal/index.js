@@ -18,7 +18,7 @@ import {
   Checkbox,
   Radio,
 } from 'antd';
-import { BookTwoTone, TagOutlined } from '@ant-design/icons';
+import { BookTwoTone, TagOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
@@ -1039,7 +1039,12 @@ const CreateCourseModal = ({
                   </Radio.Group>
                 </Form.Item>
                 <Form.Item className={styles.inlineFormItem}>
-                  <Button type="link" onClick={() => showTagOptionsHelperModal('course')}>
+                  <Button
+                    size="small"
+                    type="link"
+                    onClick={() => showTagOptionsHelperModal('course')}
+                    icon={<InfoCircleOutlined />}
+                  >
                     Understanding the tag options
                   </Button>
                 </Form.Item>
