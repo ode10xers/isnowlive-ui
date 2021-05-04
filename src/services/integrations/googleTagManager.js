@@ -9,6 +9,7 @@ export const gtmTriggerEvents = {
   CREATOR_CREATE_SESSION: 'creator_create_session',
   CREATOR_CREATE_VIDEO: 'creator_create_video',
   CREATOR_UPLOAD_VIDEO: 'creator_upload_video',
+  STRIPE_CONNECT_FAILED: 'stripe_connect_failed',
 };
 
 // Note: for nulls/undefined in the code, we will send "NA"
