@@ -8,7 +8,6 @@ import VideoCard from 'components/VideoCard';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 
 import styles from './styles.module.scss';
-import TagListPopup from 'components/TagListPopup';
 import { isMobileDevice } from 'utils/device';
 
 const { Text } = Typography;
@@ -67,7 +66,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
               <Col xs={24}>
                 <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscription, false)}</div>
               </Col>
-              <Col xs={24} className={styles.includeTextWrapper}>
+              {/* <Col xs={24} className={styles.includeTextWrapper}>
                 <Text disabled> Purchasable By </Text>
               </Col>
               <Col xs={24}>
@@ -75,10 +74,10 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
                   {' '}
                   <TagListPopup tags={[subscription?.tag].filter((tag) => tag.external_id)} />{' '}
                 </Text>
-              </Col>
+              </Col> */}
             </Row>
           </Col>
-          <Divider type="horizontal" className={styles.compactDivider} />
+          {/* <Divider type="horizontal" className={styles.compactDivider} /> */}
           <Col xs={24} className={styles.includedProductsWrapper}>
             <Row gutter={[8, 10]} justify="center">
               {Object.entries(subscription?.products).map(([key, val]) => (
@@ -92,7 +91,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
             </Row>
           </Col>
           <Divider type="horizontal" className={styles.compactDivider} />
-          {/* <Col xs={24} className={styles.includedCoursesWrapper}>
+          {/*<Col xs={24} className={styles.includedCoursesWrapper}>
             <Row gutter={[8, 10]} justify="center">
               <Col xs={24}>
                 <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscription, true)}</div>
