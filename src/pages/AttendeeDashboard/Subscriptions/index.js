@@ -20,7 +20,7 @@ import styles from './styles.module.scss';
 const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 const {
-  formatDate: { toLongDateWithDayTime },
+  formatDate: { toLongDateWithDayTime, toShortDateWithYear },
 } = dateUtil;
 
 const Subscriptions = () => {
@@ -301,33 +301,40 @@ const Subscriptions = () => {
           All
         </Button>
       ),
-      width: '200px',
+      width: '250px',
       render: (text, record) => (
         <Row gutter={[8, 8]} justify="end">
           {active && (
             <Col>
-              <Popconfirm
-                arrowPointAtCenter
-                title={
-                  <>
-                    {' '}
-                    <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
-                    <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
-                    <Paragraph>
-                      However you can still use it as long as it's not expired and there's still sufficient credits.
-                    </Paragraph>{' '}
-                  </>
-                }
-                onConfirm={() => cancelSubscription(record)}
-                okText="Yes, cancel this subscription"
-                okButtonProps={{ danger: true, type: 'primary' }}
-                cancelText="No"
-                disabled={Boolean(record.cancellation_date)}
-              >
-                <Button danger type="link" disabled={Boolean(record.cancellation_date)}>
-                  Cancel
+              {record.cancellation_date ? (
+                <Button danger className={styles.dangerBtn} type="text" disabled>
+                  {' '}
+                  Cancelled on {toShortDateWithYear(record.cancellation_date)}{' '}
                 </Button>
-              </Popconfirm>
+              ) : (
+                <Popconfirm
+                  arrowPointAtCenter
+                  title={
+                    <>
+                      {' '}
+                      <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
+                      <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
+                      <Paragraph>
+                        However you can still use it as long as it's not expired and there's still sufficient credits.
+                      </Paragraph>{' '}
+                    </>
+                  }
+                  onConfirm={() => cancelSubscription(record)}
+                  okText="Yes, cancel this subscription"
+                  okButtonProps={{ danger: true, type: 'primary' }}
+                  cancelText="No"
+                  disabled={Boolean(record.cancellation_date)}
+                >
+                  <Button danger type="link" disabled={Boolean(record.cancellation_date)}>
+                    Cancel
+                  </Button>
+                </Popconfirm>
+              )}
             </Col>
           )}
           <Col>
@@ -481,29 +488,31 @@ const Subscriptions = () => {
     let buttonsArr = [];
 
     if (isActive) {
-      buttonsArr.push(
-        <Popconfirm
-          title={
-            <>
-              {' '}
-              <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
-              <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
-              <Paragraph>
-                However you can still use it as long as it's not expired and there's still sufficient credits.
-              </Paragraph>{' '}
-            </>
-          }
-          onConfirm={() => cancelSubscription(subscriptionOrderDetails)}
-          okText="Yes, cancel this subscription"
-          okButtonProps={{ danger: true, type: 'primary' }}
-          cancelText="No"
-          disabled={Boolean(subscriptionOrderDetails.cancellation_date)}
-        >
-          <Button danger type="link" disabled={Boolean(subscriptionOrderDetails.cancellation_date)}>
-            Cancel
-          </Button>
-        </Popconfirm>
-      );
+      if (!subscriptionOrderDetails.cancellation_date) {
+        buttonsArr.push(
+          <Popconfirm
+            title={
+              <>
+                {' '}
+                <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
+                <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
+                <Paragraph>
+                  However you can still use it as long as it's not expired and there's still sufficient credits.
+                </Paragraph>{' '}
+              </>
+            }
+            onConfirm={() => cancelSubscription(subscriptionOrderDetails)}
+            okText="Yes, cancel this subscription"
+            okButtonProps={{ danger: true, type: 'primary' }}
+            cancelText="No"
+            disabled={Boolean(subscriptionOrderDetails.cancellation_date)}
+          >
+            <Button danger type="link" disabled={Boolean(subscriptionOrderDetails.cancellation_date)}>
+              Cancel
+            </Button>
+          </Popconfirm>
+        );
+      }
 
       buttonsArr.push(
         expandedActiveRowKeys.includes(subscriptionOrderDetails.subscription_order_id) ? (
@@ -541,6 +550,15 @@ const Subscriptions = () => {
           actions={generateMobileActionButtons(subscriptionOrder, isActive)}
         >
           <Row gutter={[8, 8]}>
+            {subscriptionOrder.cancellation_date && (
+              <Col xs={24}>
+                {' '}
+                <Text type="danger">
+                  {' '}
+                  Cancelled on: {toShortDateWithYear(subscriptionOrder.cancellation_date)}{' '}
+                </Text>{' '}
+              </Col>
+            )}
             <Col xs={24}>Remaining Credits:</Col>
             <Col xs={24}>{renderRemainingCreditsForSubscription(subscriptionOrder)}</Col>
           </Row>
