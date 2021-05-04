@@ -270,14 +270,15 @@ const Videos = () => {
       const { status, data } = await apis.videos.cloneVideo(video.external_id);
 
       if (isAPISuccess(status) && data) {
-        setIsLoading(false);
+        await getVideosForCreator();
         setShouldCloneVideo(true);
         showUploadVideoModal(data);
       }
     } catch (error) {
-      setIsLoading(false);
       showErrorModal('Something went wrong', error.response?.data?.message);
     }
+
+    setIsLoading(false);
   };
 
   const deleteVideo = async (videoId) => {
