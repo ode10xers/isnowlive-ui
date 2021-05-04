@@ -13,7 +13,7 @@ import VideoCard from 'components/VideoCard';
 import VideoPlayer from 'components/VideoPlayer';
 import SessionCards from 'components/SessionCards';
 import DefaultImage from 'components/Icons/DefaultImage';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showWarningModal } from 'components/Modals/modals';
 
 import { isAPISuccess, reservedDomainName, isUnapprovedUserError } from 'utils/helper';
 
@@ -88,7 +88,7 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       if (error?.response?.data?.message === `cannot access video before it's scheduled time`) {
-        showErrorModal(
+        showWarningModal(
           `Course hasn't started yet`,
           `This video is a part of a course which hasn't started yet. Please wait for the start date to watch this video`
         );
