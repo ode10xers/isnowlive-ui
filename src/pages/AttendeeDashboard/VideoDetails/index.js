@@ -13,7 +13,7 @@ import VideoCard from 'components/VideoCard';
 import VideoPlayer from 'components/VideoPlayer';
 import SessionCards from 'components/SessionCards';
 import DefaultImage from 'components/Icons/DefaultImage';
-import { showErrorModal } from 'components/Modals/modals';
+import { showErrorModal, showWarningModal } from 'components/Modals/modals';
 
 import { isAPISuccess, reservedDomainName, isUnapprovedUserError } from 'utils/helper';
 
@@ -87,7 +87,12 @@ const VideoDetails = ({ match }) => {
         setVideoToken(data.token);
       }
     } catch (error) {
-      if (!isUnapprovedUserError(error.response)) {
+      if (error?.response?.data?.message === `cannot access video before it's scheduled time`) {
+        showWarningModal(
+          `Course hasn't started yet`,
+          `This video is a part of a course which hasn't started yet. Please wait for the start date to watch this video`
+        );
+      } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal(
           'Failed to load video token. Either video is expired or you have reached viewing limit of video'
         );
