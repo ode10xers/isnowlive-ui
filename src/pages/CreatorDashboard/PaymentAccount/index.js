@@ -142,6 +142,9 @@ const PaymentAccount = () => {
       ) {
         relinkStripe();
       } else {
+        pushToDataLayer(gtmTriggerEvents.STRIPE_CONNECT_FAILED, {
+          selected_country: selectedCountry,
+        });
         trackFailedEvent(eventTag, error, { country: selectedCountry });
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
