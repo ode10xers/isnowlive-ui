@@ -145,7 +145,7 @@ const ManageSessions = () => {
     copyToClipboard(pageLink);
   };
 
-  const generateSessionColumns = useCallback(() => {
+  const generateSessionColumns = () => {
     const initialColumns = [
       {
         title: 'Session Name',
@@ -282,8 +282,7 @@ const ManageSessions = () => {
     }
 
     return initialColumns;
-    //eslint-disable-next-line
-  }, [creatorMemberTags]);
+  };
 
   const renderSessionItem = (item) => {
     const layout = (label, value) => (

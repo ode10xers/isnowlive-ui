@@ -242,7 +242,7 @@ const ClassPassList = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
-  const generatePassesColumns = useCallback(() => {
+  const generatePassesColumns = () => {
     const initialColumns = [
       {
         title: 'Pass Name',
@@ -368,8 +368,7 @@ const ClassPassList = () => {
     }
 
     return initialColumns;
-    //eslint-disable-next-line
-  }, [creatorMemberTags]);
+  };
 
   const buyersColumns = [
     {

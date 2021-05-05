@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Row, Col, Tooltip, Typography, Button, Card, Empty, Collapse, Tag } from 'antd';
 import {
@@ -83,141 +83,138 @@ const VideoCourses = ({
   const collapseRowUnpublished = (rowKey) =>
     setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
-  const generateVideoCourseColumns = useCallback(
-    (published) => {
-      const initialColumns = [
-        {
-          title: 'Course Name',
-          dataIndex: 'name',
-          key: 'name',
-          render: (text, record) => {
-            return {
-              props: {
-                style: {
-                  borderLeft: `6px solid ${record.color_code || '#FFF'}`,
-                },
+  const generateVideoCourseColumns = (published) => {
+    const initialColumns = [
+      {
+        title: 'Course Name',
+        dataIndex: 'name',
+        key: 'name',
+        render: (text, record) => {
+          return {
+            props: {
+              style: {
+                borderLeft: `6px solid ${record.color_code || '#FFF'}`,
               },
-              children: (
-                <>
-                  <Text> {record?.name} </Text>
-                  {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
-                </>
-              ),
-            };
-          },
+            },
+            children: (
+              <>
+                <Text> {record?.name} </Text>
+                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
+              </>
+            ),
+          };
         },
-        {
-          title: 'Total Videos',
-          width: '120px',
-          render: (text, record) =>
-            record.videos?.length > 0 ? <Tag color="blue"> {record.videos?.length} videos </Tag> : null,
-        },
-        {
-          title: 'Duration',
-          dataIndex: 'validity',
-          key: 'validity',
-          width: '100px',
-          render: (text, record) => `${record?.validity} days`,
-        },
-        {
-          title: 'Price',
-          dataIndex: 'price',
-          key: 'price',
-          width: '100px',
-          render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
-        },
-        {
-          title: published ? (
-            <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
-              {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-            </Button>
-          ) : (
-            <Button ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
-              {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-            </Button>
-          ),
-          width: '250px',
-          align: 'right',
-          render: (text, record) => (
-            <Row gutter={8} justify="end">
-              <Col xs={3}>
-                <Tooltip title="Send Customer Email">
-                  <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+      },
+      {
+        title: 'Total Videos',
+        width: '120px',
+        render: (text, record) =>
+          record.videos?.length > 0 ? <Tag color="blue"> {record.videos?.length} videos </Tag> : null,
+      },
+      {
+        title: 'Duration',
+        dataIndex: 'validity',
+        key: 'validity',
+        width: '100px',
+        render: (text, record) => `${record?.validity} days`,
+      },
+      {
+        title: 'Price',
+        dataIndex: 'price',
+        key: 'price',
+        width: '100px',
+        render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
+      },
+      {
+        title: published ? (
+          <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
+            {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          </Button>
+        ) : (
+          <Button ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
+            {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          </Button>
+        ),
+        width: '250px',
+        align: 'right',
+        render: (text, record) => (
+          <Row gutter={8} justify="end">
+            <Col xs={3}>
+              <Tooltip title="Send Customer Email">
+                <Button type="text" onClick={() => showSendEmailModal(record)} icon={<MailOutlined />} />
+              </Tooltip>
+            </Col>
+            <Col xs={3}>
+              <Tooltip title="Edit Course">
+                <Button
+                  block
+                  type="text"
+                  onClick={() => showEditModal(record)}
+                  icon={<EditTwoTone twoToneColor="#08979c" />}
+                />
+              </Tooltip>
+            </Col>
+            <Col xs={3}>
+              <Tooltip title="Copy Course Link">
+                <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
+              </Tooltip>
+            </Col>
+            <Col xs={5}>
+              {record.is_published ? (
+                <Tooltip title="Hide Course">
+                  <Button danger block type="link" onClick={() => unpublishCourse(record)}>
+                    Hide
+                  </Button>
                 </Tooltip>
-              </Col>
-              <Col xs={3}>
-                <Tooltip title="Edit Course">
-                  <Button
-                    block
-                    type="text"
-                    onClick={() => showEditModal(record)}
-                    icon={<EditTwoTone twoToneColor="#08979c" />}
-                  />
+              ) : (
+                <Tooltip title="Unhide Course">
+                  <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
+                    Show
+                  </Button>
                 </Tooltip>
-              </Col>
-              <Col xs={3}>
-                <Tooltip title="Copy Course Link">
-                  <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
-                </Tooltip>
-              </Col>
-              <Col xs={5}>
-                {record.is_published ? (
-                  <Tooltip title="Hide Course">
-                    <Button danger block type="link" onClick={() => unpublishCourse(record)}>
-                      Hide
-                    </Button>
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="Unhide Course">
-                    <Button block type="link" className={styles.successBtn} onClick={() => publishCourse(record)}>
-                      Show
-                    </Button>
-                  </Tooltip>
-                )}
-              </Col>
-              <Col xs={10}>
-                {record.is_published ? (
-                  expandedPublishedRowKeys.includes(record.id) ? (
-                    <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
-                      {record.buyers?.length} Buyers <UpOutlined />
-                    </Button>
-                  ) : (
-                    <Button block type="link" onClick={() => expandRowPublished(record.id)}>
-                      {record.buyers?.length} Buyers <DownOutlined />
-                    </Button>
-                  )
-                ) : expandedUnpublishedRowKeys.includes(record.id) ? (
-                  <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
+              )}
+            </Col>
+            <Col xs={10}>
+              {record.is_published ? (
+                expandedPublishedRowKeys.includes(record.id) ? (
+                  <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
                     {record.buyers?.length} Buyers <UpOutlined />
                   </Button>
                 ) : (
-                  <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
+                  <Button block type="link" onClick={() => expandRowPublished(record.id)}>
                     {record.buyers?.length} Buyers <DownOutlined />
                   </Button>
-                )}
-              </Col>
-            </Row>
-          ),
-        },
-      ];
+                )
+              ) : expandedUnpublishedRowKeys.includes(record.id) ? (
+                <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
+                  {record.buyers?.length} Buyers <UpOutlined />
+                </Button>
+              ) : (
+                <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
+                  {record.buyers?.length} Buyers <DownOutlined />
+                </Button>
+              )}
+            </Col>
+          </Row>
+        ),
+      },
+    ];
 
-      if (creatorMemberTags.length > 0) {
-        const tagColumnPosition = 1;
-        const tagColumnObject = {
-          title: 'Purchasable By',
-          key: 'tag',
-          dataIndex: 'tag',
-          width: '130px',
-          render: (text, record) => <TagListPopup tags={record.tag} />,
-        };
+    if (creatorMemberTags.length > 0) {
+      const tagColumnPosition = 1;
+      const tagColumnObject = {
+        title: 'Purchasable By',
+        key: 'tag',
+        dataIndex: 'tag',
+        width: '130px',
+        render: (text, record) => <TagListPopup tags={record.tag} />,
+      };
 
-        initialColumns.splice(tagColumnPosition, 0, tagColumnObject);
-      }
+      initialColumns.splice(tagColumnPosition, 0, tagColumnObject);
+    }
 
-      return initialColumns;
-    }, //eslint-disable-next-line
-    [creatorMemberTags]
-  );
+    return initialColumns;
+  };
 
   const buyersColumns = [
     {
