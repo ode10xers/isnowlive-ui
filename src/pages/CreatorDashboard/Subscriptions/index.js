@@ -193,7 +193,7 @@ const Subscriptions = () => {
       className: undefined,
     },
     {
-      label: 'Session or Video Credits/Month',
+      label: 'Session/Video Credit',
       className: undefined,
     },
     {

@@ -560,7 +560,7 @@ const CreateCourseModal = ({
           closable: true,
           maskClosable: false,
           title: 'Some items in this course have changed',
-          width: 500,
+          width: 640,
           content: (
             <Row gutter={[8, 4]}>
               <Col xs={24}>
@@ -577,18 +577,18 @@ const CreateCourseModal = ({
                     <Button
                       block
                       type="default"
-                      onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: true }, modalRef)}
+                      onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: false }, modalRef)}
                     >
-                      Change existing orders
+                      Don't change existing orders
                     </Button>
                   </Col>
                   <Col>
                     <Button
                       block
                       type="primary"
-                      onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: false }, modalRef)}
+                      onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: true }, modalRef)}
                     >
-                      Don't change existing orders
+                      Change existing orders
                     </Button>
                   </Col>
                 </Row>
