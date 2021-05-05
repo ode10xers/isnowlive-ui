@@ -84,7 +84,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
       }
     } catch (error) {
       if (error?.response?.status !== 404 && !isUnapprovedUserError(error.response)) {
-        message.error('Failed fetching previously used payment methods');
+        message.error(error?.response?.data?.message || 'Failed fetching previously used payment methods');
       }
     }
   }, []);

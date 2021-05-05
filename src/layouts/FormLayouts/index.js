@@ -97,6 +97,10 @@ export const courseModalFormLayout = {
 export const courseModalTailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
+export const subscriptionModalFormLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 16 },
+};
 export const couponModalFormLayout = {
   labelCol: { span: 10 },
   wrapperCol: { span: 14 },

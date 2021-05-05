@@ -37,6 +37,7 @@ export default {
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
+    retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
@@ -134,6 +135,38 @@ export default {
     publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
     unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
+  },
+  subscriptions: {
+    createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
+    publishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/publish`),
+    unpublishSubscription: (subscriptionId) => http.post(`/secure/creator/subscription/${subscriptionId}/unpublish`),
+    updateSubscription: (subscriptionId, payload) =>
+      http.patch(`/secure/creator/subscription/${subscriptionId}`, payload),
+    getCreatorSubscriptions: (pageNo, perPage = 3) =>
+      http.get(`/secure/creator/subscription?page=${pageNo}&per_page=${perPage}`),
+    getSubscriptionDetails: (subscriptionId) => http.get(`/secure/creator/subscription/${subscriptionId}`),
+    deleteSubscription: (subscriptionId) => http.delete(`/secure/creator/subscription/${subscriptionId}`),
+    getSubscriptionEarnings: (pageNo, perPage) =>
+      http.get(`/secure/creator/payments/earnings/subscriptions?page_no=${pageNo}&per_page${perPage}`),
+    getEarningsBySubscriptionId: (subscriptionId) =>
+      http.get(`/secure/creator/payments/earnings/subscriptions/id/${subscriptionId}`),
+    getSubscriptionsByUsername: () => http.get(`/subscriptions`),
+    getSubscriptionsForSession: (sessionId) => http.get(`/subscriptions?session_id=${sessionId}`),
+    getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
+    getSubscriptionsForCourse: (courseId) => http.get(`/subscriptions?course_id=${courseId}`),
+    createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
+    cancelSubscriptionOrder: (subscriptionOrderId) =>
+      http.post(`/secure/customer/subscriptions/orders/${subscriptionOrderId}/cancel`),
+    getSubscriptionOrderUsageDetails: (productOrderType, subscriptionOrderId) =>
+      http.get(
+        `/secure/customer/orders/universal?type=${productOrderType}&source=SUBSCRIPTION&source_id=${subscriptionOrderId}`
+      ),
+    getAttendeeSubscriptions: () => http.get('/secure/customer/subscriptions/orders/'),
+    getUserSubscriptionForSession: (sessionId) =>
+      http.get(`/secure/customer/subscriptions/orders/?session_id=${sessionId}`),
+    getUserSubscriptionForVideo: (videoId) => http.get(`/secure/customer/subscriptions/orders/?video_id=${videoId}`),
+    getUserSubscriptionForCourse: (courseId) =>
+      http.get(`/secure/customer/subscriptions/orders/?course_id=${courseId}`),
   },
   audiences: {
     getCreatorMembers: (pageNo, perPage) =>

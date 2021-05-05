@@ -264,6 +264,7 @@ export const StripePaymentStatus = {
 export const paymentSource = {
   GATEWAY: 'PAYMENT_GATEWAY',
   PASS: 'PASS',
+  SUBSCRIPTION: 'SUBSCRIPTION',
 };
 
 export const orderType = {
@@ -271,6 +272,7 @@ export const orderType = {
   PASS: 'PASS_ORDER',
   VIDEO: 'VIDEO_ORDER',
   COURSE: 'COURSE_ORDER',
+  SUBSCRIPTION: 'SUBSCRIPTION_ORDER',
 };
 
 export const courseType = {
@@ -284,6 +286,7 @@ export const productType = {
   PASS: 'Pass',
   VIDEO: 'Video',
   COURSE: 'Course',
+  SUBSCRIPTION: 'Membership',
   PRODUCT: 'Product', //As a default
 };
 

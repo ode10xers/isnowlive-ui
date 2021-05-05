@@ -19,7 +19,6 @@ import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { redirectToVideosPage } from 'utils/redirect';
 import { isAPISuccess, tagColors, getRandomTagColor, reservedDomainName, courseType } from 'utils/helper';
 
 import styles from './styles.module.scss';
@@ -40,8 +39,6 @@ const CourseDetails = ({ match, history }) => {
   const [courseSessions, setCourseSessions] = useState(null);
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
   const [username, setUsername] = useState(null);
-
-  // const username = location.state?.username || window.location.hostname.split('.')[0];
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
     try {
@@ -290,12 +287,7 @@ const CourseDetails = ({ match, history }) => {
                         <Row gutter={[8, 8]}>
                           {course.videos?.map((video) => (
                             <Col xs={24} lg={12} key={video?.external_id}>
-                              <VideoCard
-                                video={video}
-                                buyable={false}
-                                onCardClick={() => redirectToVideosPage(video)}
-                                showDetailsBtn={false}
-                              />
+                              <VideoCard video={video} buyable={false} showDetailsBtn={false} />
                             </Col>
                           ))}
                         </Row>

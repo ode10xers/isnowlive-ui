@@ -14,7 +14,7 @@ const validationRules = {
     {
       type: 'array',
       required: true,
-      message: 'Please select at least one item',
+      message: 'Please select min. one item',
       min: 1,
       // validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
     },

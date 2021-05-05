@@ -21,7 +21,7 @@ const {
   formatDate: { getISODayOfWeek },
 } = dateUtil;
 
-const SessionCards = ({ sessions, shouldFetchInventories = true }) => {
+const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = false }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
 
@@ -77,7 +77,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true }) => {
                     bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
                     onClick={() => redirectToSessionsPage(session)}
                   >
-                    {isMobileDevice ? (
+                    {isMobileDevice || compactView ? (
                       <Row gutter={[8, 8]}>
                         <Col xs={24}>
                           <Image

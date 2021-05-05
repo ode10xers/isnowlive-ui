@@ -1,15 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import classNames from 'classnames';
+
 import { Row, Col, Typography, Button, Card, Empty, message } from 'antd';
-import { useHistory } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
 import Routes from 'routes';
-import dateUtil from 'utils/date';
+
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ShowAmount from 'components/ShowAmount';
+import { showErrorModal } from 'components/Modals/modals';
+
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, getPaymentStatus } from 'utils/helper';
 
@@ -17,88 +21,130 @@ import { mixPanelEventTags, trackSimpleEvent } from 'services/integrations/mixpa
 
 import styles from './styles.module.scss';
 
+const { creator } = mixPanelEventTags;
 const { Title, Text } = Typography;
 const {
-  formatDate: { toLongDateWithTime },
+  formatDate: { toLongDateWithTime, toLongDateWithDay },
 } = dateUtil;
-const { creator } = mixPanelEventTags;
 
-const VideoEarnings = ({ match }) => {
+const productDetails = {
+  session: {
+    productName: 'Session',
+    earningsApi: apis.session.getEarningsByInventoryId,
+  },
+  video: {
+    productName: 'Video',
+    earningsApi: apis.videos.getEarningsByVideoId,
+  },
+  pass: {
+    productName: 'Pass',
+    earningsApi: apis.passes.getEarningsByPassId,
+  },
+  course: {
+    productName: 'Course',
+    earningsApi: apis.courses.getEarningsByCourseId,
+  },
+  subscription: {
+    productName: 'Subscription',
+    earningsApi: apis.subscriptions.getEarningsBySubscriptionId,
+  },
+};
+
+const EarningDetails = ({ match }) => {
   const history = useHistory();
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [earnings, setEarnings] = useState(null);
 
-  const getEarningData = useCallback(
-    async (video_id) => {
-      try {
-        const { status, data } = await apis.videos.getEarningsByVideoId(video_id);
-        if (isAPISuccess(status)) {
-          setIsLoading(false);
-          setEarnings(data);
-        }
-      } catch (error) {
-        message.error(error.response?.data?.message || 'Unable to fetch the video earning details');
-        setTimeout(() => {
-          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
-        }, 1500);
+  const productType = match.params.productType;
+  const productId = match.params.productId;
+
+  const getEarningData = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await productDetails[productType].earningsApi(productId);
+
+      if (isAPISuccess(status) && data) {
+        setEarnings(data);
       }
-    },
-    [history]
-  );
+    } catch (error) {
+      showErrorModal(`Unable to fetch ${productDetails[productType]} earning details`);
+    }
+
+    setIsLoading(false);
+  }, [productType, productId]);
 
   useEffect(() => {
-    if (match?.params?.video_id) {
-      getEarningData(match?.params?.video_id);
+    if (productType && productId && productDetails[productType]) {
+      getEarningData();
     } else {
-      message.error('Unable to find the video.');
+      message.error('Unable to find product earning details');
       setTimeout(() => {
         history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount);
       }, 1500);
     }
-  }, [getEarningData, history, match.params.video_id]);
+  }, [productType, productId, history, getEarningData]);
 
   const trackAndNavigate = (destination, eventTag) => {
     trackSimpleEvent(eventTag);
     history.push(destination);
   };
 
-  const showVideoLayout = (title, details) => (
+  const showProductLayout = (title, details) => (
     <div className={styles.box2}>
       <Row>
         <Col xs={24}>
-          <Text type="secondary">{title}</Text>
+          {' '}
+          <Text type="secondary"> {title} </Text>{' '}
         </Col>
-        <Col xs={24}>{details}</Col>
+        <Col xs={24}> {details} </Col>
       </Row>
     </div>
   );
 
-  const showVideoName = showVideoLayout('Video Name', <Title level={isMobileDevice ? 5 : 3}>{earnings?.name}</Title>);
-
-  const showVideoEarnings = showVideoLayout(
-    'Total Earning',
-    <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency.toUpperCase()} />
+  const renderEarningDetails = () => (
+    <>
+      <Col xs={24} md={productType === 'session' ? 8 : 16}>
+        {showProductLayout(
+          `${productDetails[productType].productName} Name`,
+          <Title level={isMobileDevice ? 5 : 3}> {earnings?.name} </Title>
+        )}
+      </Col>
+      {productType === 'session' && (
+        <Col xs={24} md={8}>
+          {showProductLayout(
+            'Session Day and Date',
+            <Title level={isMobileDevice ? 5 : 3}> {toLongDateWithDay(earnings?.session_date) || '-'} </Title>
+          )}
+        </Col>
+      )}
+      <Col xs={24} md={8}>
+        {showProductLayout(
+          'Total Earnings',
+          <ShowAmount amount={earnings?.total_earned} currency={earnings?.currency.toUpperCase()} />
+        )}
+      </Col>
+    </>
   );
 
-  let videoColumns = [
+  const detailsColumns = [
     {
       title: 'Attendee Name',
       key: 'name',
-      width: '12%',
       render: (record) => <Text className={styles.textAlignLeft}>{record.name}</Text>,
     },
     {
       title: 'Date',
       dataIndex: 'booking_time',
       key: 'booking_time',
-      width: '5%',
+      width: '200px',
       render: (text, record) => <Text>{toLongDateWithTime(record.booking_time)}</Text>,
     },
     {
       title: 'Amount',
       dataIndex: 'total_price',
       key: 'total_price',
-      width: '5%',
+      width: '120px',
       render: (text, record) => (
         <Text>
           {record.currency.toUpperCase()} {record.total_price}
@@ -109,7 +155,7 @@ const VideoEarnings = ({ match }) => {
       title: 'Fees',
       dataIndex: 'platform_fees',
       key: 'platform_fees',
-      width: '5%',
+      width: '120px',
       render: (text, record) => (
         <Text>
           {record.currency.toUpperCase()} {record.platform_fees}
@@ -120,7 +166,7 @@ const VideoEarnings = ({ match }) => {
       title: 'Net',
       dataIndex: 'net_price',
       key: 'net_price',
-      width: '5%',
+      width: '120px',
       render: (text, record) => (
         <Text>
           {record.currency.toUpperCase()} {record.net_price}
@@ -131,12 +177,12 @@ const VideoEarnings = ({ match }) => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: '5%',
+      width: '90px',
       render: (text, record) => <Text>{getPaymentStatus(record.status)}</Text>,
     },
   ];
 
-  const renderVideoItem = (item) => {
+  const renderMobileDetailsItem = (item) => {
     const layout = (label, value) => (
       <Row>
         <Col span={9}>
@@ -193,14 +239,9 @@ const VideoEarnings = ({ match }) => {
         </Row>
         <Row className={styles.mt50}>
           <Col xs={24} md={24}>
-            <Title level={5}>Video Earning Details</Title>
+            <Title level={5}> {productDetails[productType].productName} Earning Details</Title>
           </Col>
-          <Col xs={24} md={16}>
-            {showVideoName}
-          </Col>
-          <Col xs={24} md={8}>
-            {showVideoEarnings}
-          </Col>
+          {renderEarningDetails()}
         </Row>
         <Row className={styles.mt50}>
           <Col xs={24} md={24}>
@@ -210,7 +251,7 @@ const VideoEarnings = ({ match }) => {
             {isMobileDevice ? (
               <>
                 {earnings?.details?.length > 0 ? (
-                  earnings.details.map(renderVideoItem)
+                  earnings.details.map(renderMobileDetailsItem)
                 ) : (
                   <div className={classNames(styles.textAlignCenter, 'text-empty')}>
                     <Empty />
@@ -218,7 +259,12 @@ const VideoEarnings = ({ match }) => {
                 )}
               </>
             ) : (
-              <Table columns={videoColumns} data={earnings?.details} loading={isLoading} />
+              <Table
+                columns={detailsColumns}
+                data={earnings?.details}
+                loading={isLoading}
+                rowKey={(record) => `${record.name}_${record.booking_time}`}
+              />
             )}
           </Col>
         </Row>
@@ -227,4 +273,4 @@ const VideoEarnings = ({ match }) => {
   );
 };
 
-export default VideoEarnings;
+export default EarningDetails;

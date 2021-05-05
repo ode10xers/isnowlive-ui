@@ -40,6 +40,7 @@ const SessionRegistration = ({
   setSelectedPass,
   selectedPass = null,
   selectedInventory,
+  userSubscription = null,
   classDetails,
   logOut,
 }) => {
@@ -563,21 +564,50 @@ const SessionRegistration = ({
               )}
             </Item>
 
-            {user && userPasses.length > 0 ? (
-              <div>
-                <Title level={5}> Purchased pass(es) usable for this class </Title>
-                {isMobileDevice ? (
-                  userPasses.map(renderUserPassItem)
-                ) : (
-                  <Table
-                    size="small"
-                    columns={userPassesColumns}
-                    data={userPasses}
-                    rowKey={(record) => record.pass_order_id}
-                  />
+            {user && userSubscription ? (
+              // Render help text that this session will be booked using user's subscription
+              <Row className={styles.mt10}>
+                <Paragraph>
+                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
+                  <Text delete>
+                    {classDetails?.price} {classDetails?.currency.toUpperCase()}
+                  </Text>
+                  <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased subscription
+                  <Text strong> {userSubscription.subscription_name} </Text>
+                </Paragraph>
+              </Row>
+            ) : user && userPasses.length > 0 ? (
+              // Render User's Purchased Passes that's usable to book this session
+              <>
+                <div>
+                  <Title level={5}> Purchased pass(es) usable for this class </Title>
+                  {isMobileDevice ? (
+                    userPasses.map(renderUserPassItem)
+                  ) : (
+                    <Table
+                      size="small"
+                      columns={userPassesColumns}
+                      data={userPasses}
+                      rowKey={(record) => record.pass_order_id}
+                    />
+                  )}
+                </div>
+                {selectedInventory && selectedPass && (
+                  <Row className={styles.mt10}>
+                    <Paragraph>
+                      Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
+                      <Text delete>
+                        {classDetails?.price} {classDetails?.currency.toUpperCase()}
+                      </Text>
+                      <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased pass
+                      <Text strong> {selectedPass.name} </Text>
+                    </Paragraph>
+                  </Row>
                 )}
-              </div>
+              </>
             ) : (
+              // Render single session buy option as a separate option
+              // Below that, render Passes that the user can purchase to book this session
               <>
                 {availablePasses.length > 0 ? (
                   <>
@@ -621,6 +651,7 @@ const SessionRegistration = ({
                     </div>
                   </>
                 ) : (
+                  // Render simple help text if no passes are available for class
                   <Item {...sessionRegistrationTailLayout}>
                     <Title level={5}>
                       Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class
@@ -630,24 +661,13 @@ const SessionRegistration = ({
               </>
             )}
 
-            <Row className={styles.mt10}>
-              {user && selectedInventory && selectedPass && userPasses.length > 0 && (
-                <Paragraph>
-                  Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'} class for{' '}
-                  <Text delete>
-                    {classDetails?.price} {classDetails?.currency.toUpperCase()}
-                  </Text>
-                  <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased pass
-                  <Text strong> {selectedPass.name} </Text>
-                </Paragraph>
-              )}
-            </Row>
-
             <Item {...sessionRegistrationTailLayout}>
               <Row className={styles.mt10} gutter={[8, 8]}>
                 <Col xs={8} md={8} xl={6}>
                   <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                    {user && classDetails?.price > 0 && !(selectedPass && userPasses.length > 0) ? 'Buy' : 'Register'}
+                    {user && classDetails?.price > 0 && !(selectedPass && userPasses.length > 0) && !userSubscription
+                      ? 'Buy'
+                      : 'Register'}
                   </Button>
                 </Col>
                 {!selectedInventory && (

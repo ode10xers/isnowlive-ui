@@ -20,7 +20,7 @@ import Uppy from '@uppy/core';
 import Tus from '@uppy/tus';
 import { DragDrop, useUppy } from '@uppy/react';
 
-import { BookTwoTone, TagOutlined } from '@ant-design/icons';
+import { BookTwoTone, InfoCircleOutlined, TagOutlined } from '@ant-design/icons';
 
 import config from 'config';
 import apis from 'apis';
@@ -536,7 +536,7 @@ const UploadVideoModal = ({
       maskClosable={false}
       closable={[1, 3].includes(formPart)}
       onCancel={() => closeModal(false)}
-      width={800}
+      width={850}
       afterClose={() => {
         document.body.classList.remove(['ant-scrolling-effect']);
         document.body.removeAttribute('style');
@@ -620,7 +620,9 @@ const UploadVideoModal = ({
                           </Select.Option>
                         ))}
                       {classes?.filter((session) => session.is_active).length <= 0 && (
-                        <Text disabled> No published sessions </Text>
+                        <Select.Option disabled value="no_published_session">
+                          <Text disabled> No published sessions </Text>
+                        </Select.Option>
                       )}
                     </Select.OptGroup>
                     <Select.OptGroup
@@ -652,7 +654,9 @@ const UploadVideoModal = ({
                           </Select.Option>
                         ))}
                       {classes?.filter((session) => !session.is_active).length <= 0 && (
-                        <Text disabled> No unpublished sessions </Text>
+                        <Select.Option disabled value="no_unpublished_session">
+                          <Text disabled> No unpublished sessions </Text>
+                        </Select.Option>
                       )}
                     </Select.OptGroup>
                   </Select>
@@ -673,7 +677,12 @@ const UploadVideoModal = ({
                     </Radio.Group>
                   </Form.Item>
                   <Form.Item className={styles.inlineFormItem}>
-                    <Button type="link" onClick={() => showCourseOptionsHelperModal('video')}>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => showCourseOptionsHelperModal('video')}
+                      icon={<InfoCircleOutlined />}
+                    >
                       Understanding the options
                     </Button>
                   </Form.Item>
@@ -723,7 +732,12 @@ const UploadVideoModal = ({
                     </Radio.Group>
                   </Form.Item>
                   <Form.Item className={styles.inlineFormItem}>
-                    <Button type="link" onClick={() => showTagOptionsHelperModal('video')}>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => showTagOptionsHelperModal('video')}
+                      icon={<InfoCircleOutlined />}
+                    >
                       Understanding the tag options
                     </Button>
                   </Form.Item>

@@ -1,0 +1,23 @@
+@import '../../styles/variables.scss';
+
+.cardListItem {
+  text-align: center;
+  padding: 17px 10px !important;
+}
+
+.disabled {
+  opacity: 0.4;
+  background-color: map-get($colors, 'Silver');
+}
+
+.subscriptionNameWrapper {
+  min-height: 32px;
+}
+
+.buttonContainer {
+  padding: 13px 10px 12px !important;
+}
+
+.greenText {
+  color: map-get($map: $colors, $key: 'KellyGreen') !important;
+}

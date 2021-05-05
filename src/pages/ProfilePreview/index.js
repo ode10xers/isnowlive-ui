@@ -9,6 +9,7 @@ import {
   EditOutlined,
   PlayCircleOutlined,
   BookOutlined,
+  ScheduleOutlined,
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
@@ -19,6 +20,7 @@ import apis from 'apis';
 import Sessions from 'components/Sessions';
 import PublicPassList from 'components/PublicPassList';
 import PublicVideoList from 'components/PublicVideoList';
+import CreatorSubscriptions from 'components/CreatorSubscriptions';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 import EMCode from 'components/EMCode';
 import Loader from 'components/Loader';
@@ -58,6 +60,7 @@ const productKeys = {
   PASS: 'pass',
   VIDEO: 'video',
   COURSE: 'course',
+  SUBSCRIPTION: 'membership',
 };
 
 const ProfilePreview = ({ username = getLocalUserDetails().username || null }) => {
@@ -71,15 +74,16 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
   const isMobileDevice = Boolean(md.mobile());
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
-  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const [view, setView] = useState('calendar');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);
+
+  const [sessions, setSessions] = useState([]);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   const [passes, setPasses] = useState([]);
   const [isPassesLoading, setIsPassesLoading] = useState(true);
@@ -93,6 +97,9 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
   const [sessionCountByDate, setSessionCountByDate] = useState({});
   const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
+
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [isSubscriptionsLoading, setIsSubscriptionsLoading] = useState(true);
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -193,6 +200,22 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     }
   }, []);
 
+  const getSubscriptionDetails = useCallback(async () => {
+    setIsSubscriptionsLoading(true);
+
+    try {
+      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
+
+      if (isAPISuccess(status) && data) {
+        setSubscriptions(data.sort((a, b) => a.price - b.price));
+        setIsSubscriptionsLoading(false);
+      }
+    } catch (error) {
+      setIsSubscriptionsLoading(false);
+      console.error('Failed to load subscription details');
+    }
+  }, []);
+
   useEffect(() => {
     if (history.location.pathname.includes('dashboard')) {
       setIsOnDashboard(true);
@@ -202,6 +225,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     getPassesDetails();
     getVideosDetails();
     getCoursesDetails();
+    getSubscriptionDetails();
     getCalendarSessionDetails();
   }, [
     history.location.pathname,
@@ -210,24 +234,27 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     getPassesDetails,
     getVideosDetails,
     getCoursesDetails,
+    getSubscriptionDetails,
     getCalendarSessionDetails,
     userDetails,
   ]);
 
   const getDefaultTabToShow = useCallback(() => {
     let targetListTab = '';
-    if (sessions.length) {
+    if (sessions.length > 0) {
       targetListTab = productKeys.SESSION;
-    } else if (passes.length) {
+    } else if (passes.length > 0) {
       targetListTab = productKeys.PASS;
-    } else if (videos.length) {
+    } else if (videos.length > 0) {
       targetListTab = productKeys.VIDEO;
-    } else if (liveCourses.length || videoCourses.length) {
+    } else if (liveCourses.length > 0 || videoCourses.length > 0) {
       targetListTab = productKeys.COURSE;
+    } else if (subscriptions.length > 0) {
+      targetListTab = productKeys.SUBSCRIPTION;
     }
 
     return targetListTab;
-  }, [sessions, passes, videos, liveCourses, videoCourses]);
+  }, [sessions, passes, videos, liveCourses, videoCourses, subscriptions]);
 
   useEffect(() => {
     let targetListTab = getDefaultTabToShow();
@@ -248,6 +275,9 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
       } else if (sectionToShow === productKeys.COURSE && (liveCourses.length > 0 || videoCourses.length > 0)) {
         targetListTab = productKeys.COURSE;
         targetElement = document.getElementById(productKeys.COURSE);
+      } else if (sectionToShow === productKeys.SUBSCRIPTION && subscriptions.length > 0) {
+        targetListTab = productKeys.SUBSCRIPTION;
+        targetElement = document.getElementById(productKeys.SUBSCRIPTION);
       } else if (sectionToShow === 'home') {
         targetElement = document.getElementById('home');
         targetListTab = getDefaultTabToShow();
@@ -264,7 +294,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
 
     setSelectedListTab(targetListTab);
     //eslint-disable-next-line
-  }, [location.state, sessions, passes, videos, liveCourses, videoCourses, profile]);
+  }, [location.state, sessions, passes, videos, liveCourses, videoCourses, subscriptions, profile]);
 
   const handleChangeListTab = (key) => {
     setIsListLoading(true);
@@ -555,6 +585,25 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
                     </Tabs.TabPane>
                   )}
                 </Tabs>
+              </Tabs.TabPane>
+            )}
+            {subscriptions.length > 0 && (
+              <Tabs.TabPane
+                key={productKeys.SUBSCRIPTION}
+                tab={
+                  <div className={styles.largeTabHeader} id="membership">
+                    <ScheduleOutlined />
+                    Membership
+                  </div>
+                }
+              >
+                <Row className={styles.mt20}>
+                  <Col span={24}>
+                    <Loader loading={isSubscriptionsLoading} size="large" text="Loading memberships">
+                      <CreatorSubscriptions subscriptions={subscriptions} />
+                    </Loader>
+                  </Col>
+                </Row>
               </Tabs.TabPane>
             )}
           </Tabs>

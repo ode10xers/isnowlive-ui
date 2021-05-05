@@ -376,7 +376,7 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
   });
 };
 
-export const showCoursePurchaseSuccessModal = () => {
+export const showPurchaseSingleCourseSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
 
   Modal.success({
@@ -396,7 +396,114 @@ export const showCoursePurchaseSuccessModal = () => {
           You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
           <Text strong> friends@passion.do. </Text>
         </Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showPurchaseSubscriptionSuccessModal = () => {
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Subscription purchased',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions
+      )),
+    content: (
+      <>
+        <Paragraph>You have successfully purchased this subscription.</Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showGetVideoWithSubscriptionSuccessModal = () => {
+  const userEmail = getLocalUserDetails().email;
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Purchase successful',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
+      )),
+    content: (
+      <>
+        <Paragraph>We have purchased this video using 1 credit from your subscription</Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
+      </>
+    ),
+  });
+};
+
+export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) => {
+  const username = getUsernameFromUrl();
+  const userEmail = getLocalUserDetails().email;
+
+  const inventoryDetails = await getSessionInventoryDetails(inventoryId);
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Registration successful',
+    okButtonProps: { style: { display: 'none' } },
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
+      )),
+    content: (
+      <>
+        <Paragraph>We have booked this session using 1 credit from your subscription</Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
+        {generateCustomButtonsForSessionModals(username, inventoryDetails)}
+      </>
+    ),
+  });
+};
+
+export const showGetCourseWithSubscriptionSuccessModal = () => {
+  const userEmail = getLocalUserDetails().email;
+
+  Modal.success({
+    center: true,
+    closable: true,
+    maskClosable: false,
+    title: 'Purchase successful',
+    okText: 'Go To Dashboard',
+    onOk: () =>
+      (window.location.href = getDashboardUrl(
+        null,
+        Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
+      )),
+    content: (
+      <>
+        <Paragraph>We have purchased this course using 1 credit from your subscription</Paragraph>
+        <Paragraph>
+          You would have received a confirmation email on <Text strong> {userEmail}</Text>. Look out for an email from{' '}
+          <Text strong> friends@passion.do. </Text>
+        </Paragraph>
+        <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
   });

@@ -145,7 +145,7 @@ const ManageSessions = () => {
     copyToClipboard(pageLink);
   };
 
-  const generateSessionColumns = useCallback(() => {
+  const generateSessionColumns = () => {
     const initialColumns = [
       {
         title: 'Session Name',
@@ -161,7 +161,7 @@ const ManageSessions = () => {
               <>
                 {' '}
                 <Text className={styles.textAlignLeft}>{record.name}</Text>{' '}
-                {record.is_active ? null : <EyeInvisibleOutlined />}{' '}
+                {record.is_active ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}{' '}
               </>
             ),
           };
@@ -282,8 +282,7 @@ const ManageSessions = () => {
     }
 
     return initialColumns;
-    //eslint-disable-next-line
-  }, [creatorMemberTags]);
+  };
 
   const renderSessionItem = (item) => {
     const layout = (label, value) => (
@@ -310,7 +309,7 @@ const ManageSessions = () => {
               })
             }
           >
-            <Text>{item.name}</Text> {item.is_active ? null : <EyeInvisibleOutlined />}
+            <Text>{item.name}</Text> {item.is_active ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
           </div>
         }
         actions={[
