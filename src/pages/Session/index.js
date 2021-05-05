@@ -17,7 +17,13 @@ import {
   DatePicker,
   Modal,
 } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined, VideoCameraOutlined, TagOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+  VideoCameraOutlined,
+  TagOutlined,
+  InfoCircleOutlined,
+} from '@ant-design/icons';
 import moment from 'moment';
 
 import config from 'config';
@@ -869,7 +875,12 @@ const Session = ({ match, history }) => {
                 </Radio.Group>
               </Form.Item>
               <Form.Item className={styles.inlineFormItem}>
-                <Button type="link" onClick={() => showCourseOptionsHelperModal('session')}>
+                <Button
+                  size="small"
+                  type="link"
+                  onClick={() => showCourseOptionsHelperModal('session')}
+                  icon={<InfoCircleOutlined />}
+                >
                   Understanding the options
                 </Button>
               </Form.Item>
@@ -892,7 +903,12 @@ const Session = ({ match, history }) => {
                 </Radio.Group>
               </Form.Item>
               <Form.Item className={styles.inlineFormItem}>
-                <Button type="link" onClick={() => showTagOptionsHelperModal('sesison')}>
+                <Button
+                  size="small"
+                  type="link"
+                  onClick={() => showTagOptionsHelperModal('session')}
+                  icon={<InfoCircleOutlined />}
+                >
                   Understanding the tag options
                 </Button>
               </Form.Item>

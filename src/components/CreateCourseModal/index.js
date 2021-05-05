@@ -18,7 +18,7 @@ import {
   Checkbox,
   Radio,
 } from 'antd';
-import { BookTwoTone, TagOutlined } from '@ant-design/icons';
+import { BookTwoTone, TagOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
@@ -485,6 +485,7 @@ const CreateCourseModal = ({
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
+        access: values.courseAccessType,
         type: courseTypes.VIDEO_NON_SEQ.name.toUpperCase(),
         price: currency ? values.price ?? 1 : 0,
         currency: currency?.toLowerCase() || '',
@@ -507,6 +508,7 @@ const CreateCourseModal = ({
         name: values.courseName,
         color_code: colorCode || values.colorCode || whiteColor,
         course_image_url: courseImageUrl || values.courseImageUrl,
+        access: values.courseAccessType,
         type: courseTypes.MIXED.name.toUpperCase(),
         price: currency ? values.price ?? 1 : 0,
         currency: currency?.toLowerCase() || '',
@@ -682,7 +684,9 @@ const CreateCourseModal = ({
                   </Select.Option>
                 ))}
               {courseClasses?.filter((courseClass) => courseClass.is_active).length <= 0 && (
-                <Text disabled> No published sessions </Text>
+                <Select.Option disabled value="no_published_session">
+                  <Text disabled> No published sessions </Text>
+                </Select.Option>
               )}
             </Select.OptGroup>
             <Select.OptGroup
@@ -716,7 +720,9 @@ const CreateCourseModal = ({
                   </Select.Option>
                 ))}
               {courseClasses?.filter((courseClass) => !courseClass.is_active).length <= 0 && (
-                <Text disabled> No unpublished sessions </Text>
+                <Select.Option disabled value="no_unpublished_session">
+                  <Text disabled> No unpublished sessions </Text>
+                </Select.Option>
               )}
             </Select.OptGroup>
           </Select>
@@ -945,7 +951,9 @@ const CreateCourseModal = ({
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => video.is_published).length <= 0 && (
-                      <Text disabled> No published video </Text>
+                      <Select.Option disabled value="no_published_video">
+                        <Text disabled> No published video </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
@@ -978,7 +986,9 @@ const CreateCourseModal = ({
                         </Select.Option>
                       ))}
                     {videos?.filter((video) => !video.is_published).length <= 0 && (
-                      <Text disabled> No unpublished video </Text>
+                      <Select.Option disabled value="no_unpublished_video">
+                        <Text disabled> No unpublished video </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                 </Select>
@@ -1029,7 +1039,12 @@ const CreateCourseModal = ({
                   </Radio.Group>
                 </Form.Item>
                 <Form.Item className={styles.inlineFormItem}>
-                  <Button type="link" onClick={() => showTagOptionsHelperModal('course')}>
+                  <Button
+                    size="small"
+                    type="link"
+                    onClick={() => showTagOptionsHelperModal('course')}
+                    icon={<InfoCircleOutlined />}
+                  >
                     Understanding the tag options
                   </Button>
                 </Form.Item>

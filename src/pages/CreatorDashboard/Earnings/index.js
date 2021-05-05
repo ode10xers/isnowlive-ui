@@ -39,6 +39,7 @@ const getEarningsAPIs = {
   passes: apis.passes.getCreatorPassEarnings,
   videos: apis.videos.getCreatorVideosEarnings,
   courses: apis.courses.getCreatorCourseEarnings,
+  subscriptions: apis.subscriptions.getSubscriptionEarnings,
 };
 
 const Earnings = () => {
@@ -57,18 +58,21 @@ const Earnings = () => {
     passes: [],
     videos: [],
     courses: [],
+    subscriptions: [],
   });
   const [showMore, setShowMore] = useState({
     sessions: false,
     passes: false,
     videos: false,
     courses: false,
+    subscriptions: false,
   });
   const [currentPage, setCurrentPage] = useState({
     sessions: 1,
     passes: 1,
     videos: 1,
     courses: 1,
+    subscriptions: 1,
   });
   const itemsPerPage = 10;
 
@@ -326,7 +330,7 @@ const Earnings = () => {
   const openSessionDetails = (item) => {
     trackSimpleEvent(creator.click.payment.sessionEarnings, { session_data: item });
     if (item?.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/payments/inventory/${item.inventory_id}`);
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/session/${item.inventory_id}`);
     }
   };
 
@@ -345,6 +349,12 @@ const Earnings = () => {
   const openCourseDetails = (item) => {
     if (item?.course_id) {
       history.push(`${Routes.creatorDashboard.rootPath}/payments/course/${item.course_id}`);
+    }
+  };
+
+  const openSubscriptionDetails = (item) => {
+    if (item?.subscription_id) {
+      history.push(`${Routes.creatorDashboard.rootPath}/payments/subscription/${item.subscription_id}`);
     }
   };
 
@@ -510,6 +520,13 @@ const Earnings = () => {
       stateKey: 'courses',
       redirectMethod: openCourseDetails,
       showMoreMethod: () => handleShowMore('courses'),
+    },
+    {
+      name: 'Membership',
+      key: 'subscription_id',
+      stateKey: 'subscriptions',
+      redirectMethod: openSubscriptionDetails,
+      showMoreMethod: () => handleShowMore('subscriptions'),
     },
   ];
 

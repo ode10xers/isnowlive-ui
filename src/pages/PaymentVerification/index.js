@@ -11,7 +11,7 @@ import {
   showErrorModal,
   showAlreadyBookedModal,
   showPurchaseSingleVideoSuccessModal,
-  showCoursePurchaseSuccessModal,
+  showPurchaseSingleCourseSuccessModal,
   showPurchasePassAndGetVideoSuccessModal,
 } from 'components/Modals/modals';
 
@@ -19,18 +19,14 @@ import apis from 'apis';
 
 import dateUtil from 'utils/date';
 import parseQueryString from 'utils/parseQueryString';
-import { useGlobalContext } from 'services/globalContext';
 import { isAPISuccess, paymentSource, orderType, productType } from 'utils/helper';
 
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
+// TODO: This page is no longer used, since in page payment is implemented
 const PaymentVerification = () => {
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
   const location = useLocation();
   const history = useHistory();
   const [isLoading, setIsLoading] = useState(true);
@@ -111,7 +107,7 @@ const PaymentVerification = () => {
               showPurchaseSingleVideoSuccessModal(order_id);
             } else if (order_type === orderType.COURSE) {
               // it is a course purchase
-              showCoursePurchaseSuccessModal();
+              showPurchaseSingleCourseSuccessModal();
             } else {
               // it is a session purchase
               // We actually need the inventory_id here, but this page will
@@ -130,7 +126,7 @@ const PaymentVerification = () => {
       setIsLoading(false);
       showErrorModal('Something went wrong');
     }
-  }, [order_id, transaction_id, order_type, inventory_id, video_id, history, userDetails]);
+  }, [order_id, transaction_id, order_type, inventory_id, video_id, history]);
 
   return (
     <Row justify="center">

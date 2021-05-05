@@ -10,7 +10,6 @@ import Loader from 'components/Loader';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { redirectToVideosPage } from 'utils/redirect';
 import { isAPISuccess, orderType, paymentSource, productType, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -116,12 +115,7 @@ const PublicVideoList = ({ username = null, videos }) => {
         <Row justify="start" gutter={[20, 20]}>
           {videos?.map((video) => (
             <Col xs={24} lg={12} key={video?.external_id}>
-              <VideoCard
-                video={video}
-                buyable={true}
-                onCardClick={() => redirectToVideosPage(video)}
-                showAuthModal={() => handleSelectVideo(video)}
-              />
+              <VideoCard video={video} buyable={true} showAuthModal={() => handleSelectVideo(video)} />
             </Col>
           ))}
         </Row>

@@ -6,10 +6,11 @@ import apis from 'apis';
 
 import PaymentCard from 'components/Payment/PaymentCard';
 import {
-  showCoursePurchaseSuccessModal,
+  showPurchaseSingleCourseSuccessModal,
   showBookSingleSessionSuccessModal,
   showPurchaseSingleVideoSuccessModal,
   showPurchasePassSuccessModal,
+  showPurchaseSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -71,7 +72,6 @@ const PaymentPopup = () => {
     try {
       //TODO: Use productType here to adjust the payload
       // e.g. if productType === PASS it should be pass_id (match the BE implementation)
-      console.log(productType);
 
       const payload = {
         coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
@@ -160,7 +160,7 @@ const PaymentPopup = () => {
           showPurchasePassSuccessModal(orderResponse.payment_order_id);
         }
       } else if (verifyOrderRes === orderType.COURSE) {
-        showCoursePurchaseSuccessModal();
+        showPurchaseSingleCourseSuccessModal();
       } else if (verifyOrderRes === orderType.CLASS) {
         // Showing confirmation for Single Session Booking
         // inventory_id is attached for session orders
@@ -168,6 +168,8 @@ const PaymentPopup = () => {
       } else if (verifyOrderRes === orderType.VIDEO) {
         // Showing confirmation for Single Session Booking
         showPurchaseSingleVideoSuccessModal(orderResponse.payment_order_id);
+      } else if (verifyOrderRes === orderType.SUBSCRIPTION) {
+        showPurchaseSubscriptionSuccessModal();
       }
     }
 
@@ -188,12 +190,17 @@ const PaymentPopup = () => {
           ? `and you'll be left with ${passDetails.classes_remaining - 1}/${passDetails.class_count} credits`
           : ''
       }`;
+    } else if (paymentInstrumentDetails.type === 'SUBSCRIPTION') {
+      const subscriptionDetails = paymentInstrumentDetails;
+
+      textContent = `Will use ${subscriptionDetails.subscription_name} to book this and you'll be left with ${
+        subscriptionDetails.products[productType].credits - subscriptionDetails.products[productType].credits_used - 1
+      }/${subscriptionDetails.products[productType].credits} credits`;
     }
 
     return (
       <Text strong className={styles.blueText}>
-        {' '}
-        {textContent}{' '}
+        {textContent}
       </Text>
     );
   };
@@ -281,8 +288,7 @@ const PaymentPopup = () => {
                   loading={isApplyingCoupon}
                   enterButton={
                     <Button block type="primary" disabled={couponCode === ''}>
-                      {' '}
-                      Apply{' '}
+                      Apply
                     </Button>
                   }
                   placeholder="Input discount code"

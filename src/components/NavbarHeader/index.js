@@ -31,6 +31,7 @@ const NavbarHeader = () => {
   const [shouldShowPassLink, setShouldShowPassLink] = useState(false);
   const [shouldShowVideoLink, setShouldShowVideoLink] = useState(false);
   const [shouldShowCourseLink, setShouldShowCourseLink] = useState(false);
+  const [shouldShowSubscriptionLink, setShouldShowSubscriptionLink] = useState(false);
 
   const {
     state: { userDetails },
@@ -82,6 +83,18 @@ const NavbarHeader = () => {
       }
     } catch (error) {
       console.error(error.response?.data?.message || 'Failed to fetch courses for creator');
+    }
+  };
+
+  const checkShouldShowSubscriptionLink = async () => {
+    try {
+      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
+
+      if (isAPISuccess(status) && data) {
+        setShouldShowSubscriptionLink(data.length > 0);
+      }
+    } catch (error) {
+      console.error(error.response?.data?.message || 'Failed to fetch memberships for creator');
     }
   };
 
@@ -172,6 +185,7 @@ const NavbarHeader = () => {
       checkShouldShowPassLink();
       checkShouldShowVideoLink();
       checkShouldShowCourseLink();
+      checkShouldShowSubscriptionLink();
     }
   }, [username, userDetails]);
 
@@ -284,6 +298,15 @@ const NavbarHeader = () => {
                     onClick={() => redirectToCreatorProfile('course')}
                   >
                     Courses
+                  </Menu.Item>
+                )}
+                {shouldShowSubscriptionLink && (
+                  <Menu.Item
+                    key="Membership"
+                    className={siteLinkActive('membership') ? 'ant-menu-item-active' : undefined}
+                    onClick={() => redirectToCreatorProfile('membership')}
+                  >
+                    Memberships
                   </Menu.Item>
                 )}
                 {localUserDetails ? (
@@ -467,6 +490,15 @@ const NavbarHeader = () => {
                           <span className={styles.menuLink}>Courses</span>
                         </li>
                       )}
+                      {shouldShowSubscriptionLink && (
+                        <li
+                          key="Creator Memberships"
+                          className={siteLinkActive('membership') ? styles.active : undefined}
+                          onClick={() => redirectToCreatorProfile('membership')}
+                        >
+                          <span className={styles.menuLink}>Memberships</span>
+                        </li>
+                      )}
                       {localUserDetails && (
                         <>
                           <li key="Divider" className={styles.divider} />
@@ -504,6 +536,13 @@ const NavbarHeader = () => {
                             onClick={() => redirectToDashboard('/courses')}
                           >
                             <span className={styles.menuLink}>My Courses</span>
+                          </li>
+                          <li
+                            key="Attendee Subscriptions"
+                            className={isActive('/attendee/dashboard/subscriptions') ? styles.active : undefined}
+                            onClick={() => redirectToDashboard('/subscriptions')}
+                          >
+                            <span className={styles.menuLink}>My Memberships</span>
                           </li>
                         </>
                       )}

@@ -275,7 +275,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Session Name',
       dataIndex: 'name',
       key: 'name',
-      width: '150px',
+      width: '220px',
       render: (text, record) => {
         if (record.is_date) {
           return {

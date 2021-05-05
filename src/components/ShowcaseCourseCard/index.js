@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 
@@ -8,11 +8,17 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
-import { showCoursePurchaseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import {
+  showPurchaseSingleCourseSuccessModal,
+  showGetCourseWithSubscriptionSuccessModal,
+  showErrorModal,
+  showAlreadyBookedModal,
+} from 'components/Modals/modals';
 import DefaultImage from 'components/Icons/DefaultImage';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { getLocalUserDetails } from 'utils/storage';
 import { redirectToCoursesPage } from 'utils/redirect';
 import {
   isValidFile,
@@ -37,12 +43,53 @@ const {
 const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPage }) => {
   const history = useHistory();
 
-  const { showPaymentPopup } = useGlobalContext();
+  const {
+    showPaymentPopup,
+    state: { userDetails },
+  } = useGlobalContext();
 
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [usableUserSubscription, setUsableUserSubscription] = useState(null);
+  const [shouldFollowUpGetCourse, setShouldFollowUpGetCourse] = useState(false);
+
+  const getUsableSubscriptionForUser = useCallback(async (courseId) => {
+    try {
+      const loggedInUserData = getLocalUserDetails();
+
+      if (loggedInUserData) {
+        // TODO: Can put this as a generic helper
+        // currently commented out because subscriptions does not support courses
+        // const { status, data } = await apis.subscriptions.getUserSubscriptionForCourse(courseId);
+
+        // if (isAPISuccess(status) && data) {
+        //   if (data.active.length > 0) {
+        //     // Choose a purchased subscription based on these conditions
+        //     // 1. Should be usable for Courses
+        //     // 2. Still have credits to purchase courses
+        //     // 3. This course can be purchased by this subscription
+        //     const usableSubscription =
+        //       data.active.find(
+        //         (subscription) =>
+        //           subscription.products['COURSE'] &&
+        //           subscription.products['COURSE']?.credits > 0 &&
+        //           subscription.products['COURSE']?.product_ids?.includes(courseId)
+        //       ) || null;
+
+        //     setUsableUserSubscription(usableSubscription);
+        //   } else {
+        //     setUsableUserSubscription(null);
+        //   }
+        // }
+        setUsableUserSubscription(null);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed fetching usable membership for user');
+      setIsLoading(false);
+    }
+  }, []);
 
   const openAuthModal = (course) => {
     setSelectedCourse(course);
@@ -50,7 +97,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
   };
 
   const closeAuthModal = () => {
-    setSelectedCourse(null);
     setShowAuthModal(false);
   };
 
@@ -61,10 +107,31 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
     }
   }, [history]);
 
-  const showConfirmPaymentPopup = () => {
+  useEffect(() => {
+    if (shouldFollowUpGetCourse) {
+      showConfirmPaymentPopup();
+    }
+    //eslint-disable-next-line
+  }, [shouldFollowUpGetCourse]);
+
+  useEffect(() => {
+    if (!userDetails) {
+      setUsableUserSubscription(null);
+    }
+  }, [userDetails]);
+
+  const showConfirmPaymentPopup = async () => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
       return;
+    }
+
+    if (!shouldFollowUpGetCourse && !usableUserSubscription) {
+      await getUsableSubscriptionForUser(selectedCourse.id);
+      setShouldFollowUpGetCourse(true);
+      return;
+    } else {
+      setShouldFollowUpGetCourse(false);
     }
 
     let desc = [];
@@ -77,7 +144,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
       desc.push(`${selectedCourse.videos.length} Videos`);
     }
 
-    const paymentPopupData = {
+    let paymentPopupData = {
       productId: selectedCourse.id,
       productType: 'COURSE',
       itemList: [
@@ -90,10 +157,56 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
       ],
     };
 
-    showPaymentPopup(paymentPopupData, createOrder);
+    // if (usableUserSubscription) {
+    //   paymentPopupData = {
+    //     ...paymentPopupData,
+    //     paymentInstrumentDetails: {
+    //       type: 'SUBSCRIPTION',
+    //       ...usableUserSubscription,
+    //     },
+    //   };
+
+    //   showPaymentPopup(paymentPopupData, buyCourseWithSubscription);
+    // } else {
+    //   showPaymentPopup(paymentPopupData, buySingleCourse);
+    // }
+
+    showPaymentPopup(paymentPopupData, buySingleCourse);
   };
 
-  const createOrder = async (couponCode = '') => {
+  //eslint-disable-next-line
+  const buyCourseWithSubscription = async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.courses.createOrderForUser({
+        course_id: selectedCourse.id,
+        price: selectedCourse.price,
+        currency: selectedCourse.currency?.toLowerCase(),
+        timezone_location: getTimezoneLocation(),
+        payment_source: paymentSource.SUBSCRIPTION,
+        source_id: usableUserSubscription.subscription_order_id,
+      });
+
+      if (isAPISuccess(status) && data) {
+        showGetCourseWithSubscriptionSuccessModal();
+        setIsLoading(false);
+        setSelectedCourse(null);
+        return null;
+      }
+    } catch (error) {
+      if (
+        error?.response?.status === 500 &&
+        error?.response?.data?.message === 'user already has a confirmed order for this course'
+      ) {
+        showAlreadyBookedModal(productType.COURSE);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
+      }
+    }
+    setIsLoading(false);
+  };
+
+  const buySingleCourse = async (couponCode = '') => {
     if (!selectedCourse) {
       showErrorModal('Something went wrong', 'Invalid Course Selected');
       return;
@@ -122,7 +235,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
             payment_order_id: data.course_order_id,
           };
         } else {
-          showCoursePurchaseSuccessModal();
+          showPurchaseSingleCourseSuccessModal();
           return null;
         }
       }

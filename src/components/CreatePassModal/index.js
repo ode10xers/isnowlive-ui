@@ -218,7 +218,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
       }
     } else {
       setSelectedTagType('anyone');
-      form.setFieldsValue({ ...form.getFieldsValue(), courseTagType: 'anyone', selectedMemberTag: null });
+      form.setFieldsValue({ ...form.getFieldsValue(), passTagType: 'anyone', selectedMemberTag: null });
       Modal.confirm({
         title: `You currently don't have any member tags. You need to create tags to limit access to this product.`,
         okText: 'Setup Member Tags',
@@ -355,6 +355,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                 <Form.Item className={styles.inlineFormItem}>
                   <Tooltip title="Understanding the tag options">
                     <Button
+                      size="small"
                       type="link"
                       onClick={() => showTagOptionsHelperModal('pass')}
                       icon={<InfoCircleOutlined />}
@@ -452,8 +453,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                           </Row>
                         </Select.Option>
                       ))}
-                    {classes?.filter((session) => session.is_active).length <= 0 && (
-                      <Text disabled> No published sessions </Text>
+                    {classes
+                      ?.filter((session) => session.is_active)
+                      .filter((session) =>
+                        !selectedTag ? true : session.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_published_session">
+                        <Text disabled> No published sessions </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
@@ -485,8 +492,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                           </Row>
                         </Select.Option>
                       ))}
-                    {classes?.filter((session) => !session.is_active).length <= 0 && (
-                      <Text disabled> No unpublished sessions </Text>
+                    {classes
+                      ?.filter((session) => !session.is_active)
+                      .filter((session) =>
+                        !selectedTag ? true : session.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_unpublished_session">
+                        <Text disabled> No unpublished sessions </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                 </Select>
@@ -554,8 +567,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                           </Row>
                         </Select.Option>
                       ))}
-                    {videos?.filter((video) => video.is_published).length <= 0 && (
-                      <Text disabled> No published videos </Text>
+                    {videos
+                      ?.filter((video) => video.is_published)
+                      .filter((video) =>
+                        !selectedTag ? true : video.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_published_video">
+                        <Text disabled> No published videos </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                   <Select.OptGroup
@@ -587,8 +606,14 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                           </Row>
                         </Select.Option>
                       ))}
-                    {videos?.filter((video) => !video.is_published).length <= 0 && (
-                      <Text disabled> No unpublished videos </Text>
+                    {videos
+                      ?.filter((video) => !video.is_published)
+                      .filter((video) =>
+                        !selectedTag ? true : video.tags?.map((tag) => tag.external_id).includes(selectedTag)
+                      ).length <= 0 && (
+                      <Select.Option disabled value="no_unpublished_video">
+                        <Text disabled> No unpublished videos </Text>
+                      </Select.Option>
                     )}
                   </Select.OptGroup>
                 </Select>

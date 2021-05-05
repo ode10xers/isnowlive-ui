@@ -1,0 +1,39 @@
+@import '../../styles/variables.scss';
+
+.productName {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inlineFormItem {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+}
+
+.modalActionRow {
+  margin-top: 10px;
+}
+
+.numericInput {
+  width: 100% !important;
+}
+
+.helpTextWrapper {
+  font-size: 12px;
+  align-self: center;
+}
+
+.compactFormItem {
+  margin-bottom: 0px !important;
+}
+
+.saveBtn {
+  background-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+  border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
+}
+
+.colorPicker {
+  width: inherit !important;
+}

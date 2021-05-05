@@ -34,6 +34,7 @@ const {
   timeCalculation: { isBeforeDate },
 } = dateUtil;
 
+//TODO: Refactor this for overall same experience across all products
 const ClassPassList = () => {
   const { showSendEmailPopup } = useGlobalContext();
 
@@ -241,7 +242,7 @@ const ClassPassList = () => {
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
-  const generatePassesColumns = useCallback(() => {
+  const generatePassesColumns = () => {
     const initialColumns = [
       {
         title: 'Pass Name',
@@ -257,7 +258,7 @@ const ClassPassList = () => {
             children: (
               <>
                 <Text> {record.name} </Text>
-                {record.is_published ? null : <EyeInvisibleOutlined />}
+                {record.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
               </>
             ),
           };
@@ -367,8 +368,7 @@ const ClassPassList = () => {
     }
 
     return initialColumns;
-    //eslint-disable-next-line
-  }, [creatorMemberTags]);
+  };
 
   const buyersColumns = [
     {

@@ -13,6 +13,7 @@ export const mixPanelEventTags = {
         passesNav: '(Creator) Passes Nav Clicked',
         videosNav: '(Creator) Videos Nav Clicked',
         coursesNav: '(Creator) Courses Nav Clicked',
+        subscriptionsNav: '(Creator) Subscription Nav Clicked',
         couponsNav: '(Creator) Coupons Nav Clicked',
         livestreamNav: '(Creator) LiveStream Nav Clicked',
         profileNav: '(Creator) Public Page Nav Clicked',
@@ -100,6 +101,7 @@ export const mixPanelEventTags = {
         becomeHost: '(Attendee) Become Host Clicked',
         videosNav: '(Attendee) Videos Nav Clicked',
         coursesNav: '(Attendee) Courses Nav Clicked',
+        subscriptionsNav: '(Attendee) Subscriptions Nav Clicked',
       },
       sessions: {
         pastSessionDetails: '(Attendee) Past Session Details Clicked',
