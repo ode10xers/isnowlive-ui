@@ -205,7 +205,9 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
       setSelectedVideos([]);
       // setSelectedCourses([]);
       setColorCode(initialColor);
+      setSelectedTagType('anyone');
       setSelectedMemberTag(null);
+      setCurrency('');
     }
 
     getCreatorCurrencyDetails();
