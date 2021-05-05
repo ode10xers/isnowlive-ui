@@ -82,7 +82,7 @@ const formInitialValues = {
   selectedMemberTags: [],
 };
 
-const { Text, Title } = Typography;
+const { Text, Title, Paragraph } = Typography;
 
 const {
   timeCalculation: { dateIsBeforeDate },
@@ -360,6 +360,7 @@ const CreateCourseModal = ({
         setHighestMaxParticipantCourseSession(null);
         setSelectedTagType('anyone');
         // setIsSequentialVideos(false);
+        document.body.removeAttribute('style');
       }
 
       fetchAllVideosForCreator(isVideoModal);
@@ -467,6 +468,32 @@ const CreateCourseModal = ({
     }
   };
 
+  const saveChangesToCourse = async (payload, modalRef = null) => {
+    setSubmitting(true);
+
+    if (modalRef) {
+      modalRef.destroy();
+    }
+
+    try {
+      const response = editedCourse
+        ? await apis.courses.updateCourse(editedCourse.id, payload)
+        : await apis.courses.createCourse(payload);
+
+      if (isAPISuccess(response.status)) {
+        showSuccessModal(`${payload.name} successfully ${editedCourse ? 'updated' : 'created'}`);
+        closeModal(true);
+      }
+    } catch (error) {
+      showErrorModal(
+        `Failed to ${editedCourse ? 'update' : 'create'} course`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setSubmitting(false);
+  };
+
   const handleFinish = async (values) => {
     setSubmitting(true);
 
@@ -522,20 +549,62 @@ const CreateCourseModal = ({
       };
     }
 
-    try {
-      const response = editedCourse
-        ? await apis.courses.updateCourse(editedCourse.id, payload)
-        : await apis.courses.createCourse(payload);
+    if (editedCourse) {
+      const isIncludedVideoChanged =
+        JSON.stringify(editedCourse?.videos?.map((courseVideo) => courseVideo.external_id)) !==
+        JSON.stringify(payload.video_ids);
 
-      if (isAPISuccess(response.status)) {
-        showSuccessModal(`${payload.name} successfully ${editedCourse ? 'updated' : 'created'}`);
-        closeModal(true);
+      if (isIncludedVideoChanged) {
+        const modalRef = Modal.confirm({
+          centered: true,
+          closable: true,
+          maskClosable: false,
+          title: 'Some items in this course have changed',
+          width: 500,
+          content: (
+            <Row gutter={[8, 4]}>
+              <Col xs={24}>
+                <Paragraph>It seems you have added or removed some items in this course.</Paragraph>
+              </Col>
+              <Col xs={24}>
+                <Paragraph>
+                  Would you like these changes to also reflect in the course orders already purchased by some attendees?
+                </Paragraph>
+              </Col>
+              <Col xs={24}>
+                <Row gutter={8} justify="end">
+                  <Col>
+                    <Button
+                      block
+                      danger
+                      ghost
+                      type="primary"
+                      onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: true }, modalRef)}
+                    >
+                      Change existing orders
+                    </Button>
+                  </Col>
+                  <Col>
+                    <Button
+                      block
+                      type="primary"
+                      onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: false }, modalRef)}
+                    >
+                      Don't change existing orders
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          ),
+          okButtonProps: { style: { display: 'none' } },
+          cancelButtonProps: { style: { display: 'none' } },
+        });
+      } else {
+        saveChangesToCourse({ ...payload, new_videos_to_orders: false });
       }
-    } catch (error) {
-      showErrorModal(
-        `Failed to ${editedCourse ? 'update' : 'create'} course`,
-        error?.response?.data?.message || 'Something went wrong.'
-      );
+    } else {
+      saveChangesToCourse(payload);
     }
 
     setSubmitting(false);
@@ -859,7 +928,7 @@ const CreateCourseModal = ({
       visible={visible}
       footer={null}
       onCancel={() => closeModal(false)}
-      width={800}
+      width={820}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -1045,7 +1114,7 @@ const CreateCourseModal = ({
                     onClick={() => showTagOptionsHelperModal('course')}
                     icon={<InfoCircleOutlined />}
                   >
-                    Understanding the tag options
+                    Understanding the options
                   </Button>
                 </Form.Item>
               </Form.Item>
