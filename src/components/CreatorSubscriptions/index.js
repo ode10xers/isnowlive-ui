@@ -11,7 +11,7 @@ import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 
 import dateUtil from 'utils/date';
 import { generateBaseCreditsText } from 'utils/subscriptions';
-import { isAPISuccess, orderType } from 'utils/helper';
+import { isAPISuccess, orderType, isUnapprovedUserError } from 'utils/helper';
 // import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -101,7 +101,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
           'Discount Code Not Applicable',
           'The discount code you entered is not applicable this product. Please try again with a different discount code'
         );
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }

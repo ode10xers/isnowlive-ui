@@ -11,7 +11,7 @@ import SessionCards from 'components/SessionCards';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess, orderType } from 'utils/helper';
+import { isAPISuccess, orderType, isUnapprovedUserError } from 'utils/helper';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { isMobileDevice } from 'utils/device';
 
@@ -146,10 +146,12 @@ const Subscriptions = () => {
         }
       }
     } catch (error) {
-      showErrorModal(
-        'Failed to fetch subscription orders',
-        error?.response?.data?.message || 'Something wrong happened'
-      );
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal(
+          'Failed to fetch subscription orders',
+          error?.response?.data?.message || 'Something wrong happened'
+        );
+      }
     }
 
     setIsLoading(false);
@@ -176,17 +178,19 @@ const Subscriptions = () => {
           <>
             <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
             <Paragraph>
-              However you can still use it as long as it's not expired and there's still sufficient credits.
+              However you can still use it as long as it's not expired and there's still enough credits.
             </Paragraph>
           </>
         );
         fetchUserSubscriptionOrders();
       }
     } catch (error) {
-      showErrorModal(
-        'Failed to cancel subscription order',
-        error?.response?.data?.message || 'Something wrong happened'
-      );
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal(
+          'Failed to cancel subscription order',
+          error?.response?.data?.message || 'Something wrong happened'
+        );
+      }
     }
 
     setIsLoading(false);
@@ -317,10 +321,10 @@ const Subscriptions = () => {
                   title={
                     <>
                       {' '}
-                      <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
+                      <Paragraph> Are you sure about cancelling this subscription? </Paragraph>{' '}
                       <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
                       <Paragraph>
-                        However you can still use it as long as it's not expired and there's still sufficient credits.
+                        However you can still use it as long as it's not expired and there's still enough credits.
                       </Paragraph>{' '}
                     </>
                   }
@@ -428,13 +432,13 @@ const Subscriptions = () => {
                   <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, false)}</div>
                 </Col>
               </Row>
-              {subscriptionDetails.products['COURSE'] && (
+              {/* {subscriptionDetails.products['COURSE'] && (
                 <Row gutter={[8, 8]}>
                   <Col xs={24}>
                     <div className={styles.baseCreditsText}>{generateBaseCreditsText(subscriptionDetails, true)}</div>
                   </Col>
                 </Row>
-              )}
+              )} */}
             </Space>
           </Col>
 
@@ -494,10 +498,10 @@ const Subscriptions = () => {
             title={
               <>
                 {' '}
-                <Paragraph> Are you sure about cancelling this subcription? </Paragraph>{' '}
+                <Paragraph> Are you sure about cancelling this subscription? </Paragraph>{' '}
                 <Paragraph>By cancelling, the subscription won't be renewed when it finally expires.</Paragraph>
                 <Paragraph>
-                  However you can still use it as long as it's not expired and there's still sufficient credits.
+                  However you can still use it as long as it's not expired and there's still enough credits.
                 </Paragraph>{' '}
               </>
             }

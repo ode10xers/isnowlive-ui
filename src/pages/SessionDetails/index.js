@@ -579,7 +579,6 @@ const SessionDetails = ({ match, history }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      message.error(error.response?.data?.message || 'Something went wrong');
 
       if (
         error.response?.data?.message === 'It seems you have already booked this session, please check your dashboard'
@@ -587,6 +586,8 @@ const SessionDetails = ({ match, history }) => {
         showAlreadyBookedModal(productType.CLASS);
       } else if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
         showAlreadyBookedModal(productType.PASS);
+      } else if (!isUnapprovedUserError(error.response)) {
+        message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
 

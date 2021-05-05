@@ -311,7 +311,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
 
   const handleCancelChange = () => {
     if (editedSubscription) {
-      saveChanges(editedSubscription);
+      saveChanges();
     } else {
       cancelChanges();
     }

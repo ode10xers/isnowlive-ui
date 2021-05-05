@@ -199,7 +199,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         error?.response?.data?.message === 'user already has a confirmed order for this course'
       ) {
         showAlreadyBookedModal(productType.COURSE);
-      } else {
+      } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
