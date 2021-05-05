@@ -417,7 +417,12 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                       rules={validationRules.numberValidation('Please Input Subscription Price', 0, false)}
                       noStyle
                     >
-                      <InputNumber min={0} placeholder="Enter Price" className={styles.numericInput} />
+                      <InputNumber
+                        min={0}
+                        placeholder="Enter Price"
+                        className={styles.numericInput}
+                        disabled={currency === ''}
+                      />
                     </Form.Item>
                   </Col>
                   <Col xs={8} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
