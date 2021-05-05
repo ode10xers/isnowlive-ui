@@ -189,8 +189,6 @@ const Videos = () => {
   }, [isOnboarding]);
 
   const toggleExpandAllPublished = () => {
-    console.log(videos);
-
     if (expandedPublishedRowKeys.length > 0) {
       setExpandedPublishedRowKeys([]);
     } else {

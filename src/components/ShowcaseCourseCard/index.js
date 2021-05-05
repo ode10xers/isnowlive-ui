@@ -61,27 +61,29 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
 
       if (loggedInUserData) {
         // TODO: Can put this as a generic helper
-        const { status, data } = await apis.subscriptions.getUserSubscriptionForCourse(courseId);
+        // currently commented out because subscriptions does not support courses
+        // const { status, data } = await apis.subscriptions.getUserSubscriptionForCourse(courseId);
 
-        if (isAPISuccess(status) && data) {
-          if (data.active.length > 0) {
-            // Choose a purchased subscription based on these conditions
-            // 1. Should be usable for Courses
-            // 2. Still have credits to purchase courses
-            // 3. This course can be purchased by this subscription
-            const usableSubscription =
-              data.active.find(
-                (subscription) =>
-                  subscription.products['COURSE'] &&
-                  subscription.products['COURSE']?.credits > 0 &&
-                  subscription.products['COURSE']?.product_ids?.includes(courseId)
-              ) || null;
+        // if (isAPISuccess(status) && data) {
+        //   if (data.active.length > 0) {
+        //     // Choose a purchased subscription based on these conditions
+        //     // 1. Should be usable for Courses
+        //     // 2. Still have credits to purchase courses
+        //     // 3. This course can be purchased by this subscription
+        //     const usableSubscription =
+        //       data.active.find(
+        //         (subscription) =>
+        //           subscription.products['COURSE'] &&
+        //           subscription.products['COURSE']?.credits > 0 &&
+        //           subscription.products['COURSE']?.product_ids?.includes(courseId)
+        //       ) || null;
 
-            setUsableUserSubscription(usableSubscription);
-          } else {
-            setUsableUserSubscription(null);
-          }
-        }
+        //     setUsableUserSubscription(usableSubscription);
+        //   } else {
+        //     setUsableUserSubscription(null);
+        //   }
+        // }
+        setUsableUserSubscription(null);
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed fetching usable membership for user');

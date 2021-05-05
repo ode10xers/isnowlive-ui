@@ -254,8 +254,6 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
             .map((video) => video.external_id) || []
         : [];
 
-      console.log(refilteredSessions);
-
       setSelectedSessions(refilteredSessions);
       setSelectedVideos(refilteredVideos);
 

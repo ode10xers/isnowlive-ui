@@ -262,8 +262,6 @@ const Subscriptions = () => {
       segmentedSubscriptions.push(tempSubscriptions.splice(0, 3));
     }
 
-    console.log(segmentedSubscriptions);
-
     return segmentedSubscriptions.map((segmentedSubs) => (
       <Row gutter={10} justify="start" key={segmentedSubs[0].external_id || 'button'}>
         <Col xs={5}>
