@@ -121,7 +121,7 @@ const SubscriptionCards = ({
       extra={
         <Button
           disabled={editing}
-          type="link"
+          type="primary"
           onClick={() => editSubscription(subscription.external_id)}
           icon={<EditOutlined />}
         />
