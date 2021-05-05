@@ -219,7 +219,6 @@ const Session = ({ match, history }) => {
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
             color_code: data?.color_code || whiteColor,
             session_course_type: data?.is_course ? 'course' : 'normal',
-            session_access_type: data?.access,
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
             session_tag_type: data?.tags?.length > 0 ? 'selected' : 'anyone',
             selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
