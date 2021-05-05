@@ -576,9 +576,7 @@ const CreateCourseModal = ({
                   <Col>
                     <Button
                       block
-                      danger
-                      ghost
-                      type="primary"
+                      type="default"
                       onClick={() => saveChangesToCourse({ ...payload, new_videos_to_orders: true }, modalRef)}
                     >
                       Change existing orders
