@@ -19,6 +19,7 @@ import AuthModal from 'components/AuthModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+import InputPriceAmount from 'components/InputPriceAmount';
 import {
   showErrorModal,
   showBookSessionWithPassSuccessModal,
@@ -80,6 +81,7 @@ const SessionDetails = ({ match, history }) => {
   const [sessionVideos, setSessionVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
+  const [inputPriceAmount, setInputPriceAmount] = useState(0);
   const [username, setUsername] = useState(null);
 
   const getDetails = useCallback(
@@ -96,6 +98,7 @@ const SessionDetails = ({ match, history }) => {
               (inventory) => inventory.num_participants < sessionDetails.max_participants
             ),
           });
+          setInputPriceAmount(sessionDetails.price);
 
           const latestInventories = sessionDetails.inventory
             .filter((inventory) => isBeforeDate(inventory.end_time))
@@ -426,7 +429,7 @@ const SessionDetails = ({ match, history }) => {
             name: session.name,
             description: toLongDateWithTime(selectedInventory.start_time),
             currency: session.currency,
-            price: session.price,
+            price: inputPriceAmount || session.price,
           },
         ],
       };
@@ -438,6 +441,7 @@ const SessionDetails = ({ match, history }) => {
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
         payment_source: paymentSource.GATEWAY,
+        amount: inputPriceAmount || session.price,
       };
 
       showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleClass(payload, couponCode));
@@ -840,6 +844,15 @@ const SessionDetails = ({ match, history }) => {
                     setShowSignInForm(true);
                     setIncorrectPassword(false);
                   }}
+                  priceInputComponent={
+                    <InputPriceAmount
+                      onInputChange={setInputPriceAmount}
+                      inputValue={inputPriceAmount}
+                      minimum={session?.price}
+                      suffix={session?.currency?.toUpperCase()}
+                    />
+                  }
+                  isValidPrice={inputPriceAmount >= session?.price}
                 />
               )}
             </Col>

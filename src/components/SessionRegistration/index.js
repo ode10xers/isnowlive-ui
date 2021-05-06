@@ -43,6 +43,8 @@ const SessionRegistration = ({
   userSubscription = null,
   classDetails,
   logOut,
+  priceInputComponent = null,
+  isValidPrice = true,
 }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
@@ -107,7 +109,7 @@ const SessionRegistration = ({
       key: 'price',
       align: 'right',
       width: '50%',
-      render: (text, record) => `${record.price} ${record.currency.toUpperCase()}`,
+      render: (text, record) => priceInputComponent || `${record.price} ${record.currency.toUpperCase()}`,
     },
   ];
 
@@ -661,25 +663,33 @@ const SessionRegistration = ({
               </>
             )}
 
-            <Item {...sessionRegistrationTailLayout}>
-              <Row className={styles.mt10} gutter={[8, 8]}>
-                <Col xs={8} md={8} xl={6}>
-                  <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
-                    {user && classDetails?.price > 0 && !(selectedPass && userPasses.length > 0) && !userSubscription
-                      ? 'Buy'
-                      : 'Register'}
-                  </Button>
-                </Col>
-                {!selectedInventory && (
-                  <Col xs={24}>
-                    <Paragraph>
-                      Please select the date & time for the class you wish to attend
-                      {isMobileDevice ? '' : ', in the calendar on the right'}
-                    </Paragraph>
+            <div className={styles.mt10}>
+              <Item {...sessionRegistrationTailLayout}>
+                <Row gutter={[8, 8]}>
+                  <Col xs={8} md={8} xl={6}>
+                    <Button
+                      block
+                      size="large"
+                      type="primary"
+                      htmlType="submit"
+                      disabled={!selectedInventory || (!selectedPass && !isValidPrice)}
+                    >
+                      {user && classDetails?.price > 0 && !(selectedPass && userPasses.length > 0) && !userSubscription
+                        ? 'Buy'
+                        : 'Register'}
+                    </Button>
                   </Col>
-                )}
-              </Row>
-            </Item>
+                  {!selectedInventory && (
+                    <Col xs={24}>
+                      <Paragraph>
+                        Please select the date & time for the class you wish to attend
+                        {isMobileDevice ? '' : ', in the calendar on the right'}
+                      </Paragraph>
+                    </Col>
+                  )}
+                </Row>
+              </Item>
+            </div>
           </Form>
         </Col>
       </Row>
