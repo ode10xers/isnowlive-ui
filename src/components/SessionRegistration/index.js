@@ -57,7 +57,7 @@ const formInitialValues = {
   password: '',
 };
 
-const SessionRegistration = ({ availablePasses = [], classDetails }) => {
+const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false }) => {
   const {
     state: { userDetails },
     logIn,
@@ -201,15 +201,19 @@ const SessionRegistration = ({ availablePasses = [], classDetails }) => {
   // Logic for automatically selecting first available inventory and timeslot
   useEffect(() => {
     if (classDetails) {
-      const latestInventories = classDetails.inventory
-        .filter((inventory) => isBeforeDate(inventory.end_time))
-        .filter((inventory) => inventory.num_participants < classDetails.max_participants)
-        .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
-      setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
+      if (isInventoryDetails) {
+        setSelectedInventory(classDetails);
+      } else {
+        const latestInventories = classDetails.inventory
+          .filter((inventory) => isBeforeDate(inventory.end_time))
+          .filter((inventory) => inventory.num_participants < classDetails.max_participants)
+          .sort((a, b) => (a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0));
+        setSelectedInventory(latestInventories.length > 0 ? latestInventories[0] : null);
+      }
     } else {
       setSelectedInventory(null);
     }
-  }, [classDetails]);
+  }, [classDetails, isInventoryDetails]);
 
   // This logic is for setting default pass right after user logs in from the page
   useEffect(() => {
@@ -1184,24 +1188,26 @@ const SessionRegistration = ({ availablePasses = [], classDetails }) => {
                 </Row>
               </div>
             </Col>
-            <Col
-              xs={24}
-              lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
-              order={isMobileDevice ? 1 : 2}
-              className={isMobileDevice ? styles.mt20 : styles.mt50}
-            >
-              <SessionInventorySelect
-                inventories={
-                  classDetails?.inventory.sort((a, b) =>
-                    a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
-                  ) || []
-                }
-                selectedSlot={selectedInventory}
-                handleSubmit={(val) => {
-                  setSelectedInventory(val);
-                }}
-              />
-            </Col>
+            {!isInventoryDetails && (
+              <Col
+                xs={24}
+                lg={{ span: 9, offset: isMobileDevice ? 0 : 1 }}
+                order={isMobileDevice ? 1 : 2}
+                className={isMobileDevice ? styles.mt20 : styles.mt50}
+              >
+                <SessionInventorySelect
+                  inventories={
+                    classDetails?.inventory.sort((a, b) =>
+                      a.start_time > b.start_time ? 1 : b.start_time > a.start_time ? -1 : 0
+                    ) || []
+                  }
+                  selectedSlot={selectedInventory}
+                  handleSubmit={(val) => {
+                    setSelectedInventory(val);
+                  }}
+                />
+              </Col>
+            )}
           </>
         )}
       </Row>
