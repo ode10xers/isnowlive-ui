@@ -44,11 +44,11 @@ const {
         pay_what_you_want: Boolean | undefined, -> can be undefined since PWYW is not yet supported for all
       },
     ],
-    paymentInstrumentDetails: {
+    paymentInstrumentDetails: { -> Optional, can be null
       type: String, -> can be 'SUBSCRIPTION' or 'PASS', we use it to show additional UI 
       ...{ paymentInstrumentOrderData }
     },
-    flexiblePaymentDetails: {
+    flexiblePaymentDetails: { -> Optional, can be null
       enabled: Boolean,
       minimumPrice: Integer,
     },
@@ -305,7 +305,7 @@ const PaymentPopup = () => {
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={10}>
             <Col xs={14}>
-              <Text strong>Total payable amount</Text>
+              <Text strong>{flexiblePaymentDetails?.enabled ? 'Your Fair Price' : 'Total payable amount'}</Text>
             </Col>
             <Col xs={10} className={styles.paymentTotalText}>
               {itemList &&

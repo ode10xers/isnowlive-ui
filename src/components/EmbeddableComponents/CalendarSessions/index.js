@@ -77,7 +77,7 @@ const CalendarSessions = ({ profileUsername }) => {
 
   const createOrder = async (couponCode = '', priceAmount = 0) => {
     // Currently discount engine has not been implemented for session
-    // however this form of createOrder will be what is used to accomodate
+    // however this form of createOrder will be what is used to accommodate
     // the new Payment Popup
 
     // Some front end checks to prevent the logic below from breaking
