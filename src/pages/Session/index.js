@@ -1013,12 +1013,12 @@ const Session = ({ match, history }) => {
               extra={`Set your ${sessionPaymentType === priceTypes.FLEXIBLE ? 'minimum ' : ''}price`}
               rules={validationRules.numberValidation(
                 `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
-                sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 1,
+                sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0,
                 false
               )}
               hidden={sessionPaymentType === priceTypes.FREE}
             >
-              <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 1} placeholder="Amount" />
+              <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
             </Form.Item>
 
             {sessionPaymentType !== priceTypes.FREE && (

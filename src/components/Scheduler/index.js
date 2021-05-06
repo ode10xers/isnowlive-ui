@@ -512,6 +512,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         visible={openModal}
         onCancel={handleCancel}
         footer={null}
+        afterClose={() => document.body.removeAttribute('style')}
       >
         <>
           <Row className={classNames(styles.mt10, styles.mb10)}>
