@@ -61,7 +61,7 @@ const useOptions = () => {
 // NOTE: isFree is a flag sent from PaymentPopup in case the user does not need to pay
 // It can be used to bypass button disable condition, hide the card form, etc
 const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
-  const { text = 'PAY' } = btnProps;
+  const { text = 'PAY', disableButton = false } = btnProps;
   const {
     state: { paymentPopupVisible },
   } = useGlobalContext();
@@ -264,11 +264,11 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
           block
           size="middle"
           type="primary"
-          disabled={!isFree && isButtonDisabled && !selectedCard}
+          disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
           onClick={handleSubmit}
           className={classNames(
             styles.buyButton,
-            !isFree && isButtonDisabled && !selectedCard ? styles.disabledBtn : undefined
+            disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBtn : undefined
           )}
           loading={isSubmitting}
         >
