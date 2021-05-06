@@ -560,7 +560,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
                 <Row className={styles.mt20}>
                   <Col span={24}>
                     <Loader loading={isVideosLoading} size="large" text="Loading videos">
-                      <PublicVideoList videos={videos} username={username} />
+                      <PublicVideoList videos={videos} />
                     </Loader>
                   </Col>
                 </Row>
