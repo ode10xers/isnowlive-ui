@@ -19,7 +19,6 @@ import AuthModal from 'components/AuthModal';
 import SessionRegistration from 'components/SessionRegistration';
 import SessionInventorySelect from 'components/SessionInventorySelect';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
-import InputPriceAmount from 'components/InputPriceAmount';
 import {
   showErrorModal,
   showBookSessionWithPassSuccessModal,
@@ -421,6 +420,8 @@ const SessionDetails = ({ match, history }) => {
         showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndBookClass(payload, couponCode));
       }
     } else {
+      console.log(inputPriceAmount);
+
       const paymentPopupData = {
         productId: session.session_id,
         productType: 'SESSION',
@@ -844,15 +845,16 @@ const SessionDetails = ({ match, history }) => {
                     setShowSignInForm(true);
                     setIncorrectPassword(false);
                   }}
-                  priceInputComponent={
-                    <InputPriceAmount
-                      onInputChange={setInputPriceAmount}
-                      inputValue={inputPriceAmount}
-                      minimum={session?.price}
-                      suffix={session?.currency?.toUpperCase()}
-                    />
-                  }
-                  isValidPrice={inputPriceAmount >= session?.price}
+                  setPriceAmount={setInputPriceAmount}
+                  // priceInputComponent={
+                  //   <InputPriceAmount
+                  //     onInputChange={setInputPriceAmount}
+                  //     inputValue={inputPriceAmount}
+                  //     minimum={session?.price}
+                  //     suffix={session?.currency?.toUpperCase()}
+                  //   />
+                  // }
+                  // isValidPrice={inputPriceAmount >= session?.price}
                 />
               )}
             </Col>

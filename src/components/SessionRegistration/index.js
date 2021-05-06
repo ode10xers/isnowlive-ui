@@ -9,6 +9,7 @@ import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons'
 import Routes from 'routes';
 
 import Table from 'components/Table';
+import InputPriceAmount from 'components/InputPriceAmount';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -43,8 +44,9 @@ const SessionRegistration = ({
   userSubscription = null,
   classDetails,
   logOut,
-  priceInputComponent = null,
-  isValidPrice = true,
+  setPriceAmount = () => {},
+  // priceInputComponent = null,
+  // isValidPrice = true,
 }) => {
   const md = new MobileDetect(window.navigator.userAgent);
   const isMobileDevice = Boolean(md.mobile());
@@ -54,6 +56,7 @@ const SessionRegistration = ({
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [legalsAccepted, setLegalsAccepted] = useState(false);
   const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
+  const [inputPrice, setInputPrice] = useState(classDetails?.price || 0);
 
   useEffect(() => {
     if (user) {
@@ -109,7 +112,20 @@ const SessionRegistration = ({
       key: 'price',
       align: 'right',
       width: '50%',
-      render: (text, record) => priceInputComponent || `${record.price} ${record.currency.toUpperCase()}`,
+      render: (text, record) =>
+        record.pay_what_you_want ? (
+          <InputPriceAmount
+            onInputChange={(val) => {
+              setInputPrice(val);
+              setPriceAmount(val);
+            }}
+            inputValue={inputPrice}
+            minimum={record.price}
+            suffix={record?.currency?.toUpperCase()}
+          />
+        ) : (
+          `${record.price} ${record.currency.toUpperCase()}`
+        ),
     },
   ];
 
@@ -450,7 +466,7 @@ const SessionRegistration = ({
     );
   };
 
-  const handleFormSubmit = (values) => {
+  const handleFormSubmit = async (values) => {
     setShowLegalsErrorMessage(false);
 
     if (!legalsAccepted) {
@@ -458,7 +474,7 @@ const SessionRegistration = ({
       return;
     }
 
-    onFinish(values);
+    onFinish(values, inputPrice);
   };
 
   return (
@@ -672,7 +688,7 @@ const SessionRegistration = ({
                       size="large"
                       type="primary"
                       htmlType="submit"
-                      disabled={!selectedInventory || (!selectedPass && !isValidPrice)}
+                      disabled={!selectedInventory || (!selectedPass && inputPrice < classDetails?.price)}
                     >
                       {user && classDetails?.price > 0 && !(selectedPass && userPasses.length > 0) && !userSubscription
                         ? 'Buy'
