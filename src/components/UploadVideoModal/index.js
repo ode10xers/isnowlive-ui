@@ -874,7 +874,35 @@ const UploadVideoModal = ({
         )}
 
         {formPart === 3 && (
-          <Tabs defaultActiveKey="preview">
+          <Tabs defaultActiveKey="static">
+            <Tabs.TabPane key="static" tab={<Text strong> Static Image </Text>}>
+              <Row justify="center" gutter={[8, 8]}>
+                <Col xs={24}>
+                  <div className={styles.imageWrapper}>
+                    <ImageUpload
+                      aspect={4}
+                      className={classNames('avatar-uploader', styles.coverImage)}
+                      name="thumbnail_url"
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      onChange={setCoverImageUrl}
+                      value={coverImageUrl}
+                      label="Cover Image"
+                    />
+                  </div>
+                </Col>
+                <Col xs={24}>
+                  <Button
+                    block
+                    type="primary"
+                    disabled={!coverImageUrl}
+                    onClick={() => updateVideoWithImageUrl(coverImageUrl)}
+                  >
+                    {' '}
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </Tabs.TabPane>
             <Tabs.TabPane key="preview" tab={<Text strong> Video Preview </Text>}>
               <Row justify="center" style={{ textAlign: 'center' }}>
                 <Col xs={24}>
@@ -907,34 +935,6 @@ const UploadVideoModal = ({
                 </Col>
                 <Col xs={24} className={styles.mt20}>
                   <Button block type="primary" onClick={() => onCoverImageUpload()}>
-                    Submit
-                  </Button>
-                </Col>
-              </Row>
-            </Tabs.TabPane>
-            <Tabs.TabPane key="static" tab={<Text strong> Static Image </Text>}>
-              <Row justify="center" gutter={[8, 8]}>
-                <Col xs={24}>
-                  <div className={styles.imageWrapper}>
-                    <ImageUpload
-                      aspect={4}
-                      className={classNames('avatar-uploader', styles.coverImage)}
-                      name="thumbnail_url"
-                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                      onChange={setCoverImageUrl}
-                      value={coverImageUrl}
-                      label="Cover Image"
-                    />
-                  </div>
-                </Col>
-                <Col xs={24}>
-                  <Button
-                    block
-                    type="primary"
-                    disabled={!coverImageUrl}
-                    onClick={() => updateVideoWithImageUrl(coverImageUrl)}
-                  >
-                    {' '}
                     Submit
                   </Button>
                 </Col>
