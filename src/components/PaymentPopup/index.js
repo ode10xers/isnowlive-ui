@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button, Image } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip } from 'antd';
 
 import apis from 'apis';
 
 import PaymentCard from 'components/Payment/PaymentCard';
+import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
+  resetBodyStyle,
   showPurchaseSingleCourseSuccessModal,
   showBookSingleSessionSuccessModal,
   showPurchaseSingleVideoSuccessModal,
@@ -14,13 +16,12 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
+import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import TermsAndConditionsText from 'components/TermsAndConditionsText';
 
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
@@ -28,6 +29,36 @@ const { Text, Title } = Typography;
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
+
+/* 
+  NOTE: Here's the expected format for paymentPopupData
+
+  paymentPopupData : {
+    productId: String | Integer, -> integer is for inventories, since we pass inventory_id
+    productType: String, -> used for coupons and accessing subscription products, 
+    itemList: [ -> Array of products that will be listed in the popup
+      {
+        name: String,
+        description: String,
+        currency: String,
+        price: Integer,
+        pay_what_you_want: Boolean | undefined, -> can be undefined since PWYW is not yet supported for all
+      },
+    ],
+    paymentInstrumentDetails: { -> Optional, can be null
+      type: String, -> can be 'SUBSCRIPTION' or 'PASS', we use it to show additional UI 
+      ...{ paymentInstrumentOrderData }
+    },
+    flexiblePaymentDetails: { -> Optional, can be null
+      enabled: Boolean,
+      minimumPrice: Integer,
+    },
+  }
+
+  Possible Product Type values : 'SESSION' | 'VIDEO' | 'PASS' | 'COURSE' | 'SUBSCRIPTION'
+  paymentInstrumentOrderData will be a Pass Order Object (for type 'PASS') 
+    or Subscription Order Object (for type 'SUBSCRIPTION')
+*/
 
 const PaymentPopup = () => {
   const {
@@ -41,9 +72,15 @@ const PaymentPopup = () => {
   const [couponErrorText, setCouponErrorText] = useState(null);
   const [couponApplied, setCouponApplied] = useState(false);
   const [showCouponField, setShowCouponField] = useState(false);
+  const [priceAmount, setPriceAmount] = useState(0);
 
-  const { itemList = [], productId = null, productType = null, paymentInstrumentDetails = null } =
-    paymentPopupData || {};
+  const {
+    itemList = [],
+    productId = null,
+    productType = null,
+    paymentInstrumentDetails = null,
+    flexiblePaymentDetails = null,
+  } = paymentPopupData || {};
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
 
   useEffect(() => {
@@ -53,8 +90,17 @@ const PaymentPopup = () => {
       setCouponErrorText(null);
       setDiscountedPrice(null);
       setIsApplyingCoupon(false);
+      setPriceAmount(0);
     }
-  }, [paymentPopupVisible]);
+  }, [paymentPopupVisible, totalPrice]);
+
+  useEffect(() => {
+    if (flexiblePaymentDetails?.enabled) {
+      setPriceAmount(flexiblePaymentDetails?.minimumPrice || 5);
+    } else {
+      setPriceAmount(0);
+    }
+  }, [flexiblePaymentDetails]);
 
   const handleCouponCodeChange = (e) => {
     if (couponErrorText) {
@@ -100,6 +146,7 @@ const PaymentPopup = () => {
     setCouponErrorText(null);
     setDiscountedPrice(null);
     setIsApplyingCoupon(false);
+    resetBodyStyle();
 
     hidePaymentPopup();
   };
@@ -116,10 +163,17 @@ const PaymentPopup = () => {
   };
 
   const handleBeforePayment = async () => {
+    let result = null;
     const appliedCouponCode = couponApplied ? couponCode : '';
-    const result = await paymentPopupCallback(appliedCouponCode);
 
-    return result ? result : null;
+    if (!flexiblePaymentDetails?.enabled) {
+      result = await paymentPopupCallback(appliedCouponCode);
+    } else {
+      // TODO: Confirm if Pay What you want can use coupons
+      result = await paymentPopupCallback(appliedCouponCode, priceAmount);
+    }
+
+    return result;
   };
 
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
@@ -205,7 +259,17 @@ const PaymentPopup = () => {
     );
   };
 
-  const isFree = () => (discountedPrice ? discountedPrice === 0 : paymentInstrumentDetails || totalPrice === 0);
+  const isFree = () =>
+    flexiblePaymentDetails?.enabled
+      ? false
+      : discountedPrice
+      ? discountedPrice === 0
+      : paymentInstrumentDetails || totalPrice === 0;
+
+  const getMinimumPrice = () => flexiblePaymentDetails?.minimumPrice || 5;
+
+  const checkMinimumPriceRequirement = () =>
+    flexiblePaymentDetails?.enabled ? priceAmount < getMinimumPrice() : false;
 
   return (
     <Modal
@@ -226,7 +290,7 @@ const PaymentPopup = () => {
               <List.Item
                 actions={[
                   <Text strong>
-                    {item?.currency?.toUpperCase()} {item?.price}
+                    {item?.pay_what_you_want ? 'Your Fair Price' : `${item?.currency?.toUpperCase()} ${item?.price}`}
                   </Text>,
                 ]}
               >
@@ -242,12 +306,17 @@ const PaymentPopup = () => {
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={10}>
             <Col xs={14}>
-              <Text strong>Total payable amount</Text>
+              <Text strong>{flexiblePaymentDetails?.enabled ? 'Your Fair Price' : 'Total payable amount'}</Text>
             </Col>
             <Col xs={10} className={styles.paymentTotalText}>
               {itemList &&
                 itemList.length > 0 &&
-                (discountedPrice !== null ? (
+                (flexiblePaymentDetails?.enabled ? (
+                  <Tooltip title={`Input your fair price (min. ${getMinimumPrice()})`}>
+                    <InputNumber onChange={setPriceAmount} min={getMinimumPrice()} value={priceAmount} />
+                    <span className="ant-form-text"> {itemList[0]?.currency.toUpperCase()} </span>
+                  </Tooltip>
+                ) : discountedPrice !== null ? (
                   <>
                     <Text delete className={styles.discounted}>
                       {itemList[0].currency?.toUpperCase()} {totalPrice}
@@ -305,7 +374,7 @@ const PaymentPopup = () => {
           <Row gutter={8} justify="center">
             <Col xs={24} className={styles.mb10}>
               <PaymentCard
-                btnProps={{ text: isFree() ? 'Get' : 'Buy', disableCondition: false }}
+                btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
                 isFree={isFree()}
                 onBeforePayment={handleBeforePayment}
                 onAfterPayment={handleAfterPayment}

@@ -26,7 +26,11 @@ const SessionInfo = ({ session }) => {
             Price
           </Text>
           <Text className={styles.subText}>
-            {session?.price === 0 ? 'Free' : `${session?.price || 0} ${session?.currency.toUpperCase()}`}
+            {session?.pay_what_you_want
+              ? 'Your Fair Price'
+              : session?.price === 0
+              ? 'Free'
+              : `${session?.price || 0} ${session?.currency?.toUpperCase()}`}
           </Text>
         </Col>
       )}

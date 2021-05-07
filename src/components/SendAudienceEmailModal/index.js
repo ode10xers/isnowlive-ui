@@ -7,7 +7,7 @@ import apis from 'apis';
 
 import TextEditor from 'components/TextEditor';
 import FileUpload from 'components/FileUpload';
-import { showSuccessModal, showErrorModal } from 'components/Modals/modals';
+import { resetBodyStyle, showSuccessModal, showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
@@ -89,6 +89,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       onCancel={() => closeModal()}
       footer={null}
       width={640}
+      afterClose={resetBodyStyle}
     >
       <Form
         layout="horizontal"

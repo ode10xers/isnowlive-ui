@@ -7,7 +7,7 @@ import apis from 'apis';
 
 import FileUpload from 'components/FileUpload';
 import TextEditor from 'components/TextEditor';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -111,6 +111,7 @@ const SendCustomerEmailModal = () => {
       onCancel={() => hideSendEmailPopup()}
       footer={null}
       width={640}
+      afterClose={resetBodyStyle}
     >
       <Form
         layout="horizontal"

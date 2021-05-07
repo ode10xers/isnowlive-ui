@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import classNames from 'classnames';
+// import classNames from 'classnames';
 
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { Button, Row, Col, message } from 'antd';
@@ -61,9 +61,10 @@ const useOptions = () => {
 // NOTE: isFree is a flag sent from PaymentPopup in case the user does not need to pay
 // It can be used to bypass button disable condition, hide the card form, etc
 const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
-  const { text = 'PAY' } = btnProps;
+  const { text = 'PAY', disableButton = false } = btnProps;
   const {
     state: { paymentPopupVisible },
+    hidePaymentPopup,
   } = useGlobalContext();
 
   const stripe = useStripe();
@@ -83,10 +84,13 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
         setSavedUserCards(data);
       }
     } catch (error) {
-      if (error?.response?.status !== 404 && !isUnapprovedUserError(error.response)) {
+      if (isUnapprovedUserError(error.response)) {
+        hidePaymentPopup();
+      } else if (error?.response?.status !== 404) {
         message.error(error?.response?.data?.message || 'Failed fetching previously used payment methods');
       }
     }
+    //eslint-disable-next-line
   }, []);
 
   // Here we need to refetch the user cards if the payment popup is closed
@@ -262,14 +266,13 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
       <Col xs={8} lg={6}>
         <Button
           block
-          size="middle"
+          size="large"
           type="primary"
-          disabled={!isFree && isButtonDisabled && !selectedCard}
+          disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
           onClick={handleSubmit}
-          className={classNames(
-            styles.buyButton,
-            !isFree && isButtonDisabled && !selectedCard ? styles.disabledBtn : undefined
-          )}
+          className={
+            disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn
+          }
           loading={isSubmitting}
         >
           {text}

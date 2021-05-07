@@ -7,7 +7,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import FileUpload from 'components/FileUpload';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -78,6 +78,7 @@ const CreateDocumentModal = ({ visible, closeModal }) => {
       footer={null}
       onCancel={() => closeModal(false)}
       width={720}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         <Form {...profileFormItemLayout} form={form} scrollToFirstError={true} onFinish={handleSubmit}>

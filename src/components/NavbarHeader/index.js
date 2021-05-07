@@ -16,6 +16,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
+import { resetBodyStyle } from 'components/Modals/modals';
 
 const { Text, Paragraph } = Typography;
 
@@ -102,14 +103,14 @@ const NavbarHeader = () => {
     setAuthModalState('signIn');
     setAuthModalVisible(true);
     setShowMobileMenu(false);
-    document.body.removeAttribute('style');
+    resetBodyStyle();
   };
 
   const showSignUpModal = () => {
     setAuthModalState('signUp');
     setAuthModalVisible(true);
     setShowMobileMenu(false);
-    document.body.removeAttribute('style');
+    resetBodyStyle();
   };
 
   const isCreatorCheck = () => {
@@ -177,7 +178,7 @@ const NavbarHeader = () => {
   useEffect(() => {
     //For some reason, sometimes the modals locks the scrolling of <body>
     //This line here is to remove the style element of <body>
-    document.body.removeAttribute('style');
+    resetBodyStyle();
     setLocalUserDetails(getLocalUserDetails());
 
     if (username && !reservedDomainName.includes(username)) {
@@ -386,13 +387,13 @@ const NavbarHeader = () => {
                 width="100vw"
                 onCancel={() => {
                   setShowMobileMenu(false);
-                  document.body.removeAttribute('style');
+                  resetBodyStyle();
                 }}
                 onOk={() => {
                   setShowMobileMenu(false);
-                  document.body.removeAttribute('style');
+                  resetBodyStyle();
                 }}
-                afterClose={() => document.body.removeAttribute('style')}
+                afterClose={resetBodyStyle}
               >
                 <Row className={styles.topRow}>
                   <Col xs={20}>

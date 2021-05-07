@@ -27,7 +27,7 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
-import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -360,7 +360,6 @@ const CreateCourseModal = ({
         setHighestMaxParticipantCourseSession(null);
         setSelectedTagType('anyone');
         // setIsSequentialVideos(false);
-        document.body.removeAttribute('style');
       }
 
       fetchAllVideosForCreator(isVideoModal);
@@ -742,7 +741,9 @@ const CreateCourseModal = ({
                       </Col>
                       <Col xs={7} className={styles.textAlignRight}>
                         <Text strong>
-                          {courseClass.price > 0
+                          {courseClass.pay_what_you_want
+                            ? `min. ${courseClass.price}`
+                            : courseClass.price > 0
                             ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
                             : 'Free'}
                         </Text>
@@ -778,7 +779,9 @@ const CreateCourseModal = ({
                       </Col>
                       <Col xs={7} className={styles.textAlignRight}>
                         <Text strong>
-                          {courseClass.price > 0
+                          {courseClass.pay_what_you_want
+                            ? `min. ${courseClass.price}`
+                            : courseClass.price > 0
                             ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
                             : 'Free'}
                         </Text>
@@ -927,6 +930,7 @@ const CreateCourseModal = ({
       footer={null}
       onCancel={() => closeModal(false)}
       width={820}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         <Form

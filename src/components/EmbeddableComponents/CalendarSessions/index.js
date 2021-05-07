@@ -75,9 +75,9 @@ const CalendarSessions = ({ profileUsername }) => {
     setAuthModalVisible(false);
   };
 
-  const createOrder = async (couponCode = '') => {
+  const createOrder = async (couponCode = '', priceAmount = 0) => {
     // Currently discount engine has not been implemented for session
-    // however this form of createOrder will be what is used to accomodate
+    // however this form of createOrder will be what is used to accommodate
     // the new Payment Popup
 
     // Some front end checks to prevent the logic below from breaking
@@ -89,13 +89,17 @@ const CalendarSessions = ({ profileUsername }) => {
     setIsSessionLoading(true);
 
     try {
-      const payload = {
+      let payload = {
         inventory_id: selectedInventory.inventory_id,
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
         payment_source: paymentSource.GATEWAY,
       };
+
+      if (selectedInventory.pay_what_you_want) {
+        payload = { ...payload, amount: priceAmount };
+      }
 
       const { status, data } = await apis.session.createOrderForUser(payload);
 
@@ -142,6 +146,15 @@ const CalendarSessions = ({ profileUsername }) => {
 
     const desc = toLongDateWithTime(selectedInventory.start_time);
 
+    let flexiblePaymentDetails = null;
+
+    if (selectedInventory.pay_what_you_want) {
+      flexiblePaymentDetails = {
+        enabled: true,
+        minimumPrice: selectedInventory.price,
+      };
+    }
+
     const paymentPopupData = {
       productId: selectedInventory.inventory_id,
       productType: 'SESSION',
@@ -151,8 +164,10 @@ const CalendarSessions = ({ profileUsername }) => {
           description: desc,
           currency: selectedInventory.currency,
           price: selectedInventory.price,
+          pay_what_you_want: selectedInventory.pay_what_you_want,
         },
       ],
+      flexiblePaymentDetails,
     };
 
     showPaymentPopup(paymentPopupData, createOrder);

@@ -13,6 +13,7 @@ import {
   Button,
   Progress,
   TimePicker,
+  Tabs,
   message,
   Popconfirm,
 } from 'antd';
@@ -27,13 +28,15 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
+import TextEditor from 'components/TextEditor';
+import ImageUpload from 'components/ImageUpload';
 import {
   showErrorModal,
   showSuccessModal,
   showCourseOptionsHelperModal,
   showTagOptionsHelperModal,
+  resetBodyStyle,
 } from 'components/Modals/modals';
-import TextEditor from 'components/TextEditor';
 
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
@@ -219,7 +222,7 @@ const UploadVideoModal = ({
 
   useEffect(() => {
     if (visible) {
-      document.body.style.overflow = 'hidden';
+      // document.body.style.overflow = 'hidden';
 
       if (editedVideo) {
         form.setFieldsValue({
@@ -249,8 +252,7 @@ const UploadVideoModal = ({
       }
       fetchAllClassesForCreator();
     } else {
-      document.body.removeAttribute('style');
-      document.body.classList.remove(['ant-scrolling-effect']);
+      resetBodyStyle();
     }
     return () => {
       setCoverImageUrl(null);
@@ -260,8 +262,7 @@ const UploadVideoModal = ({
       setSelectedTagType('anyone');
       setCurrency('');
       uppy.current = null;
-      document.body.classList.remove(['ant-scrolling-effect']);
-      document.body.removeAttribute('style');
+      resetBodyStyle();
     };
     //eslint-disable-next-line
   }, [visible, editedVideo, fetchAllClassesForCreator, getCreatorCurrencyDetails, form, formPart]);
@@ -325,6 +326,26 @@ const UploadVideoModal = ({
         },
       });
     }
+  };
+
+  const onCourseTypeChange = (e) => {
+    setIsCourseVideo(e.target.value === 'course');
+  };
+
+  const cancelUpload = async () => {
+    setIsLoading(true);
+    uppy.current.cancelAll();
+
+    try {
+      const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+
+      if (isAPISuccess(status)) {
+        message.success('Video upload aborted');
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+    }
+    setIsLoading(false);
   };
 
   const handleFinish = async (values) => {
@@ -422,6 +443,52 @@ const UploadVideoModal = ({
     setIsSubmitting(false);
   };
 
+  const updateVideoWithImageUrl = (imageUrl) => {
+    apis.videos
+      .updateVideo(editedVideo.external_id, {
+        currency: currency.toLowerCase(),
+        title: editedVideo.title,
+        description: editedVideo.description,
+        price: videoType === videoTypes.FREE.name ? 0 : editedVideo.price,
+        validity: editedVideo.validity,
+        session_ids: selectedSessionIds || editedVideo.session_ids || [],
+        thumbnail_url: imageUrl,
+        watch_limit: editedVideo.watch_limit,
+        is_course: isCourseVideo,
+      })
+      .then(() => {
+        setIsLoading(false);
+        closeModal(true);
+
+        if (shouldClone) {
+          showSuccessModal('Video cloned successfully');
+        } else if (updateVideoDetails) {
+          showSuccessModal('Video details updated successfully');
+        } else {
+          showSuccessModal(
+            'Video Successfully Uploaded',
+            <>
+              <Paragraph>
+                We have received your video. It takes us about 10 minutes to process your video. Until then your video
+                is hidden.
+              </Paragraph>
+              <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+            </>
+          );
+          if (editedVideo && uploadingFile) {
+            pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
+              video_id: editedVideo?.external_id || customNullValue,
+            });
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsLoading(false);
+        showErrorModal('Something went wrong!');
+      });
+  };
+
   const onCoverImageUpload = async () => {
     try {
       setIsLoading(true);
@@ -436,49 +503,7 @@ const UploadVideoModal = ({
         formData.append('file', new File([blob], 'thumbnail.gif', { type: 'image/gif' }));
         const { data } = await apis.user.uploadImage(formData);
         if (data) {
-          apis.videos
-            .updateVideo(editedVideo.external_id, {
-              currency: currency.toLowerCase(),
-              title: editedVideo.title,
-              description: editedVideo.description,
-              price: videoType === videoTypes.FREE.name ? 0 : editedVideo.price,
-              validity: editedVideo.validity,
-              session_ids: selectedSessionIds || editedVideo.session_ids || [],
-              thumbnail_url: data,
-              watch_limit: editedVideo.watch_limit,
-              is_course: isCourseVideo,
-            })
-            .then(() => {
-              setIsLoading(false);
-              closeModal(true);
-
-              if (shouldClone) {
-                showSuccessModal('Video cloned successfully');
-              } else if (updateVideoDetails) {
-                showSuccessModal('Video details updated successfully');
-              } else {
-                showSuccessModal(
-                  'Video Successfully Uploaded',
-                  <>
-                    <Paragraph>
-                      We have received your video. It takes us about 10 minutes to process your video. Until then your
-                      video is hidden.
-                    </Paragraph>
-                    <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
-                  </>
-                );
-                if (editedVideo && uploadingFile) {
-                  pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
-                    video_id: editedVideo?.external_id || customNullValue,
-                  });
-                }
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-              setIsLoading(false);
-              showErrorModal('Something went wrong!');
-            });
+          updateVideoWithImageUrl(data);
         }
       }
     } catch (error) {
@@ -486,26 +511,6 @@ const UploadVideoModal = ({
       setIsLoading(false);
       showErrorModal('Something went wrong!');
     }
-  };
-
-  const onCourseTypeChange = (e) => {
-    setIsCourseVideo(e.target.value === 'course');
-  };
-
-  const cancelUpload = async () => {
-    setIsLoading(true);
-    uppy.current.cancelAll();
-
-    try {
-      const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
-
-      if (isAPISuccess(status)) {
-        message.success('Video upload aborted');
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to remove uploaded video');
-    }
-    setIsLoading(false);
   };
 
   const handleVideoPreviewTimeChange = (time, timeString) => {
@@ -537,10 +542,7 @@ const UploadVideoModal = ({
       closable={[1, 3].includes(formPart)}
       onCancel={() => closeModal(false)}
       width={850}
-      afterClose={() => {
-        document.body.classList.remove(['ant-scrolling-effect']);
-        document.body.removeAttribute('style');
-      }}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         {formPart === 1 && (
@@ -613,7 +615,11 @@ const UploadVideoModal = ({
                               </Col>
                               <Col xs={7} className={styles.textAlignRight}>
                                 <Text strong>
-                                  {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                                  {session.pay_what_you_want
+                                    ? `min. ${session.price}`
+                                    : session.price > 0
+                                    ? `${session.currency?.toUpperCase()} ${session.price}`
+                                    : 'Free'}
                                 </Text>
                               </Col>
                             </Row>
@@ -647,7 +653,11 @@ const UploadVideoModal = ({
                               </Col>
                               <Col xs={7} className={styles.textAlignRight}>
                                 <Text strong>
-                                  {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                                  {session.pay_what_you_want
+                                    ? `min. ${session.price}`
+                                    : session.price > 0
+                                    ? `${session.currency?.toUpperCase()} ${session.price}`
+                                    : 'Free'}
                                 </Text>
                               </Col>
                             </Row>
@@ -817,6 +827,7 @@ const UploadVideoModal = ({
             </Form.Item>
           </Form>
         )}
+
         {formPart === 2 && (
           <div className={styles.videoUpload}>
             <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFile ? 'none' : 'auto' }}>
@@ -863,41 +874,73 @@ const UploadVideoModal = ({
         )}
 
         {formPart === 3 && (
-          <Row justify="center" style={{ textAlign: 'center' }}>
-            <Col xs={24}>
-              {videoPreviewTime && (
-                <iframe
-                  key={videoPreviewTime}
-                  title={editedVideo?.title || ''}
-                  src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
-                    videoPreviewTime
-                  )}&height=200&duration=15s`}
-                  style={{
-                    border: 'none',
-                    width: 400,
-                    height: 200,
-                  }}
-                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                ></iframe>
-              )}
-            </Col>
-            <Col xs={24} className={styles.mt20}>
-              We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
-            </Col>
-            <Col xs={24} className={styles.mt20}>
-              Select Time:{' '}
-              <TimePicker
-                showNow={false}
-                defaultValue={moment(videoPreviewTime, 'hh:mm:ss')}
-                onChange={handleVideoPreviewTimeChange}
-              />
-            </Col>
-            <Col xs={24} className={styles.mt20}>
-              <Button block type="primary" onClick={() => onCoverImageUpload()}>
-                Submit
-              </Button>
-            </Col>
-          </Row>
+          <Tabs defaultActiveKey="static">
+            <Tabs.TabPane key="static" tab={<Text strong> Static Image </Text>}>
+              <Row justify="center" gutter={[8, 8]}>
+                <Col xs={24}>
+                  <div className={styles.imageWrapper}>
+                    <ImageUpload
+                      aspect={4}
+                      className={classNames('avatar-uploader', styles.coverImage)}
+                      name="thumbnail_url"
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      onChange={setCoverImageUrl}
+                      value={coverImageUrl}
+                      label="Cover Image"
+                    />
+                  </div>
+                </Col>
+                <Col xs={24}>
+                  <Button
+                    block
+                    type="primary"
+                    disabled={!coverImageUrl}
+                    onClick={() => updateVideoWithImageUrl(coverImageUrl)}
+                  >
+                    {' '}
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </Tabs.TabPane>
+            <Tabs.TabPane key="preview" tab={<Text strong> Video Preview </Text>}>
+              <Row justify="center" style={{ textAlign: 'center' }}>
+                <Col xs={24}>
+                  {videoPreviewTime && (
+                    <iframe
+                      key={videoPreviewTime}
+                      title={editedVideo?.title || ''}
+                      src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+                        videoPreviewTime
+                      )}&height=200&duration=15s`}
+                      style={{
+                        border: 'none',
+                        width: 400,
+                        height: 200,
+                      }}
+                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                    ></iframe>
+                  )}
+                </Col>
+                <Col xs={24} className={styles.mt20}>
+                  We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
+                </Col>
+                <Col xs={24} className={styles.mt20}>
+                  Select Time:{' '}
+                  <TimePicker
+                    showNow={false}
+                    defaultValue={moment(videoPreviewTime, 'hh:mm:ss')}
+                    onChange={handleVideoPreviewTimeChange}
+                  />
+                </Col>
+                <Col xs={24} className={styles.mt20}>
+                  <Button block type="primary" onClick={() => onCoverImageUpload()}>
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </Tabs.TabPane>
+          </Tabs>
         )}
       </Loader>
     </Modal>
