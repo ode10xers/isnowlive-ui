@@ -1,14 +1,5 @@
 @import '../../../styles/variables.scss';
 
-.buyButton {
-  @extend .greenBtn;
-  height: 40px !important;
-}
-
-.disabledBtn {
-  opacity: 0.7;
-}
-
 .StripeCustomElement {
   box-sizing: border-box;
   height: 40px;

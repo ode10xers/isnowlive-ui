@@ -448,7 +448,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                              {session.pay_what_you_want
+                                ? `min. ${session.price}`
+                                : session.price > 0
+                                ? `${session.currency?.toUpperCase()} ${session.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -487,7 +491,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                              {session.pay_what_you_want
+                                ? `min. ${session.price}`
+                                : session.price > 0
+                                ? `${session.currency?.toUpperCase()} ${session.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>

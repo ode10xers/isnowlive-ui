@@ -213,7 +213,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
               </Col>
               <Col xs={24} md={{ span: 18, offset: 3 }}>
                 {!showSignIn && (
-                  <Form.Item label="Name" className={styles.nameInputWrapper}>
+                  <Form.Item label="Name" className={styles.nameInputWrapper} required>
                     <Form.Item
                       className={styles.firstNameInput}
                       name="first_name"

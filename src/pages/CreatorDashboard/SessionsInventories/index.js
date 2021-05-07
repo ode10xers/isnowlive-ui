@@ -11,7 +11,6 @@ import {
   InfoCircleOutlined,
   BookTwoTone,
   MailOutlined,
-  EditOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -328,7 +327,7 @@ const SessionsInventories = ({ match }) => {
                   type="link"
                   className={styles.detailsButton}
                   onClick={() => openSessionInventoryDetails(record)}
-                  icon={<EditOutlined />}
+                  icon={<InfoCircleOutlined />}
                 />
               </Tooltip>
             </Col>
@@ -453,7 +452,7 @@ const SessionsInventories = ({ match }) => {
         </Tooltip>
       ) : (
         <Tooltip title="Edit Event Details">
-          <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<EditOutlined />} />
+          <Button type="link" onClick={() => openSessionInventoryDetails(item)} icon={<InfoCircleOutlined />} />
         </Tooltip>
       ),
       <Tooltip title="Copy Event Page Link">

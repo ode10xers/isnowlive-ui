@@ -742,7 +742,9 @@ const CreateCourseModal = ({
                       </Col>
                       <Col xs={7} className={styles.textAlignRight}>
                         <Text strong>
-                          {courseClass.price > 0
+                          {courseClass.pay_what_you_want
+                            ? `min. ${courseClass.price}`
+                            : courseClass.price > 0
                             ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
                             : 'Free'}
                         </Text>
@@ -778,7 +780,9 @@ const CreateCourseModal = ({
                       </Col>
                       <Col xs={7} className={styles.textAlignRight}>
                         <Text strong>
-                          {courseClass.price > 0
+                          {courseClass.pay_what_you_want
+                            ? `min. ${courseClass.price}`
+                            : courseClass.price > 0
                             ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
                             : 'Free'}
                         </Text>

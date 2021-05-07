@@ -993,7 +993,7 @@ const Session = ({ match, history }) => {
               <Radio.Group>
                 <Radio value={priceTypes.FREE}>Free</Radio>
                 <Radio value={priceTypes.PAID}>Paid</Radio>
-                <Radio value={priceTypes.FLEXIBLE}>Flexible Payment</Radio>
+                <Radio value={priceTypes.FLEXIBLE}>Let attendees pay what they can</Radio>
               </Radio.Group>
             </Form.Item>
 
@@ -1010,7 +1010,13 @@ const Session = ({ match, history }) => {
             <Form.Item
               {...(!isMobileDevice && profileFormTailLayout)}
               name="price"
-              extra={`Set your ${sessionPaymentType === priceTypes.FLEXIBLE ? 'minimum ' : ''}price`}
+              extra={
+                sessionPaymentType === priceTypes.FLEXIBLE
+                  ? `Choose your minimum price. We default to 5 ${form
+                      .getFieldsValue()
+                      .currency.toUpperCase()} as default`
+                  : 'Set your price'
+              }
               rules={validationRules.numberValidation(
                 `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
                 sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0,
