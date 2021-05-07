@@ -5,7 +5,7 @@ import { CopyOutlined } from '@ant-design/icons';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
@@ -153,6 +153,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
         footer={null}
         width={560}
         onCancel={() => closeModal(false)}
+        afterClose={resetBodyStyle}
         destroyOnClose={true}
         title={
           !showForm ? (

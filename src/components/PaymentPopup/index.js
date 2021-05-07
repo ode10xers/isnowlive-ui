@@ -7,6 +7,7 @@ import apis from 'apis';
 import PaymentCard from 'components/Payment/PaymentCard';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
+  resetBodyStyle,
   showPurchaseSingleCourseSuccessModal,
   showBookSingleSessionSuccessModal,
   showPurchaseSingleVideoSuccessModal,
@@ -145,6 +146,7 @@ const PaymentPopup = () => {
     setCouponErrorText(null);
     setDiscountedPrice(null);
     setIsApplyingCoupon(false);
+    resetBodyStyle();
 
     hidePaymentPopup();
   };

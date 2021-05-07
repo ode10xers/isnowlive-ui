@@ -18,9 +18,11 @@ import moment from 'moment';
 import classNames from 'classnames';
 import { DeleteFilled, SaveOutlined } from '@ant-design/icons';
 
-import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
+import { resetBodyStyle } from 'components/Modals/modals';
+
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { convertSchedulesToLocal, generateTimes } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -512,7 +514,7 @@ const Scheduler = ({ sessionSlots, recurring, recurringDatesRange, handleSlotsCh
         visible={openModal}
         onCancel={handleCancel}
         footer={null}
-        afterClose={() => document.body.removeAttribute('style')}
+        afterClose={resetBodyStyle}
       >
         <>
           <Row className={classNames(styles.mt10, styles.mb10)}>

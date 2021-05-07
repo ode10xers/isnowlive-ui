@@ -9,7 +9,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
@@ -322,6 +322,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
       footer={null}
       onCancel={() => closeModal(false)}
       width={800}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         <Form

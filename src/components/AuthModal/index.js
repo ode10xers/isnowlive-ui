@@ -10,7 +10,12 @@ import { isAPISuccess } from 'utils/helper';
 
 import Loader from 'components/Loader';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
-import { showErrorModal, sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
+import {
+  showErrorModal,
+  sendNewPasswordEmail,
+  showSetNewPasswordModal,
+  resetBodyStyle,
+} from 'components/Modals/modals';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -61,7 +66,6 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
 
   useEffect(() => {
     if (visible) {
-      document.body.style.overflow = 'hidden';
       const user = getLocalUserDetails();
       if (user) {
         if (!currentUser) {
@@ -74,8 +78,6 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
       }
 
       setShowSignIn(showingSignIn);
-    } else {
-      document.body.style.overflow = 'auto';
     }
     //eslint-disable-next-line
   }, [form, currentUser, visible]);
@@ -195,7 +197,13 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
 
   return (
     <div>
-      <Modal visible={visible} centered={true} onCancel={() => closeModal(true)} footer={null}>
+      <Modal
+        visible={visible}
+        centered={true}
+        onCancel={() => closeModal(true)}
+        footer={null}
+        afterClose={resetBodyStyle}
+      >
         <Loader loading={isLoading} size="large">
           <Form
             form={form}

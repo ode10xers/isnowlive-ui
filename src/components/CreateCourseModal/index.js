@@ -27,7 +27,7 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
-import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -360,7 +360,6 @@ const CreateCourseModal = ({
         setHighestMaxParticipantCourseSession(null);
         setSelectedTagType('anyone');
         // setIsSequentialVideos(false);
-        document.body.removeAttribute('style');
       }
 
       fetchAllVideosForCreator(isVideoModal);
@@ -931,6 +930,7 @@ const CreateCourseModal = ({
       footer={null}
       onCancel={() => closeModal(false)}
       width={820}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         <Form
