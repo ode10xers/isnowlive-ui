@@ -135,6 +135,11 @@ $spacing: (
   border-color: map-get($map: $colors, $key: 'KellyGreen') !important;
   color: map-get($map: $colors, $key: 'White') !important;
 }
+
 .ant-btn {
   border-radius: 5px !important;
+}
+
+.ant-card .ant-image .ant-image-img {
+    height: 200px;
 }
