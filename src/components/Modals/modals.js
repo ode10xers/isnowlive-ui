@@ -55,10 +55,18 @@ const getDashboardUrl = (userName = null, targetPath = Routes.attendeeDashboard.
   }
 };
 
+// This helper is a workaround to get rid of some scrolling lock
+// issue that sometimes happens after closing a modal
+export const resetBodyStyle = () => {
+  document.body.classList.remove(['ant-scrolling-effect']);
+  document.body.removeAttribute('style');
+};
+
 export const showErrorModal = (title, message = '') => {
   Modal.error({
-    title: title || 'Something wrong occured',
+    title: title || 'Something wrong occurred',
     content: message,
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -66,6 +74,7 @@ export const showSuccessModal = (title, message = '') => {
   Modal.success({
     title: title || 'Success',
     content: message,
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -73,6 +82,7 @@ export const showWarningModal = (title, message = '') => {
   Modal.warning({
     title: title || 'Warning',
     content: message,
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -108,6 +118,7 @@ export const showSetNewPasswordModal = (email) => {
     okText: 'Okay',
     cancelText: 'Talk to us',
     onCancel: () => openFreshChatWidget(),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -170,6 +181,7 @@ export const showPurchasePassSuccessModal = async (passOrderId) => {
         <Paragraph>You can see your Passes in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -209,6 +221,7 @@ export const showPurchasePassAndBookSessionSuccessModal = async (passOrderId, in
         {generateCustomButtonsForSessionModals(username, inventoryDetails)}
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -244,6 +257,7 @@ export const showBookSessionWithPassSuccessModal = async (passOrderId, inventory
         {generateCustomButtonsForSessionModals(username, inventoryDetails)}
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -274,6 +288,7 @@ export const showBookSingleSessionSuccessModal = async (inventoryId) => {
         {generateCustomButtonsForSessionModals(username, inventoryDetails)}
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -309,6 +324,7 @@ export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -341,6 +357,7 @@ export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
         <Paragraph>You can see all your bookings in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -373,6 +390,7 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -399,6 +417,7 @@ export const showPurchaseSingleCourseSuccessModal = () => {
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -420,6 +439,7 @@ export const showPurchaseSubscriptionSuccessModal = () => {
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -447,6 +467,7 @@ export const showGetVideoWithSubscriptionSuccessModal = () => {
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -479,6 +500,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
         {generateCustomButtonsForSessionModals(username, inventoryDetails)}
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -506,6 +528,7 @@ export const showGetCourseWithSubscriptionSuccessModal = () => {
         <Paragraph>You can see all your purchases in 1 place on your dashboard.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -547,6 +570,7 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
     ),
     okText: 'Go To Dashboard',
     onOk: () => (window.location.href = getDashboardUrl(null, Routes.attendeeDashboard.rootPath + targetSection)),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -583,6 +607,7 @@ export const showMemberUnapprovedJoinModal = async () => {
         cancelText: 'Chat with us',
         onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
         onCancel: () => openFreshChatWidget(),
+        afterClose: resetBodyStyle,
       });
     }
   }
@@ -608,6 +633,7 @@ export const showCourseOptionsHelperModal = (productName = 'session') => {
         <Paragraph>If you are in doubt, choose normal for now. You can always change this later.</Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
 
@@ -627,5 +653,6 @@ export const showTagOptionsHelperModal = (productName = 'session') => {
         </Paragraph>
       </>
     ),
+    afterClose: resetBodyStyle,
   });
 };
