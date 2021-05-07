@@ -659,11 +659,17 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   const bookClass = async (payload) => await apis.session.createOrderForUser(payload);
   const buyPass = async (payload) => await apis.passes.createOrderForUser(payload);
 
-  const buySingleClass = async (payload, couponCode = '') => {
+  const buySingleClass = async (payload, couponCode = '', priceAmount) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await bookClass(payload);
+      let modifiedPayload = payload;
+
+      if (priceAmount !== undefined) {
+        modifiedPayload = { ...payload, amount: priceAmount };
+      }
+
+      const { status, data } = await bookClass(modifiedPayload);
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
@@ -900,18 +906,50 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndBookClass(payload, couponCode));
       }
     } else {
-      const paymentPopupData = {
-        productId: classDetails.session_id,
-        productType: 'SESSION',
-        itemList: [
-          {
-            name: classDetails.name,
-            description: toLongDateWithTime(selectedInventory.start_time),
-            currency: classDetails.currency,
-            price: inputPrice || classDetails.price,
-          },
-        ],
-      };
+      let paymentPopupData = null;
+      if (!usableUserSubscription && userPasses.length === 0 && availablePasses.length === 0) {
+        // In this case, the UI will be simple and won't show some table and input
+        // so we need to pass the information to PaymentPopup to tell it that
+        // they should handle the price input (if it's a PWYW session)
+        let flexiblePaymentDetails = null;
+
+        if (classDetails.pay_what_you_want) {
+          flexiblePaymentDetails = {
+            enabled: true,
+            minimumPrice: classDetails.price,
+          };
+        }
+
+        paymentPopupData = {
+          productId: classDetails.session_id,
+          productType: 'SESSION',
+          itemList: [
+            {
+              name: classDetails.name,
+              description: toLongDateWithTime(selectedInventory.start_time),
+              currency: classDetails.currency,
+              price: classDetails.price,
+              pay_what_you_want: classDetails.pay_what_you_want,
+            },
+          ],
+          flexiblePaymentDetails,
+        };
+      } else {
+        // Else the price input will be handled in the page
+        // So just show usual PaymentPopup
+        paymentPopupData = {
+          productId: classDetails.session_id,
+          productType: 'SESSION',
+          itemList: [
+            {
+              name: classDetails.name,
+              description: toLongDateWithTime(selectedInventory.start_time),
+              currency: classDetails.currency,
+              price: inputPrice || classDetails.price,
+            },
+          ],
+        };
+      }
 
       // Default case, book single class;
       const payload = {
@@ -920,10 +958,12 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
         payment_source: paymentSource.GATEWAY,
-        amount: inputPrice || classDetails.price,
       };
 
-      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleClass(payload, couponCode));
+      showPaymentPopup(
+        paymentPopupData,
+        async (couponCode = '', priceAmount = undefined) => await buySingleClass(payload, couponCode, priceAmount)
+      );
     }
   };
 

@@ -168,7 +168,6 @@ const PaymentPopup = () => {
       result = await paymentPopupCallback(appliedCouponCode);
     } else {
       // TODO: Confirm if Pay What you want can use coupons
-      console.log(priceAmount);
       result = await paymentPopupCallback(appliedCouponCode, priceAmount);
     }
 
