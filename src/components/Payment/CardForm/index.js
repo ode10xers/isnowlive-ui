@@ -270,7 +270,9 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
           type="primary"
           disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
           onClick={handleSubmit}
-          className={disableButton || (!isFree && isButtonDisabled && !selectedCard) ? undefined : styles.greenBtn}
+          className={
+            disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn
+          }
           loading={isSubmitting}
         >
           {text}
