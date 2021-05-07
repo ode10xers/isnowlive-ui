@@ -1,8 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-
-import { Row, Col, Image, Space, Typography } from 'antd';
+import { Row, Col, Button, Image, Space, Typography } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -16,7 +15,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername } from 'utils/helper';
-
+import { showNewsletterSignupModal } from 'components/Modals/modals';
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
@@ -74,7 +73,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
       <Col xs={24} md={{ span: 22, offset: 1 }}>
         <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
       </Col>
-      <Col xs={24} md={{ span: 22, offset: 1 }}>
+      <Col xs={24} md={{ span: 10, offset: 1 }}>
         {profile?.profile?.social_media_links && (
           <Space size={'middle'}>
             {profile.profile.social_media_links.website && (
@@ -108,6 +107,11 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
             )}
           </Space>
         )}
+      </Col>
+      <Col xs={24} md={{ span: 8, offset: 2 }}>
+        <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterSignupModal()}>
+          Signup to our Newsletter
+        </Button>
       </Col>
     </Row>
   );
