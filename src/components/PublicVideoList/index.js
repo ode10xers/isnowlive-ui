@@ -20,7 +20,7 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-const PublicVideoList = ({ username = null, videos }) => {
+const PublicVideoList = ({ videos }) => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);

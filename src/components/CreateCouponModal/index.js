@@ -5,7 +5,7 @@ import { Row, Col, Modal, Button, Form, Input, InputNumber, Select, Typography, 
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
@@ -147,6 +147,7 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
       footer={null}
       onCancel={() => closeModal(false)}
       width={640}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         <Form

@@ -29,7 +29,7 @@ const Videos = ({ profileUsername }) => {
 
   return (
     <Loader loading={isVideosLoading} size="large" text="Loading videos">
-      <PublicVideoList videos={videos} username={profileUsername} />
+      <PublicVideoList videos={videos} />
     </Loader>
   );
 };

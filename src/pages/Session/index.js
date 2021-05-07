@@ -114,13 +114,19 @@ const initialSession = {
   session_tag_type: 'anyone',
 };
 
+const priceTypes = {
+  FREE: 'Free',
+  PAID: 'Paid',
+  FLEXIBLE: 'Flexible',
+};
+
 const Session = ({ match, history }) => {
   const location = useLocation();
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
   const [isSessionTypeGroup, setIsSessionTypeGroup] = useState(true);
-  const [isSessionFree, setIsSessionFree] = useState(false);
+  const [sessionPaymentType, setSessionPaymentType] = useState(priceTypes.PAID);
   const [currencyList, setCurrencyList] = useState(null);
   const [sessionRefundable, setSessionRefundable] = useState(true);
   const [refundBeforeHours, setRefundBeforeHours] = useState(24);
@@ -168,11 +174,11 @@ const Session = ({ match, history }) => {
           if (!sessionData) {
             form.setFieldsValue({
               ...form.getFieldsValue(),
-              price_type: 'Paid',
+              price_type: priceTypes.PAID,
               currency: creatorCurrency.toUpperCase() || '',
               price: 10,
             });
-            setIsSessionFree(false);
+            setSessionPaymentType(priceTypes.PAID);
           } else {
             form.setFieldsValue({
               ...form.getFieldsValue(),
@@ -183,11 +189,11 @@ const Session = ({ match, history }) => {
           setStripeCurrency(null);
           form.setFieldsValue({
             ...form.getFieldsValue(),
-            price_type: 'Free',
+            price_type: priceTypes.FREE,
             price: 0,
             currency: '',
           });
-          setIsSessionFree(true);
+          setSessionPaymentType(priceTypes.FREE);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -213,7 +219,11 @@ const Session = ({ match, history }) => {
           form.setFieldsValue({
             ...data,
             type: data?.max_participants >= 2 ? 'Group' : '1-on-1',
-            price_type: data?.price === 0 ? 'Free' : 'Paid',
+            price_type: data?.pay_what_you_want
+              ? priceTypes.FLEXIBLE
+              : data?.price > 0
+              ? priceTypes.PAID
+              : priceTypes.FREE,
             is_refundable: data?.is_refundable ? 'Yes' : 'No',
             refund_before_hours: data?.refund_before_hours || 0,
             recurring_dates_range: data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : [],
@@ -225,7 +235,9 @@ const Session = ({ match, history }) => {
           });
           setSessionImageUrl(data.session_image_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
-          setIsSessionFree(data?.price === 0 ? true : false);
+          setSessionPaymentType(
+            data?.pay_what_you_want ? priceTypes.FLEXIBLE : data?.price > 0 ? priceTypes.PAID : priceTypes.FREE
+          );
           setIsSessionRecurring(data?.recurring);
           setSessionRefundable(data?.is_refundable);
           setRefundBeforeHours(data?.refund_before_hours || 0);
@@ -356,16 +368,16 @@ const Session = ({ match, history }) => {
 
   const handleSessionPriceType = (e) => {
     const setFreeSession = () => {
-      form.setFieldsValue({ ...form.getFieldsValue(), price_type: 'Free', price: 0 });
+      form.setFieldsValue({ ...form.getFieldsValue(), price_type: priceTypes.FREE, price: 0 });
       setSession({ ...session, price: 0 });
-      setIsSessionFree(true);
+      setSessionPaymentType(priceTypes.FREE);
     };
 
-    if (e.target.value === 'Free') {
+    if (e.target.value === priceTypes.FREE) {
       setFreeSession();
     } else {
       if (stripeCurrency) {
-        setIsSessionFree(false);
+        setSessionPaymentType(e.target.value);
       } else {
         Modal.confirm({
           title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
@@ -604,7 +616,11 @@ const Session = ({ match, history }) => {
     try {
       setIsLoading(true);
       const data = {
-        price: isSessionFree ? 0 : values.price || 0,
+        price:
+          sessionPaymentType === priceTypes.FREE
+            ? 0
+            : values.price || (sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0), // Setting Default to 5 for Flexible payment
+        pay_what_you_want: sessionPaymentType === priceTypes.FLEXIBLE,
         currency: values.currency?.toLowerCase() || stripeCurrency?.toLowerCase() || '',
         max_participants: values.max_participants,
         name: values.name,
@@ -975,12 +991,13 @@ const Session = ({ match, history }) => {
               onChange={handleSessionPriceType}
             >
               <Radio.Group>
-                <Radio value="Paid">Paid</Radio>
-                <Radio value="Free">Free</Radio>
+                <Radio value={priceTypes.FREE}>Free</Radio>
+                <Radio value={priceTypes.PAID}>Paid</Radio>
+                <Radio value={priceTypes.FLEXIBLE}>Let attendees pay what they can</Radio>
               </Radio.Group>
             </Form.Item>
 
-            <Form.Item name="currency" label="Currency" hidden={isSessionFree}>
+            <Form.Item name="currency" label="Currency" hidden={sessionPaymentType === priceTypes.FREE}>
               <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
                 {currencyList &&
                   Object.entries(currencyList).map(([key, value], i) => (
@@ -993,14 +1010,24 @@ const Session = ({ match, history }) => {
             <Form.Item
               {...(!isMobileDevice && profileFormTailLayout)}
               name="price"
-              extra="Set your price"
-              rules={validationRules.requiredValidation}
-              hidden={isSessionFree}
+              extra={
+                sessionPaymentType === priceTypes.FLEXIBLE
+                  ? `Choose your minimum price. We default to 5 ${form
+                      .getFieldsValue()
+                      .currency.toUpperCase()} as default`
+                  : 'Set your price'
+              }
+              rules={validationRules.numberValidation(
+                `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
+                sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0,
+                false
+              )}
+              hidden={sessionPaymentType === priceTypes.FREE}
             >
-              <InputNumber min={1} placeholder="Amount" />
+              <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
             </Form.Item>
 
-            {!isSessionFree && (
+            {sessionPaymentType !== priceTypes.FREE && (
               <Form.Item
                 name="is_refundable"
                 label="Refundable"
@@ -1014,7 +1041,7 @@ const Session = ({ match, history }) => {
               </Form.Item>
             )}
 
-            {!isSessionFree && sessionRefundable && (
+            {sessionPaymentType !== priceTypes.FREE && sessionRefundable && (
               <>
                 <Form.Item
                   {...(!isMobileDevice && profileFormItemLayout)}

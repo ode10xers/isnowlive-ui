@@ -9,7 +9,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor } from 'utils/helper';
@@ -322,6 +322,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
       footer={null}
       onCancel={() => closeModal(false)}
       width={800}
+      afterClose={resetBodyStyle}
     >
       <Loader size="large" loading={isLoading}>
         <Form
@@ -448,7 +449,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                              {session.pay_what_you_want
+                                ? `min. ${session.price}`
+                                : session.price > 0
+                                ? `${session.currency?.toUpperCase()} ${session.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -487,7 +492,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                              {session.pay_what_you_want
+                                ? `min. ${session.price}`
+                                : session.price > 0
+                                ? `${session.currency?.toUpperCase()} ${session.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
