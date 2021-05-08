@@ -656,15 +656,3 @@ export const showTagOptionsHelperModal = (productName = 'session') => {
     afterClose: resetBodyStyle,
   });
 };
-
-export const showNewsletterSignupModal = () => {
-  Modal.info({
-    centered: true,
-    closable: true,
-    maskClosable: true,
-    title: 'Signup to our Newsletter',
-    width: 640,
-    content: <></>,
-    afterClose: resetBodyStyle,
-  });
-};

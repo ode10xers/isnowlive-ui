@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { Row, Col, Button, Image, Space, Typography } from 'antd';
@@ -12,15 +12,26 @@ import {
 
 import Share from 'components/Share';
 import DefaultImage from 'components/Icons/DefaultImage';
-
+import { resetBodyStyle } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername } from 'utils/helper';
-import { showNewsletterSignupModal } from 'components/Modals/modals';
+import NewsletterModal from 'components/NewsletterModal';
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
+
+  const closePurchaseModal = () => {
+    setNewsletterModalVisible(false);
+  };
+
+  const showNewsletterModal = () => {
+    setNewsletterModalVisible(true);
+    resetBodyStyle();
+  };
+
   const renderCreatorName = () => {
     const creatorName = `${profile?.first_name} ${profile?.last_name}`;
 
@@ -109,7 +120,8 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
         )}
       </Col>
       <Col xs={24} md={{ span: 8, offset: 2 }}>
-        <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterSignupModal()}>
+        <NewsletterModal visible={showNewsletterModalVisible} closeModal={closePurchaseModal} />
+        <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
           Signup to our Newsletter
         </Button>
       </Col>
