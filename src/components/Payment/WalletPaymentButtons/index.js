@@ -109,7 +109,9 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentDetails 
           currency: paymentDetails.currency,
           total: {
             label: 'Sub-Total',
-            amount: paymentDetails.total,
+            // It seems that this amount includes sub-unit (e.g cents),
+            // so we need to * 100 for this to show correctly
+            amount: paymentDetails.total * 100,
           },
           requestPayerName: true,
           disableWallets: ['browserCard'],
