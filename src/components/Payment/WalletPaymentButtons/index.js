@@ -114,7 +114,7 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentDetails 
             amount: paymentDetails.total * 100,
           },
           requestPayerName: true,
-          disableWallets: ['browserCard'],
+          // disableWallets: ['browserCard'],
           // requestPayerEmail: true,
         });
 
