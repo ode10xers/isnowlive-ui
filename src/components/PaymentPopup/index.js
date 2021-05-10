@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip, Tabs } from 'antd';
 
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+import config from 'config';
 import apis from 'apis';
 
-import PaymentCard from 'components/Payment/PaymentCard';
-import PaymentWallet from 'components/Payment/PaymentWallet';
+import CardForm from 'components/Payment/CardForm';
+import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
   resetBodyStyle,
@@ -18,7 +22,7 @@ import {
 
 import dateUtil from 'utils/date';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
-import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError, getUsernameFromUrl } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -62,6 +66,8 @@ const {
     or Subscription Order Object (for type 'SUBSCRIPTION')
 */
 
+const stripePromise = loadStripe(config.stripe.secretKey);
+
 const PaymentPopup = () => {
   const {
     state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData },
@@ -75,6 +81,9 @@ const PaymentPopup = () => {
   const [couponApplied, setCouponApplied] = useState(false);
   const [showCouponField, setShowCouponField] = useState(false);
   const [priceAmount, setPriceAmount] = useState(0);
+  // TODO: Defaults to SG, confirm with Rahul what should be the default here
+  const [creatorCountry, setCreatorCountry] = useState('SG');
+  const [creatorCurrency, setCreatorCurrency] = useState('SGD');
 
   const {
     itemList = [],
@@ -84,6 +93,25 @@ const PaymentPopup = () => {
     flexiblePaymentDetails = null,
   } = paymentPopupData || {};
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
+
+  const fetchCreatorCountry = useCallback(async () => {
+    console.log('Fetching creator details for payment');
+    try {
+      const { status, data } = await apis.user.getProfileByUsername(getUsernameFromUrl());
+
+      if (isAPISuccess(status) && data) {
+        setCreatorCountry(data.country);
+        setCreatorCurrency(data.currency);
+      }
+    } catch (error) {
+      console.error('Failed fetching creator profile for country', error?.response);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCreatorCountry();
+    //eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     if (!paymentPopupVisible) {
@@ -171,8 +199,8 @@ const PaymentPopup = () => {
     if (!flexiblePaymentDetails?.enabled) {
       result = await paymentPopupCallback(appliedCouponCode);
     } else {
-      // TODO: Confirm if Pay What you want can use coupons
-      result = await paymentPopupCallback(appliedCouponCode, priceAmount);
+      // PWYW can't be used with coupons
+      result = await paymentPopupCallback('', priceAmount);
     }
 
     return result;
@@ -295,7 +323,7 @@ const PaymentPopup = () => {
               <List.Item
                 actions={[
                   <Text strong>
-                    {item?.pay_what_you_want ? 'Your Fair Price' : `${item?.currency?.toUpperCase()} ${item?.price}`}
+                    {item?.pay_what_you_want ? 'Your Fair Price' : `${creatorCurrency.toUpperCase()} ${item?.price}`}
                   </Text>,
                 ]}
               >
@@ -319,27 +347,27 @@ const PaymentPopup = () => {
                 (flexiblePaymentDetails?.enabled ? (
                   <Tooltip title={`Input your fair price (min. ${getMinimumPrice()})`}>
                     <InputNumber onChange={setPriceAmount} min={getMinimumPrice()} value={priceAmount} />
-                    <span className="ant-form-text"> {itemList[0]?.currency.toUpperCase()} </span>
+                    <span className="ant-form-text"> {creatorCurrency.toUpperCase()} </span>
                   </Tooltip>
                 ) : discountedPrice !== null ? (
                   <>
                     <Text delete className={styles.discounted}>
-                      {itemList[0].currency?.toUpperCase()} {totalPrice}
+                      {creatorCurrency.toUpperCase()} {totalPrice}
                     </Text>{' '}
                     <Text>
-                      {itemList[0].currency?.toUpperCase()} {discountedPrice}
+                      {creatorCurrency.toUpperCase()} {discountedPrice}
                     </Text>
                   </>
                 ) : paymentInstrumentDetails ? (
                   <>
                     <Text delete className={styles.discounted}>
-                      {itemList[0].currency?.toUpperCase()} {totalPrice}
+                      {creatorCurrency.toUpperCase()} {totalPrice}
                     </Text>{' '}
-                    <Text>{itemList[0].currency?.toUpperCase()} 0</Text>
+                    <Text>{creatorCurrency.toUpperCase()} 0</Text>
                   </>
                 ) : (
                   <Text>
-                    {itemList[0].currency?.toUpperCase()} {totalPrice}
+                    {creatorCurrency.toUpperCase()} {totalPrice}
                   </Text>
                 ))}
             </Col>
@@ -378,19 +406,27 @@ const PaymentPopup = () => {
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={8} justify="center">
             <Col xs={24} className={styles.mb10}>
-              <Tabs defaultActiveKey="card_payment">
-                <TabPane key="card_payment" tab={<Text strong> Pay with Card </Text>}>
-                  <PaymentCard
-                    btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
-                    isFree={isFree()}
-                    onBeforePayment={handleBeforePayment}
-                    onAfterPayment={handleAfterPayment}
-                  />
-                </TabPane>
-                <TabPane key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
-                  <PaymentWallet />
-                </TabPane>
-              </Tabs>
+              <Elements stripe={stripePromise}>
+                <Tabs defaultActiveKey="card_payment">
+                  <TabPane forceRender={true} key="card_payment" tab={<Text strong> Pay with Card </Text>}>
+                    <CardForm
+                      btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
+                      isFree={isFree()}
+                      onBeforePayment={handleBeforePayment}
+                      onAfterPayment={handleAfterPayment}
+                    />
+                  </TabPane>
+                  {!flexiblePaymentDetails?.enabled && (
+                    <TabPane forceRender={true} key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
+                      <WalletPaymentButtons
+                        paymentDetails={{ country: creatorCountry, currency: creatorCurrency, total: totalPrice }}
+                        onBeforePayment={handleBeforePayment}
+                        onAfterPayment={handleAfterPayment}
+                      />
+                    </TabPane>
+                  )}
+                </Tabs>
+              </Elements>
             </Col>
             <Col xs={14}>
               <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
