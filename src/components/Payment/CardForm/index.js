@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 // import classNames from 'classnames';
 
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { Button, Row, Col, message } from 'antd';
+import { Button, Row, Col, Tabs, Typography, message } from 'antd';
 
 import apis from 'apis';
 
@@ -15,6 +15,9 @@ import { isAPISuccess, isUnapprovedUserError, StripePaymentStatus } from 'utils/
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+
+const { TabPane } = Tabs;
+const { Text } = Typography;
 
 // Additional CardOptions Reference:
 // https://stripe.com/docs/stripe-js/react#customization-and-styling
@@ -233,52 +236,54 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
   };
 
   return (
-    <Row gutter={[8, 8]} justify="center">
-      {!isFree && (
-        <>
-          {savedUserCards.length > 0 && (
-            <Col xs={24}>
-              <SavedCards
-                disabled={disableSavedCards}
-                userCards={savedUserCards}
-                selectedCard={selectedCard}
-                setSelectedCard={changeSelectedCard}
+    <TabPane forceRender={true} key="card_payment" tab={<Text strong> Pay with Card </Text>}>
+      <Row gutter={[8, 8]} justify="center">
+        {!isFree && (
+          <>
+            {savedUserCards.length > 0 && (
+              <Col xs={24}>
+                <SavedCards
+                  disabled={disableSavedCards}
+                  userCards={savedUserCards}
+                  selectedCard={selectedCard}
+                  setSelectedCard={changeSelectedCard}
+                />
+              </Col>
+            )}
+            <Col xs={24} className={styles.inlineCardForm}>
+              <CardElement
+                options={options}
+                onChange={(event) => {
+                  setDisableSavedCards(!event.empty);
+
+                  if (event.complete) {
+                    setIsButtonDisabled(false);
+                  } else {
+                    setIsButtonDisabled(true);
+                  }
+                }}
               />
             </Col>
-          )}
-          <Col xs={24} className={styles.inlineCardForm}>
-            <CardElement
-              options={options}
-              onChange={(event) => {
-                setDisableSavedCards(!event.empty);
+          </>
+        )}
 
-                if (event.complete) {
-                  setIsButtonDisabled(false);
-                } else {
-                  setIsButtonDisabled(true);
-                }
-              }}
-            />
-          </Col>
-        </>
-      )}
-
-      <Col xs={8} lg={6}>
-        <Button
-          block
-          size="large"
-          type="primary"
-          disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
-          onClick={handleSubmit}
-          className={
-            disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn
-          }
-          loading={isSubmitting}
-        >
-          {text}
-        </Button>
-      </Col>
-    </Row>
+        <Col xs={8} lg={6}>
+          <Button
+            block
+            size="large"
+            type="primary"
+            disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
+            onClick={handleSubmit}
+            className={
+              disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn
+            }
+            loading={isSubmitting}
+          >
+            {text}
+          </Button>
+        </Col>
+      </Row>
+    </TabPane>
   );
 };
 

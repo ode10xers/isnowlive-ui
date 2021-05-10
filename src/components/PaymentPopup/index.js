@@ -30,7 +30,6 @@ import styles from './styles.module.scss';
 
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
-const { TabPane } = Tabs;
 const { Text, Title } = Typography;
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -371,7 +370,7 @@ const PaymentPopup = () => {
                   </Text>
                 ))}
             </Col>
-            {!paymentInstrumentDetails && totalPrice > 0 && (
+            {!flexiblePaymentDetails?.enabled && !paymentInstrumentDetails && totalPrice > 0 && (
               <Col xs={24}>
                 <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
                   {showCouponField ? `Don't use ` : 'Use '} a coupon
@@ -408,22 +407,19 @@ const PaymentPopup = () => {
             <Col xs={24} className={styles.mb10}>
               <Elements stripe={stripePromise}>
                 <Tabs defaultActiveKey="card_payment">
-                  <TabPane forceRender={true} key="card_payment" tab={<Text strong> Pay with Card </Text>}>
-                    <CardForm
-                      btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
-                      isFree={isFree()}
+                  <CardForm
+                    btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
+                    isFree={isFree()}
+                    onBeforePayment={handleBeforePayment}
+                    onAfterPayment={handleAfterPayment}
+                  />
+                  {!flexiblePaymentDetails?.enabled && (
+                    <WalletPaymentButtons
+                      creatorDetails={{ country: creatorCountry, currency: creatorCurrency }}
+                      amount={totalPrice}
                       onBeforePayment={handleBeforePayment}
                       onAfterPayment={handleAfterPayment}
                     />
-                  </TabPane>
-                  {!flexiblePaymentDetails?.enabled && (
-                    <TabPane forceRender={true} key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
-                      <WalletPaymentButtons
-                        paymentDetails={{ country: creatorCountry, currency: creatorCurrency, total: totalPrice }}
-                        onBeforePayment={handleBeforePayment}
-                        onAfterPayment={handleAfterPayment}
-                      />
-                    </TabPane>
                   )}
                 </Tabs>
               </Elements>

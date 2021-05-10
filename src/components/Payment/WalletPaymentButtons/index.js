@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
+import { Tabs, Typography } from 'antd';
+
 import { PaymentRequestButtonElement, useStripe } from '@stripe/react-stripe-js';
 
 import Loader from 'components/Loader';
@@ -8,22 +10,21 @@ import { showErrorModal } from 'components/Modals/modals';
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 
 /*
-  Here, paymentDetails is required because PaymentRequest 
-  requires country, currency, and total, below is a sample format
+  Here, creatorDetails is required because PaymentRequest 
+  requires country and currency, below is a sample format
 
-  paymentDetails = {
+  creatorDetails = {
     country: 'US',
     currency: 'usd',
-    total: 120,
   }
 */
+const { TabPane } = Tabs;
+const { Text } = Typography;
 
-// TODO: Try to find out a better way to support PWYW for this
-// Currently disabled for PWYW
-const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentDetails }) => {
+const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorDetails, amount = 1 }) => {
   const stripe = useStripe();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [paymentRequest, setPaymentRequest] = useState(null);
 
   const onConfirmPaymentDetails = async (ev) => {
@@ -72,7 +73,7 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentDetails 
             const { error } = await stripe.confirmCardPayment(clientSecret);
             if (error) {
               // The payment failed -- ask your customer for a new payment method.
-              alert('Payment Failed for this payment method that requires additional steps');
+              showErrorModal('Additional steps required to finish payment failed', error);
               console.error(error);
             } else {
               // Payment requires next steps, but is successful
@@ -99,19 +100,17 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentDetails 
   };
 
   const setupStripePaymentRequest = useCallback(async () => {
-    setIsLoading(true);
-
     try {
-      if (stripe && paymentDetails) {
+      if (stripe && creatorDetails) {
         // Create Payment Request
         const paymentReq = stripe.paymentRequest({
-          country: paymentDetails.country,
-          currency: paymentDetails.currency,
+          country: creatorDetails.country,
+          currency: creatorDetails.currency,
           total: {
             label: 'Sub-Total',
             // It seems that this amount includes sub-unit (e.g cents),
             // so we need to * 100 for this to show correctly
-            amount: paymentDetails.total * 100,
+            amount: amount * 100,
           },
           requestPayerName: true,
           // disableWallets: ['browserCard'],
@@ -126,32 +125,37 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentDetails 
         if (result) {
           paymentReq.on('paymentmethod', onConfirmPaymentDetails);
           setPaymentRequest(paymentReq);
-          setIsLoading(false);
         }
       }
     } catch (error) {
       console.error('Failed to create Payment Request');
-      setIsLoading(false);
     }
+
     //eslint-disable-next-line
-  }, [stripe, paymentDetails]);
+  }, [stripe]);
 
   useEffect(() => {
     setupStripePaymentRequest();
   }, [setupStripePaymentRequest]);
 
-  return (
-    <Loader loading={isLoading} text="Checking available wallet payment methods...">
-      {paymentRequest ? (
+  useEffect(() => {
+    if (paymentRequest) {
+      paymentRequest.update({
+        total: {
+          label: 'Sub-Total',
+          amount: amount * 100,
+        },
+      });
+    }
+  }, [paymentRequest, amount]);
+
+  return paymentRequest ? (
+    <TabPane forceRender={true} key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
+      <Loader loading={isLoading} text="Processing payment..." size="small">
         <PaymentRequestButtonElement options={{ paymentRequest }} />
-      ) : (
-        <div>
-          Default text to show when no wallet payment options are available. Do note that this also includes
-          browser-saved cards, but we can choose to hide that option
-        </div>
-      )}
-    </Loader>
-  );
+      </Loader>
+    </TabPane>
+  ) : null;
 };
 
 export default WalletPaymentButtons;
