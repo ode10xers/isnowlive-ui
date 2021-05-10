@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Tabs, Typography } from 'antd';
+import { Tabs } from 'antd';
 
 import { useStripe } from '@stripe/react-stripe-js';
 
 import CardForm from 'components/Payment/CardForm';
 import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
+import PaymentOptionsSelection, { paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
 
 const { TabPane } = Tabs;
-const { Text } = Typography;
 
 /*
   Here, creatorDetails is required because PaymentRequest 
@@ -31,6 +31,7 @@ const PaymentOptionsWrapper = ({
 }) => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState(null);
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState('card_payment');
 
   // The Payment Request Object is loaded here
   // Because there can be a case where user don't have any
@@ -74,12 +75,12 @@ const PaymentOptionsWrapper = ({
 
   useEffect(() => {
     setupStripePaymentRequest();
-    //eslint-disable-next-line
-  }, []);
+  }, [setupStripePaymentRequest]);
 
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)
   useEffect(() => {
+    console.log(paymentRequest);
     if (paymentRequest) {
       paymentRequest.update({
         total: {
@@ -92,8 +93,17 @@ const PaymentOptionsWrapper = ({
   }, [amount, paymentRequest]);
 
   return (
-    <Tabs defaultActiveKey="card_payment">
-      <TabPane forceRender={true} key="card_payment" tab={<Text strong> Pay with Card </Text>}>
+    <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={8}>
+      <TabPane
+        forceRender={true}
+        key={paymentMethodOptions.CARD}
+        tab={
+          <PaymentOptionsSelection
+            paymentOptionKey={paymentMethodOptions.CARD}
+            isActive={selectedPaymentOption === paymentMethodOptions.CARD}
+          />
+        }
+      >
         <CardForm
           btnProps={{ text: isFreeProduct ? 'Get' : 'Buy', disableButton: minimumPriceRequirementFulfilled }}
           isFree={isFreeProduct}
@@ -101,17 +111,25 @@ const PaymentOptionsWrapper = ({
           onAfterPayment={handleAfterPayment}
         />
       </TabPane>
-      {paymentRequest && (
-        <TabPane forceRender={true} key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
+      <TabPane
+        forceRender={true}
+        key={paymentMethodOptions.WALLET}
+        disabled={!paymentRequest}
+        tab={
+          <PaymentOptionsSelection
+            paymentOptionKey={paymentMethodOptions.WALLET}
+            isActive={selectedPaymentOption === paymentMethodOptions.WALLET}
+          />
+        }
+      >
+        {paymentRequest && (
           <WalletPaymentButtons
             paymentRequest={paymentRequest}
-            // creatorDetails={{ country: creatorCountry, currency: creatorCurrency }}
-            // amount={flexiblePaymentDetails?.enabled ? priceAmount : totalPrice}
             onBeforePayment={handleBeforePayment}
             onAfterPayment={handleAfterPayment}
           />
-        </TabPane>
-      )}
+        )}
+      </TabPane>
     </Tabs>
   );
 };

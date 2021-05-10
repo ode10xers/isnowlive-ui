@@ -1,16 +1,21 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Card, Image } from 'antd';
+import { Row, Col, Typography, Card } from 'antd';
 import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import styles from './styles.module.scss';
 
+import VisaLogo from 'assets/icons/visa/VisaLogo';
+import AmexLogo from 'assets/icons/amex/AmexLogo';
+import MastercardLogo from 'assets/icons/mastercard/MastercardLogo';
+
 const { Text } = Typography;
 
 const cardBrandImages = {
-  VISA: require('../../../assets/icons/visa_logo.png'),
-  AMEX: require('../../../assets/icons/amex_logo.png'),
-  MASTERCARD: require('../../../assets/icons/mastercard_logo.png'),
+  // VISA: require('../../../assets/icons/visa_logo.png'),
+  VISA: <VisaLogo />,
+  AMEX: <AmexLogo />,
+  MASTERCARD: <MastercardLogo />,
 };
 
 const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
@@ -58,12 +63,13 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               : 'Check to pay with this card'}
           </Col>
           <Col xs={3} className={styles.cardBrandWrapper}>
-            <Image
+            {/* <Image
               className={styles.cardBrandImage}
               preview={false}
               src={cardBrandImages[userCard.brand.toUpperCase()]}
               alt=""
-            />
+            /> */}
+            {cardBrandImages[userCard.brand.toUpperCase()]}
           </Col>
           <Col xs={4}>{userCard.last_digits}</Col>
         </Row>

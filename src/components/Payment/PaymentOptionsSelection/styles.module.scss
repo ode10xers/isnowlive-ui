@@ -1,0 +1,17 @@
+@import '../../../styles/variables.scss';
+
+.paymentOptionCard {
+  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke');
+  border-radius: 8px;
+  min-width: 120px;
+  max-width: 160px;
+
+  &.active, &.active:hover {
+    border-color: map-get($map: $colors, $key: 'DodgerBlue');
+    font-weight: 500;
+  }
+
+  .paymentOptionName {
+    font-size: 12px;
+  }
+}
