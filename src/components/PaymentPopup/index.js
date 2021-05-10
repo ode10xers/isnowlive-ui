@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip, Tabs } from 'antd';
 
 import apis from 'apis';
 
 import PaymentCard from 'components/Payment/PaymentCard';
+import PaymentWallet from 'components/Payment/PaymentWallet';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
   resetBodyStyle,
@@ -25,6 +26,7 @@ import styles from './styles.module.scss';
 
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
+const { TabPane } = Tabs;
 const { Text, Title } = Typography;
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -376,12 +378,19 @@ const PaymentPopup = () => {
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={8} justify="center">
             <Col xs={24} className={styles.mb10}>
-              <PaymentCard
-                btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
-                isFree={isFree()}
-                onBeforePayment={handleBeforePayment}
-                onAfterPayment={handleAfterPayment}
-              />
+              <Tabs defaultActiveKey="card_payment">
+                <TabPane key="card_payment" tab={<Text strong> Pay with Card </Text>}>
+                  <PaymentCard
+                    btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
+                    isFree={isFree()}
+                    onBeforePayment={handleBeforePayment}
+                    onAfterPayment={handleAfterPayment}
+                  />
+                </TabPane>
+                <TabPane key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
+                  <PaymentWallet />
+                </TabPane>
+              </Tabs>
             </Col>
             <Col xs={14}>
               <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
