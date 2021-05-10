@@ -24,19 +24,6 @@
   }
 }
 
-.passwordHelpText {
-  margin-top: -26px;
-  max-width: 320px;
-
-  .span {
-    color: map-get($colors, 'Charcoal') !important;
-  }
-}
-
-.incorrectPasswordText {
-  margin-top: -26px;
-}
-
 @media (max-width: 768px) {
   .nameInputWrapper {
     .firstNameInput,
@@ -46,13 +33,17 @@
       margin-left: 0px !important;
     }
   }
+}
 
-  .passwordHelpText {
-    margin-top: -24px;
-    font-size: 12px;
+.inlineFormItem{
+  display: inline-block !important;
+  width: calc(50% - 8px);
+}
 
-    .linkBtn {
-      font-size: 12px;
-    }
-  }
+.inlineFormItem_lastname{
+  margin: 0 8px !important;
+}
+
+.formBottomMargin{
+  margin-bottom: 0 !important;
 }
