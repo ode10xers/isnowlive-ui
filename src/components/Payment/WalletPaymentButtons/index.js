@@ -1,6 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
-
-import { Tabs, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 import { PaymentRequestButtonElement, useStripe } from '@stripe/react-stripe-js';
 
@@ -9,23 +7,10 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 
-/*
-  Here, creatorDetails is required because PaymentRequest 
-  requires country and currency, below is a sample format
-
-  creatorDetails = {
-    country: 'US',
-    currency: 'usd',
-  }
-*/
-const { TabPane } = Tabs;
-const { Text } = Typography;
-
-const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorDetails, amount = 1 }) => {
+const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest }) => {
   const stripe = useStripe();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentRequest, setPaymentRequest] = useState(null);
 
   const onConfirmPaymentDetails = async (ev) => {
     setIsLoading(true);
@@ -99,62 +84,17 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorDetails,
     setIsLoading(false);
   };
 
-  const setupStripePaymentRequest = useCallback(async () => {
-    try {
-      if (stripe && creatorDetails) {
-        // Create Payment Request
-        const paymentReq = stripe.paymentRequest({
-          country: creatorDetails.country,
-          currency: creatorDetails.currency,
-          total: {
-            label: 'Sub-Total',
-            // It seems that this amount includes sub-unit (e.g cents),
-            // so we need to * 100 for this to show correctly
-            amount: amount * 100,
-          },
-          requestPayerName: true,
-          // disableWallets: ['browserCard'],
-          // requestPayerEmail: true,
-        });
-
-        // Check availability of Payment Request API
-        // See more about the availability here
-        // https://stripe.com/docs/stripe-js/elements/payment-request-button?html-or-react=react#react-prerequisites
-        const result = await paymentReq.canMakePayment();
-
-        if (result) {
-          paymentReq.on('paymentmethod', onConfirmPaymentDetails);
-          setPaymentRequest(paymentReq);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to create Payment Request');
-    }
-
-    //eslint-disable-next-line
-  }, [stripe]);
-
-  useEffect(() => {
-    setupStripePaymentRequest();
-  }, [setupStripePaymentRequest]);
-
   useEffect(() => {
     if (paymentRequest) {
-      paymentRequest.update({
-        total: {
-          label: 'Sub-Total',
-          amount: amount * 100,
-        },
-      });
+      paymentRequest.on('paymentmethod', onConfirmPaymentDetails);
     }
-  }, [paymentRequest, amount]);
+    //eslint-disable-next-line
+  }, [paymentRequest]);
 
   return paymentRequest ? (
-    <TabPane forceRender={true} key="wallet_payment" tab={<Text strong> Pay with E-Wallet </Text>}>
-      <Loader loading={isLoading} text="Processing payment..." size="small">
-        <PaymentRequestButtonElement options={{ paymentRequest }} />
-      </Loader>
-    </TabPane>
+    <Loader loading={isLoading} text="Processing payment..." size="small">
+      <PaymentRequestButtonElement options={{ paymentRequest }} />
+    </Loader>
   ) : null;
 };
 

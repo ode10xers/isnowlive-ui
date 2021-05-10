@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip, Tabs } from 'antd';
-
+import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
 import config from 'config';
 import apis from 'apis';
 
-import CardForm from 'components/Payment/CardForm';
-import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
   resetBodyStyle,
@@ -27,8 +24,11 @@ import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError, getUsern
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import PaymentOptionsWrapper from 'components/Payment/PaymentOptionsWrapper';
 
 const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
+
+const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Title } = Typography;
 const {
@@ -65,8 +65,6 @@ const {
     or Subscription Order Object (for type 'SUBSCRIPTION')
 */
 
-const stripePromise = loadStripe(config.stripe.secretKey);
-
 const PaymentPopup = () => {
   const {
     state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData },
@@ -91,7 +89,7 @@ const PaymentPopup = () => {
     paymentInstrumentDetails = null,
     flexiblePaymentDetails = null,
   } = paymentPopupData || {};
-  const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0);
+  const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0) || 0;
 
   const fetchCreatorCountry = useCallback(async () => {
     console.log('Fetching creator details for payment');
@@ -300,6 +298,16 @@ const PaymentPopup = () => {
   const checkMinimumPriceRequirement = () =>
     flexiblePaymentDetails?.enabled ? priceAmount < getMinimumPrice() : false;
 
+  const getAmountForPaymentRequest = () => {
+    if (flexiblePaymentDetails?.enabled) {
+      const minimumPrice = getMinimumPrice();
+
+      return priceAmount < minimumPrice ? minimumPrice : priceAmount;
+    } else {
+      return totalPrice;
+    }
+  };
+
   // TODO: Check for selected and available Payment method here
   // Based on the selected payment method, render the correct components
 
@@ -406,22 +414,14 @@ const PaymentPopup = () => {
           <Row gutter={8} justify="center">
             <Col xs={24} className={styles.mb10}>
               <Elements stripe={stripePromise}>
-                <Tabs defaultActiveKey="card_payment">
-                  <CardForm
-                    btnProps={{ text: isFree() ? 'Get' : 'Buy', disableButton: checkMinimumPriceRequirement() }}
-                    isFree={isFree()}
-                    onBeforePayment={handleBeforePayment}
-                    onAfterPayment={handleAfterPayment}
-                  />
-                  {!flexiblePaymentDetails?.enabled && (
-                    <WalletPaymentButtons
-                      creatorDetails={{ country: creatorCountry, currency: creatorCurrency }}
-                      amount={totalPrice}
-                      onBeforePayment={handleBeforePayment}
-                      onAfterPayment={handleAfterPayment}
-                    />
-                  )}
-                </Tabs>
+                <PaymentOptionsWrapper
+                  handleAfterPayment={handleAfterPayment}
+                  handleBeforePayment={handleBeforePayment}
+                  isFreeProduct={isFree()}
+                  minimumPriceRequirementFulfilled={checkMinimumPriceRequirement()}
+                  creatorDetails={{ country: creatorCountry, currency: creatorCurrency }}
+                  amount={getAmountForPaymentRequest()}
+                />
               </Elements>
             </Col>
             <Col xs={14}>
