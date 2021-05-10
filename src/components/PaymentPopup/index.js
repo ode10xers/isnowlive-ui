@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button, Image, InputNumber, Tooltip } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, InputNumber, Tooltip } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
@@ -25,8 +25,9 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 import PaymentOptionsWrapper from 'components/Payment/PaymentOptionsWrapper';
+import SupportedPayments from 'components/SupportedPayments/SupportedPayments';
 
-const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
+// const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -424,8 +425,9 @@ const PaymentPopup = () => {
                 />
               </Elements>
             </Col>
-            <Col xs={14}>
-              <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" />
+            <Col xs={18}>
+              {/* <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" /> */}
+              <SupportedPayments />
             </Col>
             <Col xs={24} className={styles.tncText}>
               <TermsAndConditionsText shouldCheck={false} />
