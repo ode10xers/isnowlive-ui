@@ -271,6 +271,9 @@ const PaymentPopup = () => {
   const checkMinimumPriceRequirement = () =>
     flexiblePaymentDetails?.enabled ? priceAmount < getMinimumPrice() : false;
 
+  // TODO: Check for selected and available Payment method here
+  // Based on the selected payment method, render the correct components
+
   return (
     <Modal
       visible={paymentPopupVisible}
