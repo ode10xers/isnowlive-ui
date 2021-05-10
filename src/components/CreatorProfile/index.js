@@ -119,7 +119,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </Space>
         )}
       </Col>
-      <Col xs={24} md={{ span: 8, offset: 2 }}>
+      <Col xs={24} md={{ span: 10, offset: 1 }}>
         <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
         <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
           Subscribe to newsletter
