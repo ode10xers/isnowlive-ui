@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Tabs } from 'antd';
+import { Tabs, Row, Col, Typography } from 'antd';
 
 import { useStripe } from '@stripe/react-stripe-js';
 
@@ -15,6 +15,7 @@ import { isAPISuccess } from 'utils/helper';
 import RedirectToStripeCheckoutButton from '../RedirectToStripeCheckoutButton';
 
 const { TabPane } = Tabs;
+const { Text } = Typography;
 
 /*
   Here, creatorDetails is required because PaymentRequest 
@@ -189,33 +190,40 @@ const PaymentOptionsWrapper = ({
 
   return (
     <Loader loading={isLoading} text="Fetching available payment methods...">
-      <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={4} size="small">
-        {renderPaymentOptions()}
-
-        {/* Wallet payments only depends on client side requirements, so we process it separately */}
-        {paymentRequest && (
-          <TabPane
-            forceRender={true}
-            key={paymentMethodOptions.WALLET.key}
-            // disabled={!paymentRequest}
-            tab={
-              <PaymentOptionsSelection
-                paymentOptionKey={paymentMethodOptions.WALLET.key}
-                isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
-                // disabled={!paymentRequest}
-              />
-            }
-          >
+      <Row gutter={[8, 8]}>
+        <Col xs={24}>
+          <Text strong> Pay with </Text>
+        </Col>
+        <Col xs={24}>
+          <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={4} size="small">
+            {/* Wallet payments only depends on client side requirements, so we process it separately */}
             {paymentRequest && (
-              <WalletPaymentButtons
-                paymentRequest={paymentRequest}
-                onBeforePayment={handleBeforePayment}
-                onAfterPayment={handleAfterPayment}
-              />
+              <TabPane
+                forceRender={true}
+                key={paymentMethodOptions.WALLET.key}
+                // disabled={!paymentRequest}
+                tab={
+                  <PaymentOptionsSelection
+                    paymentOptionKey={paymentMethodOptions.WALLET.key}
+                    isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
+                    // disabled={!paymentRequest}
+                  />
+                }
+              >
+                {paymentRequest && (
+                  <WalletPaymentButtons
+                    paymentRequest={paymentRequest}
+                    onBeforePayment={handleBeforePayment}
+                    onAfterPayment={handleAfterPayment}
+                  />
+                )}
+              </TabPane>
             )}
-          </TabPane>
-        )}
-      </Tabs>
+
+            {renderPaymentOptions()}
+          </Tabs>
+        </Col>
+      </Row>
     </Loader>
   );
 };

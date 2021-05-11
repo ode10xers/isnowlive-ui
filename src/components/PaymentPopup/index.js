@@ -429,7 +429,7 @@ const PaymentPopup = () => {
                 />
               </Elements>
             </Col>
-            <Col xs={18}>
+            <Col xs={24}>
               {/* <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" /> */}
               <SupportedPayments />
             </Col>

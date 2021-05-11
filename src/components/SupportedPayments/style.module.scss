@@ -3,3 +3,9 @@
 .helperText {
   font-size: 11px;
 }
+
+@media screen and (max-width: 425px) {
+  .helperText {
+    font-size : 9px;
+  }
+}

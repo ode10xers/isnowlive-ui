@@ -3,8 +3,8 @@
 .paymentOptionCard {
   border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
   border-radius: 8px;
-  min-width: 120px;
-  max-width: 170px;
+  max-width: 120px;
+  // max-width: 170px;
 
   &.active, &.active:hover {
     border-color: map-get($map: $colors, $key: 'DodgerBlue') !important;

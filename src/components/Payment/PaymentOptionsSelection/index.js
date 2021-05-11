@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Card, Typography, Row, Col, Space } from 'antd';
 
 import VisaLogo from 'assets/icons/visa/VisaLogo';
-import AmexLogo from 'assets/icons/amex/AmexLogo';
+// import AmexLogo from 'assets/icons/amex/AmexLogo';
 import MastercardLogo from 'assets/icons/mastercard/MastercardLogo';
 import GooglePayLogo from 'assets/icons/gpay/GooglePayLogo';
 import ApplePayLogo from 'assets/icons/apple_pay/ApplePayLogo';
@@ -32,7 +32,7 @@ export const paymentMethodOptions = {
   },
   DEBIT: {
     key: 'debit_payment',
-    options: ['au_becs_debit', 'bacs_debit', 'sepa_debit'],
+    options: ['bacs_debit', 'sepa_debit'],
   },
 };
 
@@ -42,10 +42,10 @@ const paymentOptionsData = {
       <>
         <VisaLogo />
         <MastercardLogo />
-        <AmexLogo />
+        {/* <AmexLogo /> */}
       </>
     ),
-    label: 'Pay with Credit/Debit card',
+    label: 'Credit/Debit card',
   },
   [paymentMethodOptions.WALLET.key]: {
     icons: (
@@ -54,7 +54,7 @@ const paymentOptionsData = {
         <ApplePayLogo />
       </>
     ),
-    label: 'Pay with E-wallet',
+    label: 'E-wallet',
   },
   [paymentMethodOptions.ONLINE_BANKING.key]: {
     icons: (
@@ -64,7 +64,7 @@ const paymentOptionsData = {
         <KlarnaLogo />
       </>
     ),
-    label: 'Pay with Online Banking',
+    label: 'Online Banking',
   },
   [paymentMethodOptions.DEBIT.key]: {
     icons: (
@@ -72,7 +72,7 @@ const paymentOptionsData = {
         <SepaLogo />
       </>
     ),
-    label: 'Pay with Bank Debit',
+    label: 'Bank Debit',
   },
 };
 
