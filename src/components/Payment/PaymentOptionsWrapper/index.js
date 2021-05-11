@@ -9,10 +9,12 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import CardForm from 'components/Payment/CardForm';
 import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
+import RedirectToStripeCheckoutButton from 'components/Payment/RedirectToStripeCheckoutButton';
 import PaymentOptionsSelection, { paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
 
 import { isAPISuccess } from 'utils/helper';
-import RedirectToStripeCheckoutButton from '../RedirectToStripeCheckoutButton';
+
+import styles from './styles.module.scss';
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -189,7 +191,7 @@ const PaymentOptionsWrapper = ({
   };
 
   const handleCustomTabBarRender = (props, DefaultTabBar) => {
-    // console.log(props.panes);
+    console.log(props.panes);
 
     let panesArr = [];
 
@@ -200,7 +202,7 @@ const PaymentOptionsWrapper = ({
     });
 
     return (
-      <Row gutter={[8, 8]}>
+      <Row gutter={[8, 8]} className={styles.mb10}>
         {panesArr.map((pane) => (
           <Col xs={12} key={pane.key} onClick={() => setSelectedPaymentOption(pane.key)}>
             {pane.props.tab}
@@ -220,21 +222,18 @@ const PaymentOptionsWrapper = ({
           <Tabs
             activeKey={selectedPaymentOption}
             onChange={setSelectedPaymentOption}
-            tabBarGutter={4}
-            size="small"
             renderTabBar={handleCustomTabBarRender}
           >
+            {renderPaymentOptions()}
             {/* Wallet payments only depends on client side requirements, so we process it separately */}
             {paymentRequest && (
               <TabPane
                 forceRender={true}
                 key={paymentMethodOptions.WALLET.key}
-                // disabled={!paymentRequest}
                 tab={
                   <PaymentOptionsSelection
                     paymentOptionKey={paymentMethodOptions.WALLET.key}
                     isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
-                    // disabled={!paymentRequest}
                   />
                 }
               >
@@ -247,8 +246,6 @@ const PaymentOptionsWrapper = ({
                 )}
               </TabPane>
             )}
-
-            {renderPaymentOptions()}
           </Tabs>
         </Col>
       </Row>
