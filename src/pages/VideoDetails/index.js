@@ -287,6 +287,7 @@ const VideoDetails = ({ match }) => {
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.video_order_id,
             payment_order_type: orderType.VIDEO,
           };
@@ -310,7 +311,10 @@ const VideoDetails = ({ match }) => {
             showPurchaseSingleVideoSuccessModal(data.video_order_id);
           }
 
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -322,7 +326,9 @@ const VideoDetails = ({ match }) => {
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buyPassAndGetVideo = async (payload, couponCode = '') => {
@@ -337,6 +343,7 @@ const VideoDetails = ({ match }) => {
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.pass_order_id,
             payment_order_type: orderType.PASS,
             follow_up_booking_info: {
@@ -358,7 +365,10 @@ const VideoDetails = ({ match }) => {
             setIsLoading(false);
           }
 
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -370,7 +380,9 @@ const VideoDetails = ({ match }) => {
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buyVideoUsingPass = async (payload) => {
@@ -382,7 +394,10 @@ const VideoDetails = ({ match }) => {
       if (isAPISuccess(status) && data) {
         showGetVideoWithPassSuccessModal(payload.source_id);
         setIsLoading(false);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
       setIsLoading(false);
@@ -394,7 +409,9 @@ const VideoDetails = ({ match }) => {
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buyVideoUsingSubscription = async (payload) => {
@@ -404,7 +421,10 @@ const VideoDetails = ({ match }) => {
       if (isAPISuccess(status) && data) {
         showGetVideoWithSubscriptionSuccessModal();
         setIsLoading(false);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
       setIsLoading(false);
@@ -415,7 +435,9 @@ const VideoDetails = ({ match }) => {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
     }
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const showConfirmPaymentPopup = async () => {

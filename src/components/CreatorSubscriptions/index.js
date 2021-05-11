@@ -77,7 +77,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
         user_timezone_location: getTimezoneLocation(),
       };
 
-      const { status, data } = await apis.subscriptions.createSubscriptionOrder(payload);
+      const { status, data } = await apis.subscriptions.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
@@ -86,12 +86,16 @@ const CreatorSubscriptions = ({ subscriptions }) => {
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_type: orderType.SUBSCRIPTION,
             payment_order_id: data.subscription_order_id,
           };
         } else {
           showPurchaseSubscriptionSuccessModal();
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -106,7 +110,9 @@ const CreatorSubscriptions = ({ subscriptions }) => {
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const renderShowcaseSubscriptionCards = (subscription) => (

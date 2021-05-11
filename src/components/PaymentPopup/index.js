@@ -205,7 +205,7 @@ const PaymentPopup = () => {
   };
 
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
-    if (orderResponse) {
+    if (orderResponse && orderResponse?.is_successful_order) {
       if (verifyOrderRes === orderType.PASS) {
         /*
           In pass order, there can be follow up bookings
@@ -255,7 +255,9 @@ const PaymentPopup = () => {
       }
     }
 
-    closePaymentPopup();
+    if (!orderResponse?.is_successful_order) {
+      closePaymentPopup();
+    }
   };
 
   const generatePaymentInstrumentDetails = () => {
@@ -412,7 +414,7 @@ const PaymentPopup = () => {
         )}
 
         <Col xs={24} className={styles.topBorder}>
-          <Row gutter={8} justify="center">
+          <Row gutter={[8, 8]} justify="center">
             <Col xs={24} className={styles.mb10}>
               <Elements stripe={stripePromise}>
                 <PaymentOptionsWrapper

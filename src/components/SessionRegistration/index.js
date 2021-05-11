@@ -678,13 +678,17 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.order_id,
             payment_order_type: orderType.CLASS,
             inventory_id: inventoryId,
           };
         } else {
           showBookSingleSessionSuccessModal(inventoryId);
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -700,7 +704,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buyPassAndBookClass = async (payload, couponCode = '') => {
@@ -716,6 +722,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.pass_order_id,
             payment_order_type: orderType.PASS,
             follow_up_booking_info: {
@@ -741,7 +748,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             showPurchasePassAndBookSessionSuccessModal(data.pass_order_id, inventoryId);
           }
 
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -757,7 +767,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const bookClassUsingPass = async (payload) => {
@@ -769,7 +781,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
         showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
       setIsLoading(false);
@@ -784,7 +799,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const bookClassUsingSubscription = async (payload) => {
@@ -796,7 +813,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
         showBookSessionWithSubscriptionSuccessModal(payload.inventory_id);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
       setIsLoading(false);
@@ -812,7 +832,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const showConfirmPaymentPopup = () => {
