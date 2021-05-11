@@ -196,8 +196,12 @@ const PaymentOptionsWrapper = ({
     let panesArr = [];
 
     props.panes.forEach((pane) => {
-      if (pane && pane.length > 0) {
-        panesArr.push(...pane);
+      if (pane) {
+        if (Array.isArray(pane) && pane.length > 0) {
+          panesArr.push(...pane);
+        } else {
+          panesArr.push(pane);
+        }
       }
     });
 
