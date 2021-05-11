@@ -417,6 +417,7 @@ const PaymentPopup = () => {
             <Col xs={24} className={styles.mb10}>
               <Elements stripe={stripePromise}>
                 <PaymentOptionsWrapper
+                  shouldFetchAvailablePaymentMethods={paymentPopupVisible}
                   handleAfterPayment={handleAfterPayment}
                   handleBeforePayment={handleBeforePayment}
                   isFreeProduct={isFree()}

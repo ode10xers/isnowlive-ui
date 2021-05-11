@@ -12,7 +12,6 @@ import MastercardLogo from 'assets/icons/mastercard/MastercardLogo';
 const { Text } = Typography;
 
 const cardBrandImages = {
-  // VISA: require('../../../assets/icons/visa_logo.png'),
   VISA: <VisaLogo />,
   AMEX: <AmexLogo />,
   MASTERCARD: <MastercardLogo />,

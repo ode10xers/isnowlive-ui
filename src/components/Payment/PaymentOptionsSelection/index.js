@@ -10,14 +10,34 @@ import GooglePayLogo from 'assets/icons/gpay/GooglePayLogo';
 import ApplePayLogo from 'assets/icons/apple_pay/ApplePayLogo';
 
 import styles from './styles.module.scss';
+import GiropayLogo from 'assets/icons/giropay/GiropayLogo';
+import IdealLogo from 'assets/icons/ideal/IdealLogo';
+import KlarnaLogo from 'assets/icons/klarna/KlarnaLogo';
+import SepaLogo from 'assets/icons/sepa/SepaLogo';
 
+// NOTE: Change this if the supported payment method constants
+// is changed in the BE
 export const paymentMethodOptions = {
-  CARD: 'card_payment',
-  WALLET: 'wallet_payment',
+  CARD: {
+    key: 'card_payment',
+    options: ['card'],
+  },
+  WALLET: {
+    key: 'wallet_payment',
+    options: ['google_pay', 'apple_pay', 'alipay'],
+  },
+  ONLINE_BANKING: {
+    key: 'online_banking_payment',
+    options: ['bancontact', 'eps', 'fpx', 'giropay', 'ideal', 'sofort', 'p24'],
+  },
+  DEBIT: {
+    key: 'debit_payment',
+    options: ['au_becs_debit', 'bacs_debit', 'sepa_debit'],
+  },
 };
 
 const paymentOptionsData = {
-  [paymentMethodOptions.CARD]: {
+  [paymentMethodOptions.CARD.key]: {
     icons: (
       <>
         <VisaLogo />
@@ -25,16 +45,34 @@ const paymentOptionsData = {
         <AmexLogo />
       </>
     ),
-    label: 'Pay with card',
+    label: 'Pay with Credit/Debit card',
   },
-  [paymentMethodOptions.WALLET]: {
+  [paymentMethodOptions.WALLET.key]: {
     icons: (
       <>
         <GooglePayLogo />
         <ApplePayLogo />
       </>
     ),
-    label: 'Pay with e-wallet',
+    label: 'Pay with E-wallet',
+  },
+  [paymentMethodOptions.ONLINE_BANKING.key]: {
+    icons: (
+      <>
+        <IdealLogo />
+        <GiropayLogo />
+        <KlarnaLogo />
+      </>
+    ),
+    label: 'Pay with Online Banking',
+  },
+  [paymentMethodOptions.DEBIT.key]: {
+    icons: (
+      <>
+        <SepaLogo />
+      </>
+    ),
+    label: 'Pay with Bank Debit',
   },
 };
 

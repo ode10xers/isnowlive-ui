@@ -4,9 +4,14 @@ import { Tabs } from 'antd';
 
 import { useStripe } from '@stripe/react-stripe-js';
 
+import apis from 'apis';
+
+import Loader from 'components/Loader';
 import CardForm from 'components/Payment/CardForm';
 import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
 import PaymentOptionsSelection, { paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
+
+import { isAPISuccess } from 'utils/helper';
 
 const { TabPane } = Tabs;
 
@@ -20,8 +25,11 @@ const { TabPane } = Tabs;
   }
 */
 
+const defaultAvailablePaymentOptions = paymentMethodOptions.CARD.options;
+
 // NOTE: Payment Request won't work on local
 const PaymentOptionsWrapper = ({
+  shouldFetchAvailablePaymentMethods,
   handleAfterPayment,
   handleBeforePayment,
   isFreeProduct = false,
@@ -30,8 +38,10 @@ const PaymentOptionsWrapper = ({
   amount,
 }) => {
   const stripe = useStripe();
+  const [isLoading, setIsLoading] = useState(false);
   const [paymentRequest, setPaymentRequest] = useState(null);
-  const [selectedPaymentOption, setSelectedPaymentOption] = useState('card_payment');
+  const [availablePaymentOptions, setAvailablePaymentOptions] = useState(defaultAvailablePaymentOptions);
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState(paymentMethodOptions.CARD.key);
 
   // The Payment Request Object is loaded here
   // Because there can be a case where user don't have any
@@ -73,6 +83,31 @@ const PaymentOptionsWrapper = ({
     //eslint-disable-next-line
   }, [stripe]);
 
+  const fetchAvailablePaymentMethods = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.payment.getAvailablePaymentMethods();
+
+      if (isAPISuccess(status) && data) {
+        // The data here should map to paymentMethodOptions
+        setAvailablePaymentOptions(data.method_types);
+      }
+    } catch (error) {
+      console.error('Failed fetching payment methods for user', error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (shouldFetchAvailablePaymentMethods) {
+      fetchAvailablePaymentMethods();
+    } else {
+      setAvailablePaymentOptions(defaultAvailablePaymentOptions);
+    }
+  }, [shouldFetchAvailablePaymentMethods, fetchAvailablePaymentMethods]);
+
   useEffect(() => {
     setupStripePaymentRequest();
   }, [setupStripePaymentRequest]);
@@ -80,7 +115,6 @@ const PaymentOptionsWrapper = ({
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)
   useEffect(() => {
-    console.log(paymentRequest);
     if (paymentRequest) {
       paymentRequest.update({
         total: {
@@ -92,48 +126,80 @@ const PaymentOptionsWrapper = ({
     }
   }, [amount, paymentRequest]);
 
-  return (
-    <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={4} size="small">
-      <TabPane
-        forceRender={true}
-        key={paymentMethodOptions.CARD}
-        tab={
-          <PaymentOptionsSelection
-            paymentOptionKey={paymentMethodOptions.CARD}
-            isActive={selectedPaymentOption === paymentMethodOptions.CARD}
-          />
-        }
-      >
+  // We don't handle wallet payments here since it has a client side requirement check
+  const paymentMethodsData = {
+    [paymentMethodOptions.CARD.key]: {
+      children: (
         <CardForm
           btnProps={{ text: isFreeProduct ? 'Get' : 'Buy', disableButton: minimumPriceRequirementFulfilled }}
           isFree={isFreeProduct}
           onBeforePayment={handleBeforePayment}
           onAfterPayment={handleAfterPayment}
         />
+      ),
+    },
+    [paymentMethodOptions.ONLINE_BANKING.key]: {
+      children: <>Placeholder for Online Banking Here</>,
+    },
+    [paymentMethodOptions.DEBIT.key]: {
+      children: <>Placeholder for Debit Here</>,
+    },
+  };
+
+  const renderPaymentOptions = () => {
+    const paymentOptionsToShow = Object.entries(paymentMethodOptions)
+      .filter(
+        ([key, val]) =>
+          key !== paymentMethodOptions.WALLET.key &&
+          val.options.some((option) => availablePaymentOptions.includes(option))
+      )
+      .map(([key, val]) => val);
+
+    return paymentOptionsToShow.map((optionToShow) => (
+      <TabPane
+        key={optionToShow.key}
+        tab={
+          <PaymentOptionsSelection
+            paymentOptionKey={optionToShow.key}
+            isActive={selectedPaymentOption === optionToShow.key}
+          />
+        }
+      >
+        {paymentMethodsData[optionToShow.key].children}
       </TabPane>
-      {paymentRequest && (
-        <TabPane
-          forceRender={true}
-          key={paymentMethodOptions.WALLET}
-          disabled={!paymentRequest}
-          tab={
-            <PaymentOptionsSelection
-              paymentOptionKey={paymentMethodOptions.WALLET}
-              isActive={selectedPaymentOption === paymentMethodOptions.WALLET}
-              disabled={!paymentRequest}
-            />
-          }
-        >
-          {paymentRequest && (
-            <WalletPaymentButtons
-              paymentRequest={paymentRequest}
-              onBeforePayment={handleBeforePayment}
-              onAfterPayment={handleAfterPayment}
-            />
-          )}
-        </TabPane>
-      )}
-    </Tabs>
+    ));
+  };
+
+  return (
+    <Loader loading={isLoading} text="Fetching available payment methods...">
+      <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={4} size="small">
+        {renderPaymentOptions()}
+
+        {/* Wallet payments only depends on client side requirements, so we process it separately */}
+        {paymentRequest && (
+          <TabPane
+            forceRender={true}
+            key={paymentMethodOptions.WALLET.key}
+            // disabled={!paymentRequest}
+            tab={
+              <PaymentOptionsSelection
+                paymentOptionKey={paymentMethodOptions.WALLET.key}
+                isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
+                // disabled={!paymentRequest}
+              />
+            }
+          >
+            {paymentRequest && (
+              <WalletPaymentButtons
+                paymentRequest={paymentRequest}
+                onBeforePayment={handleBeforePayment}
+                onAfterPayment={handleAfterPayment}
+              />
+            )}
+          </TabPane>
+        )}
+      </Tabs>
+    </Loader>
   );
 };
 
