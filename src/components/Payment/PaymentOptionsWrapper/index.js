@@ -188,6 +188,28 @@ const PaymentOptionsWrapper = ({
     ));
   };
 
+  const handleCustomTabBarRender = (props, DefaultTabBar) => {
+    console.log(props.panes);
+
+    let panesArr = [];
+
+    props.panes.forEach((pane) => {
+      if (pane && pane.length > 0) {
+        panesArr.push(...pane);
+      }
+    });
+
+    return (
+      <Row gutter={[8, 8]}>
+        {panesArr.map((pane) => (
+          <Col xs={12} key={pane.key} onClick={() => setSelectedPaymentOption(pane.key)}>
+            {pane.props.tab}
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
   return (
     <Loader loading={isLoading} text="Fetching available payment methods...">
       <Row gutter={[8, 8]}>
@@ -195,7 +217,13 @@ const PaymentOptionsWrapper = ({
           <Text strong> Pay with </Text>
         </Col>
         <Col xs={24}>
-          <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={4} size="small">
+          <Tabs
+            activeKey={selectedPaymentOption}
+            onChange={setSelectedPaymentOption}
+            tabBarGutter={4}
+            size="small"
+            renderTabBar={handleCustomTabBarRender}
+          >
             {/* Wallet payments only depends on client side requirements, so we process it separately */}
             {paymentRequest && (
               <TabPane
