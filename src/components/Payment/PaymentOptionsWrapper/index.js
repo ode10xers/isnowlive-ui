@@ -119,6 +119,7 @@ const PaymentOptionsWrapper = ({
           <PaymentOptionsSelection
             paymentOptionKey={paymentMethodOptions.WALLET}
             isActive={selectedPaymentOption === paymentMethodOptions.WALLET}
+            disabled={!paymentRequest}
           />
         }
       >

@@ -40,12 +40,15 @@ const paymentOptionsData = {
 
 const { Text } = Typography;
 
-const PaymentOptionsSelection = ({ paymentOptionKey, isActive = false }) => {
+const PaymentOptionsSelection = ({ paymentOptionKey, isActive = false, disabled = false }) => {
   return (
     <Card
-      className={classNames(styles.paymentOptionCard, isActive ? styles.active : undefined)}
+      className={classNames(
+        styles.paymentOptionCard,
+        disabled ? styles.disabled : isActive ? styles.active : undefined
+      )}
       size="small"
-      hoverable={true}
+      hoverable={!disabled}
     >
       <Row gutter={[8, 4]}>
         <Col xs={24}>
