@@ -119,12 +119,15 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </Space>
         )}
       </Col>
-      <Col xs={24} md={{ span: 6, offset: 1 }}>
-        <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
-        <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
-          Subscribe to newsletter
-        </Button>
-      </Col>
+
+      {profile.collect_emails && (
+        <Col xs={24} md={{ span: 6, offset: 1 }}>
+          <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
+          <Button block type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
+            Subscribe to newsletter
+          </Button>
+        </Col>
+      )}
     </Row>
   );
 };

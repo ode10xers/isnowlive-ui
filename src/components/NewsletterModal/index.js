@@ -3,7 +3,7 @@ import { Row, Col, Form, Typography, Input, Modal, Button } from 'antd';
 import Loader from 'components/Loader';
 import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
 import apis from 'apis';
-import { newsletterModalLayout } from 'layouts/FormLayouts';
+import { newsletterModalLayout, newsletterFormTailLayout } from 'layouts/FormLayouts';
 import classNames from 'classnames';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -60,7 +60,7 @@ const NewsletterModal = ({ visible, closeModal }) => {
         afterClose={resetBodyStyle}
       >
         <Loader loading={isLoading} size="large">
-          <Form labelAlign="left" onFinish={onFinish} scrollToFirstError={true}>
+          <Form labelAlign="right" onFinish={onFinish} scrollToFirstError={true}>
             <Row gutter={8}>
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
@@ -92,8 +92,8 @@ const NewsletterModal = ({ visible, closeModal }) => {
                 >
                   <Input placeholder="Please Enter your Email" />
                 </Form.Item>
-                <Form.Item colon={false}>
-                  <Button type="primary" htmlType="submit">
+                <Form.Item colon={false} {...newsletterFormTailLayout}>
+                  <Button block type="primary" htmlType="submit">
                     Subscribe
                   </Button>
                 </Form.Item>
