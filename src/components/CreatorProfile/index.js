@@ -23,7 +23,7 @@ const { Title } = Typography;
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
 
-  const closePurchaseModal = () => {
+  const closeNewsletterModal = () => {
     setNewsletterModalVisible(false);
   };
 
@@ -119,10 +119,10 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </Space>
         )}
       </Col>
-      <Col xs={24} md={{ span: 8, offset: 2 }}>
-        <NewsletterModal visible={showNewsletterModalVisible} closeModal={closePurchaseModal} />
+      <Col xs={24} md={{ span: 10, offset: 1 }}>
+        <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
         <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
-          Signup to our Newsletter
+          Subscribe to newsletter
         </Button>
       </Col>
     </Row>
