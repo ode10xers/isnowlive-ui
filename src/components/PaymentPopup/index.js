@@ -7,6 +7,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import config from 'config';
 import apis from 'apis';
 
+import PaymentOptionsWrapper from 'components/Payment/PaymentOptionsWrapper';
+import SupportedPayments from 'components/SupportedPayments/SupportedPayments';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
   resetBodyStyle,
@@ -24,9 +26,6 @@ import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError, getUsern
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import PaymentOptionsWrapper from 'components/Payment/PaymentOptionsWrapper';
-import SupportedPayments from 'components/SupportedPayments/SupportedPayments';
-
 // const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
 const stripePromise = loadStripe(config.stripe.secretKey);

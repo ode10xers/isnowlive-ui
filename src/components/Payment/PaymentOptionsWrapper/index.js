@@ -93,7 +93,7 @@ const PaymentOptionsWrapper = ({
   }, [amount, paymentRequest]);
 
   return (
-    <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} size="small">
+    <Tabs activeKey={selectedPaymentOption} onChange={setSelectedPaymentOption} tabBarGutter={4} size="small">
       <TabPane
         forceRender={true}
         key={paymentMethodOptions.CARD}
