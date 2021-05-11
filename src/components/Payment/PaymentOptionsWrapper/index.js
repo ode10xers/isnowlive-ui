@@ -111,26 +111,28 @@ const PaymentOptionsWrapper = ({
           onAfterPayment={handleAfterPayment}
         />
       </TabPane>
-      <TabPane
-        forceRender={true}
-        key={paymentMethodOptions.WALLET}
-        disabled={!paymentRequest}
-        tab={
-          <PaymentOptionsSelection
-            paymentOptionKey={paymentMethodOptions.WALLET}
-            isActive={selectedPaymentOption === paymentMethodOptions.WALLET}
-            disabled={!paymentRequest}
-          />
-        }
-      >
-        {paymentRequest && (
-          <WalletPaymentButtons
-            paymentRequest={paymentRequest}
-            onBeforePayment={handleBeforePayment}
-            onAfterPayment={handleAfterPayment}
-          />
-        )}
-      </TabPane>
+      {paymentRequest && (
+        <TabPane
+          forceRender={true}
+          key={paymentMethodOptions.WALLET}
+          disabled={!paymentRequest}
+          tab={
+            <PaymentOptionsSelection
+              paymentOptionKey={paymentMethodOptions.WALLET}
+              isActive={selectedPaymentOption === paymentMethodOptions.WALLET}
+              disabled={!paymentRequest}
+            />
+          }
+        >
+          {paymentRequest && (
+            <WalletPaymentButtons
+              paymentRequest={paymentRequest}
+              onBeforePayment={handleBeforePayment}
+              onAfterPayment={handleAfterPayment}
+            />
+          )}
+        </TabPane>
+      )}
     </Tabs>
   );
 };
