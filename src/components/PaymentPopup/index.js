@@ -189,6 +189,8 @@ const PaymentPopup = () => {
     setShowCouponField(!showCouponField);
   };
 
+  // This will run the callback (we will populate this with order creation functions)
+  // and return the order response object
   const handleBeforePayment = async () => {
     let result = null;
     const appliedCouponCode = couponApplied ? couponCode : '';

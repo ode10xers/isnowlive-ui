@@ -12,6 +12,7 @@ import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
 import PaymentOptionsSelection, { paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
 
 import { isAPISuccess } from 'utils/helper';
+import RedirectToStripeCheckoutButton from '../RedirectToStripeCheckoutButton';
 
 const { TabPane } = Tabs;
 
@@ -139,10 +140,26 @@ const PaymentOptionsWrapper = ({
       ),
     },
     [paymentMethodOptions.ONLINE_BANKING.key]: {
-      children: <>Placeholder for Online Banking Here</>,
+      children: (
+        <RedirectToStripeCheckoutButton
+          onBeforePayment={handleBeforePayment}
+          methodName="Online Banking"
+          paymentMethods={availablePaymentOptions.filter((payOption) =>
+            paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
+          )}
+        />
+      ),
     },
     [paymentMethodOptions.DEBIT.key]: {
-      children: <>Placeholder for Debit Here</>,
+      children: (
+        <RedirectToStripeCheckoutButton
+          onBeforePayment={handleBeforePayment}
+          methodName="Bank Debit"
+          paymentMethods={availablePaymentOptions.filter((payOption) =>
+            paymentMethodOptions.DEBIT.options.includes(payOption)
+          )}
+        />
+      ),
     },
   };
 
