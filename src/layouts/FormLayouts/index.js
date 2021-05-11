@@ -113,3 +113,6 @@ export const sendCustomerEmailBodyFormLayout = {
   labelCol: { span: 24 },
   wrapperCol: { span: 24 },
 };
+export const newsletterModalLayout = {
+  wrapperCol: { offset: 3, span: 18 },
+};
