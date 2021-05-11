@@ -8,12 +8,12 @@ import VisaLogo from 'assets/icons/visa/VisaLogo';
 import MastercardLogo from 'assets/icons/mastercard/MastercardLogo';
 import GooglePayLogo from 'assets/icons/gpay/GooglePayLogo';
 import ApplePayLogo from 'assets/icons/apple_pay/ApplePayLogo';
-
-import styles from './styles.module.scss';
 import GiropayLogo from 'assets/icons/giropay/GiropayLogo';
 import IdealLogo from 'assets/icons/ideal/IdealLogo';
-import KlarnaLogo from 'assets/icons/klarna/KlarnaLogo';
+// import KlarnaLogo from 'assets/icons/klarna/KlarnaLogo';
 import SepaLogo from 'assets/icons/sepa/SepaLogo';
+
+import styles from './styles.module.scss';
 
 // NOTE: Change this if the supported payment method constants
 // is changed in the BE
@@ -61,7 +61,7 @@ const paymentOptionsData = {
       <>
         <IdealLogo />
         <GiropayLogo />
-        <KlarnaLogo />
+        {/* <KlarnaLogo /> */}
       </>
     ),
     label: 'Online Banking',
