@@ -83,7 +83,8 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
         }
       }
     } else {
-      ev.complete('fail');
+      // ev.complete('fail');
+      paymentRequest.abort();
     }
 
     onAfterPayment(orderResponse, verifyOrderRes);
