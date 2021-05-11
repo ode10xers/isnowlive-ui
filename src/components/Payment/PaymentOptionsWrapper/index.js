@@ -189,7 +189,7 @@ const PaymentOptionsWrapper = ({
   };
 
   const handleCustomTabBarRender = (props, DefaultTabBar) => {
-    console.log(props.panes);
+    // console.log(props.panes);
 
     let panesArr = [];
 

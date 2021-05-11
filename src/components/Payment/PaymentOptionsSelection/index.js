@@ -4,13 +4,13 @@ import classNames from 'classnames';
 import { Card, Typography, Row, Col, Space } from 'antd';
 
 import VisaLogo from 'assets/icons/visa/VisaLogo';
-// import AmexLogo from 'assets/icons/amex/AmexLogo';
+import AmexLogo from 'assets/icons/amex/AmexLogo';
 import MastercardLogo from 'assets/icons/mastercard/MastercardLogo';
 import GooglePayLogo from 'assets/icons/gpay/GooglePayLogo';
 import ApplePayLogo from 'assets/icons/apple_pay/ApplePayLogo';
 import GiropayLogo from 'assets/icons/giropay/GiropayLogo';
 import IdealLogo from 'assets/icons/ideal/IdealLogo';
-// import KlarnaLogo from 'assets/icons/klarna/KlarnaLogo';
+import KlarnaLogo from 'assets/icons/klarna/KlarnaLogo';
 import SepaLogo from 'assets/icons/sepa/SepaLogo';
 
 import styles from './styles.module.scss';
@@ -40,9 +40,9 @@ const paymentOptionsData = {
   [paymentMethodOptions.CARD.key]: {
     icons: (
       <>
-        <VisaLogo />
-        <MastercardLogo />
-        {/* <AmexLogo /> */}
+        <VisaLogo height={22} width={22} />
+        <MastercardLogo height={22} width={22} />
+        <AmexLogo height={22} width={22} />
       </>
     ),
     label: 'Credit/Debit card',
@@ -59,9 +59,9 @@ const paymentOptionsData = {
   [paymentMethodOptions.ONLINE_BANKING.key]: {
     icons: (
       <>
-        <IdealLogo />
-        <GiropayLogo />
-        {/* <KlarnaLogo /> */}
+        <IdealLogo height={22} width={22} />
+        <GiropayLogo height={22} width={22} />
+        <KlarnaLogo height={22} width={22} />
       </>
     ),
     label: 'Online Banking',
