@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-
-import { Row, Col, Image, Space, Typography } from 'antd';
+import { Row, Col, Button, Image, Space, Typography } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -13,15 +12,26 @@ import {
 
 import Share from 'components/Share';
 import DefaultImage from 'components/Icons/DefaultImage';
-
+import { resetBodyStyle } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername } from 'utils/helper';
-
+import NewsletterModal from 'components/NewsletterModal';
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
+
+  const closeNewsletterModal = () => {
+    setNewsletterModalVisible(false);
+  };
+
+  const showNewsletterModal = () => {
+    setNewsletterModalVisible(true);
+    resetBodyStyle();
+  };
+
   const renderCreatorName = () => {
     const creatorName = `${profile?.first_name} ${profile?.last_name}`;
 
@@ -43,7 +53,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   };
 
   return (
-    <Row className={styles.imageWrapper} gutter={[8, 8]}>
+    <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-between">
       {showCoverImage && (
         <Col xs={24} className={styles.coverImageWrapper}>
           <Image
@@ -71,10 +81,10 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </div>
         </div>
       </Col>
-      <Col xs={24} md={{ span: 22, offset: 1 }}>
+      <Col xs={24} md={{ span: 22 }}>
         <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
       </Col>
-      <Col xs={24} md={{ span: 22, offset: 1 }}>
+      <Col xs={24} md={{ span: 8 }}>
         {profile?.profile?.social_media_links && (
           <Space size={'middle'}>
             {profile.profile.social_media_links.website && (
@@ -109,6 +119,15 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </Space>
         )}
       </Col>
+
+      {profile.collect_emails && (
+        <Col xs={24} md={{ span: 6, offset: 1 }}>
+          <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
+          <Button block type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
+            Subscribe to newsletter
+          </Button>
+        </Col>
+      )}
     </Row>
   );
 };

@@ -1,0 +1,49 @@
+@import '../../styles/variables.scss';
+
+.smallText {
+  font-size: 11px;
+}
+
+.linkBtn {
+  padding: 0px !important;
+  cursor: pointer;
+  color: map-get($colors, 'DodgerBlue') !important;
+}
+
+.nameInputWrapper {
+  margin: 0px !important;
+
+  .firstNameInput {
+    max-width: 128px;
+    display: inline-block !important;
+  }
+
+  .lastNameInput {
+    @extend .firstNameInput;
+    margin-left: 8px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .nameInputWrapper {
+    .firstNameInput,
+    .lastNameInput {
+      max-width: 100%;
+      display: block !important;
+      margin-left: 0px !important;
+    }
+  }
+}
+
+.inlineFormItem{
+  display: inline-block !important;
+  width: calc(50% - 8px);
+}
+
+.inlineFormItem_lastname{
+  margin: 0 8px !important;
+}
+
+.formBottomMargin{
+  margin-bottom: 0 !important;
+}
