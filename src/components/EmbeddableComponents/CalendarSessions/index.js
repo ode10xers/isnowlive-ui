@@ -94,6 +94,7 @@ const CalendarSessions = ({ profileUsername }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
+        coupon_code: couponCode,
         payment_source: paymentSource.GATEWAY,
       };
 

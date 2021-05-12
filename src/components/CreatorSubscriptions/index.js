@@ -74,6 +74,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
     try {
       const payload = {
         subscription_id: selectedSubscription.external_id,
+        coupon_code: couponCode,
         user_timezone_location: getTimezoneLocation(),
       };
 
