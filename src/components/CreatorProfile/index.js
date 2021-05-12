@@ -53,7 +53,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   };
 
   return (
-    <Row className={styles.imageWrapper} gutter={[8, 8]}>
+    <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-between">
       {showCoverImage && (
         <Col xs={24} className={styles.coverImageWrapper}>
           <Image
@@ -81,10 +81,10 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </div>
         </div>
       </Col>
-      <Col xs={24} md={{ span: 22, offset: 1 }}>
+      <Col xs={24} md={{ span: 22 }}>
         <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
       </Col>
-      <Col xs={24} md={{ span: 10, offset: 1 }}>
+      <Col xs={24} md={{ span: 8 }}>
         {profile?.profile?.social_media_links && (
           <Space size={'middle'}>
             {profile.profile.social_media_links.website && (
@@ -119,12 +119,15 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </Space>
         )}
       </Col>
-      <Col xs={24} md={{ span: 10, offset: 1 }}>
-        <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
-        <Button type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
-          Subscribe to newsletter
-        </Button>
-      </Col>
+
+      {profile.collect_emails && (
+        <Col xs={24} md={{ span: 6, offset: 1 }}>
+          <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
+          <Button block type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
+            Subscribe to newsletter
+          </Button>
+        </Col>
+      )}
     </Row>
   );
 };
