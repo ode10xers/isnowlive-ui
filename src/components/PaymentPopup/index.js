@@ -415,8 +415,8 @@ const PaymentPopup = () => {
         )}
 
         <Col xs={24} className={styles.topBorder}>
-          <Row gutter={[8, 8]} justify="center">
-            <Col xs={24} className={styles.mb10}>
+          <Row gutter={[8, 12]} justify="center">
+            <Col xs={24}>
               <Elements stripe={stripePromise}>
                 <PaymentOptionsWrapper
                   shouldFetchAvailablePaymentMethods={paymentPopupVisible}

@@ -14,7 +14,6 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
 
   const onConfirmPaymentDetails = async (ev) => {
     setIsLoading(true);
-    console.log('Payment Method Event Object', ev);
 
     // Create Order here
     const orderResponse = await onBeforePayment();

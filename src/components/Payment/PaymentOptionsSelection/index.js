@@ -40,9 +40,9 @@ const paymentOptionsData = {
   [paymentMethodOptions.CARD.key]: {
     icons: (
       <>
-        <VisaLogo height={22} width={22} />
-        <MastercardLogo height={22} width={22} />
-        <AmexLogo height={22} width={22} />
+        <VisaLogo className={styles.paymentIcon} />
+        <MastercardLogo className={styles.paymentIcon} />
+        <AmexLogo className={styles.paymentIcon} />
       </>
     ),
     label: 'Credit/Debit card',
@@ -50,8 +50,8 @@ const paymentOptionsData = {
   [paymentMethodOptions.WALLET.key]: {
     icons: (
       <>
-        <GooglePayLogo />
-        <ApplePayLogo />
+        <GooglePayLogo className={styles.paymentIcon} />
+        <ApplePayLogo className={styles.paymentIcon} />
       </>
     ),
     label: 'E-wallet',
@@ -59,9 +59,9 @@ const paymentOptionsData = {
   [paymentMethodOptions.ONLINE_BANKING.key]: {
     icons: (
       <>
-        <IdealLogo height={22} width={22} />
-        <GiropayLogo height={22} width={22} />
-        <KlarnaLogo height={22} width={22} />
+        <IdealLogo className={styles.paymentIcon} />
+        <GiropayLogo className={styles.paymentIcon} />
+        <KlarnaLogo className={styles.paymentIcon} />
       </>
     ),
     label: 'Online Banking',
@@ -69,7 +69,7 @@ const paymentOptionsData = {
   [paymentMethodOptions.DEBIT.key]: {
     icons: (
       <>
-        <SepaLogo />
+        <SepaLogo className={styles.paymentIcon} />
       </>
     ),
     label: 'Bank Debit',

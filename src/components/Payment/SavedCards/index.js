@@ -12,9 +12,9 @@ import MastercardLogo from 'assets/icons/mastercard/MastercardLogo';
 const { Text } = Typography;
 
 const cardBrandImages = {
-  VISA: <VisaLogo />,
-  AMEX: <AmexLogo />,
-  MASTERCARD: <MastercardLogo />,
+  VISA: <VisaLogo className={styles.cardLogo} />,
+  AMEX: <AmexLogo className={styles.cardLogo} />,
+  MASTERCARD: <MastercardLogo className={styles.cardLogo} />,
 };
 
 const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {

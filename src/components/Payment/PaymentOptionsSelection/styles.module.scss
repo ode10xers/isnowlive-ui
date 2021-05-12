@@ -4,8 +4,6 @@
   border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
   border-radius: 8px;
   width: 100%;
-  // max-width: 120px;
-  // max-width: 170px;
 
   &.active, &.active:hover {
     border: 2px solid map-get($map: $colors, $key: 'DodgerBlue') !important;
@@ -18,5 +16,27 @@
 
   .paymentOptionName {
     font-size: 12px;
+  }
+
+  .paymentIcon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .paymentOptionCard {
+    .paymentIcon {
+      width: 26px;
+      height: 26px;
+    }
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .paymentOptionCard {
+    .paymentOptionName {
+      font-size: 10px;  
+    }
   }
 }

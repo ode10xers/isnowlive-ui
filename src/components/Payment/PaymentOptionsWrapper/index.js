@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { Tabs, Row, Col, Typography } from 'antd';
+import { Tabs, Row, Col, Typography, Divider } from 'antd';
 
 import { useStripe } from '@stripe/react-stripe-js';
 
@@ -147,6 +147,7 @@ const PaymentOptionsWrapper = ({
         <RedirectToStripeCheckoutButton
           onBeforePayment={handleBeforePayment}
           methodName="Online Banking"
+          helperText="You’ll be redirected to a Stripe page to select from iDEAL, Sofort, Bancontact or Giro payment options"
           paymentMethods={availablePaymentOptions.filter((payOption) =>
             paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
           )}
@@ -158,6 +159,7 @@ const PaymentOptionsWrapper = ({
         <RedirectToStripeCheckoutButton
           onBeforePayment={handleBeforePayment}
           methodName="Bank Debit"
+          helperText="You’ll be redirected to a Stripe page to select between SEPA or Bacs Direct Debit options"
           paymentMethods={availablePaymentOptions.filter((payOption) =>
             paymentMethodOptions.DEBIT.options.includes(payOption)
           )}
@@ -191,8 +193,6 @@ const PaymentOptionsWrapper = ({
   };
 
   const handleCustomTabBarRender = (props, DefaultTabBar) => {
-    console.log(props.panes);
-
     let panesArr = [];
 
     props.panes.forEach((pane) => {
@@ -212,13 +212,16 @@ const PaymentOptionsWrapper = ({
             {pane.props.tab}
           </Col>
         ))}
+        <Col xs={24}>
+          <Divider className={styles.compactDivider} />
+        </Col>
       </Row>
     );
   };
 
   return (
     <Loader loading={isLoading} text="Fetching available payment methods...">
-      <Row gutter={[8, 8]}>
+      <Row gutter={[8, 8]} className={styles.mb10}>
         <Col xs={24}>
           <Text strong> Pay with </Text>
         </Col>
@@ -251,6 +254,9 @@ const PaymentOptionsWrapper = ({
               </TabPane>
             )}
           </Tabs>
+        </Col>
+        <Col xs={24}>
+          <Divider className={styles.compactDivider} />
         </Col>
       </Row>
     </Loader>

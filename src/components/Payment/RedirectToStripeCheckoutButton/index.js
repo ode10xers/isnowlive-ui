@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 
-import { Button, Col, Row, Typography } from 'antd';
+import { Button, Col, Row } from 'antd';
 
 import Loader from 'components/Loader';
 
 import styles from './styles.module.scss';
 
-const { Paragraph } = Typography;
-
-const RedirectToStripeCheckoutButton = ({ onBeforePayment, methodName, paymentMethods = [] }) => {
+const RedirectToStripeCheckoutButton = ({ onBeforePayment, methodName, helperText, paymentMethods = [] }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckoutButtonClick = (e) => {
@@ -32,25 +30,21 @@ const RedirectToStripeCheckoutButton = ({ onBeforePayment, methodName, paymentMe
   return (
     <Loader loading={isLoading} text="Processing payment request...">
       <Row gutter={[8, 8]} justify="center">
-        <Col xs={24}>
-          <Paragraph>You can click the button below to proceed to the payment step.</Paragraph>
-          <Paragraph>
-            This will redirect you to a separate payment page where you can finish the payment process using your
-            preferred payment methods.
-          </Paragraph>
-        </Col>
-        <Col xs={18}>
-          <Button
-            block
-            type="primary"
-            size="large"
-            onClick={handleCheckoutButtonClick}
-            className={styles.greenBtn}
-            disabled={paymentMethods.length === 0}
-          >
-            Checkout {methodName ? `using ${methodName}` : ''}
-          </Button>
-        </Col>
+        <Col xs={24}>{helperText}</Col>
+        {methodName && (
+          <Col xs={24} md={18}>
+            <Button
+              block
+              type="primary"
+              size="large"
+              onClick={handleCheckoutButtonClick}
+              className={styles.greenBtn}
+              disabled={paymentMethods.length === 0}
+            >
+              Select {methodName} option
+            </Button>
+          </Col>
+        )}
       </Row>
     </Loader>
   );

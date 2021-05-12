@@ -1,5 +1,15 @@
 @import '../../../styles/variables.scss';
 
+.cardLogo {
+  height: 28px;
+  width: 28px;
+
+  @media screen and (max-width: 569px) {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .savedCardElement {
   box-sizing: border-box;
   height: 40px;

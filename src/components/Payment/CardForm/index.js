@@ -233,7 +233,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
   };
 
   return (
-    <Row gutter={[8, 8]} justify="center">
+    <Row gutter={[8, 12]} justify="center">
       {!isFree && (
         <>
           {savedUserCards.length > 0 && (
