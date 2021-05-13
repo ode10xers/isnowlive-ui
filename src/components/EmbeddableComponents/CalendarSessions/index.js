@@ -157,7 +157,7 @@ const CalendarSessions = ({ profileUsername }) => {
     }
 
     const paymentPopupData = {
-      productId: selectedInventory.inventory_id,
+      productId: selectedInventory.session_external_id,
       productType: 'SESSION',
       itemList: [
         {
