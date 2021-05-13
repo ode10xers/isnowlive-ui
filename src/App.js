@@ -153,6 +153,8 @@ function App() {
     );
   }
 
+  // TODO: Right now these pages are accessible via the iframe widget
+  // Not sure if there will be any weird behaviors
   return (
     <>
       <PaymentPopup />
