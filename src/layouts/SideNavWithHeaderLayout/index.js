@@ -16,9 +16,11 @@ const SideNavWithHeaderLayout = ({ children }) => {
   const handleCollapsed = (collapsed) => {
     if (document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0]) {
       if (!collapsed) {
-        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '200px';
+        // document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '200px';
+        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].classList.add('expanded');
       } else {
-        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '-36px';
+        // document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '-36px';
+        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].classList.remove('expanded');
       }
     }
   };
@@ -43,7 +45,7 @@ const SideNavWithHeaderLayout = ({ children }) => {
           <Sider
             className={classNames(styles.sideIcon, reservedDomainName.includes(username) ? undefined : styles.hide)}
             width={250}
-            breakpoint="md"
+            breakpoint="lg"
             collapsedWidth="0"
             onCollapse={handleCollapsed}
           >
