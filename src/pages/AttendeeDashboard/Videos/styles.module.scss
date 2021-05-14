@@ -3,9 +3,14 @@
 .successBtn {
   color: map-get($colors, $key: 'KellyGreen') !important;
 }
+
+.videoTitle {
+  min-height: 48px;
+}
+
 .coverImage {
   border-radius: 8px;
-  height: 100px !important;
+  height: 120px !important;
 
   @media screen and (max-width: 768px) {
     height: 200px !important;

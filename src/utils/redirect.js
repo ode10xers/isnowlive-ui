@@ -1,19 +1,20 @@
 import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
-import { isWidgetUrl } from 'utils/widgets';
-import parseQueryString from 'utils/parseQueryString';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 export const redirectToInventoryPage = (inventory) => {
-  const baseUrl = generateUrlFromUsername(inventory.creator_username || 'app');
+  let urlUsername = getUsernameFromUrl();
 
-  if (isWidgetUrl()) {
-    const { isWidget, authCode } = parseQueryString(window.location.search);
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
 
-    window.open(
-      `${baseUrl}/e/${inventory.inventory_id}?isWidget=${isWidget}${authCode ? `&authCode=${authCode}` : ''}`,
-      '_self'
-    );
+  const baseUrl = generateUrlFromUsername(inventory.creator_username || inventory.username || urlUsername);
+  const targetUrl = `${baseUrl}/e/${inventory.inventory_id}`;
+
+  if (isInIframeWidget() || isWidgetUrl()) {
+    window.open(targetUrl, '_self');
   } else {
-    window.open(`${baseUrl}/e/${inventory.inventory_id}`);
+    window.open(targetUrl);
   }
 };
 
@@ -25,16 +26,12 @@ export const redirectToSessionsPage = (session) => {
   }
 
   const baseUrl = generateUrlFromUsername(session.creator_username || urlUsername);
+  const targetUrl = `${baseUrl}/s/${session.session_id}`;
 
-  if (isWidgetUrl()) {
-    const { isWidget, authCode } = parseQueryString(window.location.search);
-
-    window.open(
-      `${baseUrl}/s/${session.session_id}?isWidget=${isWidget}${authCode ? `&authCode=${authCode}` : ''}`,
-      '_self'
-    );
+  if (isInIframeWidget() || isWidgetUrl()) {
+    window.open(targetUrl, '_self');
   } else {
-    window.open(`${baseUrl}/s/${session.session_id}`);
+    window.open(targetUrl);
   }
 };
 
@@ -47,15 +44,12 @@ export const redirectToVideosPage = (video) => {
 
   const baseUrl = generateUrlFromUsername(video.creator_username || urlUsername);
 
-  if (isWidgetUrl()) {
-    const { isWidget, authCode } = parseQueryString(window.location.search);
+  const targetUrl = `${baseUrl}/v/${video.external_id}`;
 
-    window.open(
-      `${baseUrl}/v/${video.external_id}?isWidget=${isWidget}${authCode ? `&authCode=${authCode}` : ''}`,
-      '_self'
-    );
+  if (isInIframeWidget() || isWidgetUrl()) {
+    window.open(targetUrl, '_self');
   } else {
-    window.open(`${baseUrl}/v/${video.external_id}`);
+    window.open(targetUrl);
   }
 };
 
@@ -67,12 +61,11 @@ export const redirectToCoursesPage = (course) => {
   }
 
   const baseUrl = generateUrlFromUsername(course.creator_username || urlUsername);
+  const targetUrl = `${baseUrl}/c/${course.id}`;
 
-  if (isWidgetUrl()) {
-    const { isWidget, authCode } = parseQueryString(window.location.search);
-
-    window.open(`${baseUrl}/c/${course.id}?isWidget=${isWidget}${authCode ? `&authCode=${authCode}` : ''}`, '_self');
+  if (isInIframeWidget() || isWidgetUrl()) {
+    window.open(targetUrl, '_self');
   } else {
-    window.open(`${baseUrl}/c/${course.id}`);
+    window.open(targetUrl);
   }
 };

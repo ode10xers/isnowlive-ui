@@ -18,7 +18,7 @@ const ExternalSiteSettings = () => {
   const [selectedWidget, setSelectedWidget] = useState(widgetComponentsName['CALENDAR'].value);
 
   const generateWidgetText = useCallback(() => {
-    return `<iframe title="Passion.do Widget Container" src="${widgetLink}" width="100%" height="700px" />`;
+    return `<iframe title="Passion.do Plugin Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; payment;" allowpaymentrequest="true" allowfullscreen="true"> </iframe>`;
   }, [widgetLink]);
 
   useEffect(() => {
@@ -34,17 +34,17 @@ const ExternalSiteSettings = () => {
     <div className={styles.box}>
       <Row gutter={[20, 16]}>
         <Col xs={24}>
-          <Title level={4}> Widgets </Title>
+          <Title level={4}> Plugins </Title>
         </Col>
         <Col xs={24}>
           <Row gutter={[8, 16]}>
             <Col xs={24}>
-              <Paragraph>Select a widget that you want to embed below.</Paragraph>
+              <Paragraph>Select a plugin that you want to embed below.</Paragraph>
             </Col>
             <Col xs={24}>
               <Row gutter={[10, 10]}>
                 <Col xs={24} lg={4}>
-                  <Text strong> Select Widget </Text>
+                  <Text strong> Select Plugin </Text>
                 </Col>
                 <Col xs={24} lg={20}>
                   <Select
@@ -59,7 +59,7 @@ const ExternalSiteSettings = () => {
               </Row>
             </Col>
             <Col xs={24}>
-              <Paragraph>You can copy the code snippet below to where you want to show the widget</Paragraph>
+              <Paragraph>You can copy the code snippet below to where you want to show the plugin</Paragraph>
             </Col>
             <Col xs={24}>
               <div className={styles.codeSnippetContainer}>

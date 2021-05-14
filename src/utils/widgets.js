@@ -42,3 +42,10 @@ export const isWidgetUrl = () => {
   const { isWidget } = parseQueryString(location.search);
   return isWidget === 'true';
 };
+
+export const isInIframeWidget = () => {
+  // Compares the current window location with the parent's
+  // If it is viewed inside an iframe from a diff site
+  // this function will return true
+  return window.location !== window.parent.location;
+};
