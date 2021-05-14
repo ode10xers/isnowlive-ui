@@ -1,6 +1,6 @@
 @import '../../styles/variables.scss';
 
-.container {
+.container, .widgetContainer {
   .mainContent {
     padding: 0 24px 24px;
     min-height: 100vh;
@@ -38,6 +38,13 @@
 
 .sideIcon {
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+
+  :global {
+    .ant-layout-sider-zero-width-trigger {
+      color: map-get($colors, 'White');
+      background: map-get($map: $colors, $key: 'DodgerBlue');
+    }
+  }
 }
 
 @media screen and (max-width: 993px) {
@@ -50,14 +57,13 @@
       .ant-layout-sider-zero-width-trigger {
         top: 20px;
         right: -36px;
-        color: map-get($colors, 'White');
-        background: map-get($map: $colors, $key: 'DodgerBlue');
       }
     }
   }
 }
 
 @media (max-width: 767px) {
+.container {
   .sideIcon {
     position: absolute !important;
     z-index: 999;
@@ -80,4 +86,5 @@
       display: none;
     }
   }
+}
 }

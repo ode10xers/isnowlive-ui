@@ -9,6 +9,7 @@ import DashboardHeader from 'components/DashboardHeader';
 import { reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
+import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 const { Content, Sider, Header } = Layout;
 
@@ -24,6 +25,29 @@ const SideNavWithHeaderLayout = ({ children }) => {
       }
     }
   };
+
+  if (isInIframeWidget() || isWidgetUrl()) {
+    return (
+      <div>
+        <DashboardHeader />
+        <Divider className={styles.divider} />
+        <Layout className={styles.widgetContainer}>
+          <Sider
+            className={styles.sideIcon}
+            width={250}
+            breakpoint="xxl"
+            collapsedWidth="0"
+            onCollapse={handleCollapsed}
+          >
+            <SideNavigation />
+          </Sider>
+          <Layout className={styles.mainContent}>
+            <Content>{children}</Content>
+          </Layout>
+        </Layout>
+      </div>
+    );
+  }
 
   const username = window.location.hostname.split('.')[0];
 
