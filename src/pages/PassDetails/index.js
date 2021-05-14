@@ -136,6 +136,7 @@ const PassDetails = ({ match, history }) => {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: pass.id,
         price: pass.price,
+        coupon_code: couponCode,
         currency: pass.currency.toLowerCase(),
       });
 

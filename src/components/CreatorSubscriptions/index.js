@@ -54,7 +54,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
     }
 
     const paymentPopupData = {
-      productId: selectedSubscription.session_external_id,
+      productId: selectedSubscription.external_id,
       productType: 'SUBSCRIPTION',
       itemList: [
         {
