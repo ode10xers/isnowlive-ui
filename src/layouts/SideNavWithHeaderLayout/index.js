@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Layout, Divider } from 'antd';
+import { Layout, Divider, Typography } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
 import NavbarHeader from 'components/NavbarHeader';
@@ -12,8 +12,12 @@ import styles from './style.module.scss';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 const { Content, Sider, Header } = Layout;
+const { Text } = Typography;
 
 const SideNavWithHeaderLayout = ({ children }) => {
+  // Currently only being used in widget view
+  const [isSideMenuCollapsed, setIsSideMenuCollapsed] = useState(true);
+
   const handleCollapsed = (collapsed) => {
     if (document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0]) {
       if (!collapsed) {
@@ -24,6 +28,8 @@ const SideNavWithHeaderLayout = ({ children }) => {
         document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].classList.remove('expanded');
       }
     }
+
+    setIsSideMenuCollapsed(collapsed);
   };
 
   if (isInIframeWidget() || isWidgetUrl()) {
@@ -37,7 +43,11 @@ const SideNavWithHeaderLayout = ({ children }) => {
             width={250}
             breakpoint="xxl"
             collapsedWidth="0"
+            collapsible={true}
+            defaultCollapsed={true}
+            collapsed={isSideMenuCollapsed}
             onCollapse={handleCollapsed}
+            trigger={<Text className={styles.triggerText}> {isSideMenuCollapsed ? 'Open' : 'Close'} side menu </Text>}
           >
             <SideNavigation />
           </Sider>

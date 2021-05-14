@@ -41,10 +41,20 @@
 
   :global {
     .ant-layout-sider-zero-width-trigger {
+      line-height: 24px;
+      height: fit-content;
       color: map-get($colors, 'White');
       background: map-get($map: $colors, $key: 'DodgerBlue');
     }
   }
+}
+
+.triggerText {
+  @extend .whiteText;
+  font-weight: 400;
+  padding: 10px 8px;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
 }
 
 @media screen and (max-width: 993px) {
