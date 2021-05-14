@@ -18,8 +18,7 @@ const ExternalSiteSettings = () => {
   const [selectedWidget, setSelectedWidget] = useState(widgetComponentsName['CALENDAR'].value);
 
   const generateWidgetText = useCallback(() => {
-    return `<iframe title="Passion.do Widget Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-    allowfullscreen="true" />`;
+    return `<iframe title="Passion.do Widget Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;" allowfullscreen="true"> </iframe>`;
   }, [widgetLink]);
 
   useEffect(() => {
