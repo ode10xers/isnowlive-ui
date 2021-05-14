@@ -23,7 +23,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-const CalendarSessions = ({ profileUsername }) => {
+const CalendarSessions = () => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -174,9 +174,9 @@ const CalendarSessions = ({ profileUsername }) => {
   };
 
   useEffect(() => {
-    getCalendarSessions(profileUsername);
+    getCalendarSessions();
     // eslint-disable-next-line
-  }, [profileUsername]);
+  }, []);
 
   return (
     <Loader loading={isSessionLoading} size="large" text="Loading sessions">
