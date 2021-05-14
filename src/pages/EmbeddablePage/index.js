@@ -4,19 +4,20 @@ import CalendarSessions from '../../components/EmbeddableComponents/CalendarSess
 import Passes from '../../components/EmbeddableComponents/Passes';
 import Videos from '../../components/EmbeddableComponents/Videos';
 import Courses from '../../components/EmbeddableComponents/Courses';
+import Subscriptions from '../../components/EmbeddableComponents/Subscriptions';
 
 export default function EmbeddablePage({ widget }) {
-  const profileUsername = window.location.hostname.split('.')[0] || '';
-
   let componentToLoad = null;
   if (widget === 'calendar') {
-    componentToLoad = <CalendarSessions profileUsername={profileUsername} />;
+    componentToLoad = <CalendarSessions />;
   } else if (widget === 'passes') {
-    componentToLoad = <Passes profileUsername={profileUsername} />;
+    componentToLoad = <Passes />;
   } else if (widget === 'videos') {
-    componentToLoad = <Videos profileUsername={profileUsername} />;
+    componentToLoad = <Videos />;
   } else if (widget === 'courses') {
-    componentToLoad = <Courses profileUsername={profileUsername} />;
+    componentToLoad = <Courses />;
+  } else if (widget === 'memberships') {
+    componentToLoad = <Subscriptions />;
   }
 
   return <div style={{ padding: '20px' }}>{componentToLoad}</div>;
