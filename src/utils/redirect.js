@@ -2,7 +2,13 @@ import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 
 export const redirectToInventoryPage = (inventory) => {
-  const baseUrl = generateUrlFromUsername(inventory.creator_username || 'app');
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(inventory.creator_username || inventory.username || urlUsername);
   const targetUrl = `${baseUrl}/e/${inventory.inventory_id}`;
 
   if (isInIframeWidget() || isWidgetUrl()) {
