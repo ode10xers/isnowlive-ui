@@ -9,7 +9,6 @@ import {
   TwitterOutlined,
   LinkedinOutlined,
 } from '@ant-design/icons';
-
 import Share from 'components/Share';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { resetBodyStyle } from 'components/Modals/modals';
@@ -17,10 +16,15 @@ import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername } from 'utils/helper';
 import NewsletterModal from 'components/NewsletterModal';
 import styles from './styles.module.scss';
+import { useLocation } from 'react-router-dom';
 
 const { Title } = Typography;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  let { search } = useLocation();
+  const query = new URLSearchParams(search);
+  localStorage.setItem('ref', JSON.stringify(query.get('ref')));
+
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
 
   const closeNewsletterModal = () => {
@@ -119,7 +123,6 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           </Space>
         )}
       </Col>
-
       {profile.collect_emails && (
         <Col xs={24} md={{ span: 6, offset: 1 }}>
           <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
