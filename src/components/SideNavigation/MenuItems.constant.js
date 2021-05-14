@@ -302,4 +302,12 @@ export const attendeeMenuItems = [
     mixPanelTag: attendee.click.dashboard.subscriptionsNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions,
   },
+  {
+    order: 6,
+    key: 'referrals',
+    title: 'Referrals',
+    icon: <ScheduleOutlined />,
+    mixPanelTag: attendee.click.dashboard.referralsNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.referrals,
+  },
 ];

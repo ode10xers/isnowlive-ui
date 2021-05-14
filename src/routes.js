@@ -60,6 +60,7 @@ const Routes = {
     courses: '/courses',
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
+    referrals: '/referrals',
   },
 };
 

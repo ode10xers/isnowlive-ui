@@ -102,6 +102,7 @@ export const mixPanelEventTags = {
         videosNav: '(Attendee) Videos Nav Clicked',
         coursesNav: '(Attendee) Courses Nav Clicked',
         subscriptionsNav: '(Attendee) Subscriptions Nav Clicked',
+        referralsNav: '(Attendee) Referrals Nav Clicked',
       },
       sessions: {
         pastSessionDetails: '(Attendee) Past Session Details Clicked',
