@@ -41,6 +41,7 @@
 
   :global {
     .ant-layout-sider-zero-width-trigger {
+      padding: 10px;
       line-height: 24px;
       height: fit-content;
       color: map-get($colors, 'White');
@@ -52,7 +53,6 @@
 .triggerText {
   @extend .whiteText;
   font-weight: 400;
-  padding: 10px 8px;
   writing-mode: vertical-rl;
   text-orientation: mixed;
 }
