@@ -118,16 +118,51 @@ const PaymentPopup = () => {
     try {
       //TODO: Use productType here to adjust the payload
       // e.g. if productType === PASS it should be pass_id (match the BE implementation)
+      let couponStatus = null;
+      let couponData = null;
+      switch (productType) {
+        case 'COURSE':
+          const coursePayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            course_id: productId,
+          };
+          const { status: statusCourse, data: dataCourse } = await apis.coupons.validateCourseCoupon(coursePayload);
+          couponStatus = statusCourse;
+          couponData = dataCourse;
+          break;
+        case 'SESSION':
+          const sessionPayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            session_id: productId,
+          };
+          const { status: statusSession, data: dataSession } = await apis.coupons.validateSessionCoupon(sessionPayload);
+          couponStatus = statusSession;
+          couponData = dataSession;
+          break;
+        case 'PASS':
+          const passPayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            pass_id: productId,
+          };
+          const { status: statusPass, data: dataPass } = await apis.coupons.validatePassCoupon(passPayload);
+          couponStatus = statusPass;
+          couponData = dataPass;
+          break;
+        case 'VIDEO':
+          const videoPayload = {
+            coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
+            video_id: productId,
+          };
+          const { status: statusVideo, data: dataVideo } = await apis.coupons.validateVideoCoupon(videoPayload);
+          couponStatus = statusVideo;
+          couponData = dataVideo;
+          break;
+        default:
+          break;
+      }
 
-      const payload = {
-        coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
-        course_id: productId,
-      };
-
-      const { status, data } = await apis.coupons.validateCourseCoupon(payload);
-
-      if (isAPISuccess(status) && data) {
-        setDiscountedPrice(data.discounted_amount);
+      if (isAPISuccess(couponStatus) && couponData) {
+        setDiscountedPrice(couponData.discounted_amount);
         setCouponErrorText(<Text type="success"> Coupon Applied! </Text>);
         setCouponApplied(true);
       }
@@ -193,6 +228,7 @@ const PaymentPopup = () => {
               video_id: followUpBookingInfo.productId,
               payment_source: paymentSource.PASS,
               source_id: orderResponse.payment_order_id,
+
               user_timezone_location: getTimezoneLocation(),
             };
 

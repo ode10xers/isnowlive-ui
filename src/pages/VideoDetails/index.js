@@ -279,7 +279,8 @@ const VideoDetails = ({ match }) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await purchaseVideo(payload);
+      let modifiedPayload = { ...payload, coupon_code: couponCode };
+      const { status, data } = await purchaseVideo(modifiedPayload);
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
@@ -329,7 +330,8 @@ const VideoDetails = ({ match }) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.passes.createOrderForUser(payload);
+      let modifiedPayload = { ...payload, coupon_code: couponCode };
+      const { status, data } = await apis.passes.createOrderForUser(modifiedPayload);
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
@@ -529,7 +531,10 @@ const VideoDetails = ({ match }) => {
         currency: selectedPass.currency.toLowerCase(),
       };
 
-      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndGetVideo(payload, couponCode));
+      showPaymentPopup(
+        paymentPopupData,
+        async (couponCode = '') => await buyPassAndGetVideo({ ...payload, coupon_code: couponCode }, couponCode)
+      );
     } else {
       // Single Video Booking
       // Will also trigger for free video
@@ -552,7 +557,10 @@ const VideoDetails = ({ match }) => {
         user_timezone_location: getTimezoneLocation(),
       };
 
-      showPaymentPopup(paymentPopupData, async (couponCode = '') => await buySingleVideo(payload, couponCode));
+      showPaymentPopup(
+        paymentPopupData,
+        async (couponCode = '') => await buySingleVideo({ ...payload, coupon_code: couponCode }, couponCode)
+      );
     }
   };
 

@@ -27,6 +27,21 @@ const creatorProductInfo = [
     name: 'Courses',
     apiMethod: apis.courses.getCreatorCourses,
   },
+  {
+    key: 'SESSION',
+    name: 'Sessions',
+    apiMethod: apis.session.getSession,
+  },
+  {
+    key: 'PASS',
+    name: 'Passes',
+    apiMethod: apis.passes.getCreatorPasses,
+  },
+  {
+    key: 'VIDEO',
+    name: 'Videos',
+    apiMethod: apis.videos.getCreatorVideos,
+  },
 ];
 
 // ! Coupons API will use external IDs, so for SESSION and PASS need to use external_id
@@ -43,6 +58,12 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
     switch (productType) {
       case 'course':
         return productData['id'];
+      case 'session':
+        return productData['session_external_id'];
+      case 'pass':
+        return productData['external_id'];
+      case 'video':
+        return productData['external_id'];
       default:
         break;
     }
@@ -54,6 +75,12 @@ const CreateCouponModal = ({ visible, closeModal, editedCoupon = null }) => {
     switch (productType) {
       case 'course':
         return productData['name'];
+      case 'session':
+        return productData['name'];
+      case 'pass':
+        return productData['name'];
+      case 'video':
+        return productData['title'];
       default:
         break;
     }
