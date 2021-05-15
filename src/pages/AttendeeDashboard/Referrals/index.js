@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Typography } from 'antd';
 import styles from './styles.module.scss';
-const { Title, Text, Paragraph } = Typography;
+const { Title } = Typography;
 
 const Referrals = () => {
   return (
