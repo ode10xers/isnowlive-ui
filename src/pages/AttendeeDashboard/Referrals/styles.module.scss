@@ -1,19 +1,22 @@
 @import '../../../styles/variables.scss';
 
-.baseCreditsText {
-  font-size: 14px;
-  font-weight: 500;
+.detailsButton {
+  padding-left: 0px !important;
 }
 
-.subSection {
-  margin-left: 12px !important;
+.helperText {
+  display: block;
 }
 
-.mobileSubscriptionDetailsWrapper {
-  padding: 10px;
-  background-color: map-get($map: $colors, $key: 'White1');
+.mobileDetailsText {
+  font-size: 13px;
 }
 
-.dangerBtn {
-  color: map-get($colors, 'SunsetOrange') !important;
+.codeSnippetContainer{
+  display: inline !important;
+}
+
+.copySnippetBtnContainer{
+  display: inline !important;
+  margin-left: 25px;
 }
