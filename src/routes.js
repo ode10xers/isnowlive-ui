@@ -48,6 +48,7 @@ const Routes = {
     externalSiteSettings: '/widgets',
     membersSettings: '/members/settings',
     membersTags: '/members/tag',
+    affiliate: '/affiliate',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',

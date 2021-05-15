@@ -245,6 +245,15 @@ export const creatorMenuItems = [
       },
     ],
   },
+  {
+    order: 18,
+    is_button: false,
+    key: 'affiliate',
+    title: 'Affiliate Dashboard',
+    icon: <AuditOutlined />,
+    mixPanelTag: creator.click.dashboard.affiliateNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.affiliate,
+  },
 ];
 
 export const attendeeMenuItems = [
