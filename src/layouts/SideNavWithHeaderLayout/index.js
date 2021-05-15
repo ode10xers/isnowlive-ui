@@ -32,34 +32,8 @@ const SideNavWithHeaderLayout = ({ children }) => {
     setIsSideMenuCollapsed(collapsed);
   };
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    return (
-      <div>
-        <DashboardHeader />
-        <Divider className={styles.divider} />
-        <Layout className={styles.widgetContainer}>
-          <Sider
-            className={styles.sideIcon}
-            width={250}
-            breakpoint="xxl"
-            collapsedWidth="0"
-            collapsible={true}
-            defaultCollapsed={true}
-            collapsed={isSideMenuCollapsed}
-            onCollapse={handleCollapsed}
-            trigger={<Text className={styles.triggerText}> {isSideMenuCollapsed ? 'Open' : 'Close'} side menu </Text>}
-          >
-            <SideNavigation />
-          </Sider>
-          <Layout className={styles.mainContent}>
-            <Content>{children}</Content>
-          </Layout>
-        </Layout>
-      </div>
-    );
-  }
-
   const username = window.location.hostname.split('.')[0];
+  const isInWidget = isInIframeWidget() || isWidgetUrl();
 
   return (
     <>
@@ -75,16 +49,32 @@ const SideNavWithHeaderLayout = ({ children }) => {
             <Divider className={styles.divider} />
           </>
         )}
-        <Layout className={styles.container}>
-          <Sider
-            className={classNames(styles.sideIcon, reservedDomainName.includes(username) ? undefined : styles.hide)}
-            width={250}
-            breakpoint="lg"
-            collapsedWidth="0"
-            onCollapse={handleCollapsed}
-          >
-            <SideNavigation />
-          </Sider>
+        <Layout className={isInWidget ? styles.container : styles.widgetContainer}>
+          {isInWidget ? (
+            <Sider
+              className={styles.sideIcon}
+              width={250}
+              breakpoint="xxl"
+              collapsedWidth="0"
+              collapsible={true}
+              defaultCollapsed={true}
+              collapsed={isSideMenuCollapsed}
+              onCollapse={handleCollapsed}
+              trigger={<Text className={styles.triggerText}> {isSideMenuCollapsed ? 'Open' : 'Close'} side menu </Text>}
+            >
+              <SideNavigation />
+            </Sider>
+          ) : (
+            <Sider
+              className={classNames(styles.sideIcon, reservedDomainName.includes(username) ? undefined : styles.hide)}
+              width={250}
+              breakpoint="lg"
+              collapsedWidth="0"
+              onCollapse={handleCollapsed}
+            >
+              <SideNavigation />
+            </Sider>
+          )}
           <Layout className={styles.mainContent}>
             <Content>{children}</Content>
           </Layout>
