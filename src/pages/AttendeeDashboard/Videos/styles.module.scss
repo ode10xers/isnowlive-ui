@@ -13,7 +13,7 @@
   height: 120px !important;
 
   @media screen and (max-width: 993px) {
-    height: 160px !important;
+    height: 140px !important;
   }
 
   @media screen and (max-width: 768px) {
@@ -21,9 +21,10 @@
   }
 
   @media screen and (max-width: 569px) {
-    height: 120px !important;
+    height: 150px !important;
   }
 }
+
 .videoItem {
   cursor: pointer;
 }
