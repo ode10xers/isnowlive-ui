@@ -5,7 +5,7 @@ import PublicVideoList from 'components/PublicVideoList';
 import apis from 'apis';
 import { isAPISuccess } from 'utils/helper';
 
-const Videos = ({ profileUsername }) => {
+const Videos = () => {
   const [videos, setVideos] = useState([]);
   const [isVideosLoading, setIsVideosLoading] = useState(true);
 
