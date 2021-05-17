@@ -60,45 +60,49 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
     return e && e.fileList;
   };
 
-  const handleFinish = async (values) => {
-    setSubmitting(true);
-
-    try {
-      const payload = {
-        body: values.emailBody,
-        subject: values.subject,
-        audience_ids: selectedRecipients || values.recipients,
-        document_url: emailDocumentUrl || '',
-      };
-
-      const { status } = await apis.audiences.sendEmailToAudiences(payload);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Emails sent successfully');
-        closeModal();
-      }
-    } catch (error) {
-      showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
+  const resetEditorContent = () => {
+    if (emailEditor.current) {
+      emailEditor.current.editor.loadBlank({ backgroundColor: '#ffffff' });
     }
-
-    setSubmitting(false);
   };
 
-  const exportEmailHTML = () => {
+  const handleFinish = (values) => {
     if (emailEditor.current) {
-      emailEditor.current.editor.exportHTML((data) => {
-        console.log(data);
+      emailEditor.current.editor.exportHtml(async (data) => {
+        const emailBody = data.chunks.body.replaceAll(`\n`, '');
+        console.log(emailBody);
+
+        setSubmitting(true);
+        try {
+          const payload = {
+            body: emailBody,
+            subject: values.subject,
+            audience_ids: selectedRecipients || values.recipients,
+            document_url: emailDocumentUrl || '',
+          };
+
+          const { status } = await apis.audiences.sendEmailToAudiences(payload);
+
+          if (isAPISuccess(status)) {
+            showSuccessModal('Emails sent successfully');
+            resetEditorContent();
+            closeModal();
+          }
+        } catch (error) {
+          showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
+        }
+        setSubmitting(false);
       });
     }
   };
 
   const handleEditorLoad = () => {
     const editorId = emailEditor.current.editorId;
-    console.log(editorId);
 
     const editorElement = document.getElementById(editorId);
-    console.log(editorElement);
-    editorElement.querySelector('iframe').style.minWidth = '500px';
+    // NOTE: the Unlayer iframe has a default min-width value of 1024px
+    // We can override it here to squish the iframe so it fits in the modal
+    editorElement.querySelector('iframe').style.minWidth = '1024px';
   };
 
   return (
@@ -108,7 +112,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       centered={true}
       onCancel={() => closeModal()}
       footer={null}
-      width={800}
+      width={1080}
       afterClose={resetBodyStyle}
     >
       <Form
@@ -164,6 +168,11 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
               // Customizing their editor with CSS requires premium
               options={{
                 id: 'unlayerEmbeddedEditor',
+                features: {
+                  textEditor: {
+                    cleanPaste: false,
+                  },
+                },
               }}
               appearance={{
                 theme: 'dark',
@@ -223,11 +232,6 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
           </Col>
         </Row>
         <Row justify="end" align="center" gutter={16}>
-          <Col xs={12} md={6}>
-            <Button block ghost type="primary" onClick={() => exportEmailHTML()} loading={submitting}>
-              Export HTML
-            </Button>
-          </Col>
           <Col xs={12} md={6}>
             <Button block type="default" onClick={() => closeModal()} loading={submitting}>
               Cancel
