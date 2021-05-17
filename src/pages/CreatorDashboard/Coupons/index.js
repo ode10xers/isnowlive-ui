@@ -209,7 +209,7 @@ const Coupons = () => {
                 </Tooltip>
               ) : (
                 <Tooltip title="Unhide Discount Code">
-                  <Button type="primary" className={styles.greenBtn} onClick={() => publishCoupon(record.external_id)}>
+                  <Button type="link" className={styles.greenText} onClick={() => publishCoupon(record.external_id)}>
                     Show
                   </Button>
                 </Tooltip>

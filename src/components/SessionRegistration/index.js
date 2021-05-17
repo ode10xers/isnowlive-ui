@@ -720,7 +720,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             payment_order_type: orderType.PASS,
             follow_up_booking_info: {
               productType: 'SESSION',
-              productId: selectedInventory.session_external_id,
+              productId: selectedInventory.inventory_id,
             },
           };
         } else {
