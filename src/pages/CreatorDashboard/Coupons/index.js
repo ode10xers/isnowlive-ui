@@ -167,7 +167,7 @@ const Coupons = () => {
               <List
                 size="small"
                 dataSource={record.products}
-                renderItem={(item) => <List.Item> {item.name} </List.Item>}
+                renderItem={(item) => <List.Item> {item.name || item.title} </List.Item>}
               />
             }
           >
@@ -209,7 +209,7 @@ const Coupons = () => {
                 </Tooltip>
               ) : (
                 <Tooltip title="Unhide Discount Code">
-                  <Button type="link" className={styles.greenBtn} onClick={() => publishCoupon(record.external_id)}>
+                  <Button type="primary" className={styles.greenBtn} onClick={() => publishCoupon(record.external_id)}>
                     Show
                   </Button>
                 </Tooltip>
