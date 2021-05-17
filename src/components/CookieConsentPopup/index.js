@@ -18,6 +18,9 @@ const DOMAIN = {
   production: '.passion.do',
 };
 
+// TODO: This component is currently hidden since some customers
+// are frightened by it. Once we add this back, don't forget to also adjust
+// App.js and services/globalContext.js
 const CookieConsentPopup = () => {
   const { setCookieConsent } = useGlobalContext();
 
