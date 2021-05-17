@@ -8,7 +8,6 @@ import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
 import { showMemberUnapprovedJoinModal } from 'components/Modals/modals';
 
 import { clearGTMUserAttributes } from './integrations/googleTagManager';
-import { isInIframeWidget } from 'utils/widgets';
 
 const UNAUTHORIZED = 401;
 
@@ -29,13 +28,13 @@ class HttpService {
       (response) => response,
       (error) => {
         const { status } = error.response;
+        // TODO: Explore what to do when unauthorized in widget view
+        // Since sometimes this causes infinite loading
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
           clearGTMUserAttributes();
-          if (!isInIframeWidget()) {
-            window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
-          }
+          window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
         } else if (isUnapprovedUserError(error.response)) {
           showMemberUnapprovedJoinModal();
         }
