@@ -33,7 +33,7 @@ class HttpService {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
           clearGTMUserAttributes();
-          if (!isInIframeWidget) {
+          if (!isInIframeWidget()) {
             window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
           }
         } else if (isUnapprovedUserError(error.response)) {
