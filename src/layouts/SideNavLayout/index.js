@@ -12,9 +12,11 @@ const SideNavLayout = ({ children }) => {
   const handleCollapsed = (collapsed) => {
     if (document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0]) {
       if (!collapsed) {
-        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '200px';
+        // document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '200px';
+        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].classList.add('expanded');
       } else {
-        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '-36px';
+        // document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].style.right = '-36px';
+        document.getElementsByClassName('ant-layout-sider-zero-width-trigger-left')[0].classList.remove('expanded');
       }
     }
   };
@@ -24,7 +26,7 @@ const SideNavLayout = ({ children }) => {
       <DashboardHeader />
       <Divider className={styles.divider} />
       <Layout className={styles.container}>
-        <Sider className={styles.sideIcon} width={250} breakpoint="md" collapsedWidth="0" onCollapse={handleCollapsed}>
+        <Sider className={styles.sideIcon} width={250} breakpoint="lg" collapsedWidth="0" onCollapse={handleCollapsed}>
           <SideNavigation />
         </Sider>
         <Layout className={styles.mainContent}>

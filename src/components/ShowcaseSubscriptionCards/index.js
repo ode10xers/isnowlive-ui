@@ -11,7 +11,7 @@ import styles from './styles.module.scss';
 import { isMobileDevice } from 'utils/device';
 
 const { Text } = Typography;
-const defaultBorderColor = '#eeeeee';
+const defaultBorderColor = '#888888';
 
 const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} }) => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);

@@ -14,7 +14,7 @@ import styles from './style.module.scss';
 
 const { Title } = Typography;
 
-const Courses = ({ profileUsername }) => {
+const Courses = () => {
   const [liveCourses, setLiveCourses] = useState([]);
   const [videoCourses, setVideoCourses] = useState([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
@@ -44,14 +44,14 @@ const Courses = ({ profileUsername }) => {
       <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
         <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
           <div className={styles.p10}>
-            <ShowcaseCourseCard username={profileUsername} courses={liveCourses} />
+            <ShowcaseCourseCard courses={liveCourses} />
           </div>
         </Loader>
       </Tabs.TabPane>
       <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
         <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
           <div className={styles.p10}>
-            <ShowcaseCourseCard username={profileUsername} courses={videoCourses} />
+            <ShowcaseCourseCard courses={videoCourses} />
           </div>
         </Loader>
       </Tabs.TabPane>

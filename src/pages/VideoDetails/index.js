@@ -62,7 +62,6 @@ const VideoDetails = ({ match }) => {
   const [userPasses, setUserPasses] = useState([]);
   const [expandedPassKeys, setExpandedPassKeys] = useState([]);
   const [shouldFollowUpGetVideo, setShouldFollowUpGetVideo] = useState(false);
-  const [username, setUsername] = useState(null);
   const [usableUserSubscription, setUsableUserSubscription] = useState(null);
 
   const getProfileDetails = useCallback(async (creatorUsername) => {
@@ -105,7 +104,6 @@ const VideoDetails = ({ match }) => {
           setVideo(data);
 
           const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
-          setUsername(creatorUsername);
           await getProfileDetails(creatorUsername);
 
           if (data.is_course) {
@@ -412,7 +410,7 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
 
       if (error.response?.data?.message === 'user already has a confirmed order for this video') {
-        showAlreadyBookedModal(productType.VIDEO, username);
+        showAlreadyBookedModal(productType.VIDEO);
       } else if (!isUnapprovedUserError(error.response)) {
         showErrorModal('Something went wrong', error.response?.data?.message);
       }
@@ -526,7 +524,7 @@ const VideoDetails = ({ match }) => {
       };
 
       const payload = {
-        pass_id: selectedPass.id,
+        pass_id: selectedPass.external_id,
         price: selectedPass.price,
         currency: selectedPass.currency.toLowerCase(),
       };
@@ -728,7 +726,7 @@ const VideoDetails = ({ match }) => {
                           <Title level={5}> This video can only be purchased via this course </Title>
                         </Col>
                         <Col xs={24}>
-                          <ShowcaseCourseCard courses={courses} username={username} />
+                          <ShowcaseCourseCard courses={courses} />
                         </Col>
                       </Row>
                     </div>
