@@ -37,7 +37,7 @@ import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
 import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
-import CookieConsentPopup from 'components/CookieConsentPopup';
+// import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
@@ -213,7 +213,7 @@ function App() {
           </Switch>
         )}
       </Router>
-      {!isWidget && <CookieConsentPopup />}
+      {/* {!isWidget && <CookieConsentPopup />} */}
     </>
   );
 }

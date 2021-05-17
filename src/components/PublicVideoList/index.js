@@ -63,6 +63,7 @@ const PublicVideoList = ({ videos }) => {
       const payload = {
         video_id: selectedVideo?.external_id,
         payment_source: paymentSource.GATEWAY,
+        coupon_code: couponCode,
         user_timezone_location: getTimezoneLocation(),
       };
 

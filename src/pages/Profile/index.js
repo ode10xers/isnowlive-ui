@@ -51,8 +51,8 @@ const Profile = () => {
 
   const getProfileDetails = useCallback(async () => {
     try {
-      const { data } = await apis.user.getProfile();
-      if (data) {
+      const { status, data } = await apis.user.getProfile();
+      if (isAPISuccess(status) && data) {
         const localUserDetails = getLocalUserDetails();
         if (!localUserDetails.profile_complete) {
           data.username = '';

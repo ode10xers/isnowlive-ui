@@ -1,0 +1,15 @@
+@import '../../styles/variables.scss';
+
+.inlineFormItem{
+  display: inline-block !important;
+  width: calc(50% - 8px);
+}
+
+.inlineFormItem_lastname{
+  margin: 0 0 0 8px !important;
+  width: 50%;
+}
+
+.formBottomMargin{
+  margin-bottom: 0 !important;
+}

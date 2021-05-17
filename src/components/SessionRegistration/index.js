@@ -663,10 +663,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
     setIsLoading(true);
 
     try {
-      let modifiedPayload = payload;
+      let modifiedPayload = { ...payload, coupon_code: couponCode };
 
       if (priceAmount !== undefined) {
-        modifiedPayload = { ...payload, amount: priceAmount };
+        modifiedPayload = { ...payload, amount: priceAmount, coupon_code: couponCode };
       }
 
       const { status, data } = await bookClass(modifiedPayload);
@@ -829,7 +829,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       };
 
       const paymentPopupData = {
-        productId: classDetails.session_id,
+        productId: classDetails.session_external_id,
         productType: 'SESSION',
         itemList: [
           {
@@ -851,7 +851,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
       if (usersPass) {
         const paymentPopupData = {
-          productId: classDetails.session_id,
+          productId: classDetails.session_external_id,
           productType: 'SESSION',
           itemList: [
             {
@@ -898,12 +898,15 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         };
 
         const payload = {
-          pass_id: selectedPass.id,
+          pass_id: selectedPass.external_id,
           price: selectedPass.price,
           currency: selectedPass.currency.toLowerCase(),
         };
 
-        showPaymentPopup(paymentPopupData, async (couponCode = '') => await buyPassAndBookClass(payload, couponCode));
+        showPaymentPopup(
+          paymentPopupData,
+          async (couponCode = '') => await buyPassAndBookClass({ ...payload, coupon_code: couponCode }, couponCode)
+        );
       }
     } else {
       let paymentPopupData = null;
@@ -921,7 +924,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         }
 
         paymentPopupData = {
-          productId: classDetails.session_id,
+          productId: classDetails.session_external_id,
           productType: 'SESSION',
           itemList: [
             {
@@ -938,7 +941,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         // Else the price input will be handled in the page
         // So just show usual PaymentPopup
         paymentPopupData = {
-          productId: classDetails.session_id,
+          productId: classDetails.session_external_id,
           productType: 'SESSION',
           itemList: [
             {

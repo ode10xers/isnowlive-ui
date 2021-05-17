@@ -28,6 +28,8 @@ class HttpService {
       (response) => response,
       (error) => {
         const { status } = error.response;
+        // TODO: Explore what to do when unauthorized in widget view
+        // Since sometimes this causes infinite loading
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();

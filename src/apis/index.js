@@ -135,6 +135,9 @@ export default {
     publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
     unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
+    validateSessionCoupon: (payload) => http.post('/secure/customer/promotions/validate/session', payload),
+    validateVideoCoupon: (payload) => http.post('/secure/customer/promotions/validate/video', payload),
+    validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
   },
   subscriptions: {
     createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
@@ -179,6 +182,7 @@ export default {
     approveCreatorMemberRequest: (payload) => http.put('/secure/creator/audience', payload),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
+    sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
