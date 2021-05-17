@@ -53,7 +53,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   };
 
   return (
-    <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-between">
+    <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-around">
       {showCoverImage && (
         <Col xs={24} className={styles.coverImageWrapper}>
           <Image
@@ -84,50 +84,66 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
       <Col xs={24} md={{ span: 22 }}>
         <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
       </Col>
-      <Col xs={24} md={{ span: 8 }}>
-        {profile?.profile?.social_media_links && (
-          <Space size={'middle'}>
-            {profile.profile.social_media_links.website && (
-              <a href={`//${profile.profile.social_media_links.website}`} target="_blank" rel="noopener noreferrer">
-                <GlobalOutlined className={styles.socialIcon} />
-              </a>
+      <Col xs={24} md={{ span: 22 }}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} md={{ span: 16 }}>
+            {profile?.profile?.social_media_links && (
+              <Space size={'middle'}>
+                {profile.profile.social_media_links.website && (
+                  <a href={`//${profile.profile.social_media_links.website}`} target="_blank" rel="noopener noreferrer">
+                    <GlobalOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.facebook_link && (
+                  <a
+                    href={`${profile.profile.social_media_links.facebook_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FacebookOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.twitter_link && (
+                  <a
+                    href={`${profile.profile.social_media_links.twitter_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <TwitterOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.instagram_link && (
+                  <a
+                    href={`${profile.profile.social_media_links.instagram_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <InstagramOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {profile.profile.social_media_links.linkedin_link && (
+                  <a
+                    href={`${profile.profile.social_media_links.linkedin_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <LinkedinOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+              </Space>
             )}
-            {profile.profile.social_media_links.facebook_link && (
-              <a href={`${profile.profile.social_media_links.facebook_link}`} target="_blank" rel="noopener noreferrer">
-                <FacebookOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profile.profile.social_media_links.twitter_link && (
-              <a href={`${profile.profile.social_media_links.twitter_link}`} target="_blank" rel="noopener noreferrer">
-                <TwitterOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profile.profile.social_media_links.instagram_link && (
-              <a
-                href={`${profile.profile.social_media_links.instagram_link}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <InstagramOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profile.profile.social_media_links.linkedin_link && (
-              <a href={`${profile.profile.social_media_links.linkedin_link}`} target="_blank" rel="noopener noreferrer">
-                <LinkedinOutlined className={styles.socialIcon} />
-              </a>
-            )}
-          </Space>
-        )}
-      </Col>
+          </Col>
 
-      {profile.collect_emails && (
-        <Col xs={24} md={{ span: 6, offset: 1 }}>
-          <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
-          <Button block type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
-            Subscribe to newsletter
-          </Button>
-        </Col>
-      )}
+          {profile?.profile?.collect_emails && (
+            <Col xs={24} md={{ span: 6, offset: 2 }}>
+              <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
+              <Button block type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
+                Subscribe to newsletter
+              </Button>
+            </Col>
+          )}
+        </Row>
+      </Col>
     </Row>
   );
 };
