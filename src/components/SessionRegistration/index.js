@@ -898,7 +898,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         };
 
         const payload = {
-          pass_id: selectedPass.id,
+          pass_id: selectedPass.external_id,
           price: selectedPass.price,
           currency: selectedPass.currency.toLowerCase(),
         };
