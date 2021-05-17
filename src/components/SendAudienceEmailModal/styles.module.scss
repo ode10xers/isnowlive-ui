@@ -4,3 +4,8 @@
   color: map-get($colors, $key: 'KellyGreen') !important;
   font-weight: bold !important;
 }
+
+#editor-2 > iframe {
+  min-width: 500px;
+  width: 100%;
+}

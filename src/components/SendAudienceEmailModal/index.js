@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { Row, Col, Modal, Form, Input, Tooltip, Button, Select, Typography } from 'antd';
 import { FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
+import EmailEditor from 'react-email-editor';
+
 import apis from 'apis';
 
-import TextEditor from 'components/TextEditor';
+// import TextEditor from 'components/TextEditor';
 import FileUpload from 'components/FileUpload';
 import { resetBodyStyle, showSuccessModal, showErrorModal } from 'components/Modals/modals';
 
@@ -13,7 +15,7 @@ import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 
-import { sendCustomerEmailFormLayout, sendCustomerEmailBodyFormLayout } from 'layouts/FormLayouts';
+import { sendCustomerEmailFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
@@ -27,6 +29,7 @@ const formInitialValues = {
 // But the data is handled differently since Audience is a different entity
 // Also SendCustomerEmail requires some product information while this one does not
 const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
+  const emailEditor = useRef(null);
   const [form] = Form.useForm();
 
   const [submitting, setSubmitting] = useState(false);
@@ -81,6 +84,23 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
     setSubmitting(false);
   };
 
+  const exportEmailHTML = () => {
+    if (emailEditor.current) {
+      emailEditor.current.editor.exportHTML((data) => {
+        console.log(data);
+      });
+    }
+  };
+
+  const handleEditorLoad = () => {
+    const editorId = emailEditor.current.editorId;
+    console.log(editorId);
+
+    const editorElement = document.getElementById(editorId);
+    console.log(editorElement);
+    editorElement.querySelector('iframe').style.minWidth = '500px';
+  };
+
   return (
     <Modal
       title={<Title level={5}> Send email to audiences </Title>}
@@ -88,7 +108,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       centered={true}
       onCancel={() => closeModal()}
       footer={null}
-      width={640}
+      width={800}
       afterClose={resetBodyStyle}
     >
       <Form
@@ -140,6 +160,20 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
             </Form.Item>
           </Col>
           <Col xs={24}>
+            <EmailEditor
+              // Customizing their editor with CSS requires premium
+              options={{
+                id: 'unlayerEmbeddedEditor',
+              }}
+              appearance={{
+                theme: 'dark',
+              }}
+              safeHtml={true}
+              ref={emailEditor}
+              onLoad={handleEditorLoad}
+            />
+          </Col>
+          {/* <Col xs={24}>
             <Form.Item
               {...sendCustomerEmailBodyFormLayout}
               label="Email Body"
@@ -149,7 +183,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
             >
               <TextEditor name="emailBody" form={form} placeholder="Content of the email goes here" />
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col xs={24}>
             <Form.Item name="document_url" id="document_url" valuePropName="fileList" getValueFromEvent={normFile}>
               <Row>
@@ -189,6 +223,11 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
           </Col>
         </Row>
         <Row justify="end" align="center" gutter={16}>
+          <Col xs={12} md={6}>
+            <Button block ghost type="primary" onClick={() => exportEmailHTML()} loading={submitting}>
+              Export HTML
+            </Button>
+          </Col>
           <Col xs={12} md={6}>
             <Button block type="default" onClick={() => closeModal()} loading={submitting}>
               Cancel
