@@ -125,7 +125,7 @@ const PassDetails = ({ match, history }) => {
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     if (!pass) {
       showErrorModal('Something went wrong', 'Invalid Pass Selected');
       return null;
@@ -134,8 +134,9 @@ const PassDetails = ({ match, history }) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.passes.createOrderForUser({
-        pass_id: pass.id,
+        pass_id: pass.external_id,
         price: pass.price,
+        coupon_code: couponCode,
         currency: pass.currency.toLowerCase(),
       });
 

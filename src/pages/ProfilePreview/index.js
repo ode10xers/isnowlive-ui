@@ -349,6 +349,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
+        coupon_code: couponCode,
         payment_source: paymentSource.GATEWAY,
       };
 
@@ -411,7 +412,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     }
 
     const paymentPopupData = {
-      productId: selectedInventory.inventory_id,
+      productId: selectedInventory.session_external_id,
       productType: 'SESSION',
       itemList: [
         {

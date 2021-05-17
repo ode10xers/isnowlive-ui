@@ -77,8 +77,9 @@ const PublicPassList = ({ passes }) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.passes.createOrderForUser({
-        pass_id: selectedPass.id,
+        pass_id: selectedPass.external_id,
         price: selectedPass.price,
+        coupon_code: couponCode,
         currency: selectedPass.currency.toLowerCase(),
       });
 
