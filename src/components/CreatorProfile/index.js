@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { Row, Col, Button, Image, Space, Typography, Switch } from 'antd';
@@ -85,6 +85,12 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
     setIsLoading(false);
   };
 
+  useEffect(() => {
+    if (profile) {
+      setCreatorProfile(profile);
+    }
+  }, [profile]);
+
   return (
     <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-around">
       {showCoverImage && (
@@ -109,7 +115,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
             <Share
               label="Share"
               shareUrl={generateUrlFromUsername(creatorProfile?.username)}
-              title={`${creatorProfile.first_name} ${creatorProfile?.last_name}`}
+              title={`${creatorProfile?.first_name} ${creatorProfile?.last_name}`}
             />
           </div>
         </div>
