@@ -1491,7 +1491,6 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
   };
 
   const resetEditorContent = () => {
-    console.log('HERE');
     if (emailEditor.current) {
       emailEditor.current.editor.loadBlank(initialEditorBodyTemplate);
       emailEditor.current.editor.setBodyValues(initialEditorBodyTemplate);
@@ -1536,6 +1535,8 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
 
   const handleEditorLoad = () => {
     adjustEditorIframeMinWidth();
+    // The Unlayer behaves weirdly that we have to loadDesign first
+    // Then reset it so that we can "apply" some default body values
     emailEditor.current.editor.loadDesign(testTemplate);
     resetEditorContent();
   };
