@@ -25,47 +25,6 @@ const formInitialValues = {
   subject: '',
 };
 
-/*
-  Design template for default body
-
-  {
-    counters: {}
-    body: {
-      rows: [],
-      "values":{
-            "backgroundColor":"#e8d4bb",
-            "backgroundImage":{
-                "url":"",
-                "fullWidth":true,
-                "repeat":false,
-                "center":true,
-                "cover":false
-            },
-            "contentWidth":"600px",
-            "contentAlign":"center",
-            "fontFamily":{
-                "label":"Montserrat",
-                "value":"'Montserrat',sans-serif",
-                "url":"https://fonts.googleapis.com/css?family=Montserrat:400,700",
-                "defaultFont":true
-            },
-            "preheaderText":"",
-            "linkStyle":{
-                "body":true,
-                "linkColor":"#0000ee",
-                "linkHoverColor":"#0000ee",
-                "linkUnderline":true,
-                "linkHoverUnderline":true
-            },
-            "_meta":{
-                "htmlID":"u_body",
-                "htmlClassNames":"u_body"
-            }
-        }
-    }
-  }
-*/
-
 // the Unlayer behaves very weirdly
 // For some reason it works if
 // 1) onLoad, we load a template (in this case testTemplate is used)
@@ -1605,13 +1564,12 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
               options={{
                 features: {
                   textEditor: {
+                    // Disable clean paste to keep formatting on paste
                     cleanPaste: false,
                   },
                 },
               }}
-              appearance={{
-                theme: 'dark',
-              }}
+              appearance={{ theme: 'dark' }}
               safeHtml={true}
               ref={emailEditor}
               onLoad={handleEditorLoad}
