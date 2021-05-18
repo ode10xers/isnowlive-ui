@@ -1,3 +1,5 @@
+// TODO: Dynamically adjust this domain key
+// so it's also usable for creator custom domain
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',
   DOMAIN: {

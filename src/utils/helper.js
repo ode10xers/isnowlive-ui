@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { message } from 'antd';
 import dateUtil from 'utils/date';
-import { getLocalUserDetails } from './storage';
+import { getCreatorDetailsInLS, getLocalUserDetails } from './storage';
 
 const {
   formatDate: { getTimeDiff },
@@ -15,7 +15,14 @@ export const isUnapprovedUserError = (errorResponse) =>
 
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
-export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
+export const getUsernameFromUrl = () => {
+  if (window.location.origin.includes('passion.do') || window.location.origin.includes('localhost')) {
+    return window.location.hostname.split('.')[0] || 'app';
+  }
+
+  // If in a custom domain
+  return getCreatorDetailsInLS().username;
+};
 
 export const getCreatorUsernameForHeader = () => {
   const creatorUsername = getUsernameFromUrl();
@@ -147,6 +154,10 @@ export const isValidFile = (url) => {
 };
 
 export const generateUrlFromUsername = (username) => {
+  if (!window.location.origin.includes('passion.do') && !window.location.origin.includes('localhost')) {
+    return window.location.origin;
+  }
+
   let newUrl = '';
   if (process.env.NODE_ENV === 'development') {
     newUrl = 'http://' + username + '.localhost:' + window.location.port;

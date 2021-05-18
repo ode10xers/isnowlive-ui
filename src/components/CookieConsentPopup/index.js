@@ -12,6 +12,9 @@ import styles from './styles.module.scss';
 
 const { Paragraph, Text } = Typography;
 
+//TODO: Right now the component is unused
+// But later when it's used, we need to make this dynamic
+// to adjust creator's custom domain (see authCookie.js)
 const DOMAIN = {
   development: '.localhost',
   staging: '.stage.passion.do',

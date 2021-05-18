@@ -44,6 +44,7 @@ import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
+import { storeCreatorDetailsToLS } from 'utils/storage';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -74,6 +75,30 @@ function App() {
   const isWidget = isWidgetUrl() || isInIframeWidget();
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
+
+  // Logic to initially save creator details in LS
+  useEffect(() => {
+    const fetchCreatorDetailsForCustomDomain = async (customDomain) => {
+      console.log('Fetching creator details based on domain ', customDomain);
+
+      try {
+        const { status, data } = await apis.user.getCreatorDetailsByCustomDomain(customDomain);
+
+        if (isAPISuccess(status) && data) {
+          storeCreatorDetailsToLS(data);
+        }
+      } catch (error) {
+        console.error('Failed fetching creator details based on domain', error?.response?.data);
+      }
+    };
+
+    // const customDomain = window.location.hostname;
+    const customDomain = 'otnaille.online';
+
+    if (!customDomain.includes('passion.do') || !customDomain.includes('localhost')) {
+      fetchCreatorDetailsForCustomDomain(customDomain);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isWidget) {
