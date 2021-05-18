@@ -13,7 +13,7 @@ import styles from './styles.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
 
-const ExternalSiteSettings = () => {
+const Plugins = () => {
   const [widgetLink, setWidgetLink] = useState('');
   const [selectedWidget, setSelectedWidget] = useState(widgetComponentsName['CALENDAR'].value);
 
@@ -93,4 +93,4 @@ const ExternalSiteSettings = () => {
   );
 };
 
-export default ExternalSiteSettings;
+export default Plugins;

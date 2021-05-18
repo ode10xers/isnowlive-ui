@@ -26,6 +26,7 @@ export default {
     getCreatorUserPreferences: () => http.get('/secure/creator/settings'),
     sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
     confirmCreatorPaymentStatusUpdated: (payload) => http.put('/secure/creator/settings/ga', payload),
+    updateCustomDomainForCreator: (payload) => http.post('/secure/creator/profile/custom-domain', payload),
   },
   payment: {
     stripe: {
