@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import MobileDetect from 'mobile-detect';
 
 import { Row, Col, Typography, Button, Card, Tag, Space, message } from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
@@ -16,6 +15,7 @@ import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } 
 
 import { isAPISuccess, isUnapprovedUserError, orderType, productType } from 'utils/helper';
 import { redirectToSessionsPage, redirectToVideosPage } from 'utils/redirect';
+import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -25,9 +25,6 @@ const { Text, Paragraph } = Typography;
 
 const PublicPassList = ({ passes }) => {
   const { showPaymentPopup } = useGlobalContext();
-
-  const md = new MobileDetect(window.navigator.userAgent);
-  const isMobileDevice = Boolean(md.mobile());
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPass, setSelectedPass] = useState(null);
