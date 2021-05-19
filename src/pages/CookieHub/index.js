@@ -17,7 +17,7 @@ const CookieHub = () => {
   const fetchCreatorDetails = useCallback(async () => {
     const creatorUsername = getUsernameFromUrl() || 'app';
 
-    let domainsWhitelist = [`${creatorUsername}.${DOMAINS[process.env.NODE_ENV]}`];
+    let domainsWhitelist = [`${creatorUsername}.${DOMAINS[process.env.REACT_APP_ENV]}`];
 
     if (!reservedDomainName.includes(creatorUsername)) {
       try {
