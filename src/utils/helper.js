@@ -21,7 +21,7 @@ export const getUsernameFromUrl = () => {
   }
 
   // If in a custom domain
-  return getCreatorDetailsInLS()?.username || null;
+  return getCreatorDetailsInLS()?.username || 'app';
 };
 
 export const getCreatorUsernameForHeader = () => {

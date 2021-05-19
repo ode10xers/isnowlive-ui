@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
 import apis from 'apis';
@@ -77,7 +77,7 @@ function App() {
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
   // Logic to initially save creator details in LS
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fetchCreatorDetailsForCustomDomain = async (customDomain) => {
       console.log('Fetching creator details based on domain ', customDomain);
 
