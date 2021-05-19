@@ -28,6 +28,7 @@ const setAuthCookie = (authCode, expiryDays) => {
   document.cookie = `${AUTH_COOKIE.NAME}=${authCode};expires=${expiryDate};path=/;domain=${domain}`;
 
   if (isInCustomDomain()) {
+    console.log('Setting token from custom domain');
     const creatorUsername = getUsernameFromUrl();
 
     set({
@@ -60,6 +61,8 @@ const getCustomDomainAuthToken = async () => {
     iframeUrl: `https://${creatorUsername}${AUTH_COOKIE.DOMAIN[process.env.REACT_APP_ENV]}${Routes.cookieHub}`,
     dataKey: TOSSED_AUTH_DATA_KEY,
   });
+
+  console.log('Custom Domain Auth Token : ', customDomainAuthToken);
 
   return customDomainAuthToken || '';
 };
