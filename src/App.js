@@ -92,10 +92,9 @@ function App() {
       }
     };
 
-    // const customDomain = window.location.hostname;
-    const customDomain = 'otnaille.online';
+    const customDomain = window.location.hostname;
 
-    if (!customDomain.includes('passion.do') || !customDomain.includes('localhost')) {
+    if (!customDomain.includes('passion.do') && !customDomain.includes('localhost')) {
       fetchCreatorDetailsForCustomDomain(customDomain);
     }
   }, []);
