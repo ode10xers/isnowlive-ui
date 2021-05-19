@@ -31,7 +31,7 @@ const setAuthCookie = (authCode, expiryDays) => {
     const creatorUsername = getUsernameFromUrl();
 
     set({
-      iframeUrl: generateUrlFromUsername(creatorUsername),
+      iframeUrl: `https://${creatorUsername}${AUTH_COOKIE.DOMAIN[process.env.REACT_APP_ENV]}${Routes.cookieHub}`,
       dataKey: TOSSED_AUTH_DATA_KEY,
       data: authCode,
     });
