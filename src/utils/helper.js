@@ -13,15 +13,18 @@ const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing thi
 export const isUnapprovedUserError = (errorResponse) =>
   errorResponse.status === FORBIDDEN && errorResponse.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
 
+export const isInCustomDomain = () =>
+  !window.location.hostname.includes('passion.do') && !window.location.hostname.includes('localhost');
+
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const getUsernameFromUrl = () => {
-  if (window.location.origin.includes('passion.do') || window.location.origin.includes('localhost')) {
-    return window.location.hostname.split('.')[0] || 'app';
+  if (isInCustomDomain()) {
+    // If in a custom domain
+    return getCreatorDetailsInLS()?.username || 'app';
   }
 
-  // If in a custom domain
-  return getCreatorDetailsInLS()?.username || 'app';
+  return window.location.hostname.split('.')[0] || 'app';
 };
 
 export const getCreatorUsernameForHeader = () => {
@@ -154,7 +157,7 @@ export const isValidFile = (url) => {
 };
 
 export const generateUrlFromUsername = (username) => {
-  if (!window.location.origin.includes('passion.do') && !window.location.origin.includes('localhost')) {
+  if (isInCustomDomain()) {
     return window.location.origin;
   }
 

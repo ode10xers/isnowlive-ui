@@ -128,9 +128,9 @@ const Login = ({ history }) => {
 
         <Row>
           <Col {...formTailLayout.wrapperCol}>
-            <a href onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
+            <Button type="link" onClick={() => trackAndSetLoginView(user.click.newPassword, false)}>
               Set a new password
-            </a>
+            </Button>
           </Col>
         </Row>
       </>
@@ -157,9 +157,9 @@ const Login = ({ history }) => {
 
         <Row>
           <Col {...formTailLayout.wrapperCol}>
-            <a href onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
+            <Button type="link" onClick={() => trackAndSetLoginView(user.click.loginWithNewPassword, true)}>
               Login with password
-            </a>
+            </Button>
           </Col>
         </Row>
       </>

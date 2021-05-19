@@ -8,7 +8,7 @@ import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 import parseQueryString from 'utils/parseQueryString';
 
@@ -81,7 +81,7 @@ function App() {
   useEffect(() => {
     const currentDomain = window.location.hostname;
 
-    if (currentDomain.includes('passion.do') || currentDomain.includes('localhost')) {
+    if (!isInCustomDomain()) {
       setShouldFetchCreatorDetails(false);
     } else {
       if (shouldFetchCreatorDetails) {

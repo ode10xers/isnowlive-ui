@@ -1,5 +1,5 @@
-// TODO: Dynamically adjust this domain key
-// so it's also usable for creator custom domain
+import { isInCustomDomain } from 'utils/helper';
+
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',
   DOMAIN: {
@@ -7,6 +7,11 @@ const AUTH_COOKIE = {
     staging: '.stage.passion.do',
     production: '.passion.do',
   },
+  EXPIRY_IN_DAYS: 7,
+};
+
+const CUSTOM_DOMAIN_COOKIE = {
+  NAME: '__custom_domain_passion_auth_code__',
   EXPIRY_IN_DAYS: 7,
 };
 
@@ -21,10 +26,16 @@ const setAuthCookie = (authCode, expiryDays) => {
   const expiryDate = getCookieExpiryDate(expiryDays);
 
   document.cookie = `${AUTH_COOKIE.NAME}=${authCode};expires=${expiryDate};path=/;domain=${domain}`;
+
+  if (isInCustomDomain()) {
+    const customDomain = window.location.hostname;
+    const customDomainCookieExpiry = getCookieExpiryDate(CUSTOM_DOMAIN_COOKIE.EXPIRY_IN_DAYS);
+    document.cookie = `${CUSTOM_DOMAIN_COOKIE.NAME}=${authCode};expires=${customDomainCookieExpiry};path=/;domain=${customDomain}`;
+  }
 };
 
 const getAuthCookie = () => {
-  const name = AUTH_COOKIE.NAME + '=';
+  const name = (isInCustomDomain() ? CUSTOM_DOMAIN_COOKIE.NAME : AUTH_COOKIE.NAME) + '=';
   const decodedCookie = decodeURIComponent(document.cookie);
   const cookiesArray = decodedCookie.split(';');
   for (let i = 0; i < cookiesArray.length; i++) {

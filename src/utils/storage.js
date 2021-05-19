@@ -21,7 +21,6 @@ const CREATOR_DETAILS_LS_KEY = 'passion-creator-details';
 
 export const getCreatorDetailsInLS = () => {
   const creatorDetails = JSON.parse(localStorage.getItem(CREATOR_DETAILS_LS_KEY));
-  console.trace(creatorDetails?.username);
   if (creatorDetails) {
     return creatorDetails;
   }
