@@ -1,4 +1,7 @@
-import { isInCustomDomain } from 'utils/helper';
+import { get, set } from 'cookie-toss';
+import Routes from 'routes';
+
+import { generateUrlFromUsername, getUsernameFromUrl, isInCustomDomain } from 'utils/helper';
 
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',
@@ -10,10 +13,7 @@ const AUTH_COOKIE = {
   EXPIRY_IN_DAYS: 7,
 };
 
-const CUSTOM_DOMAIN_COOKIE = {
-  NAME: '__custom_domain_passion_auth_code__',
-  EXPIRY_IN_DAYS: 7,
-};
+const TOSSED_AUTH_DATA_KEY = '__ls_passion_auth_token__';
 
 const getCookieExpiryDate = (expiryDays = AUTH_COOKIE.EXPIRY_IN_DAYS) => {
   let d = new Date();
@@ -28,14 +28,18 @@ const setAuthCookie = (authCode, expiryDays) => {
   document.cookie = `${AUTH_COOKIE.NAME}=${authCode};expires=${expiryDate};path=/;domain=${domain}`;
 
   if (isInCustomDomain()) {
-    const customDomain = window.location.hostname;
-    const customDomainCookieExpiry = getCookieExpiryDate(CUSTOM_DOMAIN_COOKIE.EXPIRY_IN_DAYS);
-    document.cookie = `${CUSTOM_DOMAIN_COOKIE.NAME}=${authCode};expires=${customDomainCookieExpiry};path=/;domain=${customDomain}`;
+    const creatorUsername = getUsernameFromUrl();
+
+    set({
+      iframeUrl: generateUrlFromUsername(creatorUsername),
+      dataKey: TOSSED_AUTH_DATA_KEY,
+      data: authCode,
+    });
   }
 };
 
 const getAuthCookie = () => {
-  const name = (isInCustomDomain() ? CUSTOM_DOMAIN_COOKIE.NAME : AUTH_COOKIE.NAME) + '=';
+  const name = AUTH_COOKIE.NAME + '=';
   const decodedCookie = decodeURIComponent(document.cookie);
   const cookiesArray = decodedCookie.split(';');
   for (let i = 0; i < cookiesArray.length; i++) {
@@ -50,8 +54,18 @@ const getAuthCookie = () => {
   return '';
 };
 
+const getCustomDomainAuthToken = async () => {
+  const creatorUsername = getUsernameFromUrl();
+  const customDomainAuthToken = await get({
+    iframeUrl: `https://${creatorUsername}${AUTH_COOKIE.DOMAIN[process.env.NODE_ENV]}${Routes.cookieHub}`,
+    dataKey: TOSSED_AUTH_DATA_KEY,
+  });
+
+  return customDomainAuthToken || '';
+};
+
 const deleteAuthCookie = () => {
   setAuthCookie('', 0);
 };
 
-export { setAuthCookie, getAuthCookie, deleteAuthCookie };
+export { setAuthCookie, getAuthCookie, deleteAuthCookie, getCustomDomainAuthToken };

@@ -5,7 +5,7 @@ import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
-import { getAuthCookie } from 'services/authCookie';
+import { getAuthCookie, getCustomDomainAuthToken } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
 import { isAPISuccess, isInCustomDomain } from 'utils/helper';
@@ -42,6 +42,7 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
+import CookieHub from 'pages/CookieHub';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
 import { storeCreatorDetailsToLS } from 'utils/storage';
@@ -93,7 +94,7 @@ function App() {
 
             if (isAPISuccess(status) && data) {
               storeCreatorDetailsToLS(data);
-              http.setCreatorUsernameHeader();
+              await http.setupHttpHeaderForCustomDomain();
             }
           } catch (error) {
             console.error('Failed fetching creator details based on domain', error?.response?.data);
@@ -133,8 +134,14 @@ function App() {
       try {
         const { data, status } = await apis.user.getProfile();
         if (isAPISuccess(status) && data) {
+          const authTokenData = data.auth_token
+            ? data.auth_token
+            : isInCustomDomain()
+            ? await getCustomDomainAuthToken()
+            : getAuthCookie();
+
           setUserAuthentication(true);
-          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+          setUserDetails({ ...data, auth_token: authTokenData });
           setTimeout(() => {
             setIsReadyToLoad(true);
           }, 100);
@@ -144,31 +151,35 @@ function App() {
       }
     };
 
-    if (!isWidget) {
-      const authToken = getAuthCookie();
-      if (authToken && authToken !== '') {
-        getUserDetails();
-      } else {
-        removeUserState();
-      }
-    } else if (isWidget) {
-      // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
-      if (authCode && authCode !== '') {
-        http.setAuthToken(authCode);
-        setAuthTokenInLS(authCode);
-        getUserDetails();
-      } else {
-        const tokenFromLS = getAuthTokenFromLS();
-        if (tokenFromLS) {
-          http.setAuthToken(tokenFromLS);
+    const initializeApp = async () => {
+      if (!isWidget) {
+        const authToken = isInCustomDomain() ? await getCustomDomainAuthToken() : getAuthCookie();
+        if (authToken && authToken !== '') {
           getUserDetails();
         } else {
           removeUserState();
         }
+      } else if (isWidget) {
+        // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
+        if (authCode && authCode !== '') {
+          http.setAuthToken(authCode);
+          setAuthTokenInLS(authCode);
+          getUserDetails();
+        } else {
+          const tokenFromLS = getAuthTokenFromLS();
+          if (tokenFromLS) {
+            http.setAuthToken(tokenFromLS);
+            getUserDetails();
+          } else {
+            removeUserState();
+          }
+        }
+      } else {
+        setIsReadyToLoad(true);
       }
-    } else {
-      setIsReadyToLoad(true);
-    }
+    };
+
+    initializeApp();
     // eslint-disable-next-line
   }, [isWidget]);
 
@@ -192,6 +203,9 @@ function App() {
       <PaymentPopup />
       <SendCustomerEmailModal />
       <Router>
+        <Route path={Routes.cookieHub} exact>
+          <CookieHub />
+        </Route>
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (
           <EmbeddablePage widget={widgetType} />
         ) : (

@@ -3,7 +3,7 @@ import config from 'config';
 
 import { getCreatorUsernameForHeader, isUnapprovedUserError } from 'utils/helper';
 
-import { setAuthCookie, getAuthCookie, deleteAuthCookie } from './authCookie';
+import { setAuthCookie, getAuthCookie, deleteAuthCookie, getCustomDomainAuthToken } from './authCookie';
 
 import { showMemberUnapprovedJoinModal } from 'components/Modals/modals';
 
@@ -46,11 +46,15 @@ class HttpService {
     );
   }
 
-  setCreatorUsernameHeader() {
+  async setupHttpHeaderForCustomDomain() {
+    const customDomainAuthToken = await getCustomDomainAuthToken();
+
+    this.authToken = customDomainAuthToken;
+
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
-        'auth-token': this.authToken,
+        'auth-token': customDomainAuthToken,
         'creator-username': getCreatorUsernameForHeader(),
       },
     });

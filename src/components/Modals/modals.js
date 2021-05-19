@@ -12,6 +12,7 @@ import {
   getUsernameFromUrl,
   reservedDomainName,
   generateMailToLink,
+  isInCustomDomain,
 } from 'utils/helper';
 import {
   getUserPassOrderDetails,
@@ -22,20 +23,20 @@ import {
 import { isWidgetUrl } from 'utils/widgets';
 
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
-import { getAuthCookie } from 'services/authCookie';
+import { getAuthCookie, getCustomDomainAuthToken } from 'services/authCookie';
 
 import styles from './style.modules.scss';
 
 const { Text, Paragraph } = Typography;
 
-const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPath) => {
+const getDashboardUrl = async (userName, targetPath = Routes.attendeeDashboard.rootPath) => {
   if (!isWidgetUrl()) {
     return generateUrlFromUsername(userName) + targetPath;
   } else {
     let completeUrl = generateUrlFromUsername(userName) + targetPath;
 
     let authCode = null;
-    const authCodeFromCookie = getAuthCookie();
+    const authCodeFromCookie = isInCustomDomain() ? await getCustomDomainAuthToken() : getAuthCookie();
     if (authCodeFromCookie && authCodeFromCookie !== '') {
       authCode = authCodeFromCookie;
     } else {
@@ -142,8 +143,8 @@ const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
         <Button
           type="primary"
           block
-          onClick={() =>
-            (window.location.href = getDashboardUrl(
+          onClick={async () =>
+            (window.location.href = await getDashboardUrl(
               username,
               Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
             ))
@@ -168,8 +169,8 @@ export const showPurchasePassSuccessModal = async (passOrderId) => {
     maskClosable: false,
     okText: 'Go To Dashboard',
     title: 'Purchase Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes
       )),
@@ -200,8 +201,8 @@ export const showPurchasePassAndBookSessionSuccessModal = async (passOrderId, in
     maskClosable: false,
     okButtonProps: { style: { display: 'none' } },
     title: 'Registration Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
       )),
@@ -238,8 +239,8 @@ export const showBookSessionWithPassSuccessModal = async (passOrderId, inventory
     maskClosable: false,
     okButtonProps: { style: { display: 'none' } },
     title: 'Registration Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
       )),
@@ -273,8 +274,8 @@ export const showBookSingleSessionSuccessModal = async (inventoryId) => {
     maskClosable: false,
     okButtonProps: { style: { display: 'none' } },
     title: 'Registration Successful',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
       )),
@@ -304,8 +305,8 @@ export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
@@ -341,8 +342,8 @@ export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
@@ -376,8 +377,8 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
     maskClosable: false,
     title: 'Video Purchased',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
@@ -408,8 +409,8 @@ export const showPurchaseSingleCourseSuccessModal = () => {
     maskClosable: false,
     title: 'Course purchased',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
       )),
@@ -435,8 +436,8 @@ export const showPurchaseSubscriptionSuccessModal = () => {
     maskClosable: false,
     title: 'Subscription purchased',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions
       )),
@@ -460,8 +461,8 @@ export const showGetVideoWithSubscriptionSuccessModal = () => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
@@ -492,8 +493,8 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
     title: 'Registration successful',
     okButtonProps: { style: { display: 'none' } },
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
       )),
@@ -522,8 +523,8 @@ export const showGetCourseWithSubscriptionSuccessModal = () => {
     maskClosable: false,
     title: 'Purchase successful',
     okText: 'Go To Dashboard',
-    onOk: () =>
-      (window.location.href = getDashboardUrl(
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(
         username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
       )),
@@ -580,7 +581,8 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + targetSection)),
+    onOk: async () =>
+      (window.location.href = await getDashboardUrl(username, Routes.attendeeDashboard.rootPath + targetSection)),
     afterClose: resetBodyStyle,
   });
 };
