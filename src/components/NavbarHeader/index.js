@@ -20,8 +20,6 @@ import { resetBodyStyle } from 'components/Modals/modals';
 
 const { Text, Paragraph } = Typography;
 
-const username = getUsernameFromUrl();
-
 const NavbarHeader = () => {
   const history = useHistory();
   const location = useLocation();
@@ -175,13 +173,13 @@ const NavbarHeader = () => {
     }
   };
 
+  const username = getUsernameFromUrl();
+
   useEffect(() => {
     //For some reason, sometimes the modals locks the scrolling of <body>
     //This line here is to remove the style element of <body>
     resetBodyStyle();
     setLocalUserDetails(getLocalUserDetails());
-
-    console.log('In NavbarHeader : ', username);
 
     if (username && !reservedDomainName.includes(username)) {
       checkShouldShowSessionLink();
@@ -190,7 +188,7 @@ const NavbarHeader = () => {
       checkShouldShowCourseLink();
       checkShouldShowSubscriptionLink();
     }
-  }, [userDetails]);
+  }, [username, userDetails]);
 
   if (reservedDomainName.includes(username)) {
     return null;

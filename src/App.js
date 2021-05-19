@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
 import apis from 'apis';
@@ -72,33 +72,40 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
+  const [shouldFetchCreatorDetails, setShouldFetchCreatorDetails] = useState(true);
   const isWidget = isWidgetUrl() || isInIframeWidget();
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
   // Logic to initially save creator details in LS
-  useLayoutEffect(() => {
-    const fetchCreatorDetailsForCustomDomain = async (customDomain) => {
-      console.log('Fetching creator details based on domain ', customDomain);
+  useEffect(() => {
+    const currentDomain = window.location.hostname;
 
-      try {
-        const { status, data } = await apis.user.getCreatorDetailsByCustomDomain(customDomain);
+    if (currentDomain.includes('passion.do') || currentDomain.includes('localhost')) {
+      setShouldFetchCreatorDetails(false);
+    } else {
+      if (shouldFetchCreatorDetails) {
+        const fetchCreatorDetailsForCustomDomain = async (customDomain) => {
+          console.log('Fetching creator details based on domain ', customDomain);
 
-        if (isAPISuccess(status) && data) {
-          storeCreatorDetailsToLS(data);
-          http.setCreatorUsernameHeader();
-        }
-      } catch (error) {
-        console.error('Failed fetching creator details based on domain', error?.response?.data);
+          try {
+            const { status, data } = await apis.user.getCreatorDetailsByCustomDomain(customDomain);
+
+            if (isAPISuccess(status) && data) {
+              storeCreatorDetailsToLS(data);
+              http.setCreatorUsernameHeader();
+            }
+          } catch (error) {
+            console.error('Failed fetching creator details based on domain', error?.response?.data);
+          }
+
+          setShouldFetchCreatorDetails(false);
+        };
+
+        fetchCreatorDetailsForCustomDomain(currentDomain);
       }
-    };
-
-    const customDomain = window.location.hostname;
-
-    if (!customDomain.includes('passion.do') && !customDomain.includes('localhost')) {
-      fetchCreatorDetailsForCustomDomain(customDomain);
     }
-  }, []);
+  }, [shouldFetchCreatorDetails]);
 
   useEffect(() => {
     if (!isWidget) {
@@ -165,7 +172,7 @@ function App() {
     // eslint-disable-next-line
   }, [isWidget]);
 
-  if (!isReadyToLoad) {
+  if (!isReadyToLoad || shouldFetchCreatorDetails) {
     return <div>Loading...</div>;
   }
 
