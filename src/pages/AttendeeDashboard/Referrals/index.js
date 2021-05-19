@@ -1,10 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Row, Col, Typography, Button, Tooltip } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
-import { getUsernameFromUrl } from 'utils/helper';
-import { getLocalUserDetails } from 'utils/storage';
 import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-
+import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { copyToClipboard } from 'utils/helper';
 import apis from 'apis';
@@ -16,12 +15,16 @@ import styles from './styles.module.scss';
 const { Text, Title } = Typography;
 
 const Referrals = () => {
-  const [widgetLink, setWidgetLink] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrders, setCourseOrders] = useState([]);
 
   const generateWidgetText = () => {
-    return 'Hellow World' + widgetLink;
+    var userNameValue = '';
+    const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
+    const siteLink = generateUrlFromUsername(username);
+    const referralCode = getLocalUserDetails().referral_code;
+
+    return siteLink + '?ref=' + referralCode;
   };
 
   const generateUserName = () => {
@@ -34,7 +37,7 @@ const Referrals = () => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.referrals.getCustomerRefCode();
+      const { status, data } = await apis.referrals.getCustomerRefData();
 
       if (isAPISuccess(status) && data) {
         setCourseOrders(data);
@@ -48,28 +51,9 @@ const Referrals = () => {
     setIsLoading(false);
   }, []);
 
-  const setWidgetLink2 = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.referrals.getCustomerRefData();
-
-      if (isAPISuccess(status) && data) {
-        setWidgetLink(data);
-      }
-    } catch (error) {
-      if (!isUnapprovedUserError(error.response)) {
-        showErrorModal('Something wrong happened', error?.response?.data?.message || 'Failed to fetch course orders');
-      }
-    }
-
-    setIsLoading(false);
-  }, []);
-
   useEffect(() => {
     fetchUserCourseOrders();
-    setWidgetLink2();
-  }, [fetchUserCourseOrders, setWidgetLink2]);
+  }, [fetchUserCourseOrders]);
 
   const courseColumns = [
     {
@@ -83,7 +67,7 @@ const Referrals = () => {
               borderLeft: `6px solid ${record.color_code || '#FFF'}`,
             },
           },
-          children: <Text> {record?.course_name} </Text>,
+          children: <Text> {record?.name} </Text>,
         };
       },
     },
@@ -92,7 +76,16 @@ const Referrals = () => {
       key: 'date',
       dataIndex: 'date',
       width: '85px',
-      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
+      render: (text, record) => {
+        return {
+          props: {
+            style: {
+              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
+            },
+          },
+          children: <Text> {record?.joining_date} </Text>,
+        };
+      },
     },
   ];
 
@@ -121,9 +114,9 @@ const Referrals = () => {
         <Col xs={24}>
           <Table
             columns={courseColumns}
-            data={courseOrders?.active}
+            data={courseOrders?.referrals}
             loading={isLoading}
-            rowKey={(record) => record.course_order_id}
+            rowKey={(record) => record.id}
           />
         </Col>
       </Row>

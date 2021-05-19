@@ -35,7 +35,7 @@ const SignUp = ({ history }) => {
       const { data } = await apis.user.signup({
         email: values.email,
         is_creator: true,
-        reference: referenceCode,
+        referrer: referenceCode,
       });
       if (data) {
         pushToDataLayer(gtmTriggerEvents.CREATOR_SIGNUP, {

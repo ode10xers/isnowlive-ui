@@ -97,7 +97,7 @@ const AuthModal = ({ visible, closeModal, showingSignIn = true, onLoggedInCallba
         last_name: values.last_name,
         email: values.email,
         is_creator: false,
-        reference: referenceCode,
+        referrer: referenceCode,
       });
       if (data) {
         logIn(data, true, isWidgetUrl());

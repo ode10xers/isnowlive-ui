@@ -178,7 +178,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         last_name: values.last_name,
         email: values.email,
         is_creator: false,
-        reference: referenceCode,
+        referrer: referenceCode,
       });
       if (data) {
         setIsLoading(false);
