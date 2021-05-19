@@ -1,7 +1,7 @@
 import { get, set } from 'cookie-toss';
 import Routes from 'routes';
 
-import { generateUrlFromUsername, getUsernameFromUrl, isInCustomDomain } from 'utils/helper';
+import { getUsernameFromUrl, isInCustomDomain } from 'utils/helper';
 
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',
@@ -57,7 +57,7 @@ const getAuthCookie = () => {
 const getCustomDomainAuthToken = async () => {
   const creatorUsername = getUsernameFromUrl();
   const customDomainAuthToken = await get({
-    iframeUrl: `https://${creatorUsername}${AUTH_COOKIE.DOMAIN[process.env.NODE_ENV]}${Routes.cookieHub}`,
+    iframeUrl: `https://${creatorUsername}${AUTH_COOKIE.DOMAIN[process.env.REACT_APP_ENV]}${Routes.cookieHub}`,
     dataKey: TOSSED_AUTH_DATA_KEY,
   });
 
