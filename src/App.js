@@ -86,6 +86,7 @@ function App() {
 
         if (isAPISuccess(status) && data) {
           storeCreatorDetailsToLS(data);
+          http.setCreatorUsernameHeader();
         }
       } catch (error) {
         console.error('Failed fetching creator details based on domain', error?.response?.data);

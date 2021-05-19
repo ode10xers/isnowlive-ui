@@ -16,11 +16,13 @@ class HttpService {
     this.baseURL = config.server.baseURL;
     this.authToken = getAuthCookie() || '';
 
+    const creatorUsername = getCreatorUsernameForHeader() || '';
+
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
-        'creator-username': getCreatorUsernameForHeader(),
+        'creator-username': creatorUsername,
       },
     });
 
@@ -44,6 +46,16 @@ class HttpService {
     );
   }
 
+  setCreatorUsernameHeader() {
+    this.axios = axios.create({
+      baseURL: this.baseURL,
+      headers: {
+        'auth-token': this.authToken,
+        'creator-username': getCreatorUsernameForHeader(),
+      },
+    });
+  }
+
   setAuthToken(authToken) {
     setAuthCookie(authToken);
     this.authToken = authToken;
@@ -59,6 +71,7 @@ class HttpService {
       (response) => response,
       (error) => {
         const { status } = error.response;
+
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
