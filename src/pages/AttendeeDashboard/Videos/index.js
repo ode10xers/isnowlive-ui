@@ -64,14 +64,16 @@ const Videos = () => {
           )
         }
       >
-        <Row gutter={[10, 10]}>
-          <Col xs={24} md={12} xl={10}>
+        <Row gutter={[12, 12]}>
+          <Col xs={24} md={10} lg={14} xl={12}>
             <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
           </Col>
-          <Col xs={24} md={12} xl={14}>
+          <Col xs={24} md={14} lg={10} xl={12}>
             <Row>
               <Col xs={24}>
-                <Title level={4}>{video.title}</Title>
+                <Title level={5} className={styles.videoTitle}>
+                  {video.title}
+                </Title>
               </Col>
               <Col xs={24}>
                 {video.price === 0 ? (

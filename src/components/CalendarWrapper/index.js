@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 
 import CalendarView from 'components/CalendarView';
-import { generateUrlFromUsername } from 'utils/helper';
 
 import { generateLightColorHex, getBackgroundColorsForMobile } from './helper';
+
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { redirectToInventoryPage } from 'utils/redirect';
 
 // eslint-disable-next-line
 import styles from './styles.scss';
@@ -18,12 +19,6 @@ const {
 const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClick }) => {
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'week');
   const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
-
-  // Reworked this to redirect to Inventory Page as per Rahul's request
-  const redirectToInventoryPage = (session) => {
-    const baseUrl = generateUrlFromUsername(session.creator_username || 'app');
-    window.open(`${baseUrl}/e/${session.inventory_id}`);
-  };
 
   const onViewChange = (e) => {
     setCalendarView(e);

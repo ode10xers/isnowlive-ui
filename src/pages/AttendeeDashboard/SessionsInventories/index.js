@@ -21,6 +21,8 @@ import {
 
 import styles from './styles.module.scss';
 import { showErrorModal } from 'components/Modals/modals';
+import { redirectToInventoryPage } from 'utils/redirect';
+import { isInIframeWidget } from 'utils/widgets';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLocaleDate, toLongDateWithLongDay },
@@ -142,9 +144,7 @@ const SessionsInventories = ({ match }) => {
       session_data: item,
     });
 
-    if (item.username && item.inventory_id) {
-      window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
-    }
+    redirectToInventoryPage(item);
   };
 
   const cancelOrderForSession = async (orderId) => {
@@ -242,7 +242,10 @@ const SessionsInventories = ({ match }) => {
       price: data.price,
     };
 
-    window.open(`${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`);
+    window.open(
+      `${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`,
+      isInIframeWidget() ? '_self' : '_blank'
+    );
   };
 
   const emptyTableCell = {

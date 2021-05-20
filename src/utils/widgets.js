@@ -19,9 +19,13 @@ export const widgetComponentsName = {
     value: 'courses',
     label: 'Courses',
   },
+  MEMBERSHIPS: {
+    value: 'memberships',
+    label: 'Memberships',
+  },
 };
 
-export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses'];
+export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses', 'memberships'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
@@ -41,4 +45,11 @@ export const isWidgetUrl = () => {
   const location = window.location;
   const { isWidget } = parseQueryString(location.search);
   return isWidget === 'true';
+};
+
+export const isInIframeWidget = () => {
+  // Compares the current window location with the parent's
+  // If it is viewed inside an iframe from a diff site
+  // this function will return true
+  return window.location !== window.parent.location;
 };

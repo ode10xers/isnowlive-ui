@@ -5,7 +5,7 @@ import apis from 'apis';
 import { isAPISuccess } from 'utils/helper';
 import { formatPassesData } from 'utils/productsHelper';
 
-const Passes = ({ profileUsername }) => {
+const Passes = () => {
   const [passes, setPasses] = useState([]);
   const [isPassesLoading, setIsPassesLoading] = useState(true);
 

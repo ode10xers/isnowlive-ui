@@ -3,7 +3,7 @@ import { Row, Col, Form, Typography, Input, Modal, Button } from 'antd';
 import Loader from 'components/Loader';
 import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
 import apis from 'apis';
-import { newsletterModalLayout, newsletterFormTailLayout } from 'layouts/FormLayouts';
+import { newsletterModalLayout } from 'layouts/FormLayouts';
 import classNames from 'classnames';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -61,13 +61,13 @@ const NewsletterModal = ({ visible, closeModal }) => {
       >
         <Loader loading={isLoading} size="large">
           <Form labelAlign="right" onFinish={onFinish} scrollToFirstError={true}>
-            <Row gutter={8}>
+            <Row gutter={[8, 8]} justify="center">
               <Col xs={24}>
                 <Paragraph className={styles.textAlignCenter}>
                   <Title level={4}>Subscribe to Newsletter</Title>
                 </Paragraph>
               </Col>
-              <Col>
+              <Col xs={22}>
                 <Form.Item {...newsletterModalLayout} label="Name" className={styles.formBottomMargin} required={true}>
                   <Form.Item
                     name="firstName"
@@ -92,11 +92,11 @@ const NewsletterModal = ({ visible, closeModal }) => {
                 >
                   <Input placeholder="Please Enter your Email" />
                 </Form.Item>
-                <Form.Item colon={false} {...newsletterFormTailLayout}>
-                  <Button block type="primary" htmlType="submit">
-                    Subscribe
-                  </Button>
-                </Form.Item>
+              </Col>
+              <Col xs={24} md={10} lg={8}>
+                <Button block type="primary" htmlType="submit">
+                  Subscribe
+                </Button>
               </Col>
             </Row>
           </Form>

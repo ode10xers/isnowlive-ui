@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
-import { Row, Col, Button, Image, Space, Typography } from 'antd';
+import { Row, Col, Button, Image, Space, Typography, Switch } from 'antd';
 import {
   GlobalOutlined,
   FacebookOutlined,
@@ -11,12 +11,13 @@ import {
 } from '@ant-design/icons';
 import Share from 'components/Share';
 import DefaultImage from 'components/Icons/DefaultImage';
-import { resetBodyStyle } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername } from 'utils/helper';
+import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
 import NewsletterModal from 'components/NewsletterModal';
 import styles from './styles.module.scss';
 import { useLocation } from 'react-router-dom';
+import apis from 'apis';
 
 const { Title } = Typography;
 
@@ -26,6 +27,10 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   localStorage.setItem('ref', JSON.stringify(query.get('ref')));
 
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
+  const [creatorProfile, setCreatorProfile] = useState(profile || null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isInDashboard = window.location.pathname.includes('dashboard');
 
   const closeNewsletterModal = () => {
     setNewsletterModalVisible(false);
@@ -37,7 +42,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   };
 
   const renderCreatorName = () => {
-    const creatorName = `${profile?.first_name} ${profile?.last_name}`;
+    const creatorName = `${creatorProfile?.first_name} ${creatorProfile?.last_name}`;
 
     let headingLevel = 2;
 
@@ -56,8 +61,42 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
     return <Title level={headingLevel}>{creatorName}</Title>;
   };
 
+  const updateCollectEmailFlag = async (checked) => {
+    setIsLoading(true);
+    const creatorProfileData = creatorProfile;
+
+    try {
+      const payload = {
+        ...creatorProfileData,
+        profile: {
+          ...creatorProfileData?.profile,
+          collect_emails: checked,
+        },
+      };
+
+      const { status } = await apis.user.updateProfile(payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Successfully updated newsletter signup settings');
+        setCreatorProfile(payload);
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed updating newsletter signup setting',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (profile) {
+      setCreatorProfile(profile);
+    }
+  }, [profile]);
+
   return (
-    <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-between">
+    <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-around">
       {showCoverImage && (
         <Col xs={24} className={styles.coverImageWrapper}>
           <Image
@@ -79,58 +118,102 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
           <div className={styles.shareButton}>
             <Share
               label="Share"
-              shareUrl={generateUrlFromUsername(profile.username)}
-              title={`${profile.first_name} ${profile.last_name}`}
+              shareUrl={generateUrlFromUsername(creatorProfile?.username)}
+              title={`${creatorProfile?.first_name} ${creatorProfile?.last_name}`}
             />
           </div>
         </div>
       </Col>
       <Col xs={24} md={{ span: 22 }}>
-        <div className={styles.bio}>{ReactHtmlParser(profile?.profile?.bio)}</div>
+        <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
       </Col>
-      <Col xs={24} md={{ span: 8 }}>
-        {profile?.profile?.social_media_links && (
-          <Space size={'middle'}>
-            {profile.profile.social_media_links.website && (
-              <a href={`//${profile.profile.social_media_links.website}`} target="_blank" rel="noopener noreferrer">
-                <GlobalOutlined className={styles.socialIcon} />
-              </a>
+      <Col xs={24} md={{ span: 22 }}>
+        <Row gutter={[8, 8]}>
+          <Col xs={24} md={7}>
+            {creatorProfile?.profile?.social_media_links && (
+              <Space size={'middle'}>
+                {creatorProfile.profile.social_media_links.website && (
+                  <a
+                    href={`//${creatorProfile.profile.social_media_links.website}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <GlobalOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {creatorProfile.profile.social_media_links.facebook_link && (
+                  <a
+                    href={`${creatorProfile.profile.social_media_links.facebook_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FacebookOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {creatorProfile.profile.social_media_links.twitter_link && (
+                  <a
+                    href={`${creatorProfile.profile.social_media_links.twitter_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <TwitterOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {creatorProfile.profile.social_media_links.instagram_link && (
+                  <a
+                    href={`${creatorProfile.profile.social_media_links.instagram_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <InstagramOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+                {creatorProfile.profile.social_media_links.linkedin_link && (
+                  <a
+                    href={`${creatorProfile.profile.social_media_links.linkedin_link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <LinkedinOutlined className={styles.socialIcon} />
+                  </a>
+                )}
+              </Space>
             )}
-            {profile.profile.social_media_links.facebook_link && (
-              <a href={`${profile.profile.social_media_links.facebook_link}`} target="_blank" rel="noopener noreferrer">
-                <FacebookOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profile.profile.social_media_links.twitter_link && (
-              <a href={`${profile.profile.social_media_links.twitter_link}`} target="_blank" rel="noopener noreferrer">
-                <TwitterOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profile.profile.social_media_links.instagram_link && (
-              <a
-                href={`${profile.profile.social_media_links.instagram_link}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <InstagramOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profile.profile.social_media_links.linkedin_link && (
-              <a href={`${profile.profile.social_media_links.linkedin_link}`} target="_blank" rel="noopener noreferrer">
-                <LinkedinOutlined className={styles.socialIcon} />
-              </a>
-            )}
-          </Space>
-        )}
+          </Col>
+
+          <Col xs={24} md={17}>
+            <Row gutter={[8, 8]} justify="end">
+              {isInDashboard && (
+                <>
+                  <Col xs={20} md={10} className={styles.textAlignRight}>
+                    Show newsletter signup button here?
+                  </Col>
+                  <Col xs={4} md={2}>
+                    <Switch
+                      loading={isLoading}
+                      checked={creatorProfile?.profile?.collect_emails}
+                      onChange={updateCollectEmailFlag}
+                    />
+                  </Col>
+                </>
+              )}
+              {(isInDashboard || creatorProfile?.profile?.collect_emails) && (
+                <Col xs={24} md={8}>
+                  <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
+                  <Button
+                    block
+                    type="primary"
+                    disabled={isInDashboard && !creatorProfile?.profile?.collect_emails}
+                    onClick={() => showNewsletterModal()}
+                  >
+                    Subscribe to newsletter
+                  </Button>
+                </Col>
+              )}
+            </Row>
+          </Col>
+        </Row>
       </Col>
-      {profile.collect_emails && (
-        <Col xs={24} md={{ span: 6, offset: 1 }}>
-          <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
-          <Button block type="primary" className={styles.lightRedBtn} onClick={() => showNewsletterModal()}>
-            Subscribe to newsletter
-          </Button>
-        </Col>
-      )}
     </Row>
   );
 };

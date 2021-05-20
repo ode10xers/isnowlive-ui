@@ -1,6 +1,6 @@
 import React, { useReducer, useContext, createContext } from 'react';
 import Routes from 'routes';
-import { getCookieConsentValue } from 'react-cookie-consent';
+// import { getCookieConsentValue } from 'react-cookie-consent';
 
 import { getLocalUserDetails } from 'utils/storage';
 
@@ -85,7 +85,9 @@ const GlobalDataProvider = ({ children }) => {
   const initialState = {
     userDetails: getLocalUserDetails(),
     isAuthenticated: false,
-    cookieConsent: Boolean(getCookieConsentValue()),
+    // TODO: Hardcoding it to true for now, since the popup will be disabled
+    // cookieConsent: Boolean(getCookieConsentValue()),
+    cookieConsent: true,
     paymentPopupVisible: false,
     paymentPopupData: null,
     paymentPopupCallback: () => {},
