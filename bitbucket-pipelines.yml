@@ -48,7 +48,7 @@ pipelines:
             - mkdir -p ~/.ssh
             - cat known_hosts >> ~/.ssh/known_hosts
             - (umask  077 ; echo ${STAGE_KEY} | base64 --decode > ~/.ssh/id_rsa)
-            - scp -r build/* ${STAGE_USER}@{STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/.
+            - scp -r build/* ${STAGE_USER}@${STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/.
   pull-requests:
     '**':
       - step:
