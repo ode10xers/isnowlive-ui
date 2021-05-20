@@ -47,7 +47,6 @@ pipelines:
           script:
             - mkdir -p ~/.ssh
             - cat known_hosts >> ~/.ssh/known_hosts
-            - (umask  077 ; echo ${STAGE_KEY} | base64 --decode > ~/.ssh/id_rsa)
             - scp -r build/* ubuntu@13.213.31.40:/home/ubuntu/Stage/Frontend/.
   pull-requests:
     '**':
