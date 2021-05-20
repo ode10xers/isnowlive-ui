@@ -47,7 +47,7 @@ pipelines:
           script:
             - mkdir -p ~/.ssh
             - cat known_hosts >> ~/.ssh/known_hosts
-            - scp -r build/* ${STAGE_USER}@${STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/.
+            - scp -r build/* $STAGE_USER@$STAGE_SERVER:$STAGE_DEPLOYMENT_PATH/.
   pull-requests:
     '**':
       - step:
