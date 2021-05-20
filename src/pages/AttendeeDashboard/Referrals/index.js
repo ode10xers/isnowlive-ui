@@ -19,8 +19,7 @@ const Referrals = () => {
   const [courseOrders, setCourseOrders] = useState([]);
 
   const generateWidgetText = () => {
-    var userNameValue = '';
-    const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();
+    const username = getUsernameFromUrl();
     const siteLink = generateUrlFromUsername(username);
     const referralCode = getLocalUserDetails().referral_code;
 
@@ -28,7 +27,7 @@ const Referrals = () => {
   };
 
   const generateUserName = () => {
-    return getLocalUserDetails()?.username || getUsernameFromUrl();
+    return getUsernameFromUrl();
   };
 
   const copyWidgetSnippet = () => copyToClipboard(generateWidgetText());
@@ -75,7 +74,6 @@ const Referrals = () => {
       title: 'Joining Date',
       key: 'date',
       dataIndex: 'date',
-      width: '85px',
       render: (text, record) => {
         return {
           props: {
