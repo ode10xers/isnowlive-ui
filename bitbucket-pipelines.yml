@@ -42,6 +42,14 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
+      - step:
+          name: deploy to ec2
+          deployment: staging
+          script:
+            - mkdir -p ~/.ssh
+            - cat known_hosts >> ~/.ssh/known_hosts
+            - (umask  077 ; echo ${STAGE_KEY} | base64 --decode > ~/.ssh/id_rsa)
+            - scp -r build/* ${STAGE_USER}@{STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/.
   pull-requests:
     '**':
       - step:
