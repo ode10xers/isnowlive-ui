@@ -42,6 +42,13 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
+            - echo "deploying to ec2"
+            - apk add openssh-client
+            - mkdir -p ~/.ssh
+            - (umask  077 ; echo ${STAGE_KEY} | base64 -d > ~/.ssh/id_rsa)
+            - cat known_hosts >> ~/.ssh/known_hosts
+            - scp -r build/* ${STAGE_USER}@${STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/.
+            
   pull-requests:
     '**':
       - step:
