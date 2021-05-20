@@ -44,6 +44,7 @@ pipelines:
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
       - step:
           name: deploy to ec2
+          deployment: staging
           script:
             - mkdir -p ~/.ssh
             - cat known_hosts >> ~/.ssh/known_hosts
