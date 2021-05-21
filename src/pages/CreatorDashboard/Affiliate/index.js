@@ -14,7 +14,7 @@ const { Title } = Typography;
 const { Panel } = Collapse;
 
 const Affiliate = () => {
-  const [isLoading, setIsLoading] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [affiliateData, setRefData] = useState([]);
 
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
@@ -73,7 +73,7 @@ const Affiliate = () => {
     getReferenceData();
   }, [getReferenceData]);
 
-  const generateCouponColumns = (published) => [
+  const generateAffiliateColumns = (published) => [
     {
       title: 'Name',
       dataIndex: 'name',
@@ -91,28 +91,28 @@ const Affiliate = () => {
       ),
       align: 'right',
       width: '220px',
-      render: (text, record) => {
-        const redemptionText = `${record.referrals?.length || 0} Users`;
+      render: (text, refRecord) => {
+        const redemptionText = `${refRecord.referrals?.length || 0} Users`;
 
         return (
           <Row gutter={[8, 8]} justify="end">
             <Col xs={12}>
-              {record ? (
-                expandedPublishedRowKeys.includes(record.id) ? (
-                  <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
+              {refRecord ? (
+                expandedPublishedRowKeys.includes(refRecord.id) ? (
+                  <Button block type="link" onClick={() => collapseRowPublished(refRecord.id)}>
                     {redemptionText} <UpOutlined />
                   </Button>
                 ) : (
-                  <Button block type="link" onClick={() => expandRowPublished(record.id)}>
+                  <Button block type="link" onClick={() => expandRowPublished(refRecord.id)}>
                     {redemptionText} <DownOutlined />
                   </Button>
                 )
-              ) : expandedUnpublishedRowKeys.includes(record.id) ? (
-                <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
+              ) : expandedUnpublishedRowKeys.includes(refRecord.id) ? (
+                <Button block type="link" onClick={() => collapseRowUnpublished(refRecord.id)}>
                   {redemptionText} <UpOutlined />
                 </Button>
               ) : (
-                <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
+                <Button block type="link" onClick={() => expandRowUnpublished(refRecord.id)}>
                   {redemptionText} <DownOutlined />
                 </Button>
               )}
@@ -168,7 +168,7 @@ const Affiliate = () => {
                   <Table
                     sticky={true}
                     size="small"
-                    columns={generateCouponColumns(true)}
+                    columns={generateAffiliateColumns(true)}
                     data={affiliateData?.filter((affiliate) => affiliate)}
                     loading={isLoading}
                     rowKey={(record) => record.id}

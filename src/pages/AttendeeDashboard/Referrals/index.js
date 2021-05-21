@@ -16,7 +16,7 @@ const { Text, Title } = Typography;
 
 const Referrals = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [courseOrders, setCourseOrders] = useState([]);
+  const [customerRefData, setCustomerRefData] = useState([]);
 
   const generateWidgetText = () => {
     const username = getUsernameFromUrl();
@@ -32,18 +32,21 @@ const Referrals = () => {
 
   const copyWidgetSnippet = () => copyToClipboard(generateWidgetText());
 
-  const fetchUserCourseOrders = useCallback(async () => {
+  const fetchCustomerRefData = useCallback(async () => {
     setIsLoading(true);
 
     try {
       const { status, data } = await apis.referrals.getCustomerRefData();
 
       if (isAPISuccess(status) && data) {
-        setCourseOrders(data);
+        setCustomerRefData(data);
       }
     } catch (error) {
       if (!isUnapprovedUserError(error.response)) {
-        showErrorModal('Something wrong happened', error?.response?.data?.message || 'Failed to fetch course orders');
+        showErrorModal(
+          'Something wrong happened',
+          error?.response?.data?.message || 'Failed to fetch Customer Reference Data'
+        );
       }
     }
 
@@ -51,10 +54,10 @@ const Referrals = () => {
   }, []);
 
   useEffect(() => {
-    fetchUserCourseOrders();
-  }, [fetchUserCourseOrders]);
+    fetchCustomerRefData();
+  }, [fetchCustomerRefData]);
 
-  const courseColumns = [
+  const referenceColumns = [
     {
       title: 'Referred Person',
       key: 'name',
@@ -111,8 +114,8 @@ const Referrals = () => {
         </Col>
         <Col xs={24}>
           <Table
-            columns={courseColumns}
-            data={courseOrders?.referrals}
+            columns={referenceColumns}
+            data={customerRefData?.referrals}
             loading={isLoading}
             rowKey={(record) => record.id}
           />
