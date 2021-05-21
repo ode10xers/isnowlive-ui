@@ -7,10 +7,14 @@ import { getLocalUserDetails } from 'utils/storage';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { copyToClipboard } from 'utils/helper';
 import apis from 'apis';
+import dateUtil from 'utils/date';
 import Table from 'components/Table';
 import { showErrorModal } from 'components/Modals/modals';
 import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
 import styles from './styles.module.scss';
+const {
+  formatDate: { toLongDateWithDayTime },
+} = dateUtil;
 
 const { Text, Title } = Typography;
 
@@ -77,16 +81,7 @@ const Referrals = () => {
       title: 'Joining Date',
       key: 'date',
       dataIndex: 'date',
-      render: (text, record) => {
-        return {
-          props: {
-            style: {
-              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
-            },
-          },
-          children: <Text> {record?.joining_date} </Text>,
-        };
-      },
+      render: (text) => toLongDateWithDayTime(text),
     },
   ];
 

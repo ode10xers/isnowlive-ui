@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Button, Typography, Collapse, Empty } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import apis from 'apis';
+import dateUtil from 'utils/date';
 import Loader from 'components/Loader';
 import Table from 'components/Table';
 import { showErrorModal } from 'components/Modals/modals';
@@ -9,6 +10,9 @@ import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
 import styles from './styles.module.scss';
 import classNames from 'classnames';
+const {
+  formatDate: { toLongDateWithDayTime },
+} = dateUtil;
 
 const { Title } = Typography;
 const { Panel } = Collapse;
@@ -133,6 +137,7 @@ const Affiliate = () => {
       title: 'Joining Date',
       dataIndex: 'joining_date',
       key: 'joining_date',
+      render: (text) => toLongDateWithDayTime(text),
     },
   ];
 
