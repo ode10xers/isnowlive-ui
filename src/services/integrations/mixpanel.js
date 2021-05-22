@@ -26,6 +26,7 @@ export const mixPanelEventTags = {
         membersListNav: '(Creator) Member List Nav Clicked',
         membersTagsNav: '(Creator) Member Tags Nav Clicked',
         membersSettingsNav: '(Creator) Make site private Clicked',
+        affiliateNav: '(Creator) Affiliate Dashboard Nav Clicked',
       },
       sessions: {
         manage: {
@@ -102,6 +103,7 @@ export const mixPanelEventTags = {
         videosNav: '(Attendee) Videos Nav Clicked',
         coursesNav: '(Attendee) Courses Nav Clicked',
         subscriptionsNav: '(Attendee) Subscriptions Nav Clicked',
+        referralsNav: '(Attendee) Referrals Nav Clicked',
       },
       sessions: {
         pastSessionDetails: '(Attendee) Past Session Details Clicked',

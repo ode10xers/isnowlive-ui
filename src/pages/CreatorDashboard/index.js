@@ -24,6 +24,7 @@ import ExternalSiteSettings from 'pages/CreatorDashboard/ExternalSiteSettings';
 import MembersList from 'pages/CreatorDashboard/Members/MembersList';
 import MembersTags from 'pages/CreatorDashboard/AdvancedSettings/MembersTags';
 import MemberSettings from 'pages/CreatorDashboard/AdvancedSettings/MembersSettings';
+import Affiliate from 'pages/CreatorDashboard/Affiliate';
 
 const CreatorDashboard = ({ match }) => {
   return (
@@ -52,6 +53,7 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
       <Route exact path={match.url + Routes.creatorDashboard.membersTags} component={MembersTags} />
       <Route exact path={match.url + Routes.creatorDashboard.membersSettings} component={MemberSettings} />
+      <Route exact path={match.url + Routes.creatorDashboard.affiliate} component={Affiliate} />
       <Redirect to={match.url + Routes.creatorDashboard.defaultPath} />
     </Switch>
   );

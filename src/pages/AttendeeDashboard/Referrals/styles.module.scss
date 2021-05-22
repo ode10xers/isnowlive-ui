@@ -1,0 +1,22 @@
+@import '../../../styles/variables.scss';
+
+.detailsButton {
+  padding-left: 0px !important;
+}
+
+.helperText {
+  display: block;
+}
+
+.mobileDetailsText {
+  font-size: 13px;
+}
+
+.codeSnippetContainer{
+  display: inline !important;
+}
+
+.copySnippetBtnContainer{
+  display: inline !important;
+  margin-left: 25px;
+}
