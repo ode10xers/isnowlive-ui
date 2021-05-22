@@ -304,7 +304,7 @@ const Videos = () => {
         dataIndex: 'thumbnail_url',
         key: 'thumbnail_url',
         align: 'center',
-        width: '180px',
+        width: '210px',
         render: (text, record) => {
           return {
             props: {
@@ -316,8 +316,7 @@ const Videos = () => {
               <Image
                 src={record.thumbnail_url || 'error'}
                 alt={record.title}
-                height={78}
-                width={150}
+                height={120}
                 fallback={DefaultImage()}
                 className={styles.thumbnailImage}
               />
@@ -363,9 +362,9 @@ const Videos = () => {
           </Button>
         ),
         align: 'right',
-        width: '450px',
+        width: '380px',
         render: (text, record) => (
-          <Row gutter={4} justify="end">
+          <Row gutter={4} justify="start">
             <Col xs={24} md={2}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showEmailModal(record)} icon={<MailOutlined />} />
@@ -439,7 +438,7 @@ const Videos = () => {
                 />
               </Tooltip>
             </Col>
-            <Col xs={24} md={6}>
+            <Col xs={24} md={4}>
               {record.is_published ? (
                 <Tooltip title="Hide Video">
                   <Button type="link" danger onClick={() => unpublishVideo(record.external_id)}>
@@ -459,7 +458,7 @@ const Videos = () => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={24} md={6}>
+            <Col xs={24} md={4}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.external_id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.external_id)}>
@@ -491,7 +490,7 @@ const Videos = () => {
         title: 'Purchasable By',
         key: 'tags',
         dataIndex: 'tags',
-        width: '150px',
+        width: '96px',
         render: (text, record) => <TagListPopup tags={record.tags} />,
       };
       initialColumns.splice(tagColumnPosition, 0, tagColumnObject);
@@ -813,6 +812,7 @@ const Videos = () => {
                     </Loader>
                   ) : (
                     <Table
+                      size="small"
                       sticky={true}
                       columns={generateVideoColumns(true)}
                       data={videos?.filter((video) => video?.is_published)}
