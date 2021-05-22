@@ -40,7 +40,6 @@ const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
-//TODO: Refactor this for overall same experience across all products
 const Videos = () => {
   const { showSendEmailPopup } = useGlobalContext();
   const location = useLocation();

@@ -30,7 +30,6 @@ const CustomDomain = () => {
     setSubmitting(true);
 
     try {
-      //TODO: Implement API Here
       const { status } = await apis.user.updateCustomDomainForCreator({
         domain_url: customDomain,
       });

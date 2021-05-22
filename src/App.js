@@ -179,17 +179,6 @@ function App() {
     return <div>Loading...</div>;
   }
 
-  // if (isWidget && isReadyToLoad && publishedWidgets.includes(widgetType)) {
-  //   return (
-  //     <>
-  //       <PaymentPopup />
-  //       <EmbeddablePage widget={widgetType} />
-  //     </>
-  //   );
-  // }
-
-  // TODO: Right now these pages are accessible via the iframe widget
-  // Not sure if there will be any weird behaviors
   return (
     <>
       <PaymentPopup />

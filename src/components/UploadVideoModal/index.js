@@ -139,14 +139,13 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  const setUppyListeners = (external_id) => {
+  const updateUppyListeners = (external_id) => {
     if (uppy.current) {
       // Set the upload URL
       uppy.current.getPlugin('Tus').setOptions({
         endpoint: `${config.server.baseURL}/creator/videos/${external_id}/upload`,
       });
 
-      // TODO: Will probably have to remove the listeners, since it kind of stacks up
       // Set the on complete listener
       uppy.current.on('complete', async (result) => {
         if (result.successful.length) {
@@ -250,7 +249,7 @@ const UploadVideoModal = ({
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
 
-        setUppyListeners(editedVideo.external_id);
+        updateUppyListeners(editedVideo.external_id);
       } else {
         form.resetFields();
       }
@@ -402,44 +401,9 @@ const UploadVideoModal = ({
               showErrorModal(`Failed to get video token`);
             });
         } else {
-          setUppyListeners(response.data.external_id);
+          updateUppyListeners(response.data.external_id);
           setFormPart(2);
         }
-        /*
-        if (response.data) {
-          if (response.data.video_uid.length) {
-            apis.videos
-              .getVideoToken(response.data.external_id)
-              .then((res) => {
-                setVideoPreviewToken(res.data.token);
-                setFormPart(3);
-              })
-              .catch((error) => {
-                console.log(error);
-                showErrorModal(`Failed to get video token`);
-              });
-          } else {
-            setUppyListeners(response.data.external_id);
-            setFormPart(2);
-          }
-        } else {
-          if (editedVideo.video_uid.length) {
-            apis.videos
-              .getVideoToken(editedVideo.external_id)
-              .then((res) => {
-                setVideoPreviewToken(res.data.token);
-                setFormPart(3);
-              })
-              .catch((error) => {
-                console.log(error);
-                showErrorModal(`Failed to get video token`);
-              });
-          } else {
-            setUppyListeners(editedVideo.external_id);
-            setFormPart(2);
-          }
-        }
-        */
       }
     } catch (error) {
       showErrorModal(
