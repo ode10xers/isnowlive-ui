@@ -146,8 +146,9 @@ const UploadVideoModal = ({
         endpoint: `${config.server.baseURL}/creator/videos/${external_id}/upload`,
       });
 
+      // TODO: Will probably have to remove the listeners, since it kind of stacks up
       // Set the on complete listener
-      uppy.current.on('complete', (result) => {
+      uppy.current.on('complete', async (result) => {
         if (result.successful.length) {
           apis.videos
             .getVideoToken(external_id)
@@ -180,6 +181,13 @@ const UploadVideoModal = ({
     setVideoUploadPercent(0);
     setUploadingFile(null);
   });
+
+  const removeUppyListeners = () => {
+    if (uppy.current) {
+      const eventNames = ['complete', 'cancel-all', 'progress', 'file-added'];
+      eventNames.forEach((eventName) => uppy.current.off(eventName));
+    }
+  };
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -261,7 +269,7 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
-      uppy.current = null;
+      removeUppyListeners();
       resetBodyStyle();
     };
     //eslint-disable-next-line
