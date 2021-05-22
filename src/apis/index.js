@@ -194,4 +194,9 @@ export default {
     getCreatorLegals: () => http.get('/secure/creator/legal'),
     getLegalsByCreatorUsername: (creatorUsername) => http.get(`/creator/${creatorUsername}/legal`),
   },
+  referrals: {
+    getCustomerRefCode: () => http.get('/secure/customer/referral/code'),
+    getCustomerRefData: () => http.get('/secure/customer/referral'),
+    getCreatorRefData: () => http.get('/secure/creator/referral'),
+  },
 };
