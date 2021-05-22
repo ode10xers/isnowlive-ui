@@ -259,6 +259,15 @@ export const creatorMenuItems = [
       },
     ],
   },
+  {
+    order: 18,
+    is_button: false,
+    key: 'affiliate',
+    title: 'Affiliate Dashboard',
+    icon: <AuditOutlined />,
+    mixPanelTag: creator.click.dashboard.affiliateNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.affiliate,
+  },
 ];
 
 export const attendeeMenuItems = [
@@ -315,5 +324,13 @@ export const attendeeMenuItems = [
     icon: <ScheduleOutlined />,
     mixPanelTag: attendee.click.dashboard.subscriptionsNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions,
+  },
+  {
+    order: 6,
+    key: 'referrals',
+    title: 'Referrals',
+    icon: <ScheduleOutlined />,
+    mixPanelTag: attendee.click.dashboard.referralsNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.referrals,
   },
 ];

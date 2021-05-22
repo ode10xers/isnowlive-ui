@@ -29,12 +29,13 @@ const SignUp = ({ history }) => {
 
   const onFinish = async (values) => {
     const eventTag = user.click.signUp;
-
+    const referenceCode = JSON.parse(localStorage.getItem('ref'));
     try {
       setIsLoading(true);
       const { data } = await apis.user.signup({
         email: values.email,
         is_creator: true,
+        referrer: referenceCode,
       });
       if (data) {
         pushToDataLayer(gtmTriggerEvents.CREATOR_SIGNUP, {
@@ -44,6 +45,7 @@ const SignUp = ({ history }) => {
         logIn(data, true);
         setIsLoading(false);
         mapUserToMixPanel(data);
+        localStorage.removeItem('ref');
         trackSuccessEvent(eventTag, { email: values.email });
         history.push(Routes.profile);
       }

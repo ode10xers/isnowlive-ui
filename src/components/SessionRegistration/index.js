@@ -171,17 +171,20 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   };
 
   const signupUser = async (values) => {
+    const referenceCode = JSON.parse(localStorage.getItem('ref'));
     try {
       const { data } = await apis.user.signup({
         first_name: values.first_name,
         last_name: values.last_name,
         email: values.email,
         is_creator: false,
+        referrer: referenceCode,
       });
       if (data) {
         setIsLoading(false);
         logIn(data, true);
         showConfirmPaymentPopup();
+        localStorage.removeItem('ref');
       }
     } catch (error) {
       if (error.response?.data?.message && error.response.data.message === 'user already exists') {

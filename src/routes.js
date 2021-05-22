@@ -50,6 +50,7 @@ const Routes = {
     domains: '/domains',
     membersSettings: '/members/settings',
     membersTags: '/members/tag',
+    affiliate: '/affiliate',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
@@ -62,6 +63,7 @@ const Routes = {
     courses: '/courses',
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
+    referrals: '/referrals',
   },
 };
 

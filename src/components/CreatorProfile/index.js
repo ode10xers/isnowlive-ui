@@ -9,7 +9,6 @@ import {
   TwitterOutlined,
   LinkedinOutlined,
 } from '@ant-design/icons';
-
 import Share from 'components/Share';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
@@ -17,11 +16,16 @@ import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
 import NewsletterModal from 'components/NewsletterModal';
 import styles from './styles.module.scss';
+import { useLocation } from 'react-router-dom';
 import apis from 'apis';
 
 const { Title } = Typography;
 
 const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+  let { search } = useLocation();
+  const query = new URLSearchParams(search);
+  localStorage.setItem('ref', JSON.stringify(query.get('ref')));
+
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
   const [creatorProfile, setCreatorProfile] = useState(profile || null);
   const [isLoading, setIsLoading] = useState(false);
