@@ -83,7 +83,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (!isWidget) {
+    if (!isWidget && !signupAuthToken) {
       initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
@@ -95,7 +95,7 @@ function App() {
         }
       }
     }
-  }, [userDetails, cookieConsent, isWidget]);
+  }, [userDetails, cookieConsent, isWidget, signupAuthToken]);
 
   useEffect(() => {
     const removeUserState = () => {
@@ -119,35 +119,37 @@ function App() {
       }
     };
 
-    if (!isWidget) {
-      const authToken = getAuthCookie();
-      if (authToken && authToken !== '') {
-        getUserDetails();
-      } else {
-        removeUserState();
-      }
-    } else if (isWidget) {
-      // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
-      if (authCode && authCode !== '') {
-        http.setAuthToken(authCode);
-        setAuthTokenInLS(authCode);
-        getUserDetails();
-      } else {
-        const tokenFromLS = getAuthTokenFromLS();
-        if (tokenFromLS) {
-          http.setAuthToken(tokenFromLS);
+    if (!signupAuthToken) {
+      if (!isWidget) {
+        const authToken = getAuthCookie();
+        if (authToken && authToken !== '') {
           getUserDetails();
         } else {
           removeUserState();
         }
+      } else if (isWidget) {
+        // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
+        if (authCode && authCode !== '') {
+          http.setAuthToken(authCode);
+          setAuthTokenInLS(authCode);
+          getUserDetails();
+        } else {
+          const tokenFromLS = getAuthTokenFromLS();
+          if (tokenFromLS) {
+            http.setAuthToken(tokenFromLS);
+            getUserDetails();
+          } else {
+            removeUserState();
+          }
+        }
+      } else {
+        setIsReadyToLoad(true);
       }
-    } else {
-      setIsReadyToLoad(true);
     }
     // eslint-disable-next-line
-  }, [isWidget]);
+  }, [isWidget, signupAuthToken]);
 
-  if (!isReadyToLoad) {
+  if (!isReadyToLoad || signupAuthToken) {
     return <div>Loading...</div>;
   }
 
