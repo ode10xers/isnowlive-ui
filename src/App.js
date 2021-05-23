@@ -5,7 +5,7 @@ import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
-import { getAuthCookie } from 'services/authCookie';
+import { getAuthCookie, setAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
 import { isAPISuccess } from 'utils/helper';
@@ -73,7 +73,14 @@ function App() {
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
   const isWidget = isWidgetUrl() || isInIframeWidget();
   const windowLocation = window.location;
-  const { authCode, widgetType } = parseQueryString(windowLocation.search);
+  const { authCode, widgetType, signupAuthToken } = parseQueryString(windowLocation.search);
+
+  if (signupAuthToken) {
+    setAuthCookie(signupAuthToken);
+    http.setAuthToken(signupAuthToken);
+
+    window.location = window.location.origin + window.location.pathname;
+  }
 
   useEffect(() => {
     if (!isWidget) {
