@@ -16,7 +16,7 @@ import validationRules from 'utils/validation';
 
 const { Title, Text } = Typography;
 
-const defaultTemplateKey = 'new';
+const defaultTemplateKey = 'blank';
 
 const EmailTemplates = () => {
   const emailEditor = useRef(null);

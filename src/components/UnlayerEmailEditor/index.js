@@ -75,6 +75,7 @@ const UnlayerEmailEditor = React.forwardRef((props, ref) => {
     // NOTE: the Unlayer iframe has a default min-width value of 1024px
     // We can override it here to squish the iframe so it fits in the modal
     editorElement.querySelector('iframe').style.minWidth = '1024px';
+    editorElement.querySelector('iframe').style.minHeight = '640px';
   };
 
   const handleEditorLoad = () => {
