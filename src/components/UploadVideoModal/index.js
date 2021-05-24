@@ -826,7 +826,7 @@ const UploadVideoModal = ({
                   <Popconfirm
                     arrowPointAtCenter
                     title={<Text> Are you sure you want to cancel the video upload? </Text>}
-                    onConfirm={() => cancelUpload()}
+                    onConfirm={cancelUpload}
                     okText="Yes, Cancel the Upload"
                     okButtonProps={{ danger: true, type: 'primary' }}
                     cancelText="No"

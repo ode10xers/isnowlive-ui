@@ -189,8 +189,22 @@ export const creatorMenuItems = [
     key: 'newsletter',
     title: 'Newsletter',
     icon: <AuditOutlined />,
-    mixPanelTag: creator.click.dashboard.newsletterNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.newsletter,
+    children: [
+      {
+        order: 1,
+        key: 'audience_list',
+        title: 'Audience List',
+        mixPanelTag: creator.click.dashboard.audienceListNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,
+      },
+      {
+        order: 2,
+        key: 'email_templates',
+        title: 'Email Templates',
+        mixPanelTag: creator.click.dashboard.emailTemplatesNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.emailTemplates,
+      },
+    ],
   },
   {
     order: 15,
