@@ -83,7 +83,13 @@ const CustomDomain = () => {
           <Title level={5}> Custom Domain </Title>
         </Col>
         <Col xs={24}>
-          <Paragraph>Some help text we can provide here</Paragraph>
+          <Paragraph>
+            You can run your passion.do site on your own domain. Please add the domain you want below
+          </Paragraph>
+          <Paragraph>Main Domain - an example main domain is vinyasayoga.com</Paragraph>
+          <Paragraph>
+            Subdomain = an example subdomain is online.vinyasayoga.com or live.vinyasayoga.com or book.vinyasayoga.com
+          </Paragraph>
         </Col>
         <Col xs={24}>
           <Form form={form} scrollToFirstError={true} labelAlign="right" onFinish={handleFinish}>
