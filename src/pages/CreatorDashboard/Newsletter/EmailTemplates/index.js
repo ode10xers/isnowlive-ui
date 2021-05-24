@@ -138,9 +138,9 @@ const EmailTemplates = () => {
       return;
     }
 
-    emailEditor.current.editor.exportHtml(async (data) => {
-      const htmlTemplate = data.chunks.body.replaceAll('\n', '');
-      const jsonTemplate = data.design;
+    emailEditor.current.editor.exportHtml(async (templateData) => {
+      const htmlTemplate = templateData.html.replaceAll('\n', '');
+      const jsonTemplate = templateData.design;
 
       try {
         const payload = {
@@ -206,6 +206,7 @@ const EmailTemplates = () => {
         </Row>
       </Col>
       {/* CTA Sections */}
+
       <Col xs={24}>
         <Loader loading={isLoading} size="large">
           <Form form={form} scrollToFirstError={true} onFinish={handleFormFinish}>
@@ -217,7 +218,7 @@ const EmailTemplates = () => {
               </Col>
               <Col xs={24} md={12} lg={14}>
                 <Row gutter={[8, 8]} justify="end">
-                  <Col xs={24} md={12}>
+                  <Col xs={24} md={12} lg={8}>
                     <Form.Item hidden={isCreating}>
                       <Popconfirm
                         arrowPointAtCenter
@@ -235,9 +236,9 @@ const EmailTemplates = () => {
                       </Popconfirm>
                     </Form.Item>
                   </Col>
-                  <Col xs={24} md={12}>
+                  <Col xs={24} md={12} lg={8}>
                     <Button block type="primary" htmlType="submit">
-                      Save {isCreating ? 'new' : 'changes to'} template
+                      {isCreating ? 'Save new' : 'Update this'} template
                     </Button>
                   </Col>
                 </Row>

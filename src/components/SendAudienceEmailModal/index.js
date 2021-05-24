@@ -118,7 +118,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
   const handleFinish = (values) => {
     if (emailEditor.current) {
       emailEditor.current.editor.exportHtml(async (data) => {
-        const emailBody = data.chunks.body.replaceAll(`\n`, '');
+        const emailBody = data.html.replaceAll(`\n`, '');
         setIsLoading(true);
         try {
           const payload = {

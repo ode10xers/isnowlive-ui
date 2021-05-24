@@ -141,7 +141,7 @@ const SendCustomerEmailModal = () => {
   const handleFinish = async (values) => {
     if (emailEditor.current) {
       emailEditor.current.editor.exportHtml(async (data) => {
-        const emailBody = data.chunks.body.replaceAll(`\n`, '');
+        const emailBody = data.html.replaceAll(`\n`, '');
         setIsLoading(true);
 
         try {
