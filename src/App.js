@@ -42,7 +42,6 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
-import CookieHub from 'pages/CookieHub';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
 import { storeCreatorDetailsToLS } from 'utils/storage';
@@ -201,9 +200,6 @@ function App() {
       <PaymentPopup />
       <SendCustomerEmailModal />
       <Router>
-        <Route path={Routes.cookieHub} exact>
-          <CookieHub />
-        </Route>
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (
           <EmbeddablePage widget={widgetType} />
         ) : (
