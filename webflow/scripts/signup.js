@@ -20,13 +20,12 @@ function hideApiLoad() {
   apiLoaderOverlay.style.display = 'none';
 }
 
-
 function showErrorSwal(title, msg) {
   Swal.fire({
     title: title || 'An error occured',
     text: msg || 'Something wrong happened',
     icon: 'error',
-    confirmButtonText: 'Okay'
+    confirmButtonText: 'Okay',
   });
 }
 
@@ -56,20 +55,20 @@ async function sendPostRequest(apiPath, payload) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    return { ...await response.json(), status: response.status };
+    return { ...(await response.json()), status: response.status };
   } catch (error) {
     return error;
   }
 }
 
 async function handleSignUpCreator(payload) {
-  showApiLoader()
+  showApiLoader();
   const response = await sendPostRequest('/user', payload);
 
   if (successCodes.includes(response.status)) {
     setAuthToken(response, true);
   } else {
-    hideApiLoader()
+    hideApiLoader();
     showErrorSwal();
   }
 }
@@ -88,9 +87,13 @@ function setAuthToken(userData, isSignup = false) {
   if (!userData) return;
 
   if (userData.profile && userData.profile.custom_domain) {
-    window.location.href = `https://${userData.profile.custom_domain}/creator/${isSignup ? 'profile' : 'dashboard'}?signupAuthToken=${userData.auth_token}`;
+    window.location.href = `https://${userData.profile.custom_domain}/creator/${
+      isSignup ? 'profile' : 'dashboard'
+    }?signupAuthToken=${userData.auth_token}`;
   } else {
-    window.location.href = `https://${isSignup ? 'app' : userData.username || 'app'}${isProd ? '' : '.stage'}.passion.do/creator/${isSignup ? 'profile' : 'dashboard'}?signupAuthToken=${userData.auth_token}`;
+    window.location.href = `https://${isSignup ? 'app' : userData.username || 'app'}${
+      isProd ? '' : '.stage'
+    }.passion.do/creator/${isSignup ? 'profile' : 'dashboard'}?signupAuthToken=${userData.auth_token}`;
   }
 }
 
@@ -101,7 +104,7 @@ function getElementsAndAttachEvent(query, eventName, eventHandler) {
 }
 
 function initFormClickHandler() {
-  getElementsAndAttachEvent("[signup-creator-handler-btn=true]", 'click', (e) => {
+  getElementsAndAttachEvent('[signup-creator-handler-btn=true]', 'click', (e) => {
     const payload = { ...getJSONFromForm(e), is_creator: true };
 
     const emailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -110,9 +113,8 @@ function initFormClickHandler() {
     } else {
       showErrorSwal('Invalid Email', 'Enter correct email id');
     }
-
   });
-  getElementsAndAttachEvent("[login-creator-handler-btn=true]", 'click', handleLoginCreator);
+  getElementsAndAttachEvent('[login-creator-handler-btn=true]', 'click', handleLoginCreator);
 
   document.getElementById('login-modal-form').onsubmit = (e) => {
     e.preventDefault();
@@ -121,7 +123,7 @@ function initFormClickHandler() {
   };
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener('DOMContentLoaded', (event) => {
   initFormClickHandler();
   insertLoader();
 });

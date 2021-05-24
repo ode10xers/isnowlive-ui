@@ -1,4 +1,4 @@
-function validateEmailAndSignup (input, validation) {
+function validateEmailAndSignup(input, validation) {
   if (!!input.value && input.validity.valid) {
     validation.innerText = '';
 
@@ -11,7 +11,6 @@ function validateEmailAndSignup (input, validation) {
 
 let containers = document.getElementsByClassName('cta-animate-container');
 [...containers].forEach((container) => {
-
   let ctaButton = container.lastElementChild;
 
   // Create text input with style hidden
@@ -29,8 +28,8 @@ let containers = document.getElementsByClassName('cta-animate-container');
   let emailValidationMsg = document.createElement('p');
   emailValidationMsg.style.color = 'red';
   emailValidationMsg.style.float = 'left';
-  
-  if (window.outerWidth > 480) {        
+
+  if (window.outerWidth > 480) {
     emailInput.style.transition = 'width 0.6s ease 0s';
   } else {
     emailInput.style.transition = 'height 0.6s ease 0s';
@@ -38,7 +37,6 @@ let containers = document.getElementsByClassName('cta-animate-container');
 
   function showEmailInput() {
     if (emailInput.style.visibility !== 'visible') {
-
       emailInput.style.height = '41px';
       emailInput.style.marginTop = '11px';
       emailInput.style.paddingRight = '50px';
@@ -48,11 +46,11 @@ let containers = document.getElementsByClassName('cta-animate-container');
       emailInput.style.visibility = 'visible';
       emailInput.style.opacity = 1;
 
-      if (window.outerWidth > 480) {        
+      if (window.outerWidth > 480) {
         emailInput.style.width = '280px';
         ctaButton.style.marginLeft = '-35px';
       } else {
-        container.style.flexDirection = 'column'
+        container.style.flexDirection = 'column';
         emailInput.style.width = '100%';
       }
     }
@@ -64,7 +62,7 @@ let containers = document.getElementsByClassName('cta-animate-container');
   ctaButton.addEventListener('mouseover', showEmailInput);
 
   ctaButton.addEventListener('click', () => {
-    validateEmailAndSignup(emailInput ,emailValidationMsg);
+    validateEmailAndSignup(emailInput, emailValidationMsg);
   });
 
   window.addEventListener('scroll', () => {
@@ -75,4 +73,4 @@ let containers = document.getElementsByClassName('cta-animate-container');
 
   // Insert it in the container with style flex and two childs text input and button
   // Attach scroll event to button to show input
-})
+});

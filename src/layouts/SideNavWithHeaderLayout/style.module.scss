@@ -1,6 +1,7 @@
 @import '../../styles/variables.scss';
 
-.container, .widgetContainer {
+.container,
+.widgetContainer {
   .mainContent {
     padding: 0 24px 24px;
     min-height: 100vh;
@@ -73,28 +74,28 @@
 }
 
 @media (max-width: 767px) {
-.container {
-  .sideIcon {
-    position: absolute !important;
-    z-index: 999;
-    height: 100vh;
-    box-shadow: 2px 0 4px -3px #333 !important;
-    :global {
-      .ant-layout-sider-zero-width-trigger {
-        top: -50px;
-        right: -36px;
-        color: map-get($colors, 'Black');
-        background: transparent;
+  .container {
+    .sideIcon {
+      position: absolute !important;
+      z-index: 999;
+      height: 100vh;
+      box-shadow: 2px 0 4px -3px #333 !important;
+      :global {
+        .ant-layout-sider-zero-width-trigger {
+          top: -50px;
+          right: -36px;
+          color: map-get($colors, 'Black');
+          background: transparent;
 
-        &.expanded {
-          right: 210px;
+          &.expanded {
+            right: 210px;
+          }
         }
       }
-    }
 
-    &.hide {
-      display: none;
+      &.hide {
+        display: none;
+      }
     }
   }
-}
 }
