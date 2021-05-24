@@ -1,6 +1,8 @@
 import React from 'react';
 import { Steps } from 'antd';
-import MobileDetect from 'mobile-detect';
+
+import { isMobileDevice } from 'utils/device';
+
 import styles from './styles.module.scss';
 
 const stepsList = [
@@ -22,9 +24,6 @@ const stepsList = [
 ];
 
 const OnboardSteps = ({ current }) => {
-  const md = new MobileDetect(window.navigator.userAgent);
-  const isMobileDevice = Boolean(md.mobile());
-
   return (
     <Steps
       className={styles.stepsLarge}

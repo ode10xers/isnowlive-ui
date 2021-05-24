@@ -6,7 +6,7 @@ import SideNavigation from 'components/SideNavigation';
 import NavbarHeader from 'components/NavbarHeader';
 import DashboardHeader from 'components/DashboardHeader';
 
-import { reservedDomainName } from 'utils/helper';
+import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
 
 import styles from './style.module.scss';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
@@ -32,7 +32,7 @@ const SideNavWithHeaderLayout = ({ children }) => {
     setIsSideMenuCollapsed(collapsed);
   };
 
-  const username = window.location.hostname.split('.')[0];
+  const username = getUsernameFromUrl();
   const isInWidget = isInIframeWidget() || isWidgetUrl();
 
   return (

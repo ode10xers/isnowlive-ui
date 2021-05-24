@@ -204,7 +204,6 @@ const PaymentPopup = () => {
     if (!flexiblePaymentDetails?.enabled) {
       result = await paymentPopupCallback(appliedCouponCode);
     } else {
-      // TODO: Confirm if Pay What you want can use coupons
       result = await paymentPopupCallback(appliedCouponCode, priceAmount);
     }
 
@@ -374,9 +373,9 @@ const PaymentPopup = () => {
                   </Text>
                 ))}
             </Col>
-            {!paymentInstrumentDetails && totalPrice > 0 && (
+            {!paymentInstrumentDetails && !flexiblePaymentDetails?.enabled && totalPrice > 0 && (
               <Col xs={24}>
-                <Button className={styles.linkBtn} type="link" onClick={() => toggleCouponFieldVisibility()}>
+                <Button className={styles.linkBtn} type="link" onClick={toggleCouponFieldVisibility}>
                   {showCouponField ? `Don't use ` : 'Use '} a coupon
                 </Button>
               </Col>

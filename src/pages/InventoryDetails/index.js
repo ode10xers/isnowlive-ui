@@ -16,7 +16,13 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, reservedDomainName, isUnapprovedUserError } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  reservedDomainName,
+  isUnapprovedUserError,
+  getUsernameFromUrl,
+} from 'utils/helper';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
@@ -47,7 +53,7 @@ const InventoryDetails = ({ match, history }) => {
 
           setSession(inventoryDetails);
 
-          const creatorUsername = inventoryDetails.creator_username || window.location.hostname.split('.')[0];
+          const creatorUsername = inventoryDetails.creator_username || getUsernameFromUrl();
 
           const creatorDetailsResponse = await apis.user.getProfileByUsername(creatorUsername);
           if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
@@ -80,7 +86,7 @@ const InventoryDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.inventory_id) {
-      const domainUsername = window.location.hostname.split('.')[0];
+      const domainUsername = getUsernameFromUrl();
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getDetails(match.params.inventory_id);
       }

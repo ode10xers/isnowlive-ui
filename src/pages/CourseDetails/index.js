@@ -19,7 +19,14 @@ import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, tagColors, getRandomTagColor, reservedDomainName, courseType } from 'utils/helper';
+import {
+  isAPISuccess,
+  tagColors,
+  getRandomTagColor,
+  reservedDomainName,
+  courseType,
+  getUsernameFromUrl,
+} from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -64,8 +71,7 @@ const CourseDetails = ({ match, history }) => {
         if (isAPISuccess(status) && data) {
           setCourse(data);
 
-          const creatorUsername =
-            data.creator_username || location.state?.username || window.location.hostname.split('.')[0];
+          const creatorUsername = data.creator_username || location.state?.username || getUsernameFromUrl();
           setUsername(creatorUsername);
           await getProfileDetails(creatorUsername);
 
@@ -92,7 +98,7 @@ const CourseDetails = ({ match, history }) => {
     }
 
     if (match.params.course_id) {
-      const domainUsername = window.location.hostname.split('.')[0];
+      const domainUsername = getUsernameFromUrl();
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getCourseDetails(match.params.course_id);
       }

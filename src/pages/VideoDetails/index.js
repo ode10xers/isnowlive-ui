@@ -33,6 +33,7 @@ import {
   productType,
   reservedDomainName,
   isUnapprovedUserError,
+  getUsernameFromUrl,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -103,7 +104,7 @@ const VideoDetails = ({ match }) => {
         if (isAPISuccess(status) && data) {
           setVideo(data);
 
-          const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
+          const creatorUsername = data.creator_username || getUsernameFromUrl();
           await getProfileDetails(creatorUsername);
 
           if (data.is_course) {
@@ -226,7 +227,7 @@ const VideoDetails = ({ match }) => {
 
   useEffect(() => {
     if (match.params.video_id) {
-      const domainUsername = window.location.hostname.split('.')[0];
+      const domainUsername = getUsernameFromUrl();
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getVideoDetails(match.params.video_id);
         getAvailablePassesForVideo(match.params.video_id);

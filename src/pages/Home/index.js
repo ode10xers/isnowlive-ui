@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import Routes from 'routes';
 import ProfilePreview from 'pages/ProfilePreview';
 
-import { reservedDomainName } from 'utils/helper';
+import { getUsernameFromUrl, reservedDomainName } from 'utils/helper';
 
 const Home = () => {
   const history = useHistory();
@@ -12,7 +12,7 @@ const Home = () => {
   const [username, setUsername] = useState(null);
 
   useEffect(() => {
-    const domainName = window.location.hostname.split('.')[0];
+    const domainName = getUsernameFromUrl();
     if (domainName && !reservedDomainName.includes(domainName)) {
       setLoadProfile(true);
       setUsername(domainName);

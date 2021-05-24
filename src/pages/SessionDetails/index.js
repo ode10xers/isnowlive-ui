@@ -16,7 +16,13 @@ import SessionRegistration from 'components/SessionRegistration';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import { isMobileDevice } from 'utils/device';
-import { generateUrlFromUsername, isAPISuccess, reservedDomainName, isUnapprovedUserError } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isAPISuccess,
+  reservedDomainName,
+  isUnapprovedUserError,
+  getUsernameFromUrl,
+} from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -50,7 +56,7 @@ const SessionDetails = ({ match, history }) => {
 
           setSessionVideos(sessionDetails.Videos || []);
 
-          const creatorUsername = sessionDetails.creator_username || window.location.hostname.split('.')[0];
+          const creatorUsername = sessionDetails.creator_username || getUsernameFromUrl();
           const creatorDetailsResponse = await apis.user.getProfileByUsername(creatorUsername);
 
           if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
@@ -94,7 +100,7 @@ const SessionDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.session_id) {
-      const domainUsername = window.location.hostname.split('.')[0];
+      const domainUsername = getUsernameFromUrl();
 
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getDetails(match.params.session_id);

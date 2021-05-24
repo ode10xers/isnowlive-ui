@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
-import MobileDetect from 'mobile-detect';
 
 import { Card, Image, Row, Col, Typography, Empty, Tag, message } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
@@ -12,6 +11,7 @@ import Loader from 'components/Loader';
 import dateUtil from 'utils/date';
 import { isValidFile, isoDayOfWeek } from 'utils/helper';
 import { redirectToSessionsPage } from 'utils/redirect';
+import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -22,9 +22,6 @@ const {
 } = dateUtil;
 
 const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = false }) => {
-  const md = new MobileDetect(window.navigator.userAgent);
-  const isMobileDevice = Boolean(md.mobile());
-
   const [adjustedSessions, setAdjustedSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 

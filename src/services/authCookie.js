@@ -1,3 +1,5 @@
+import { isInCustomDomain } from 'utils/helper';
+
 const AUTH_COOKIE = {
   NAME: '__passion_auth_code__',
   DOMAIN: {
@@ -15,7 +17,7 @@ const getCookieExpiryDate = (expiryDays = AUTH_COOKIE.EXPIRY_IN_DAYS) => {
 };
 
 const setAuthCookie = (authCode, expiryDays) => {
-  const domain = AUTH_COOKIE.DOMAIN[process.env.NODE_ENV];
+  const domain = isInCustomDomain() ? window.location.hostname : AUTH_COOKIE.DOMAIN[process.env.NODE_ENV];
   const expiryDate = getCookieExpiryDate(expiryDays);
 
   document.cookie = `${AUTH_COOKIE.NAME}=${authCode};expires=${expiryDate};path=/;domain=${domain}`;

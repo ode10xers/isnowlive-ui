@@ -7,7 +7,6 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import { getLocalUserDetails } from 'utils/storage';
 import {
-  generateUrl,
   productType,
   generateUrlFromUsername,
   getUsernameFromUrl,
@@ -29,13 +28,11 @@ import styles from './style.modules.scss';
 
 const { Text, Paragraph } = Typography;
 
-const getDashboardUrl = (userName = null, targetPath = Routes.attendeeDashboard.rootPath) => {
-  const usernameValue = userName ? userName : getUsernameFromUrl();
-
+const getDashboardUrl = (userName, targetPath = Routes.attendeeDashboard.rootPath) => {
   if (!isWidgetUrl()) {
-    return generateUrl(usernameValue) + targetPath;
+    return generateUrlFromUsername(userName) + targetPath;
   } else {
-    let completeUrl = generateUrl(usernameValue) + targetPath;
+    let completeUrl = generateUrlFromUsername(userName) + targetPath;
 
     let authCode = null;
     const authCodeFromCookie = getAuthCookie();
@@ -163,6 +160,7 @@ const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
 // Since the contents and required info will be different
 export const showPurchasePassSuccessModal = async (passOrderId) => {
   const userPass = await getUserPassOrderDetails(passOrderId);
+  const username = getUsernameFromUrl();
 
   Modal.success({
     width: 480,
@@ -172,7 +170,7 @@ export const showPurchasePassSuccessModal = async (passOrderId) => {
     title: 'Purchase Successful',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.passes
       )),
     content: (
@@ -298,6 +296,7 @@ export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
   const userEmail = getLocalUserDetails().email;
 
   const userPass = await getUserPassOrderDetails(passOrderId);
+  const username = getUsernameFromUrl();
 
   Modal.success({
     center: true,
@@ -307,7 +306,7 @@ export const showPurchasePassAndGetVideoSuccessModal = async (passOrderId) => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
     content: (
@@ -334,6 +333,7 @@ export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
   const userEmail = getLocalUserDetails().email;
 
   const userPass = await getUserPassOrderDetails(passOrderId);
+  const username = getUsernameFromUrl();
 
   Modal.success({
     center: true,
@@ -343,7 +343,7 @@ export const showGetVideoWithPassSuccessModal = async (passOrderId) => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
     content: (
@@ -367,6 +367,7 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
   const userEmail = getLocalUserDetails().email;
 
   const userVideo = await getUserVideoOrderDetails(videoOrderId);
+  const username = getUsernameFromUrl();
 
   Modal.success({
     width: 400,
@@ -377,7 +378,7 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
     content: (
@@ -399,6 +400,8 @@ export const showPurchaseSingleVideoSuccessModal = async (videoOrderId) => {
 export const showPurchaseSingleCourseSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
 
+  const username = getUsernameFromUrl();
+
   Modal.success({
     center: true,
     closable: true,
@@ -407,7 +410,7 @@ export const showPurchaseSingleCourseSuccessModal = () => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
       )),
     content: (
@@ -424,6 +427,8 @@ export const showPurchaseSingleCourseSuccessModal = () => {
 };
 
 export const showPurchaseSubscriptionSuccessModal = () => {
+  const username = getUsernameFromUrl();
+
   Modal.success({
     center: true,
     closable: true,
@@ -432,7 +437,7 @@ export const showPurchaseSubscriptionSuccessModal = () => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions
       )),
     content: (
@@ -447,6 +452,7 @@ export const showPurchaseSubscriptionSuccessModal = () => {
 
 export const showGetVideoWithSubscriptionSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
+  const username = getUsernameFromUrl();
 
   Modal.success({
     center: true,
@@ -456,7 +462,7 @@ export const showGetVideoWithSubscriptionSuccessModal = () => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos
       )),
     content: (
@@ -488,7 +494,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.defaultPath
       )),
     content: (
@@ -508,6 +514,7 @@ export const showBookSessionWithSubscriptionSuccessModal = async (inventoryId) =
 
 export const showGetCourseWithSubscriptionSuccessModal = () => {
   const userEmail = getLocalUserDetails().email;
+  const username = getUsernameFromUrl();
 
   Modal.success({
     center: true,
@@ -517,7 +524,7 @@ export const showGetCourseWithSubscriptionSuccessModal = () => {
     okText: 'Go To Dashboard',
     onOk: () =>
       (window.location.href = getDashboardUrl(
-        null,
+        username,
         Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses
       )),
     content: (
@@ -560,6 +567,8 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
       break;
   }
 
+  const username = getUsernameFromUrl();
+
   Modal.warning({
     center: true,
     closable: true,
@@ -571,7 +580,7 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
       </Paragraph>
     ),
     okText: 'Go To Dashboard',
-    onOk: () => (window.location.href = getDashboardUrl(null, Routes.attendeeDashboard.rootPath + targetSection)),
+    onOk: () => (window.location.href = getDashboardUrl(username, Routes.attendeeDashboard.rootPath + targetSection)),
     afterClose: resetBodyStyle,
   });
 };
@@ -582,6 +591,7 @@ export const showMemberUnapprovedJoinModal = async () => {
   if (reservedDomainName.includes(creatorUsername)) {
     showErrorModal('Something went wrong');
   } else {
+    // TODO: later change this to get creator details from LS
     const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
 
     if (creatorProfileData) {

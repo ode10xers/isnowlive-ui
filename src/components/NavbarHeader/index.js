@@ -11,7 +11,7 @@ import AuthModal from 'components/AuthModal';
 
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, reservedDomainName } from 'utils/helper';
+import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
@@ -173,7 +173,7 @@ const NavbarHeader = () => {
     }
   };
 
-  const username = window.location.hostname.split('.')[0];
+  const username = getUsernameFromUrl();
 
   useEffect(() => {
     //For some reason, sometimes the modals locks the scrolling of <body>

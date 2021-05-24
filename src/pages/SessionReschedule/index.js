@@ -12,7 +12,7 @@ import CreatorProfile from 'components/CreatorProfile';
 
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
-import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import { getDuration, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
 
 import styles from './styles.module.scss';
@@ -36,7 +36,7 @@ const SessionReschedule = () => {
 
   const location = useLocation();
   const { inventory_id = null, order_id = null, price = -1 } = parseQueryString(location.search);
-  const username = window.location.hostname.split('.')[0];
+  const username = getUsernameFromUrl();
 
   const getProfileDetails = useCallback(async () => {
     setIsLoading(true);

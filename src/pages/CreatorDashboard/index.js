@@ -20,7 +20,8 @@ import Audiences from 'pages/CreatorDashboard/Audiences';
 import AccountSettings from 'pages/CreatorDashboard/SiteSettings/AccountSettings';
 import Legals from 'pages/CreatorDashboard/SiteSettings/Legals';
 import Documents from 'pages/CreatorDashboard/Documents';
-import ExternalSiteSettings from 'pages/CreatorDashboard/ExternalSiteSettings';
+import Plugins from 'pages/CreatorDashboard/ExternalSiteSettings/Plugins';
+import CustomDomain from 'pages/CreatorDashboard/ExternalSiteSettings/CustomDomain';
 import MembersList from 'pages/CreatorDashboard/Members/MembersList';
 import MembersTags from 'pages/CreatorDashboard/AdvancedSettings/MembersTags';
 import MemberSettings from 'pages/CreatorDashboard/AdvancedSettings/MembersSettings';
@@ -49,7 +50,8 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.legals} component={Legals} />
       <Route exact path={match.url + Routes.creatorDashboard.documents} component={Documents} />
       <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
-      <Route exact path={match.url + Routes.creatorDashboard.externalSiteSettings} component={ExternalSiteSettings} />
+      <Route exact path={match.url + Routes.creatorDashboard.plugins} component={Plugins} />
+      <Route exact path={match.url + Routes.creatorDashboard.domains} component={CustomDomain} />
       <Route exact path={match.url + Routes.creatorDashboard.membersList} component={MembersList} />
       <Route exact path={match.url + Routes.creatorDashboard.membersTags} component={MembersTags} />
       <Route exact path={match.url + Routes.creatorDashboard.membersSettings} component={MemberSettings} />

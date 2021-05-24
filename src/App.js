@@ -5,10 +5,10 @@ import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
-import { getAuthCookie } from 'services/authCookie';
+import { getAuthCookie, setAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 import parseQueryString from 'utils/parseQueryString';
 
@@ -44,6 +44,7 @@ import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
+import { storeCreatorDetailsToLS } from 'utils/storage';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -71,12 +72,57 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
+  const [shouldFetchCreatorDetails, setShouldFetchCreatorDetails] = useState(true);
   const isWidget = isWidgetUrl() || isInIframeWidget();
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
+  let signupAuthToken =
+    window.location.search &&
+    window.location.search.includes('signupAuthToken=') &&
+    window.location.search.split('signupAuthToken=')[1];
+  if (signupAuthToken === '') {
+    signupAuthToken = false;
+  }
+
+  if (signupAuthToken) {
+    setAuthCookie(signupAuthToken);
+    http.setAuthToken(signupAuthToken);
+
+    window.location = window.location.origin + window.location.pathname;
+  }
+
+  // Logic to initially save creator details in LS
   useEffect(() => {
-    if (!isWidget) {
+    const currentDomain = window.location.hostname;
+
+    if (!isInCustomDomain()) {
+      setShouldFetchCreatorDetails(false);
+    } else {
+      if (shouldFetchCreatorDetails) {
+        const fetchCreatorDetailsForCustomDomain = async (customDomain) => {
+          console.log('Fetching creator details based on domain ', customDomain);
+
+          try {
+            const { status, data } = await apis.user.getCreatorDetailsByCustomDomain(customDomain);
+
+            if (isAPISuccess(status) && data) {
+              storeCreatorDetailsToLS(data);
+            }
+          } catch (error) {
+            console.error('Failed fetching creator details based on domain', error?.response?.data);
+          }
+
+          setShouldFetchCreatorDetails(false);
+        };
+
+        fetchCreatorDetailsForCustomDomain(currentDomain);
+      }
+    }
+  }, [shouldFetchCreatorDetails]);
+
+  useEffect(() => {
+    if (!isWidget && !signupAuthToken) {
       initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
@@ -88,7 +134,7 @@ function App() {
         }
       }
     }
-  }, [userDetails, cookieConsent, isWidget]);
+  }, [userDetails, cookieConsent, isWidget, signupAuthToken]);
 
   useEffect(() => {
     const removeUserState = () => {
@@ -101,8 +147,10 @@ function App() {
       try {
         const { data, status } = await apis.user.getProfile();
         if (isAPISuccess(status) && data) {
+          const authTokenData = data.auth_token ? data.auth_token : getAuthCookie();
+
           setUserAuthentication(true);
-          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+          setUserDetails({ ...data, auth_token: authTokenData });
           setTimeout(() => {
             setIsReadyToLoad(true);
           }, 100);
@@ -112,49 +160,41 @@ function App() {
       }
     };
 
-    if (!isWidget) {
-      const authToken = getAuthCookie();
-      if (authToken && authToken !== '') {
-        getUserDetails();
-      } else {
-        removeUserState();
-      }
-    } else if (isWidget) {
-      // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
-      if (authCode && authCode !== '') {
-        http.setAuthToken(authCode);
-        setAuthTokenInLS(authCode);
-        getUserDetails();
-      } else {
-        const tokenFromLS = getAuthTokenFromLS();
-        if (tokenFromLS) {
-          http.setAuthToken(tokenFromLS);
+    if (!signupAuthToken) {
+      if (!isWidget) {
+        const authToken = getAuthCookie();
+        if (authToken && authToken !== '') {
           getUserDetails();
         } else {
           removeUserState();
         }
+      } else if (isWidget) {
+        // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
+        if (authCode && authCode !== '') {
+          http.setAuthToken(authCode);
+          setAuthTokenInLS(authCode);
+          getUserDetails();
+        } else {
+          const tokenFromLS = getAuthTokenFromLS();
+          if (tokenFromLS) {
+            http.setAuthToken(tokenFromLS);
+            getUserDetails();
+          } else {
+            removeUserState();
+          }
+        }
+      } else {
+        setIsReadyToLoad(true);
       }
-    } else {
-      setIsReadyToLoad(true);
     }
-    // eslint-disable-next-line
-  }, [isWidget]);
 
-  if (!isReadyToLoad) {
+    // eslint-disable-next-line
+  }, [isWidget, signupAuthToken]);
+
+  if (!isReadyToLoad || signupAuthToken || shouldFetchCreatorDetails) {
     return <div>Loading...</div>;
   }
 
-  // if (isWidget && isReadyToLoad && publishedWidgets.includes(widgetType)) {
-  //   return (
-  //     <>
-  //       <PaymentPopup />
-  //       <EmbeddablePage widget={widgetType} />
-  //     </>
-  //   );
-  // }
-
-  // TODO: Right now these pages are accessible via the iframe widget
-  // Not sure if there will be any weird behaviors
   return (
     <>
       <PaymentPopup />
