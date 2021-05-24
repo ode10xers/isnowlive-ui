@@ -63,7 +63,7 @@ const UnlayerEmailEditor = React.forwardRef((props, ref) => {
   }
 
   const resetEditorContent = useCallback(() => {
-    if (ref.current) {
+    if (ref.current?.editor) {
       ref.current.editor.loadBlank(initialEditorBodyTemplate);
       ref.current.editor.setBodyValues(initialEditorBodyTemplate);
     }

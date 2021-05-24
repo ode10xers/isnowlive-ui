@@ -7,6 +7,7 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import FileUpload from 'components/FileUpload';
+import UnlayerEmailEditor from 'components/UnlayerEmailEditor';
 import { resetBodyStyle, showSuccessModal, showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
@@ -16,7 +17,6 @@ import { getLocalUserDetails } from 'utils/storage';
 import { sendCustomerEmailFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-import UnlayerEmailEditor from 'components/UnlayerEmailEditor';
 
 const { Title, Text } = Typography;
 const defaultTemplateKey = 'blank';
@@ -171,7 +171,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       title={<Title level={5}> Send email to audiences </Title>}
       visible={visible}
       centered={true}
-      onCancel={() => closeModal()}
+      onCancel={closeModal}
       footer={null}
       width={1080}
       afterClose={resetBodyStyle}
