@@ -63,8 +63,10 @@ const UnlayerEmailEditor = React.forwardRef((props, ref) => {
   }
 
   const resetEditorContent = useCallback(() => {
-    ref.current.editor.loadBlank(initialEditorBodyTemplate);
-    ref.current.editor.setBodyValues(initialEditorBodyTemplate);
+    if (ref.current) {
+      ref.current.editor.loadBlank(initialEditorBodyTemplate);
+      ref.current.editor.setBodyValues(initialEditorBodyTemplate);
+    }
   }, [ref]);
 
   const adjustEditorIframeMinWidth = () => {
@@ -84,7 +86,6 @@ const UnlayerEmailEditor = React.forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    console.log(ref);
     if (ref.current) {
       ref.current.resetEditorContent = resetEditorContent;
     }
