@@ -186,6 +186,14 @@ export default {
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
     sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
   },
+  newsletter: {
+    getCreatorEmailTemplates: () => http.get('/secure/creator/newsletter/templates'),
+    getEmailTemplateDetails: (templateId) => http.get(`/secure/creator/newsletter/templates/${templateId}`),
+    createEmailTemplate: (payload) => http.post('/secure/creator/newsletter/templates', payload),
+    updateEmailTemplate: (templateId, payload) =>
+      http.patch(`/secure/creator/newsletter/templates/${templateId}`, payload),
+    deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/templates/${templateId}`),
+  },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
