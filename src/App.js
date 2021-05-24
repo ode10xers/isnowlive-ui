@@ -198,7 +198,7 @@ function App() {
   return (
     <>
       <PaymentPopup />
-      <SendCustomerEmailModal />
+      {userDetails && userDetails.is_creator && <SendCustomerEmailModal />}
       <Router>
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (
           <EmbeddablePage widget={widgetType} />

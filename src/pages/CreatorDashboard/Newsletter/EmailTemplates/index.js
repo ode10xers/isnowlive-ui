@@ -10,9 +10,9 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import UnlayerEmailEditor from 'components/UnlayerEmailEditor';
 
 import { isAPISuccess } from 'utils/helper';
+import validationRules from 'utils/validation';
 
 import styles from './styles.module.scss';
-import validationRules from 'utils/validation';
 
 const { Title, Text } = Typography;
 
@@ -26,7 +26,7 @@ const EmailTemplates = () => {
   const [creatorEmailTemplates, setCreatorEmailTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(defaultTemplateKey);
 
-  const isCreating = useCallback(() => selectedTemplate === defaultTemplateKey, [selectedTemplate]);
+  const isCreating = useMemo(() => selectedTemplate === defaultTemplateKey, [selectedTemplate]);
 
   const loadDesignInEditor = (data) => {
     if (emailEditor.current) {
@@ -85,7 +85,7 @@ const EmailTemplates = () => {
   }, [fetchCreatorEmailTemplates]);
 
   useEffect(() => {
-    if (!isCreating()) {
+    if (!isCreating) {
       fetchEmailTemplateDesign(selectedTemplate);
     }
   }, [selectedTemplate, fetchEmailTemplateDesign, isCreating]);
@@ -105,7 +105,7 @@ const EmailTemplates = () => {
   const handleDeleteEmailTemplate = async () => {
     setIsLoading(true);
 
-    if (isCreating()) {
+    if (isCreating) {
       showErrorModal('Please select a template to delete!');
       return;
     }
@@ -149,19 +149,19 @@ const EmailTemplates = () => {
           template_html: htmlTemplate,
         };
 
-        const { status, data } = isCreating()
+        const { status, data } = isCreating
           ? await apis.newsletter.createEmailTemplate(payload)
           : await apis.newsletter.updateEmailTemplate(selectedTemplate, payload);
 
         if (isAPISuccess(status) && data) {
-          showSuccessModal(`Email template successfully ${isCreating() ? 'created' : 'updated'}`);
+          showSuccessModal(`Email template successfully ${isCreating ? 'created' : 'updated'}`);
           await fetchCreatorEmailTemplates();
           setSelectedTemplate(data.id);
           form.setFieldsValue({ ...form.getFieldsValue(), templateName: data?.name });
         }
       } catch (error) {
         showErrorModal(
-          `Failed to ${isCreating() ? 'create' : 'update'} email template`,
+          `Failed to ${isCreating ? 'create' : 'update'} email template`,
           error?.response?.data?.message || 'Something went wrong.'
         );
       }
@@ -218,7 +218,7 @@ const EmailTemplates = () => {
               <Col xs={24} md={12} lg={14}>
                 <Row gutter={[8, 8]} justify="end">
                   <Col xs={24} md={12}>
-                    <Form.Item hidden={isCreating()}>
+                    <Form.Item hidden={isCreating}>
                       <Popconfirm
                         arrowPointAtCenter
                         icon={<DeleteOutlined className={styles.danger} />}
@@ -237,7 +237,7 @@ const EmailTemplates = () => {
                   </Col>
                   <Col xs={24} md={12}>
                     <Button block type="primary" htmlType="submit">
-                      Save {isCreating() ? 'new' : 'changes to'} template
+                      Save {isCreating ? 'new' : 'changes to'} template
                     </Button>
                   </Col>
                 </Row>
