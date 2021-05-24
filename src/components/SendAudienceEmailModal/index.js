@@ -101,6 +101,9 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       setSelectedRecipients([]);
       setValidRecipients([]);
       setIsLoading(false);
+      if (emailEditor.current) {
+        emailEditor.current.resetEditorContent();
+      }
     }
     fetchCreatorEmailTemplates();
   }, [visible, form, recipients, fetchCreatorEmailTemplates]);
