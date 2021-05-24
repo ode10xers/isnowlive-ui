@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import EmailEditor from 'react-email-editor';
 
@@ -69,21 +69,32 @@ const UnlayerEmailEditor = React.forwardRef((props, ref) => {
     }
   }, [ref]);
 
-  const adjustEditorIframeMinWidth = () => {
+  const adjustEditorIframeMinSize = () => {
     const editorId = ref.current.editorId;
     const editorElement = document.getElementById(editorId);
     // NOTE: the Unlayer iframe has a default min-width value of 1024px
     // We can override it here to squish the iframe so it fits in the modal
     editorElement.querySelector('iframe').style.minWidth = '1024px';
-    editorElement.querySelector('iframe').style.minHeight = '640px';
+    editorElement.querySelector('iframe').style.minHeight = '700px';
   };
 
   const handleEditorLoad = () => {
-    adjustEditorIframeMinWidth();
-    // The Unlayer behaves weirdly that we have to loadDesign first
-    // Then reset it so that we can "apply" some default body values
-    ref.current.editor.loadDesign(emptyTemplate);
-    resetEditorContent();
+    /*
+      TODO: Find better way to solve this
+      The problem here is that for some reason, the second time
+      this component is mounted, this function is called too fast
+      while the ref is not yet set properly
+
+      Currently the solution is to delay the logic in this function
+      hoping that by the time it runs, the ref.current value is not null
+    */
+    setTimeout(() => {
+      adjustEditorIframeMinSize();
+      // The Unlayer behaves weirdly that we have to loadDesign first
+      // Then reset it so that we can "apply" some default body values
+      ref.current.editor.loadDesign(emptyTemplate);
+      resetEditorContent();
+    }, 2000);
   };
 
   useEffect(() => {
