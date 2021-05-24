@@ -220,8 +220,22 @@ export const creatorMenuItems = [
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,
-    mixPanelTag: creator.click.dashboard.externalSiteSettingsNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
+    children: [
+      {
+        order: 1,
+        key: 'plugins',
+        title: 'Plugins',
+        mixPanelTag: creator.click.dashboard.pluginsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.plugins,
+      },
+      {
+        order: 2,
+        key: 'domains',
+        title: 'Custom Domain',
+        mixPanelTag: creator.click.dashboard.domainsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.domains,
+      },
+    ],
   },
   {
     order: 17,

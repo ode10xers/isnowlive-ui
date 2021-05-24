@@ -6,7 +6,10 @@ const {
 
 export const mapUserToPendo = (userDetails) => {
   // in your authentication promise handler or callback
-  const isDev = window.location.origin.includes('localhost') || window.location.origin.includes('stage');
+  const isDev =
+    window.location.origin.includes('localhost') ||
+    window.location.origin.includes('stage') ||
+    process.env.REACT_APP_ENV !== 'production';
 
   const allowedStageEmail = 'felicia.karissa7';
 

@@ -1,0 +1,18 @@
+@import '../../../../styles/variables.scss';
+
+.inlineFormItem {
+  display: inline-block !important;
+  width: calc(50% - 12px);
+  max-width: 240px;
+  margin-bottom: 0 !important;
+}
+
+.inlineFormSeparator {
+  display: inline-block !important;
+  width: 12px;
+  height: 32px;
+  line-height: 44px;
+  text-align: center;
+}
+
+

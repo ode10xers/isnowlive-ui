@@ -9,42 +9,9 @@
     <link rel="apple-touch-icon" href="#" />
     <title>Do Your Passion | Turn your passion into your income</title>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-8MEXZ3978F"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-
-      gtag('config', 'G-8MEXZ3978F');
-    </script> -->
-    <!-- Google Analytics Snippet ENDS -->
-
-    <!-- Google Tag Manager
-  <script>
-    (function (w, d, s, l, i) {
-      const debug = true;
-      // Added check to filter dev data
-      // Set the above debug to true to override check
-      if (debug || !(window.location.origin.includes('localhost') || window.location.origin.includes('stage'))) {
-        w[l] = w[l] || [];
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
-      }
-    })(window, document, 'script', 'dataLayer', 'GTM-NN4B2HG');
-  </script>
-  End Google Tag Manager -->
-
     <!-- Google Tag Manager -->
     <script>
-      const isDev = window.location.origin.includes('localhost') || window.location.origin.includes('stage');
+      const isDev = window.location.origin.includes('localhost') || window.location.origin.includes('stage') || "%REACT_APP_ENV%" !== 'production';
 
       if (isDev) {
         // GTM Snippet for Staging Environment
@@ -91,7 +58,9 @@
     <!-- Hotjar Tracking Code for https://app.passion.do -->
     <script>
       (function (h, o, t, j, a, r) {
-        if (!(window.location.origin.includes('localhost') || window.location.origin.includes('stage'))) {
+        const isDev = window.location.origin.includes('localhost') || window.location.origin.includes('stage') || "%REACT_APP_ENV%" !== 'production';
+
+        if (!isDev) {
           h.hj =
             h.hj ||
             function () {

@@ -7,14 +7,14 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 
-import { isAPISuccess } from 'utils/helper';
+import { getUsernameFromUrl, isAPISuccess } from 'utils/helper';
 import { generateDefaultText } from 'utils/legals';
 
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
 
-const creatorUsername = window.location.hostname.split('.')[0];
+const creatorUsername = getUsernameFromUrl();
 
 const Legals = () => {
   const [isLoading, setIsLoading] = useState(false);

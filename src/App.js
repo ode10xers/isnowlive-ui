@@ -8,7 +8,7 @@ import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie, setAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 import parseQueryString from 'utils/parseQueryString';
 
@@ -44,6 +44,7 @@ import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
+import { storeCreatorDetailsToLS } from 'utils/storage';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -71,11 +72,14 @@ function App() {
     setUserDetails,
   } = useGlobalContext();
   const [isReadyToLoad, setIsReadyToLoad] = useState(false);
+  const [shouldFetchCreatorDetails, setShouldFetchCreatorDetails] = useState(true);
   const isWidget = isWidgetUrl() || isInIframeWidget();
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
-  let signupAuthToken = window.location.search && window.location.search.includes('signupAuthToken=') &&
+  let signupAuthToken =
+    window.location.search &&
+    window.location.search.includes('signupAuthToken=') &&
     window.location.search.split('signupAuthToken=')[1];
   if (signupAuthToken === '') {
     signupAuthToken = false;
@@ -87,6 +91,35 @@ function App() {
 
     window.location = window.location.origin + window.location.pathname;
   }
+
+  // Logic to initially save creator details in LS
+  useEffect(() => {
+    const currentDomain = window.location.hostname;
+
+    if (!isInCustomDomain()) {
+      setShouldFetchCreatorDetails(false);
+    } else {
+      if (shouldFetchCreatorDetails) {
+        const fetchCreatorDetailsForCustomDomain = async (customDomain) => {
+          console.log('Fetching creator details based on domain ', customDomain);
+
+          try {
+            const { status, data } = await apis.user.getCreatorDetailsByCustomDomain(customDomain);
+
+            if (isAPISuccess(status) && data) {
+              storeCreatorDetailsToLS(data);
+            }
+          } catch (error) {
+            console.error('Failed fetching creator details based on domain', error?.response?.data);
+          }
+
+          setShouldFetchCreatorDetails(false);
+        };
+
+        fetchCreatorDetailsForCustomDomain(currentDomain);
+      }
+    }
+  }, [shouldFetchCreatorDetails]);
 
   useEffect(() => {
     if (!isWidget && !signupAuthToken) {
@@ -114,8 +147,10 @@ function App() {
       try {
         const { data, status } = await apis.user.getProfile();
         if (isAPISuccess(status) && data) {
+          const authTokenData = data.auth_token ? data.auth_token : getAuthCookie();
+
           setUserAuthentication(true);
-          setUserDetails({ ...data, auth_token: data.auth_token ? data.auth_token : getAuthCookie() });
+          setUserDetails({ ...data, auth_token: authTokenData });
           setTimeout(() => {
             setIsReadyToLoad(true);
           }, 100);
@@ -152,24 +187,14 @@ function App() {
         setIsReadyToLoad(true);
       }
     }
+
     // eslint-disable-next-line
   }, [isWidget, signupAuthToken]);
 
-  if (!isReadyToLoad || signupAuthToken) {
+  if (!isReadyToLoad || signupAuthToken || shouldFetchCreatorDetails) {
     return <div>Loading...</div>;
   }
 
-  // if (isWidget && isReadyToLoad && publishedWidgets.includes(widgetType)) {
-  //   return (
-  //     <>
-  //       <PaymentPopup />
-  //       <EmbeddablePage widget={widgetType} />
-  //     </>
-  //   );
-  // }
-
-  // TODO: Right now these pages are accessible via the iframe widget
-  // Not sure if there will be any weird behaviors
   return (
     <>
       <PaymentPopup />
@@ -178,55 +203,55 @@ function App() {
         {isWidget && isReadyToLoad && publishedWidgets.includes(widgetType) ? (
           <EmbeddablePage widget={widgetType} />
         ) : (
-            <Switch>
-              <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
-              <PrivateRoute
-                layout={SideNavWithHeaderLayout}
-                path={Routes.attendeeDashboard.rootPath}
-                component={AttendeeDashboard}
+          <Switch>
+            <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
+            <PrivateRoute
+              layout={SideNavWithHeaderLayout}
+              path={Routes.attendeeDashboard.rootPath}
+              component={AttendeeDashboard}
+            />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
+            <PrivateRoute layout={DefaultLayout} path={Routes.paymentRetry} component={PaymentRetry} />
+            <PrivateRoute
+              layout={DefaultLayout}
+              exact
+              path={Routes.stripePaymentSuccess}
+              component={PaymentVerification}
+            />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} />
+            <RouteWithLayout
+              layout={NavbarLayout}
+              exact
+              path={Routes.courseSessionDetails}
+              component={SessionDetails}
+            />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.login} component={Login} />
+            <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
+            <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
+            <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
+            <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
+            <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
+            <Route path={Routes.stripeAccountValidate}>
+              <Redirect
+                to={{
+                  pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
+                  state: { validateAccount: true },
+                }}
               />
-              <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
-              <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
-              <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
-              <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
-              <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
-              <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
-              <PrivateRoute layout={DefaultLayout} path={Routes.paymentRetry} component={PaymentRetry} />
-              <PrivateRoute
-                layout={DefaultLayout}
-                exact
-                path={Routes.stripePaymentSuccess}
-                component={PaymentVerification}
-              />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} />
-              <RouteWithLayout
-                layout={NavbarLayout}
-                exact
-                path={Routes.courseSessionDetails}
-                component={SessionDetails}
-              />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.login} component={Login} />
-              <RouteWithLayout layout={DefaultLayout} exact path={Routes.adminLogin} component={AdminLogin} />
-              <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
-              <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
-              <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
-              <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
-              <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
-              <Route path={Routes.stripeAccountValidate}>
-                <Redirect
-                  to={{
-                    pathname: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
-                    state: { validateAccount: true },
-                  }}
-                />
-              </Route>
-            </Switch>
-          )}
+            </Route>
+          </Switch>
+        )}
       </Router>
       {/* {!isWidget && <CookieConsentPopup />} */}
     </>
