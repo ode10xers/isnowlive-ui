@@ -24,6 +24,7 @@ const DOMAIN = {
 // TODO: This component is currently hidden since some customers
 // are frightened by it. Once we add this back, don't forget to also adjust
 // App.js and services/globalContext.js
+// TODO: CHange NODE_ENV here later to REACT_APP_ENV
 const CookieConsentPopup = () => {
   const { setCookieConsent } = useGlobalContext();
 
