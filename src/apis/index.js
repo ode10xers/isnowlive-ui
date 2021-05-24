@@ -187,12 +187,12 @@ export default {
     sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
   },
   newsletter: {
-    getCreatorEmailTemplates: () => http.get('/secure/creator/newsletter/template'),
-    getEmailTemplateDetails: (templateId) => http.get(`/secure/creator/newsletter/template/${templateId}`),
-    createEmailTemplate: (payload) => http.post('/secure/creator/newsletter/template', payload),
+    getCreatorEmailTemplates: () => http.get('/secure/creator/newsletter/templates'),
+    getEmailTemplateDetails: (templateId) => http.get(`/secure/creator/newsletter/templates/${templateId}`),
+    createEmailTemplate: (payload) => http.post('/secure/creator/newsletter/templates', payload),
     updateEmailTemplate: (templateId, payload) =>
-      http.patch(`/secure/creator/newsletter/template/${templateId}`, payload),
-    deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/template/${templateId}`),
+      http.patch(`/secure/creator/newsletter/templates/${templateId}`, payload),
+    deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/templates/${templateId}`),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
