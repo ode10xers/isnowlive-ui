@@ -5,7 +5,7 @@ import apis from 'apis';
 import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
-import { getAuthCookie } from 'services/authCookie';
+import { getAuthCookie, setAuthCookie } from 'services/authCookie';
 import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
 import { isAPISuccess, isInCustomDomain } from 'utils/helper';
@@ -78,6 +78,21 @@ function App() {
   const windowLocation = window.location;
   const { authCode, widgetType } = parseQueryString(windowLocation.search);
 
+  let signupAuthToken =
+    window.location.search &&
+    window.location.search.includes('signupAuthToken=') &&
+    window.location.search.split('signupAuthToken=')[1];
+  if (signupAuthToken === '') {
+    signupAuthToken = false;
+  }
+
+  if (signupAuthToken) {
+    setAuthCookie(signupAuthToken);
+    http.setAuthToken(signupAuthToken);
+
+    window.location = window.location.origin + window.location.pathname;
+  }
+
   // Logic to initially save creator details in LS
   useEffect(() => {
     const currentDomain = window.location.hostname;
@@ -108,7 +123,7 @@ function App() {
   }, [shouldFetchCreatorDetails]);
 
   useEffect(() => {
-    if (!isWidget) {
+    if (!isWidget && !signupAuthToken) {
       initializeFreshChat(userDetails, cookieConsent);
 
       if (cookieConsent) {
@@ -120,7 +135,7 @@ function App() {
         }
       }
     }
-  }, [userDetails, cookieConsent, isWidget]);
+  }, [userDetails, cookieConsent, isWidget, signupAuthToken]);
 
   useEffect(() => {
     const removeUserState = () => {
@@ -146,36 +161,38 @@ function App() {
       }
     };
 
-    if (!isWidget) {
-      const authToken = getAuthCookie();
-      if (authToken && authToken !== '') {
-        getUserDetails();
-      } else {
-        removeUserState();
-      }
-    } else if (isWidget) {
-      // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
-      if (authCode && authCode !== '') {
-        http.setAuthToken(authCode);
-        setAuthTokenInLS(authCode);
-        getUserDetails();
-      } else {
-        const tokenFromLS = getAuthTokenFromLS();
-        if (tokenFromLS) {
-          http.setAuthToken(tokenFromLS);
+    if (!signupAuthToken) {
+      if (!isWidget) {
+        const authToken = getAuthCookie();
+        if (authToken && authToken !== '') {
           getUserDetails();
         } else {
           removeUserState();
         }
+      } else if (isWidget) {
+        // TODO: Below if block can be removed, once we verify that local storage solution works for all browser in iframe
+        if (authCode && authCode !== '') {
+          http.setAuthToken(authCode);
+          setAuthTokenInLS(authCode);
+          getUserDetails();
+        } else {
+          const tokenFromLS = getAuthTokenFromLS();
+          if (tokenFromLS) {
+            http.setAuthToken(tokenFromLS);
+            getUserDetails();
+          } else {
+            removeUserState();
+          }
+        }
+      } else {
+        setIsReadyToLoad(true);
       }
-    } else {
-      setIsReadyToLoad(true);
     }
 
     // eslint-disable-next-line
-  }, [isWidget]);
+  }, [isWidget, signupAuthToken]);
 
-  if (!isReadyToLoad || shouldFetchCreatorDetails) {
+  if (!isReadyToLoad || signupAuthToken || shouldFetchCreatorDetails) {
     return <div>Loading...</div>;
   }
 
