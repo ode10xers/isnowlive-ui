@@ -1,3 +1,5 @@
+// NOTE:
+
 let apiLoaderOverlay = document.createElement('div');
 
 function insertLoader() {
@@ -16,17 +18,30 @@ function insertLoader() {
 function showApiLoader() {
   apiLoaderOverlay.style.display = 'flex';
 }
-function hideApiLoad() {
+function hideApiLoader() {
   apiLoaderOverlay.style.display = 'none';
 }
 
-function showErrorSwal(title, msg) {
-  Swal.fire({
-    title: title || 'An error occured',
-    text: msg || 'Something wrong happened',
-    icon: 'error',
-    confirmButtonText: 'Okay',
-  });
+function pushGTMEvent(eName, eData) {
+  if (window.dataLayer && window.dataLayer.push) {
+    window.dataLayer.push({
+      event: eName,
+      ...eData,
+    });
+  }
+}
+
+function showErrorMessage(title, msg) {
+  if (Swal) {
+    Swal.fire({
+      title: title || 'An error occured',
+      text: msg || 'Something wrong happened',
+      icon: 'error',
+      confirmButtonText: 'Okay',
+    });
+  } else {
+    alert('An error occured!');
+  }
 }
 
 function closeModal(e) {
@@ -35,7 +50,6 @@ function closeModal(e) {
 
 const isProd = window.location.hostname.includes('passion.do');
 const apiBaseUrl = isProd ? 'https://api.app.passion.do' : 'https://stage.api.app.is-now.live';
-
 const successCodes = [200, 201, 204];
 
 function getJSONFromForm(e) {
@@ -61,15 +75,20 @@ async function sendPostRequest(apiPath, payload) {
   }
 }
 
-async function handleSignUpCreator(payload) {
+async function handleSignUpCreator(payload, ctaText) {
   showApiLoader();
   const response = await sendPostRequest('/user', payload);
 
   if (successCodes.includes(response.status)) {
+    pushGTMEvent('creator_signup', {
+      creator_email: response.email,
+      is_creator: true,
+      signup_cta_text: ctaText || 'NA',
+    });
     setAuthToken(response, true);
   } else {
     hideApiLoader();
-    showErrorSwal();
+    showErrorMessage();
   }
 }
 
@@ -79,12 +98,26 @@ async function handleLoginCreator(e) {
   if (successCodes.includes(response.status)) {
     setAuthToken(response);
   } else {
-    showErrorSwal();
+    showErrorMessage();
   }
 }
 
 function setAuthToken(userData, isSignup = false) {
   if (!userData) return;
+
+  pushGTMEvent('creator_login', {
+    creator_external_id: userData.external_id,
+    creator_email: userData.email,
+    creator_email_verified: userData.email_verified,
+    is_creator: userData.is_creator,
+    creator_first_name: userData.first_name,
+    creator_last_name: userData.last_name,
+    creator_username: userData.username || 'NA',
+    creator_profile_complete: userData.profile_complete,
+    creator_payment_account_status: userData.payment_account_status,
+    creator_payment_currency: userData.currency || 'NA',
+    creator_zoom_connected: userData.zoom_connected,
+  });
 
   if (userData.profile && userData.profile.custom_domain) {
     window.location.href = `https://${userData.profile.custom_domain}/creator/${
@@ -109,9 +142,9 @@ function initFormClickHandler() {
 
     const emailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if (payload.email.match(emailformat)) {
-      handleSignUpCreator(payload);
+      handleSignUpCreator(payload, e.innerText);
     } else {
-      showErrorSwal('Invalid Email', 'Enter correct email id');
+      showErrorMessage('Invalid Email', 'Enter correct email id');
     }
   });
   getElementsAndAttachEvent('[login-creator-handler-btn=true]', 'click', handleLoginCreator);

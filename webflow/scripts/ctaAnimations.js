@@ -1,9 +1,12 @@
-function validateEmailAndSignup(input, validation) {
+// NOTE: handleSignUpCreator is defined in another script (signup.js)
+
+function validateEmailAndSignup(input, validation, ctaText) {
+  console.log(input);
   if (!!input.value && input.validity.valid) {
     validation.innerText = '';
 
     const payload = { email: input.value, is_creator: true };
-    handleSignUpCreator(payload);
+    handleSignUpCreator(payload, ctaText);
   } else {
     validation.innerText = 'Enter correct email Id';
   }
@@ -61,15 +64,19 @@ let containers = document.getElementsByClassName('cta-animate-container');
 
   ctaButton.addEventListener('mouseover', showEmailInput);
 
-  ctaButton.addEventListener('click', () => {
-    validateEmailAndSignup(emailInput, emailValidationMsg);
+  ctaButton.addEventListener('click', (e) => {
+    validateEmailAndSignup(emailInput, emailValidationMsg, e.target.innerText);
   });
 
-  window.addEventListener('scroll', () => {
-    if (container.getBoundingClientRect().top < (window.outerWidth > 480 ? 500 : 440)) {
-      showEmailInput();
-    }
-  });
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (container.getBoundingClientRect().top < (window.outerWidth > 480 ? 500 : 440)) {
+        showEmailInput();
+      }
+    },
+    { passive: true }
+  );
 
   // Insert it in the container with style flex and two childs text input and button
   // Attach scroll event to button to show input
