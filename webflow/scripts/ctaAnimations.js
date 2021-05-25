@@ -1,3 +1,17 @@
+// NOTE: handleSignUpCreator is defined in another script (signup.js)
+
+function validateEmailAndSignup(input, validation, ctaText) {
+  console.log(input);
+  if (!!input.value && input.validity.valid) {
+    validation.innerText = '';
+
+    const payload = { email: input.value, is_creator: true };
+    handleSignUpCreator(payload, ctaText);
+  } else {
+    validation.innerText = 'Enter correct email Id';
+  }
+}
+
 let containers = document.getElementsByClassName('cta-animate-container');
 [...containers].forEach((container) => {
   let ctaButton = container.lastElementChild;
@@ -13,6 +27,10 @@ let containers = document.getElementsByClassName('cta-animate-container');
   emailInput.style.height = '0px';
   emailInput.style.border = 0;
   emailInput.style.padding = 0;
+
+  let emailValidationMsg = document.createElement('p');
+  emailValidationMsg.style.color = 'red';
+  emailValidationMsg.style.float = 'left';
 
   if (window.outerWidth > 480) {
     emailInput.style.transition = 'width 0.6s ease 0s';
@@ -42,13 +60,23 @@ let containers = document.getElementsByClassName('cta-animate-container');
   }
 
   container.prepend(emailInput);
+  container.insertAdjacentElement('afterend', emailValidationMsg);
 
   ctaButton.addEventListener('mouseover', showEmailInput);
-  window.addEventListener('scroll', () => {
-    if (container.getBoundingClientRect().top < (window.outerWidth > 480 ? 500 : 300)) {
-      showEmailInput();
-    }
+
+  ctaButton.addEventListener('click', (e) => {
+    validateEmailAndSignup(emailInput, emailValidationMsg, e.target.innerText);
   });
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (container.getBoundingClientRect().top < (window.outerWidth > 480 ? 500 : 440)) {
+        showEmailInput();
+      }
+    },
+    { passive: true }
+  );
 
   // Insert it in the container with style flex and two childs text input and button
   // Attach scroll event to button to show input
