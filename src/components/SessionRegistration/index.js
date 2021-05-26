@@ -729,7 +729,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             payment_order_id: data.pass_order_id,
             payment_order_type: orderType.PASS,
             follow_up_booking_info: {
-              productType: 'SESSION',
+              productType: productType.CLASS,
               productId: selectedInventory.inventory_id,
             },
           };

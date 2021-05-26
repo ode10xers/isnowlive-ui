@@ -45,6 +45,7 @@ import Legals from 'pages/Legals';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
 import { storeCreatorDetailsToLS } from 'utils/storage';
+import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -223,6 +224,7 @@ function App() {
               path={Routes.stripePaymentSuccess}
               component={PaymentVerification}
             />
+            <PrivateRoute layout={NavbarLayout} exact path={Routes.paymentConfirm} component={PaymentRedirectVerify} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />

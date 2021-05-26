@@ -36,7 +36,8 @@ export default {
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
       getDashboard: () => http.get('/secure/creator/profile/stripe/dashboard'),
     },
-    getAvailablePaymentMethods: () => http.get('/secure/customer/payment/available-method-types'),
+    getAvailablePaymentMethods: (currency) =>
+      http.get(`/secure/customer/payment/available-method-types?currency=${currency}`),
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),

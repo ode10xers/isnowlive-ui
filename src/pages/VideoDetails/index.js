@@ -348,7 +348,7 @@ const VideoDetails = ({ match }) => {
             payment_order_id: data.pass_order_id,
             payment_order_type: orderType.PASS,
             follow_up_booking_info: {
-              productType: 'VIDEO',
+              productType: productType.VIDEO,
               productId: video.external_id,
             },
           };

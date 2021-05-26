@@ -21,7 +21,14 @@ import {
 
 import dateUtil from 'utils/date';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
-import { orderType, paymentSource, isAPISuccess, isUnapprovedUserError, getUsernameFromUrl } from 'utils/helper';
+import {
+  orderType,
+  productType as productTypeConstants,
+  paymentSource,
+  isAPISuccess,
+  isUnapprovedUserError,
+  getUsernameFromUrl,
+} from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -252,17 +259,16 @@ const PaymentPopup = () => {
         const followUpBookingInfo = orderResponse.follow_up_booking_info;
 
         if (followUpBookingInfo) {
-          if (followUpBookingInfo.productType === 'VIDEO') {
+          if (followUpBookingInfo.productType === productTypeConstants.VIDEO) {
             const payload = {
               video_id: followUpBookingInfo.productId,
               payment_source: paymentSource.PASS,
               source_id: orderResponse.payment_order_id,
-
               user_timezone_location: getTimezoneLocation(),
             };
 
             await followUpGetVideo(payload);
-          } else if (followUpBookingInfo.productType === 'SESSION') {
+          } else if (followUpBookingInfo.productType === productTypeConstants.CLASS) {
             const payload = {
               inventory_id: followUpBookingInfo.productId,
               user_timezone_offset: new Date().getTimezoneOffset(),

@@ -9,8 +9,9 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import CardForm from 'components/Payment/CardForm';
 import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
-import RedirectToStripeCheckoutButton from 'components/Payment/RedirectToStripeCheckoutButton';
+// import RedirectToStripeCheckoutButton from 'components/Payment/RedirectToStripeCheckoutButton';
 import PaymentOptionsSelection, { paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
+import IDealPayment from 'components/Payment/IDealPayment';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -87,11 +88,11 @@ const PaymentOptionsWrapper = ({
     //eslint-disable-next-line
   }, [stripe]);
 
-  const fetchAvailablePaymentMethods = useCallback(async () => {
+  const fetchAvailablePaymentMethods = useCallback(async (currency) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.payment.getAvailablePaymentMethods();
+      const { status, data } = await apis.payment.getAvailablePaymentMethods(currency);
 
       if (isAPISuccess(status) && data) {
         // The data here should map to paymentMethodOptions
@@ -106,11 +107,11 @@ const PaymentOptionsWrapper = ({
 
   useEffect(() => {
     if (shouldFetchAvailablePaymentMethods) {
-      fetchAvailablePaymentMethods();
+      fetchAvailablePaymentMethods(creatorDetails.currency);
     } else {
       setAvailablePaymentOptions(defaultAvailablePaymentOptions);
     }
-  }, [shouldFetchAvailablePaymentMethods, fetchAvailablePaymentMethods]);
+  }, [shouldFetchAvailablePaymentMethods, fetchAvailablePaymentMethods, creatorDetails]);
 
   useEffect(() => {
     setupStripePaymentRequest();
@@ -144,26 +145,28 @@ const PaymentOptionsWrapper = ({
     },
     [paymentMethodOptions.ONLINE_BANKING.key]: {
       children: (
-        <RedirectToStripeCheckoutButton
-          onBeforePayment={handleBeforePayment}
-          methodName="Online Banking"
-          helperText="You’ll be redirected to a Stripe page to select from iDEAL, Sofort, Bancontact or Giro payment options"
-          paymentMethods={availablePaymentOptions.filter((payOption) =>
-            paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
-          )}
-        />
+        <IDealPayment onBeforePayment={handleBeforePayment} onAfterPayment={handleAfterPayment} />
+        // <RedirectToStripeCheckoutButton
+        //   onBeforePayment={handleBeforePayment}
+        //   methodName="Online Banking"
+        //   helperText="You’ll be redirected to a Stripe page to select from iDEAL, Sofort, Bancontact or Giro payment options"
+        //   paymentMethods={availablePaymentOptions.filter((payOption) =>
+        //     paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
+        //   )}
+        // />
       ),
     },
     [paymentMethodOptions.DEBIT.key]: {
       children: (
-        <RedirectToStripeCheckoutButton
-          onBeforePayment={handleBeforePayment}
-          methodName="Bank Debit"
-          helperText="You’ll be redirected to a Stripe page to select between SEPA or Bacs Direct Debit options"
-          paymentMethods={availablePaymentOptions.filter((payOption) =>
-            paymentMethodOptions.DEBIT.options.includes(payOption)
-          )}
-        />
+        <div></div>
+        //     <RedirectToStripeCheckoutButton
+        //       onBeforePayment={handleBeforePayment}
+        //       methodName="Bank Debit"
+        //       helperText="You’ll be redirected to a Stripe page to select between SEPA or Bacs Direct Debit options"
+        //       paymentMethods={availablePaymentOptions.filter((payOption) =>
+        //         paymentMethodOptions.DEBIT.options.includes(payOption)
+        //       )}
+        //     />
       ),
     },
   };
@@ -172,7 +175,7 @@ const PaymentOptionsWrapper = ({
     const paymentOptionsToShow = Object.entries(paymentMethodOptions)
       .filter(
         ([key, val]) =>
-          key !== paymentMethodOptions.WALLET.key &&
+          val.key !== paymentMethodOptions.WALLET.key &&
           val.options.some((option) => availablePaymentOptions.includes(option))
       )
       .map(([key, val]) => val);
