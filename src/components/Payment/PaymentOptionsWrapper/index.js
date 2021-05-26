@@ -10,12 +10,12 @@ import Loader from 'components/Loader';
 import CardForm from 'components/Payment/CardForm';
 import WalletPaymentButtons from 'components/Payment/WalletPaymentButtons';
 // import RedirectToStripeCheckoutButton from 'components/Payment/RedirectToStripeCheckoutButton';
-import PaymentOptionsSelection, { paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
-import IDealPayment from 'components/Payment/IDealPayment';
+import { PaymentOptionsSelection, paymentMethodOptions } from 'components/Payment/PaymentOptionsSelection';
 
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
+import BankRedirectPayments from '../BankRedirectPayments';
 
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -145,15 +145,13 @@ const PaymentOptionsWrapper = ({
     },
     [paymentMethodOptions.ONLINE_BANKING.key]: {
       children: (
-        <IDealPayment onBeforePayment={handleBeforePayment} onAfterPayment={handleAfterPayment} />
-        // <RedirectToStripeCheckoutButton
-        //   onBeforePayment={handleBeforePayment}
-        //   methodName="Online Banking"
-        //   helperText="You’ll be redirected to a Stripe page to select from iDEAL, Sofort, Bancontact or Giro payment options"
-        //   paymentMethods={availablePaymentOptions.filter((payOption) =>
-        //     paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
-        //   )}
-        // />
+        <BankRedirectPayments
+          options={availablePaymentOptions.filter((payOption) =>
+            paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
+          )}
+          onBeforePayment={handleBeforePayment}
+          onAfterPayment={handleAfterPayment}
+        />
       ),
     },
     [paymentMethodOptions.DEBIT.key]: {

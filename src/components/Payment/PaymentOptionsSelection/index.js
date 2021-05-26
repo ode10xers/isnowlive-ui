@@ -17,6 +17,45 @@ import styles from './styles.module.scss';
 
 // NOTE: Change this if the supported payment method constants
 // is changed in the BE
+
+export const BANK_REDIRECT_OPTIONS = {
+  BANCONTACT: {
+    key: 'bancontact',
+    label: 'Bancontact',
+    icon: null,
+  },
+  GIROPAY: {
+    key: 'giropay',
+    label: 'Giropay',
+    icon: <GiropayLogo className={styles.paymentIcon} />,
+  },
+  SOFORT: {
+    key: 'sofort',
+    label: 'SoFort',
+    icon: <KlarnaLogo className={styles.paymentIcon} />,
+  },
+  IDEAL: {
+    key: 'ideal',
+    label: 'iDeal',
+    icon: <IdealLogo className={styles.paymentIcon} />,
+  },
+  EPS: {
+    key: 'eps',
+    label: 'EPS',
+    icon: null,
+  },
+  FPX: {
+    key: 'fpx',
+    label: 'FPX',
+    icon: null,
+  },
+  P24: {
+    key: 'p24',
+    label: 'P24',
+    icon: null,
+  },
+};
+
 export const paymentMethodOptions = {
   CARD: {
     key: 'card_payment',
@@ -28,7 +67,7 @@ export const paymentMethodOptions = {
   },
   ONLINE_BANKING: {
     key: 'online_banking_payment',
-    options: ['bancontact', 'eps', 'fpx', 'giropay', 'ideal', 'sofort', 'p24'],
+    options: Object.entries(BANK_REDIRECT_OPTIONS).map(([key, val]) => val.key),
   },
   DEBIT: {
     key: 'debit_payment',
@@ -78,7 +117,7 @@ const paymentOptionsData = {
 
 const { Text } = Typography;
 
-const PaymentOptionsSelection = ({ paymentOptionKey, isActive = false, disabled = false }) => {
+export const PaymentOptionsSelection = ({ paymentOptionKey, isActive = false, disabled = false }) => {
   return (
     <Card
       className={classNames(
@@ -102,4 +141,26 @@ const PaymentOptionsSelection = ({ paymentOptionKey, isActive = false, disabled 
   );
 };
 
-export default PaymentOptionsSelection;
+export const BankRedirectOptionsSelection = ({ optionKey, isActive = false, disabled = false }) => {
+  const bankOption = Object.entries(BANK_REDIRECT_OPTIONS).find(([key, val]) => val.key === optionKey);
+
+  if (!bankOption) {
+    return null;
+  }
+
+  return (
+    <Card
+      className={classNames(
+        styles.paymentOptionCard,
+        disabled ? styles.disabled : isActive ? styles.active : undefined
+      )}
+      size="small"
+      hoverable={!disabled}
+    >
+      <Row gutter={[8, 4]} justify="space-around">
+        {!!bankOption[1].icon && <Col xs={6}>{bankOption[1].icon}</Col>}
+        <Col xs={18}>{bankOption[1].label}</Col>
+      </Row>
+    </Card>
+  );
+};
