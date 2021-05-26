@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useStripe } from '@stripe/react-stripe-js';
+import { useStripe, Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 import { Row } from 'antd';
 
-import Loader from 'components/Loader';
+import config from 'config';
 
-import dateUtil from 'utils/date';
-import parseQueryString from 'utils/parseQueryString';
-import { orderType, productType, paymentSource } from 'utils/helper';
-import { verifyPaymentForOrder } from 'utils/payment';
+import Loader from 'components/Loader';
 import {
   showBookSingleSessionSuccessModal,
   showErrorModal,
@@ -18,6 +16,11 @@ import {
   showPurchaseSingleVideoSuccessModal,
   showPurchaseSubscriptionSuccessModal,
 } from 'components/Modals/modals';
+
+import dateUtil from 'utils/date';
+import parseQueryString from 'utils/parseQueryString';
+import { verifyPaymentForOrder } from 'utils/payment';
+import { orderType, productType, paymentSource } from 'utils/helper';
 import { followUpBookSession, followUpGetVideo } from 'utils/orderHelper';
 
 // Taken from the link below
@@ -166,4 +169,19 @@ const PaymentRedirectVerify = () => {
   );
 };
 
-export default PaymentRedirectVerify;
+const WrappedPaymentRedirectVerify = () => {
+  const stripePromise = loadStripe(config.stripe.secretKey);
+
+  if (!stripePromise) {
+    console.error('Failed to load Stripe');
+    return null;
+  }
+
+  return (
+    <Elements stripe={stripePromise}>
+      <PaymentRedirectVerify />
+    </Elements>
+  );
+};
+
+export default WrappedPaymentRedirectVerify;
