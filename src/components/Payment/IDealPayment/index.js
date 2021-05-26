@@ -16,14 +16,30 @@ import { orderType } from 'utils/helper';
 const useOptions = () => {
   const options = useMemo(
     () => ({
+      classes: {
+        base: styles.StripeCustomElement,
+        invalid: styles.StripeCustomElementInvalid,
+        focus: styles.StripeCustomElementFocus,
+        complete: styles.StripeCustomElementComplete,
+      },
       style: {
         base: {
           padding: '10px 12px',
-          color: '#32325d',
-          fontSize: '16px',
-          '::placeholder': {
-            color: '#aab7c4',
-          },
+          iconColor: '#1890ff',
+          fontWeight: 400,
+          fontSize: '14px',
+          fontFamily:
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'",
+        },
+        // Ant Design's Red danger color
+        invalid: {
+          iconColor: '#ff4d4f',
+          color: '#ff4d4f',
+        },
+        // Our KellyGreen in colors.scss
+        complete: {
+          iconColor: '#52c41a',
+          color: '#52c41a',
         },
       },
     }),
@@ -66,7 +82,7 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
   }, [buyerName, paymentPopupVisible, form]);
 
   const handleIdealBankChange = (event) => {
-    setIsButtonDisabled(!event.empty && event.complete);
+    setIsButtonDisabled(event.empty || !event.complete);
   };
 
   const handleFinish = async (values) => {
@@ -168,7 +184,7 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
       <Row gutter={[8, 16]} justify="center">
         <Col xs={24}>
           {/* Stripe Component */}
-          <IdealBankElement options={options} onChange={handleIdealBankChange} />
+          <IdealBankElement disabled={!stripe} options={options} onChange={handleIdealBankChange} />
         </Col>
         <Col xs={24}>
           {/* Name input component  */}

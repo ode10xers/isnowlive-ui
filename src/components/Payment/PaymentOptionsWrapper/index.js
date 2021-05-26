@@ -230,6 +230,7 @@ const PaymentOptionsWrapper = ({
         </Col>
         <Col xs={24}>
           <Tabs
+            className={styles.paymentOptionsContainer}
             activeKey={selectedPaymentOption}
             onChange={setSelectedPaymentOption}
             renderTabBar={handleCustomTabBarRender}
