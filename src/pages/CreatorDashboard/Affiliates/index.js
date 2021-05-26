@@ -16,7 +16,7 @@ const {
   formatDate: { toLongDateWithDayTime },
 } = dateUtil;
 
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 const Affiliates = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -64,16 +64,6 @@ const Affiliates = () => {
       title: 'Referred Person',
       key: 'name',
       dataIndex: 'name',
-      render: (text, record) => {
-        return {
-          props: {
-            style: {
-              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
-            },
-          },
-          children: <Text> {record?.name} </Text>,
-        };
-      },
     },
     {
       title: 'Joining Date',
