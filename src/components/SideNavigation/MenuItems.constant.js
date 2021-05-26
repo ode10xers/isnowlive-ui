@@ -276,11 +276,11 @@ export const creatorMenuItems = [
   {
     order: 18,
     is_button: false,
-    key: 'affiliate',
-    title: 'Affiliate Dashboard',
+    key: 'referrals',
+    title: 'Referral Dashboard',
     icon: <AuditOutlined />,
-    mixPanelTag: creator.click.dashboard.affiliateNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.affiliate,
+    mixPanelTag: creator.click.dashboard.referralNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.referral,
   },
 ];
 

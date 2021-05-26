@@ -50,7 +50,7 @@ const Routes = {
     domains: '/domains',
     membersSettings: '/members/settings',
     membersTags: '/members/tag',
-    affiliate: '/affiliate',
+    referral: '/referral',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',

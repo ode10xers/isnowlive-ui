@@ -17,9 +17,9 @@ const {
 const { Title } = Typography;
 const { Panel } = Collapse;
 
-const Affiliate = () => {
+const Referral = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [affiliateData, setRefData] = useState([]);
+  const [referralData, setReferralData] = useState([]);
 
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
@@ -28,7 +28,7 @@ const Affiliate = () => {
     if (expandedPublishedRowKeys.length > 0) {
       setExpandedPublishedRowKeys([]);
     } else {
-      setExpandedPublishedRowKeys(affiliateData?.filter((affiliate) => affiliate).map((affiliate) => affiliate.id));
+      setExpandedPublishedRowKeys(referralData?.filter((affiliate) => affiliate).map((affiliate) => affiliate.id));
     }
   };
 
@@ -45,7 +45,7 @@ const Affiliate = () => {
     if (expandedUnpublishedRowKeys.length > 0) {
       setExpandedUnpublishedRowKeys([]);
     } else {
-      setExpandedUnpublishedRowKeys(affiliateData?.filter((affiliate) => !affiliate).map((affiliate) => affiliate.id));
+      setExpandedUnpublishedRowKeys(referralData?.filter((affiliate) => !affiliate).map((affiliate) => affiliate.id));
     }
   };
 
@@ -64,10 +64,10 @@ const Affiliate = () => {
       const { status, data } = await apis.referrals.getCreatorRefData();
 
       if (isAPISuccess(status) && data) {
-        setRefData(data.attendees);
+        setReferralData(data.attendees);
       }
     } catch (error) {
-      showErrorModal('Failed fetching affiliate Data', error.response?.data?.message || 'Something went wrong');
+      showErrorModal('Failed fetching referral Data', error.response?.data?.message || 'Something went wrong');
     }
 
     setIsLoading(false);
@@ -153,14 +153,14 @@ const Affiliate = () => {
     <div className={styles.box}>
       <Row gutter={[8, 8]}>
         <Col xs={12} md={14} lg={18}>
-          <Title level={4}> Affiliates </Title>
+          <Title level={4}> Referrals </Title>
         </Col>
         <Col xs={24}>
           <Collapse defaultActiveKey="Published">
-            <Panel header={<Title level={5}> List of all Affiliates </Title>} key="Published">
-              {affiliateData?.length ? (
+            <Panel header={<Title level={5}> List of all Referrals </Title>} key="Published">
+              {referralData?.length ? (
                 isMobileDevice ? (
-                  <Loader loading={isLoading} size="large" text="Loading affiliateData">
+                  <Loader loading={isLoading} size="large" text="Loading referral data">
                     <Row gutter={[8, 16]}>
                       <Col xs={24}>
                         <Button block ghost type="primary" onClick={() => toggleExpandAllPublished()}>
@@ -174,7 +174,7 @@ const Affiliate = () => {
                     sticky={true}
                     size="small"
                     columns={generateAffiliateColumns(true)}
-                    data={affiliateData?.filter((affiliate) => affiliate)}
+                    data={referralData?.filter((affiliate) => affiliate)}
                     loading={isLoading}
                     rowKey={(record) => record.id}
                     expandable={{
@@ -196,4 +196,4 @@ const Affiliate = () => {
   );
 };
 
-export default Affiliate;
+export default Referral;
