@@ -16,6 +16,8 @@ import {
   Html5Outlined,
   TeamOutlined,
   ControlOutlined,
+  ApartmentOutlined,
+  PartitionOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -278,9 +280,18 @@ export const creatorMenuItems = [
     is_button: false,
     key: 'referrals',
     title: 'Referral Dashboard',
-    icon: <AuditOutlined />,
+    icon: <ApartmentOutlined />,
     mixPanelTag: creator.click.dashboard.referralNav,
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.referral,
+  },
+  {
+    order: 19,
+    is_button: false,
+    key: 'affiliates',
+    title: 'Affiliates Dashboard',
+    icon: <PartitionOutlined />,
+    mixPanelTag: creator.click.dashboard.affiliateNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.affiliates,
   },
 ];
 
@@ -343,7 +354,7 @@ export const attendeeMenuItems = [
     order: 6,
     key: 'referrals',
     title: 'Referrals',
-    icon: <ScheduleOutlined />,
+    icon: <PartitionOutlined />,
     mixPanelTag: attendee.click.dashboard.referralsNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.referrals,
   },
