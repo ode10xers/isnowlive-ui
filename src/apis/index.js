@@ -26,6 +26,8 @@ export default {
     getCreatorUserPreferences: () => http.get('/secure/creator/settings'),
     sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
     confirmCreatorPaymentStatusUpdated: (payload) => http.put('/secure/creator/settings/ga', payload),
+    getCreatorDetailsByCustomDomain: (customDomain) => http.get(`/domain/${customDomain}/creator-profile`),
+    updateCustomDomainForCreator: (payload) => http.post('/secure/creator/profile/custom-domain', payload),
   },
   payment: {
     stripe: {
@@ -136,6 +138,9 @@ export default {
     publishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/publish`),
     unpublishCoupon: (couponId) => http.post(`/secure/creator/coupons/${couponId}/unpublish`),
     validateCourseCoupon: (payload) => http.post('/secure/customer/promotions/validate/course', payload),
+    validateSessionCoupon: (payload) => http.post('/secure/customer/promotions/validate/session', payload),
+    validateVideoCoupon: (payload) => http.post('/secure/customer/promotions/validate/video', payload),
+    validatePassCoupon: (payload) => http.post('/secure/customer/promotions/validate/pass', payload),
   },
   subscriptions: {
     createSubscription: (payload) => http.post('/secure/creator/subscription', payload),
@@ -182,6 +187,14 @@ export default {
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
     sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
   },
+  newsletter: {
+    getCreatorEmailTemplates: () => http.get('/secure/creator/newsletter/templates'),
+    getEmailTemplateDetails: (templateId) => http.get(`/secure/creator/newsletter/templates/${templateId}`),
+    createEmailTemplate: (payload) => http.post('/secure/creator/newsletter/templates', payload),
+    updateEmailTemplate: (templateId, payload) =>
+      http.patch(`/secure/creator/newsletter/templates/${templateId}`, payload),
+    deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/templates/${templateId}`),
+  },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),
     createDocument: (payload) => http.post('/secure/creator/documents', payload),
@@ -191,5 +204,10 @@ export default {
     updateLegals: (payload) => http.patch('/secure/creator/legal', payload),
     getCreatorLegals: () => http.get('/secure/creator/legal'),
     getLegalsByCreatorUsername: (creatorUsername) => http.get(`/creator/${creatorUsername}/legal`),
+  },
+  referrals: {
+    getCustomerRefCode: () => http.get('/secure/customer/referral/code'),
+    getCustomerRefData: () => http.get('/secure/customer/referral'),
+    getCreatorRefData: () => http.get('/secure/creator/referral'),
   },
 };

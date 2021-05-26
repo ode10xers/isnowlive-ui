@@ -12,10 +12,11 @@ import CreatorProfile from 'components/CreatorProfile';
 
 import { isMobileDevice } from 'utils/device';
 import dateUtil from 'utils/date';
-import { getDuration, generateUrlFromUsername } from 'utils/helper';
+import { getDuration, generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import parseQueryString from 'utils/parseQueryString';
 
 import styles from './styles.module.scss';
+import { redirectToInventoryPage } from 'utils/redirect';
 
 const { Title, Text } = Typography;
 
@@ -35,13 +36,7 @@ const SessionReschedule = () => {
 
   const location = useLocation();
   const { inventory_id = null, order_id = null, price = -1 } = parseQueryString(location.search);
-  const username = window.location.hostname.split('.')[0];
-
-  const openSessionInventoryDetails = (item) => {
-    if (item.username && item.inventory_id) {
-      window.open(`${generateUrlFromUsername(item.username)}/e/${item.inventory_id}`);
-    }
-  };
+  const username = getUsernameFromUrl();
 
   const getProfileDetails = useCallback(async () => {
     setIsLoading(true);
@@ -274,7 +269,7 @@ const SessionReschedule = () => {
     return (
       <Card
         className={styles.card}
-        onClick={() => openSessionInventoryDetails(item)}
+        onClick={() => redirectToInventoryPage(item)}
         title={
           <div style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}>
             <Text>{item.name}</Text>

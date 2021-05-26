@@ -16,11 +16,13 @@ class HttpService {
     this.baseURL = config.server.baseURL;
     this.authToken = getAuthCookie() || '';
 
+    const creatorUsername = getCreatorUsernameForHeader() || '';
+
     this.axios = axios.create({
       baseURL: this.baseURL,
       headers: {
         'auth-token': this.authToken,
-        'creator-username': getCreatorUsernameForHeader(),
+        'creator-username': creatorUsername,
       },
     });
 
@@ -28,6 +30,8 @@ class HttpService {
       (response) => response,
       (error) => {
         const { status } = error.response;
+        // TODO: Explore what to do when unauthorized in widget view
+        // Since sometimes this causes infinite loading
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
@@ -57,6 +61,7 @@ class HttpService {
       (response) => response,
       (error) => {
         const { status } = error.response;
+
         if (status === UNAUTHORIZED) {
           localStorage.removeItem('user-details');
           deleteAuthCookie();

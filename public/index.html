@@ -9,42 +9,12 @@
     <link rel="apple-touch-icon" href="#" />
     <title>Do Your Passion | Turn your passion into your income</title>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-8MEXZ3978F"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
-
-      gtag('config', 'G-8MEXZ3978F');
-    </script> -->
-    <!-- Google Analytics Snippet ENDS -->
-
-    <!-- Google Tag Manager
-  <script>
-    (function (w, d, s, l, i) {
-      const debug = true;
-      // Added check to filter dev data
-      // Set the above debug to true to override check
-      if (debug || !(window.location.origin.includes('localhost') || window.location.origin.includes('stage'))) {
-        w[l] = w[l] || [];
-        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-        var f = d.getElementsByTagName(s)[0],
-          j = d.createElement(s),
-          dl = l != 'dataLayer' ? '&l=' + l : '';
-        j.async = true;
-        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-        f.parentNode.insertBefore(j, f);
-      }
-    })(window, document, 'script', 'dataLayer', 'GTM-NN4B2HG');
-  </script>
-  End Google Tag Manager -->
-
     <!-- Google Tag Manager -->
     <script>
-      const isDev = window.location.origin.includes('localhost') || window.location.origin.includes('stage');
+      const isDev =
+        window.location.origin.includes('localhost') ||
+        window.location.origin.includes('stage') ||
+        '%REACT_APP_ENV%' !== 'production';
 
       if (isDev) {
         // GTM Snippet for Staging Environment
@@ -90,34 +60,27 @@
 
     <!-- Hotjar Tracking Code for https://app.passion.do -->
     <script>
-      (function (h, o, t, j, a, r) {
-        if (!(window.location.origin.includes('localhost') || window.location.origin.includes('stage'))) {
-          h.hj =
-            h.hj ||
-            function () {
-              (h.hj.q = h.hj.q || []).push(arguments);
-            };
-          h._hjSettings = { hjid: 2179259, hjsv: 6 };
-          a = o.getElementsByTagName('head')[0];
-          r = o.createElement('script');
-          r.async = 1;
-          r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
-          a.appendChild(r);
-        }
-      })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
-    </script>
+      // (function (h, o, t, j, a, r) {
+      //   const isDev =
+      //     window.location.origin.includes('localhost') ||
+      //     window.location.origin.includes('stage') ||
+      //     '%REACT_APP_ENV%' !== 'production';
 
-    <!-- Pendo Code Snippet -->
-    <script>
-    (function(apiKey){
-        (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=o._q||[];
-        v=['initialize','identify','updateOptions','pageLoad','track'];for(w=0,x=v.length;w<x;++w)(function(m){
-            o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
-            y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
-            z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
-    })('acef271a-fd73-4eec-7d06-fdd04b5e9478');
+      //   if (!isDev) {
+      //     h.hj =
+      //       h.hj ||
+      //       function () {
+      //         (h.hj.q = h.hj.q || []).push(arguments);
+      //       };
+      //     h._hjSettings = { hjid: 2179259, hjsv: 6 };
+      //     a = o.getElementsByTagName('head')[0];
+      //     r = o.createElement('script');
+      //     r.async = 1;
+      //     r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
+      //     a.appendChild(r);
+      //   }
+      // })(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
     </script>
-    <!-- Pendo Code Snippet Ends -->
   </head>
 
   <body>

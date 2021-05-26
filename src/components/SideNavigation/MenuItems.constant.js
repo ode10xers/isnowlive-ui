@@ -189,8 +189,22 @@ export const creatorMenuItems = [
     key: 'newsletter',
     title: 'Newsletter',
     icon: <AuditOutlined />,
-    mixPanelTag: creator.click.dashboard.newsletterNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.newsletter,
+    children: [
+      {
+        order: 1,
+        key: 'audience_list',
+        title: 'Audience List',
+        mixPanelTag: creator.click.dashboard.audienceListNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.audiences,
+      },
+      {
+        order: 2,
+        key: 'email_templates',
+        title: 'Email Templates',
+        mixPanelTag: creator.click.dashboard.emailTemplatesNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.emailTemplates,
+      },
+    ],
   },
   {
     order: 15,
@@ -220,8 +234,22 @@ export const creatorMenuItems = [
     key: 'external_site_setting',
     title: 'External Site Settings',
     icon: <Html5Outlined />,
-    mixPanelTag: creator.click.dashboard.externalSiteSettingsNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.externalSiteSettings,
+    children: [
+      {
+        order: 1,
+        key: 'plugins',
+        title: 'Plugins',
+        mixPanelTag: creator.click.dashboard.pluginsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.plugins,
+      },
+      {
+        order: 2,
+        key: 'domains',
+        title: 'Custom Domain',
+        mixPanelTag: creator.click.dashboard.domainsNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.domains,
+      },
+    ],
   },
   {
     order: 17,
@@ -244,6 +272,15 @@ export const creatorMenuItems = [
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.membersTags,
       },
     ],
+  },
+  {
+    order: 18,
+    is_button: false,
+    key: 'affiliate',
+    title: 'Affiliate Dashboard',
+    icon: <AuditOutlined />,
+    mixPanelTag: creator.click.dashboard.affiliateNav,
+    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.affiliate,
   },
 ];
 
@@ -301,5 +338,13 @@ export const attendeeMenuItems = [
     icon: <ScheduleOutlined />,
     mixPanelTag: attendee.click.dashboard.subscriptionsNav,
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions,
+  },
+  {
+    order: 6,
+    key: 'referrals',
+    title: 'Referrals',
+    icon: <ScheduleOutlined />,
+    mixPanelTag: attendee.click.dashboard.referralsNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.referrals,
   },
 ];

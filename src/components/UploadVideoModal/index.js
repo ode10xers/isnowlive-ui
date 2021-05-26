@@ -139,7 +139,7 @@ const UploadVideoModal = ({
     setVideoUploadPercent(result);
   });
 
-  const setUppyListeners = (external_id) => {
+  const updateUppyListeners = (external_id) => {
     if (uppy.current) {
       // Set the upload URL
       uppy.current.getPlugin('Tus').setOptions({
@@ -147,7 +147,7 @@ const UploadVideoModal = ({
       });
 
       // Set the on complete listener
-      uppy.current.on('complete', (result) => {
+      uppy.current.on('complete', async (result) => {
         if (result.successful.length) {
           apis.videos
             .getVideoToken(external_id)
@@ -180,6 +180,13 @@ const UploadVideoModal = ({
     setVideoUploadPercent(0);
     setUploadingFile(null);
   });
+
+  const removeUppyListeners = () => {
+    if (uppy.current) {
+      const eventNames = ['complete', 'cancel-all', 'progress', 'file-added'];
+      eventNames.forEach((eventName) => uppy.current.off(eventName));
+    }
+  };
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -242,7 +249,7 @@ const UploadVideoModal = ({
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
 
-        setUppyListeners(editedVideo.external_id);
+        updateUppyListeners(editedVideo.external_id);
       } else {
         form.resetFields();
       }
@@ -261,7 +268,7 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
-      uppy.current = null;
+      removeUppyListeners();
       resetBodyStyle();
     };
     //eslint-disable-next-line
@@ -394,44 +401,9 @@ const UploadVideoModal = ({
               showErrorModal(`Failed to get video token`);
             });
         } else {
-          setUppyListeners(response.data.external_id);
+          updateUppyListeners(response.data.external_id);
           setFormPart(2);
         }
-        /*
-        if (response.data) {
-          if (response.data.video_uid.length) {
-            apis.videos
-              .getVideoToken(response.data.external_id)
-              .then((res) => {
-                setVideoPreviewToken(res.data.token);
-                setFormPart(3);
-              })
-              .catch((error) => {
-                console.log(error);
-                showErrorModal(`Failed to get video token`);
-              });
-          } else {
-            setUppyListeners(response.data.external_id);
-            setFormPart(2);
-          }
-        } else {
-          if (editedVideo.video_uid.length) {
-            apis.videos
-              .getVideoToken(editedVideo.external_id)
-              .then((res) => {
-                setVideoPreviewToken(res.data.token);
-                setFormPart(3);
-              })
-              .catch((error) => {
-                console.log(error);
-                showErrorModal(`Failed to get video token`);
-              });
-          } else {
-            setUppyListeners(editedVideo.external_id);
-            setFormPart(2);
-          }
-        }
-        */
       }
     } catch (error) {
       showErrorModal(
@@ -854,7 +826,7 @@ const UploadVideoModal = ({
                   <Popconfirm
                     arrowPointAtCenter
                     title={<Text> Are you sure you want to cancel the video upload? </Text>}
-                    onConfirm={() => cancelUpload()}
+                    onConfirm={cancelUpload}
                     okText="Yes, Cancel the Upload"
                     okButtonProps={{ danger: true, type: 'primary' }}
                     cancelText="No"

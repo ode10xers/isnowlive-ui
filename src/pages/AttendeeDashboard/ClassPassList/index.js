@@ -142,19 +142,19 @@ const ClassPassList = () => {
   const collapseExpiredRow = (rowKey) =>
     setExpandedExpiredRowKeys(expandedExpiredRowKeys.filter((key) => key !== rowKey));
 
-  const passesColumns = [
+  const generatePassesColumns = (isExpired) => [
     {
       title: 'Pass Name',
       dataIndex: 'name',
       key: 'name',
-      width: '35%',
+      // width: '35%',
     },
     {
       title: 'Credit Left',
       dataIndex: 'class_count',
       key: 'class_count',
       align: 'right',
-      width: '15%',
+      width: '160px',
       render: (text, record) =>
         record.limited ? `${record.classes_remaining}/${record.class_count} Credits` : 'Unlimited Credits',
     },
@@ -163,7 +163,7 @@ const ClassPassList = () => {
       dataIndex: 'expiry',
       key: 'expiry',
       align: 'center',
-      width: '18%',
+      width: '120px',
       render: (text, record) => toShortDate(record.expiry),
     },
     {
@@ -171,14 +171,25 @@ const ClassPassList = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'left',
-      width: '18%',
+      width: '100px',
       render: (text, record) => (record.price > 0 ? `${record.price} ${record.currency.toUpperCase()}` : 'Free'),
     },
     {
-      title: '',
+      title: (
+        <Button
+          block
+          ghost
+          type="primary"
+          onClick={isExpired ? toggleExpandAllExpiredPasses : toggleExpandAllActivePasses}
+        >
+          {(isExpired && expandedExpiredRowKeys.length > 0) || expandedActiveRowKeys.length > 0 ? 'Collapse' : 'Expand'}{' '}
+          All
+        </Button>
+      ),
       align: 'right',
+      width: '140px',
       render: (text, record) =>
-        record.expired ? (
+        isExpired ? (
           expandedExpiredRowKeys.includes(record.pass_order_id) ? (
             <Button type="link" onClick={() => collapseExpiredRow(record.pass_order_id)} icon={<UpOutlined />}>
               Close
@@ -236,7 +247,7 @@ const ClassPassList = () => {
     );
 
     return (
-      <div>
+      <Col key={pass.pass_order_id}>
         <Card
           className={styles.card}
           title={<Text>{pass.name}</Text>}
@@ -306,7 +317,7 @@ const ClassPassList = () => {
             )}
           </Row>
         )}
-      </div>
+      </Col>
     );
   };
 
@@ -319,22 +330,16 @@ const ClassPassList = () => {
         <Col xs={24}>
           <Collapse defaultActiveKey="Active">
             <Panel header={<Title level={5}> Active Passes </Title>} key="Active">
-              <Row gutter={8}>
-                <Col xs={24} md={16} lg={19}></Col>
-                <Col xs={24} md={8} lg={5}>
-                  <Button block shape="round" type="primary" onClick={() => toggleExpandAllActivePasses()}>
-                    {expandedActiveRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                  </Button>
-                </Col>
+              <Row gutter={[8, 8]}>
                 <Col xs={24}>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Active Passes">
-                      {passes.map(renderPassItem)}
+                      <Row gutter={[8, 8]}>{passes.map(renderPassItem)}</Row>
                     </Loader>
                   ) : (
                     <Table
                       sticky={true}
-                      columns={passesColumns}
+                      columns={generatePassesColumns(false)}
                       data={passes}
                       loading={isLoading}
                       rowKey={(record) => record.pass_order_id}
@@ -350,22 +355,16 @@ const ClassPassList = () => {
               </Row>
             </Panel>
             <Panel header={<Title level={5}> Expired Passes </Title>} key="Expired">
-              <Row gutter={8}>
-                <Col xs={24} md={16} lg={19}></Col>
-                <Col xs={24} md={8} lg={5}>
-                  <Button block shape="round" type="primary" onClick={() => toggleExpandAllExpiredPasses()}>
-                    {expandedExpiredRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-                  </Button>
-                </Col>
+              <Row gutter={[8, 8]}>
                 <Col xs={24}>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Expired Passes">
-                      {expiredPasses.map(renderPassItem)}
+                      <Row gutter={[8, 8]}>{expiredPasses.map(renderPassItem)}</Row>
                     </Loader>
                   ) : (
                     <Table
                       sticky={true}
-                      columns={passesColumns}
+                      columns={generatePassesColumns(true)}
                       data={expiredPasses}
                       loading={isLoading}
                       rowKey={(record) => record.pass_order_id}

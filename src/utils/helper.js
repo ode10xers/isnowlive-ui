@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { message } from 'antd';
 import dateUtil from 'utils/date';
-import { getLocalUserDetails } from './storage';
+import { getCreatorDetailsInLS, getLocalUserDetails } from './storage';
 
 const {
   formatDate: { getTimeDiff },
@@ -13,22 +13,32 @@ const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing thi
 export const isUnapprovedUserError = (errorResponse) =>
   errorResponse.status === FORBIDDEN && errorResponse.data?.message === UNAPPROVED_USER_ERROR_MESSAGE;
 
+export const isInCustomDomain = () =>
+  !window.location.hostname.includes('passion.do') && !window.location.hostname.includes('localhost');
+
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
-export const getUsernameFromUrl = () => window.location.hostname.split('.')[0] || 'app';
+export const getUsernameFromUrl = () => {
+  if (isInCustomDomain()) {
+    // If in a custom domain
+    return getCreatorDetailsInLS()?.username || 'app';
+  }
+
+  return window.location.hostname.split('.')[0] || 'app';
+};
 
 export const getCreatorUsernameForHeader = () => {
   const creatorUsername = getUsernameFromUrl();
   const localUserDetails = getLocalUserDetails();
 
   const isCreatorInCreatorDashboard =
-    localUserDetails && localUserDetails.is_creator && window.location.pathname.indexOf('/creator/dashboard') >= 0;
+    window.location.pathname.indexOf('/creator/dashboard') >= 0 && localUserDetails && localUserDetails.is_creator;
 
   // THis might break in case creator A accesses their dashboard with B's username in URL
   if (isCreatorInCreatorDashboard) {
     // For specific URLs we will use creator username from localStorage
     return localUserDetails.username;
-  } else if (!reservedDomainName.includes(creatorUsername)) {
+  } else if (creatorUsername && !reservedDomainName.includes(creatorUsername)) {
     // If username in URL is detected then use that
     return creatorUsername;
   } else {
@@ -147,6 +157,10 @@ export const isValidFile = (url) => {
 };
 
 export const generateUrlFromUsername = (username) => {
+  if (isInCustomDomain()) {
+    return window.location.origin;
+  }
+
   let newUrl = '';
   if (process.env.NODE_ENV === 'development') {
     newUrl = 'http://' + username + '.localhost:' + window.location.port;

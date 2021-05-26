@@ -294,7 +294,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                   onClick={() => onCardClick(course)}
                 >
                   <Row gutter={[16, 8]}>
-                    <Col xs={24} lg={isOnAttendeeDashboard ? 12 : 10} xl={10} className={styles.courseImageWrapper}>
+                    <Col xs={24} sm={isOnAttendeeDashboard ? 12 : 10} lg={10} className={styles.courseImageWrapper}>
                       <Image
                         preview={false}
                         height={isMobileDevice ? 100 : 130}
@@ -304,8 +304,8 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                     </Col>
                     <Col
                       xs={24}
-                      lg={isOnAttendeeDashboard ? 12 : 8}
-                      xl={isOnAttendeeDashboard ? 14 : 10}
+                      sm={isOnAttendeeDashboard ? 12 : 8}
+                      lg={isOnAttendeeDashboard ? 14 : 10}
                       className={styles.courseInfoWrapper}
                     >
                       <Row gutter={[8, 4]}>
@@ -333,7 +333,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                       </Row>
                     </Col>
                     {!isOnAttendeeDashboard && (
-                      <Col xs={24} lg={6} xl={4} className={styles.buyButtonWrapper}>
+                      <Col xs={24} sm={6} lg={4} className={styles.buyButtonWrapper}>
                         <Button
                           block
                           className={styles.buyButton}

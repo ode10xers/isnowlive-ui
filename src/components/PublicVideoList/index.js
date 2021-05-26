@@ -63,6 +63,7 @@ const PublicVideoList = ({ videos }) => {
       const payload = {
         video_id: selectedVideo?.external_id,
         payment_source: paymentSource.GATEWAY,
+        coupon_code: couponCode,
         user_timezone_location: getTimezoneLocation(),
       };
 
@@ -120,7 +121,7 @@ const PublicVideoList = ({ videos }) => {
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
           {videos?.map((video) => (
-            <Col xs={24} lg={12} key={video?.external_id}>
+            <Col xs={24} sm={12} key={video?.external_id}>
               <VideoCard video={video} buyable={true} showAuthModal={() => handleSelectVideo(video)} />
             </Col>
           ))}

@@ -42,12 +42,15 @@ const Routes = {
     livestream: '/livestream',
     coupons: '/coupons',
     documents: '/documents',
-    newsletter: '/newsletter',
+    audiences: '/audiences',
+    emailTemplates: '/templates/email',
     accountSettings: '/settings',
     legals: '/legals',
-    externalSiteSettings: '/widgets',
+    plugins: '/plugins',
+    domains: '/domains',
     membersSettings: '/members/settings',
     membersTags: '/members/tag',
+    affiliate: '/affiliate',
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
@@ -60,6 +63,7 @@ const Routes = {
     courses: '/courses',
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
+    referrals: '/referrals',
   },
 };
 

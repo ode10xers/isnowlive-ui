@@ -13,7 +13,6 @@ import {
 } from '@ant-design/icons';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import parse from 'html-react-parser';
-import MobileDetect from 'mobile-detect';
 
 import apis from 'apis';
 
@@ -38,6 +37,7 @@ import {
   productType,
   isUnapprovedUserError,
 } from 'utils/helper';
+import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
 import { formatPassesData, getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
@@ -70,8 +70,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     state: { userDetails },
     showPaymentPopup,
   } = useGlobalContext();
-  const md = new MobileDetect(window.navigator.userAgent);
-  const isMobileDevice = Boolean(md.mobile());
+
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -349,6 +348,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
+        coupon_code: couponCode,
         payment_source: paymentSource.GATEWAY,
       };
 
@@ -417,7 +417,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
     }
 
     const paymentPopupData = {
-      productId: selectedInventory.inventory_id,
+      productId: selectedInventory.session_external_id,
       productType: 'SESSION',
       itemList: [
         {

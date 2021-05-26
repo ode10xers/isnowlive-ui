@@ -1,38 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import { Row, Col, Modal, Form, Input, Tooltip, Button, Select, Typography } from 'antd';
 import { FilePdfOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import TextEditor from 'components/TextEditor';
+import Loader from 'components/Loader';
 import FileUpload from 'components/FileUpload';
+import UnlayerEmailEditor from 'components/UnlayerEmailEditor';
 import { resetBodyStyle, showSuccessModal, showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 
-import { sendCustomerEmailFormLayout, sendCustomerEmailBodyFormLayout } from 'layouts/FormLayouts';
+import { sendCustomerEmailFormLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const defaultTemplateKey = 'blank';
 const formInitialValues = {
   recipients: [],
   subject: '',
+  emailTemplate: defaultTemplateKey,
 };
 
 // The functionality is very similar to SendCustomerEmailModal
 // But the data is handled differently since Audience is a different entity
 // Also SendCustomerEmail requires some product information while this one does not
 const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
+  const emailEditor = useRef(null);
   const [form] = Form.useForm();
 
-  const [submitting, setSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [validRecipients, setValidRecipients] = useState([]);
   const [selectedRecipients, setSelectedRecipients] = useState([]);
   const [emailDocumentUrl, setEmailDocumentUrl] = useState(null);
+  const [creatorEmailTemplates, setCreatorEmailTemplates] = useState([]);
+
+  const loadDesignInEditor = (data) => {
+    if (emailEditor.current) {
+      emailEditor.current.loadDesign(data.template_json);
+    } else {
+      // Naive approach, give delay and check again
+      const loadDesignInterval = setInterval(() => {
+        if (emailEditor.current) {
+          emailEditor.current.loadDesign(data.template_json);
+          clearInterval(loadDesignInterval);
+        }
+      }, 1000);
+    }
+  };
+
+  const fetchCreatorEmailTemplates = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.newsletter.getCreatorEmailTemplates();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorEmailTemplates(data.templates);
+      }
+    } catch (error) {
+      console.error(error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchEmailTemplateDesign = useCallback(async (templateId) => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.newsletter.getEmailTemplateDetails(templateId);
+
+      if (isAPISuccess(status) && data) {
+        loadDesignInEditor(data);
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed fetching creator email templates',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     if (visible && recipients.length > 0) {
@@ -46,9 +100,13 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       setEmailDocumentUrl(null);
       setSelectedRecipients([]);
       setValidRecipients([]);
-      setSubmitting(false);
+      setIsLoading(false);
+      if (emailEditor.current) {
+        emailEditor.current.resetEditorContent();
+      }
     }
-  }, [visible, form, recipients]);
+    fetchCreatorEmailTemplates();
+  }, [visible, form, recipients, fetchCreatorEmailTemplates]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -57,38 +115,65 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
     return e && e.fileList;
   };
 
-  const handleFinish = async (values) => {
-    setSubmitting(true);
+  const handleFinish = (values) => {
+    if (emailEditor.current) {
+      emailEditor.current.editor.exportHtml(async (data) => {
+        const emailBody = data.html.replaceAll(`\n`, '');
+        setIsLoading(true);
+        try {
+          const payload = {
+            body: emailBody,
+            subject: values.subject,
+            audience_ids: selectedRecipients || values.recipients,
+            document_url: emailDocumentUrl || '',
+          };
 
-    try {
-      const payload = {
-        body: values.emailBody,
-        subject: values.subject,
-        audience_ids: selectedRecipients || values.recipients,
-        document_url: emailDocumentUrl || '',
-      };
+          const { status } = await apis.audiences.sendEmailToAudiences(payload);
 
-      const { status } = await apis.audiences.sendEmailToAudiences(payload);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Emails sent successfully');
-        closeModal();
-      }
-    } catch (error) {
-      showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
+          if (isAPISuccess(status)) {
+            showSuccessModal('Emails sent successfully');
+            emailEditor.current.resetEditorContent();
+            closeModal();
+          }
+        } catch (error) {
+          showErrorModal('Failed to send emails', error?.respoonse?.data?.message || 'Something went wrong');
+        }
+        setIsLoading(false);
+      });
     }
-
-    setSubmitting(false);
   };
+
+  const handleChangeSelectedTemplate = (val) => {
+    if (val === defaultTemplateKey) {
+      if (emailEditor.current) {
+        emailEditor.current.resetEditorContent();
+      }
+    } else {
+      fetchEmailTemplateDesign(val);
+    }
+  };
+
+  const templateOptions = useMemo(() => {
+    return [
+      {
+        label: <Text strong> Don't use template </Text>,
+        value: defaultTemplateKey,
+      },
+      ...creatorEmailTemplates.map((template) => ({
+        label: template.name,
+        value: template.id,
+      })),
+    ];
+  }, [creatorEmailTemplates]);
 
   return (
     <Modal
       title={<Title level={5}> Send email to audiences </Title>}
       visible={visible}
       centered={true}
-      onCancel={() => closeModal()}
+      onCancel={closeModal}
       footer={null}
-      width={640}
+      width={1080}
       afterClose={resetBodyStyle}
     >
       <Form
@@ -100,55 +185,65 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
         initialValues={formInitialValues}
       >
         <Row gutter={[8, 16]}>
+          <Loader loading={isLoading} size="large">
+            <Col xs={24}>
+              <Form.Item {...sendCustomerEmailFormLayout} label="Replies will be sent to">
+                <Text strong> {getLocalUserDetails()?.email} </Text>
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                {...sendCustomerEmailFormLayout}
+                id="recipients"
+                name="recipients"
+                label="Recipients"
+                rules={validationRules.arrayValidation}
+              >
+                <Select
+                  showArrow
+                  showSearch
+                  placeholder="Select the recipients"
+                  mode="multiple"
+                  maxTagCount={3}
+                  values={selectedRecipients}
+                  onChange={(val) => setSelectedRecipients(val)}
+                  options={validRecipients.map((recipient) => ({
+                    label: `${recipient.first_name} ${recipient.last_name || ''}`,
+                    value: recipient.id,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                {...sendCustomerEmailFormLayout}
+                id="subject"
+                name="subject"
+                label="Email Subject"
+                rules={validationRules.requiredValidation}
+              >
+                <Input placeholder="Subject of the email goes here" />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item
+                {...sendCustomerEmailFormLayout}
+                id="emailTemplate"
+                name="emailTemplate"
+                label="Email template"
+              >
+                <Select
+                  showArrow
+                  showSearch
+                  placeholder="Select the template to use"
+                  onChange={handleChangeSelectedTemplate}
+                  options={templateOptions}
+                />
+              </Form.Item>
+            </Col>
+          </Loader>
           <Col xs={24}>
-            <Form.Item {...sendCustomerEmailFormLayout} label="Replies will be sent to">
-              <Text strong> {getLocalUserDetails()?.email} </Text>
-            </Form.Item>
-          </Col>
-          <Col xs={24}>
-            <Form.Item
-              {...sendCustomerEmailFormLayout}
-              id="recipients"
-              name="recipients"
-              label="Recipients"
-              rules={validationRules.arrayValidation}
-            >
-              <Select
-                showArrow
-                showSearch
-                placeholder="Select the recipients"
-                mode="multiple"
-                maxTagCount={3}
-                values={selectedRecipients}
-                onChange={(val) => setSelectedRecipients(val)}
-                options={validRecipients.map((recipient) => ({
-                  label: `${recipient.first_name} ${recipient.last_name || ''}`,
-                  value: recipient.id,
-                }))}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24}>
-            <Form.Item
-              {...sendCustomerEmailFormLayout}
-              id="subject"
-              name="subject"
-              label="Email Subject"
-              rules={validationRules.requiredValidation}
-            >
-              <Input placeholder="Subject of the email goes here" />
-            </Form.Item>
-          </Col>
-          <Col xs={24}>
-            <Form.Item
-              {...sendCustomerEmailBodyFormLayout}
-              label="Email Body"
-              name="emailBody"
-              id="emailBody"
-              rules={validationRules.requiredValidation}
-            >
-              <TextEditor name="emailBody" form={form} placeholder="Content of the email goes here" />
-            </Form.Item>
+            <UnlayerEmailEditor ref={emailEditor} />
           </Col>
           <Col xs={24}>
             <Form.Item name="document_url" id="document_url" valuePropName="fileList" getValueFromEvent={normFile}>
@@ -190,12 +285,12 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
         </Row>
         <Row justify="end" align="center" gutter={16}>
           <Col xs={12} md={6}>
-            <Button block type="default" onClick={() => closeModal()} loading={submitting}>
+            <Button block type="default" onClick={() => closeModal()} loading={isLoading}>
               Cancel
             </Button>
           </Col>
           <Col xs={12} md={6}>
-            <Button block type="primary" htmlType="submit" loading={submitting}>
+            <Button block type="primary" htmlType="submit" loading={isLoading}>
               Send Email
             </Button>
           </Col>

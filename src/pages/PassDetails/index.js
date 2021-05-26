@@ -12,7 +12,14 @@ import CreatorProfile from 'components/CreatorProfile';
 import { showErrorModal, showAlreadyBookedModal, showPurchasePassSuccessModal } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, reservedDomainName, orderType, productType, isUnapprovedUserError } from 'utils/helper';
+import {
+  isAPISuccess,
+  reservedDomainName,
+  orderType,
+  productType,
+  isUnapprovedUserError,
+  getUsernameFromUrl,
+} from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -75,7 +82,7 @@ const PassDetails = ({ match, history }) => {
               })) || [],
           });
 
-          const creatorUsername = data.creator_username || window.location.hostname.split('.')[0];
+          const creatorUsername = data.creator_username || getUsernameFromUrl();
           await getProfileDetails(creatorUsername);
           setIsLoading(false);
         }
@@ -89,7 +96,7 @@ const PassDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.pass_id) {
-      const domainUsername = window.location.hostname.split('.')[0];
+      const domainUsername = getUsernameFromUrl();
       if (domainUsername && !reservedDomainName.includes(domainUsername)) {
         getPassDetails(match.params.pass_id);
       }
@@ -125,7 +132,7 @@ const PassDetails = ({ match, history }) => {
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (userEmail, couponCode = '') => {
+  const createOrder = async (couponCode = '') => {
     if (!pass) {
       showErrorModal('Something went wrong', 'Invalid Pass Selected');
       return null;
@@ -134,8 +141,9 @@ const PassDetails = ({ match, history }) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.passes.createOrderForUser({
-        pass_id: pass.id,
+        pass_id: pass.external_id,
         price: pass.price,
+        coupon_code: couponCode,
         currency: pass.currency.toLowerCase(),
       });
 

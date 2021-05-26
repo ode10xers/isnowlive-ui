@@ -23,7 +23,7 @@ const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-const CalendarSessions = ({ profileUsername }) => {
+const CalendarSessions = () => {
   const { showPaymentPopup } = useGlobalContext();
 
   const [isSessionLoading, setIsSessionLoading] = useState(true);
@@ -94,6 +94,7 @@ const CalendarSessions = ({ profileUsername }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone_location: getTimezoneLocation(),
         user_timezone: getCurrentLongTimezone(),
+        coupon_code: couponCode,
         payment_source: paymentSource.GATEWAY,
       };
 
@@ -162,7 +163,7 @@ const CalendarSessions = ({ profileUsername }) => {
     }
 
     const paymentPopupData = {
-      productId: selectedInventory.inventory_id,
+      productId: selectedInventory.session_external_id,
       productType: 'SESSION',
       itemList: [
         {
@@ -180,9 +181,9 @@ const CalendarSessions = ({ profileUsername }) => {
   };
 
   useEffect(() => {
-    getCalendarSessions(profileUsername);
+    getCalendarSessions();
     // eslint-disable-next-line
-  }, [profileUsername]);
+  }, []);
 
   return (
     <Loader loading={isSessionLoading} size="large" text="Loading sessions">

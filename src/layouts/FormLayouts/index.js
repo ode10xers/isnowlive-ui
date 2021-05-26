@@ -117,8 +117,3 @@ export const newsletterModalLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 18 },
 };
-export const newsletterFormTailLayout = {
-  wrapperCol: {
-    lg: { offset: 6, span: 6 },
-  },
-};
