@@ -68,7 +68,7 @@ const PaymentRedirectVerify = () => {
           if (additional_product && additional_product_id) {
             if (additional_product === productType.CLASS) {
               const payload = {
-                inventory_id: additional_product_id,
+                inventory_id: parseInt(additional_product_id),
                 user_timezone_offset: new Date().getTimezoneOffset(),
                 user_timezone_location: getTimezoneLocation(),
                 user_timezone: getCurrentLongTimezone(),
