@@ -99,8 +99,8 @@ const paymentOptionsData = {
     icons: (
       <>
         <IdealLogo className={styles.paymentIcon} />
-        <GiropayLogo className={styles.paymentIcon} />
-        <KlarnaLogo className={styles.paymentIcon} />
+        {/* <GiropayLogo className={styles.paymentIcon} />
+        <KlarnaLogo className={styles.paymentIcon} /> */}
       </>
     ),
     label: 'Online Banking',
