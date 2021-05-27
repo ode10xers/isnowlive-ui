@@ -28,7 +28,7 @@ export const mixPanelEventTags = {
         membersListNav: '(Creator) Member List Nav Clicked',
         membersTagsNav: '(Creator) Member Tags Nav Clicked',
         membersSettingsNav: '(Creator) Make site private Clicked',
-        affiliateNav: '(Creator) Affiliate Dashboard Nav Clicked',
+        referralNav: '(Creator) Referral Dashboard Nav Clicked',
       },
       sessions: {
         manage: {

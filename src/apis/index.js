@@ -210,5 +210,6 @@ export default {
     getCustomerRefCode: () => http.get('/secure/customer/referral/code'),
     getCustomerRefData: () => http.get('/secure/customer/referral'),
     getCreatorRefData: () => http.get('/secure/creator/referral'),
+    getCreatorAffiliatesData: () => http.get('/secure/creator/referral/creators-referred'),
   },
 };
