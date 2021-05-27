@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Row, Col, Typography, Button, Tooltip } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 import { atomOneLight } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import { generateUrlFromUsername, getUsernameFromUrl } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { copyToClipboard } from 'utils/helper';
@@ -23,11 +22,12 @@ const Affiliates = () => {
   const [creatorAffiliateData, setCreatorAffiliateData] = useState([]);
 
   const generateWidgetText = () => {
-    const username = getUsernameFromUrl();
-    const siteLink = generateUrlFromUsername(username);
+    // const username = getUsernameFromUrl();
+    // const siteLink = generateUrlFromUsername(username);
     const referralCode = getLocalUserDetails().referral_code;
 
-    return siteLink + '?ref=' + referralCode;
+    // Since this is for referring other creators, we'll direct them to marketing site
+    return 'https://passion.do?ref=' + referralCode;
   };
 
   const copyWidgetSnippet = () => copyToClipboard(generateWidgetText());
