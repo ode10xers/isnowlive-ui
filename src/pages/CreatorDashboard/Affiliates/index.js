@@ -36,11 +36,11 @@ const Affiliates = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Adjust this when the contract is confirmed
-      const { status, data } = await apis.referrals.getCustomerRefData();
+      const { status, data } = await apis.referrals.getCreatorAffiliatesData();
 
       if (isAPISuccess(status) && data) {
-        setCreatorAffiliateData(data);
+        console.log(data);
+        setCreatorAffiliateData(data.creators);
       }
     } catch (error) {
       if (!isUnapprovedUserError(error.response)) {
@@ -58,7 +58,6 @@ const Affiliates = () => {
     fetchCreatorAffiliateData();
   }, [fetchCreatorAffiliateData]);
 
-  // TODO: Also adjust the columns when the data is confirmed
   const referenceColumns = [
     {
       title: 'Referred Person',
@@ -67,8 +66,8 @@ const Affiliates = () => {
     },
     {
       title: 'Joining Date',
-      key: 'date',
-      dataIndex: 'date',
+      key: 'joining_date',
+      dataIndex: 'joining_date',
       render: (text) => toLongDateWithDayTime(text),
     },
   ];
@@ -98,7 +97,7 @@ const Affiliates = () => {
         <Col xs={24}>
           <Table
             columns={referenceColumns}
-            data={creatorAffiliateData?.referrals}
+            data={creatorAffiliateData}
             loading={isLoading}
             rowKey={(record) => record.id}
           />
