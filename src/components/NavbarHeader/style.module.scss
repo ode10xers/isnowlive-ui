@@ -37,7 +37,7 @@
   color: map-get($map: $colors, $key: 'DodgerBlue');
   cursor: pointer;
 
-  &.textLength9 {
+  &.textLength8 {
     font-size: 18px;
   }
 
@@ -132,7 +132,7 @@
   }
 
   .creatorSiteName {
-    &.textLength9 {
+    &.textLength8 {
       font-size: 16px;
     }
 
