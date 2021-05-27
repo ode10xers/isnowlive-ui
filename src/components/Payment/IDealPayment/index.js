@@ -133,7 +133,7 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
           paramsData = {
             ...paramsData,
             additional_product: followUpBookingInfo.productType,
-            product_id: followUpBookingInfo.productId,
+            additional_product_id: followUpBookingInfo.productId,
           };
         }
 
