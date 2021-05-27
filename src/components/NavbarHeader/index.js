@@ -218,7 +218,7 @@ const NavbarHeader = () => {
               <span
                 className={classNames(
                   styles.creatorSiteName,
-                  username.length >= 15 ? styles.textLength15 : username.length >= 9 ? styles.textLength9 : undefined
+                  username.length >= 15 ? styles.textLength15 : username.length >= 8 ? styles.textLength8 : undefined
                 )}
                 onClick={() => redirectToCreatorProfile()}
               >
@@ -403,8 +403,8 @@ const NavbarHeader = () => {
                           styles.creatorSiteName,
                           username.length >= 15
                             ? styles.textLength15
-                            : username.length >= 9
-                            ? styles.textLength9
+                            : username.length >= 8
+                            ? styles.textLength8
                             : undefined
                         )}
                         onClick={() => redirectToCreatorProfile('home')}
