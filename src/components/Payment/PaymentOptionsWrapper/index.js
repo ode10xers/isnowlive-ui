@@ -83,7 +83,8 @@ const PaymentOptionsWrapper = ({
     } catch (error) {
       console.error('Failed to create Payment Request');
     }
-  }, [stripe, creatorDetails, amount]);
+    //eslint-disable-next-line
+  }, [stripe, creatorDetails]);
 
   const fetchAvailablePaymentMethods = useCallback(async (currency) => {
     setIsLoading(true);
