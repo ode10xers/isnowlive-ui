@@ -93,7 +93,6 @@ const PaymentRedirectVerify = () => {
 
           break;
         case orderType.CLASS:
-          // TODO: need inventory ID here
           showBookSingleSessionSuccessModal(inventory_id);
           break;
         case orderType.VIDEO:

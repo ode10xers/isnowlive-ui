@@ -6,6 +6,7 @@ import Loader from 'components/Loader';
 
 import styles from './styles.module.scss';
 
+// NOTE: Currently unused
 const RedirectToStripeCheckoutButton = ({ onBeforePayment, methodName, helperText, paymentMethods = [] }) => {
   const [isLoading, setIsLoading] = useState(false);
 

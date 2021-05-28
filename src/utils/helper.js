@@ -281,13 +281,6 @@ export const paymentSource = {
   SUBSCRIPTION: 'SUBSCRIPTION',
 };
 
-export const paymentMethods = {
-  WALLET: {
-    GOOGLE_PAY: 'google_pay',
-    APPLE_PAY: 'apple_pay',
-  },
-};
-
 export const orderType = {
   CLASS: 'SESSION_ORDER',
   PASS: 'PASS_ORDER',

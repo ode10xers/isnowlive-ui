@@ -67,8 +67,6 @@ const PaymentOptionsWrapper = ({
             amount: amount * 100,
           },
           requestPayerName: true,
-          // disableWallets: ['browserCard'],
-          // requestPayerEmail: true,
         });
 
         // Check availability of Payment Request API

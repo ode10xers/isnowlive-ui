@@ -235,11 +235,11 @@ const PaymentPopup = () => {
     let result = null;
     const appliedCouponCode = couponApplied ? couponCode : '';
 
-    if (!flexiblePaymentDetails?.enabled) {
-      result = await paymentPopupCallback(appliedCouponCode);
-    } else {
+    if (flexiblePaymentDetails?.enabled) {
       // PWYW can't be used with coupons
       result = await paymentPopupCallback('', priceAmount);
+    } else {
+      result = await paymentPopupCallback(appliedCouponCode);
     }
 
     return result;
@@ -353,9 +353,6 @@ const PaymentPopup = () => {
       return totalPrice;
     }
   };
-
-  // TODO: Check for selected and available Payment method here
-  // Based on the selected payment method, render the correct components
 
   const creatorDetails = useMemo(() => ({ country: creatorCountry, currency: creatorCurrency }), [
     creatorCountry,
@@ -480,7 +477,6 @@ const PaymentPopup = () => {
               </Elements>
             </Col>
             <Col xs={24}>
-              {/* <Image className={styles.paymentSupportImage} preview={false} src={PaymentSupportImage} alt="" /> */}
               <SupportedPayments />
             </Col>
             <Col xs={24} className={styles.tncText}>
