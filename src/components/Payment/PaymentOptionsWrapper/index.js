@@ -83,8 +83,7 @@ const PaymentOptionsWrapper = ({
     } catch (error) {
       console.error('Failed to create Payment Request');
     }
-    //eslint-disable-next-line
-  }, [stripe, creatorDetails]);
+  }, [stripe, creatorDetails, amount]);
 
   const fetchAvailablePaymentMethods = useCallback(async (currency) => {
     setIsLoading(true);
@@ -117,19 +116,19 @@ const PaymentOptionsWrapper = ({
 
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)
-  useEffect(() => {
-    if (paymentRequest) {
-      paymentRequest.update({
-        total: {
-          label: 'Sub-Total',
-          // Need to * 100 because it's counting in sub-units (e.g, cents)
-          amount: amount * 100,
-        },
-      });
-      setPaymentRequest(paymentRequest);
-    }
-    //eslint-disable-next-line
-  }, [amount]);
+  // useEffect(() => {
+  //   if (paymentRequest) {
+  //     paymentRequest.update({
+  //       total: {
+  //         label: 'Sub-Total',
+  //         // Need to * 100 because it's counting in sub-units (e.g, cents)
+  //         amount: amount * 100,
+  //       },
+  //     });
+  //     setPaymentRequest(paymentRequest);
+  //   }
+  //   //eslint-disable-next-line
+  // }, [amount]);
 
   // We don't handle wallet payments here since it has a client side requirement check
   const paymentMethodsData = {
