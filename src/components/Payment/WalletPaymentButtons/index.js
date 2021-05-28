@@ -98,8 +98,7 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
     if (paymentRequest) {
       paymentRequest.on('paymentmethod', onConfirmPaymentDetails);
     }
-    //eslint-disable-next-line
-  }, [paymentRequest]);
+  }, [paymentRequest, onConfirmPaymentDetails]);
 
   return paymentRequest ? (
     <Loader loading={isLoading} text="Processing payment..." size="small">
