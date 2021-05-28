@@ -248,7 +248,7 @@ const PaymentOptionsWrapper = ({
               >
                 {renderPaymentOptions()}
                 {/* Wallet payments only depends on client side requirements, so we process it separately */}
-                {paymentRequest && (
+                {paymentRequest && !shouldSavePaymentDetails && (
                   <TabPane
                     forceRender={true}
                     key={paymentMethodOptions.WALLET.key}
