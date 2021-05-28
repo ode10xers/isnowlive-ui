@@ -52,7 +52,12 @@ const SideNavigation = () => {
             {navItem.title}
           </Item>
         ) : (
-          <Item key={navItem.key} icon={navItem?.icon || null} onClick={() => trackAndNavigate(navItem)}>
+          <Item
+            key={navItem.key}
+            className={navItem.key}
+            icon={navItem?.icon || null}
+            onClick={() => trackAndNavigate(navItem)}
+          >
             {navItem.title}
           </Item>
         )
