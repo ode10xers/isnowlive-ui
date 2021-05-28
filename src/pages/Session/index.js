@@ -813,6 +813,7 @@ const Session = ({ match, history }) => {
                 type="primary"
                 icon={<VideoCameraOutlined />}
                 onClick={() => window.open(config.zoom.oAuthURL, '_self')}
+                id="connect-your-zoom-btn"
               >
                 Connect your zoom account
               </Button>
