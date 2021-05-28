@@ -60,18 +60,22 @@ export const paymentMethodOptions = {
   CARD: {
     key: 'card_payment',
     options: ['card'],
+    can_save_payment_details: true,
   },
   WALLET: {
     key: 'wallet_payment',
     options: ['google_pay', 'apple_pay', 'alipay'],
+    can_save_payment_details: false,
   },
   ONLINE_BANKING: {
     key: 'online_banking_payment',
     options: Object.entries(BANK_REDIRECT_OPTIONS).map(([key, val]) => val.key),
+    can_save_payment_details: false,
   },
   DEBIT: {
     key: 'debit_payment',
     options: ['bacs_debit', 'sepa_debit'],
+    can_save_payment_details: false,
   },
 };
 

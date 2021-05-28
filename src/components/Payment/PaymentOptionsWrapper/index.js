@@ -39,6 +39,7 @@ const PaymentOptionsWrapper = ({
   handleBeforePayment,
   isFreeProduct = false,
   minimumPriceRequirementFulfilled = true,
+  shouldSavePaymentDetails = false,
   creatorDetails,
   amount,
 }) => {
@@ -174,7 +175,8 @@ const PaymentOptionsWrapper = ({
       .filter(
         ([key, val]) =>
           val.key !== paymentMethodOptions.WALLET.key &&
-          val.options.some((option) => availablePaymentOptions.includes(option))
+          val.options.some((option) => availablePaymentOptions.includes(option)) &&
+          (shouldSavePaymentDetails ? val.can_save_payment_details : true)
       )
       .map(([key, val]) => val);
 
@@ -223,40 +225,54 @@ const PaymentOptionsWrapper = ({
   return (
     <Loader loading={isLoading} text="Fetching available payment methods...">
       <Row gutter={[8, 8]} className={styles.mb10}>
-        <Col xs={24}>
-          <Text strong> Pay with </Text>
-        </Col>
-        <Col xs={24}>
-          <Tabs
-            className={styles.paymentOptionsContainer}
-            activeKey={selectedPaymentOption}
-            onChange={setSelectedPaymentOption}
-            renderTabBar={handleCustomTabBarRender}
-          >
-            {renderPaymentOptions()}
-            {/* Wallet payments only depends on client side requirements, so we process it separately */}
-            {paymentRequest && (
-              <TabPane
-                forceRender={true}
-                key={paymentMethodOptions.WALLET.key}
-                tab={
-                  <PaymentOptionsSelection
-                    paymentOptionKey={paymentMethodOptions.WALLET.key}
-                    isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
-                  />
-                }
+        {isFreeProduct ? (
+          <Col xs={24}>
+            <CardForm
+              btnProps={{ text: isFreeProduct ? 'Get' : 'Buy', disableButton: minimumPriceRequirementFulfilled }}
+              isFree={isFreeProduct}
+              onBeforePayment={handleBeforePayment}
+              onAfterPayment={handleAfterPayment}
+            />
+          </Col>
+        ) : (
+          <>
+            <Col xs={24}>
+              <Text strong> Pay with </Text>
+            </Col>
+            <Col xs={24}>
+              <Tabs
+                className={styles.paymentOptionsContainer}
+                activeKey={selectedPaymentOption}
+                onChange={setSelectedPaymentOption}
+                renderTabBar={handleCustomTabBarRender}
               >
+                {renderPaymentOptions()}
+                {/* Wallet payments only depends on client side requirements, so we process it separately */}
                 {paymentRequest && (
-                  <WalletPaymentButtons
-                    paymentRequest={paymentRequest}
-                    onBeforePayment={handleBeforePayment}
-                    onAfterPayment={handleAfterPayment}
-                  />
+                  <TabPane
+                    forceRender={true}
+                    key={paymentMethodOptions.WALLET.key}
+                    tab={
+                      <PaymentOptionsSelection
+                        paymentOptionKey={paymentMethodOptions.WALLET.key}
+                        isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
+                      />
+                    }
+                  >
+                    {paymentRequest && (
+                      <WalletPaymentButtons
+                        paymentRequest={paymentRequest}
+                        onBeforePayment={handleBeforePayment}
+                        onAfterPayment={handleAfterPayment}
+                      />
+                    )}
+                  </TabPane>
                 )}
-              </TabPane>
-            )}
-          </Tabs>
-        </Col>
+              </Tabs>
+            </Col>
+          </>
+        )}
+
         <Col xs={24}>
           <Divider className={styles.compactDivider} />
         </Col>

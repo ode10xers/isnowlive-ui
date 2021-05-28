@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { Row, Col, Typography, Input, List, Modal, Button, InputNumber, Tooltip } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
@@ -357,6 +357,11 @@ const PaymentPopup = () => {
   // TODO: Check for selected and available Payment method here
   // Based on the selected payment method, render the correct components
 
+  const creatorDetails = useMemo(() => ({ country: creatorCountry, currency: creatorCurrency }), [
+    creatorCountry,
+    creatorCurrency,
+  ]);
+
   return (
     <Modal
       visible={paymentPopupVisible}
@@ -465,9 +470,11 @@ const PaymentPopup = () => {
                   handleAfterPayment={handleAfterPayment}
                   handleBeforePayment={handleBeforePayment}
                   isFreeProduct={isFree()}
-                  shouldSavePaymentDetails={productType === productTypeConstants.CLASS}
+                  // Currently, only subscriptions need payment details to be saved
+                  // so we can use the saved details to charge them offline for recurring payment
+                  shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
                   minimumPriceRequirementFulfilled={checkMinimumPriceRequirement()}
-                  creatorDetails={{ country: creatorCountry, currency: creatorCurrency }}
+                  creatorDetails={creatorDetails}
                   amount={getAmountForPaymentRequest()}
                 />
               </Elements>
