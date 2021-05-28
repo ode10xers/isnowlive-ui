@@ -96,6 +96,7 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
 
   useEffect(() => {
     if (paymentRequest) {
+      paymentRequest.removeAllListeners();
       paymentRequest.on('paymentmethod', onConfirmPaymentDetails);
     }
   }, [paymentRequest, onConfirmPaymentDetails]);
