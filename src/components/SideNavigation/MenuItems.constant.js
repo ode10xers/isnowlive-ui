@@ -5,10 +5,8 @@ import {
   VideoCameraOutlined,
   ToolOutlined,
   DollarOutlined,
-  GlobalOutlined,
   PlayCircleOutlined,
   BookOutlined,
-  SettingOutlined,
   ScheduleOutlined,
   AuditOutlined,
   FilePdfOutlined,
@@ -16,6 +14,7 @@ import {
   TeamOutlined,
   ControlOutlined,
   PartitionOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -145,12 +144,39 @@ export const creatorMenuItems = [
   },
   {
     order: 8,
-    is_button: false,
-    key: 'your_site',
-    title: 'Your Site',
+    key: 'passion_site',
+    title: 'Your Passion Site',
     icon: <GlobalOutlined />,
-    mixPanelTag: creator.click.dashboard.profileNav,
-    path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
+    children: [
+      {
+        order: 1,
+        key: 'your_site',
+        title: 'Your Site',
+        mixPanelTag: creator.click.dashboard.profileNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile,
+      },
+      {
+        order: 2,
+        key: 'livestream',
+        title: 'Livestream',
+        mixPanelTag: creator.click.dashboard.livestreamNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
+      },
+      {
+        order: 3,
+        key: 'account_settings',
+        title: 'Account Settings',
+        mixPanelTag: creator.click.dashboard.accountNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
+      },
+      {
+        order: 4,
+        key: 'legals_settings',
+        title: 'Waiver and Policies',
+        mixPanelTag: creator.click.dashboard.legalNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.legals,
+      },
+    ],
   },
   {
     order: 9,
@@ -218,35 +244,6 @@ export const creatorMenuItems = [
   },
   {
     order: 13,
-    key: 'site_settings',
-    title: 'Site Settings',
-    icon: <SettingOutlined />,
-    children: [
-      {
-        order: 1,
-        key: 'livestream',
-        title: 'Livestream',
-        mixPanelTag: creator.click.dashboard.livestreamNav,
-        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream,
-      },
-      {
-        order: 2,
-        key: 'account_settings',
-        title: 'Account Settings',
-        mixPanelTag: creator.click.dashboard.accountNav,
-        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.accountSettings,
-      },
-      {
-        order: 3,
-        key: 'legals_settings',
-        title: 'Waiver and Policies',
-        mixPanelTag: creator.click.dashboard.legalNav,
-        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.legals,
-      },
-    ],
-  },
-  {
-    order: 14,
     is_button: false,
     key: 'external_site_setting',
     title: 'External Site Settings',
@@ -269,7 +266,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 15,
+    order: 14,
     key: 'advanced_settings',
     title: 'Advanced Settings',
     icon: <ControlOutlined />,
@@ -291,7 +288,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 16,
+    order: 15,
     is_button: false,
     key: 'affiliates',
     title: 'Affiliates Dashboard',
