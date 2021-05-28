@@ -83,9 +83,8 @@ const PaymentOptionsWrapper = ({
     } catch (error) {
       console.error('Failed to create Payment Request');
     }
-
     //eslint-disable-next-line
-  }, [stripe]);
+  }, [stripe, creatorDetails]);
 
   const fetchAvailablePaymentMethods = useCallback(async (currency) => {
     setIsLoading(true);
@@ -127,8 +126,10 @@ const PaymentOptionsWrapper = ({
           amount: amount * 100,
         },
       });
+      setPaymentRequest(paymentRequest);
     }
-  }, [amount, paymentRequest]);
+    //eslint-disable-next-line
+  }, [amount]);
 
   // We don't handle wallet payments here since it has a client side requirement check
   const paymentMethodsData = {

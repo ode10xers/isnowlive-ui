@@ -231,20 +231,19 @@ const PaymentPopup = () => {
 
   // This will run the callback (we will populate this with order creation functions)
   // and return the order response object
-  const handleBeforePayment = useCallback(async () => {
+  const handleBeforePayment = async () => {
     let result = null;
     const appliedCouponCode = couponApplied ? couponCode : '';
 
     if (flexiblePaymentDetails?.enabled) {
       // PWYW can't be used with coupons
-      console.log(priceAmount);
       result = await paymentPopupCallback('', priceAmount);
     } else {
       result = await paymentPopupCallback(appliedCouponCode);
     }
 
     return result;
-  }, [priceAmount, couponCode, couponApplied, flexiblePaymentDetails, paymentPopupCallback]);
+  };
 
   const handleAfterPayment = async (orderResponse = null, verifyOrderRes = null) => {
     if (orderResponse && orderResponse?.is_successful_order) {
