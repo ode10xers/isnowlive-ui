@@ -51,7 +51,7 @@ const PublicPassList = ({ passes }) => {
 
     const paymentPopupData = {
       productId: selectedPass.external_id,
-      productType: 'PASS',
+      productType: productType.PASS,
       itemList: [
         {
           name: selectedPass.name,

@@ -118,7 +118,7 @@ const PassDetails = ({ match, history }) => {
 
     const paymentPopupData = {
       productId: pass.external_id,
-      productType: 'PASS',
+      productType: productType.PASS,
       itemList: [
         {
           name: pass.name,

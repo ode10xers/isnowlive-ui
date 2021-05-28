@@ -11,7 +11,7 @@ import ShowcaseSubscriptionCards from 'components/ShowcaseSubscriptionCards';
 
 import dateUtil from 'utils/date';
 import { generateBaseCreditsText } from 'utils/subscriptions';
-import { isAPISuccess, orderType, isUnapprovedUserError } from 'utils/helper';
+import { isAPISuccess, orderType, isUnapprovedUserError, productType } from 'utils/helper';
 // import { isMobileDevice } from 'utils/device';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -55,7 +55,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
 
     const paymentPopupData = {
       productId: selectedSubscription.external_id,
-      productType: 'SUBSCRIPTION',
+      productType: productType.SUBSCRIPTION,
       itemList: [
         {
           name: selectedSubscription.name,

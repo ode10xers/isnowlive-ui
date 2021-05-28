@@ -147,7 +147,7 @@ const SendCustomerEmailModal = () => {
         try {
           const payload = {
             product_id: productId,
-            product_type: productType,
+            product_type: productType.toUpperCase(),
             body: emailBody,
             subject: values.subject,
             user_ids: selectedRecipients || values.recipients,

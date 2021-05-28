@@ -476,7 +476,7 @@ const VideoDetails = ({ match }) => {
 
       const paymentPopupData = {
         productId: video.external_id,
-        productType: 'VIDEO',
+        productType: productType.VIDEO,
         itemList: [
           {
             name: video.title,
@@ -486,7 +486,7 @@ const VideoDetails = ({ match }) => {
           },
         ],
         paymentInstrumentDetails: {
-          type: 'SUBSCRIPTION',
+          type: paymentSource.SUBSCRIPTION,
           ...usableUserSubscription,
         },
       };
@@ -500,7 +500,7 @@ const VideoDetails = ({ match }) => {
       // Single video booking flow to prevent accidental credit usage
       const paymentPopupData = {
         productId: video.external_id,
-        productType: 'VIDEO',
+        productType: productType.VIDEO,
         itemList: [
           {
             name: video.title,
@@ -510,7 +510,7 @@ const VideoDetails = ({ match }) => {
           },
         ],
         paymentInstrumentDetails: {
-          type: 'PASS',
+          type: paymentSource.PASS,
           ...usableUserPass,
         },
       };
@@ -529,7 +529,7 @@ const VideoDetails = ({ match }) => {
       // We first buy the pass, then followup book the video
       const paymentPopupData = {
         productId: selectedPass.external_id,
-        productType: 'PASS',
+        productType: productType.PASS,
         itemList: [
           {
             name: selectedPass.name,
@@ -561,7 +561,7 @@ const VideoDetails = ({ match }) => {
       // Will also trigger for free video
       const paymentPopupData = {
         productId: video.external_id,
-        productType: 'VIDEO',
+        productType: productType.VIDEO,
         itemList: [
           {
             name: video.title,

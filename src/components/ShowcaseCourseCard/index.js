@@ -146,7 +146,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
 
     let paymentPopupData = {
       productId: selectedCourse.id,
-      productType: 'COURSE',
+      productType: productType.COURSE,
       itemList: [
         {
           name: selectedCourse.name,

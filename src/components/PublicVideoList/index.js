@@ -44,7 +44,7 @@ const PublicVideoList = ({ videos }) => {
 
     const paymentPopupData = {
       productId: selectedVideo.external_id,
-      productType: 'VIDEO',
+      productType: productType.VIDEO,
       itemList: [
         {
           name: selectedVideo.title,

@@ -855,7 +855,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
       const paymentPopupData = {
         productId: classDetails.session_external_id,
-        productType: 'SESSION',
+        productType: productType.CLASS,
         itemList: [
           {
             name: classDetails.name,
@@ -865,7 +865,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
           },
         ],
         paymentInstrumentDetails: {
-          type: 'SUBSCRIPTION',
+          type: paymentSource.SUBSCRIPTION,
           ...usableUserSubscription,
         },
       };
@@ -877,7 +877,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (usersPass) {
         const paymentPopupData = {
           productId: classDetails.session_external_id,
-          productType: 'SESSION',
+          productType: productType.CLASS,
           itemList: [
             {
               name: classDetails.name,
@@ -887,7 +887,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             },
           ],
           paymentInstrumentDetails: {
-            type: 'PASS',
+            type: paymentSource.PASS,
             ...usersPass,
           },
         };
@@ -905,7 +905,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       } else {
         const paymentPopupData = {
           productId: selectedPass.external_id,
-          productType: 'PASS',
+          productType: productType.PASS,
           itemList: [
             {
               name: selectedPass.name,
@@ -950,7 +950,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
         paymentPopupData = {
           productId: classDetails.session_external_id,
-          productType: 'SESSION',
+          productType: productType.CLASS,
           itemList: [
             {
               name: classDetails.name,
@@ -967,7 +967,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         // So just show usual PaymentPopup
         paymentPopupData = {
           productId: classDetails.session_external_id,
-          productType: 'SESSION',
+          productType: productType.CLASS,
           itemList: [
             {
               name: classDetails.name,

@@ -418,7 +418,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
 
     const paymentPopupData = {
       productId: selectedInventory.session_external_id,
-      productType: 'SESSION',
+      productType: productType.CLASS,
       itemList: [
         {
           name: selectedInventory.name,

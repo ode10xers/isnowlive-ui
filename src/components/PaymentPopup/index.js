@@ -33,7 +33,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-// const PaymentSupportImage = require('../../assets/images/payment_support_image.png');
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -99,7 +98,6 @@ const PaymentPopup = () => {
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0) || 0;
 
   const fetchCreatorCountry = useCallback(async () => {
-    console.log('Fetching creator details for payment');
     try {
       const { status, data } = await apis.user.getProfileByUsername(getUsernameFromUrl());
 
@@ -155,7 +153,7 @@ const PaymentPopup = () => {
       let couponStatus = null;
       let couponData = null;
       switch (productType) {
-        case 'COURSE':
+        case productTypeConstants.COURSE:
           const coursePayload = {
             coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
             course_id: productId,
@@ -164,7 +162,7 @@ const PaymentPopup = () => {
           couponStatus = statusCourse;
           couponData = dataCourse;
           break;
-        case 'SESSION':
+        case productTypeConstants.CLASS:
           const sessionPayload = {
             coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
             session_id: productId,
@@ -173,7 +171,7 @@ const PaymentPopup = () => {
           couponStatus = statusSession;
           couponData = dataSession;
           break;
-        case 'PASS':
+        case productTypeConstants.PASS:
           const passPayload = {
             coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
             pass_id: productId,
@@ -182,7 +180,7 @@ const PaymentPopup = () => {
           couponStatus = statusPass;
           couponData = dataPass;
           break;
-        case 'VIDEO':
+        case productTypeConstants.VIDEO:
           const videoPayload = {
             coupon_code: couponCode.toLowerCase() || value.toLowerCase(),
             video_id: productId,
@@ -310,19 +308,21 @@ const PaymentPopup = () => {
 
     let textContent = '';
 
-    if (paymentInstrumentDetails.type === 'PASS') {
+    if (paymentInstrumentDetails.type === paymentSource.PASS) {
       const passDetails = paymentInstrumentDetails;
       textContent = `Will use ${passDetails.pass_name} to book this ${
         passDetails.limited
           ? `and you'll be left with ${passDetails.classes_remaining - 1}/${passDetails.class_count} credits`
           : ''
       }`;
-    } else if (paymentInstrumentDetails.type === 'SUBSCRIPTION') {
+    } else if (paymentInstrumentDetails.type === paymentSource.SUBSCRIPTION) {
       const subscriptionDetails = paymentInstrumentDetails;
 
       textContent = `Will use ${subscriptionDetails.subscription_name} to book this and you'll be left with ${
-        subscriptionDetails.products[productType].credits - subscriptionDetails.products[productType].credits_used - 1
-      }/${subscriptionDetails.products[productType].credits} credits`;
+        subscriptionDetails.products[productType.toUpperCase()].credits -
+        subscriptionDetails.products[productType.toUpperCase()].credits_used -
+        1
+      }/${subscriptionDetails.products[productType.toUpperCase()].credits} credits`;
     }
 
     return (
@@ -465,6 +465,7 @@ const PaymentPopup = () => {
                   handleAfterPayment={handleAfterPayment}
                   handleBeforePayment={handleBeforePayment}
                   isFreeProduct={isFree()}
+                  shouldSavePaymentDetails={productType === productTypeConstants.CLASS}
                   minimumPriceRequirementFulfilled={checkMinimumPriceRequirement()}
                   creatorDetails={{ country: creatorCountry, currency: creatorCurrency }}
                   amount={getAmountForPaymentRequest()}
