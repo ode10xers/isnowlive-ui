@@ -990,7 +990,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
       showPaymentPopup(
         paymentPopupData,
-        async (couponCode = '', priceAmount = undefined) => await buySingleClass(payload, couponCode, priceAmount)
+        async (couponCode = '', priceAmount = 5) => await buySingleClass(payload, couponCode, priceAmount)
       );
     }
   };

@@ -237,6 +237,7 @@ const PaymentPopup = () => {
 
     if (flexiblePaymentDetails?.enabled) {
       // PWYW can't be used with coupons
+      console.log(priceAmount);
       result = await paymentPopupCallback('', priceAmount);
     } else {
       result = await paymentPopupCallback(appliedCouponCode);
