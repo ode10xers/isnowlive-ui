@@ -335,7 +335,7 @@ const PaymentPopup = () => {
   const isFree = () =>
     flexiblePaymentDetails?.enabled
       ? false
-      : discountedPrice
+      : couponApplied
       ? discountedPrice === 0
       : paymentInstrumentDetails || totalPrice === 0;
 
