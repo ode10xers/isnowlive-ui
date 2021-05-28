@@ -25,7 +25,8 @@ const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
 } = dateUtil;
 
-// TODO: This page is no longer used, since in page payment is implemented
+// NOTE: This page is no longer used, since in-page payment is implemented
+// For handling payment redirects, we are using PaymentRedirectVerification
 const PaymentVerification = () => {
   const location = useLocation();
   const history = useHistory();

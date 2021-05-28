@@ -8,7 +8,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
 import VideoCourses from 'pages/CreatorDashboard/Courses/VideoCourses';
 
-import { courseType, isAPISuccess } from 'utils/helper';
+import { courseType, isAPISuccess, productType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -116,7 +116,7 @@ const Courses = () => {
         expired: [],
       },
       productId: course?.id || null,
-      productType: 'COURSE',
+      productType: productType.COURSE,
     });
   };
 

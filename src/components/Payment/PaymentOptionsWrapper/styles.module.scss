@@ -1,0 +1,11 @@
+@import '../../../styles/variables.scss';
+
+.compactDivider {
+  margin: 12px 0 !important;
+}
+
+.paymentOptionsContainer {
+  // This is so that some components that
+  // needs more height can still be visible
+  overflow: visible !important;
+}

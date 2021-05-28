@@ -143,7 +143,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
     const orderResponse = await onBeforePayment();
     let verifyOrderRes = null;
     // The case below is when payment is required
-    if (orderResponse && orderResponse.payment_required) {
+    if (orderResponse && orderResponse?.is_successful_order && orderResponse?.payment_required) {
       if (!selectedCard) {
         // Flow for when using new card
         // We will take the card details and save in the BE
@@ -233,7 +233,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
   };
 
   return (
-    <Row gutter={[8, 8]} justify="center">
+    <Row gutter={[8, 12]} justify="center">
       {!isFree && (
         <>
           {savedUserCards.length > 0 && (

@@ -367,13 +367,17 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_type: orderType.CLASS,
             payment_order_id: data.order_id,
             inventory_id: inventoryId,
           };
         } else {
           showBookSingleSessionSuccessModal(inventoryId);
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -388,9 +392,11 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
       } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
-
-      return null;
     }
+
+    return {
+      is_successful_order: false,
+    };
   };
 
   const showConfirmPaymentPopup = () => {
@@ -412,7 +418,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
 
     const paymentPopupData = {
       productId: selectedInventory.session_external_id,
-      productType: 'SESSION',
+      productType: productType.CLASS,
       itemList: [
         {
           name: selectedInventory.name,

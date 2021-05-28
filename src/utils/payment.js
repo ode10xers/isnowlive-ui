@@ -3,7 +3,14 @@ import { message } from 'antd';
 import apis from 'apis';
 
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import {
+  generateQueryString,
+  generateUrlFromUsername,
+  getUsernameFromUrl,
+  isAPISuccess,
+  isUnapprovedUserError,
+} from 'utils/helper';
+import Routes from 'routes';
 
 // User API now also gives currency info
 // This function will fetch the creator currency from
@@ -68,4 +75,11 @@ export const verifyPaymentForOrder = async (payload) => {
     }
     return null;
   }
+};
+
+// NOTE: Currently the logic only handles non-nested primitive data (excl. array)
+export const generateRedirectUrlForStripe = (paramsData) => {
+  const baseUrl = generateUrlFromUsername(getUsernameFromUrl()) + Routes.paymentConfirm;
+
+  return baseUrl + '?' + generateQueryString(paramsData);
 };

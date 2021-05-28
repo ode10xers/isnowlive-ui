@@ -681,13 +681,17 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.order_id,
             payment_order_type: orderType.CLASS,
             inventory_id: inventoryId,
           };
         } else {
           showBookSingleSessionSuccessModal(inventoryId);
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -703,7 +707,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buyPassAndBookClass = async (payload, couponCode = '') => {
@@ -719,10 +725,11 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.pass_order_id,
             payment_order_type: orderType.PASS,
             follow_up_booking_info: {
-              productType: 'SESSION',
+              productType: productType.CLASS,
               productId: selectedInventory.inventory_id,
             },
           };
@@ -744,7 +751,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             showPurchasePassAndBookSessionSuccessModal(data.pass_order_id, inventoryId);
           }
 
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -760,7 +770,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const bookClassUsingPass = async (payload) => {
@@ -772,7 +784,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
         showBookSessionWithPassSuccessModal(payload.source_id, payload.inventory_id);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
       setIsLoading(false);
@@ -787,7 +802,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const bookClassUsingSubscription = async (payload) => {
@@ -799,7 +816,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
         showBookSessionWithSubscriptionSuccessModal(payload.inventory_id);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
       setIsLoading(false);
@@ -815,7 +835,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const showConfirmPaymentPopup = () => {
@@ -833,7 +855,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
       const paymentPopupData = {
         productId: classDetails.session_external_id,
-        productType: 'SESSION',
+        productType: productType.CLASS,
         itemList: [
           {
             name: classDetails.name,
@@ -843,7 +865,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
           },
         ],
         paymentInstrumentDetails: {
-          type: 'SUBSCRIPTION',
+          type: paymentSource.SUBSCRIPTION,
           ...usableUserSubscription,
         },
       };
@@ -855,7 +877,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       if (usersPass) {
         const paymentPopupData = {
           productId: classDetails.session_external_id,
-          productType: 'SESSION',
+          productType: productType.CLASS,
           itemList: [
             {
               name: classDetails.name,
@@ -865,7 +887,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             },
           ],
           paymentInstrumentDetails: {
-            type: 'PASS',
+            type: paymentSource.PASS,
             ...usersPass,
           },
         };
@@ -883,7 +905,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       } else {
         const paymentPopupData = {
           productId: selectedPass.external_id,
-          productType: 'PASS',
+          productType: productType.PASS,
           itemList: [
             {
               name: selectedPass.name,
@@ -928,7 +950,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
         paymentPopupData = {
           productId: classDetails.session_external_id,
-          productType: 'SESSION',
+          productType: productType.CLASS,
           itemList: [
             {
               name: classDetails.name,
@@ -945,7 +967,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         // So just show usual PaymentPopup
         paymentPopupData = {
           productId: classDetails.session_external_id,
-          productType: 'SESSION',
+          productType: productType.CLASS,
           itemList: [
             {
               name: classDetails.name,

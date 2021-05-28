@@ -700,7 +700,7 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
 
-              <Col xs={24}>
+              <Col xs={creatorMemberTags.length === 0 ? 0 : 24}>
                 <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
                   <Form.Item
                     name="videoTagType"
@@ -726,7 +726,7 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
 
-              <Col xs={24}>
+              <Col xs={selectedTagType === 'anyone' || creatorMemberTags.length === 0 ? 0 : 24}>
                 <Form.Item
                   name="selectedMemberTags"
                   id="selectedMemberTags"

@@ -28,7 +28,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import dateUtil from 'utils/date';
-import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -133,7 +133,7 @@ const Videos = () => {
         expired: expiredRecipients,
       },
       productId: video?.external_id || null,
-      productType: 'VIDEO',
+      productType: productType.VIDEO,
     });
   };
 
