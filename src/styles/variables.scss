@@ -136,6 +136,10 @@ $spacing: (
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
+.disabledBuyBtn {
+  background: map-get($map: $colors, $key: 'KellyGreenPale') !important;
+}
+
 .ant-btn {
-  border-radius: 5px !important;
+  border-radius: 6px !important;
 }

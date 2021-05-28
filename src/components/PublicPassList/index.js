@@ -51,7 +51,7 @@ const PublicPassList = ({ passes }) => {
 
     const paymentPopupData = {
       productId: selectedPass.external_id,
-      productType: 'PASS',
+      productType: productType.PASS,
       itemList: [
         {
           name: selectedPass.name,
@@ -87,12 +87,16 @@ const PublicPassList = ({ passes }) => {
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_type: orderType.PASS,
             payment_order_id: data.pass_order_id,
           };
         } else {
           showPurchasePassSuccessModal(data.pass_order_id);
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -102,7 +106,9 @@ const PublicPassList = ({ passes }) => {
       } else if (!isUnapprovedUserError(error.response)) {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
-      return null;
+      return {
+        is_successful_order: false,
+      };
     }
   };
 

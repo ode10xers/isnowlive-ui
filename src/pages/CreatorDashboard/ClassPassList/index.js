@@ -21,7 +21,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -110,7 +110,7 @@ const ClassPassList = () => {
         expired: expiredRecipients,
       },
       productId: pass?.external_id || null,
-      productType: 'PASS',
+      productType: productType.PASS,
     });
   };
 

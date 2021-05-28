@@ -118,7 +118,7 @@ const PassDetails = ({ match, history }) => {
 
     const paymentPopupData = {
       productId: pass.external_id,
-      productType: 'PASS',
+      productType: productType.PASS,
       itemList: [
         {
           name: pass.name,
@@ -153,13 +153,17 @@ const PassDetails = ({ match, history }) => {
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_type: orderType.PASS,
             payment_order_id: data.pass_order_id,
           };
         } else {
           showPurchasePassSuccessModal(data.pass_order_id);
 
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -170,6 +174,10 @@ const PassDetails = ({ match, history }) => {
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
+
+    return {
+      is_successful_order: false,
+    };
   };
 
   return (

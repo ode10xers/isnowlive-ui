@@ -36,6 +36,8 @@ export default {
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
       getDashboard: () => http.get('/secure/creator/profile/stripe/dashboard'),
     },
+    getAvailablePaymentMethods: (currency) =>
+      http.get(`/secure/customer/payment/available-method-types?currency=${currency}`),
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
@@ -159,7 +161,7 @@ export default {
     getSubscriptionsForSession: (sessionId) => http.get(`/subscriptions?session_id=${sessionId}`),
     getSubscriptionsForVideo: (videoId) => http.get(`/subscriptions?video_id=${videoId}`),
     getSubscriptionsForCourse: (courseId) => http.get(`/subscriptions?course_id=${courseId}`),
-    createSubscriptionOrder: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
+    createOrderForUser: (payload) => http.post('/secure/customer/subscriptions/orders', payload),
     cancelSubscriptionOrder: (subscriptionOrderId) =>
       http.post(`/secure/customer/subscriptions/orders/${subscriptionOrderId}/cancel`),
     getSubscriptionOrderUsageDetails: (productOrderType, subscriptionOrderId) =>

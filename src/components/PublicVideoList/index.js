@@ -44,7 +44,7 @@ const PublicVideoList = ({ videos }) => {
 
     const paymentPopupData = {
       productId: selectedVideo.external_id,
-      productType: 'VIDEO',
+      productType: productType.VIDEO,
       itemList: [
         {
           name: selectedVideo.title,
@@ -75,13 +75,17 @@ const PublicVideoList = ({ videos }) => {
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_id: data.video_order_id,
             payment_order_type: orderType.VIDEO,
           };
         } else {
           showPurchaseSingleVideoSuccessModal(data.video_order_id);
 
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -94,7 +98,9 @@ const PublicVideoList = ({ videos }) => {
       }
     }
 
-    return null;
+    return {
+      is_successful_order: false,
+    };
   };
 
   const openAuthModal = () => {

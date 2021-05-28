@@ -1,9 +1,5 @@
 @import '../../../styles/variables.scss';
 
-.disabledBuyBtn {
-  background: map-get($map: $colors, $key: 'KellyGreenPale') !important;
-}
-
 .StripeCustomElement {
   box-sizing: border-box;
   height: 40px;

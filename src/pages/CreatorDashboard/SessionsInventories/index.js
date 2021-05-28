@@ -26,7 +26,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, getDuration, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
+import { isAPISuccess, getDuration, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -144,7 +144,7 @@ const SessionsInventories = ({ match }) => {
         expired: isPast ? inventory.participants || [] : [],
       },
       productId: inventory.external_id,
-      productType: 'SESSION',
+      productType: productType.CLASS,
     });
   };
 

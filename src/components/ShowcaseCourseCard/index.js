@@ -146,7 +146,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
 
     let paymentPopupData = {
       productId: selectedCourse.id,
-      productType: 'COURSE',
+      productType: productType.COURSE,
       itemList: [
         {
           name: selectedCourse.name,
@@ -191,9 +191,13 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         showGetCourseWithSubscriptionSuccessModal();
         setIsLoading(false);
         setSelectedCourse(null);
-        return null;
+        return {
+          ...data,
+          is_successful_order: true,
+        };
       }
     } catch (error) {
+      setIsLoading(false);
       if (
         error?.response?.status === 500 &&
         error?.response?.data?.message === 'user already has a confirmed order for this course'
@@ -203,7 +207,10 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
-    setIsLoading(false);
+
+    return {
+      is_successful_order: false,
+    };
   };
 
   const buySingleCourse = async (couponCode = '') => {
@@ -231,12 +238,16 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         if (data.payment_required) {
           return {
             ...data,
+            is_successful_order: true,
             payment_order_type: orderType.COURSE,
             payment_order_id: data.course_order_id,
           };
         } else {
           showPurchaseSingleCourseSuccessModal();
-          return null;
+          return {
+            ...data,
+            is_successful_order: true,
+          };
         }
       }
     } catch (error) {
@@ -255,6 +266,10 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
         message.error(error.response?.data?.message || 'Something went wrong');
       }
     }
+
+    return {
+      is_successful_order: false,
+    };
   };
 
   return (
