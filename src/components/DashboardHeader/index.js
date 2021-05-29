@@ -1,8 +1,9 @@
-import React from 'react';
-import classNames from 'classnames';
-import { Row, Col, Button, Modal, Typography } from 'antd';
+import React, { useState } from 'react';
+// import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
+import { Row, Col, Button, Modal, Typography } from 'antd';
 import { VideoCameraAddOutlined, TeamOutlined, CloseOutlined } from '@ant-design/icons';
+import SwitchSelector from 'react-switch-selector';
 
 import Routes from 'routes';
 import { useGlobalContext } from 'services/globalContext';
@@ -17,21 +18,56 @@ const logo = require('assets/images/Logo-passion-transparent.png');
 const { user, attendee } = mixPanelEventTags;
 const { Paragraph } = Typography;
 
+const switchSelectorProps = {
+  border: '1px solid #1890ff',
+  backgroundColor: '#fff',
+  selectedBackgroundColor: '#1890ff80',
+  fontColor: '#000',
+  selectedFontColor: '#fff !important',
+};
+
+const options = [
+  {
+    label: (
+      <div className={styles.navSwitchItem}>
+        <VideoCameraAddOutlined className={styles.navItemIcon} />
+        Hosting
+      </div>
+    ),
+    value: 'creator',
+  },
+  {
+    label: (
+      <div className={styles.navSwitchItem}>
+        <TeamOutlined className={styles.navItemIcon} />
+        Attending
+      </div>
+    ),
+    value: 'attendee',
+  },
+];
+
 const DashboardHeader = () => {
   const { logOut } = useGlobalContext();
   const history = useHistory();
 
-  const isActive = (path) => {
-    if (history.location.pathname.includes(path)) {
-      return styles.isActiveNavItem;
-    }
-  };
+  const isInCreatorDashboard = window.location.pathname.includes('/creator');
+
+  // Based on the above options, 0 = creator, 1 = attendee
+  const [selectedNavSwitchIndex, setSelectedNavSwitchIndex] = useState(isInCreatorDashboard ? 0 : 1);
+
+  // const isActive = (path) => {
+  //   if (history.location.pathname.includes(path)) {
+  //     return styles.isActiveNavItem;
+  //   }
+  // };
 
   const isCreatorCheck = () => {
     const userDetails = getLocalUserDetails();
 
     if (userDetails.is_creator) {
       trackAndNavigate(Routes.creatorDashboard.rootPath, user.click.switchToCreator);
+      setSelectedNavSwitchIndex(0);
     } else {
       Modal.confirm({
         autoFocusButton: 'cancel',
@@ -52,7 +88,10 @@ const DashboardHeader = () => {
         title: 'Become a Host',
         okText: 'Become Host',
         cancelText: 'Talk to Us',
-        onOk: () => trackAndNavigate(Routes.profile, attendee.click.dashboard.becomeHost),
+        onOk: () => {
+          trackAndNavigate(Routes.profile, attendee.click.dashboard.becomeHost);
+          setSelectedNavSwitchIndex(0);
+        },
         onCancel: () => openFreshChatWidget(),
       });
     }
@@ -68,13 +107,30 @@ const DashboardHeader = () => {
     logOut(history, true);
   };
 
+  const handleNavSwitchChange = (value) => {
+    if (value === 'creator' && !isInCreatorDashboard) {
+      isCreatorCheck();
+    } else if (value === 'attendee') {
+      setSelectedNavSwitchIndex(1);
+      trackAndNavigate(Routes.attendeeDashboard.rootPath, user.click.switchToAttendee);
+    }
+  };
+
   return (
     <Row className={styles.headerContainer}>
       <Col flex="auto" className={isMobileDevice && styles.logoWrapper}>
         <img src={logo} alt="Passion.do" className={styles.logo} />
       </Col>
       <Col flex={isMobileDevice ? 'auto' : '400px'} className={isMobileDevice && styles.navItemWrapper}>
-        <span
+        <div className={styles.navSwitchWrapper}>
+          <SwitchSelector
+            onChange={handleNavSwitchChange}
+            options={options}
+            forcedSelectedIndex={selectedNavSwitchIndex}
+            {...switchSelectorProps}
+          />
+        </div>
+        {/* <span
           className={classNames(styles.ml10, styles.navItem, isActive(Routes.creatorDashboard.rootPath))}
           onClick={() => isCreatorCheck()}
         >
@@ -87,7 +143,7 @@ const DashboardHeader = () => {
         >
           <TeamOutlined className={styles.navItemIcon} />
           Attending
-        </span>
+        </span> */}
         <Button type="text" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
           Logout
         </Button>
