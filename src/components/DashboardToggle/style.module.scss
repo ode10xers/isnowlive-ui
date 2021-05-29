@@ -1,0 +1,22 @@
+@import '../../styles/variables.scss';
+
+.navSwitchWrapper {
+  height: 36px;
+  margin: auto;
+  width: 100%;
+  max-width: clamp(220px, 220px, 400px);
+  display: inline-block;
+}
+
+.navSwitchItem {
+  padding: 8px 4px;
+  color: map-get($map: $colors, $key: 'Black');
+}
+
+input[checked] + .navSwitchItem {
+  color: map-get($map: $colors, $key: 'White');
+}
+
+.navItemIcon {
+  margin-right: 5px;
+}

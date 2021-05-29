@@ -1,25 +1,5 @@
 @import '../../styles/variables.scss';
 
-.navSwitchWrapper {
-  height: 36px;
-  margin: auto 0;
-  width: clamp(100%, 220px, 400px);
-  display: inline-block;
-}
-
-.navSwitchItem {
-  padding: 8px 4px;
-  color: map-get($map: $colors, $key: 'Black');
-}
-
-input[checked] + .navSwitchItem {
-  color: map-get($map: $colors, $key: 'White');
-}
-
-.navItemIcon {
-  margin-right: 5px;
-}
-
 .lightRedBtn {
   background: map-get($map: $colors, $key: 'Razzmatazz') !important;
   border-color: map-get($map: $colors, $key: 'Razzmatazz') !important;
@@ -131,6 +111,12 @@ input[checked] + .navSwitchItem {
       width: 100%;
       text-align: left;
       padding: 8px 4px 16px;
+
+      &.mobileToggleWrapper {
+        margin: 0 auto;
+        width: fit-content;
+        min-width: 240px;
+      }
 
       &.active {
         border-bottom: 1px solid map-get($map: $colors, $key: 'DodgerBlue');

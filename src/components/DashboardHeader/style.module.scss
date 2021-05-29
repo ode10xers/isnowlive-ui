@@ -1,42 +1,20 @@
 @import '../../styles/variables.scss';
 
-.navSwitchWrapper {
-  min-height: 44px;
-  width: clamp(100px, 240px, 400px);
-  display: inline-block;
-}
-
-.navSwitchItem {
-  padding: 8px 4px;
-  color: map-get($map: $colors, $key: 'Black');
-}
-
-input[checked] + .navSwitchItem {
-  color: map-get($map: $colors, $key: 'White');
-}
-
 .headerContainer {
-  height: 50px;
-  padding: 5px;
+  height: 64px;
+  padding: 14px;
 }
 .navItemWrapper {
   text-align: end;
-}
-.navItem {
-  cursor: pointer;
-}
-.navItemIcon {
-  margin-right: 5px;
 }
 .logo {
   height: 40px;
   margin-left: 5px;
 }
-.isActiveNavItem {
-  color: map-get($colors, 'DodgerBlue');
-}
 .logout {
-  margin-left: 40px;
+  margin-left: auto;
+  margin-right: 0;
+  float: right;
 }
 
 @media (max-width: 767px) {
@@ -49,7 +27,6 @@ input[checked] + .navSwitchItem {
   }
   .logout {
     margin-left: 0px;
-    float: right;
     margin-top: 4px;
   }
 }

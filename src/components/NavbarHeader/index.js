@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
-import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
-import SwitchSelector from 'react-switch-selector';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import AuthModal from 'components/AuthModal';
+import DashboardToggle from 'components/DashboardToggle';
 import { resetBodyStyle } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
@@ -16,40 +15,10 @@ import { getLocalUserDetails } from 'utils/storage';
 import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
 
-const { Text, Paragraph } = Typography;
-
-const switchSelectorProps = {
-  border: '1px solid #1890ff',
-  backgroundColor: '#fff',
-  selectedBackgroundColor: '#1890ff',
-};
-
-const switchSelectorOptions = [
-  {
-    label: (
-      <div className={styles.navSwitchItem}>
-        <VideoCameraAddOutlined className={styles.navItemIcon} />
-        Hosting
-      </div>
-    ),
-    value: 'creator',
-    selectedFontColor: '#fff',
-  },
-  {
-    label: (
-      <div className={styles.navSwitchItem}>
-        <TeamOutlined className={styles.navItemIcon} />
-        Attending
-      </div>
-    ),
-    value: 'attendee',
-    selectedFontColor: '#fff',
-  },
-];
+const { Text } = Typography;
 
 const NavbarHeader = () => {
   const history = useHistory();
@@ -144,36 +113,6 @@ const NavbarHeader = () => {
     resetBodyStyle();
   };
 
-  const isCreatorCheck = () => {
-    const userDetails = getLocalUserDetails();
-
-    if (userDetails.is_creator) {
-      history.push(Routes.creatorDashboard.rootPath);
-    } else {
-      Modal.confirm({
-        autoFocusButton: 'cancel',
-        centered: true,
-        closable: true,
-        maskClosable: true,
-        content: (
-          <>
-            <Paragraph>Ready to become a host and start making money by hosting live events?</Paragraph>
-            <Paragraph>
-              By clicking on "<strong>Become Host</strong>" your account will be upgraded to a host account and you will
-              get access to your dashboard and features empowering you to host live events on topics you are passionate
-              about and make money from it.
-            </Paragraph>
-          </>
-        ),
-        title: 'Become a Host',
-        okText: 'Become Host',
-        cancelText: 'Talk to Us',
-        onOk: () => history.push(Routes.profile),
-        onCancel: () => openFreshChatWidget(),
-      });
-    }
-  };
-
   const isActive = (path) => location.pathname.includes(path);
 
   const siteLinkActive = (section) => {
@@ -188,8 +127,6 @@ const NavbarHeader = () => {
 
   const inDashboard = () =>
     location.pathname.includes('/attendee/dashboard') || location.pathname.includes('/creator/dashboard');
-
-  const isInCreatorDashboard = () => location.pathname.includes('/creator');
 
   const redirectToCreatorProfile = (section) => {
     setShowMobileMenu(false);
@@ -227,14 +164,6 @@ const NavbarHeader = () => {
     return null;
   }
 
-  const handleNavSwitchChange = (value) => {
-    if (value === 'creator' && !isInCreatorDashboard()) {
-      isCreatorCheck();
-    } else if (value === 'attendee') {
-      history.push(Routes.attendeeDashboard.rootPath);
-    }
-  };
-
   //TODO: Investigate better solution for dynamic font size adjustment
   // Involves jquery: https://stackoverflow.com/questions/687998/auto-size-dynamic-text-to-fill-fixed-size-container?rq=1
   // Currently implemented (inelegant solution) : https://stackoverflow.com/a/56588899
@@ -268,36 +197,7 @@ const NavbarHeader = () => {
             </Col>
             {localUserDetails && inDashboard() && (
               <Col className={styles.modeSelectWrapper}>
-                <div className={styles.navSwitchWrapper}>
-                  <SwitchSelector
-                    onChange={handleNavSwitchChange}
-                    options={switchSelectorOptions}
-                    initialSelectedIndex={isInCreatorDashboard() ? 0 : 1}
-                    {...switchSelectorProps}
-                  />
-                </div>
-                {/* <span
-                  className={classNames(
-                    styles.ml10,
-                    styles.navItem,
-                    isActive(Routes.creatorDashboard.rootPath) ? styles.active : undefined
-                  )}
-                  onClick={() => isCreatorCheck()}
-                >
-                  <VideoCameraAddOutlined className={styles.navItemIcon} />
-                  Hosting
-                </span>
-                <span
-                  className={classNames(
-                    styles.ml10,
-                    styles.navItem,
-                    isActive(Routes.attendeeDashboard.rootPath) ? styles.active : undefined
-                  )}
-                  onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
-                >
-                  <TeamOutlined className={styles.navItemIcon} />
-                  Attending
-                </span> */}
+                <DashboardToggle />
               </Col>
             )}
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
@@ -468,41 +368,8 @@ const NavbarHeader = () => {
                   <Col xs={24}>
                     <ul className={styles.menuLinks}>
                       {localUserDetails && inDashboard() && (
-                        <li key="Mode Selection">
-                          <Row gutter={[8, 8]}>
-                            <div className={styles.navSwitchWrapper}>
-                              <SwitchSelector
-                                onChange={handleNavSwitchChange}
-                                options={switchSelectorOptions}
-                                initialSelectedIndex={isInCreatorDashboard() ? 0 : 1}
-                                {...switchSelectorProps}
-                              />
-                            </div>
-                            {/* <Col xs={12}>
-                              <span
-                                className={classNames(
-                                  styles.navItem,
-                                  isActive(Routes.creatorDashboard.rootPath) ? styles.active : undefined
-                                )}
-                                onClick={() => isCreatorCheck()}
-                              >
-                                <VideoCameraAddOutlined className={styles.navItemIcon} />
-                                Hosting
-                              </span>
-                            </Col>
-                            <Col xs={12}>
-                              <span
-                                className={classNames(
-                                  styles.navItem,
-                                  isActive(Routes.attendeeDashboard.rootPath) ? styles.active : undefined
-                                )}
-                                onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
-                              >
-                                <TeamOutlined className={styles.navItemIcon} />
-                                Attending
-                              </span>
-                            </Col> */}
-                          </Row>
+                        <li key="Mode Selection" className={styles.mobileToggleWrapper}>
+                          <DashboardToggle />
                         </li>
                       )}
                       <li
