@@ -24,7 +24,7 @@ const switchSelectorProps = {
   selectedBackgroundColor: '#1890ff',
 };
 
-const options = [
+const switchSelectorOptions = [
   {
     label: (
       <div className={styles.navSwitchItem}>
@@ -51,7 +51,7 @@ const DashboardHeader = () => {
   const { logOut } = useGlobalContext();
   const history = useHistory();
 
-  const isInCreatorDashboard = window.location.pathname.includes('/creator');
+  const isInCreatorDashboard = () => window.location.pathname.includes('/creator');
 
   // Based on the above options, 0 = creator, 1 = attendee
   // const [selectedNavSwitchIndex, setSelectedNavSwitchIndex] = useState(isInCreatorDashboard ? 0 : 1);
@@ -125,8 +125,8 @@ const DashboardHeader = () => {
         <div className={styles.navSwitchWrapper}>
           <SwitchSelector
             onChange={handleNavSwitchChange}
-            options={options}
-            initialSelectedIndex={isInCreatorDashboard ? 0 : 1}
+            options={switchSelectorOptions}
+            initialSelectedIndex={isInCreatorDashboard() ? 0 : 1}
             {...switchSelectorProps}
           />
         </div>

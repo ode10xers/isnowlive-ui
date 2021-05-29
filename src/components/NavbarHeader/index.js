@@ -3,22 +3,53 @@ import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
 import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
+import SwitchSelector from 'react-switch-selector';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import AuthModal from 'components/AuthModal';
+import { resetBodyStyle } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
+
 import { useGlobalContext } from 'services/globalContext';
 import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
-import { resetBodyStyle } from 'components/Modals/modals';
 
 const { Text, Paragraph } = Typography;
+
+const switchSelectorProps = {
+  border: '1px solid #1890ff',
+  backgroundColor: '#fff',
+  selectedBackgroundColor: '#1890ff',
+};
+
+const switchSelectorOptions = [
+  {
+    label: (
+      <div className={styles.navSwitchItem}>
+        <VideoCameraAddOutlined className={styles.navItemIcon} />
+        Hosting
+      </div>
+    ),
+    value: 'creator',
+    selectedFontColor: '#fff',
+  },
+  {
+    label: (
+      <div className={styles.navSwitchItem}>
+        <TeamOutlined className={styles.navItemIcon} />
+        Attending
+      </div>
+    ),
+    value: 'attendee',
+    selectedFontColor: '#fff',
+  },
+];
 
 const NavbarHeader = () => {
   const history = useHistory();
@@ -158,6 +189,8 @@ const NavbarHeader = () => {
   const inDashboard = () =>
     location.pathname.includes('/attendee/dashboard') || location.pathname.includes('/creator/dashboard');
 
+  const isInCreatorDashboard = () => location.pathname.includes('/creator');
+
   const redirectToCreatorProfile = (section) => {
     setShowMobileMenu(false);
     history.push(`${Routes.root}`, { section: section || 'home' });
@@ -194,6 +227,14 @@ const NavbarHeader = () => {
     return null;
   }
 
+  const handleNavSwitchChange = (value) => {
+    if (value === 'creator' && !isInCreatorDashboard()) {
+      isCreatorCheck();
+    } else if (value === 'attendee') {
+      history.push(Routes.attendeeDashboard.rootPath);
+    }
+  };
+
   //TODO: Investigate better solution for dynamic font size adjustment
   // Involves jquery: https://stackoverflow.com/questions/687998/auto-size-dynamic-text-to-fill-fixed-size-container?rq=1
   // Currently implemented (inelegant solution) : https://stackoverflow.com/a/56588899
@@ -227,7 +268,15 @@ const NavbarHeader = () => {
             </Col>
             {localUserDetails && inDashboard() && (
               <Col className={styles.modeSelectWrapper}>
-                <span
+                <div className={styles.navSwitchWrapper}>
+                  <SwitchSelector
+                    onChange={handleNavSwitchChange}
+                    options={switchSelectorOptions}
+                    initialSelectedIndex={isInCreatorDashboard() ? 0 : 1}
+                    {...switchSelectorProps}
+                  />
+                </div>
+                {/* <span
                   className={classNames(
                     styles.ml10,
                     styles.navItem,
@@ -248,7 +297,7 @@ const NavbarHeader = () => {
                 >
                   <TeamOutlined className={styles.navItemIcon} />
                   Attending
-                </span>
+                </span> */}
               </Col>
             )}
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
@@ -421,7 +470,15 @@ const NavbarHeader = () => {
                       {localUserDetails && inDashboard() && (
                         <li key="Mode Selection">
                           <Row gutter={[8, 8]}>
-                            <Col xs={12}>
+                            <div className={styles.navSwitchWrapper}>
+                              <SwitchSelector
+                                onChange={handleNavSwitchChange}
+                                options={switchSelectorOptions}
+                                initialSelectedIndex={isInCreatorDashboard() ? 0 : 1}
+                                {...switchSelectorProps}
+                              />
+                            </div>
+                            {/* <Col xs={12}>
                               <span
                                 className={classNames(
                                   styles.navItem,
@@ -444,7 +501,7 @@ const NavbarHeader = () => {
                                 <TeamOutlined className={styles.navItemIcon} />
                                 Attending
                               </span>
-                            </Col>
+                            </Col> */}
                           </Row>
                         </li>
                       )}
