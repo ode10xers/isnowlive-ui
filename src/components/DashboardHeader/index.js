@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 // import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { Row, Col, Button, Modal, Typography } from 'antd';
@@ -21,9 +21,7 @@ const { Paragraph } = Typography;
 const switchSelectorProps = {
   border: '1px solid #1890ff',
   backgroundColor: '#fff',
-  selectedBackgroundColor: '#1890ff80',
-  fontColor: '#000',
-  selectedFontColor: '#fff !important',
+  selectedBackgroundColor: '#1890ff',
 };
 
 const options = [
@@ -35,6 +33,7 @@ const options = [
       </div>
     ),
     value: 'creator',
+    selectedFontColor: '#fff',
   },
   {
     label: (
@@ -44,6 +43,7 @@ const options = [
       </div>
     ),
     value: 'attendee',
+    selectedFontColor: '#fff',
   },
 ];
 
@@ -54,7 +54,7 @@ const DashboardHeader = () => {
   const isInCreatorDashboard = window.location.pathname.includes('/creator');
 
   // Based on the above options, 0 = creator, 1 = attendee
-  const [selectedNavSwitchIndex, setSelectedNavSwitchIndex] = useState(isInCreatorDashboard ? 0 : 1);
+  // const [selectedNavSwitchIndex, setSelectedNavSwitchIndex] = useState(isInCreatorDashboard ? 0 : 1);
 
   // const isActive = (path) => {
   //   if (history.location.pathname.includes(path)) {
@@ -67,7 +67,7 @@ const DashboardHeader = () => {
 
     if (userDetails.is_creator) {
       trackAndNavigate(Routes.creatorDashboard.rootPath, user.click.switchToCreator);
-      setSelectedNavSwitchIndex(0);
+      // setSelectedNavSwitchIndex(0);
     } else {
       Modal.confirm({
         autoFocusButton: 'cancel',
@@ -90,7 +90,7 @@ const DashboardHeader = () => {
         cancelText: 'Talk to Us',
         onOk: () => {
           trackAndNavigate(Routes.profile, attendee.click.dashboard.becomeHost);
-          setSelectedNavSwitchIndex(0);
+          // setSelectedNavSwitchIndex(0);
         },
         onCancel: () => openFreshChatWidget(),
       });
@@ -111,7 +111,7 @@ const DashboardHeader = () => {
     if (value === 'creator' && !isInCreatorDashboard) {
       isCreatorCheck();
     } else if (value === 'attendee') {
-      setSelectedNavSwitchIndex(1);
+      // setSelectedNavSwitchIndex(1);
       trackAndNavigate(Routes.attendeeDashboard.rootPath, user.click.switchToAttendee);
     }
   };
@@ -126,7 +126,7 @@ const DashboardHeader = () => {
           <SwitchSelector
             onChange={handleNavSwitchChange}
             options={options}
-            forcedSelectedIndex={selectedNavSwitchIndex}
+            initialSelectedIndex={isInCreatorDashboard ? 0 : 1}
             {...switchSelectorProps}
           />
         </div>

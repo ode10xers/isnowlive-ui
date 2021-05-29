@@ -8,7 +8,11 @@
 
 .navSwitchItem {
   padding: 8px 4px;
-  color: inherit;
+  color: map-get($map: $colors, $key: 'Black');
+}
+
+input[checked] + .navSwitchItem {
+  color: map-get($map: $colors, $key: 'White');
 }
 
 .headerContainer {
@@ -44,15 +48,23 @@
     text-align: center;
   }
   .logout {
-    margin-left: 10px;
+    margin-left: 0px;
     float: right;
-    margin-top: -5px;
+    margin-top: 4px;
   }
 }
 
-@media (max-width: 425px) {
+@media (max-width: 426px) {
   .headerContainer {
-    height: 90px;
+    height: 96px;
     padding: 5px;
+  }
+
+  .navSwitchWrapper {
+    margin: 4px 0;
+  }
+
+  .logout {
+    margin-top: -40px;
   }
 }
