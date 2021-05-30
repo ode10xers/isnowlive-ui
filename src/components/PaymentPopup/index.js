@@ -347,7 +347,6 @@ const PaymentPopup = () => {
   const getAmountForPaymentRequest = () => {
     if (flexiblePaymentDetails?.enabled) {
       const minimumPrice = getMinimumPrice();
-
       return priceAmount < minimumPrice ? minimumPrice : priceAmount;
     } else {
       return totalPrice;
