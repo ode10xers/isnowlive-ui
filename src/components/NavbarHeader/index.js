@@ -2,23 +2,23 @@ import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Col, Menu, Button, Typography, Modal } from 'antd';
-import { VideoCameraAddOutlined, TeamOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import AuthModal from 'components/AuthModal';
+import DashboardToggle from 'components/DashboardToggle';
+import { resetBodyStyle } from 'components/Modals/modals';
 
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
 import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper';
+
 import { useGlobalContext } from 'services/globalContext';
-import { openFreshChatWidget } from 'services/integrations/fresh-chat';
 
 import styles from './style.module.scss';
-import { resetBodyStyle } from 'components/Modals/modals';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 const NavbarHeader = () => {
   const history = useHistory();
@@ -113,36 +113,6 @@ const NavbarHeader = () => {
     resetBodyStyle();
   };
 
-  const isCreatorCheck = () => {
-    const userDetails = getLocalUserDetails();
-
-    if (userDetails.is_creator) {
-      history.push(Routes.creatorDashboard.rootPath);
-    } else {
-      Modal.confirm({
-        autoFocusButton: 'cancel',
-        centered: true,
-        closable: true,
-        maskClosable: true,
-        content: (
-          <>
-            <Paragraph>Ready to become a host and start making money by hosting live events?</Paragraph>
-            <Paragraph>
-              By clicking on "<strong>Become Host</strong>" your account will be upgraded to a host account and you will
-              get access to your dashboard and features empowering you to host live events on topics you are passionate
-              about and make money from it.
-            </Paragraph>
-          </>
-        ),
-        title: 'Become a Host',
-        okText: 'Become Host',
-        cancelText: 'Talk to Us',
-        onOk: () => history.push(Routes.profile),
-        onCancel: () => openFreshChatWidget(),
-      });
-    }
-  };
-
   const isActive = (path) => location.pathname.includes(path);
 
   const siteLinkActive = (section) => {
@@ -227,28 +197,7 @@ const NavbarHeader = () => {
             </Col>
             {localUserDetails && inDashboard() && (
               <Col className={styles.modeSelectWrapper}>
-                <span
-                  className={classNames(
-                    styles.ml10,
-                    styles.navItem,
-                    isActive(Routes.creatorDashboard.rootPath) ? styles.active : undefined
-                  )}
-                  onClick={() => isCreatorCheck()}
-                >
-                  <VideoCameraAddOutlined className={styles.navItemIcon} />
-                  Hosting
-                </span>
-                <span
-                  className={classNames(
-                    styles.ml10,
-                    styles.navItem,
-                    isActive(Routes.attendeeDashboard.rootPath) ? styles.active : undefined
-                  )}
-                  onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
-                >
-                  <TeamOutlined className={styles.navItemIcon} />
-                  Attending
-                </span>
+                <DashboardToggle />
               </Col>
             )}
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
@@ -419,33 +368,8 @@ const NavbarHeader = () => {
                   <Col xs={24}>
                     <ul className={styles.menuLinks}>
                       {localUserDetails && inDashboard() && (
-                        <li key="Mode Selection">
-                          <Row gutter={[8, 8]}>
-                            <Col xs={12}>
-                              <span
-                                className={classNames(
-                                  styles.navItem,
-                                  isActive(Routes.creatorDashboard.rootPath) ? styles.active : undefined
-                                )}
-                                onClick={() => isCreatorCheck()}
-                              >
-                                <VideoCameraAddOutlined className={styles.navItemIcon} />
-                                Hosting
-                              </span>
-                            </Col>
-                            <Col xs={12}>
-                              <span
-                                className={classNames(
-                                  styles.navItem,
-                                  isActive(Routes.attendeeDashboard.rootPath) ? styles.active : undefined
-                                )}
-                                onClick={() => history.push(Routes.attendeeDashboard.rootPath)}
-                              >
-                                <TeamOutlined className={styles.navItemIcon} />
-                                Attending
-                              </span>
-                            </Col>
-                          </Row>
+                        <li key="Mode Selection" className={styles.mobileToggleWrapper}>
+                          <DashboardToggle />
                         </li>
                       )}
                       <li

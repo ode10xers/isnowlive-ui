@@ -27,7 +27,7 @@
 }
 
 .modeSelectWrapper {
-  flex: 0 1 200px;
+  flex: 0 1 220px;
 }
 
 .creatorSiteName {
@@ -111,6 +111,12 @@
       width: 100%;
       text-align: left;
       padding: 8px 4px 16px;
+
+      &.mobileToggleWrapper {
+        margin: 0 auto;
+        width: fit-content;
+        min-width: 240px;
+      }
 
       &.active {
         border-bottom: 1px solid map-get($map: $colors, $key: 'DodgerBlue');

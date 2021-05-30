@@ -75,7 +75,7 @@ const CalendarSessions = () => {
     setAuthModalVisible(false);
   };
 
-  const createOrder = async (couponCode = '', priceAmount = 0) => {
+  const createOrder = async (couponCode = '', priceAmount = 5) => {
     // Currently discount engine has not been implemented for session
     // however this form of createOrder will be what is used to accommodate
     // the new Payment Popup
