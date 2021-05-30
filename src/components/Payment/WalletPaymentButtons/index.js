@@ -95,7 +95,7 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
       onAfterPayment(orderResponse, verifyOrderRes);
       setIsLoading(false);
     },
-    [onBeforePayment, onAfterPayment, stripe, paymentRequest]
+    [onBeforePayment, onAfterPayment, stripe, paymentRequest, hidePaymentPopup]
   );
 
   useEffect(() => {
