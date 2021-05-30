@@ -7,8 +7,11 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 
+import { useGlobalContext } from 'services/globalContext';
+
 const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest }) => {
   const stripe = useStripe();
+  const { hidePaymentPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -88,6 +91,7 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
         paymentRequest.abort();
       }
 
+      hidePaymentPopup();
       onAfterPayment(orderResponse, verifyOrderRes);
       setIsLoading(false);
     },
