@@ -79,3 +79,17 @@
     cursor: pointer;
   }
 }
+
+.centeredPreview {
+  margin: auto;
+  min-height: 200px;
+  object-fit: scale-down;
+}
+
+.thumbnailPreview {
+  @extend .centeredPreview;
+
+  border: none;
+  width: 360px;
+  height: 200px;
+}

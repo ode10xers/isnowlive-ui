@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import {
   Row,
@@ -7,6 +7,7 @@ import {
   Form,
   Typography,
   Radio,
+  Image,
   Input,
   InputNumber,
   Select,
@@ -265,6 +266,7 @@ const UploadVideoModal = ({
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
+      setVideoPreviewTime('00:00:01');
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
@@ -503,6 +505,33 @@ const UploadVideoModal = ({
       return 'Set a preview thumbnail';
     }
   };
+
+  const handleUploadStaticImage = () => {
+    if (!coverImageUrl?.endsWith('.gif')) {
+      updateVideoWithImageUrl(coverImageUrl);
+    }
+  };
+
+  const videoThumbnailPreview = useMemo(
+    () =>
+      videoPreviewTime ? (
+        <iframe
+          className={styles.thumbnailPreview}
+          key={videoPreviewTime}
+          title={editedVideo?.title || ''}
+          src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+            videoPreviewTime
+          )}&height=200&duration=15s`}
+          // style={{
+          //   border: 'none',
+          //   width: 400,
+          //   height: 200,
+          // }}
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+        ></iframe>
+      ) : null,
+    [videoPreviewTime, videoPreviewToken, editedVideo]
+  );
 
   return (
     <Modal
@@ -849,6 +878,14 @@ const UploadVideoModal = ({
           <Tabs defaultActiveKey="static">
             <Tabs.TabPane key="static" tab={<Text strong> Static Image </Text>}>
               <Row justify="center" gutter={[8, 8]}>
+                {coverImageUrl && !coverImageUrl?.endsWith('.gif') && (
+                  <Col xs={24}>
+                    <Paragraph strong>
+                      You can click on the image below to change the image. You will have to click on submit for the
+                      changes to be saved.
+                    </Paragraph>
+                  </Col>
+                )}
                 <Col xs={24}>
                   <div className={styles.imageWrapper}>
                     <ImageUpload
@@ -857,7 +894,7 @@ const UploadVideoModal = ({
                       name="thumbnail_url"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       onChange={setCoverImageUrl}
-                      value={coverImageUrl}
+                      value={coverImageUrl?.endsWith('.gif') ? null : coverImageUrl}
                       label="Cover Image"
                     />
                   </div>
@@ -866,38 +903,44 @@ const UploadVideoModal = ({
                   <Button
                     block
                     type="primary"
-                    disabled={!coverImageUrl}
-                    onClick={() => updateVideoWithImageUrl(coverImageUrl)}
+                    disabled={!coverImageUrl || coverImageUrl?.endsWith('.gif')}
+                    onClick={handleUploadStaticImage}
                   >
-                    {' '}
                     Submit
                   </Button>
                 </Col>
               </Row>
             </Tabs.TabPane>
             <Tabs.TabPane key="preview" tab={<Text strong> Video Preview </Text>}>
-              <Row justify="center" style={{ textAlign: 'center' }}>
+              <Row justify="center" gutter={[12, 20]} className={styles.textAlignCenter}>
+                {editedVideo?.thumbnail_url ? (
+                  <>
+                    <Col xs={24} md={12}>
+                      <Row justify="center" align="middle" gutter={[8, 16]}>
+                        <Col xs={24}>
+                          <Text strong> Previous Thumbnail </Text>
+                        </Col>
+                        <Col xs={24}>
+                          <Image preview={false} src={editedVideo?.thumbnail_url} className={styles.centeredPreview} />
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Row justify="center" align="middle" gutter={[8, 16]}>
+                        <Col xs={24}>
+                          <Text strong> New Thumbnail </Text>
+                        </Col>
+                        <Col xs={24}>{videoThumbnailPreview}</Col>
+                      </Row>
+                    </Col>
+                  </>
+                ) : (
+                  <Col xs={24}>{videoThumbnailPreview}</Col>
+                )}
                 <Col xs={24}>
-                  {videoPreviewTime && (
-                    <iframe
-                      key={videoPreviewTime}
-                      title={editedVideo?.title || ''}
-                      src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
-                        videoPreviewTime
-                      )}&height=200&duration=15s`}
-                      style={{
-                        border: 'none',
-                        width: 400,
-                        height: 200,
-                      }}
-                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                    ></iframe>
-                  )}
-                </Col>
-                <Col xs={24} className={styles.mt20}>
                   We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
                 </Col>
-                <Col xs={24} className={styles.mt20}>
+                <Col xs={24}>
                   Select Time:{' '}
                   <TimePicker
                     showNow={false}
@@ -905,7 +948,7 @@ const UploadVideoModal = ({
                     onChange={handleVideoPreviewTimeChange}
                   />
                 </Col>
-                <Col xs={24} className={styles.mt20}>
+                <Col xs={24}>
                   <Button
                     block
                     type="primary"
