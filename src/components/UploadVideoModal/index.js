@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import {
   Row,
@@ -7,9 +7,11 @@ import {
   Form,
   Typography,
   Radio,
+  Image,
   Input,
   InputNumber,
   Select,
+  Spin,
   Button,
   Progress,
   TimePicker,
@@ -99,9 +101,11 @@ const UploadVideoModal = ({
   const [isCourseVideo, setIsCourseVideo] = useState(false);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
-  const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
+  const [videoPreviewTime, setVideoPreviewTime] = useState('');
   const [, setVideoLength] = useState(0);
   const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState('preview');
+  const [videoPreviewLoading, setVideoPreviewLoading] = useState(true);
 
   const uppy = useRef(null);
   uppy.current = useUppy(() => {
@@ -265,6 +269,7 @@ const UploadVideoModal = ({
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
+      setVideoPreviewTime('');
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
@@ -486,10 +491,15 @@ const UploadVideoModal = ({
   };
 
   const handleVideoPreviewTimeChange = (time, timeString) => {
-    setVideoPreviewTime(timeString.length > 0 ? timeString : '00:00:01');
+    setVideoPreviewTime(timeString.length > 0 ? timeString : '');
+    setVideoPreviewLoading(true);
   };
 
   const parseTimeString = (timeString) => {
+    if (!timeString) {
+      return '';
+    }
+
     let time = timeString.split(':');
     return `${time[0] || 0}h${time[1] || 0}m${time[2] || 0}s`;
   };
@@ -503,6 +513,54 @@ const UploadVideoModal = ({
       return 'Set a preview thumbnail';
     }
   };
+
+  const handleUploadStaticImage = () => {
+    if (!coverImageUrl?.endsWith('.gif')) {
+      updateVideoWithImageUrl(coverImageUrl);
+    }
+  };
+
+  const videoThumbnailPreview = useMemo(
+    () =>
+      videoPreviewTime ? (
+        <iframe
+          onLoad={() => setVideoPreviewLoading(false)}
+          className={styles.thumbnailPreview}
+          key={videoPreviewTime}
+          title={editedVideo?.title || ''}
+          src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
+            videoPreviewTime
+          )}&height=200&duration=15s`}
+          // style={{
+          //   border: 'none',
+          //   width: 400,
+          //   height: 200,
+          // }}
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+        ></iframe>
+      ) : (
+        <div className={styles.mt50}>
+          <Text strong> Select a timestamp below and click OK to see a preview </Text>
+        </div>
+      ),
+    [videoPreviewTime, videoPreviewToken, editedVideo]
+  );
+
+  const handleRadioTabChange = (e) => {
+    setActiveTabKey(e.target.value);
+  };
+
+  const handleCustomTabBarRender = (props, DefaultTabBar) => (
+    <div className={styles.mb20}>
+      <Radio.Group value={activeTabKey} onChange={handleRadioTabChange}>
+        {Array.isArray(props.panes) ? (
+          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+        ) : (
+          <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
+        )}
+      </Radio.Group>
+    </div>
+  );
 
   return (
     <Modal
@@ -846,9 +904,90 @@ const UploadVideoModal = ({
         )}
 
         {formPart === 3 && (
-          <Tabs defaultActiveKey="static">
-            <Tabs.TabPane key="static" tab={<Text strong> Static Image </Text>}>
+          <Tabs renderTabBar={handleCustomTabBarRender} type="card" activeKey={activeTabKey}>
+            <Tabs.TabPane key="preview" tab="Video Preview">
+              <Row justify="center" gutter={[12, 20]} className={styles.textAlignCenter}>
+                {editedVideo?.thumbnail_url ? (
+                  <>
+                    <Col xs={24} md={12}>
+                      <Row justify="center" align="middle" gutter={[8, 16]}>
+                        <Col xs={24}>
+                          <Text strong> Previous Thumbnail </Text>
+                        </Col>
+                        <Col xs={24}>
+                          <Image preview={false} src={editedVideo?.thumbnail_url} className={styles.centeredPreview} />
+                        </Col>
+                      </Row>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Row justify="center" align="middle" gutter={[8, 16]}>
+                        <Col xs={24}>
+                          <Text strong> New Thumbnail </Text>
+                        </Col>
+                        <Col xs={24} className={styles.relativeContainer}>
+                          {videoPreviewLoading && videoPreviewTime && (
+                            <div className={styles.videoPreviewLoaderContainer}>
+                              <Spin
+                                className={styles.videoPreviewLoader}
+                                size="large"
+                                spinning={true}
+                                tip="Loading preview"
+                              />
+                            </div>
+                          )}
+                          {videoThumbnailPreview}
+                        </Col>
+                      </Row>
+                    </Col>
+                  </>
+                ) : (
+                  <Col xs={24} className={styles.relativeContainer}>
+                    {videoPreviewLoading && videoPreviewTime && (
+                      <div className={styles.videoPreviewLoaderContainer}>
+                        <Spin
+                          className={styles.videoPreviewLoader}
+                          size="large"
+                          spinning={true}
+                          tip="Loading preview"
+                        />
+                      </div>
+                    )}
+                    {videoThumbnailPreview}
+                  </Col>
+                )}
+                <Col xs={24}>
+                  We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
+                </Col>
+                <Col xs={editedVideo?.thumbnail_url ? { span: 12, offset: 12 } : 24}>
+                  Select Time:{' '}
+                  <TimePicker
+                    showNow={false}
+                    value={videoPreviewTime ? moment(videoPreviewTime, 'hh:mm:ss') : null}
+                    onChange={handleVideoPreviewTimeChange}
+                  />
+                </Col>
+                <Col xs={24}>
+                  <Button
+                    block
+                    type="primary"
+                    className="submit-video-thumbnail-btn"
+                    onClick={() => onCoverImageUpload()}
+                  >
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </Tabs.TabPane>
+            <Tabs.TabPane key="static" tab="Static Image">
               <Row justify="center" gutter={[8, 8]}>
+                {coverImageUrl && !coverImageUrl?.endsWith('.gif') && (
+                  <Col xs={24}>
+                    <Paragraph strong>
+                      You can click on the image below to change the image. You will have to click on submit for the
+                      changes to be saved.
+                    </Paragraph>
+                  </Col>
+                )}
                 <Col xs={24}>
                   <div className={styles.imageWrapper}>
                     <ImageUpload
@@ -857,7 +996,7 @@ const UploadVideoModal = ({
                       name="thumbnail_url"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       onChange={setCoverImageUrl}
-                      value={coverImageUrl}
+                      value={coverImageUrl?.endsWith('.gif') ? null : coverImageUrl}
                       label="Cover Image"
                     />
                   </div>
@@ -866,51 +1005,8 @@ const UploadVideoModal = ({
                   <Button
                     block
                     type="primary"
-                    disabled={!coverImageUrl}
-                    onClick={() => updateVideoWithImageUrl(coverImageUrl)}
-                  >
-                    {' '}
-                    Submit
-                  </Button>
-                </Col>
-              </Row>
-            </Tabs.TabPane>
-            <Tabs.TabPane key="preview" tab={<Text strong> Video Preview </Text>}>
-              <Row justify="center" style={{ textAlign: 'center' }}>
-                <Col xs={24}>
-                  {videoPreviewTime && (
-                    <iframe
-                      key={videoPreviewTime}
-                      title={editedVideo?.title || ''}
-                      src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
-                        videoPreviewTime
-                      )}&height=200&duration=15s`}
-                      style={{
-                        border: 'none',
-                        width: 400,
-                        height: 200,
-                      }}
-                      allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                    ></iframe>
-                  )}
-                </Col>
-                <Col xs={24} className={styles.mt20}>
-                  We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
-                </Col>
-                <Col xs={24} className={styles.mt20}>
-                  Select Time:{' '}
-                  <TimePicker
-                    showNow={false}
-                    defaultValue={moment(videoPreviewTime, 'hh:mm:ss')}
-                    onChange={handleVideoPreviewTimeChange}
-                  />
-                </Col>
-                <Col xs={24} className={styles.mt20}>
-                  <Button
-                    block
-                    type="primary"
-                    className="submit-video-thumbnail-btn"
-                    onClick={() => onCoverImageUpload()}
+                    disabled={!coverImageUrl || coverImageUrl?.endsWith('.gif')}
+                    onClick={handleUploadStaticImage}
                   >
                     Submit
                   </Button>
