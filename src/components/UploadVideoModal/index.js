@@ -11,6 +11,7 @@ import {
   Input,
   InputNumber,
   Select,
+  Spin,
   Button,
   Progress,
   TimePicker,
@@ -104,6 +105,7 @@ const UploadVideoModal = ({
   const [, setVideoLength] = useState(0);
   const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState('preview');
+  const [videoPreviewLoading, setVideoPreviewLoading] = useState(true);
 
   const uppy = useRef(null);
   uppy.current = useUppy(() => {
@@ -490,6 +492,7 @@ const UploadVideoModal = ({
 
   const handleVideoPreviewTimeChange = (time, timeString) => {
     setVideoPreviewTime(timeString.length > 0 ? timeString : '');
+    setVideoPreviewLoading(true);
   };
 
   const parseTimeString = (timeString) => {
@@ -521,6 +524,7 @@ const UploadVideoModal = ({
     () =>
       videoPreviewTime ? (
         <iframe
+          onLoad={() => setVideoPreviewLoading(false)}
           className={styles.thumbnailPreview}
           key={videoPreviewTime}
           title={editedVideo?.title || ''}
@@ -534,7 +538,11 @@ const UploadVideoModal = ({
           // }}
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
         ></iframe>
-      ) : null,
+      ) : (
+        <div className={styles.mt50}>
+          <Text strong> Select a timestamp below and click OK to see a preview </Text>
+        </div>
+      ),
     [videoPreviewTime, videoPreviewToken, editedVideo]
   );
 
@@ -916,12 +924,36 @@ const UploadVideoModal = ({
                         <Col xs={24}>
                           <Text strong> New Thumbnail </Text>
                         </Col>
-                        <Col xs={24}>{videoThumbnailPreview}</Col>
+                        <Col xs={24} className={styles.relativeContainer}>
+                          {videoPreviewLoading && videoPreviewTime && (
+                            <div className={styles.videoPreviewLoaderContainer}>
+                              <Spin
+                                className={styles.videoPreviewLoader}
+                                size="large"
+                                spinning={true}
+                                tip="Loading preview"
+                              />
+                            </div>
+                          )}
+                          {videoThumbnailPreview}
+                        </Col>
                       </Row>
                     </Col>
                   </>
                 ) : (
-                  <Col xs={24}>{videoThumbnailPreview}</Col>
+                  <Col xs={24} className={styles.relativeContainer}>
+                    {videoPreviewLoading && videoPreviewTime && (
+                      <div className={styles.videoPreviewLoaderContainer}>
+                        <Spin
+                          className={styles.videoPreviewLoader}
+                          size="large"
+                          spinning={true}
+                          tip="Loading preview"
+                        />
+                      </div>
+                    )}
+                    {videoThumbnailPreview}
+                  </Col>
                 )}
                 <Col xs={24}>
                   We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
