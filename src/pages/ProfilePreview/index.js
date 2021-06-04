@@ -76,7 +76,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
   const [isLoading, setIsLoading] = useState(true);
   const [isOnDashboard, setIsOnDashboard] = useState(false);
   const [profile, setProfile] = useState({});
-  const [view, setView] = useState('calendar');
+  const [view, setView] = useState('list');
   const [calendarSession, setCalendarSession] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState(productKeys.SESSION);
   const [isListLoading, setIsListLoading] = useState(false);

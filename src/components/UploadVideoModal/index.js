@@ -100,9 +100,10 @@ const UploadVideoModal = ({
   const [isCourseVideo, setIsCourseVideo] = useState(false);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
-  const [videoPreviewTime, setVideoPreviewTime] = useState('00:00:01');
+  const [videoPreviewTime, setVideoPreviewTime] = useState('');
   const [, setVideoLength] = useState(0);
   const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
+  const [activeTabKey, setActiveTabKey] = useState('preview');
 
   const uppy = useRef(null);
   uppy.current = useUppy(() => {
@@ -266,7 +267,7 @@ const UploadVideoModal = ({
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
       setVideoType(videoTypes.FREE.name);
-      setVideoPreviewTime('00:00:01');
+      setVideoPreviewTime('');
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
@@ -488,10 +489,14 @@ const UploadVideoModal = ({
   };
 
   const handleVideoPreviewTimeChange = (time, timeString) => {
-    setVideoPreviewTime(timeString.length > 0 ? timeString : '00:00:01');
+    setVideoPreviewTime(timeString.length > 0 ? timeString : '');
   };
 
   const parseTimeString = (timeString) => {
+    if (!timeString) {
+      return '';
+    }
+
     let time = timeString.split(':');
     return `${time[0] || 0}h${time[1] || 0}m${time[2] || 0}s`;
   };
@@ -531,6 +536,22 @@ const UploadVideoModal = ({
         ></iframe>
       ) : null,
     [videoPreviewTime, videoPreviewToken, editedVideo]
+  );
+
+  const handleRadioTabChange = (e) => {
+    setActiveTabKey(e.target.value);
+  };
+
+  const handleCustomTabBarRender = (props, DefaultTabBar) => (
+    <div className={styles.mb20}>
+      <Radio.Group value={activeTabKey} onChange={handleRadioTabChange}>
+        {Array.isArray(props.panes) ? (
+          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+        ) : (
+          <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
+        )}
+      </Radio.Group>
+    </div>
   );
 
   return (
@@ -875,43 +896,8 @@ const UploadVideoModal = ({
         )}
 
         {formPart === 3 && (
-          <Tabs defaultActiveKey="static">
-            <Tabs.TabPane key="static" tab={<Text strong> Static Image </Text>}>
-              <Row justify="center" gutter={[8, 8]}>
-                {coverImageUrl && !coverImageUrl?.endsWith('.gif') && (
-                  <Col xs={24}>
-                    <Paragraph strong>
-                      You can click on the image below to change the image. You will have to click on submit for the
-                      changes to be saved.
-                    </Paragraph>
-                  </Col>
-                )}
-                <Col xs={24}>
-                  <div className={styles.imageWrapper}>
-                    <ImageUpload
-                      aspect={4}
-                      className={classNames('avatar-uploader', styles.coverImage)}
-                      name="thumbnail_url"
-                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                      onChange={setCoverImageUrl}
-                      value={coverImageUrl?.endsWith('.gif') ? null : coverImageUrl}
-                      label="Cover Image"
-                    />
-                  </div>
-                </Col>
-                <Col xs={24}>
-                  <Button
-                    block
-                    type="primary"
-                    disabled={!coverImageUrl || coverImageUrl?.endsWith('.gif')}
-                    onClick={handleUploadStaticImage}
-                  >
-                    Submit
-                  </Button>
-                </Col>
-              </Row>
-            </Tabs.TabPane>
-            <Tabs.TabPane key="preview" tab={<Text strong> Video Preview </Text>}>
+          <Tabs renderTabBar={handleCustomTabBarRender} type="card" activeKey={activeTabKey}>
+            <Tabs.TabPane key="preview" tab="Video Preview">
               <Row justify="center" gutter={[12, 20]} className={styles.textAlignCenter}>
                 {editedVideo?.thumbnail_url ? (
                   <>
@@ -940,11 +926,11 @@ const UploadVideoModal = ({
                 <Col xs={24}>
                   We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
                 </Col>
-                <Col xs={24}>
+                <Col xs={editedVideo?.thumbnail_url ? { span: 12, offset: 12 } : 24}>
                   Select Time:{' '}
                   <TimePicker
                     showNow={false}
-                    defaultValue={moment(videoPreviewTime, 'hh:mm:ss')}
+                    value={videoPreviewTime ? moment(videoPreviewTime, 'hh:mm:ss') : null}
                     onChange={handleVideoPreviewTimeChange}
                   />
                 </Col>
@@ -954,6 +940,41 @@ const UploadVideoModal = ({
                     type="primary"
                     className="submit-video-thumbnail-btn"
                     onClick={() => onCoverImageUpload()}
+                  >
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            </Tabs.TabPane>
+            <Tabs.TabPane key="static" tab="Static Image">
+              <Row justify="center" gutter={[8, 8]}>
+                {coverImageUrl && !coverImageUrl?.endsWith('.gif') && (
+                  <Col xs={24}>
+                    <Paragraph strong>
+                      You can click on the image below to change the image. You will have to click on submit for the
+                      changes to be saved.
+                    </Paragraph>
+                  </Col>
+                )}
+                <Col xs={24}>
+                  <div className={styles.imageWrapper}>
+                    <ImageUpload
+                      aspect={4}
+                      className={classNames('avatar-uploader', styles.coverImage)}
+                      name="thumbnail_url"
+                      action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                      onChange={setCoverImageUrl}
+                      value={coverImageUrl?.endsWith('.gif') ? null : coverImageUrl}
+                      label="Cover Image"
+                    />
+                  </div>
+                </Col>
+                <Col xs={24}>
+                  <Button
+                    block
+                    type="primary"
+                    disabled={!coverImageUrl || coverImageUrl?.endsWith('.gif')}
+                    onClick={handleUploadStaticImage}
                   >
                     Submit
                   </Button>
