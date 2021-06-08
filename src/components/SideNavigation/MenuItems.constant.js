@@ -240,6 +240,13 @@ export const creatorMenuItems = [
         mixPanelTag: creator.click.dashboard.emailTemplatesNav,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.emailTemplates,
       },
+      {
+        order: 3,
+        key: 'email_list',
+        title: 'Email List',
+        mixPanelTag: creator.click.dashboard.emailListNav,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.emailList,
+      },
     ],
   },
   {

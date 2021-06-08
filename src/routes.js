@@ -45,6 +45,7 @@ const Routes = {
     documents: '/documents',
     audiences: '/audiences',
     emailTemplates: '/templates/email',
+    emailList: '/templates/email-list',
     accountSettings: '/settings',
     legals: '/legals',
     plugins: '/plugins',
