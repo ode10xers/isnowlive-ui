@@ -34,15 +34,19 @@ const EmailList = () => {
   const totalItemsPerPage = 10;
   const isCreating = useMemo(() => selectedTemplate === defaultTemplateKey, [selectedTemplate]);
 
-  const hideSendEmailModal = () => {
+  const hideSendEmailModal = (flag) => {
+    if (flag === true) {
+      fetchEmailListDetails(selectedTemplate);
+    }
     setSendEmailModalVisible(false);
   };
 
   const deleteAudience = async (audience) => {
     try {
-      const { status } = await apis.audiences.deleteAudienceFromList({
-        id: [audience.id],
-      });
+      const payload = {
+        audiences: [audience.id],
+      };
+      const { status } = await apis.newsletter.deleteEmailListAudience(selectedTemplate, payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('Successfully removed audience');
@@ -112,9 +116,8 @@ const EmailList = () => {
     {
       title: 'Actions',
       width: '15%',
-      hidden: !isCreating,
       render: (record) => (
-        <Row gutter={[8, 8]}>
+        <Row gutter={[8, 8]} hidden={isCreating}>
           <Col xs={4}>
             <Popconfirm
               arrowPointAtCenter
@@ -185,6 +188,12 @@ const EmailList = () => {
   }, [selectedTemplate, fetchEmailListDetails, isCreating]);
 
   const handleChangeSelectedTemplate = (val) => {
+    if (val === defaultTemplateKey) {
+      setSelectedTemplate(val);
+      setPageNumber(1);
+      getAudienceList(1, totalItemsPerPage);
+    }
+
     const selectedTemplateData = creatorEmailTemplates.find((template) => template.id === val);
     form.setFieldsValue({ ...form.getFieldsValue(), templateName: selectedTemplateData?.name || null });
     setSelectedTemplate(val);
@@ -214,7 +223,7 @@ const EmailList = () => {
     setIsLoading(false);
   };
 
-  const handleFormFinish = (values) => {
+  const handleFormFinish = async (values) => {
     setIsLoading(true);
 
     if (isCreating) {
@@ -224,12 +233,13 @@ const EmailList = () => {
           audiences: selectedAudiences,
         };
 
-        const { status, data } = apis.newsletter.createEmailList(payload);
+        const { status, data } = await apis.newsletter.createEmailList(payload);
 
-        if (isAPISuccess(status) || data) {
+        if (isAPISuccess(status)) {
           showSuccessModal(`Email List successfully ${isCreating ? 'created' : 'updated'}`);
-          fetchCreatorEmailList();
           setSelectedTemplate(data.id);
+          fetchEmailListDetails(data.id);
+          fetchCreatorEmailList();
           form.setFieldsValue({ ...form.getFieldsValue(), templateName: data?.name });
         }
       } catch (error) {
@@ -239,7 +249,6 @@ const EmailList = () => {
         );
       }
     } else {
-      console.log(selectedTemplate);
       setSendEmailModalVisible(true);
     }
 
@@ -316,7 +325,7 @@ const EmailList = () => {
                     </Col>
                     <Col xs={24} md={12} lg={8}>
                       <Button block type="primary" htmlType="submit">
-                        {isCreating ? 'Save new' : 'Update this'} list
+                        {isCreating ? 'Create' : 'Update'} list
                       </Button>
                     </Col>
                   </Row>
@@ -340,7 +349,7 @@ const EmailList = () => {
                 }}
               />
             </Col>
-            <Col xs={8}>
+            <Col xs={8} hidden={!isCreating}>
               <Button
                 block
                 type="default"

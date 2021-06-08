@@ -23,14 +23,13 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
   const isCreating = useMemo(() => selectedTemplate === defaultTemplateKey, [selectedTemplate]);
 
   useEffect(() => {
-    console.log(listID);
     if (visible && listID !== undefined) {
       setValidRecipients(listID);
       setSelectedTemplate(listID);
     }
   }, [visible, form, listID]);
 
-  const handleFormFinish = (values) => {
+  const handleFormFinish = async (values) => {
     setIsLoading(true);
 
     try {
@@ -38,11 +37,11 @@ const AllAudienceModal = ({ visible, closeModal, listID }) => {
         audiences: selectedAudiences,
       };
 
-      const { status } = apis.newsletter.updateEmailList(validRecipients, payload);
+      const { status } = await apis.newsletter.updateEmailList(validRecipients, payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal(`Email List successfully ${isCreating ? 'created' : 'updated'}`);
-        closeModal();
+        closeModal(true);
       }
     } catch (error) {
       showErrorModal(
