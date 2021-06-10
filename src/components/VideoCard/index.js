@@ -73,6 +73,8 @@ const VideoCard = ({
     );
   };
 
+  const videoThumbnailUrl = video?.thumbnail_url || orderDetails?.thumbnail_url || 'error';
+
   return (
     <Card
       className={styles.videoCard}
@@ -85,7 +87,7 @@ const VideoCard = ({
         cover || (
           <Image
             className={styles.videoThumbnail}
-            src={video?.thumbnail_url || orderDetails?.thumbnail_url || 'error'}
+            src={videoThumbnailUrl}
             alt={video?.title || orderDetails?.title}
             fallback={DefaultImage()}
             preview={false}

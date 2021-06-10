@@ -273,6 +273,7 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
+      setActiveTabKey('preview');
       removeUppyListeners();
       resetBodyStyle();
     };
@@ -991,7 +992,6 @@ const UploadVideoModal = ({
                 <Col xs={24}>
                   <div className={styles.imageWrapper}>
                     <ImageUpload
-                      aspect={4}
                       className={classNames('avatar-uploader', styles.coverImage)}
                       name="thumbnail_url"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
