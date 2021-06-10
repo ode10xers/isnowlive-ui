@@ -111,8 +111,6 @@ const PublicVideoList = ({ videos }) => {
     setShowPurchaseVideoModal(false);
   };
 
-  console.log(videos.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : 0)).map((video) => video.thumbnail_url));
-
   return (
     <div className={styles.box}>
       <AuthModal
