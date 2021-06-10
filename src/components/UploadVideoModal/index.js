@@ -253,6 +253,10 @@ const UploadVideoModal = ({
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
 
+        setActiveTabKey(
+          editedVideo.thumbnail_url && editedVideo.thumbnail_url?.endsWith('.gif') ? 'preview' : 'static'
+        );
+
         updateUppyListeners(editedVideo.external_id);
       } else {
         form.resetFields();
@@ -273,6 +277,7 @@ const UploadVideoModal = ({
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
       setCurrency('');
+      setActiveTabKey('preview');
       removeUppyListeners();
       resetBodyStyle();
     };
@@ -972,6 +977,7 @@ const UploadVideoModal = ({
                     type="primary"
                     className="submit-video-thumbnail-btn"
                     onClick={() => onCoverImageUpload()}
+                    disabled={!videoPreviewTime}
                   >
                     Submit
                   </Button>
@@ -991,7 +997,6 @@ const UploadVideoModal = ({
                 <Col xs={24}>
                   <div className={styles.imageWrapper}>
                     <ImageUpload
-                      aspect={4}
                       className={classNames('avatar-uploader', styles.coverImage)}
                       name="thumbnail_url"
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"

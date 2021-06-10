@@ -35,7 +35,7 @@
 
 .imageWrapper {
   position: relative;
-  height: 200px;
+  // height: 200px;
 }
 
 .colorPickerPreview {
@@ -52,7 +52,8 @@
 .coverImage {
   & > div {
     width: 100% !important;
-    height: 200px !important;
+    min-height: 330px;
+    // height: 200px !important;
   }
 }
 

@@ -109,14 +109,14 @@ const LiveCourses = ({
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
-        width: '210px',
+        // width: '210px',
         render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
       },
       {
         title: 'Course Content',
         dataIndex: 'inventory_ids',
         key: 'inventory_ids',
-        width: '200px',
+        // width: '200px',
         render: (text, record) => (
           <>
             {record.inventory_ids?.length > 0 && <Tag color="volcano"> {record.inventory_ids?.length} sessions</Tag>}

@@ -80,6 +80,7 @@ const formInitialValues = {
   courseTagType: 'anyone',
   videoList: [],
   selectedMemberTags: [],
+  colorCode: initialColor,
 };
 
 const { Text, Title, Paragraph } = Typography;
@@ -951,7 +952,6 @@ const CreateCourseModal = ({
               >
                 <div className={styles.imageWrapper}>
                   <ImageUpload
-                    aspect={4}
                     className={classNames('avatar-uploader', styles.coverImage)}
                     name="courseImageUrl"
                     action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
