@@ -8,7 +8,13 @@
 
   .cardImage {
     border-radius: 5px;
-    object-fit: fill;
+    object-fit: scale-down;
+    height: 100%;
+  }
+
+  .cardDetailsContainer {
+    display: flex;
+    flex-direction: column;
   }
 
   .sessionType {
@@ -16,6 +22,10 @@
     background: map-get($colors, $key: 'PaleCornflowerBlue');
     border-radius: 8px;
     padding: 5px 10px 5px 10px;
+  }
+
+  .tagsList {
+    margin-top: auto !important;
   }
 
   .tags {
@@ -40,7 +50,7 @@
         sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
     }
 
-    height: 78px;
+    height: 64px;
     // overflow-y: auto;
     overflow: hidden;
     margin: 5px 0;

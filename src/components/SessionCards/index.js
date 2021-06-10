@@ -71,7 +71,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                 <Col span={24} key={session.session_id}>
                   <Card
                     className={styles.sessionCard}
-                    bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}
+                    bodyStyle={{ padding: 16 }}
                     onClick={() => redirectToSessionsPage(session)}
                   >
                     {isMobileDevice || compactView ? (
@@ -79,7 +79,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                         <Col xs={24}>
                           <Image
                             preview={false}
-                            height={100}
+                            // height={100}
                             className={styles.cardImage}
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
@@ -119,13 +119,13 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                         <Col xs={24} md={11}>
                           <Image
                             preview={false}
-                            height={136}
-                            width="100%"
+                            // height={136}
+                            // width="100%"
                             className={styles.cardImage}
                             src={isValidFile(session?.session_image_url) ? session.session_image_url : DefaultImage}
                           />
                         </Col>
-                        <Col xs={24} md={13}>
+                        <Col xs={24} md={13} className={styles.cardDetailsContainer}>
                           <Row>
                             <Col xs={24}>
                               <Title ellipsis={{ rows: 1 }} level={5}>
@@ -135,27 +135,25 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
                             <Col xs={24}>
                               <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
                             </Col>
-                            <Col xs={24}>
-                              <Row>
-                                <Col xs={24} lg={21}>
-                                  {isoDayOfWeek.map((day, index) => (
-                                    <Tag
-                                      key={`${session.session_id}_${day}`}
-                                      className={
-                                        session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
-                                      }
-                                      color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
-                                    >
-                                      {day}
-                                    </Tag>
-                                  ))}
-                                </Col>
-                                <Col xs={24} lg={3}>
-                                  <Tag color="cyan" className={styles.sessionTag}>
-                                    {session.group ? 'Group' : '1-on-1'}
-                                  </Tag>
-                                </Col>
-                              </Row>
+                          </Row>
+                          <Row className={styles.tagsList}>
+                            <Col xs={24} lg={21}>
+                              {isoDayOfWeek.map((day, index) => (
+                                <Tag
+                                  key={`${session.session_id}_${day}`}
+                                  className={
+                                    session.inventory_days.includes(index + 1) ? styles.tags : styles.tagsDisabled
+                                  }
+                                  color={session.inventory_days.includes(index + 1) ? 'blue' : 'default'}
+                                >
+                                  {day}
+                                </Tag>
+                              ))}
+                            </Col>
+                            <Col xs={24} lg={3}>
+                              <Tag color="cyan" className={styles.sessionTag}>
+                                {session.group ? 'Group' : '1-on-1'}
+                              </Tag>
                             </Col>
                           </Row>
                         </Col>

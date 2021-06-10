@@ -16,7 +16,7 @@ const ImageUpload = ({
   showUploadList = false,
   multiple = false,
   name,
-  aspect = 1,
+  aspect = 2.7015 / 1,
   className,
 }) => {
   const [loading] = useState(false);
