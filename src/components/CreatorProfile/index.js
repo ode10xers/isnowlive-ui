@@ -134,7 +134,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
               <Space size={'middle'}>
                 {creatorProfile.profile.social_media_links.website && (
                   <a
-                    href={`//${creatorProfile.profile.social_media_links.website}`}
+                    href={`${creatorProfile.profile.social_media_links.website}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
