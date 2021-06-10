@@ -86,7 +86,7 @@ const VideoCard = ({
       cover={
         cover || (
           <Image
-            className={styles.videoThumbnail}
+            className={videoThumbnailUrl.endsWith('.gif') ? styles.videoThumbnail : styles.staticVideoThumbnail}
             src={videoThumbnailUrl}
             alt={video?.title || orderDetails?.title}
             fallback={DefaultImage()}

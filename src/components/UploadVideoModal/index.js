@@ -253,6 +253,10 @@ const UploadVideoModal = ({
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
 
+        setActiveTabKey(
+          editedVideo.thumbnail_url && editedVideo.thumbnail_url?.endsWith('.gif') ? 'preview' : 'static'
+        );
+
         updateUppyListeners(editedVideo.external_id);
       } else {
         form.resetFields();
@@ -973,6 +977,7 @@ const UploadVideoModal = ({
                     type="primary"
                     className="submit-video-thumbnail-btn"
                     onClick={() => onCoverImageUpload()}
+                    disabled={!videoPreviewTime}
                   >
                     Submit
                   </Button>

@@ -111,6 +111,8 @@ const PublicVideoList = ({ videos }) => {
     setShowPurchaseVideoModal(false);
   };
 
+  console.log(videos.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : 0)).map((video) => video.thumbnail_url));
+
   return (
     <div className={styles.box}>
       <AuthModal
@@ -120,11 +122,13 @@ const PublicVideoList = ({ videos }) => {
       />
       <Loader loading={isLoading} size="large" text="Processing...">
         <Row justify="start" gutter={[20, 20]}>
-          {videos?.map((video) => (
-            <Col xs={24} sm={12} key={video?.external_id}>
-              <VideoCard video={video} buyable={true} showAuthModal={() => handleSelectVideo(video)} />
-            </Col>
-          ))}
+          {videos
+            ?.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : -1))
+            .map((video) => (
+              <Col xs={24} sm={12} key={video?.external_id}>
+                <VideoCard video={video} buyable={true} showAuthModal={() => handleSelectVideo(video)} />
+              </Col>
+            ))}
         </Row>
       </Loader>
     </div>

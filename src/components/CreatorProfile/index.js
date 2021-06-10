@@ -30,7 +30,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   const [creatorProfile, setCreatorProfile] = useState(profile || null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isInDashboard = window.location.pathname.includes('dashboard');
+  const isInCreatorDashboard = window.location.pathname.includes('/creator/dashboard');
 
   const closeNewsletterModal = () => {
     setNewsletterModalVisible(false);
@@ -183,7 +183,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
 
           <Col xs={24} md={17}>
             <Row gutter={[8, 8]} justify="end">
-              {isInDashboard && (
+              {isInCreatorDashboard && (
                 <>
                   <Col xs={20} md={10} className={styles.textAlignRight}>
                     Show newsletter signup button here?
@@ -197,13 +197,13 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
                   </Col>
                 </>
               )}
-              {(isInDashboard || creatorProfile?.profile?.collect_emails) && (
+              {(isInCreatorDashboard || creatorProfile?.profile?.collect_emails) && (
                 <Col xs={24} md={8}>
                   <NewsletterModal visible={showNewsletterModalVisible} closeModal={closeNewsletterModal} />
                   <Button
                     block
                     type="primary"
-                    disabled={isInDashboard && !creatorProfile?.profile?.collect_emails}
+                    disabled={isInCreatorDashboard && !creatorProfile?.profile?.collect_emails}
                     onClick={() => showNewsletterModal()}
                   >
                     Subscribe to newsletter
