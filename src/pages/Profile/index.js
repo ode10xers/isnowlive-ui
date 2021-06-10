@@ -308,57 +308,66 @@ const Profile = () => {
       >
         {/* ========PRIMARY INFO======== */}
         <Section>
-          <Title level={4}>1. Primary Information</Title>
-          <Paragraph className={styles.mt10} type="secondary">
-            This is your public page on the internet, add a great closeup picture or your logo, a cover to define your
-            page and an a brief description to showcase yourself to your attendees.
-          </Paragraph>
-          <div className={styles.imageWrapper}>
-            <Form.Item
-              id="cover_image_url"
-              name="cover_image_url"
-              rules={validationRules.requiredValidation}
-              wrapperCol={{ span: 24 }}
-              className={styles.coverImageWrapper}
-            >
-              <div>
-                <ImageUpload
-                  aspect={4}
-                  className={classNames('avatar-uploader', styles.coverImage)}
+          <Row gutter={[8, 10]}>
+            <Col xs={24}>
+              <Title level={4}>1. Primary Information</Title>
+            </Col>
+            <Col xs={24}>
+              <Paragraph className={styles.mt10} type="secondary">
+                This is your public page on the internet, add a great closeup picture or your logo, a cover to define
+                your page and an a brief description to showcase yourself to your attendees.
+              </Paragraph>
+            </Col>
+            <Col xs={24}>
+              <div className={styles.imageWrapper}>
+                <Form.Item
+                  id="cover_image_url"
                   name="cover_image_url"
-                  onChange={onCoverImageUpload}
-                  value={coverImage}
-                  label={
-                    <>
-                      <Text type="danger">*</Text> Cover Photo{' '}
-                    </>
-                  }
-                />
-              </div>
-            </Form.Item>
+                  rules={validationRules.requiredValidation}
+                  wrapperCol={{ span: 24 }}
+                  className={styles.coverImageWrapper}
+                >
+                  <div>
+                    <ImageUpload
+                      className={classNames('avatar-uploader', styles.coverImage)}
+                      name="cover_image_url"
+                      onChange={onCoverImageUpload}
+                      value={coverImage}
+                      label={
+                        <>
+                          <Text type="danger">*</Text> Cover Photo{' '}
+                        </>
+                      }
+                    />
+                  </div>
+                </Form.Item>
 
-            <Form.Item
-              id="profile_image_url"
-              name="profile_image_url"
-              rules={validationRules.requiredValidation}
-              wrapperCol={{ span: 24 }}
-              className={styles.profileImageWrapper}
-            >
-              <div>
-                <ImageUpload
+                <Form.Item
+                  id="profile_image_url"
                   name="profile_image_url"
-                  className={classNames('avatar-uploader', styles.profileImage)}
-                  onChange={onProfileImageUpload}
-                  value={profileImage}
-                  label={
-                    <>
-                      <Text type="danger">*</Text> Profile Photo{' '}
-                    </>
-                  }
-                />
+                  rules={validationRules.requiredValidation}
+                  wrapperCol={{ span: 24 }}
+                  className={styles.profileImageWrapper}
+                >
+                  <div>
+                    <ImageUpload
+                      aspect={1}
+                      name="profile_image_url"
+                      className={classNames('avatar-uploader', styles.profileImage)}
+                      onChange={onProfileImageUpload}
+                      value={profileImage}
+                      label={
+                        <>
+                          <Text type="danger">*</Text> Profile Photo{' '}
+                        </>
+                      }
+                    />
+                  </div>
+                </Form.Item>
               </div>
-            </Form.Item>
-          </div>
+            </Col>
+          </Row>
+
           <Form.Item label="Name" required className={styles.nameInputWrapper}>
             <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
               <Input placeholder="First Name" />

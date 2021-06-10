@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Col, Typography, Space, Divider, Card, Button, Tag, message } from 'antd';
+import { Row, Col, Typography, Space, Divider, Card, Button, Tag, Image, message } from 'antd';
 import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 
@@ -737,6 +737,16 @@ const VideoDetails = ({ match }) => {
                       showDetailsBtn={false}
                       showDesc={true}
                       onCardClick={() => {}}
+                      cover={
+                        video?.thumbnail_url ? (
+                          <Image
+                            className={styles.videoDetailsCardCover}
+                            preview={false}
+                            src={video?.thumbnail_url}
+                            alt={video?.title}
+                          />
+                        ) : null
+                      }
                     />
                   </Col>
                 </Loader>
