@@ -67,7 +67,11 @@ const EmailList = () => {
       const { status, data } = await apis.audiences.getCreatorAudiences(pageNumber, itemsPerPage);
 
       if (isAPISuccess(status) && data) {
-        setAudienceList((audienceList) => [...audienceList, ...data.data]);
+        if (pageNumber === 1) {
+          setAudienceList(data.data);
+        } else {
+          setAudienceList((audienceList) => [...audienceList, ...data.data]);
+        }
         setCanShowMore(data.next_page);
       }
     } catch (error) {
