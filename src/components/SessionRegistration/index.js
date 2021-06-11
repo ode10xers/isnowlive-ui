@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Form, Input, Typography, Tag, Card, message, InputNumber, Space } from 'antd';
+import { Row, Col, Button, Form, Input, Typography, Tag, Card, message, InputNumber } from 'antd';
 import { DownOutlined, UpOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -299,7 +299,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       dataIndex: 'name',
       key: 'name',
       align: 'left',
-      width: '50%',
+      width: '180px',
       render: (text, record) => (record.pay_what_you_want ? 'Pay what you value this session' : text),
     },
     {
@@ -310,10 +310,11 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       width: '50%',
       render: (text, record) =>
         record.pay_what_you_want ? (
-          <Space size="small">
+          <Item wrapperCol={24} className={styles.pwywInputWrapper}>
             <Item
+              wrapperCol={24}
               name="pywy_price"
-              className={styles.pwywInputWrapper}
+              noStyle
               rules={
                 !selectedPass
                   ? validationRules.numberValidation(
@@ -328,12 +329,12 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                 min={1}
                 size="small"
                 value={inputPrice}
-                className={styles.compactNumericalInput}
+                className={classNames(styles.compactNumericalInput, inputPrice ? undefined : styles.highlightInput)}
                 onChange={handlePWYWInputPriceChange}
               />
             </Item>
-            <Text> {record.currency.toUpperCase()} </Text>
-          </Space>
+            <span className="ant-form-text"> {record.currency.toUpperCase()} </span>
+          </Item>
         ) : (
           `${record.price} ${record.currency.toUpperCase()}`
         ),

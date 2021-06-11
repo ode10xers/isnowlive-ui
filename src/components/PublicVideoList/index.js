@@ -60,6 +60,7 @@ const PublicVideoList = ({ videos }) => {
           description: desc,
           currency: selectedVideo.currency,
           price: selectedVideo.price,
+          pay_what_you_want: selectedVideo.pay_what_you_want,
         },
       ],
       flexiblePaymentDetails,
