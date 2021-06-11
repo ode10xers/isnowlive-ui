@@ -120,7 +120,12 @@ const VideoCard = ({
                   </Col>
                   <Col span={10} className={styles.textAlignRight}>
                     <Text strong className={styles.priceText}>
-                      Price : {video?.price === 0 ? 'Free' : `${video?.currency.toUpperCase()} ${video?.price}`}
+                      Price :{' '}
+                      {video.pay_what_you_want
+                        ? `min. ${video.price}`
+                        : video.price > 0
+                        ? `${video.currency?.toUpperCase()} ${video.price}`
+                        : 'Free'}
                     </Text>
                   </Col>
                 </Row>

@@ -6,9 +6,13 @@
   padding: 15px;
 }
 
+.pwywInputWrapper {
+  margin: auto 0 !important;
+}
+
 .compactNumericalInput {
-  border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
-  width: 70px !important;
+  border: 1.8px solid map-get($map: $colors, $key: 'KellyGreen') !important;
+  width: 56px !important;
 }
 
 .smallText {

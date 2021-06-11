@@ -42,6 +42,15 @@ const PublicVideoList = ({ videos }) => {
 
     const desc = `Can be watched up to ${selectedVideo.watch_limit} times, valid for ${selectedVideo.validity} days`;
 
+    let flexiblePaymentDetails = null;
+
+    if (selectedVideo.pay_what_you_want) {
+      flexiblePaymentDetails = {
+        enabled: true,
+        minimumPrice: selectedVideo.price,
+      };
+    }
+
     const paymentPopupData = {
       productId: selectedVideo.external_id,
       productType: productType.VIDEO,
@@ -53,19 +62,24 @@ const PublicVideoList = ({ videos }) => {
           price: selectedVideo.price,
         },
       ],
+      flexiblePaymentDetails,
     };
 
     showPaymentPopup(paymentPopupData, createOrder);
   };
 
-  const createOrder = async (couponCode = '') => {
+  const createOrder = async (couponCode = '', priceAmount = 5) => {
     try {
-      const payload = {
+      let payload = {
         video_id: selectedVideo?.external_id,
         payment_source: paymentSource.GATEWAY,
-        coupon_code: couponCode,
         user_timezone_location: getTimezoneLocation(),
+        coupon_code: couponCode,
       };
+
+      if (selectedVideo?.pay_what_you_want) {
+        payload = { ...payload, amount: priceAmount };
+      }
 
       const { status, data } = await apis.videos.createOrderForUser(payload);
       if (isAPISuccess(status) && data) {

@@ -1015,7 +1015,11 @@ const CreateCourseModal = ({
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
                               <Text strong>
-                                {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
+                                {video.pay_what_you_want
+                                  ? `min. ${video.price}`
+                                  : video.price > 0
+                                  ? `${video.currency?.toUpperCase()} ${video.price}`
+                                  : 'Free'}
                               </Text>
                             </Col>
                           </Row>
@@ -1050,7 +1054,11 @@ const CreateCourseModal = ({
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
                               <Text strong>
-                                {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
+                                {video.pay_what_you_want
+                                  ? `min. ${video.price}`
+                                  : video.price > 0
+                                  ? `${video.currency?.toUpperCase()} ${video.price}`
+                                  : 'Free'}
                               </Text>
                             </Col>
                           </Row>
