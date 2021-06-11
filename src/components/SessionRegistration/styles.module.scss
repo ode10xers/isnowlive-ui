@@ -11,8 +11,11 @@
 }
 
 .compactNumericalInput {
-  border: 1.8px solid map-get($map: $colors, $key: 'KellyGreen') !important;
   width: 56px !important;
+
+  &.highlightInput {
+    border: 1.8px solid map-get($map: $colors, $key: 'KellyGreen') !important;
+  }
 }
 
 .smallText {

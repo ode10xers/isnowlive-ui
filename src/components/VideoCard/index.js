@@ -122,7 +122,7 @@ const VideoCard = ({
                     <Text strong className={styles.priceText}>
                       Price :{' '}
                       {video.pay_what_you_want
-                        ? `min. ${video.price}`
+                        ? 'Flexible'
                         : video.price > 0
                         ? `${video.currency?.toUpperCase()} ${video.price}`
                         : 'Free'}

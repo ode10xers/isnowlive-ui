@@ -4,6 +4,10 @@
   padding: 0px !important;
 }
 
+.redInputBorder {
+  border: 1.5px solid map-get($map: $colors, $key: 'SunsetOrange') !important;
+}
+
 .tncText {
   text-align: center;
   margin-top: -12px;

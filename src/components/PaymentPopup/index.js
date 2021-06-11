@@ -132,7 +132,6 @@ const PaymentPopup = () => {
   useEffect(() => {
     if (flexiblePaymentDetails?.enabled) {
       setPriceAmount(null);
-      form.validateFields(['pwyw_price']);
     } else {
       setPriceAmount(0);
     }
@@ -427,7 +426,12 @@ const PaymentPopup = () => {
                           getMinimumPrice()
                         )}
                       >
-                        <InputNumber onChange={onPriceAmountChanged} min={1} value={priceAmount} />
+                        <InputNumber
+                          className={priceAmount ? undefined : styles.redInputBorder}
+                          onChange={onPriceAmountChanged}
+                          min={1}
+                          value={priceAmount}
+                        />
                         <span className="ant-form-text"> {creatorCurrency.toUpperCase()} </span>
                       </Form.Item>
                     </Form>
