@@ -274,12 +274,22 @@ const VideoDetails = ({ match }) => {
     return null;
   };
 
-  const buySingleVideo = async (payload, couponCode = '') => {
+  const buySingleVideo = async (couponCode = '', priceAmount = 5) => {
     setIsLoading(true);
 
     try {
-      let modifiedPayload = { ...payload, coupon_code: couponCode };
-      const { status, data } = await purchaseVideo(modifiedPayload);
+      let payload = {
+        video_id: video.external_id,
+        payment_source: paymentSource.GATEWAY,
+        user_timezone_location: getTimezoneLocation(),
+        coupon_code: couponCode,
+      };
+
+      if (video.pay_what_you_want) {
+        payload = { ...payload, amount: priceAmount };
+      }
+
+      const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
@@ -331,12 +341,19 @@ const VideoDetails = ({ match }) => {
     };
   };
 
-  const buyPassAndGetVideo = async (payload, couponCode = '') => {
+  // TODO : When Pass has PWYW, modify to be similar like buySingleVideo
+  const buyPassAndGetVideo = async (couponCode = '') => {
     setIsLoading(true);
 
     try {
-      let modifiedPayload = { ...payload, coupon_code: couponCode };
-      const { status, data } = await apis.passes.createOrderForUser(modifiedPayload);
+      const payload = {
+        pass_id: selectedPass.external_id,
+        price: selectedPass.price,
+        currency: selectedPass.currency.toLowerCase(),
+        coupon_code: couponCode,
+      };
+
+      const { status, data } = await apis.passes.createOrderForUser(payload);
 
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
@@ -386,10 +403,19 @@ const VideoDetails = ({ match }) => {
     };
   };
 
-  const buyVideoUsingPass = async (payload) => {
+  const buyVideoUsingPass = async () => {
     setIsLoading(true);
 
     try {
+      const usableUserPass = getUserPurchasedPass(true);
+
+      const payload = {
+        video_id: video.external_id,
+        payment_source: paymentSource.PASS,
+        source_id: usableUserPass.pass_order_id,
+        user_timezone_location: getTimezoneLocation(),
+      };
+
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
@@ -415,8 +441,14 @@ const VideoDetails = ({ match }) => {
     };
   };
 
-  const buyVideoUsingSubscription = async (payload) => {
+  const buyVideoUsingSubscription = async () => {
     try {
+      const payload = {
+        video_id: video.external_id,
+        payment_source: paymentSource.SUBSCRIPTION,
+        source_id: usableUserSubscription.subscription_order_id,
+      };
+
       const { status, data } = await purchaseVideo(payload);
 
       if (isAPISuccess(status) && data) {
@@ -468,11 +500,6 @@ const VideoDetails = ({ match }) => {
       // Get Video using Subscription
       // If user have a subscription usable for purchasing this product
       // We prioritize using that subscription
-      const payload = {
-        video_id: video.external_id,
-        payment_source: paymentSource.SUBSCRIPTION,
-        source_id: usableUserSubscription.subscription_order_id,
-      };
 
       const paymentPopupData = {
         productId: video.external_id,
@@ -491,7 +518,7 @@ const VideoDetails = ({ match }) => {
         },
       };
 
-      showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription(payload));
+      showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription());
     } else if (usableUserPass && video?.price > 0) {
       // Get Video using Pass
       // If user have usable pass for this video
@@ -515,14 +542,7 @@ const VideoDetails = ({ match }) => {
         },
       };
 
-      const payload = {
-        video_id: video.external_id,
-        payment_source: paymentSource.PASS,
-        source_id: usableUserPass.pass_order_id,
-        user_timezone_location: getTimezoneLocation(),
-      };
-
-      showPaymentPopup(paymentPopupData, async () => await buyVideoUsingPass(payload));
+      showPaymentPopup(paymentPopupData, async () => await buyVideoUsingPass());
     } else if (selectedPass && video?.price > 0) {
       // Buy Pass and Get Video
       // If user decide to buy pass along with video
@@ -546,19 +566,20 @@ const VideoDetails = ({ match }) => {
         ],
       };
 
-      const payload = {
-        pass_id: selectedPass.external_id,
-        price: selectedPass.price,
-        currency: selectedPass.currency.toLowerCase(),
-      };
-
-      showPaymentPopup(
-        paymentPopupData,
-        async (couponCode = '') => await buyPassAndGetVideo({ ...payload, coupon_code: couponCode }, couponCode)
-      );
+      showPaymentPopup(paymentPopupData, buyPassAndGetVideo);
     } else {
       // Single Video Booking
       // Will also trigger for free video
+
+      let flexiblePaymentDetails = null;
+
+      if (video.pay_what_you_want) {
+        flexiblePaymentDetails = {
+          enabled: true,
+          minimumPrice: video.price,
+        };
+      }
+
       const paymentPopupData = {
         productId: video.external_id,
         productType: productType.VIDEO,
@@ -568,20 +589,13 @@ const VideoDetails = ({ match }) => {
             description: videoDesc,
             currency: video.currency,
             price: video.price,
+            pay_what_you_want: video.pay_what_you_want,
           },
         ],
+        flexiblePaymentDetails,
       };
 
-      const payload = {
-        video_id: video.external_id,
-        payment_source: paymentSource.GATEWAY,
-        user_timezone_location: getTimezoneLocation(),
-      };
-
-      showPaymentPopup(
-        paymentPopupData,
-        async (couponCode = '') => await buySingleVideo({ ...payload, coupon_code: couponCode }, couponCode)
-      );
+      showPaymentPopup(paymentPopupData, buySingleVideo);
     }
   };
 
@@ -859,9 +873,11 @@ const VideoDetails = ({ match }) => {
                                       </Text>
                                       <Divider type="vertical" />
                                       <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                        {video?.price === 0
-                                          ? 'Free video'
-                                          : ` ${video?.currency.toUpperCase()} ${video?.price}`}
+                                        {video.pay_what_you_want
+                                          ? 'Pay what you value this video'
+                                          : video.price > 0
+                                          ? `${video.currency?.toUpperCase()} ${video.price}`
+                                          : 'Free'}
                                       </Text>
                                     </Space>
                                   </Col>

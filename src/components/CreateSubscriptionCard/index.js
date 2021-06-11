@@ -557,7 +557,11 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                              {session.pay_what_you_want
+                                ? `min. ${session.price}`
+                                : session.price > 0
+                                ? `${session.currency?.toUpperCase()} ${session.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -601,7 +605,11 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                               {session.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {session.name}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {session.price > 0 ? `${session.currency?.toUpperCase()} ${session.price}` : 'Free'}
+                              {session.pay_what_you_want
+                                ? `min. ${session.price}`
+                                : session.price > 0
+                                ? `${session.currency?.toUpperCase()} ${session.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -666,7 +674,11 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                               {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
+                              {video.pay_what_you_want
+                                ? `min. ${video.price}`
+                                : video.price > 0
+                                ? `${video.currency?.toUpperCase()} ${video.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -709,7 +721,11 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                               {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
+                              {video.pay_what_you_want
+                                ? `min. ${video.price}`
+                                : video.price > 0
+                                ? `${video.currency?.toUpperCase()} ${video.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
