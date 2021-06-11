@@ -29,6 +29,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   const [showNewsletterModalVisible, setNewsletterModalVisible] = useState(false);
   const [creatorProfile, setCreatorProfile] = useState(profile || null);
   const [isLoading, setIsLoading] = useState(false);
+  const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
 
   const isInCreatorDashboard = window.location.pathname.includes('/creator/dashboard');
 
@@ -107,6 +108,10 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
     }
   };
 
+  const showMoreCreatorBio = () => {
+    setShouldExpandCreatorBio(true);
+  };
+
   return (
     <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-around">
       {showCoverImage && (
@@ -137,7 +142,16 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
         </div>
       </Col>
       <Col xs={24} md={{ span: 22 }}>
-        <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+        {shouldExpandCreatorBio ? (
+          <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+        ) : (
+          <>
+            <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+            <div className={styles.readMoreText} onClick={showMoreCreatorBio}>
+              Read More
+            </div>
+          </>
+        )}
       </Col>
       <Col xs={24} md={{ span: 22 }}>
         <Row gutter={[8, 8]}>

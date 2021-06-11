@@ -399,15 +399,14 @@ const UploadVideoModal = ({
         price:
           videoType === videoPriceTypes.FREE.name
             ? 0
-            : values.price || videoType === videoPriceTypes.FLEXIBLE.name
-            ? 5
-            : 0,
+            : values.price ?? (videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0),
         validity: values.validity,
         session_ids: selectedSessionIds || values.session_ids || [],
         thumbnail_url: coverImageUrl,
         watch_limit: values.watch_limit || 1,
         is_course: isCourseVideo,
         tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
+        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
       };
 
       const response = editedVideo
@@ -465,6 +464,7 @@ const UploadVideoModal = ({
         thumbnail_url: imageUrl,
         watch_limit: editedVideo.watch_limit,
         is_course: isCourseVideo,
+        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
       })
       .then(() => {
         setIsLoading(false);

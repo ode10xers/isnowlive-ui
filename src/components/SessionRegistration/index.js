@@ -55,6 +55,7 @@ const formInitialValues = {
   last_name: '',
   email: '',
   password: '',
+  pwyw_price: null,
 };
 
 const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false }) => {
@@ -70,7 +71,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [legalsAccepted, setLegalsAccepted] = useState(false);
   const [showLegalsErrorMessage, setShowLegalsErrorMessage] = useState(false);
-  const [inputPrice, setInputPrice] = useState(classDetails?.price || 0);
+  const [inputPrice, setInputPrice] = useState(null);
 
   const [shouldShowSignInForm, setShouldShowSignInForm] = useState(false);
   const [user, setUser] = useState(null);
@@ -275,6 +276,12 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
   const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
 
+  const handlePWYWInputPriceChange = async (value) => {
+    form.setFieldsValue({ ...form.getFieldsValue(), pwyw_price: value });
+    setInputPrice(value);
+    await form.validateFields(['pwyw_price']);
+  };
+
   const singleClassColumns = [
     {
       title: '',
@@ -293,6 +300,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       key: 'name',
       align: 'left',
       width: '50%',
+      render: (text, record) => (record.pay_what_you_want ? 'Pay what you value this session' : text),
     },
     {
       title: '',
@@ -302,16 +310,28 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       width: '50%',
       render: (text, record) =>
         record.pay_what_you_want ? (
-          <Space>
-            <Text>Pay what you value this session</Text>
-            <InputNumber
-              className={styles.compactNumericalInput}
-              size="small"
-              defaultValue={record.price}
-              min={record.price}
-              onChange={(val) => (val ? setInputPrice(val) : setInputPrice(record.price))}
-              value={inputPrice}
-            />
+          <Space size="small">
+            <Item
+              name="pywy_price"
+              className={styles.pwywInputWrapper}
+              rules={
+                !selectedPass
+                  ? validationRules.numberValidation(
+                      `Please input valid price (min. ${record.price})`,
+                      record.price,
+                      false
+                    )
+                  : []
+              }
+            >
+              <InputNumber
+                min={1}
+                size="small"
+                value={inputPrice}
+                className={styles.compactNumericalInput}
+                onChange={handlePWYWInputPriceChange}
+              />
+            </Item>
             <Text> {record.currency.toUpperCase()} </Text>
           </Space>
         ) : (

@@ -349,7 +349,12 @@ const Videos = () => {
         key: 'price',
         align: 'left',
         width: '100px',
-        render: (text, record) => (parseInt(text) === 0 ? 'Free' : `${text} ${record.currency.toUpperCase()}`),
+        render: (text, record) =>
+          record.pay_what_you_want
+            ? `min. ${text}`
+            : parseInt(text) === 0
+            ? 'Free'
+            : `${text} ${record.currency.toUpperCase()}`,
       },
       {
         title: published ? (
