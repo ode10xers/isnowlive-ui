@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { Row, Col, Typography, Input, List, Modal, Button, InputNumber, Tooltip } from 'antd';
+import { Row, Col, Typography, Input, List, Modal, Button, InputNumber, Tooltip, Form } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
@@ -33,6 +33,7 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import validationRules from 'utils/validation';
 
 const stripePromise = loadStripe(config.stripe.secretKey);
 
@@ -72,6 +73,7 @@ const {
 */
 
 const PaymentPopup = () => {
+  const [form] = Form.useForm();
   const {
     state: { paymentPopupVisible, paymentPopupCallback, paymentPopupData },
     hidePaymentPopup,
@@ -128,10 +130,13 @@ const PaymentPopup = () => {
 
   useEffect(() => {
     if (flexiblePaymentDetails?.enabled) {
-      setPriceAmount(flexiblePaymentDetails?.minimumPrice || 5);
+      setPriceAmount(null);
+      form.validateFields(['pwyw_price']);
     } else {
       setPriceAmount(0);
     }
+
+    //eslint-disable-next-line
   }, [flexiblePaymentDetails]);
 
   const handleCouponCodeChange = (e) => {
@@ -296,9 +301,19 @@ const PaymentPopup = () => {
       }
     }
 
-    if (!orderResponse?.is_successful_order) {
-      closePaymentPopup();
-    }
+    console.log(orderResponse);
+    // TODO: Confirm if we want to keep on closing
+    closePaymentPopup();
+
+    // if (!orderResponse?.is_successful_order) {
+    //   closePaymentPopup();
+    // }
+  };
+
+  const onPriceAmountChanged = async (value) => {
+    setPriceAmount(value);
+    form.setFieldsValue({ ...form.getFieldsValue(), pwyw_price: value });
+    await form.validateFields(['pwyw_price']);
   };
 
   const generatePaymentInstrumentDetails = () => {
@@ -341,8 +356,7 @@ const PaymentPopup = () => {
 
   const getMinimumPrice = () => flexiblePaymentDetails?.minimumPrice || 5;
 
-  const checkMinimumPriceRequirement = () =>
-    flexiblePaymentDetails?.enabled ? priceAmount < getMinimumPrice() : false;
+  const isPriceLessThanMinimum = () => (flexiblePaymentDetails?.enabled ? priceAmount < getMinimumPrice() : false);
 
   const getAmountForPaymentRequest = () => {
     if (flexiblePaymentDetails?.enabled) {
@@ -392,16 +406,30 @@ const PaymentPopup = () => {
         </Col>
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={10}>
-            <Col xs={14}>
-              <Text strong>{flexiblePaymentDetails?.enabled ? 'Your Fair Price' : 'Total payable amount'}</Text>
+            <Col xs={10} md={14}>
+              <Text strong>
+                {flexiblePaymentDetails?.enabled
+                  ? `Pay what you value this ${productType?.toLowerCase()}`
+                  : 'Total payable amount'}
+              </Text>
             </Col>
-            <Col xs={10} className={styles.paymentTotalText}>
+            <Col xs={14} md={10} className={styles.paymentTotalText}>
               {itemList &&
                 itemList.length > 0 &&
                 (flexiblePaymentDetails?.enabled ? (
-                  <Tooltip title={`Input your fair price (min. ${getMinimumPrice()})`}>
-                    <InputNumber onChange={setPriceAmount} min={getMinimumPrice()} value={priceAmount} />
-                    <span className="ant-form-text"> {creatorCurrency.toUpperCase()} </span>
+                  <Tooltip title="Input your fair price">
+                    <Form form={form} scrollToFirstError>
+                      <Form.Item
+                        name="pwyw_price"
+                        rules={validationRules.numberValidation(
+                          `Please input the minimum value (min. ${getMinimumPrice()})`,
+                          getMinimumPrice()
+                        )}
+                      >
+                        <InputNumber onChange={onPriceAmountChanged} min={1} value={priceAmount} />
+                        <span className="ant-form-text"> {creatorCurrency.toUpperCase()} </span>
+                      </Form.Item>
+                    </Form>
                   </Tooltip>
                 ) : discountedPrice !== null ? (
                   <>
@@ -469,7 +497,7 @@ const PaymentPopup = () => {
                   // Currently, only subscriptions need payment details to be saved
                   // so we can use the saved details to charge them offline for recurring payment
                   shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
-                  minimumPriceRequirementFulfilled={checkMinimumPriceRequirement()}
+                  minimumPriceRequirementFulfilled={isPriceLessThanMinimum()}
                   creatorDetails={creatorDetails}
                   amount={getAmountForPaymentRequest()}
                 />

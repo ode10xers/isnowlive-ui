@@ -303,7 +303,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       render: (text, record) =>
         record.pay_what_you_want ? (
           <Space>
-            <Text>Your fair price</Text>
+            <Text>Pay what you value this session</Text>
             <InputNumber
               className={styles.compactNumericalInput}
               size="small"
