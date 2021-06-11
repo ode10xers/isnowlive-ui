@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useStripe, useElements, IdealBankElement } from '@stripe/react-stripe-js';
 
-import { Row, Col, Form, Input, Button } from 'antd';
+import { Row, Col, Form, Input, Button, Spin } from 'antd';
 
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -65,6 +65,7 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
   const elements = useElements();
   const options = useOptions();
 
+  const [isLoadingStripeComponent, setIsLoadingStripeComponent] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -173,6 +174,10 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
     }, 3000);
   };
 
+  const handleStripeComponentReady = (element) => {
+    setIsLoadingStripeComponent(false);
+  };
+
   return (
     <Form
       layout="vertical"
@@ -184,7 +189,14 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
       <Row gutter={[8, 16]} justify="center">
         <Col xs={24}>
           {/* Stripe Component */}
-          <IdealBankElement disabled={!stripe} options={options} onChange={handleIdealBankChange} />
+          <Spin spinning={isLoadingStripeComponent}>
+            <IdealBankElement
+              disabled={!stripe}
+              options={options}
+              onChange={handleIdealBankChange}
+              onReady={handleStripeComponentReady}
+            />
+          </Spin>
         </Col>
         <Col xs={24}>
           {/* Name input component  */}

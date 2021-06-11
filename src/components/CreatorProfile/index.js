@@ -95,6 +95,18 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
     }
   }, [profile]);
 
+  const getCreatorWebsiteLink = () => {
+    if (creatorProfile?.profile?.social_media_links?.website) {
+      if (creatorProfile?.profile?.social_media_links?.website.includes('//')) {
+        return creatorProfile?.profile?.social_media_links?.website;
+      } else {
+        return '//' + creatorProfile?.profile?.social_media_links?.website;
+      }
+    } else {
+      return '';
+    }
+  };
+
   return (
     <Row className={styles.imageWrapper} gutter={[8, 8]} justify="space-around">
       {showCoverImage && (
@@ -133,11 +145,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
             {creatorProfile?.profile?.social_media_links && (
               <Space size={'middle'}>
                 {creatorProfile.profile.social_media_links.website && (
-                  <a
-                    href={`//${creatorProfile.profile.social_media_links.website}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={getCreatorWebsiteLink()} target="_blank" rel="noopener noreferrer">
                     <GlobalOutlined className={styles.socialIcon} />
                   </a>
                 )}
