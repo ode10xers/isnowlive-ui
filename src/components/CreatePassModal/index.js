@@ -571,7 +571,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                               {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
+                              {video.pay_what_you_want
+                                ? `min. ${video.price}`
+                                : video.price > 0
+                                ? `${video.currency?.toUpperCase()} ${video.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
@@ -610,7 +614,11 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
                               {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
                             </Col>
                             <Col xs={7} className={styles.textAlignRight}>
-                              {video.price > 0 ? `${video.currency?.toUpperCase()} ${video.price}` : 'Free'}
+                              {video.pay_what_you_want
+                                ? `min. ${video.price}`
+                                : video.price > 0
+                                ? `${video.currency?.toUpperCase()} ${video.price}`
+                                : 'Free'}
                             </Col>
                           </Row>
                         </Select.Option>
