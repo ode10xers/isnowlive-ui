@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { PaymentRequestButtonElement, useStripe } from '@stripe/react-stripe-js';
 
@@ -9,7 +9,9 @@ import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payme
 
 import { useGlobalContext } from 'services/globalContext';
 
-const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest }) => {
+import styles from './styles.module.scss';
+
+const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPayment, paymentRequest }) => {
   const stripe = useStripe();
   const { hidePaymentPopup } = useGlobalContext();
 
@@ -105,9 +107,32 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
     }
   }, [paymentRequest, onConfirmPaymentDetails]);
 
+  const handlePaymentRequestButtonClick = (e) => {
+    if (disabled && e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  const customButtonOptions = useMemo(
+    () =>
+      disabled
+        ? {
+            style: {
+              base: styles.StripePaymentButtonDisabled,
+            },
+          }
+        : null,
+    [disabled]
+  );
+
   return paymentRequest ? (
     <Loader loading={isLoading} text="Processing payment..." size="small">
-      <PaymentRequestButtonElement options={{ paymentRequest }} />
+      <PaymentRequestButtonElement
+        disabled={disabled}
+        onClick={handlePaymentRequestButtonClick}
+        options={{ ...customButtonOptions, paymentRequest }}
+      />
     </Loader>
   ) : null;
 };
