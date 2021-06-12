@@ -118,7 +118,7 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
     () =>
       disabled
         ? {
-            style: {
+            classes: {
               base: styles.StripePaymentButtonDisabled,
             },
           }
