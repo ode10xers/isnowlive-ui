@@ -603,7 +603,7 @@ const UploadVideoModal = ({
       footer={null}
       maskClosable={false}
       closable={[1, 3].includes(formPart)}
-      onCancel={() => closeModal(false)}
+      onCancel={() => closeModal(true)}
       width={850}
       afterClose={resetBodyStyle}
     >
@@ -780,6 +780,7 @@ const UploadVideoModal = ({
                 </Form.Item>
               </Col>
               <Col xs={videoType === videoPriceTypes.FREE.name ? 0 : 24}>
+                {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
                 <Form.Item
                   id="price"
                   name="price"
@@ -788,7 +789,7 @@ const UploadVideoModal = ({
                   hidden={videoType === videoPriceTypes.FREE.name}
                   rules={validationRules.numberValidation(
                     `Please input the price ${videoType === videoPriceTypes.FLEXIBLE.name ? '(min. 5)' : ''}`,
-                    videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 1,
+                    videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0,
                     false
                   )}
                 >
