@@ -1007,6 +1007,7 @@ const Session = ({ match, history }) => {
                   ))}
               </Select>
             </Form.Item>
+            {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
             <Form.Item
               {...(!isMobileDevice && profileFormTailLayout)}
               name="price"
