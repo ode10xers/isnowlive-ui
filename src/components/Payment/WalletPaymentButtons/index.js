@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Typography } from 'antd';
 
 import { PaymentRequestButtonElement, useStripe } from '@stripe/react-stripe-js';
 
@@ -10,6 +11,8 @@ import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payme
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+
+const { Text } = Typography;
 
 const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPayment, paymentRequest }) => {
   const stripe = useStripe();
@@ -107,32 +110,12 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
     }
   }, [paymentRequest, onConfirmPaymentDetails]);
 
-  const handlePaymentRequestButtonClick = (e) => {
-    if (disabled && e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  };
-
-  const customButtonOptions = useMemo(
-    () =>
-      disabled
-        ? {
-            classes: {
-              base: styles.StripePaymentButtonDisabled,
-            },
-          }
-        : null,
-    [disabled]
-  );
-
   return paymentRequest ? (
     <Loader loading={isLoading} text="Processing payment..." size="small">
-      <PaymentRequestButtonElement
-        disabled={disabled}
-        onClick={handlePaymentRequestButtonClick}
-        options={{ ...customButtonOptions, paymentRequest }}
-      />
+      {disabled && <Text disabled> Please confirm all the information above is correct before paying </Text>}
+      <div className={disabled ? styles.hidden : undefined}>
+        <PaymentRequestButtonElement options={{ paymentRequest }} />
+      </div>
     </Loader>
   ) : null;
 };

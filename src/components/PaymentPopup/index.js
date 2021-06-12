@@ -421,6 +421,7 @@ const PaymentPopup = () => {
                         )}
                       >
                         <InputNumber
+                          placeholder="Put your amount here"
                           className={priceAmount ? undefined : styles.redInputBorder}
                           onChange={onPriceAmountChanged}
                           min={1}
