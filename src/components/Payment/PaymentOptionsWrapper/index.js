@@ -129,6 +129,7 @@ const PaymentOptionsWrapper = ({
     //eslint-disable-next-line
   }, [amount]);
 
+  // TODO: Rename minimumPriceRequirementFulfilled for better context
   // We don't handle wallet payments here since it has a client side requirement check
   const paymentMethodsData = {
     [paymentMethodOptions.CARD.key]: {
@@ -144,6 +145,7 @@ const PaymentOptionsWrapper = ({
     [paymentMethodOptions.ONLINE_BANKING.key]: {
       children: (
         <BankRedirectPayments
+          disabled={minimumPriceRequirementFulfilled}
           options={availablePaymentOptions.filter((payOption) =>
             paymentMethodOptions.ONLINE_BANKING.options.includes(payOption)
           )}
@@ -258,6 +260,7 @@ const PaymentOptionsWrapper = ({
                   >
                     {paymentRequest && (
                       <WalletPaymentButtons
+                        disabled={minimumPriceRequirementFulfilled}
                         paymentRequest={paymentRequest}
                         onBeforePayment={handleBeforePayment}
                         onAfterPayment={handleAfterPayment}

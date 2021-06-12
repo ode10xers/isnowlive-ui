@@ -301,13 +301,7 @@ const PaymentPopup = () => {
       }
     }
 
-    console.log(orderResponse);
-    // TODO: Confirm if we want to keep on closing
     closePaymentPopup();
-
-    // if (!orderResponse?.is_successful_order) {
-    //   closePaymentPopup();
-    // }
   };
 
   const onPriceAmountChanged = async (value) => {
@@ -427,6 +421,7 @@ const PaymentPopup = () => {
                         )}
                       >
                         <InputNumber
+                          placeholder="Put your amount here"
                           className={priceAmount ? undefined : styles.redInputBorder}
                           onChange={onPriceAmountChanged}
                           min={1}
