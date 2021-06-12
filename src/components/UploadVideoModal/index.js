@@ -888,7 +888,7 @@ const UploadVideoModal = ({
             <Form.Item {...(!isMobileDevice && formTailLayout)}>
               <Row>
                 <Col xs={12}>
-                  <Button block type="default" onClick={() => closeModal(false)}>
+                  <Button block type="default" onClick={() => closeModal(true)}>
                     Cancel
                   </Button>
                 </Col>

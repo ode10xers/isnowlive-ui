@@ -11,7 +11,7 @@ const { TabPane } = Tabs;
 // NOTE: For the keys used in the TabPane,
 // See the options in PaymentOptionsSelection under the
 // ONLINE_BANKING key
-const BankRedirectPayments = ({ options = [], onBeforePayment, onAfterPayment }) => {
+const BankRedirectPayments = ({ disabled = false, options = [], onBeforePayment, onAfterPayment }) => {
   const [selectedBankRedirectPaymentOption, setSelectedBankRedirectPaymentOption] = useState('ideal');
 
   const handleCustomTabBarRender = (props, DefaultTabBar) => (
@@ -50,7 +50,7 @@ const BankRedirectPayments = ({ options = [], onBeforePayment, onAfterPayment })
                 />
               }
             >
-              <IDealPayment onBeforePayment={onBeforePayment} onAfterPayment={onAfterPayment} />
+              <IDealPayment disabled={disabled} onBeforePayment={onBeforePayment} onAfterPayment={onAfterPayment} />
             </TabPane>
           )}
         </Tabs>
