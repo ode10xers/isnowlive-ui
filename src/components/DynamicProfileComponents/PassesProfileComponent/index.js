@@ -1,18 +1,17 @@
 import React from 'react';
 
 import { Card, Typography } from 'antd';
-import { VideoCameraTwoTone } from '@ant-design/icons';
-
-import SessionListView from './SessionListView';
+import { LikeTwoTone } from '@ant-design/icons';
 
 import styles from './style.module.scss';
+import PassesListView from './PassesListView';
 
 const { Text } = Typography;
 
 const DefaultContainerTitle = (
   <Text style={{ color: '#0050B3' }}>
-    <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-    SESSIONS
+    <LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />
+    CREDIT PASSES
   </Text>
 );
 
@@ -23,7 +22,7 @@ const cardHeadingStyle = {
   color: '#0050B3',
 };
 
-const SessionsProfileComponent = ({ title = DefaultContainerTitle }) => {
+const PassesProfileComponent = ({ title = DefaultContainerTitle }) => {
   return (
     <div className={styles.p10}>
       <Card
@@ -32,10 +31,10 @@ const SessionsProfileComponent = ({ title = DefaultContainerTitle }) => {
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12 }}
       >
-        <SessionListView />
+        <PassesListView />
       </Card>
     </div>
   );
 };
 
-export default SessionsProfileComponent;
+export default PassesProfileComponent;

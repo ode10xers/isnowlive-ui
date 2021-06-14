@@ -16,7 +16,7 @@ const {
 
 const { Text, Title } = Typography;
 
-const SessionListCards = ({ session }) => {
+const SessionListCard = ({ session }) => {
   const extraTags = (
     <Space>
       <Tag color="green"> Everyone </Tag>
@@ -89,4 +89,4 @@ const SessionListCards = ({ session }) => {
   );
 };
 
-export default SessionListCards;
+export default SessionListCard;

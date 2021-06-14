@@ -8,6 +8,7 @@ import CreatorProfile from 'components/CreatorProfile';
 
 import { isAPISuccess } from 'utils/helper';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
+import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 
 // TODO: Define the Profile UI Configurations Sample Data here
 
@@ -44,6 +45,9 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             showCoverImage={true}
             coverImage={creatorProfileData?.cover_image_url}
           />
+        </Col>
+        <Col xs={24}>
+          <PassesProfileComponent />
         </Col>
         <Col xs={24}>
           <SessionsProfileComponent />

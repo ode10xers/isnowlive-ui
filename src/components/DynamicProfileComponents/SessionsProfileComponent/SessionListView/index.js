@@ -5,7 +5,7 @@ import { Row, Col, Spin, Button, Typography } from 'antd';
 import apis from 'apis';
 
 import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
-import SessionListCards from '../SessionListCards';
+import SessionListCard from '../SessionListCard';
 
 import { isAPISuccess, preventDefaults } from 'utils/helper';
 
@@ -55,7 +55,7 @@ const SessionListView = ({ limit = 3 }) => {
   const renderSessionCards = (session) => {
     return (
       <Col xs={24} sm={12} key={session.external_id}>
-        <SessionListCards session={session} />
+        <SessionListCard session={session} />
       </Col>
     );
   };
