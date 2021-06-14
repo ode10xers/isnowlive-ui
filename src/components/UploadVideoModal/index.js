@@ -54,14 +54,18 @@ import moment from 'moment';
 
 const { Text, Paragraph } = Typography;
 
-const videoTypes = {
+const videoPriceTypes = {
   FREE: {
     name: 'FREE',
-    label: 'FREE',
+    label: 'Free',
   },
   PAID: {
     name: 'PAID',
-    label: 'PAID',
+    label: 'Paid',
+  },
+  FLEXIBLE: {
+    name: 'FLEXIBLE',
+    label: 'Let attendees pay what they can',
   },
 };
 
@@ -69,7 +73,7 @@ const formInitialValues = {
   title: '',
   description: '',
   classList: [],
-  videoType: videoTypes.FREE.name,
+  videoType: videoPriceTypes.FREE.name,
   price: 0,
   watch_limit: 1,
   video_course_type: 'normal',
@@ -94,7 +98,7 @@ const UploadVideoModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSessionIds, setSelectedSessionIds] = useState([]);
-  const [videoType, setVideoType] = useState(videoTypes.FREE.name);
+  const [videoType, setVideoType] = useState(videoPriceTypes.FREE.name);
   const [coverImageUrl, setCoverImageUrl] = useState(null);
   const [videoUploadPercent, setVideoUploadPercent] = useState(0);
   const [uploadingFile, setUploadingFile] = useState(null);
@@ -241,14 +245,26 @@ const UploadVideoModal = ({
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
           session_ids: editedVideo.sessions.map((session) => session.session_id),
           videoType:
-            editedVideo.currency === '' || editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name,
+            editedVideo.currency === ''
+              ? videoPriceTypes.FREE.name
+              : editedVideo.pay_what_you_want
+              ? videoPriceTypes.FLEXIBLE.name
+              : editedVideo.price === 0
+              ? videoPriceTypes.FREE.name
+              : videoPriceTypes.PAID.name,
           video_course_type: editedVideo.is_course ? 'course' : 'normal',
           videoTagType: editedVideo.tags?.length > 0 ? 'selected' : 'anyone',
           selectedMemberTags: editedVideo.tags?.map((tag) => tag.external_id),
         });
         setSelectedTagType(editedVideo.tags?.length > 0 ? 'selected' : 'anyone');
         setCurrency(editedVideo.currency.toUpperCase() || '');
-        setVideoType(editedVideo.price === 0 ? videoTypes.FREE.name : videoTypes.PAID.name);
+        setVideoType(
+          editedVideo.pay_what_you_want
+            ? videoPriceTypes.FLEXIBLE.name
+            : editedVideo.price === 0
+            ? videoPriceTypes.FREE.name
+            : videoPriceTypes.PAID.name
+        );
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
@@ -272,7 +288,7 @@ const UploadVideoModal = ({
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
-      setVideoType(videoTypes.FREE.name);
+      setVideoType(videoPriceTypes.FREE.name);
       setVideoPreviewTime('');
       setIsCourseVideo(false);
       setSelectedTagType('anyone');
@@ -294,35 +310,42 @@ const UploadVideoModal = ({
   const setFreeVideo = () => {
     form.setFieldsValue({
       ...form.getFieldsValue(),
-      videoType: videoTypes.FREE.name,
+      videoType: videoPriceTypes.FREE.name,
       price: 0,
     });
-    setVideoType(videoTypes.FREE.name);
+    setVideoType(videoPriceTypes.FREE.name);
   };
 
-  const handleChangeLimitType = (priceType) => {
-    if (currency === '') {
-      Modal.confirm({
-        title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
-        okText: 'Setup payment account',
-        cancelText: 'Keep it free',
-        onCancel: () => setFreeVideo(),
-        onOk: () => {
-          const newWindow = window.open(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
-          newWindow.blur();
-          window.focus();
-          setFreeVideo();
-          // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
-        },
-      });
+  const handleChangeLimitType = (e) => {
+    const priceType = e.target.value;
+
+    if (priceType === videoPriceTypes.FREE.name) {
+      setFreeVideo();
     } else {
-      const values = form.getFieldsValue();
-      form.setFieldsValue({
-        ...values,
-        videoType: priceType,
-        price: priceType === videoTypes.FREE.name ? 0 : values.price || 10,
-      });
-      setVideoType(priceType);
+      if (currency) {
+        const values = form.getFieldsValue();
+        form.setFieldsValue({
+          ...values,
+          videoType: priceType,
+          price: priceType === videoPriceTypes.FREE.name ? 0 : values.price || 10,
+        });
+        setVideoType(priceType);
+      } else {
+        Modal.confirm({
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
+          onCancel: () => setFreeVideo(),
+          onOk: () => {
+            setFreeVideo();
+            const newWindow = window.open(
+              `${Routes.creatorDashboard.rootPath}${Routes.creatorDashboard.paymentAccount}`
+            );
+            newWindow.blur();
+            window.focus();
+          },
+        });
+      }
     }
   };
 
@@ -373,13 +396,17 @@ const UploadVideoModal = ({
         currency: currency.toLowerCase(),
         title: values.title,
         description: values.description,
-        price: videoType === videoTypes.FREE.name ? 0 : values.price,
+        price:
+          videoType === videoPriceTypes.FREE.name
+            ? 0
+            : values.price ?? (videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0),
         validity: values.validity,
         session_ids: selectedSessionIds || values.session_ids || [],
         thumbnail_url: coverImageUrl,
         watch_limit: values.watch_limit || 1,
         is_course: isCourseVideo,
         tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
+        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
       };
 
       const response = editedVideo
@@ -431,12 +458,13 @@ const UploadVideoModal = ({
         currency: currency.toLowerCase(),
         title: editedVideo.title,
         description: editedVideo.description,
-        price: videoType === videoTypes.FREE.name ? 0 : editedVideo.price,
+        price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
         validity: editedVideo.validity,
         session_ids: selectedSessionIds || editedVideo.session_ids || [],
         thumbnail_url: imageUrl,
         watch_limit: editedVideo.watch_limit,
         is_course: isCourseVideo,
+        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
       })
       .then(() => {
         setIsLoading(false);
@@ -575,7 +603,7 @@ const UploadVideoModal = ({
       footer={null}
       maskClosable={false}
       closable={[1, 3].includes(formPart)}
-      onCancel={() => closeModal(false)}
+      onCancel={() => closeModal(true)}
       width={850}
       afterClose={resetBodyStyle}
     >
@@ -739,27 +767,38 @@ const UploadVideoModal = ({
                   name="videoType"
                   label="Video Pricing"
                   rules={validationRules.requiredValidation}
+                  onChange={handleChangeLimitType}
                 >
                   <Radio.Group
                     className="video-type-radio"
-                    onChange={(e) => handleChangeLimitType(e.target.value)}
-                    value={videoType}
-                    options={Object.values(videoTypes).map((pType) => ({
+                    // value={videoType}
+                    options={Object.values(videoPriceTypes).map((pType) => ({
                       label: pType.label,
                       value: pType.name,
                     }))}
                   />
                 </Form.Item>
               </Col>
-              <Col xs={videoType === videoTypes.FREE.name ? 0 : 24}>
+              <Col xs={videoType === videoPriceTypes.FREE.name ? 0 : 24}>
+                {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
                 <Form.Item
                   id="price"
                   name="price"
                   label={`Price (${currency.toUpperCase()})`}
-                  hidden={videoType === videoTypes.FREE.name}
-                  rules={validationRules.numberValidation('Please Input Video Price', 0, false)}
+                  extra={`Set your ${videoType === videoPriceTypes.FLEXIBLE.name ? 'minimum' : ''} price`}
+                  hidden={videoType === videoPriceTypes.FREE.name}
+                  rules={validationRules.numberValidation(
+                    `Please input the price ${videoType === videoPriceTypes.FLEXIBLE.name ? '(min. 5)' : ''}`,
+                    videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0,
+                    false
+                  )}
                 >
-                  <InputNumber min={0} disabled={currency === ''} placeholder="Price" className={styles.numericInput} />
+                  <InputNumber
+                    min={videoType === videoPriceTypes.FLEXIBLE.name ? 5 : 0}
+                    disabled={currency === ''}
+                    placeholder="Price"
+                    className={styles.numericInput}
+                  />
                 </Form.Item>
               </Col>
 
@@ -849,7 +888,7 @@ const UploadVideoModal = ({
             <Form.Item {...(!isMobileDevice && formTailLayout)}>
               <Row>
                 <Col xs={12}>
-                  <Button block type="default" onClick={() => closeModal(false)}>
+                  <Button block type="default" onClick={() => closeModal(true)}>
                     Cancel
                   </Button>
                 </Col>

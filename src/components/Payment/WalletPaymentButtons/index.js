@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { Typography } from 'antd';
 
 import { PaymentRequestButtonElement, useStripe } from '@stripe/react-stripe-js';
 
@@ -9,7 +10,11 @@ import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payme
 
 import { useGlobalContext } from 'services/globalContext';
 
-const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest }) => {
+import styles from './styles.module.scss';
+
+const { Text } = Typography;
+
+const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPayment, paymentRequest }) => {
   const stripe = useStripe();
   const { hidePaymentPopup } = useGlobalContext();
 
@@ -107,7 +112,15 @@ const WalletPaymentButtons = ({ onBeforePayment, onAfterPayment, paymentRequest 
 
   return paymentRequest ? (
     <Loader loading={isLoading} text="Processing payment..." size="small">
-      <PaymentRequestButtonElement options={{ paymentRequest }} />
+      {disabled && (
+        <Text disabled className={styles.textAlignCenter}>
+          {' '}
+          Please confirm all the information above is correct before paying{' '}
+        </Text>
+      )}
+      <div className={disabled ? styles.hidden : undefined}>
+        <PaymentRequestButtonElement options={{ paymentRequest }} />
+      </div>
     </Loader>
   ) : null;
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useStripe, useElements, IdealBankElement } from '@stripe/react-stripe-js';
 
-import { Row, Col, Form, Input, Button } from 'antd';
+import { Row, Col, Form, Input, Button, Spin } from 'antd';
 
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -54,7 +54,7 @@ const formInitialValue = { name: null };
 // TODO: Can try to refactor along with other redirect payment methods
 // Since the flow is pretty similar if we're using payment intents
 // It's just that sometimes the required data and the method used is different
-const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'ideal' }) => {
+const IDealPayment = ({ disabled = false, onBeforePayment, onAfterPayment, paymentMethodType = 'ideal' }) => {
   const {
     state: { userDetails, paymentPopupVisible },
   } = useGlobalContext();
@@ -65,6 +65,7 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
   const elements = useElements();
   const options = useOptions();
 
+  const [isLoadingStripeComponent, setIsLoadingStripeComponent] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -139,8 +140,6 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
 
         const returnUrl = generateRedirectUrlForStripe(paramsData);
 
-        console.log(returnUrl);
-
         const { error } = await stripe.confirmIdealPayment(clientSecret, {
           payment_method: {
             ideal: idealBank,
@@ -157,7 +156,7 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
         if (error) {
           // Show error to your customer.
           console.log(error);
-          showErrorModal('An error occured!', error.message);
+          showErrorModal('An error occurred!', error.message);
         }
 
         // Otherwise the customer will be redirected away from your
@@ -173,6 +172,12 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
     }, 3000);
   };
 
+  const handleStripeComponentReady = (element) => {
+    setIsLoadingStripeComponent(false);
+  };
+
+  const shouldDisableButton = () => isButtonDisabled || !stripe || disabled;
+
   return (
     <Form
       layout="vertical"
@@ -184,7 +189,14 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
       <Row gutter={[8, 16]} justify="center">
         <Col xs={24}>
           {/* Stripe Component */}
-          <IdealBankElement disabled={!stripe} options={options} onChange={handleIdealBankChange} />
+          <Spin spinning={isLoadingStripeComponent}>
+            <IdealBankElement
+              disabled={!stripe}
+              options={options}
+              onChange={handleIdealBankChange}
+              onReady={handleStripeComponentReady}
+            />
+          </Spin>
         </Col>
         <Col xs={24}>
           {/* Name input component  */}
@@ -202,8 +214,8 @@ const IDealPayment = ({ onBeforePayment, onAfterPayment, paymentMethodType = 'id
             block
             size="large"
             type="primary"
-            disabled={isButtonDisabled || !stripe}
-            className={isButtonDisabled ? styles.disabledBuyBtn : styles.greenBtn}
+            disabled={shouldDisableButton()}
+            className={shouldDisableButton() ? styles.disabledBuyBtn : styles.greenBtn}
             loading={isSubmitting}
             htmlType="submit"
           >
