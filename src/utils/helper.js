@@ -256,6 +256,11 @@ export const copyToClipboard = (link) => {
   }
 };
 
+export const preventDefaults = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+};
+
 export const ZoomAuthType = {
   OAUTH: 'OAUTH',
   JWT: 'JWT',

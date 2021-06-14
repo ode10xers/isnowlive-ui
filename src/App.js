@@ -46,6 +46,8 @@ import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
 import { storeCreatorDetailsToLS } from 'utils/storage';
 import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
+import MobileLayout from 'layouts/MobileLayout';
+import NewHome from 'pages/NewHome';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -242,6 +244,8 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
+            {/* New Pages are put higher for more priority matching */}
+            <RouteWithLayout layout={MobileLayout} exact path={Routes.root} component={NewHome} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
             <Route path={Routes.stripeAccountValidate}>

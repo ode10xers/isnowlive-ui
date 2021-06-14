@@ -23,7 +23,7 @@ const formatDate = {
   toShortDateWithYear: (date) => moment(date).format(`DD MMM 'YY`),
   toUtcStartOfDay: (date) => moment(date).startOf('day').utc().format(),
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
-  getTimeDiff: (startTime = moment(), endTime = moment(), unit) => moment(startTime).diff(endTime, unit),
+  getTimeDiff: (startTime = moment(), endTime = moment(), unit = 'minutes') => moment(startTime).diff(endTime, unit),
   getISODayOfWeek: (date) => moment(date).isoWeekday(),
 };
 
