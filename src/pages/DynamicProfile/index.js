@@ -48,6 +48,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [creatorProfileData, setCreatorProfileData] = useState({});
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
+  const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     setIsLoading(true);
@@ -92,7 +93,20 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const handleDragEnd = (result) => {
     console.log(result);
 
-    const { destination, source } = result;
+    const { destination, source, draggableId } = result;
+
+    const componentsList = creatorUIConfig.components;
+    const targetComponent = componentsList.find((component) => component.key === draggableId);
+
+    if (targetComponent && destination) {
+      componentsList.splice(source.index, 1);
+      componentsList.splice(destination.index, 0, targetComponent);
+
+      setCreatorUIConfig({
+        ...creatorUIConfig,
+        components: componentsList,
+      });
+    }
   };
 
   // TODO: Currently using old CreatorProfile, decide if we want to make a new one
@@ -111,14 +125,22 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Col>
           <Col xs={24} className={styles.mb20}>
             <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId={creatorProfileData?.external_id || 'creator-profile-column'}>
+              <Droppable
+                isDropDisabled={!editingMode}
+                droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
+              >
                 {(provided) => (
                   <Row gutter={[8, 16]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
                     {sampleUIConfig.components.map((component, idx) => {
                       const RenderedComponent = componentsMap[component.key];
 
                       return (
-                        <Draggable draggableId={component.key} index={idx} key={component.key}>
+                        <Draggable
+                          isDragDisabled={!editingMode}
+                          draggableId={component.key}
+                          index={idx}
+                          key={component.key}
+                        >
                           {(provided, snapshot) => (
                             <Col
                               xs={24}
