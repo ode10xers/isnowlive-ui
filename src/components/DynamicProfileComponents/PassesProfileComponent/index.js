@@ -23,7 +23,13 @@ const cardHeadingStyle = {
 };
 
 // TODO: Create Edit Overlays (for editing/deleting)
-const PassesProfileComponent = ({ isEditing, title = null }) => {
+const PassesProfileComponent = ({
+  identifier = null,
+  isEditing = false,
+  updateConfigHandler,
+  removeComponentHandler,
+  title = null,
+}) => {
   return (
     <div className={styles.p10}>
       <Card

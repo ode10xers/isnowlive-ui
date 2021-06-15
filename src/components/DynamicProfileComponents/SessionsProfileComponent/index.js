@@ -3,6 +3,7 @@ import { Card, Typography } from 'antd';
 import { VideoCameraTwoTone } from '@ant-design/icons';
 
 import SessionListView from './SessionListView';
+import SessionEditView from './SessionEditView';
 
 import styles from './style.module.scss';
 
@@ -24,17 +25,33 @@ const cardHeadingStyle = {
 };
 
 // TODO: Create Edit Overlays (for editing/deleting)
-const SessionsProfileComponent = ({ isEditing, title = null }) => {
+const SessionsProfileComponent = ({
+  identifier = null,
+  isEditing = false,
+  updateConfigHandler,
+  removeComponentHandler,
+  ...customComponentProps
+}) => {
+  const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
+  const deleteComponent = () => removeComponentHandler(identifier);
+
   return (
     <div className={styles.p10}>
       <Card
-        title={<ContainerTitle title={title} />}
+        title={<ContainerTitle title={customComponentProps.title} />}
         headStyle={cardHeadingStyle}
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12 }}
       >
         <SessionListView />
       </Card>
+      {isEditing && (
+        <SessionEditView
+          configValues={customComponentProps}
+          deleteHandler={deleteComponent}
+          updateHandler={saveEditChanges}
+        />
+      )}
     </div>
   );
 };

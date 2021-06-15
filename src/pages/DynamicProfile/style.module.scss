@@ -20,4 +20,5 @@
   padding: 8px 4px;
   background-color: map-get($map: $colors, $key: 'PaleCornflowerBlue');
   border: 1px solid map-get($map: $colors, $key: 'AliceBlue');
+  border-radius: 12px 12px 0 0;
 }

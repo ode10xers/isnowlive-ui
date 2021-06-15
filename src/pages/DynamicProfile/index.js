@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { message, Spin, Row, Col, Affix, Button, Space } from 'antd';
+import { message, Spin, Row, Col, Affix, Button, Space, Modal, Typography } from 'antd';
 import { EditOutlined, MenuOutlined, SaveOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -16,6 +16,9 @@ import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
+
+const { Paragraph } = Typography;
 
 // TODO: Define the Profile UI Configurations Sample Data here
 const sampleUIConfig = {
@@ -40,7 +43,6 @@ const componentsMap = {
   SESSIONS: SessionsProfileComponent,
 };
 
-// TODO: Style this
 const DragAndDropHandle = ({ isEditing = false, ...props }) =>
   isEditing ? (
     <div className={styles.dndHandle} {...props}>
@@ -59,6 +61,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [editingMode, setEditingMode] = useState(false);
   const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState(null);
+  const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     setIsLoading(true);
@@ -79,6 +82,8 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setIsLoading(false);
   }, []);
 
+  //#region Start of Use Effects
+
   useEffect(() => {
     fetchCreatorProfileData(creatorUsername);
   }, [fetchCreatorProfileData, creatorUsername]);
@@ -94,11 +99,21 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setEditingMode(false);
   }, [userDetails, creatorProfileData]);
 
+  //#endregion End of Use Effects
+
+  //#region Start Of Page Edit Button Handlers
+
+  const disableEditingMode = () => {
+    setTempCreatorUIConfig(null);
+    setEditingMode(false);
+  };
+
   const handleEditDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);
 
     setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
     setEditingMode(true);
+    setUiConfigChanged(false);
   };
 
   const handleSaveDynamicProfileButtonClicked = (e) => {
@@ -107,17 +122,100 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     // TODO: Save the data here to API
     console.log(tempCreatorUIConfig);
     setCreatorUIConfig(deepCloneObject(tempCreatorUIConfig));
-    setTempCreatorUIConfig(null);
-
-    setEditingMode(false);
+    setUiConfigChanged(false);
+    disableEditingMode();
   };
 
   const handleCancelDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);
 
-    setTempCreatorUIConfig(null);
-    setEditingMode(false);
+    if (uiConfigChanged) {
+      Modal.confirm({
+        mask: true,
+        maskClosable: false,
+        centered: true,
+        width: 420,
+        title: 'Unsaved changes detected',
+        content: (
+          <Paragraph>
+            Are you sure you want to close editing mode? You have made changes that will not be saved if you close now.
+          </Paragraph>
+        ),
+        onOk: disableEditingMode,
+        okText: 'Close without saving',
+        okButtonProps: {
+          type: 'primary',
+          danger: true,
+        },
+        cancelText: 'Cancel',
+        cancelButtonProps: {
+          type: 'default',
+        },
+        afterClose: resetBodyStyle,
+      });
+    } else {
+      disableEditingMode();
+    }
   };
+
+  //#endregion End of Page Edit Button Handlers
+
+  //#region Start Of Component Edit Handlers
+
+  const updateComponentConfig = (identifier = null, newConfig = null) => {
+    if (!identifier) {
+      showErrorModal('Invalid identifier passed');
+      return;
+    }
+
+    if (!newConfig) {
+      showErrorModal('Invalid configuration passed');
+      return;
+    }
+
+    // Updates the temp config first, will be removed if user cancels
+    const tempConfigComponents = tempCreatorUIConfig.components;
+    const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
+    const targetComponent = tempConfigComponents.find((component) => component.key === identifier);
+
+    if (!targetComponent || targetIndex === -1) {
+      showErrorModal(`Component with identifier ${identifier} not found!`);
+      return;
+    }
+
+    targetComponent.props = newConfig;
+    tempConfigComponents.splice(targetIndex, 1, targetComponent);
+    setTempCreatorUIConfig({
+      ...tempCreatorUIConfig,
+      components: tempConfigComponents,
+    });
+    setUiConfigChanged(true);
+  };
+
+  const removeComponent = (identifier = null) => {
+    if (!identifier) {
+      showErrorModal('Invalid identifier passed');
+      return;
+    }
+
+    const tempConfigComponents = tempCreatorUIConfig.components;
+    const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
+
+    if (targetIndex === -1) {
+      showErrorModal(`Component with identifier ${identifier} not found!`);
+      return;
+    }
+
+    tempConfigComponents.splice(targetIndex, 1);
+    setTempCreatorUIConfig({
+      ...tempCreatorUIConfig,
+      components: tempConfigComponents,
+    });
+  };
+
+  //#endregion End Of Component Edit Handlers
+
+  //#region Start Of Drag and Drop Handlers
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -125,10 +223,11 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     const componentsList = tempCreatorUIConfig.components;
     const targetComponent = componentsList.find((component) => component.key === draggableId);
 
-    if (targetComponent && destination) {
+    if (targetComponent && destination && destination.index !== source.index) {
       componentsList.splice(source.index, 1);
       componentsList.splice(destination.index, 0, targetComponent);
 
+      setUiConfigChanged(true);
       setTempCreatorUIConfig({
         ...tempCreatorUIConfig,
         components: componentsList,
@@ -144,15 +243,22 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         {(provided) => (
           <Col xs={24} {...provided.draggableProps} ref={provided.innerRef}>
             <DragAndDropHandle {...provided.dragHandleProps} isEditing={editingMode} />
-            <RenderedComponent isEditing={editingMode} {...component.props} />
+            <RenderedComponent
+              identifier={component.key}
+              isEditing={editingMode}
+              updateConfigHandler={updateComponentConfig}
+              removeComponentHandler={removeComponent}
+              {...component.props}
+            />
           </Col>
         )}
       </Draggable>
     );
   };
 
-  // TODO: Currently using old CreatorProfile, decide if we want to make a new one
+  //#endregion End Of Drag and Drop Handlers
 
+  // TODO: Currently using old CreatorProfile, decide if we want to make a new one
   return (
     <>
       <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
@@ -184,37 +290,39 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Col>
         </Row>
       </Spin>
-      <Affix offsetBottom={20} className={styles.editDynamicProfileButtonContainer}>
-        {editingMode ? (
-          <Space align="bottom" size="small">
+      {editable && (
+        <Affix offsetBottom={20} className={styles.editDynamicProfileButtonContainer}>
+          {editingMode ? (
+            <Space align="bottom" size="small">
+              <Button
+                className={classNames(styles.dynamicProfileButtons, styles.greenBtn)}
+                type="primary"
+                shape="round"
+                size="large"
+                icon={<SaveOutlined />}
+                onClick={handleSaveDynamicProfileButtonClicked}
+              />
+              <Button
+                className={classNames(styles.dynamicProfileButtons, styles.redBtn)}
+                type="primary"
+                shape="round"
+                size="large"
+                icon={<CloseCircleOutlined />}
+                onClick={handleCancelDynamicProfileButtonClicked}
+              />
+            </Space>
+          ) : (
             <Button
-              className={classNames(styles.dynamicProfileButtons, styles.greenBtn)}
+              className={styles.dynamicProfileButtons}
               type="primary"
               shape="round"
               size="large"
-              icon={<SaveOutlined />}
-              onClick={handleSaveDynamicProfileButtonClicked}
+              icon={<EditOutlined />}
+              onClick={handleEditDynamicProfileButtonClicked}
             />
-            <Button
-              className={classNames(styles.dynamicProfileButtons, styles.redBtn)}
-              type="primary"
-              shape="round"
-              size="large"
-              icon={<CloseCircleOutlined />}
-              onClick={handleCancelDynamicProfileButtonClicked}
-            />
-          </Space>
-        ) : (
-          <Button
-            className={styles.dynamicProfileButtons}
-            type="primary"
-            shape="round"
-            size="large"
-            icon={<EditOutlined />}
-            onClick={handleEditDynamicProfileButtonClicked}
-          />
-        )}
-      </Affix>
+          )}
+        </Affix>
+      )}
     </>
   );
 };
