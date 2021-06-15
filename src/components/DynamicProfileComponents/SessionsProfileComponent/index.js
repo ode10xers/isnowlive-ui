@@ -23,7 +23,6 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Create custom DnD Handle
 // TODO: Create Edit Overlays (for editing/deleting)
 const SessionsProfileComponent = ({ isEditing, title = null }) => {
   return (

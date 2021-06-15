@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { message, Spin, Row, Col, Affix, Button } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { message, Spin, Row, Col, Affix, Button, Space } from 'antd';
+import { EditOutlined, MenuOutlined, SaveOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -9,7 +10,7 @@ import CreatorProfile from 'components/CreatorProfile';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 
-import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -39,6 +40,14 @@ const componentsMap = {
   SESSIONS: SessionsProfileComponent,
 };
 
+// TODO: Style this
+const DragAndDropHandle = ({ isEditing = false, ...props }) =>
+  isEditing ? (
+    <div className={styles.dndHandle} {...props}>
+      <MenuOutlined />
+    </div>
+  ) : null;
+
 const DynamicProfile = ({ creatorUsername = null }) => {
   const {
     state: { userDetails },
@@ -49,6 +58,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
   const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
+  const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState(null);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     setIsLoading(true);
@@ -87,26 +97,58 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const handleEditDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);
 
+    setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
     setEditingMode(true);
   };
 
-  const handleDragEnd = (result) => {
-    console.log(result);
+  const handleSaveDynamicProfileButtonClicked = (e) => {
+    preventDefaults(e);
 
+    // TODO: Save the data here to API
+    console.log(tempCreatorUIConfig);
+    setCreatorUIConfig(deepCloneObject(tempCreatorUIConfig));
+    setTempCreatorUIConfig(null);
+
+    setEditingMode(false);
+  };
+
+  const handleCancelDynamicProfileButtonClicked = (e) => {
+    preventDefaults(e);
+
+    setTempCreatorUIConfig(null);
+    setEditingMode(false);
+  };
+
+  const handleDragEnd = (result) => {
     const { destination, source, draggableId } = result;
 
-    const componentsList = creatorUIConfig.components;
+    const componentsList = tempCreatorUIConfig.components;
     const targetComponent = componentsList.find((component) => component.key === draggableId);
 
     if (targetComponent && destination) {
       componentsList.splice(source.index, 1);
       componentsList.splice(destination.index, 0, targetComponent);
 
-      setCreatorUIConfig({
-        ...creatorUIConfig,
+      setTempCreatorUIConfig({
+        ...tempCreatorUIConfig,
         components: componentsList,
       });
     }
+  };
+
+  const renderDraggableCustomComponents = (component, idx) => {
+    const RenderedComponent = componentsMap[component.key];
+
+    return (
+      <Draggable isDragDisabled={!editingMode} draggableId={component.key} index={idx} key={component.key}>
+        {(provided) => (
+          <Col xs={24} {...provided.draggableProps} ref={provided.innerRef}>
+            <DragAndDropHandle {...provided.dragHandleProps} isEditing={editingMode} />
+            <RenderedComponent isEditing={editingMode} {...component.props} />
+          </Col>
+        )}
+      </Draggable>
+    );
   };
 
   // TODO: Currently using old CreatorProfile, decide if we want to make a new one
@@ -131,29 +173,9 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               >
                 {(provided) => (
                   <Row gutter={[8, 16]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
-                    {sampleUIConfig.components.map((component, idx) => {
-                      const RenderedComponent = componentsMap[component.key];
-
-                      return (
-                        <Draggable
-                          isDragDisabled={!editingMode}
-                          draggableId={component.key}
-                          index={idx}
-                          key={component.key}
-                        >
-                          {(provided, snapshot) => (
-                            <Col
-                              xs={24}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              ref={provided.innerRef}
-                            >
-                              <RenderedComponent isEditing={editingMode} {...component.props} />
-                            </Col>
-                          )}
-                        </Draggable>
-                      );
-                    })}
+                    {editingMode
+                      ? tempCreatorUIConfig?.components.map(renderDraggableCustomComponents)
+                      : creatorUIConfig.components.map(renderDraggableCustomComponents)}
                     {provided.placeholder}
                   </Row>
                 )}
@@ -163,14 +185,35 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         </Row>
       </Spin>
       <Affix offsetBottom={20} className={styles.editDynamicProfileButtonContainer}>
-        <Button
-          className={styles.editDynamicProfileButton}
-          type="primary"
-          shape="round"
-          size="large"
-          icon={<EditOutlined />}
-          onClick={handleEditDynamicProfileButtonClicked}
-        />
+        {editingMode ? (
+          <Space align="bottom" size="small">
+            <Button
+              className={classNames(styles.dynamicProfileButtons, styles.greenBtn)}
+              type="primary"
+              shape="round"
+              size="large"
+              icon={<SaveOutlined />}
+              onClick={handleSaveDynamicProfileButtonClicked}
+            />
+            <Button
+              className={classNames(styles.dynamicProfileButtons, styles.redBtn)}
+              type="primary"
+              shape="round"
+              size="large"
+              icon={<CloseCircleOutlined />}
+              onClick={handleCancelDynamicProfileButtonClicked}
+            />
+          </Space>
+        ) : (
+          <Button
+            className={styles.dynamicProfileButtons}
+            type="primary"
+            shape="round"
+            size="large"
+            icon={<EditOutlined />}
+            onClick={handleEditDynamicProfileButtonClicked}
+          />
+        )}
       </Affix>
     </>
   );

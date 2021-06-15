@@ -7,6 +7,8 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+export const deepCloneObject = (objData) => JSON.parse(JSON.stringify(objData));
+
 // Will occur if a member that is not yet approved tries to access secure APIS
 const FORBIDDEN = 403;
 const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';

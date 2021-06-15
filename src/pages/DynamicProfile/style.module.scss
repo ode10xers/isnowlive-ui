@@ -4,10 +4,20 @@
   position: fixed;
   left : 20px;
 
-  .editDynamicProfileButton {
+  .dynamicProfileButtons {
     border-radius: 50% !important;
     width: 50px !important;
     height: 50px !important;
     padding: 8px !important;
   }
+}
+
+.dndHandle {
+  text-align:center;
+  height: 40px;
+  max-width: 120px;
+  margin: 0 auto -12px;
+  padding: 8px 4px;
+  background-color: map-get($map: $colors, $key: 'PaleCornflowerBlue');
+  border: 1px solid map-get($map: $colors, $key: 'AliceBlue');
 }
