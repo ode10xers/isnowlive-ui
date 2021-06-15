@@ -16,7 +16,7 @@ import validationRules from 'utils/validation';
 
 import styles from './styles.module.scss';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const defaultTemplateKey = 'blank';
 
@@ -276,9 +276,6 @@ const EmailList = () => {
     <div>
       <AllAudienceModal visible={sendEmailModalVisible} closeModal={hideSendEmailModal} listID={selectedTemplate} />
       <Row gutter={[8, 24]} className={styles.box}>
-        <Col xs={24}>
-          <Title level={5}>Email Lists</Title>
-        </Col>
         {/* Dropdown section */}
         <Col xs={24}>
           <Row gutter={[8, 8]}>

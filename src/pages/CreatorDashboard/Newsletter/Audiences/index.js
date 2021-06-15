@@ -6,6 +6,7 @@ import apis from 'apis';
 
 import AudienceImport from './AudienceImport';
 import AudienceList from './AudienceList';
+import EmailList from '../EmailList';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
@@ -101,6 +102,9 @@ const Audiences = () => {
           </TabPane>
           <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import List </Title>}>
             <AudienceImport />
+          </TabPane>
+          <TabPane key="emailList" tab={<Title level={5}> Email List </Title>}>
+            <EmailList />
           </TabPane>
         </Tabs>
       </Col>
