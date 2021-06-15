@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Card, Typography } from 'antd';
 import { VideoCameraTwoTone } from '@ant-design/icons';
 
@@ -9,10 +8,10 @@ import styles from './style.module.scss';
 
 const { Text } = Typography;
 
-const DefaultContainerTitle = (
+const ContainerTitle = ({ title = 'SESSIONS' }) => (
   <Text style={{ color: '#0050B3' }}>
     <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-    SESSIONS
+    {title}
   </Text>
 );
 
@@ -21,13 +20,16 @@ const cardHeadingStyle = {
   background: '#F1FBFF',
   boxShadow: 'inset 0px -1px 0px #E6F5FB',
   color: '#0050B3',
+  borderRadius: '12px 12px 0 0',
 };
 
-const SessionsProfileComponent = ({ title = DefaultContainerTitle }) => {
+// TODO: Create custom DnD Handle
+// TODO: Create Edit Overlays (for editing/deleting)
+const SessionsProfileComponent = ({ isEditing, title = null }) => {
   return (
     <div className={styles.p10}>
       <Card
-        title={title}
+        title={<ContainerTitle title={title} />}
         headStyle={cardHeadingStyle}
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12 }}

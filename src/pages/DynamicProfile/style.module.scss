@@ -1,0 +1,13 @@
+@import '../../styles/variables.scss';
+
+.editDynamicProfileButtonContainer {
+  position: fixed;
+  left : 20px;
+
+  .editDynamicProfileButton {
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+    padding: 8px !important;
+  }
+}
