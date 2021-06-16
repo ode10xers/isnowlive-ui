@@ -130,18 +130,13 @@ const CreateCourseModal = ({
     setIsLoading(false);
   }, []);
 
-  const fetchAllVideosForCreator = useCallback(async (filterCourseVideos = false) => {
+  const fetchAllVideosForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
         let filteredVideos = data;
-
-        if (filterCourseVideos) {
-          filteredVideos = filteredVideos.filter((video) => video.is_course);
-        }
-
         setVideos(filteredVideos);
       }
     } catch (error) {
@@ -363,7 +358,7 @@ const CreateCourseModal = ({
         // setIsSequentialVideos(false);
       }
 
-      fetchAllVideosForCreator(isVideoModal);
+      fetchAllVideosForCreator();
       getCreatorCurrencyDetails();
     }
   }, [
