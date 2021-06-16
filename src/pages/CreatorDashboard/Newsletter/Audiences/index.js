@@ -4,10 +4,10 @@ import { Row, Col, Tabs, Typography, Switch, message } from 'antd';
 
 import apis from 'apis';
 
-import AudienceImport from './AudienceImport';
-import AudienceList from './AudienceList';
-import EmailList from '../EmailList';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import AudienceImport from './AudienceImport';
+// import AudienceList from './AudienceList';
+import EmailList from './EmailList';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -17,7 +17,7 @@ const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
 
 const Audiences = () => {
-  const [selectedTab, setSelectedTab] = useState('list');
+  const [selectedTab, setSelectedTab] = useState('emailList');
   const [creatorProfile, setCreatorProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -96,15 +96,15 @@ const Audiences = () => {
         </Row>
       </Col>
       <Col xs={24}>
-        <Tabs size="large" activeKey={selectedTab} onChange={setSelectedTab}>
-          <TabPane key="list" tab={<Title level={5}> Audience & Member List </Title>}>
+        <Tabs type="card" size="large" activeKey={selectedTab} onChange={setSelectedTab}>
+          {/* <TabPane key="list" tab={<Title level={5}> All Audiences </Title>}>
             <AudienceList />
-          </TabPane>
-          <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import List </Title>}>
-            <AudienceImport />
-          </TabPane>
-          <TabPane key="emailList" tab={<Title level={5}> Email List </Title>}>
+          </TabPane> */}
+          <TabPane key="emailList" tab={<Title level={5}> Audience List </Title>}>
             <EmailList />
+          </TabPane>
+          <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import Audiences </Title>}>
+            <AudienceImport />
           </TabPane>
         </Tabs>
       </Col>
