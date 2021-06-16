@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import { Modal, Row, Col, Input, Button, Form, Typography } from 'antd';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Modal, Row, Col, Input, Button, Form } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
 
@@ -14,9 +14,7 @@ const formInitialValues = {
   title: null,
 };
 
-const { Paragraph } = Typography;
-
-const SessionEditView = ({ configValues, deleteHandler, updateHandler }) => {
+const SessionEditView = ({ configValues, updateHandler }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -36,27 +34,6 @@ const SessionEditView = ({ configValues, deleteHandler, updateHandler }) => {
     setEditModalVisible(true);
   };
 
-  const handleDeleteComponentClicked = (e) => {
-    preventDefaults(e);
-
-    Modal.confirm({
-      closable: true,
-      centered: true,
-      mask: true,
-      maskClosable: false,
-      title: 'Delete this component?',
-      content: <Paragraph>Are you sure you want to remove this component?</Paragraph>,
-      okText: 'Yes, remove it',
-      okButtonProps: {
-        danger: true,
-        type: 'primary',
-      },
-      cancelText: 'Cancel',
-      onOk: () => deleteHandler(),
-      afterClose: resetBodyStyle,
-    });
-  };
-
   const cancelEditChanges = (e) => {
     preventDefaults(e);
     setEditModalVisible(false);
@@ -70,15 +47,10 @@ const SessionEditView = ({ configValues, deleteHandler, updateHandler }) => {
 
   return (
     <>
-      <Row>
+      <Row justify="center">
         <Col xs={12} className={styles.editViewButtonContainer}>
           <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
             <EditOutlined />
-          </button>
-        </Col>
-        <Col xs={12} className={styles.editViewButtonContainer}>
-          <button className={styles.deleteComponentButton} onClick={handleDeleteComponentClicked}>
-            <DeleteOutlined />
           </button>
         </Col>
       </Row>
@@ -93,6 +65,7 @@ const SessionEditView = ({ configValues, deleteHandler, updateHandler }) => {
       >
         <Form
           form={form}
+          layout="vertical"
           scrollToFirstError={true}
           initialValues={formInitialValues}
           onFinish={handleFinishEditComponent}

@@ -9,7 +9,6 @@ import {
   CloseCircleOutlined,
   VideoCameraOutlined,
   LikeOutlined,
-  PlusCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -24,7 +23,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 
 const { Paragraph } = Typography;
 
@@ -37,12 +36,12 @@ const sampleUIConfig = {
         title: 'My Live Sessions',
       },
     },
-    // {
-    //   key: 'PASSES',
-    //   props: {
-    //     title: 'Credit Passes',
-    //   },
-    // },
+    {
+      key: 'PASSES',
+      props: {
+        title: 'Credit Passes',
+      },
+    },
   ],
 };
 
@@ -77,11 +76,12 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     state: { userDetails },
   } = useGlobalContext();
 
+  const [containerRef, setContainerRef] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [creatorProfileData, setCreatorProfileData] = useState({});
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
-  const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
+  // const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState(null);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
@@ -126,47 +126,46 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   //#region Start Of Page Edit Button Handlers
 
-  const getExistingComponentInstance = (identifier) => {
-    const currentComponentsList = tempCreatorUIConfig.components;
-    const duplicateComponent = currentComponentsList.find((component) => component.key === identifier);
+  // const getExistingComponentInstance = (identifier) => {
+  //   const currentComponentsList = tempCreatorUIConfig.components;
+  //   const duplicateComponent = currentComponentsList.find((component) => component.key === identifier);
 
-    return duplicateComponent;
-  };
+  //   return duplicateComponent;
+  // };
 
-  const addComponent = (identifier = null, props) => {
-    if (!identifier) {
-      showErrorModal('Invalid component identifier!');
-      return;
-    }
+  // const addComponent = (identifier = null, props) => {
+  //   if (!identifier) {
+  //     showErrorModal('Invalid component identifier!');
+  //     return;
+  //   }
 
-    // TODO: Confirm whether we want uniqueness or not here
-    // Currently all of them will be unique (no duplicate allowed)
-    const existingComponentInstance = getExistingComponentInstance(identifier);
+  //   // TODO: Confirm whether we want uniqueness or not here
+  //   // Currently all of them will be unique (no duplicate allowed)
+  //   const existingComponentInstance = getExistingComponentInstance(identifier);
 
-    if (existingComponentInstance) {
-      showErrorModal('Duplicate of this component already exists!');
-      return;
-    }
+  //   if (existingComponentInstance) {
+  //     showErrorModal('Duplicate of this component already exists!');
+  //     return;
+  //   }
 
-    const currentComponentsList = deepCloneObject(tempCreatorUIConfig).components || [];
-    currentComponentsList.push({
-      key: identifier,
-      props: props,
-    });
+  //   const currentComponentsList = deepCloneObject(tempCreatorUIConfig).components || [];
+  //   currentComponentsList.push({
+  //     key: identifier,
+  //     props: props,
+  //   });
 
-    setTempCreatorUIConfig({
-      ...tempCreatorUIConfig,
-      components: currentComponentsList,
-    });
-    setUiConfigChanged(false);
-    setAddComponentModalVisible(false);
-    showSuccessModal('Component added', `Make sure to save so you don't lose the changes`);
-  };
+  //   setTempCreatorUIConfig({
+  //     ...tempCreatorUIConfig,
+  //     components: currentComponentsList,
+  //   });
+  //   setUiConfigChanged(false);
+  //   setAddComponentModalVisible(false);
+  //   showSuccessModal('Component added', `Make sure to save so you don't lose the changes`);
+  // };
 
   const disableEditingMode = () => {
     setTempCreatorUIConfig(null);
     setEditingMode(false);
-    setAddComponentModalVisible(false);
   };
 
   const handleEditDynamicProfileButtonClicked = (e) => {
@@ -175,7 +174,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
     setEditingMode(true);
     setUiConfigChanged(false);
-    setAddComponentModalVisible(false);
   };
 
   const handleSaveDynamicProfileButtonClicked = (e) => {
@@ -220,10 +218,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
   };
 
-  const handleAddComponentDynamicProfileButtonClicked = (e) => {
-    preventDefaults(e);
-    setAddComponentModalVisible(true);
-  };
+  // const handleAddComponentDynamicProfileButtonClicked = (e) => {
+  //   preventDefaults(e);
+  //   setAddComponentModalVisible(true);
+  // };
 
   //#endregion End of Page Edit Button Handlers
 
@@ -259,26 +257,26 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setUiConfigChanged(true);
   };
 
-  const removeComponent = (identifier = null) => {
-    if (!identifier) {
-      showErrorModal('Invalid identifier passed');
-      return;
-    }
+  // const removeComponent = (identifier = null) => {
+  //   if (!identifier) {
+  //     showErrorModal('Invalid identifier passed');
+  //     return;
+  //   }
 
-    const tempConfigComponents = tempCreatorUIConfig.components;
-    const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
+  //   const tempConfigComponents = tempCreatorUIConfig.components;
+  //   const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
 
-    if (targetIndex === -1) {
-      showErrorModal(`Component with identifier ${identifier} not found!`);
-      return;
-    }
+  //   if (targetIndex === -1) {
+  //     showErrorModal(`Component with identifier ${identifier} not found!`);
+  //     return;
+  //   }
 
-    tempConfigComponents.splice(targetIndex, 1);
-    setTempCreatorUIConfig({
-      ...tempCreatorUIConfig,
-      components: tempConfigComponents,
-    });
-  };
+  //   tempConfigComponents.splice(targetIndex, 1);
+  //   setTempCreatorUIConfig({
+  //     ...tempCreatorUIConfig,
+  //     components: tempConfigComponents,
+  //   });
+  // };
 
   //#endregion End Of Component Edit View Handlers
 
@@ -314,7 +312,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               identifier={component.key}
               isEditing={editingMode}
               updateConfigHandler={updateComponentConfig}
-              removeComponentHandler={removeComponent}
               {...component.props}
             />
           </Col>
@@ -327,7 +324,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   // TODO: Currently using old CreatorProfile, decide if we want to make a new one
   return (
-    <>
+    <div ref={setContainerRef}>
       <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
         <Row gutter={8} justify="center">
           <Col xs={24}>
@@ -358,10 +355,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         </Row>
       </Spin>
       {editable && (
-        <Affix offsetBottom={20} className={styles.editDynamicProfileButtonContainer}>
+        <Affix
+          offsetBottom={20}
+          className={styles.editDynamicProfileButtonContainer}
+          target={() => containerRef ?? window}
+        >
           {editingMode ? (
             <Row gutter={[8, 8]}>
-              <Col xs={24}>
+              {/* <Col xs={24}>
                 <Space align="bottom" size="small">
                   <Button
                     className={classNames(styles.dynamicProfileButtons, styles.addBtn)}
@@ -372,7 +373,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                     onClick={handleAddComponentDynamicProfileButtonClicked}
                   />
                 </Space>
-              </Col>
+              </Col> */}
               <Col xs={24}>
                 <Space align="bottom" size="small">
                   <Button
@@ -406,7 +407,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           )}
         </Affix>
       )}
-      {editingMode && (
+      {/* {editingMode && (
         <Modal
           visible={addComponentModalVisible}
           title="Select a component to add"
@@ -432,8 +433,8 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             ))}
           </Row>
         </Modal>
-      )}
-    </>
+      )} */}
+    </div>
   );
 };
 

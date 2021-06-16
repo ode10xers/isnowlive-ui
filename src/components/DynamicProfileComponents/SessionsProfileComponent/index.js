@@ -24,16 +24,13 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Disable list view mechanics when editing
 const SessionsProfileComponent = ({
   identifier = null,
   isEditing = false,
   updateConfigHandler,
-  removeComponentHandler,
   ...customComponentProps
 }) => {
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
-  const deleteComponent = () => removeComponentHandler(identifier);
 
   return (
     <div className={styles.p10}>
@@ -41,18 +38,12 @@ const SessionsProfileComponent = ({
         title={<ContainerTitle title={customComponentProps.title} />}
         headStyle={cardHeadingStyle}
         className={styles.profileComponentContainer}
-        bodyStyle={{ padding: 12 }}
+        bodyStyle={{ padding: 12, position: 'relative' }}
       >
         <SessionListView />
         {isEditing && <div className={styles.clickDisableOverlay} />}
       </Card>
-      {isEditing && (
-        <SessionEditView
-          configValues={customComponentProps}
-          deleteHandler={deleteComponent}
-          updateHandler={saveEditChanges}
-        />
-      )}
+      {isEditing && <SessionEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
     </div>
   );
 };
