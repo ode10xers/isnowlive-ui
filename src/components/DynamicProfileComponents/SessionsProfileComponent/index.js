@@ -24,7 +24,7 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Create Edit Overlays (for editing/deleting)
+// TODO: Disable list view mechanics when editing
 const SessionsProfileComponent = ({
   identifier = null,
   isEditing = false,
@@ -44,6 +44,7 @@ const SessionsProfileComponent = ({
         bodyStyle={{ padding: 12 }}
       >
         <SessionListView />
+        {isEditing && <div className={styles.clickDisableOverlay} />}
       </Card>
       {isEditing && (
         <SessionEditView

@@ -22,3 +22,8 @@
   border: 1px solid map-get($map: $colors, $key: 'AliceBlue');
   border-radius: 12px 12px 0 0;
 }
+
+.addBtn {
+  background-color: map-get($map: $colors, $key: 'EasternBlue') !important;
+  border-color: map-get($map: $colors, $key: 'EasternBlue') !important;
+}

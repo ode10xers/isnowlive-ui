@@ -2,7 +2,15 @@ import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Affix, Button, Space, Modal, Typography } from 'antd';
-import { EditOutlined, MenuOutlined, SaveOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  MenuOutlined,
+  SaveOutlined,
+  CloseCircleOutlined,
+  VideoCameraOutlined,
+  LikeOutlined,
+  PlusCircleOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -16,7 +24,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 const { Paragraph } = Typography;
 
@@ -29,18 +37,32 @@ const sampleUIConfig = {
         title: 'My Live Sessions',
       },
     },
-    {
-      key: 'PASSES',
-      props: {
-        title: 'Credit Passes',
-      },
-    },
+    // {
+    //   key: 'PASSES',
+    //   props: {
+    //     title: 'Credit Passes',
+    //   },
+    // },
   ],
 };
 
 const componentsMap = {
-  PASSES: PassesProfileComponent,
-  SESSIONS: SessionsProfileComponent,
+  SESSIONS: {
+    icon: <VideoCameraOutlined />,
+    label: 'Sessions',
+    component: SessionsProfileComponent,
+    defaultProps: {
+      title: 'SESSIONS',
+    },
+  },
+  PASSES: {
+    icon: <LikeOutlined />,
+    label: 'Passes',
+    component: PassesProfileComponent,
+    defaultProps: {
+      title: 'CREDIT PASSES',
+    },
+  },
 };
 
 const DragAndDropHandle = ({ isEditing = false, ...props }) =>
@@ -59,6 +81,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [creatorProfileData, setCreatorProfileData] = useState({});
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
+  const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState(null);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
@@ -103,9 +126,47 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   //#region Start Of Page Edit Button Handlers
 
+  const getExistingComponentInstance = (identifier) => {
+    const currentComponentsList = tempCreatorUIConfig.components;
+    const duplicateComponent = currentComponentsList.find((component) => component.key === identifier);
+
+    return duplicateComponent;
+  };
+
+  const addComponent = (identifier = null, props) => {
+    if (!identifier) {
+      showErrorModal('Invalid component identifier!');
+      return;
+    }
+
+    // TODO: Confirm whether we want uniqueness or not here
+    // Currently all of them will be unique (no duplicate allowed)
+    const existingComponentInstance = getExistingComponentInstance(identifier);
+
+    if (existingComponentInstance) {
+      showErrorModal('Duplicate of this component already exists!');
+      return;
+    }
+
+    const currentComponentsList = deepCloneObject(tempCreatorUIConfig).components || [];
+    currentComponentsList.push({
+      key: identifier,
+      props: props,
+    });
+
+    setTempCreatorUIConfig({
+      ...tempCreatorUIConfig,
+      components: currentComponentsList,
+    });
+    setUiConfigChanged(false);
+    setAddComponentModalVisible(false);
+    showSuccessModal('Component added', `Make sure to save so you don't lose the changes`);
+  };
+
   const disableEditingMode = () => {
     setTempCreatorUIConfig(null);
     setEditingMode(false);
+    setAddComponentModalVisible(false);
   };
 
   const handleEditDynamicProfileButtonClicked = (e) => {
@@ -114,6 +175,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
     setEditingMode(true);
     setUiConfigChanged(false);
+    setAddComponentModalVisible(false);
   };
 
   const handleSaveDynamicProfileButtonClicked = (e) => {
@@ -158,9 +220,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
   };
 
+  const handleAddComponentDynamicProfileButtonClicked = (e) => {
+    preventDefaults(e);
+    setAddComponentModalVisible(true);
+  };
+
   //#endregion End of Page Edit Button Handlers
 
-  //#region Start Of Component Edit Handlers
+  //#region Start Of Component Edit View Handlers
 
   const updateComponentConfig = (identifier = null, newConfig = null) => {
     if (!identifier) {
@@ -213,7 +280,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     });
   };
 
-  //#endregion End Of Component Edit Handlers
+  //#endregion End Of Component Edit View Handlers
 
   //#region Start Of Drag and Drop Handlers
 
@@ -236,7 +303,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   };
 
   const renderDraggableCustomComponents = (component, idx) => {
-    const RenderedComponent = componentsMap[component.key];
+    const RenderedComponent = componentsMap[component.key].component;
 
     return (
       <Draggable isDragDisabled={!editingMode} draggableId={component.key} index={idx} key={component.key}>
@@ -293,24 +360,40 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       {editable && (
         <Affix offsetBottom={20} className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
-            <Space align="bottom" size="small">
-              <Button
-                className={classNames(styles.dynamicProfileButtons, styles.greenBtn)}
-                type="primary"
-                shape="round"
-                size="large"
-                icon={<SaveOutlined />}
-                onClick={handleSaveDynamicProfileButtonClicked}
-              />
-              <Button
-                className={classNames(styles.dynamicProfileButtons, styles.redBtn)}
-                type="primary"
-                shape="round"
-                size="large"
-                icon={<CloseCircleOutlined />}
-                onClick={handleCancelDynamicProfileButtonClicked}
-              />
-            </Space>
+            <Row gutter={[8, 8]}>
+              <Col xs={24}>
+                <Space align="bottom" size="small">
+                  <Button
+                    className={classNames(styles.dynamicProfileButtons, styles.addBtn)}
+                    type="primary"
+                    shape="round"
+                    size="large"
+                    icon={<PlusCircleOutlined />}
+                    onClick={handleAddComponentDynamicProfileButtonClicked}
+                  />
+                </Space>
+              </Col>
+              <Col xs={24}>
+                <Space align="bottom" size="small">
+                  <Button
+                    className={classNames(styles.dynamicProfileButtons, styles.greenBtn)}
+                    type="primary"
+                    shape="round"
+                    size="large"
+                    icon={<SaveOutlined />}
+                    onClick={handleSaveDynamicProfileButtonClicked}
+                  />
+                  <Button
+                    className={classNames(styles.dynamicProfileButtons, styles.redBtn)}
+                    type="primary"
+                    shape="round"
+                    size="large"
+                    icon={<CloseCircleOutlined />}
+                    onClick={handleCancelDynamicProfileButtonClicked}
+                  />
+                </Space>
+              </Col>
+            </Row>
           ) : (
             <Button
               className={styles.dynamicProfileButtons}
@@ -322,6 +405,33 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             />
           )}
         </Affix>
+      )}
+      {editingMode && (
+        <Modal
+          visible={addComponentModalVisible}
+          title="Select a component to add"
+          centered={true}
+          footer={null}
+          width={420}
+          onCancel={() => setAddComponentModalVisible(false)}
+          afterClose={resetBodyStyle}
+        >
+          <Row gutter={[8, 8]}>
+            {Object.entries(componentsMap).map(([componentKey, componentOptions]) => (
+              <Col xs={24} sm={12} key={componentKey}>
+                <Button
+                  block
+                  type="text"
+                  icon={componentOptions.icon}
+                  disabled={getExistingComponentInstance(componentKey)}
+                  onClick={() => addComponent(componentKey, componentOptions.defaultProps)}
+                >
+                  {componentOptions.label}
+                </Button>
+              </Col>
+            ))}
+          </Row>
+        </Modal>
       )}
     </>
   );
