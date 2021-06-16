@@ -69,6 +69,12 @@ const Profile = () => {
     }
   }, [form]);
 
+  const showCreatorProfilePreview = (creatorUrl) => {
+    const newWindow = window.open(creatorUrl);
+    newWindow.blur();
+    window.focus();
+  };
+
   const updateProfileDetails = async (values) => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
@@ -107,11 +113,6 @@ const Profile = () => {
         if (isOnboarding) {
           const creatorUrl = generateUrlFromUsername(values.username);
 
-          const newWindow = window.open(creatorUrl);
-          newWindow.blur();
-          window.focus();
-          // history.push(Routes.livestream);
-
           const modalRef = Modal.success({
             width: 550,
             okButtonProps: { style: { display: 'none' } },
@@ -121,24 +122,27 @@ const Profile = () => {
                 <Col xs={24}>
                   <Paragraph>You can now share your website</Paragraph>
                   <Paragraph>
-                    <Link
-                      href={creatorUrl}
-                      target="_blank"
-                      copyable={{
-                        icon: [
-                          <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
-                            {' '}
-                            Copy{' '}
-                          </Button>,
-                          <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
-                            {' '}
-                            Copied!{' '}
-                          </Button>,
-                        ],
-                      }}
-                    >
-                      {creatorUrl}
-                    </Link>
+                    <Space>
+                      <Link
+                        href={creatorUrl}
+                        target="_blank"
+                        copyable={{
+                          icon: [
+                            <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
+                              Copy
+                            </Button>,
+                            <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
+                              Copied!
+                            </Button>,
+                          ],
+                        }}
+                      >
+                        {creatorUrl}
+                      </Link>
+                      <Button size="small" type="primary" onClick={() => showCreatorProfilePreview(creatorUrl)}>
+                        Show me!
+                      </Button>
+                    </Space>
                   </Paragraph>
                   <Paragraph>on your social media or with your audience.</Paragraph>
                   <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
