@@ -9,6 +9,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
+import SendAudienceEmailModal from 'components/SendAudienceEmailModal';
 import AllAudienceModal from 'components/AllAudienceModal';
 import Table from 'components/Table';
 import { isAPISuccess } from 'utils/helper';
@@ -26,6 +27,8 @@ const EmailList = () => {
   const [selectedAudiences, setSelectedAudiences] = useState([]);
   const [pageNumber, setPageNumber] = useState(1);
   const [canShowMore, setCanShowMore] = useState(false);
+  const [sendAudienceEmailModalVisible, setSendAudienceEmailModalVisible] = useState(false);
+  const [audienceEmailRecipients, setAudienceEmailRecipients] = useState([]);
   const [audienceList, setAudienceList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [creatorEmailTemplates, setCreatorEmailTemplates] = useState([]);
@@ -39,6 +42,13 @@ const EmailList = () => {
       fetchEmailListDetails(selectedTemplate);
     }
     setSendEmailModalVisible(false);
+  };
+
+  const hideSendAudienceEmailModal = (flag) => {
+    if (flag === true) {
+      fetchEmailListDetails(selectedTemplate);
+    }
+    setSendAudienceEmailModalVisible(false);
   };
 
   const deleteAudience = async (audience) => {
@@ -259,6 +269,11 @@ const EmailList = () => {
     setIsLoading(false);
   };
 
+  const showSendAudienceEmailModal = () => {
+    setAudienceEmailRecipients(selectedTemplate);
+    setSendAudienceEmailModalVisible(true);
+  };
+
   const templateOptions = useMemo(() => {
     return [
       {
@@ -274,6 +289,11 @@ const EmailList = () => {
 
   return (
     <div>
+      <SendAudienceEmailModal
+        visible={sendAudienceEmailModalVisible}
+        closeModal={hideSendAudienceEmailModal}
+        recipients={audienceEmailRecipients}
+      />
       <AllAudienceModal visible={sendEmailModalVisible} closeModal={hideSendEmailModal} listID={selectedTemplate} />
       <Row gutter={[8, 24]} className={styles.box}>
         {/* Dropdown section */}
@@ -306,6 +326,11 @@ const EmailList = () => {
                 </Col>
                 <Col xs={24} md={12} lg={14}>
                   <Row gutter={[8, 8]} justify="end">
+                    <Col xs={24} md={12} lg={8}>
+                      <Button type="primary" hidden={isCreating} onClick={() => showSendAudienceEmailModal()}>
+                        Send Email to recipients
+                      </Button>
+                    </Col>
                     <Col xs={24} md={12} lg={8}>
                       <Form.Item hidden={isCreating}>
                         <Popconfirm
