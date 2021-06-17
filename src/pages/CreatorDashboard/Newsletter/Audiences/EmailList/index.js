@@ -23,7 +23,7 @@ const { Text } = Typography;
 
 const defaultEmailListKey = 'blank';
 
-const totalItemsPerPage = 10;
+const totalItemsPerPage = 20;
 
 const EmailList = () => {
   const [form] = Form.useForm();
@@ -42,6 +42,8 @@ const EmailList = () => {
   const [allAudienceModalVisible, setAllAudienceModalVisible] = useState(false);
 
   const isCreating = useMemo(() => selectedEmailList === defaultEmailListKey, [selectedEmailList]);
+
+  //#region Start of Data Fetch
 
   const getAudienceList = useCallback(async (pageNumber, itemsPerPage) => {
     setIsLoading(true);
@@ -99,6 +101,8 @@ const EmailList = () => {
 
     setIsLoading(false);
   }, []);
+
+  //#endregion End of Data Fetch
 
   //#region Start of Use Effects
 
@@ -203,8 +207,10 @@ const EmailList = () => {
 
         if (isAPISuccess(status) && data) {
           showSuccessModal(`Email list successfully ${isCreating ? 'created' : 'updated'}`);
-          fetchCreatorEmailList();
-          handleChangeSelectedEmailList(data.id);
+          await fetchCreatorEmailList();
+          setPageNumber(1);
+          form.setFieldsValue({ ...form.getFieldsValue(), emailListName: data.name || null });
+          setSelectedEmailList(data.id);
         }
       } catch (error) {
         showErrorModal(
@@ -266,7 +272,7 @@ const EmailList = () => {
   const emailListOptions = useMemo(() => {
     return [
       {
-        label: <Text strong> Create a new list </Text>,
+        label: <Text strong> All Audiences </Text>,
         value: defaultEmailListKey,
       },
       ...creatorEmailLists.map((emailList) => ({
