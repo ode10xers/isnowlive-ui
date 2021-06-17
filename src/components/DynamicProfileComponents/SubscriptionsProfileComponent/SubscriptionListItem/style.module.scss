@@ -1,0 +1,10 @@
+@import '../../../../styles/variables.scss';
+
+.subscriptionItem {
+  background-color: var(--primary-color-01);
+  border-radius: 8px;
+
+  .subscriptionTitle {
+    color: var(--primary-color);
+  }
+}
