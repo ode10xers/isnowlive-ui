@@ -801,7 +801,7 @@ const Session = ({ match, history }) => {
                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 onChange={onSessionImageUpload}
                 value={sessionImageUrl}
-                label="Session Image"
+                label="Session Image (size of Facebook Cover Image)"
               />
             </div>
           </Form.Item>

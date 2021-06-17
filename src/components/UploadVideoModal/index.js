@@ -1041,7 +1041,7 @@ const UploadVideoModal = ({
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       onChange={setCoverImageUrl}
                       value={coverImageUrl?.endsWith('.gif') ? null : coverImageUrl}
-                      label="Cover Image"
+                      label="Cover Image (size of Facebook Cover Image)"
                     />
                   </div>
                 </Col>

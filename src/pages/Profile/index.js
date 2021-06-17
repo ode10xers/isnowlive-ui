@@ -339,7 +339,7 @@ const Profile = () => {
                       value={coverImage}
                       label={
                         <>
-                          <Text type="danger">*</Text> Cover Photo{' '}
+                          <Text type="danger">*</Text> Cover Photo (size of Facebook Cover Image)
                         </>
                       }
                     />
