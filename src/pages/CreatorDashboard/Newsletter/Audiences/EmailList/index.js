@@ -247,7 +247,7 @@ const EmailList = () => {
         message.error('Please select some audience or an email list first!');
       }
     } else {
-      setAudienceEmailRecipients(audienceList);
+      setAudienceEmailRecipients([]);
       setSendAudienceEmailModalVisible(true);
     }
   };
@@ -363,6 +363,7 @@ const EmailList = () => {
         visible={sendAudienceEmailModalVisible}
         closeModal={hideSendAudienceEmailModal}
         recipients={audienceEmailRecipients}
+        targetEmailList={selectedEmailList === defaultEmailListKey ? null : selectedEmailList}
       />
       <AllAudienceModal
         visible={allAudienceModalVisible}

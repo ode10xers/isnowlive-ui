@@ -22,6 +22,7 @@ const { Title, Text } = Typography;
 const defaultTemplateKey = 'blank';
 const formInitialValues = {
   recipients: [],
+  selectedEmailList: null,
   subject: '',
   emailTemplate: defaultTemplateKey,
 };
@@ -29,7 +30,7 @@ const formInitialValues = {
 // The functionality is very similar to SendCustomerEmailModal
 // But the data is handled differently since Audience is a different entity
 // Also SendCustomerEmail requires some product information while this one does not
-const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
+const SendAudienceEmailModal = ({ visible, closeModal, recipients = [], targetEmailList = null }) => {
   const emailEditor = useRef(null);
   const [form] = Form.useForm();
 
@@ -38,6 +39,8 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
   const [selectedRecipients, setSelectedRecipients] = useState([]);
   const [emailDocumentUrl, setEmailDocumentUrl] = useState(null);
   const [creatorEmailTemplates, setCreatorEmailTemplates] = useState([]);
+  const [selectedEmailList, setSelectedEmailList] = useState(null);
+  const [creatorEmailLists, setCreatorEmailLists] = useState([]);
 
   const loadDesignInEditor = (data) => {
     if (emailEditor.current) {
@@ -52,6 +55,22 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       }, 1000);
     }
   };
+
+  const fetchCreatorEmailLists = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.newsletter.getCreatorEmailList();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorEmailLists(data.mailing_lists);
+      }
+    } catch (error) {
+      showErrorModal('Failed fetching creator email list', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  }, []);
 
   const fetchCreatorEmailTemplates = useCallback(async () => {
     setIsLoading(true);
@@ -89,12 +108,24 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
   }, []);
 
   useEffect(() => {
-    if (visible && recipients.length > 0) {
-      setValidRecipients(recipients);
-      setSelectedRecipients(recipients.map((recipient) => recipient.id));
-      form.setFieldsValue({
-        recipients: recipients.map((recipient) => recipient.id),
-      });
+    if (visible) {
+      if (targetEmailList) {
+        fetchCreatorEmailLists();
+        setValidRecipients([]);
+        setSelectedRecipients([]);
+        setSelectedEmailList(targetEmailList);
+        form.setFieldsValue({
+          recipients: [],
+          selectedEmailList: targetEmailList,
+        });
+      } else if (recipients.length > 0) {
+        setValidRecipients(recipients);
+        setSelectedRecipients(recipients.map((recipient) => recipient.id));
+        form.setFieldsValue({
+          recipients: recipients.map((recipient) => recipient.id),
+          selectedEmailList: null,
+        });
+      }
     } else {
       form.resetFields();
       setEmailDocumentUrl(null);
@@ -106,7 +137,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
       }
     }
     fetchCreatorEmailTemplates();
-  }, [visible, form, recipients, fetchCreatorEmailTemplates]);
+  }, [visible, form, recipients, targetEmailList, fetchCreatorEmailTemplates, fetchCreatorEmailLists]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -121,6 +152,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
         const emailBody = data.html.replaceAll(`\n`, '');
         setIsLoading(true);
         try {
+          // TODO: Adjust API and payload depending on targetEmailList
           const payload = {
             body: emailBody,
             subject: values.subject,
@@ -191,13 +223,36 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients }) => {
                 <Text strong> {getLocalUserDetails()?.email} </Text>
               </Form.Item>
             </Col>
-            <Col xs={24}>
+            <Col xs={24} hidden={!targetEmailList}>
+              <Form.Item
+                {...sendCustomerEmailFormLayout}
+                id="selectedEmailList"
+                name="selectedEmailList"
+                label="Email list to send to"
+                rules={targetEmailList ? validationRules.requiredValidation : []}
+                hidden={!targetEmailList}
+              >
+                <Select
+                  showArrow
+                  showSearch
+                  placeholder="Select email list to send this email to"
+                  values={selectedEmailList}
+                  onChange={(val) => setSelectedRecipients(val)}
+                  options={creatorEmailLists.map((emailList) => ({
+                    label: emailList.name,
+                    value: emailList.id,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} hidden={targetEmailList}>
               <Form.Item
                 {...sendCustomerEmailFormLayout}
                 id="recipients"
                 name="recipients"
                 label="Recipients"
-                rules={validationRules.arrayValidation}
+                rules={targetEmailList ? [] : validationRules.arrayValidation}
+                hidden={targetEmailList}
               >
                 <Select
                   showArrow
