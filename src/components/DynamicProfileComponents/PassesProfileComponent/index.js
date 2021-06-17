@@ -1,9 +1,15 @@
-import React from 'react';
-import { Card, Typography } from 'antd';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Card, Typography, Spin, Row, Col } from 'antd';
 import { LikeTwoTone } from '@ant-design/icons';
 
-import styles from './style.module.scss';
+import apis from 'apis';
+
 import PassesListView from './PassesListView';
+import PassesEditView from './PassesEditView';
+
+import { isAPISuccess } from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const { Text } = Typography;
 
@@ -22,26 +28,59 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Create Edit Overlays (for editing/deleting)
+// TODO: Create Edit Overlays (for editing)
 const PassesProfileComponent = ({
   identifier = null,
   isEditing = false,
   updateConfigHandler,
-  removeComponentHandler,
-  title = null,
+  ...customComponentProps
 }) => {
-  return (
+  const [passes, setPasses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchCreatorPasses = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.passes.getPassesByUsername();
+
+      if (isAPISuccess(status) && data) {
+        setPasses(data);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchCreatorPasses();
+  }, [fetchCreatorPasses]);
+
+  const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
+
+  return passes.length > 0 || isEditing ? (
     <div className={styles.p10}>
       <Card
-        title={<ContainerTitle title={title} />}
+        title={<ContainerTitle title={customComponentProps?.title} />}
         headStyle={cardHeadingStyle}
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12 }}
       >
-        <PassesListView />
+        {isEditing ? (
+          <Row justify="center" align="center">
+            <Col className={styles.textAlignCenter}>Passes that you have published will show up here</Col>
+          </Row>
+        ) : (
+          <Spin spinning={isLoading} tip="Fetching Passes">
+            <PassesListView passes={passes || []} />
+          </Spin>
+        )}
       </Card>
+      {isEditing && <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
     </div>
-  );
+  ) : null;
 };
 
 export default PassesProfileComponent;

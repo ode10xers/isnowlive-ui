@@ -3,6 +3,7 @@
 .editDynamicProfileButtonContainer {
   position: fixed;
   left : 20px;
+  bottom : 20px;
 
   .dynamicProfileButtons {
     border-radius: 50% !important;
@@ -23,7 +24,7 @@
   border-radius: 12px 12px 0 0;
 }
 
-.addBtn {
+.darkBlueBtn {
   background-color: map-get($map: $colors, $key: 'EasternBlue') !important;
   border-color: map-get($map: $colors, $key: 'EasternBlue') !important;
 }

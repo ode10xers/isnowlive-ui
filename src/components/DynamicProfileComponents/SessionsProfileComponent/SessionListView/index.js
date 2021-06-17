@@ -14,14 +14,13 @@ import styles from './style.module.scss';
 const { Title } = Typography;
 
 // NOTE: The actual data that is shown here is inventories
+// TODO: Make this not show on viewing mode if sessions are empty
+// But still show up on editing mode
 const SessionListView = ({ limit = 3 }) => {
-  // TODO: Prepare standalone logic to show UI
-
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
 
-  // TODO : Confirm how we want to show errors regarding a component
   const fetchUpcomingSessions = useCallback(async () => {
     setIsLoading(true);
 
@@ -60,8 +59,6 @@ const SessionListView = ({ limit = 3 }) => {
     );
   };
 
-  // TODO: Implement Filtering later
-  // TODO: Decide limit or mechanics on Details Drawer
   return (
     <div>
       <Spin spinning={isLoading} tip="Fetching sessions">

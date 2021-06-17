@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { message, Spin, Row, Col, Affix, Button, Space, Modal, Typography } from 'antd';
+import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
   EditOutlined,
   MenuOutlined,
@@ -9,6 +9,8 @@ import {
   CloseCircleOutlined,
   VideoCameraOutlined,
   LikeOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -24,26 +26,53 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
+import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 
 const { Paragraph } = Typography;
 
 // TODO: Define the Profile UI Configurations Sample Data here
-const sampleUIConfig = {
-  components: [
-    {
-      key: 'SESSIONS',
-      props: {
-        title: 'My Live Sessions',
-      },
-    },
-    {
-      key: 'PASSES',
-      props: {
-        title: 'Credit Passes',
-      },
-    },
-  ],
-};
+const sampleUIConfig = [
+  {
+    key: 'SESSIONS',
+    title: 'My Sessions',
+    values: null,
+  },
+  {
+    key: 'PASSES',
+    title: 'My Passes',
+    values: null,
+  },
+  // {
+  //   "key": "VIDEOS",
+  //   "title": "My Videos",
+  //   "values": null
+  // },
+  // {
+  //   "key": "COURSES",
+  //   "title": "My Courses",
+  //   "values": null
+  // },
+  {
+    key: 'SUBSCRIPTIONS',
+    title: 'My Memberships',
+    values: null,
+  },
+  // {
+  //   "key": "DONATIONS",
+  //   "title": "Buy me a coffee!",
+  //   "values": [
+  //     5,
+  //     10,
+  //     15,
+  //     20
+  //   ]
+  // },
+  // {
+  //   "key": "OTHER_LINKS",
+  //   "title": "My other links",
+  //   "values": null
+  // }
+];
 
 const componentsMap = {
   SESSIONS: {
@@ -62,10 +91,18 @@ const componentsMap = {
       title: 'CREDIT PASSES',
     },
   },
+  SUBSCRIPTIONS: {
+    icon: <LikeOutlined />,
+    label: 'Memberships',
+    component: SubscriptionProfileComponent,
+    defaultProps: {
+      title: 'MEMBERSHIPS',
+    },
+  },
 };
 
-const DragAndDropHandle = ({ isEditing = false, ...props }) =>
-  isEditing ? (
+const DragAndDropHandle = ({ visible = false, ...props }) =>
+  visible ? (
     <div className={styles.dndHandle} {...props}>
       <MenuOutlined />
     </div>
@@ -76,14 +113,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     state: { userDetails },
   } = useGlobalContext();
 
-  const [containerRef, setContainerRef] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [creatorProfileData, setCreatorProfileData] = useState({});
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
   // const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
-  const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState(null);
+  const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState([]);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
@@ -139,8 +176,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   //     return;
   //   }
 
-  //   // TODO: Confirm whether we want uniqueness or not here
-  //   // Currently all of them will be unique (no duplicate allowed)
   //   const existingComponentInstance = getExistingComponentInstance(identifier);
 
   //   if (existingComponentInstance) {
@@ -164,8 +199,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   // };
 
   const disableEditingMode = () => {
-    setTempCreatorUIConfig(null);
+    setTempCreatorUIConfig([]);
     setEditingMode(false);
+    setPreviewMode(false);
+  };
+
+  const handleTogglePreviewMode = (e) => {
+    preventDefaults(e);
+    setPreviewMode(!previewMode);
   };
 
   const handleEditDynamicProfileButtonClicked = (e) => {
@@ -173,6 +214,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
     setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
     setEditingMode(true);
+    setPreviewMode(false);
     setUiConfigChanged(false);
   };
 
@@ -180,7 +222,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     preventDefaults(e);
 
     // TODO: Save the data here to API
-    console.log(tempCreatorUIConfig);
     setCreatorUIConfig(deepCloneObject(tempCreatorUIConfig));
     setUiConfigChanged(false);
     disableEditingMode();
@@ -239,7 +280,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
 
     // Updates the temp config first, will be removed if user cancels
-    const tempConfigComponents = tempCreatorUIConfig.components;
+    const tempConfigComponents = deepCloneObject(tempCreatorUIConfig);
     const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
     const targetComponent = tempConfigComponents.find((component) => component.key === identifier);
 
@@ -248,12 +289,11 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       return;
     }
 
-    targetComponent.props = newConfig;
+    // TODO: Adjust here when more customizability is required
+    console.log(newConfig);
+    targetComponent.title = newConfig.title;
     tempConfigComponents.splice(targetIndex, 1, targetComponent);
-    setTempCreatorUIConfig({
-      ...tempCreatorUIConfig,
-      components: tempConfigComponents,
-    });
+    setTempCreatorUIConfig(tempConfigComponents);
     setUiConfigChanged(true);
   };
 
@@ -285,7 +325,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const handleDragEnd = (result) => {
     const { destination, source, draggableId } = result;
 
-    const componentsList = tempCreatorUIConfig.components;
+    const componentsList = deepCloneObject(tempCreatorUIConfig);
     const targetComponent = componentsList.find((component) => component.key === draggableId);
 
     if (targetComponent && destination && destination.index !== source.index) {
@@ -293,10 +333,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       componentsList.splice(destination.index, 0, targetComponent);
 
       setUiConfigChanged(true);
-      setTempCreatorUIConfig({
-        ...tempCreatorUIConfig,
-        components: componentsList,
-      });
+      setTempCreatorUIConfig(componentsList);
     }
   };
 
@@ -304,15 +341,22 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     const RenderedComponent = componentsMap[component.key].component;
 
     return (
-      <Draggable isDragDisabled={!editingMode} draggableId={component.key} index={idx} key={component.key}>
+      <Draggable
+        isDragDisabled={!editingMode || previewMode}
+        draggableId={component.key}
+        index={idx}
+        key={component.key}
+      >
         {(provided) => (
           <Col xs={24} {...provided.draggableProps} ref={provided.innerRef}>
-            <DragAndDropHandle {...provided.dragHandleProps} isEditing={editingMode} />
+            <DragAndDropHandle {...provided.dragHandleProps} visible={editingMode && !previewMode} />
             <RenderedComponent
               identifier={component.key}
-              isEditing={editingMode}
+              isEditing={editingMode && !previewMode}
               updateConfigHandler={updateComponentConfig}
-              {...component.props}
+              // TODO: Try to handle this later when more customization is needed
+              title={component.title}
+              // {...component.props}
             />
           </Col>
         )}
@@ -322,30 +366,30 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   //#endregion End Of Drag and Drop Handlers
 
-  // TODO: Currently using old CreatorProfile, decide if we want to make a new one
+  // TODO: Make new Creator Profile
   return (
-    <div ref={setContainerRef}>
+    <div>
       <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
         <Row gutter={8} justify="center">
           <Col xs={24}>
             <CreatorProfile
+              showCoverImage={true}
               profile={creatorProfileData}
               profileImage={creatorProfileData?.profile_image_url}
-              showCoverImage={true}
               coverImage={creatorProfileData?.cover_image_url}
             />
           </Col>
           <Col xs={24} className={styles.mb20}>
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable
-                isDropDisabled={!editingMode}
+                isDropDisabled={!editingMode || previewMode}
                 droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
               >
                 {(provided) => (
                   <Row gutter={[8, 16]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
                     {editingMode
-                      ? tempCreatorUIConfig?.components.map(renderDraggableCustomComponents)
-                      : creatorUIConfig.components.map(renderDraggableCustomComponents)}
+                      ? tempCreatorUIConfig?.map(renderDraggableCustomComponents)
+                      : creatorUIConfig.map(renderDraggableCustomComponents)}
                     {provided.placeholder}
                   </Row>
                 )}
@@ -354,26 +398,22 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Col>
         </Row>
       </Spin>
-      {editable && (
-        <Affix
-          offsetBottom={20}
-          className={styles.editDynamicProfileButtonContainer}
-          target={() => containerRef ?? window}
-        >
+      {(editable || true) && (
+        <div className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
             <Row gutter={[8, 8]}>
-              {/* <Col xs={24}>
+              <Col xs={24}>
                 <Space align="bottom" size="small">
                   <Button
-                    className={classNames(styles.dynamicProfileButtons, styles.addBtn)}
+                    className={classNames(styles.dynamicProfileButtons, styles.darkBlueBtn)}
                     type="primary"
                     shape="round"
                     size="large"
-                    icon={<PlusCircleOutlined />}
-                    onClick={handleAddComponentDynamicProfileButtonClicked}
+                    icon={previewMode ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                    onClick={handleTogglePreviewMode}
                   />
                 </Space>
-              </Col> */}
+              </Col>
               <Col xs={24}>
                 <Space align="bottom" size="small">
                   <Button
@@ -405,7 +445,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               onClick={handleEditDynamicProfileButtonClicked}
             />
           )}
-        </Affix>
+        </div>
       )}
       {/* {editingMode && (
         <Modal

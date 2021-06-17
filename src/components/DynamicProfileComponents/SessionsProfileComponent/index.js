@@ -24,6 +24,8 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
+// TODO: Decide which approach to take, this one with overlay disabled
+// or the passes one where we change the content displayed
 const SessionsProfileComponent = ({
   identifier = null,
   isEditing = false,

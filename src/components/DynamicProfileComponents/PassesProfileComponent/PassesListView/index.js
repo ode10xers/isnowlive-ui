@@ -1,36 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React from 'react';
 
-import { Row, Col, Spin } from 'antd';
-
-import apis from 'apis';
+import { Row, Col } from 'antd';
 
 import PassesListItem from '../PassesListItem';
 
-import { isAPISuccess } from 'utils/helper';
-
-const PassesListView = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [passes, setPasses] = useState([]);
-
-  const fetchCreatorPasses = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.passes.getPassesByUsername();
-
-      if (isAPISuccess(status) && data) {
-        setPasses(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchCreatorPasses();
-  }, [fetchCreatorPasses]);
+const PassesListView = ({ passes = [] }) => {
+  // TODO: Add on clicks here once decided
 
   const renderPassListItems = (pass) => (
     <Col xs={12} sm={8} key={pass.external_id}>
@@ -38,13 +13,7 @@ const PassesListView = () => {
     </Col>
   );
 
-  return (
-    <div>
-      <Spin spinning={isLoading} tip="Fetching Passes">
-        {passes?.length > 0 && <Row gutter={[12, 16]}>{passes.map(renderPassListItems)}</Row>}
-      </Spin>
-    </div>
-  );
+  return <div>{passes?.length > 0 && <Row gutter={[12, 16]}>{passes.map(renderPassListItems)}</Row>}</div>;
 };
 
 export default PassesListView;
