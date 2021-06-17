@@ -56,7 +56,6 @@ pipelines:
             # - (umask  077 ; echo ${STAGE_KEY} | base64 -d > ~/.ssh/id_rsa)
             # - cat known_hosts >> ~/.ssh/known_hosts
             # - rsync -a build/ ${STAGE_USER}@${STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/
-
   pull-requests:
     '**':
       - step:
