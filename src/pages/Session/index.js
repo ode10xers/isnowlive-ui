@@ -802,6 +802,7 @@ const Session = ({ match, history }) => {
                 onChange={onSessionImageUpload}
                 value={sessionImageUrl}
                 label="Session Image (size of Facebook Cover Image)"
+                overlayHelpText="Click to change image (size of Facebook Cover Image)"
               />
             </div>
           </Form.Item>

@@ -1042,6 +1042,7 @@ const UploadVideoModal = ({
                       onChange={setCoverImageUrl}
                       value={coverImageUrl?.endsWith('.gif') ? null : coverImageUrl}
                       label="Cover Image (size of Facebook Cover Image)"
+                      overlayHelpText="Click to change image (size of Facebook Cover Image)"
                     />
                   </div>
                 </Col>

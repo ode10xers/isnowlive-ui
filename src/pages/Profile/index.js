@@ -342,6 +342,7 @@ const Profile = () => {
                           <Text type="danger">*</Text> Cover Photo (size of Facebook Cover Image)
                         </>
                       }
+                      overlayHelpText="Click to change image (size of Facebook Cover Image)"
                     />
                   </div>
                 </Form.Item>

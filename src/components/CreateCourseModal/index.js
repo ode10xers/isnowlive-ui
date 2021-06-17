@@ -953,6 +953,7 @@ const CreateCourseModal = ({
                     onChange={handleCourseImageUpload}
                     value={courseImageUrl}
                     label="Course Image (size of Facebook Cover Image)"
+                    overlayHelpText="Click to change image (size of Facebook Cover Image)"
                   />
                 </div>
               </Form.Item>
