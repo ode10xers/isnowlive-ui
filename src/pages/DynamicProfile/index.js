@@ -11,6 +11,7 @@ import {
   LikeOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
+  PlayCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -27,11 +28,17 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './style.module.scss';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
+import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
 
 const { Paragraph } = Typography;
 
 // TODO: Define the Profile UI Configurations Sample Data here
 const sampleUIConfig = [
+  {
+    key: 'SUBSCRIPTIONS',
+    title: 'My Memberships',
+    values: null,
+  },
   {
     key: 'SESSIONS',
     title: 'My Sessions',
@@ -42,21 +49,16 @@ const sampleUIConfig = [
     title: 'My Passes',
     values: null,
   },
-  // {
-  //   "key": "VIDEOS",
-  //   "title": "My Videos",
-  //   "values": null
-  // },
+  {
+    key: 'VIDEOS',
+    title: 'My Videos',
+    values: null,
+  },
   // {
   //   "key": "COURSES",
   //   "title": "My Courses",
   //   "values": null
   // },
-  {
-    key: 'SUBSCRIPTIONS',
-    title: 'My Memberships',
-    values: null,
-  },
   // {
   //   "key": "DONATIONS",
   //   "title": "Buy me a coffee!",
@@ -81,6 +83,14 @@ const componentsMap = {
     component: SessionsProfileComponent,
     defaultProps: {
       title: 'SESSIONS',
+    },
+  },
+  VIDEOS: {
+    icon: <PlayCircleOutlined />,
+    label: 'Videos',
+    component: VideoProfileComponent,
+    defaultProps: {
+      title: 'VIDEOS',
     },
   },
   PASSES: {
@@ -405,7 +415,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               <Col xs={24}>
                 <Space align="bottom" size="small">
                   <Button
-                    className={classNames(styles.dynamicProfileButtons, styles.darkBlueBtn)}
+                    className={classNames(
+                      styles.dynamicProfileButtons,
+                      previewMode ? styles.orangeBtn : styles.darkBlueBtn
+                    )}
                     type="primary"
                     shape="round"
                     size="large"

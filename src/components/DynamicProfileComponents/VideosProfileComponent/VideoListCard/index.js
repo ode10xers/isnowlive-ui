@@ -1,0 +1,80 @@
+import React from 'react';
+// import ReactHtmlParser from 'react-html-parser';
+
+import { Card, Space, Typography, Image, Row, Col } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
+
+import dateUtil from 'utils/date';
+import { isValidFile } from 'utils/helper';
+
+import styles from './style.module.scss';
+const DefaultImage = require('assets/images/greybg.jpg');
+
+const {
+  formatDate: { getVideoDuration },
+} = dateUtil;
+
+const { Text, Title } = Typography;
+
+// TODO: Re adjust this for videos
+const VideoListCard = ({ video }) => {
+  const videoDuration = (
+    <Space size={4} align="middle">
+      <PlayCircleOutlined className={styles.textIcons} />
+      <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
+    </Space>
+  );
+
+  // TODO: Adjust the height like in current VideoCard
+  const videoImage = (
+    <div className={styles.videoCoverContainer}>
+      <div className={styles.videoImageContainer}>
+        <Image
+          preview={false}
+          className={styles.videoImage}
+          src={isValidFile(video?.thumbnail_url) ? video?.thumbnail_url : DefaultImage}
+        />
+      </div>
+      <div className={styles.videoDurationContainer}>{videoDuration}</div>
+    </div>
+  );
+
+  const videoTitle = (
+    <Title level={4} className={styles.videoTitle}>
+      {video?.title}
+    </Title>
+  );
+
+  const renderVideoPrice = () => {
+    if (video?.pay_what_you_want) {
+      return 'Flexible';
+    } else if (video?.price === 0 || video?.currency === '') {
+      return 'Free';
+    } else {
+      return `${video?.currency?.toUpperCase()} ${video?.price}`;
+    }
+  };
+
+  // TODO: Customize styling for videoValidity
+  const bottomCardBar = (
+    <Row className={styles.cardFooter}>
+      <Col xs={14} className={styles.videoValidity}>
+        VALIDITY : {video?.validity} DAY{video?.validity > 1 ? 'S' : ''}
+      </Col>
+      <Col xs={10} className={styles.priceText}>
+        {renderVideoPrice()}
+      </Col>
+    </Row>
+  );
+
+  return (
+    <Card className={styles.videoListCard} cover={videoImage} bodyStyle={{ padding: 0 }}>
+      <Row>
+        <Col xs={24}>{videoTitle}</Col>
+        <Col xs={24}>{bottomCardBar}</Col>
+      </Row>
+    </Card>
+  );
+};
+
+export default VideoListCard;

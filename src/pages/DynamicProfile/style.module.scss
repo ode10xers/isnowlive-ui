@@ -4,6 +4,7 @@
   position: fixed;
   left : 20px;
   bottom : 20px;
+  z-index : 30;
 
   .dynamicProfileButtons {
     border-radius: 50% !important;
@@ -27,4 +28,9 @@
 .darkBlueBtn {
   background-color: map-get($map: $colors, $key: 'EasternBlue') !important;
   border-color: map-get($map: $colors, $key: 'EasternBlue') !important;
+}
+
+.orangeBtn {
+  background-color: map-get($map: $colors, $key: 'Pumpkin') !important;
+  border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
 }
