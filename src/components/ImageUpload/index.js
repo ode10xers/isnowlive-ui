@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import { Upload, message } from 'antd';
+import { Upload, Row, Col, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 // import ImageBlobReduce from 'image-blob-reduce';
@@ -17,6 +17,7 @@ const ImageUpload = ({
   multiple = false,
   name,
   aspect = 2.7015 / 1,
+  overlayHelpText = 'Click here to change the image',
   className,
 }) => {
   const [loading] = useState(false);
@@ -63,7 +64,12 @@ const ImageUpload = ({
         showUploadList={showUploadList}
       >
         {value ? (
-          <img src={value} alt={label} className={classNames(styles.w100, styles.image)} />
+          <div className={styles.imageContainer}>
+            <Row className={styles.imageHoverOverlay} justify="center" align="middle">
+              <Col className={styles.helpText}>{overlayHelpText}</Col>
+            </Row>
+            <img src={value} alt={label} className={classNames(styles.w100, styles.image)} />
+          </div>
         ) : (
           <div>
             {loading ? <LoadingOutlined /> : <PlusOutlined />}
