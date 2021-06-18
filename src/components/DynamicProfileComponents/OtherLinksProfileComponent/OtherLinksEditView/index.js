@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import { Modal, Row, Col, Input, Button, Form } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { Modal, Row, Col, Input, Button, Form, Typography } from 'antd';
+import { EditOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
 
@@ -12,9 +12,11 @@ import styles from './style.module.scss';
 
 const formInitialValues = {
   title: null,
+  values: [],
 };
 
-// TODO: Adjust this form to accept dynamic amounts of external links
+const { Text } = Typography;
+
 const OtherLinksEditView = ({ configValues, updateHandler }) => {
   const [form] = Form.useForm();
 
@@ -24,6 +26,7 @@ const OtherLinksEditView = ({ configValues, updateHandler }) => {
     if (configValues) {
       form.setFieldsValue({
         title: configValues.title,
+        links: configValues.values ?? [],
       });
     } else {
       form.resetFields();
@@ -41,7 +44,10 @@ const OtherLinksEditView = ({ configValues, updateHandler }) => {
   };
 
   const handleFinishEditComponent = (values) => {
-    updateHandler(values);
+    updateHandler({
+      title: values.title,
+      values: values.links,
+    });
     setEditModalVisible(false);
   };
 
@@ -74,6 +80,42 @@ const OtherLinksEditView = ({ configValues, updateHandler }) => {
             <Col xs={24}>
               <Form.Item id="title" name="title" label="Container Title" rules={validationRules.requiredValidation}>
                 <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+              </Form.Item>
+            </Col>
+            <Col xs={24}>
+              <Form.Item label="Your Links" required={true}>
+                <Form.List name="links" rules={validationRules.otherLinksValidation}>
+                  {(fields, { add, remove }, { errors }) => (
+                    <Row>
+                      {fields.map((field, index) => (
+                        <Col xs={24} key={index}>
+                          <Row gutter={10}>
+                            <Col xs={22}>
+                              <Form.Item {...field} key={field.key} rules={validationRules.requiredValidation}>
+                                <Input placeholder="Paste your link here" />
+                              </Form.Item>
+                            </Col>
+                            {fields.length > 1 ? (
+                              <Col xs={2}>
+                                <MinusCircleOutlined onClick={() => remove(field.name)} />
+                              </Col>
+                            ) : null}
+                          </Row>
+                        </Col>
+                      ))}
+                      <Col xs={24}>
+                        <Button block type="dashed" onClick={() => add()} icon={<PlusCircleOutlined />}>
+                          Add more links
+                        </Button>
+                      </Col>
+                      {errors && (
+                        <Col xs={24}>
+                          <Text type="danger"> {errors} </Text>
+                        </Col>
+                      )}
+                    </Row>
+                  )}
+                </Form.List>
               </Form.Item>
             </Col>
             <Col xs={24}>

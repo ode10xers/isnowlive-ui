@@ -41,6 +41,15 @@ const validationRules = {
       message: 'Discount code should only contain letters or numbers',
     },
   ],
+  otherLinksValidation: [
+    {
+      validator: async (_, values) => {
+        if (!values || values.length < 1) {
+          return Promise.reject('Need at least 1 value');
+        }
+      },
+    },
+  ],
 };
 
 export default validationRules;

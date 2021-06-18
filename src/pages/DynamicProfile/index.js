@@ -41,12 +41,7 @@ const sampleUIConfig = [
   {
     key: 'OTHER_LINKS',
     title: 'My other links',
-    values: [
-      'https://medium.com/swlh/react-tips-rendering-lists-dynamic-components-and-default-props-77fe091c34c6',
-      'https://bitbucket.org/',
-      'https://ant.design/components/overview/',
-      'https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec',
-    ],
+    values: null,
   },
   {
     key: 'COURSES',
@@ -328,6 +323,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     // TODO: Adjust here when more customizability is required
     console.log(newConfig);
     targetComponent.title = newConfig.title;
+    targetComponent.values = newConfig.values ?? null;
     tempConfigComponents.splice(targetIndex, 1, targetComponent);
     setTempCreatorUIConfig(tempConfigComponents);
     setUiConfigChanged(true);
@@ -434,7 +430,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Col>
         </Row>
       </Spin>
-      {editable && (
+      {(editable || true) && (
         <div className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
             <Row gutter={[8, 8]}>

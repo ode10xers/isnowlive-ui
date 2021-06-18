@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Typography } from 'antd';
-import { LikeTwoTone } from '@ant-design/icons';
+import { Card, Typography, Row, Col } from 'antd';
+import { LinkOutlined } from '@ant-design/icons';
 
 import styles from './style.module.scss';
 import OtherLinksEditView from './OtherLinksEditView';
@@ -10,7 +10,7 @@ const { Text } = Typography;
 
 const ContainerTitle = ({ title = 'MY OTHER LINKS' }) => (
   <Text style={{ color: '#0050B3' }}>
-    <LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />
+    <LinkOutlined className={styles.mr10} />
     {title}
   </Text>
 );
@@ -33,7 +33,7 @@ const OtherLinksProfileComponent = ({
   // TODO: Adjust this method since the actual form names and the data stored in API is different
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
-  return (
+  return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && !isEditing ? null : (
     <div className={styles.p10}>
       <Card
         title={<ContainerTitle title={customComponentProps?.title} />}
@@ -41,7 +41,13 @@ const OtherLinksProfileComponent = ({
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12 }}
       >
-        <OtherLinksListView links={customComponentProps?.values} />
+        {isEditing ? (
+          <Row justify="center" align="center">
+            <Col className={styles.textAlignCenter}>Links that you've entered will show up here</Col>
+          </Row>
+        ) : (
+          <OtherLinksListView links={customComponentProps?.values ?? []} />
+        )}
       </Card>
       {isEditing && <OtherLinksEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
     </div>
