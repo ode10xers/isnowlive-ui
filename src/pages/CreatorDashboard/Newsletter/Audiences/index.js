@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Tabs, Typography, Switch, message } from 'antd';
+import { Row, Col, Tabs, Typography, Switch, message, Radio } from 'antd';
 
 import apis from 'apis';
 
@@ -69,6 +69,22 @@ const Audiences = () => {
     setIsLoading(false);
   };
 
+  const handleRadioTabChange = (e) => {
+    setSelectedTab(e.target.value);
+  };
+
+  const handleCustomTabBarRender = (props, DefaultTabBar) => (
+    <div className={styles.mb20}>
+      <Radio.Group size="large" value={selectedTab} onChange={handleRadioTabChange}>
+        {Array.isArray(props.panes) ? (
+          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+        ) : (
+          <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
+        )}
+      </Radio.Group>
+    </div>
+  );
+
   return (
     <Row gutter={[16, 16]}>
       <Col xs={24}>
@@ -96,14 +112,14 @@ const Audiences = () => {
         </Row>
       </Col>
       <Col xs={24}>
-        <Tabs type="card" size="large" activeKey={selectedTab} onChange={setSelectedTab}>
+        <Tabs renderTabBar={handleCustomTabBarRender} activeKey={selectedTab}>
           {/* <TabPane key="list" tab={<Title level={5}> All Audiences </Title>}>
             <AudienceList />
           </TabPane> */}
-          <TabPane key="emailList" tab={<Title level={5}> Audience List </Title>}>
+          <TabPane key="emailList" tab="Audience List">
             <EmailList />
           </TabPane>
-          <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import Audiences </Title>}>
+          <TabPane className={styles.p50} key="import" tab="Import Audiences">
             <AudienceImport />
           </TabPane>
         </Tabs>

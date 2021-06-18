@@ -204,6 +204,8 @@ export default {
       http.put(`/secure/creator/mailing-lists/${emailListId}/audience`, payload),
     deleteEmailListAudience: (emailListId, payload) =>
       http.delete(`/secure/creator/mailing-lists/${emailListId}/audience`, payload),
+    sendEmailToEmailList: (emailListId, payload) =>
+      http.post(`/secure/creator/mailing-lists/${emailListId}/email`, payload),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),

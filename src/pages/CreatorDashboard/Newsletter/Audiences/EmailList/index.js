@@ -457,9 +457,13 @@ const EmailList = () => {
                 data={audienceList}
                 columns={audienceListColumns}
                 rowKey={(record) => record.id}
-                rowSelection={{
-                  onChange: onSelectAudienceRow,
-                }}
+                rowSelection={
+                  selectedEmailList !== defaultEmailListKey
+                    ? null
+                    : {
+                        onChange: onSelectAudienceRow,
+                      }
+                }
               />
             </Col>
             <Col xs={8}>

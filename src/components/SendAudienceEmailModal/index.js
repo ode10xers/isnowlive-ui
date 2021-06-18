@@ -121,6 +121,7 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients = [], targetEm
       } else if (recipients.length > 0) {
         setValidRecipients(recipients);
         setSelectedRecipients(recipients.map((recipient) => recipient.id));
+        setSelectedEmailList(null);
         form.setFieldsValue({
           recipients: recipients.map((recipient) => recipient.id),
           selectedEmailList: null,
@@ -152,15 +153,24 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients = [], targetEm
         const emailBody = data.html.replaceAll(`\n`, '');
         setIsLoading(true);
         try {
-          // TODO: Adjust API and payload depending on targetEmailList
-          const payload = {
+          let payload = {
             body: emailBody,
             subject: values.subject,
-            audience_ids: selectedRecipients || values.recipients,
             document_url: emailDocumentUrl || '',
           };
 
-          const { status } = await apis.audiences.sendEmailToAudiences(payload);
+          if (!selectedEmailList) {
+            payload = {
+              ...payload,
+              audience_ids: selectedRecipients || values.recipients,
+            };
+          }
+
+          console.log(payload);
+
+          const { status } = selectedEmailList
+            ? await apis.newsletter.sendEmailToEmailList(selectedEmailList, payload)
+            : await apis.audiences.sendEmailToAudiences(payload);
 
           if (isAPISuccess(status)) {
             showSuccessModal('Emails sent successfully');
