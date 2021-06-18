@@ -6,7 +6,7 @@ pipelines:
     master:
       - step:
           name: Build
-          image: node:11
+          image: node:12
           caches:
             - node
             - npm
@@ -33,7 +33,7 @@ pipelines:
     develop:
       - step:
           name: Build
-          image: node:11
+          image: node:12
           caches:
             - node
             - npm
@@ -60,7 +60,7 @@ pipelines:
     '**':
       - step:
           name: Build
-          image: node:11
+          image: node:12
           caches:
             - node
             - npm
