@@ -152,7 +152,7 @@ export const isAPISuccess = (statusCode) => {
 
 export const isValidFile = (url) => {
   const extension = url?.split('.')?.pop();
-  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf'].includes(extension)) {
+  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf', 'gif'].includes(extension)) {
     return true;
   }
   return false;

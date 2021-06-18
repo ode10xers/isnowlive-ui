@@ -16,7 +16,7 @@ const { Title } = Typography;
 // NOTE: The actual data that is shown here is inventories
 // TODO: Make this not show on viewing mode if sessions are empty
 // But still show up on editing mode
-const SessionListView = ({ limit = 3 }) => {
+const SessionListView = ({ limit = 4 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);

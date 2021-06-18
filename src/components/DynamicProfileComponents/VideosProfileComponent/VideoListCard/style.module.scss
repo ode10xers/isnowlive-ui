@@ -23,10 +23,17 @@
     }
 
     .videoImageContainer {
-      .videoImage {
+      text-align: center;
+
+      .videoThumbnail {
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .videoStaticImage {
         border-radius: 8px 8px 0 0;
-        object-fit: scale-down;
-        height: 100%;
+        object-fit: cover;
+        height: 150px;
       }
     }
   }
