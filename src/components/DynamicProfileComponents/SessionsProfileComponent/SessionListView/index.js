@@ -64,7 +64,7 @@ const SessionListView = ({ limit = 4 }) => {
       <Spin spinning={isLoading} tip="Fetching sessions">
         {sessions?.length > 0 && (
           <Row gutter={[16, 16]}>
-            {sessions.slice(0, limit).map(renderSessionCards)}
+            {sessions?.slice(0, limit).map(renderSessionCards)}
             {sessions?.length > limit && (
               <Col xs={24}>
                 <Row justify="center">

@@ -1,5 +1,4 @@
 import React from 'react';
-// import ReactHtmlParser from 'react-html-parser';
 
 import { Card, Space, Typography, Image, Row, Col } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';

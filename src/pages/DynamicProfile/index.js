@@ -6,6 +6,7 @@ import {
   EditOutlined,
   MenuOutlined,
   SaveOutlined,
+  BookOutlined,
   CloseCircleOutlined,
   VideoCameraOutlined,
   LikeOutlined,
@@ -29,11 +30,17 @@ import styles from './style.module.scss';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
+import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
 
 const { Paragraph } = Typography;
 
 // TODO: Define the Profile UI Configurations Sample Data here
 const sampleUIConfig = [
+  {
+    key: 'COURSES',
+    title: 'My Courses',
+    values: null,
+  },
   {
     key: 'SUBSCRIPTIONS',
     title: 'My Memberships',
@@ -54,11 +61,6 @@ const sampleUIConfig = [
     title: 'My Videos',
     values: null,
   },
-  // {
-  //   "key": "COURSES",
-  //   "title": "My Courses",
-  //   "values": null
-  // },
   // {
   //   "key": "DONATIONS",
   //   "title": "Buy me a coffee!",
@@ -99,6 +101,14 @@ const componentsMap = {
     component: PassesProfileComponent,
     defaultProps: {
       title: 'CREDIT PASSES',
+    },
+  },
+  COURSES: {
+    icon: <BookOutlined />,
+    label: 'Courses',
+    component: CoursesProfileComponent,
+    defaultProps: {
+      title: 'COURSES',
     },
   },
   SUBSCRIPTIONS: {

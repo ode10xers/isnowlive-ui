@@ -245,8 +245,8 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
             {/* New Pages are put higher for more priority matching */}
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.root} component={NewHome} />
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
             <Route path={Routes.stripeAccountValidate}>
               <Redirect
