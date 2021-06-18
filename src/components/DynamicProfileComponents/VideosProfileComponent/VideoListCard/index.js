@@ -16,7 +16,6 @@ const {
 
 const { Text, Title } = Typography;
 
-// TODO: Re adjust this for videos
 const VideoListCard = ({ video }) => {
   const videoDuration = (
     <Space size={4} align="middle">
@@ -25,7 +24,6 @@ const VideoListCard = ({ video }) => {
     </Space>
   );
 
-  // TODO: Adjust the height like in current VideoCard
   const videoImage = (
     <div className={styles.videoCoverContainer}>
       <div className={styles.videoImageContainer}>
@@ -55,7 +53,6 @@ const VideoListCard = ({ video }) => {
     }
   };
 
-  // TODO: Customize styling for videoValidity
   const bottomCardBar = (
     <Row className={styles.cardFooter}>
       <Col xs={14} className={styles.videoValidity}>
