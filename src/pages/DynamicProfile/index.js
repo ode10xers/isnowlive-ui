@@ -408,7 +408,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Col>
         </Row>
       </Spin>
-      {(editable || true) && (
+      {editable && (
         <div className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
             <Row gutter={[8, 8]}>
