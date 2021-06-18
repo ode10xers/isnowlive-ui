@@ -13,13 +13,19 @@ import {
   EyeOutlined,
   EyeInvisibleOutlined,
   PlayCircleOutlined,
+  LinkOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import CreatorProfile from 'components/CreatorProfile';
+import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
+import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
+import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
+import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
+import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 
 import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
@@ -27,15 +33,21 @@ import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
-import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
-import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
-import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
 
 const { Paragraph } = Typography;
 
 // TODO: Define the Profile UI Configurations Sample Data here
 const sampleUIConfig = [
+  {
+    key: 'OTHER_LINKS',
+    title: 'My other links',
+    values: [
+      'https://medium.com/swlh/react-tips-rendering-lists-dynamic-components-and-default-props-77fe091c34c6',
+      'https://bitbucket.org/',
+      'https://ant.design/components/overview/',
+      'https://medium.com/@slamflipstrom/a-beginners-guide-to-squashing-commits-with-git-rebase-8185cf6e62ec',
+    ],
+  },
   {
     key: 'COURSES',
     title: 'My Courses',
@@ -71,11 +83,6 @@ const sampleUIConfig = [
   //     20
   //   ]
   // },
-  // {
-  //   "key": "OTHER_LINKS",
-  //   "title": "My other links",
-  //   "values": null
-  // }
 ];
 
 const componentsMap = {
@@ -117,6 +124,15 @@ const componentsMap = {
     component: SubscriptionProfileComponent,
     defaultProps: {
       title: 'MEMBERSHIPS',
+    },
+  },
+  OTHER_LINKS: {
+    icon: <LinkOutlined />,
+    label: 'Other Links',
+    component: OtherLinksProfileComponent,
+    defaultProps: {
+      title: 'OTHER LINKS',
+      links: [],
     },
   },
 };
@@ -376,7 +392,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               updateConfigHandler={updateComponentConfig}
               // TODO: Try to handle this later when more customization is needed
               title={component.title}
-              // {...component.props}
+              values={component.values}
             />
           </Col>
         )}

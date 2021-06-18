@@ -53,7 +53,7 @@ const SessionListView = ({ limit = 4 }) => {
 
   const renderSessionCards = (session) => {
     return (
-      <Col xs={24} sm={12} key={session.session_external_id}>
+      <Col xs={24} sm={12} key={`${session.session_external_id}_${session.inventory_id}`}>
         <SessionListCard session={session} />
       </Col>
     );

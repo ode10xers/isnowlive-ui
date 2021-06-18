@@ -52,11 +52,11 @@ const VideoListView = ({ limit = 4 }) => {
 
   const renderVideoCards = (video, restrictedWidth = true) => {
     return restrictedWidth ? (
-      <Col xs={24} sm={12} key={video._external_id}>
+      <Col xs={24} sm={12} key={video.external_id}>
         <VideoListCard video={video} />
       </Col>
     ) : (
-      <Col xs={24} sm={12} md={8} xl={6} key={video._external_id}>
+      <Col xs={24} sm={12} md={8} xl={6} key={video.external_id}>
         <VideoListCard video={video} />
       </Col>
     );
