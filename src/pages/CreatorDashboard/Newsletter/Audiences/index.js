@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Tabs, Typography, Switch, message } from 'antd';
+import { Row, Col, Tabs, Typography, Switch, message, Radio } from 'antd';
 
 import apis from 'apis';
 
-import AudienceImport from './AudienceImport';
-import AudienceList from './AudienceList';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import AudienceImport from './AudienceImport';
+// import AudienceList from './AudienceList';
+import EmailList from './EmailList';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -16,7 +17,7 @@ const { TabPane } = Tabs;
 const { Title, Paragraph } = Typography;
 
 const Audiences = () => {
-  const [selectedTab, setSelectedTab] = useState('list');
+  const [selectedTab, setSelectedTab] = useState('emailList');
   const [creatorProfile, setCreatorProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,6 +69,22 @@ const Audiences = () => {
     setIsLoading(false);
   };
 
+  const handleRadioTabChange = (e) => {
+    setSelectedTab(e.target.value);
+  };
+
+  const handleCustomTabBarRender = (props, DefaultTabBar) => (
+    <div className={styles.mb20}>
+      <Radio.Group size="large" value={selectedTab} onChange={handleRadioTabChange}>
+        {Array.isArray(props.panes) ? (
+          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+        ) : (
+          <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
+        )}
+      </Radio.Group>
+    </div>
+  );
+
   return (
     <Row gutter={[16, 16]}>
       <Col xs={24}>
@@ -95,11 +112,14 @@ const Audiences = () => {
         </Row>
       </Col>
       <Col xs={24}>
-        <Tabs size="large" activeKey={selectedTab} onChange={setSelectedTab}>
-          <TabPane key="list" tab={<Title level={5}> Audience & Member List </Title>}>
+        <Tabs renderTabBar={handleCustomTabBarRender} activeKey={selectedTab}>
+          {/* <TabPane key="list" tab={<Title level={5}> All Audiences </Title>}>
             <AudienceList />
+          </TabPane> */}
+          <TabPane key="emailList" tab="Audience List">
+            <EmailList />
           </TabPane>
-          <TabPane className={styles.p50} key="import" tab={<Title level={5}> Import List </Title>}>
+          <TabPane className={styles.p50} key="import" tab="Import Audiences">
             <AudienceImport />
           </TabPane>
         </Tabs>
