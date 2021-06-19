@@ -12,6 +12,7 @@
   margin-left: 5px;
 }
 .logout {
+  @extend .redBtn;
   margin-left: auto;
   margin-right: 0;
   float: right;
