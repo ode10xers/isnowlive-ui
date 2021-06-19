@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Typography, Button, Tooltip, Card } from 'antd';
+import { Row, Col, Typography, Button, Tooltip, Card, Collapse, Empty } from 'antd';
 import {
   DownOutlined,
   UpOutlined,
@@ -29,19 +29,20 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 const {
   formatDate: { toDateAndTime },
   timeCalculation: { isBeforeDate },
 } = dateUtil;
 
-//TODO: Refactor this for overall same experience across all products
 const ClassPassList = () => {
   const { showSendEmailPopup } = useGlobalContext();
 
   const [targetPass, setTargetPass] = useState(null);
   const [passes, setPasses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
+  const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
@@ -216,8 +217,7 @@ const ClassPassList = () => {
   useEffect(() => {
     getPassesForCreator();
     fetchCreatorMemberTags();
-    //eslint-disable-next-line
-  }, []);
+  }, [getPassesForCreator, fetchCreatorMemberTags]);
 
   const copyPassLink = (passId) => {
     const username = getLocalUserDetails().username;
@@ -226,23 +226,41 @@ const ClassPassList = () => {
     copyToClipboard(pageLink);
   };
 
-  const toggleExpandAll = () => {
-    if (expandedRowKeys.length > 0) {
-      setExpandedRowKeys([]);
+  const toggleExpandAllPublished = () => {
+    if (expandedPublishedRowKeys.length > 0) {
+      setExpandedPublishedRowKeys([]);
     } else {
-      setExpandedRowKeys(passes.map((pass) => pass.id));
+      setExpandedPublishedRowKeys(passes?.filter((pass) => pass.is_published).map((pass) => pass.id));
     }
   };
 
-  const expandRow = (rowKey) => {
-    const tempExpandedRowsArray = expandedRowKeys;
-    tempExpandedRowsArray.push(rowKey);
-    setExpandedRowKeys([...new Set(tempExpandedRowsArray)]);
+  const toggleExpandAllUnpublished = () => {
+    if (expandedUnpublishedRowKeys.length > 0) {
+      setExpandedUnpublishedRowKeys([]);
+    } else {
+      setExpandedUnpublishedRowKeys(passes?.filter((pass) => !pass.is_published).map((pass) => pass.id));
+    }
   };
 
-  const collapseRow = (rowKey) => setExpandedRowKeys(expandedRowKeys.filter((key) => key !== rowKey));
+  const expandRowPublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedPublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedPublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
 
-  const generatePassesColumns = () => {
+  const expandRowUnpublished = (rowKey) => {
+    const tempExpandedRowsArray = expandedUnpublishedRowKeys;
+    tempExpandedRowsArray.push(rowKey);
+    setExpandedUnpublishedRowKeys([...new Set(tempExpandedRowsArray)]);
+  };
+
+  const collapseRowPublished = (rowKey) =>
+    setExpandedPublishedRowKeys(expandedPublishedRowKeys.filter((key) => key !== rowKey));
+
+  const collapseRowUnpublished = (rowKey) =>
+    setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
+
+  const generatePassesColumns = (published) => {
     const initialColumns = [
       {
         title: 'Pass Name',
@@ -289,9 +307,13 @@ const ClassPassList = () => {
         render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
       },
       {
-        title: (
-          <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
-            {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+        title: published ? (
+          <Button ghost type="primary" onClick={() => toggleExpandAllPublished()}>
+            {expandedPublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+          </Button>
+        ) : (
+          <Button ghost type="primary" onClick={() => toggleExpandAllUnpublished()}>
+            {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         ),
         align: 'right',
@@ -325,13 +347,13 @@ const ClassPassList = () => {
             </Col>
             <Col xs={24} md={5}>
               {record.is_published ? (
-                <Tooltip title="Hide Session">
+                <Tooltip title="Hide Pass">
                   <Button type="link" danger onClick={() => unpublishPass(record.id)}>
                     Hide
                   </Button>
                 </Tooltip>
               ) : (
-                <Tooltip title="Unhide Session">
+                <Tooltip title="Unhide Pass">
                   <Button type="link" className={styles.successBtn} onClick={() => publishPass(record.id)}>
                     Show
                   </Button>
@@ -339,13 +361,23 @@ const ClassPassList = () => {
               )}
             </Col>
             <Col xs={24} md={6}>
-              {expandedRowKeys.includes(record.id) ? (
-                <Button type="link" onClick={() => collapseRow(record.id)}>
-                  {`${record.buyers.length} Buyers `} <UpOutlined />
+              {record.is_published ? (
+                expandedPublishedRowKeys.includes(record.id) ? (
+                  <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
+                    {record.buyers?.length || 0} Buyers <UpOutlined />
+                  </Button>
+                ) : (
+                  <Button block type="link" onClick={() => expandRowPublished(record.id)}>
+                    {record.buyers?.length || 0} Buyers <DownOutlined />
+                  </Button>
+                )
+              ) : expandedUnpublishedRowKeys.includes(record.id) ? (
+                <Button block type="link" onClick={() => collapseRowUnpublished(record.id)}>
+                  {record.buyers?.length || 0} Buyers <UpOutlined />
                 </Button>
               ) : (
-                <Button type="link" onClick={() => expandRow(record.id)}>
-                  {`${record.buyers.length} Buyers `} <DownOutlined />
+                <Button block type="link" onClick={() => expandRowUnpublished(record.id)}>
+                  {record.buyers?.length || 0} Buyers <DownOutlined />
                 </Button>
               )}
             </Col>
@@ -437,6 +469,7 @@ const ClassPassList = () => {
       <Col xs={24} key={pass.id}>
         <Card
           className={styles.card}
+          bodyStyle={{ padding: 8 }}
           title={
             <div style={{ paddingTop: 12, borderTop: `6px solid ${pass.color_code || '#FFF'}` }}>
               <Text>{pass.name}</Text>
@@ -475,10 +508,16 @@ const ClassPassList = () => {
                 </Button>
               </Tooltip>
             ),
-            expandedRowKeys.includes(pass.id) ? (
-              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />} />
+            pass?.is_published ? (
+              expandedPublishedRowKeys.includes(pass?.id) ? (
+                <Button block type="link" onClick={() => collapseRowPublished(pass?.id)} icon={<UpOutlined />} />
+              ) : (
+                <Button block type="link" onClick={() => expandRowPublished(pass?.id)} icon={<DownOutlined />} />
+              )
+            ) : expandedUnpublishedRowKeys.includes(pass?.id) ? (
+              <Button block type="link" onClick={() => collapseRowUnpublished(pass?.id)} icon={<UpOutlined />} />
             ) : (
-              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />} />
+              <Button block type="link" onClick={() => expandRowUnpublished(pass?.id)} icon={<DownOutlined />} />
             ),
           ]}
         >
@@ -489,9 +528,13 @@ const ClassPassList = () => {
             <TagListPopup tags={[pass.tag].filter((tag) => tag.external_id)} mobileView={true} />
           )}
         </Card>
-        {expandedRowKeys.includes(pass.id) && (
-          <Row className={styles.cardExpansion}>{pass.buyers?.map(renderMobileSubscriberCards)}</Row>
-        )}
+        {pass?.is_published
+          ? expandedPublishedRowKeys.includes(pass?.id) && (
+              <Row className={styles.cardExpansion}>{pass?.buyers?.map(renderMobileSubscriberCards)}</Row>
+            )
+          : expandedUnpublishedRowKeys.includes(pass?.id) && (
+              <Row className={styles.cardExpansion}>{pass?.buyers?.map(renderMobileSubscriberCards)}</Row>
+            )}
       </Col>
     );
   };
@@ -514,25 +557,62 @@ const ClassPassList = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading Passes">
-              <Row gutter={[8, 16]}>{passes.map(renderPassItem)}</Row>
-            </Loader>
-          ) : (
-            <Table
-              sticky={true}
-              columns={generatePassesColumns()}
-              data={passes}
-              loading={isLoading}
-              rowKey={(record) => record.id}
-              expandable={{
-                expandedRowRender: renderBuyersList,
-                expandRowByClick: true,
-                expandIconColumnIndex: -1,
-                expandedRowKeys: expandedRowKeys,
-              }}
-            />
-          )}
+          <Collapse defaultActiveKey="published">
+            <Panel header={<Title level={5}> Published </Title>} key="published">
+              {passes?.filter((pass) => pass.is_published).length > 0 ? (
+                <>
+                  {isMobileDevice ? (
+                    <Loader loading={isLoading} size="large" text="Loading Passes">
+                      <Row gutter={[8, 16]}>{passes?.filter((pass) => pass.is_published).map(renderPassItem)}</Row>
+                    </Loader>
+                  ) : (
+                    <Table
+                      sticky={true}
+                      columns={generatePassesColumns(true)}
+                      data={passes?.filter((pass) => pass.is_published)}
+                      loading={isLoading}
+                      rowKey={(record) => record.id}
+                      expandable={{
+                        expandedRowRender: renderBuyersList,
+                        expandRowByClick: true,
+                        expandIconColumnIndex: -1,
+                        expandedRowKeys: expandedPublishedRowKeys,
+                      }}
+                    />
+                  )}
+                </>
+              ) : (
+                <Empty description="No Published Passes" />
+              )}
+            </Panel>
+            <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+              {passes?.filter((pass) => !pass.is_published).length > 0 ? (
+                <>
+                  {isMobileDevice ? (
+                    <Loader loading={isLoading} size="large" text="Loading Passes">
+                      <Row gutter={[8, 16]}>{passes?.filter((pass) => !pass.is_published).map(renderPassItem)}</Row>
+                    </Loader>
+                  ) : (
+                    <Table
+                      sticky={true}
+                      columns={generatePassesColumns(false)}
+                      data={passes?.filter((pass) => !pass.is_published)}
+                      loading={isLoading}
+                      rowKey={(record) => record.id}
+                      expandable={{
+                        expandedRowRender: renderBuyersList,
+                        expandRowByClick: true,
+                        expandIconColumnIndex: -1,
+                        expandedRowKeys: expandedUnpublishedRowKeys,
+                      }}
+                    />
+                  )}
+                </>
+              ) : (
+                <Empty description="No Unpublished Passes" />
+              )}
+            </Panel>
+          </Collapse>
         </Col>
       </Row>
     </div>
