@@ -26,7 +26,7 @@ import {
 
 import styles from './style.module.scss';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const SessionDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -144,36 +144,44 @@ const SessionDetails = ({ match, history }) => {
       </Row>
       <Row justify="space-between" className={styles.mt50} gutter={16}>
         <Col xs={24} lg={14}>
-          <Title level={5}>Session Information</Title>
-          {showDescription ? (
-            <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
-          ) : (
-            <>
-              <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
-              <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
-                Read More
-              </div>
-            </>
-          )}
-          {session?.prerequisites && (
-            <>
-              <Title level={5} className={styles.mt50}>
-                Session Prerequisite
-              </Title>
-              {showPrerequisite ? (
-                <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.prerequisites)}</div>
+          <Row>
+            {session?.is_offline && (
+              <Col xs={24}>
+                <Title level={5}> Session Location </Title>
+                <Text> {session?.offline_event_address} </Text>
+              </Col>
+            )}
+            <Col xs={24} className={session?.is_offline ? styles.mt50 : undefined}>
+              <Title level={5}>Session Information</Title>
+              {showDescription ? (
+                <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
               ) : (
                 <>
-                  <div className={styles.sessionPrereq}>{ReactHtmlParser(session?.prerequisites)}</div>
-                  <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
+                  <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
+                  <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
                     Read More
                   </div>
                 </>
               )}
-            </>
-          )}
+            </Col>
+            {session?.prerequisites && (
+              <Col xs={24} className={styles.mt50}>
+                <Title level={5}>Session Prerequisite</Title>
+                {showPrerequisite ? (
+                  <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.prerequisites)}</div>
+                ) : (
+                  <>
+                    <div className={styles.sessionPrereq}>{ReactHtmlParser(session?.prerequisites)}</div>
+                    <div className={styles.readMoreText} onClick={() => setShowPrerequisite(true)}>
+                      Read More
+                    </div>
+                  </>
+                )}
+              </Col>
+            )}
+          </Row>
         </Col>
-        <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : styles.mt50}>
+        <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : undefined}>
           {creator && <HostDetails host={creator} />}
         </Col>
       </Row>

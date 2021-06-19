@@ -74,6 +74,8 @@ const SessionsInventories = ({ match }) => {
           refund_before_hours: i?.refund_before_hours || 24,
           is_course: i?.is_course,
           color_code: i?.color_code || whiteColor,
+          is_offline: i?.is_offline,
+          offline_event_address: i?.offline_event_address,
         }));
 
         let filterByDateSessions = [];
@@ -183,7 +185,7 @@ const SessionsInventories = ({ match }) => {
             okText="Yes, Refund Session"
             cancelText="No"
           >
-            <Button type="text" danger>
+            <Button block size="small" type="text" danger>
               Cancel
             </Button>
           </Popconfirm>
@@ -207,7 +209,7 @@ const SessionsInventories = ({ match }) => {
               </Text>
             }
           >
-            <Button type="text" danger>
+            <Button block size="small" type="text" danger>
               Cancel
             </Button>
           </Popover>
@@ -227,7 +229,7 @@ const SessionsInventories = ({ match }) => {
             </Text>
           }
         >
-          <Button type="text" danger>
+          <Button block size="small" type="text" danger>
             Cancel
           </Button>
         </Popover>
@@ -347,7 +349,12 @@ const SessionsInventories = ({ match }) => {
         return isPast ? (
           <Row justify="start">
             <Col>
-              <Button type="link" className={styles.detailsButton} onClick={() => openSessionInventoryDetails(record)}>
+              <Button
+                size="small"
+                type="link"
+                className={styles.detailsButton}
+                onClick={() => openSessionInventoryDetails(record)}
+              >
                 Details
               </Button>
             </Col>
@@ -369,14 +376,30 @@ const SessionsInventories = ({ match }) => {
             {!isPast && (
               <>
                 <Col md={24} lg={24} xl={4}>
-                  <Button
-                    type="text"
-                    className={styles.success}
-                    disabled={!record.join_url}
-                    onClick={() => trackAndJoinSession(record)}
-                  >
-                    Join
-                  </Button>
+                  {record.is_offline ? (
+                    <Popover
+                      arrowPointAtCenter
+                      placement="topRight"
+                      trigger="click"
+                      title="Event Address"
+                      content={record.offline_event_address}
+                    >
+                      <Button block size="small" type="text" className={styles.success}>
+                        In person
+                      </Button>
+                    </Popover>
+                  ) : (
+                    <Button
+                      type="text"
+                      size="small"
+                      block
+                      className={!record.join_url ? styles.disabledSuccess : styles.success}
+                      disabled={!record.join_url}
+                      onClick={() => trackAndJoinSession(record)}
+                    >
+                      Join
+                    </Button>
+                  )}
                 </Col>
                 <Col md={24} lg={24} xl={4}>
                   {renderRefundPopup(record)}
@@ -384,14 +407,20 @@ const SessionsInventories = ({ match }) => {
               </>
             )}
             <Col md={24} lg={24} xl={4}>
-              <Button type="link" onClick={() => openSessionInventoryDetails(record)}>
+              <Button block size="small" type="link" onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
 
             {!isPast && (
               <Col md={24} lg={24} xl={6}>
-                <Button type="text" className={styles.warning} onClick={() => rescheduleSession(record)}>
+                <Button
+                  block
+                  size="small"
+                  type="text"
+                  className={styles.warning}
+                  onClick={() => rescheduleSession(record)}
+                >
                   Reschedule
                 </Button>
               </Col>
