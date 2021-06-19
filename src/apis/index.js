@@ -197,6 +197,17 @@ export default {
     updateEmailTemplate: (templateId, payload) =>
       http.patch(`/secure/creator/newsletter/templates/${templateId}`, payload),
     deleteEmailTemplate: (templateId) => http.delete(`/secure/creator/newsletter/templates/${templateId}`),
+    getCreatorEmailList: () => http.get('/secure/creator/mailing-lists'),
+    getEmailListDetails: (emailListId, pageNo, perPage) =>
+      http.get(`/secure/creator/mailing-lists/${emailListId}/audience?page_no=${pageNo}&per_page=${perPage}`),
+    deleteEmailList: (emailListId) => http.delete(`/secure/creator/mailing-lists/${emailListId}`),
+    createEmailList: (payload) => http.post('/secure/creator/mailing-lists', payload),
+    updateEmailList: (emailListId, payload) =>
+      http.put(`/secure/creator/mailing-lists/${emailListId}/audience`, payload),
+    deleteEmailListAudience: (emailListId, payload) =>
+      http.delete(`/secure/creator/mailing-lists/${emailListId}/audience`, payload),
+    sendEmailToEmailList: (emailListId, payload) =>
+      http.post(`/secure/creator/mailing-lists/${emailListId}/email`, payload),
   },
   documents: {
     getCreatorDocuments: () => http.get('/secure/creator/documents'),

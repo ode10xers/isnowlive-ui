@@ -87,6 +87,9 @@ $spacing: (
 .textAlignRight {
   text-align: right;
 }
+.redText {
+  color: map-get($map: $colors, $key: 'SunsetOrange') !important;
+}
 .blueText {
   color: map-get($map: $colors, $key: 'DodgerBlue') !important;
 }
