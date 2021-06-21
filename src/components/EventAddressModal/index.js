@@ -20,8 +20,6 @@ const EventAddressModal = ({ visible, inventory = null, closeModal }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log(visible);
-    console.log(inventory);
     if (visible && inventory && inventory?.inventory_external_id) {
       form.setFieldsValue({
         address: inventory?.offline_event_address ?? '',

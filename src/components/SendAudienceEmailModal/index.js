@@ -166,8 +166,6 @@ const SendAudienceEmailModal = ({ visible, closeModal, recipients = [], targetEm
             };
           }
 
-          console.log(payload);
-
           const { status } = selectedEmailList
             ? await apis.newsletter.sendEmailToEmailList(selectedEmailList, payload)
             : await apis.audiences.sendEmailToAudiences(payload);
