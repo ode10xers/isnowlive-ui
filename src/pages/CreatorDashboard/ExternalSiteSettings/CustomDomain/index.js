@@ -46,7 +46,6 @@ const CustomDomain = () => {
 
   const handleFinish = (values) => {
     const customDomain = generateCustomDomainFromInput(values.subdomain || null, values.domain);
-    console.log(customDomain);
 
     if (validateDomainNameFormat(customDomain)) {
       Modal.confirm({

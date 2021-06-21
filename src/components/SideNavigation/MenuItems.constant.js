@@ -77,13 +77,13 @@ export const creatorMenuItems = [
         mixPanelTag: creator.click.dashboard.manageSessions,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageSessions,
       },
-      {
-        order: 4,
-        key: 'create_session',
-        title: 'Create Session',
-        mixPanelTag: creator.click.dashboard.createSession,
-        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
-      },
+      // {
+      //   order: 4,
+      //   key: 'create_session',
+      //   title: 'Create Session',
+      //   mixPanelTag: creator.click.dashboard.createSession,
+      //   path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
+      // },
     ],
   },
   {

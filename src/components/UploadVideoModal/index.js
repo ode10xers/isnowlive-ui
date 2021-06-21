@@ -585,7 +585,7 @@ const UploadVideoModal = ({
 
   const handleCustomTabBarRender = (props, DefaultTabBar) => (
     <div className={styles.mb20}>
-      <Radio.Group value={activeTabKey} onChange={handleRadioTabChange}>
+      <Radio.Group size="large" value={activeTabKey} onChange={handleRadioTabChange}>
         {Array.isArray(props.panes) ? (
           props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
         ) : (
@@ -948,7 +948,7 @@ const UploadVideoModal = ({
         )}
 
         {formPart === 3 && (
-          <Tabs renderTabBar={handleCustomTabBarRender} type="card" activeKey={activeTabKey}>
+          <Tabs renderTabBar={handleCustomTabBarRender} activeKey={activeTabKey}>
             <Tabs.TabPane key="preview" tab="Video Preview">
               <Row justify="center" gutter={[12, 20]} className={styles.textAlignCenter}>
                 {editedVideo?.thumbnail_url ? (

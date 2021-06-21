@@ -2,17 +2,18 @@
 
 .atc {
   width: fit-content;
-  display: inline-block;
+  display: block;
 
   .atcWrapper {
-    margin-top: 4px;
+    font-size: 14px;
+    height: 24px;
 
     &.button {
       border-radius: 5px;
       border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
       color: map-get($map: $colors, $key: 'DodgerBlue');
-      padding: 4px 8px;
-      margin-top: 0px;
+      padding: 0 7px;
+      margin-top: 0px;      
     }
   }
 

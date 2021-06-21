@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import classNames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { BlockPicker } from 'react-color';
-import classNames from 'classnames';
 import {
   Form,
   Typography,
@@ -112,6 +112,8 @@ const initialSession = {
   color_code: initialColor,
   is_course: false,
   session_tag_type: 'anyone',
+  is_offline: 'false',
+  offline_event_address: '',
 };
 
 const priceTypes = {
@@ -141,6 +143,7 @@ const Session = ({ match, history }) => {
   const [creatorDocuments, setCreatorDocuments] = useState([]);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [isOfflineSession, setIsOfflineSession] = useState(false);
 
   const {
     state: {
@@ -232,7 +235,9 @@ const Session = ({ match, history }) => {
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
             session_tag_type: data?.tags?.length > 0 ? 'selected' : 'anyone',
             selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
+            is_offline: `${data?.is_offline}`,
           });
+          setIsOfflineSession(data?.is_offline);
           setSessionImageUrl(data.session_image_url);
           setIsSessionTypeGroup(data?.max_participants >= 2 ? true : false);
           setSessionPaymentType(
@@ -303,6 +308,8 @@ const Session = ({ match, history }) => {
         session_course_type: 'normal',
         session_tag_type: 'anyone',
         selected_member_tags: [],
+        is_offline: 'false',
+        offline_event_address: '',
       });
       setIsLoading(false);
     }
@@ -610,6 +617,11 @@ const Session = ({ match, history }) => {
     form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
   };
 
+  const handleSessionOfflineTypeChange = (e) => {
+    setIsOfflineSession(e.target.value === 'true');
+    form.setFieldsValue({ ...form.getFieldsValue(), is_offline: e.target.value });
+  };
+
   const onFinish = async (values) => {
     const eventTagObject = creator.click.sessions.form;
 
@@ -640,6 +652,8 @@ const Session = ({ match, history }) => {
           selectedTagType === 'anyone'
             ? []
             : values.selected_member_tags || session?.tags?.map((tag) => tag.external_id) || [],
+        is_offline: isOfflineSession,
+        offline_event_address: values.offline_event_address,
       };
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
@@ -807,18 +821,57 @@ const Session = ({ match, history }) => {
             </div>
           </Form.Item>
 
-          {zoom_connected === ZoomAuthType.NOT_CONNECTED && (
-            <Form.Item label={<Text type="danger"> Session hosting link </Text>}>
-              <Button
-                type="primary"
-                icon={<VideoCameraOutlined />}
-                onClick={() => window.open(config.zoom.oAuthURL, '_self')}
-                className="connect-your-zoom-btn"
-              >
-                Connect your zoom account
-              </Button>
+          <Form.Item wrapperCol={24} hidden={match?.params?.id}>
+            <Form.Item
+              {...profileFormItemLayout}
+              label="Session Hosting Type"
+              name="is_offline"
+              id="is_offline"
+              rules={validationRules.requiredValidation}
+              onChange={handleSessionOfflineTypeChange}
+            >
+              <Radio.Group>
+                <Radio value="false"> Online </Radio>
+                <Radio value="true"> Offline </Radio>
+              </Radio.Group>
             </Form.Item>
-          )}
+            {!isOfflineSession ? (
+              zoom_connected === ZoomAuthType.NOT_CONNECTED ? (
+                <Form.Item {...profileFormItemLayout} label={<Text type="danger"> Session hosting link </Text>}>
+                  <Button
+                    type="primary"
+                    icon={<VideoCameraOutlined />}
+                    onClick={() => window.open(config.zoom.oAuthURL, '_self')}
+                    className="connect-your-zoom-btn"
+                  >
+                    Connect your zoom account
+                  </Button>
+                </Form.Item>
+              ) : (
+                <Form.Item {...profileFormTailLayout}>
+                  <Text>
+                    {' '}
+                    We will automatically generate the meeting link for each event. If you wish to input the meeting
+                    details for each event, you can do so in the{' '}
+                    <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath} target="_blank">
+                      Upcoming Sessions
+                    </Link>
+                    .
+                  </Text>
+                </Form.Item>
+              )
+            ) : null}
+          </Form.Item>
+
+          <Form.Item
+            label="Event Address/Location"
+            name="offline_event_address"
+            id="offline_event_address"
+            hidden={!isOfflineSession}
+            rules={isOfflineSession ? validationRules.requiredValidation : []}
+          >
+            <Input placeholder="Input the event address/location" />
+          </Form.Item>
 
           <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
             <Input placeholder="Enter Session Name" />

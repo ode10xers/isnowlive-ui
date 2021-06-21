@@ -96,12 +96,13 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
     }
   }, [profile]);
 
-  const getCreatorWebsiteLink = () => {
-    if (creatorProfile?.profile?.social_media_links?.website) {
-      if (creatorProfile?.profile?.social_media_links?.website.includes('//')) {
-        return creatorProfile?.profile?.social_media_links?.website;
+  const getExternalLink = (link = null) => {
+    // if (creatorProfile?.profile?.social_media_links?.website) {
+    if (link) {
+      if (link.includes('//')) {
+        return link;
       } else {
-        return '//' + creatorProfile?.profile?.social_media_links?.website;
+        return '//' + link;
       }
     } else {
       return '';
@@ -159,13 +160,17 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
             {creatorProfile?.profile?.social_media_links && (
               <Space size={'middle'}>
                 {creatorProfile.profile.social_media_links.website && (
-                  <a href={getCreatorWebsiteLink()} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={getExternalLink(creatorProfile?.profile?.social_media_links?.website)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <GlobalOutlined className={styles.socialIcon} />
                   </a>
                 )}
                 {creatorProfile.profile.social_media_links.facebook_link && (
                   <a
-                    href={`${creatorProfile.profile.social_media_links.facebook_link}`}
+                    href={getExternalLink(creatorProfile.profile.social_media_links.facebook_link)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -174,7 +179,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
                 )}
                 {creatorProfile.profile.social_media_links.twitter_link && (
                   <a
-                    href={`${creatorProfile.profile.social_media_links.twitter_link}`}
+                    href={getExternalLink(creatorProfile.profile.social_media_links.twitter_link)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -183,7 +188,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
                 )}
                 {creatorProfile.profile.social_media_links.instagram_link && (
                   <a
-                    href={`${creatorProfile.profile.social_media_links.instagram_link}`}
+                    href={getExternalLink(creatorProfile.profile.social_media_links.instagram_link)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -192,7 +197,7 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
                 )}
                 {creatorProfile.profile.social_media_links.linkedin_link && (
                   <a
-                    href={`${creatorProfile.profile.social_media_links.linkedin_link}`}
+                    href={getExternalLink(creatorProfile.profile.social_media_links.linkedin_link)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

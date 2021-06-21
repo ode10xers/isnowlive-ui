@@ -15,6 +15,7 @@ import SendAudienceEmailModal from 'components/SendAudienceEmailModal';
 
 const { Title, Text } = Typography;
 
+// NOTE: Cyrrently this is not used and the logic is combined in EmailList
 const AudienceList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [audienceList, setAudienceList] = useState([]);
