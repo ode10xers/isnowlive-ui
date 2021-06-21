@@ -584,41 +584,47 @@ export const showAlreadyBookedModal = (prodType = productType.PRODUCT) => {
 };
 
 export const showMemberUnapprovedJoinModal = async () => {
-  const creatorUsername = getUsernameFromUrl();
+  if (!window.privateSitePopupShown) {
+    window.privateSitePopupShown = true;
+    const creatorUsername = getUsernameFromUrl();
 
-  if (reservedDomainName.includes(creatorUsername)) {
-    showErrorModal('Something went wrong');
-  } else {
-    // TODO: later change this to get creator details from LS
-    const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
+    if (reservedDomainName.includes(creatorUsername)) {
+      showErrorModal('Something went wrong');
+    } else {
+      // TODO: later change this to get creator details from LS
+      const creatorProfileData = await getCreatorProfileByUsername(creatorUsername);
 
-    if (creatorProfileData) {
-      Modal.confirm({
-        center: true,
-        closable: true,
-        maskClosable: false,
-        title: `Thanks for joining ${creatorProfileData.first_name}'s community`,
-        content: (
-          <>
-            <Paragraph>We are excited to see you join {creatorProfileData.first_name}'s private community.</Paragraph>
-            <Paragraph>
-              If you haven't spoken to {creatorProfileData.first_name} before joining, you'd need to drop an email on{' '}
-              <Text strong copyable>
-                {creatorProfileData.email}
-              </Text>{' '}
-              to start accessing any of their products.
-            </Paragraph>
-            <Paragraph>
-              For any other help please reach out to us on the blue chat button at the bottom right corner.
-            </Paragraph>
-          </>
-        ),
-        okText: `Email ${creatorProfileData.first_name}`,
-        cancelText: 'Chat with us',
-        onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
-        onCancel: () => openFreshChatWidget(),
-        afterClose: resetBodyStyle,
-      });
+      if (creatorProfileData) {
+        Modal.confirm({
+          center: true,
+          closable: true,
+          maskClosable: false,
+          title: `Thanks for joining ${creatorProfileData.first_name}'s community`,
+          content: (
+            <>
+              <Paragraph>We are excited to see you join {creatorProfileData.first_name}'s private community.</Paragraph>
+              <Paragraph>
+                If you haven't spoken to {creatorProfileData.first_name} before joining, you'd need to drop an email on{' '}
+                <Text strong copyable>
+                  {creatorProfileData.email}
+                </Text>{' '}
+                to start accessing any of their products.
+              </Paragraph>
+              <Paragraph>
+                For any other help please reach out to us on the blue chat button at the bottom right corner.
+              </Paragraph>
+            </>
+          ),
+          okText: `Email ${creatorProfileData.first_name}`,
+          cancelText: 'Chat with us',
+          onOk: () => window.open(generateMailToLink(creatorProfileData), '_blank'),
+          onCancel: () => openFreshChatWidget(),
+          afterClose: () => {
+            resetBodyStyle();
+            window.privateSitePopupShown = false;
+          },
+        });
+      }
     }
   }
 };

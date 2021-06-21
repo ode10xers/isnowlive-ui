@@ -6,6 +6,9 @@
 .danger {
   color: map-get($colors, $key: 'FireBrick') !important;
 }
+.disabledSuccess {
+  color: map-get($colors, $key: 'KellyGreenPale') !important;
+}
 .success {
   color: map-get($colors, $key: 'KellyGreen') !important;
 }

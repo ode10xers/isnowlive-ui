@@ -11,6 +11,7 @@ import {
   InfoCircleOutlined,
   BookTwoTone,
   MailOutlined,
+  CompassOutlined,
 } from '@ant-design/icons';
 import { useHistory } from 'react-router-dom';
 
@@ -21,6 +22,7 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
 import ZoomDetailsModal from 'components/ZoomDetailsModal';
+import EventAddressModal from 'components/EventAddressModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -59,7 +61,9 @@ const SessionsInventories = ({ match }) => {
   const [view, setView] = useState('list');
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'month');
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [selectedInventoryForZoom, setSelectedInventoryForZoom] = useState(null);
+  const [zoomDetailsModalVisible, setZoomDetailsModalVisible] = useState(false);
+  const [offlineEventAddressModalVisible, setOfflineEventAddressModalVisible] = useState(false);
+  const [selectedInventoryForModal, setSelectedInventoryForModal] = useState(null);
 
   const getStaffSession = useCallback(async (sessionType) => {
     try {
@@ -87,6 +91,9 @@ const SessionsInventories = ({ match }) => {
           is_published: i.is_published,
           is_course: i.is_course,
           external_id: i.inventory_external_id,
+          inventory_external_id: i.inventory_external_id,
+          is_offline: i.is_offline,
+          offline_event_address: i.offline_event_address,
         }));
 
         let filterByDateSessions = [];
@@ -357,15 +364,21 @@ const SessionsInventories = ({ match }) => {
             </Col>
 
             {!isPast &&
-              (record.start_url ? (
+              (record.is_offline ? (
+                <Col md={24} lg={24} xl={4}>
+                  <Tooltip title="Edit event location">
+                    <Button
+                      icon={<CompassOutlined />}
+                      type="link"
+                      onClick={() => showOfflineEventAddressModal(record)}
+                    />
+                  </Tooltip>
+                </Col>
+              ) : record.start_url ? (
                 <>
                   <Col md={24} lg={24} xl={4}>
                     <Tooltip title="Show Zoom Meeting Details">
-                      <Button
-                        type="link"
-                        icon={<Icons.VideoLink />}
-                        onClick={() => setSelectedInventoryForZoom(record)}
-                      />
+                      <Button type="link" icon={<Icons.VideoLink />} onClick={() => showZoomDetailsModal(record)} />
                     </Tooltip>
                   </Col>
                   <Col md={24} lg={24} xl={4}>
@@ -384,7 +397,7 @@ const SessionsInventories = ({ match }) => {
                     <Button
                       type="link"
                       icon={<VideoCameraAddOutlined />}
-                      onClick={() => setSelectedInventoryForZoom(record)}
+                      onClick={() => showZoomDetailsModal(record)}
                     />
                   </Tooltip>
                 </Col>
@@ -420,9 +433,15 @@ const SessionsInventories = ({ match }) => {
       </Row>
     );
 
+    const offlineEventAddressEditButton = (
+      <Tooltip title="Edit event location">
+        <Button icon={<CompassOutlined />} type="link" onClick={() => showOfflineEventAddressModal(item)} />
+      </Tooltip>
+    );
+
     const meetingDetailsButton = (
       <Tooltip title="Show Zoom Meeting Details">
-        <Button type="link" icon={<Icons.VideoLink />} onClick={() => setSelectedInventoryForZoom(item)} />
+        <Button type="link" icon={<Icons.VideoLink />} onClick={() => showZoomDetailsModal(item)} />
       </Tooltip>
     );
 
@@ -438,7 +457,7 @@ const SessionsInventories = ({ match }) => {
 
     const addMeetingDetailsButton = (
       <Tooltip title="Add Zoom Meeting Details">
-        <Button type="link" icon={<VideoCameraAddOutlined />} onClick={() => setSelectedInventoryForZoom(item)} />
+        <Button type="link" icon={<VideoCameraAddOutlined />} onClick={() => showZoomDetailsModal(item)} />
       </Tooltip>
     );
 
@@ -478,11 +497,15 @@ const SessionsInventories = ({ match }) => {
     ];
 
     if (!isPast) {
-      if (item.start_url) {
-        actionButtons.push(meetingDetailsButton);
-        actionButtons.push(startMeetingButton);
+      if (item.is_offline) {
+        actionButtons.push(offlineEventAddressEditButton);
       } else {
-        actionButtons.push(addMeetingDetailsButton);
+        if (item.start_url) {
+          actionButtons.push(meetingDetailsButton);
+          actionButtons.push(startMeetingButton);
+        } else {
+          actionButtons.push(addMeetingDetailsButton);
+        }
       }
     }
 
@@ -522,10 +545,31 @@ const SessionsInventories = ({ match }) => {
     setCalendarView(e);
   };
 
-  const handleCloseZoomDetailsModal = (shouldRefetch) => {
-    setSelectedInventoryForZoom(null);
+  const showZoomDetailsModal = (selectedInventory) => {
+    setSelectedInventoryForModal(selectedInventory);
+    setZoomDetailsModalVisible(true);
+  };
 
-    if (shouldRefetch) {
+  const handleCloseZoomDetailsModal = (shouldRefresh = false) => {
+    setSelectedInventoryForModal(null);
+    setZoomDetailsModalVisible(false);
+
+    if (shouldRefresh) {
+      setIsLoading(true);
+      getStaffSession(isPast ? 'past' : 'upcoming');
+    }
+  };
+
+  const showOfflineEventAddressModal = (selectedInventory) => {
+    setSelectedInventoryForModal(selectedInventory);
+    setOfflineEventAddressModalVisible(true);
+  };
+
+  const handleCloseOfflineEventAddressModal = (shouldRefresh = false) => {
+    setSelectedInventoryForModal(null);
+    setOfflineEventAddressModalVisible(false);
+
+    if (shouldRefresh) {
       setIsLoading(true);
       getStaffSession(isPast ? 'past' : 'upcoming');
     }
@@ -533,7 +577,16 @@ const SessionsInventories = ({ match }) => {
 
   return (
     <>
-      <ZoomDetailsModal selectedInventory={selectedInventoryForZoom} closeModal={handleCloseZoomDetailsModal} />
+      <EventAddressModal
+        visible={offlineEventAddressModalVisible}
+        closeModal={handleCloseOfflineEventAddressModal}
+        inventory={selectedInventoryForModal}
+      />
+      <ZoomDetailsModal
+        visible={zoomDetailsModalVisible}
+        selectedInventory={selectedInventoryForModal}
+        closeModal={handleCloseZoomDetailsModal}
+      />
       <div className={styles.box}>
         <Row gutter={[8, 8]}>
           <Col xs={24} md={18} lg={20}>

@@ -14,7 +14,7 @@ import styles from './style.module.scss';
 
 const { Title, Text, Link } = Typography;
 
-const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
+const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -96,7 +96,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
   useEffect(() => {
     form.resetFields();
 
-    if (selectedInventory) {
+    if (visible && selectedInventory && selectedInventory.inventory_id) {
       if (selectedInventory.start_url) {
         getZoomMeetingInformation(selectedInventory.inventory_id);
         setShowForm(false);
@@ -108,8 +108,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
       setShowForm(true);
       setView('generate');
     }
-    //eslint-disable-next-line
-  }, [selectedInventory]);
+  }, [visible, form, selectedInventory, getZoomMeetingInformation]);
 
   const handleViewChange = (e) => {
     setView(e.target.value);
@@ -122,6 +121,12 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
       showErrorModal('Invalid Inventory Selected');
       setIsSubmitting(false);
       closeModal(false);
+      return;
+    }
+
+    if (values.meetingId && Number.isNaN(parseInt(values.meetingId?.split(' ').join('')))) {
+      showErrorModal('Meeting ID can only consist of numbers');
+      setIsSubmitting(false);
       return;
     }
 
@@ -149,7 +154,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
     <div>
       <Modal
         centered={true}
-        visible={selectedInventory}
+        visible={visible}
         footer={null}
         width={560}
         onCancel={() => closeModal(false)}
@@ -186,7 +191,7 @@ const ZoomDetailsModal = ({ selectedInventory, closeModal }) => {
                   <Row gutter={[8, 16]}>
                     <Col xs={24} md={12}>
                       <Form.Item id="meetingId" name="meetingId" label="Meeting ID">
-                        <Input placeholder="Add zoom meeting ID" />
+                        <Input placeholder="Add zoom meeting ID (numeric inputs only)" />
                       </Form.Item>
                     </Col>
                     <Col xs={24} md={{ span: 11, offset: 1 }}>

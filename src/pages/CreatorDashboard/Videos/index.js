@@ -811,7 +811,7 @@ const Videos = () => {
         <Col xs={24}>
           <Collapse defaultActiveKey="Published">
             <Panel header={<Title level={5}> Published </Title>} key="Published">
-              {videos.length ? (
+              {videos?.filter((video) => video.is_published).length > 0 ? (
                 <>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Videos">
@@ -820,7 +820,6 @@ const Videos = () => {
                   ) : (
                     <Table
                       size="small"
-                      sticky={true}
                       columns={generateVideoColumns(true)}
                       data={videos?.filter((video) => video?.is_published)}
                       loading={isLoading}
@@ -839,7 +838,7 @@ const Videos = () => {
               )}
             </Panel>
             <Panel header={<Title level={5}> Unpublished </Title>} key="Unpublished">
-              {videos.length ? (
+              {videos?.filter((video) => !video.is_published).length > 0 ? (
                 <>
                   {isMobileDevice ? (
                     <Loader loading={isLoading} size="large" text="Loading Videos">
@@ -849,7 +848,6 @@ const Videos = () => {
                     </Loader>
                   ) : (
                     <Table
-                      sticky={true}
                       size="small"
                       columns={generateVideoColumns(false)}
                       data={videos?.filter((video) => !video?.is_published)}
