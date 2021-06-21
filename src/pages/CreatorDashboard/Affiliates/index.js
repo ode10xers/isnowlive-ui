@@ -39,7 +39,6 @@ const Affiliates = () => {
       const { status, data } = await apis.referrals.getCreatorAffiliatesData();
 
       if (isAPISuccess(status) && data) {
-        console.log(data);
         setCreatorAffiliateData(data.creators);
       }
     } catch (error) {

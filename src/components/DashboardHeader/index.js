@@ -28,7 +28,7 @@ const DashboardHeader = () => {
       </Col>
       <Col flex="auto" className={isMobileDevice && styles.navItemWrapper}>
         <DashboardToggle />
-        <Button type="text" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
+        <Button type="primary" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
           Logout
         </Button>
       </Col>

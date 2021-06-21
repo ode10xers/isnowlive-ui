@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Button, Card, message, Popconfirm } from 'antd';
+import { Row, Col, Typography, Button, Card, message, Popconfirm, Space } from 'antd';
 import {
   ArrowLeftOutlined,
   VideoCameraOutlined,
@@ -37,6 +37,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
+import EventAddressModal from 'components/EventAddressModal';
 
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },
@@ -51,6 +52,7 @@ const SessionsDetails = ({ match }) => {
   const [isPastSession, setIsPastSession] = useState(false);
   const [publicUrl, setPublicUrl] = useState(null);
   const [isEditingDocuments, setIsEditingDocuments] = useState(false);
+  const [offlineEventAddressModalVisible, setOfflineEventAddressModalVisible] = useState(false);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
     try {
@@ -135,8 +137,25 @@ const SessionsDetails = ({ match }) => {
     }
   };
 
+  const showEditOfflineEventAddressModal = () => {
+    setOfflineEventAddressModalVisible(true);
+  };
+
+  const hideEditOfflineEventAddressModal = (shouldRefresh = false) => {
+    setOfflineEventAddressModalVisible(false);
+
+    if (shouldRefresh) {
+      getInventoryDetails(match?.params?.inventory_id);
+    }
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading session details">
+      <EventAddressModal
+        visible={offlineEventAddressModalVisible}
+        closeModal={hideEditOfflineEventAddressModal}
+        inventory={session}
+      />
       <Row gutter={8} justify="start" className={classNames(styles.mt20, styles.mb20)}>
         {isPastSession ? (
           <>
@@ -335,9 +354,29 @@ const SessionsDetails = ({ match }) => {
               </Col>
 
               <Col xs={24} md={18} className={styles.mt20}>
+                {session?.is_offline && (
+                  <Space direction="vertical">
+                    <Space align="start">
+                      <Title level={5}>Session Location</Title>
+                      <Button
+                        size="small"
+                        type="link"
+                        icon={<EditOutlined />}
+                        onClick={showEditOfflineEventAddressModal}
+                      >
+                        Edit
+                      </Button>
+                    </Space>
+                    <Text type="secondary" level={5}>
+                      {session?.offline_event_address}
+                    </Text>
+                  </Space>
+                )}
                 {session?.description && (
                   <>
-                    <Title level={5}>Session Information</Title>
+                    <Title level={5} className={session?.is_offline ? styles.mt50 : undefined}>
+                      Session Information
+                    </Title>
                     <Text type="secondary" level={5}>
                       {ReactHtmlParser(session?.description)}
                     </Text>
