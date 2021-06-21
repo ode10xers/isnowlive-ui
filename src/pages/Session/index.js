@@ -235,6 +235,7 @@ const Session = ({ match, history }) => {
             document_urls: data?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [],
             session_tag_type: data?.tags?.length > 0 ? 'selected' : 'anyone',
             selected_member_tags: data?.tags?.map((tag) => tag.external_id) || [],
+            is_offline: `${data?.is_offline}`,
           });
           setIsOfflineSession(data?.is_offline);
           setSessionImageUrl(data.session_image_url);
@@ -860,16 +861,16 @@ const Session = ({ match, history }) => {
                 </Form.Item>
               )
             ) : null}
-            <Form.Item
-              {...profileFormItemLayout}
-              label="Event Address/Location"
-              name="offline_event_address"
-              id="offline_event_address"
-              hidden={!isOfflineSession}
-              rules={isOfflineSession ? validationRules.requiredValidation : []}
-            >
-              <Input placeholder="Input the event address/location" />
-            </Form.Item>
+          </Form.Item>
+
+          <Form.Item
+            label="Event Address/Location"
+            name="offline_event_address"
+            id="offline_event_address"
+            hidden={!isOfflineSession}
+            rules={isOfflineSession ? validationRules.requiredValidation : []}
+          >
+            <Input placeholder="Input the event address/location" />
           </Form.Item>
 
           <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>

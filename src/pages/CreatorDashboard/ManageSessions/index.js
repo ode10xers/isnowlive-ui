@@ -255,7 +255,7 @@ const ManageSessions = () => {
                 </Tooltip>
               </Col>
               <Col xs={24} md={5}>
-                <Tooltip title="Delete Session">
+                <Tooltip title="Delete Session" placement="bottom">
                   <Popconfirm
                     title="Do you want to delete session?"
                     icon={<DeleteOutlined className={styles.danger} />}
