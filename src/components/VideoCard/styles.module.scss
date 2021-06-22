@@ -2,6 +2,7 @@
 
 .videoCard {
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
+  background-color: var(--video-card-background-color) !important;
 
   .videoThumbnail {
     height: 200px;
@@ -28,6 +29,10 @@
       text-overflow: ellipsis;
       overflow: hidden;
       font-size: 15px;
+
+      > h1, h2, h3, h4, h5 {
+        color: var(--video-card-font-color) !important;
+      }
     }
 
     .detailsWrapper {
@@ -35,7 +40,7 @@
 
       .validityText,
       .priceText {
-        @extend .blueText;
+        color: var(--video-card-font-color) !important;
       }
 
       .highlightedBox {
@@ -74,7 +79,14 @@
 
     .buttonWrapper {
       .detailBtn {
-        border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+        border: 1px solid var(--secondary-button-color);
+        color: var(--secondary-button-font-color);
+      }
+
+      .buyBtn {
+        background-color: var(--primary-button-color);
+        border: 1px solid var(--primary-button-color);
+        color: var(--primary-button-font-color);
       }
     }
   }

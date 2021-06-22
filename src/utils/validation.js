@@ -41,6 +41,16 @@ const validationRules = {
       message: 'Discount code should only contain letters or numbers',
     },
   ],
+  hexColorValidation: (message = 'Please input a valid hex color code') => {
+    const regexTester = new RegExp(/^[0-9A-Fa-f]{6}$/);
+
+    return [
+      {
+        validator: (_, value) =>
+          !value ? Promise.resolve() : regexTester.test(value) ? Promise.resolve() : Promise.reject(message),
+      },
+    ];
+  },
 };
 
 export default validationRules;

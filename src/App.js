@@ -47,6 +47,8 @@ import { mapUserToPendo } from 'services/integrations/pendo';
 import { storeCreatorDetailsToLS } from 'utils/storage';
 import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
 
+import './styles/globals.scss';
+
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
     <Route

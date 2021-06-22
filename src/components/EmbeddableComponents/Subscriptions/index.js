@@ -37,19 +37,21 @@ const Subscriptions = () => {
   }, []);
 
   return (
-    <Row className={styles.mt20} gutter={[8, 16]}>
-      <Col span={14}>
-        <Title level={5}> Monthly Memberships </Title>
-      </Col>
-      <Col span={10}>
-        <img src={logo} alt="Passion.do" className={styles.passionLogo} />
-      </Col>
-      <Col span={24}>
-        <Loader loading={isLoading} size="large" text="Loading memberships...">
-          <CreatorSubscriptions subscriptions={subscriptions} />
-        </Loader>
-      </Col>
-    </Row>
+    <div className={styles.subscriptionPluginContainer}>
+      <Row className={styles.mt20} gutter={[8, 16]}>
+        <Col span={14}>
+          <Title level={5}> Monthly Memberships </Title>
+        </Col>
+        <Col span={10}>
+          <img src={logo} alt="Passion.do" className={styles.passionLogo} />
+        </Col>
+        <Col span={24}>
+          <Loader loading={isLoading} size="large" text="Loading memberships...">
+            <CreatorSubscriptions subscriptions={subscriptions} />
+          </Loader>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

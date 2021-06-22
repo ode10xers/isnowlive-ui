@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
+import apis from 'apis';
+
 import Loader from 'components/Loader';
 import PublicVideoList from 'components/PublicVideoList';
-import apis from 'apis';
+
 import { isAPISuccess } from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const Videos = () => {
   const [videos, setVideos] = useState([]);
@@ -28,9 +32,11 @@ const Videos = () => {
   }, []);
 
   return (
-    <Loader loading={isVideosLoading} size="large" text="Loading videos">
-      <PublicVideoList videos={videos} />
-    </Loader>
+    <div className={styles.videoPluginContainer}>
+      <Loader loading={isVideosLoading} size="large" text="Loading videos">
+        <PublicVideoList videos={videos} />
+      </Loader>
+    </div>
   );
 };
 

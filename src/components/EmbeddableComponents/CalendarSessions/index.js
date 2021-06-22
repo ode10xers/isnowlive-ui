@@ -186,35 +186,37 @@ const CalendarSessions = () => {
   }, []);
 
   return (
-    <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-      <AuthModal
-        visible={purchaseModalVisible}
-        closeModal={closeAuthModal}
-        onLoggedInCallback={showConfirmPaymentPopup}
-      />
-      {calendarSession.length > 0 && readyToPaint ? (
-        <>
-          <Row>
-            <Col xs={14}>
-              <Text type="primary" strong>
-                All event times shown below are in your local time zone ({getCurrentLongTimezone()})
-              </Text>
-            </Col>
-            <Col xs={10}>
-              <img src={logo} alt="Passion.do" className={styles.passionLogo} />
-            </Col>
-          </Row>
+    <div className={styles.calendarSessionPluginContainer}>
+      <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+        <AuthModal
+          visible={purchaseModalVisible}
+          closeModal={closeAuthModal}
+          onLoggedInCallback={showConfirmPaymentPopup}
+        />
+        {calendarSession.length > 0 && readyToPaint ? (
+          <>
+            <Row>
+              <Col xs={14}>
+                <Text type="primary" strong>
+                  All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+                </Text>
+              </Col>
+              <Col xs={10}>
+                <img src={logo} alt="Passion.do" className={styles.passionLogo} />
+              </Col>
+            </Row>
 
-          <CalendarWrapper
-            calendarSessions={calendarSession}
-            sessionCountByDate={sessionCountByDate}
-            onEventBookClick={onEventBookClick}
-          />
-        </>
-      ) : (
-        <Empty />
-      )}
-    </Loader>
+            <CalendarWrapper
+              calendarSessions={calendarSession}
+              sessionCountByDate={sessionCountByDate}
+              onEventBookClick={onEventBookClick}
+            />
+          </>
+        ) : (
+          <Empty />
+        )}
+      </Loader>
+    </div>
   );
 };
 

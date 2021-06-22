@@ -5,6 +5,10 @@
   max-width: 300px;
 }
 
+.colorPicker {
+  width: 100% !important;;
+}
+
 .codeSnippetContainer {
   position: relative;
   border: 1px solid map-get($map: $colors, $key: 'Havana');
