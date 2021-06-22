@@ -18,7 +18,7 @@ import {
 
 import apis from 'apis';
 
-import CreatorProfile from 'components/CreatorProfile';
+import NewCreatorProfile from 'components/NewCreatorProfile';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
@@ -404,7 +404,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
         <Row gutter={8} justify="center">
           <Col xs={24}>
-            <CreatorProfile
+            <NewCreatorProfile
               showCoverImage={true}
               profile={creatorProfileData}
               profileImage={creatorProfileData?.profile_image_url}

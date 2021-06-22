@@ -1,0 +1,147 @@
+@import '../../styles/variables.scss';
+
+.imageWrapper {
+  position: relative;
+  margin: 32px 16px !important;
+  padding-bottom: 20px;
+  background-color: map-get($map: $colors, $key: 'White1');
+
+  .coverImageWrapper {
+    text-align: center;
+    width: 100%;
+
+    .coverImage {
+      object-fit: cover;
+      border-radius: 8px 8px 0px 0px;
+      max-height: 300px;
+    }
+  }
+
+  .profileImageWrapper {
+    max-height: 80px;
+
+    .profileImage {
+      position: relative;
+      border-radius: 4px;
+      bottom: 80px;
+      left: 50px;
+      width: 100%;
+
+      img {
+        border: 2px solid map-get($colors, $key: 'White');
+        max-width: 120px;
+        border-radius: 4px;
+      }
+
+      .userName {
+        position: absolute;
+        bottom: -15px;
+        left: 150px;
+      }
+      .shareButton {
+        position: absolute;
+        bottom: 0px;
+        right: 100px;
+      }
+    }
+  }
+
+  .bio {
+    p,
+    span {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background-color: map-get($map: $colors, $key: 'White1') !important;
+    }
+  }
+
+  .collapsedBio {
+    p,
+    span {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background-color: map-get($map: $colors, $key: 'White1') !important;
+    }
+
+    max-height: 72px;
+    overflow: hidden;
+  }
+
+  .readMoreText {
+    margin-top: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: map-get($map: $colors, $key: 'FireBrick');
+  }
+
+  .socialIcon {
+    font-size: 24px;
+    margin: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .imageWrapper {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 32px !important;
+
+    .profileImageWrapper {
+      &.withCover {
+        margin-top: -20px;
+      }
+
+      .profileImage {
+        border-radius: 4px;
+        bottom: 20px;
+        width: 100%;
+        left: 20px;
+
+        img {
+          max-width: 70px;
+          border: 2px solid map-get($colors, $key: 'White');
+          border-radius: 4px;
+        }
+
+        .userName {
+          position: absolute;
+          bottom: 0px;
+          left: 75px;
+        }
+        .shareButton {
+          position: absolute;
+          bottom: -20px;
+          right: 36px;
+        }
+      }
+    }
+
+    .bio {
+      padding: 0 10px;
+    }
+
+    .socialIcon {
+      margin-left: 10px;
+    }
+  }
+}
+
+@media (max-width: 569px) {
+  .imageWrapper {
+    .profileImageWrapper {
+      height: 100px;
+      max-height: 100px;
+
+      .profileImage {
+        .userName {
+          left: 0px;
+          bottom: -48px;
+        }
+
+        .shareButton {
+          bottom: 10px;
+        }
+      }
+    }
+  }
+}
