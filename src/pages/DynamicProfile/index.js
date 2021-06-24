@@ -18,7 +18,7 @@ import {
 
 import apis from 'apis';
 
-import NewCreatorProfile from 'components/NewCreatorProfile';
+import NewCreatorProfile from 'components/DynamicProfileComponents/NewCreatorProfile';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
@@ -404,12 +404,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
         <Row gutter={8} justify="center">
           <Col xs={24}>
-            <NewCreatorProfile
-              showCoverImage={true}
-              profile={creatorProfileData}
-              profileImage={creatorProfileData?.profile_image_url}
-              coverImage={creatorProfileData?.cover_image_url}
-            />
+            <NewCreatorProfile creatorProfile={creatorProfileData} />
           </Col>
           <Col xs={24} className={styles.mb20}>
             <DragDropContext onDragEnd={handleDragEnd}>

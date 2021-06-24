@@ -1,0 +1,99 @@
+@import '../../../styles/variables.scss';
+
+.creatorProfileWrapper {
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+
+  .coverImageWrapper {
+    .coverImage {
+      border-radius: 12px 12px 0 0;
+    }
+  }
+
+  .creatorDetailsWrapper {
+    background: linear-gradient(204.83deg, #FFFFFF 0.14%, #FDFEFF 57.56%, #E5F2FF 102.54%);
+
+    .profileImageWrapper {
+      $profile-image-size : 120px;
+      background: transparent;
+      margin-top: calc(-1 * (#{$profile-image-size} * 0.75));
+  
+      .profileImage {
+        width: $profile-image-size;
+        height: $profile-image-size;
+        object-fit: scale-down;
+        border: 4px solid map-get($map: $colors, $key: 'White');
+        border-radius: 50%;
+      }
+    }
+  
+    .creatorUsername {
+      text-align: center;
+      font-weight: 600;
+      font-size: 24px;
+      color: map-get($colors, 'Smalt');
+    }
+  
+    .creatorProfileDivider {
+      border-top: 1.5px solid map-get($map: $colors, $key: 'ColumbiaBlue');
+      margin: 4px auto;
+      width: 80px;
+      min-width: 0 !important;
+    }
+  
+    .creatorBio {
+      text-align: center;
+      padding: 0 12px !important;
+  
+      .bio {
+        p,
+        span {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+          // background-color: map-get($map: $colors, $key: 'White1') !important;
+          text-align: center !important;
+          background: transparent !important;
+          color: map-get($colors, 'Smalt') !important;
+        }
+      }
+    
+      .collapsedBio {
+        p,
+        span {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+          // background-color: map-get($map: $colors, $key: 'White1') !important;
+          text-align: center !important;
+          background: transparent !important;
+          color: map-get($colors, 'Smalt') !important;
+        }
+    
+        max-height: 72px;
+        overflow: hidden;
+      }
+  
+      .readMoreBio {
+        @extend .readMoreText;
+        margin: 8px 0;
+        letter-spacing: 0.08em;
+      }
+    }
+  }
+
+  .socialIconWrapper {
+    background-color: map-get($map: $colors, $key: 'White');
+    padding: 12px;
+    text-align: center;
+    border-radius: 0 0 12px 12px;
+
+    .socialIconsList {
+      text-align: center;
+
+      .socialIcon {
+        margin: 0 auto;
+        font-size: 24px;
+        color: map-get($map: $colors, $key: 'DodgerBlue');
+      }
+    }
+  }
+}
