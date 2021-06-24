@@ -62,7 +62,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
   }, [sessions]);
 
   return (
-    <div>
+    <div className={styles.w100}>
       <Loader loading={isLoading} text="Fetching session informations">
         <Row gutter={[8, 8]}>
           {adjustedSessions && adjustedSessions.length > 0 ? (
