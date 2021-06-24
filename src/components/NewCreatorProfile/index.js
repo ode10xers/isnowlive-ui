@@ -21,7 +21,7 @@ import apis from 'apis';
 
 const { Title } = Typography;
 
-const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
+const NewCreatorProfile = ({ profile, profileImage, showCoverImage = false, coverImage }) => {
   let { search } = useLocation();
   const query = new URLSearchParams(search);
   localStorage.setItem('ref', JSON.stringify(query.get('ref')));
@@ -245,4 +245,4 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
   );
 };
 
-export default CreatorProfile;
+export default NewCreatorProfile;
