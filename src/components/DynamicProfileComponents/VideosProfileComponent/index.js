@@ -24,6 +24,7 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
+// NOTE : Currently unused
 const VideoProfileComponent = ({
   identifier = null,
   isEditing = false,

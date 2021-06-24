@@ -1,13 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 
-import { Row, Col, Spin, Button, Typography } from 'antd';
-
-import apis from 'apis';
+import { Row, Col, Button, Typography } from 'antd';
 
 import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
 import VideoListCard from '../VideoListCard';
 
-import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -15,30 +13,8 @@ const { Title } = Typography;
 
 // TODO: Make this not show on viewing mode if videos are empty
 // But still show up on editing mode
-const VideoListView = ({ limit = 4 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [videos, setVideos] = useState([]);
+const VideoListView = ({ limit = 2, videos = [] }) => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
-
-  const fetchCreatorVideos = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.videos.getVideosByUsername();
-
-      if (isAPISuccess(status) && data) {
-        setVideos(data.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : -1)));
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchCreatorVideos();
-  }, [fetchCreatorVideos]);
 
   const showMoreVideoCards = (e) => {
     preventDefaults(e);
@@ -64,24 +40,22 @@ const VideoListView = ({ limit = 4 }) => {
 
   return (
     <div>
-      <Spin spinning={isLoading} tip="Fetching videos">
-        {videos?.length > 0 && (
-          <Row gutter={[16, 16]}>
-            {videos.slice(0, limit).map((video) => renderVideoCards(video, true))}
-            {videos?.length > limit && (
-              <Col xs={24}>
-                <Row justify="center">
-                  <Col>
-                    <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreVideoCards}>
-                      MORE
-                    </Button>
-                  </Col>
-                </Row>
-              </Col>
-            )}
-          </Row>
-        )}
-      </Spin>
+      {videos?.length > 0 && (
+        <Row gutter={[16, 16]}>
+          {videos.slice(0, limit).map((video) => renderVideoCards(video, true))}
+          {videos?.length > limit && (
+            <Col xs={24}>
+              <Row justify="center">
+                <Col>
+                  <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreVideoCards}>
+                    MORE
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          )}
+        </Row>
+      )}
       <DetailsDrawer
         visible={detailsDrawerVisible}
         onClose={handleDrawerClose}

@@ -3,7 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { Route, Switch } from 'react-router-dom';
 
 import { Spin, Typography, Row, Col, Card } from 'antd';
-import { VideoCameraTwoTone } from '@ant-design/icons';
+import { VideoCameraTwoTone, PlayCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -13,6 +13,7 @@ import { isAPISuccess } from 'utils/helper';
 import SessionListView from '../SessionsProfileComponent/SessionListView';
 
 import styles from './style.module.scss';
+import VideoListView from '../VideosProfileComponent/VideoListView';
 
 const { Text } = Typography;
 
@@ -44,8 +45,12 @@ const CardContainer = ({ isEditing, placeholderText, cardHeader, children }) => 
 
 const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHandler, ...customComponentProps }) => {
   // TODO: Implement the edit
+
+  const { values: innerComponents } = customComponentProps;
+
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
+  const [videos, setVideos] = useState([]);
 
   const fetchUpcomingSessions = useCallback(async () => {
     try {
@@ -60,22 +65,41 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
     }
   }, []);
 
+  const fetchCreatorVideos = useCallback(async () => {
+    try {
+      const { status, data } = await apis.videos.getVideosByUsername();
+
+      if (isAPISuccess(status) && data) {
+        setVideos(data.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : -1)));
+      }
+    } catch (error) {
+      console.error('Failed fetching videos for creator');
+      console.error(error);
+    }
+  }, []);
+
   // TODO: Reimplement when we find a way to simplify the API Call
   // e.g. get count of products, which should be much lighter
   useEffect(() => {
     const fetchAllProductsData = async () => {
       setIsLoading(true);
       const sessionsPromise = fetchUpcomingSessions();
-      await Promise.all([sessionsPromise]);
+      const videosPromise = fetchCreatorVideos();
+      await Promise.all([sessionsPromise, videosPromise]);
       setIsLoading(false);
     };
     fetchAllProductsData();
-  }, [fetchUpcomingSessions]);
+  }, [fetchUpcomingSessions, fetchCreatorVideos]);
 
   const generateCardHeader = (title, icon) => ({
     title: <ContainerTitle title={title} icon={icon} />,
     headStyle: cardHeadingStyle,
   });
+
+  const getComponentTitle = (key) => {
+    const targetComponent = innerComponents.find((component) => component.key === key);
+    return targetComponent?.title ?? '';
+  };
 
   return (
     <div className={styles.p10}>
@@ -83,22 +107,30 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
         <Switch>
           {sessions.length > 0 && (
             <Route exact path={[Routes.root, Routes.sessions]}>
-              {isEditing ? (
-                <Row justify="center" align="middle">
-                  <Col className={styles.textAlignCenter}>Upcoming sessions that are published will be shown here</Col>
-                </Row>
-              ) : (
-                <CardContainer
-                  isEditing={isEditing}
-                  placeholderText="Upcoming sessions that are published will be shown here"
-                  cardHeader={generateCardHeader(
-                    'SESSIONS',
-                    <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-                  )}
-                >
-                  <SessionListView sessions={sessions} />
-                </CardContainer>
-              )}
+              <CardContainer
+                isEditing={isEditing}
+                placeholderText="Upcoming sessions that are published will be shown here"
+                cardHeader={generateCardHeader(
+                  getComponentTitle('SESSIONS'),
+                  <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
+                )}
+              >
+                <SessionListView sessions={sessions} />
+              </CardContainer>
+            </Route>
+          )}
+          {videos.length > 0 && (
+            <Route exact path={[Routes.root, Routes.videos]}>
+              <CardContainer
+                isEditing={isEditing}
+                placeholderText="Uploaded videos that are published will be shown here"
+                cardHeader={generateCardHeader(
+                  getComponentTitle('VIDEOS'),
+                  <PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />
+                )}
+              >
+                <VideoListView videos={videos} />
+              </CardContainer>
             </Route>
           )}
         </Switch>
