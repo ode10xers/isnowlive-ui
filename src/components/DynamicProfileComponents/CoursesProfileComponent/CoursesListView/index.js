@@ -1,54 +1,56 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Row, Col, Button, Spin, Typography, Radio } from 'antd';
-
-import apis from 'apis';
+import { Row, Col, Button, Typography, Radio } from 'antd';
 
 import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
 import CoursesListItem from '../CoursesListItem';
 
-import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { preventDefaults } from 'utils/helper';
 import { getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
 
 import styles from './style.module.scss';
 
 const { Title } = Typography;
 
-const CoursesListView = ({ limit = 4 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [videoCourses, setVideoCourses] = useState([]);
-  const [liveCourses, setLiveCourses] = useState([]);
-  const [selectedView, setSelectedView] = useState('live');
+const CoursesListView = ({ limit = 2, courses = [] }) => {
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [videoCourses, setVideoCourses] = useState([]);
+  // const [liveCourses, setLiveCourses] = useState([]);
+
+  const liveCourses = getLiveCoursesFromCourses(courses);
+  const videoCourses = getVideoCoursesFromCourses(courses);
+
+  const [selectedView, setSelectedView] = useState(videoCourses && videoCourses?.length > 0 ? 'video' : 'live');
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
 
-  const fetchCreatorCourses = useCallback(async () => {
-    setIsLoading(true);
+  // const fetchCreatorCourses = useCallback(async () => {
+  //   setIsLoading(true);
 
-    try {
-      const { status, data } = await apis.courses.getCoursesByUsername();
+  //   try {
+  //     const { status, data } = await apis.courses.getCoursesByUsername();
 
-      if (isAPISuccess(status) && data) {
-        const liveCourseData = getLiveCoursesFromCourses(data);
-        const videoCourseData = getVideoCoursesFromCourses(data);
-        setLiveCourses(liveCourseData);
-        setVideoCourses(videoCourseData);
+  //     if (isAPISuccess(status) && data) {
+  //       const liveCourseData = getLiveCoursesFromCourses(data);
+  //       const videoCourseData = getVideoCoursesFromCourses(data);
+  //       setLiveCourses(liveCourseData);
+  //       setVideoCourses(videoCourseData);
 
-        if (liveCourseData && liveCourseData?.length > 0) {
-          setSelectedView('live');
-        } else if (videoCourseData && videoCourseData?.length > 0) {
-          setSelectedView('video');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load courses details');
-    }
+  //       if (liveCourseData && liveCourseData?.length > 0) {
+  //         setSelectedView('live');
+  //       } else if (videoCourseData && videoCourseData?.length > 0) {
+  //         setSelectedView('video');
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to load courses details');
+  //   }
 
-    setIsLoading(false);
-  }, []);
+  //   setIsLoading(false);
+  // }, []);
 
-  useEffect(() => {
-    fetchCreatorCourses();
-  }, [fetchCreatorCourses]);
+  // useEffect(() => {
+  //   fetchCreatorCourses();
+  // }, [fetchCreatorCourses]);
 
   const showMoreCourses = (e) => {
     preventDefaults(e);
@@ -93,29 +95,29 @@ const CoursesListView = ({ limit = 4 }) => {
 
   return (
     <div>
-      <Spin spinning={isLoading} tip="Fetching courses">
-        {(liveCourses?.length > 0 || videoCourses?.length > 0) && (
-          <Row gutter={[8, 16]}>
-            <Col xs={24}>
-              <Row justify="center">
-                <Col>
-                  <Radio.Group value={selectedView} buttonStyle="solid" onChange={handleCourseViewChanged}>
-                    <Radio.Button value="live" disabled={liveCourses.length === 0}>
-                      {' '}
-                      Live Courses{' '}
-                    </Radio.Button>
-                    <Radio.Button value="video" disabled={videoCourses.length === 0}>
-                      {' '}
-                      Video Courses{' '}
-                    </Radio.Button>
-                  </Radio.Group>
-                </Col>
-              </Row>
-            </Col>
-            <Col xs={24}>{renderCourseList(selectedView === 'live' ? liveCourses : videoCourses, true)}</Col>
-          </Row>
-        )}
-      </Spin>
+      {/* <Spin spinning={isLoading} tip="Fetching courses"> */}
+      {(liveCourses?.length > 0 || videoCourses?.length > 0) && (
+        <Row gutter={[8, 16]}>
+          <Col xs={24}>
+            <Row justify="center">
+              <Col>
+                <Radio.Group value={selectedView} buttonStyle="solid" onChange={handleCourseViewChanged}>
+                  <Radio.Button value="live" disabled={liveCourses.length === 0}>
+                    {' '}
+                    Live Courses{' '}
+                  </Radio.Button>
+                  <Radio.Button value="video" disabled={videoCourses.length === 0}>
+                    {' '}
+                    Video Courses{' '}
+                  </Radio.Button>
+                </Radio.Group>
+              </Col>
+            </Row>
+          </Col>
+          <Col xs={24}>{renderCourseList(selectedView === 'live' ? liveCourses : videoCourses, true)}</Col>
+        </Row>
+      )}
+      {/* </Spin> */}
       <DetailsDrawer
         visible={detailsDrawerVisible}
         onClose={handleDrawerClose}

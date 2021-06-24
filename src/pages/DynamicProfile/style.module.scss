@@ -8,8 +8,9 @@
 .editDynamicProfileButtonContainer {
   position: fixed;
   left : 20px;
-  bottom : 20px;
+  bottom : 50px;
   z-index : 30;
+  padding: 8px;
 
   .dynamicProfileButtons {
     border-radius: 50% !important;
