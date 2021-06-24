@@ -18,7 +18,6 @@ import {
 
 import apis from 'apis';
 
-import NewCreatorProfile from 'components/DynamicProfileComponents/NewCreatorProfile';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
@@ -33,6 +32,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
 
 const { Paragraph } = Typography;
 
@@ -400,31 +400,33 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   // TODO: Make new Creator Profile
   return (
-    <div>
-      <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
-        <Row gutter={8} justify="center">
-          <Col xs={24}>
-            <NewCreatorProfile creatorProfile={creatorProfileData} />
-          </Col>
-          <Col xs={24} className={styles.mb20}>
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable
-                isDropDisabled={!editingMode || previewMode}
-                droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
-              >
-                {(provided) => (
-                  <Row gutter={[8, 16]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
-                    {editingMode
-                      ? tempCreatorUIConfig?.map(renderDraggableCustomComponents)
-                      : creatorUIConfig.map(renderDraggableCustomComponents)}
-                    {provided.placeholder}
-                  </Row>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </Col>
-        </Row>
-      </Spin>
+    <>
+      <div className={styles.creatorProfilePage}>
+        <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
+          <Row gutter={8} justify="center">
+            <Col xs={24}>
+              <CreatorProfileComponent creatorProfile={creatorProfileData} isEditing={editingMode && !previewMode} />
+            </Col>
+            <Col xs={24} className={styles.mb20}>
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable
+                  isDropDisabled={!editingMode || previewMode}
+                  droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
+                >
+                  {(provided) => (
+                    <Row gutter={[8, 16]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
+                      {editingMode
+                        ? tempCreatorUIConfig?.map(renderDraggableCustomComponents)
+                        : creatorUIConfig.map(renderDraggableCustomComponents)}
+                      {provided.placeholder}
+                    </Row>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </Col>
+          </Row>
+        </Spin>
+      </div>
       {(editable || true) && (
         <div className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
@@ -478,33 +480,33 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         </div>
       )}
       {/* {editingMode && (
-        <Modal
-          visible={addComponentModalVisible}
-          title="Select a component to add"
-          centered={true}
-          footer={null}
-          width={420}
-          onCancel={() => setAddComponentModalVisible(false)}
-          afterClose={resetBodyStyle}
-        >
-          <Row gutter={[8, 8]}>
-            {Object.entries(componentsMap).map(([componentKey, componentOptions]) => (
-              <Col xs={24} sm={12} key={componentKey}>
-                <Button
-                  block
-                  type="text"
-                  icon={componentOptions.icon}
-                  disabled={getExistingComponentInstance(componentKey)}
-                  onClick={() => addComponent(componentKey, componentOptions.defaultProps)}
-                >
-                  {componentOptions.label}
-                </Button>
-              </Col>
-            ))}
-          </Row>
-        </Modal>
-      )} */}
-    </div>
+            <Modal
+              visible={addComponentModalVisible}
+              title="Select a component to add"
+              centered={true}
+              footer={null}
+              width={420}
+              onCancel={() => setAddComponentModalVisible(false)}
+              afterClose={resetBodyStyle}
+            >
+              <Row gutter={[8, 8]}>
+                {Object.entries(componentsMap).map(([componentKey, componentOptions]) => (
+                  <Col xs={24} sm={12} key={componentKey}>
+                    <Button
+                      block
+                      type="text"
+                      icon={componentOptions.icon}
+                      disabled={getExistingComponentInstance(componentKey)}
+                      onClick={() => addComponent(componentKey, componentOptions.defaultProps)}
+                    >
+                      {componentOptions.label}
+                    </Button>
+                  </Col>
+                ))}
+              </Row>
+            </Modal>
+          )} */}
+    </>
   );
 };
 

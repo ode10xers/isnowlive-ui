@@ -1,12 +1,14 @@
-@import '../../../styles/variables.scss';
+@import '../../../../styles/variables.scss';
 
 .creatorProfileWrapper {
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
+  position: relative;
 
   .coverImageWrapper {
     .coverImage {
       border-radius: 12px 12px 0 0;
+      max-height: 320px;
     }
   }
 
@@ -81,10 +83,10 @@
   }
 
   .socialIconWrapper {
+    @extend .bottomBorderRadius;
     background-color: map-get($map: $colors, $key: 'White');
     padding: 12px;
     text-align: center;
-    border-radius: 0 0 12px 12px;
 
     .socialIconsList {
       text-align: center;
@@ -96,4 +98,19 @@
       }
     }
   }
+}
+
+.bottomBorderRadius {
+  border-radius: 0 0 12px 12px;
+}
+
+.clickDisableOverlay {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
