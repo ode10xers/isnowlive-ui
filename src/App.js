@@ -215,7 +215,7 @@ function App() {
             />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
-            <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
@@ -246,7 +246,12 @@ function App() {
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
-            <RouteWithLayout layout={MobileLayout} exact path={Routes.root} component={NewHome} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={[Routes.root, Routes.sessions, Routes.videos, Routes.courses]}
+              component={NewHome}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
             <Route path={Routes.stripeAccountValidate}>
               <Redirect

@@ -86,7 +86,7 @@ const LiveStream = () => {
           // setTimeout is used for better user experince suggest by Rahul
           // setTimeout(() => {
           // if (isOnboarding) {
-          //   history.push(Routes.session);
+          //   history.push(Routes.sessionCreate);
           // } else {
           //   history.push(Routes.creatorDashboard.rootPath);
           // }
@@ -168,7 +168,7 @@ const LiveStream = () => {
         // setTimeout is used for better user experince suggest by Rahul
         // setTimeout(() => {
         //   if (isOnboarding) {
-        //     history.push(Routes.session);
+        //     history.push(Routes.sessionCreate);
         //   } else {
         //     history.push(Routes.creatorDashboard.rootPath);
         //   }
@@ -195,7 +195,7 @@ const LiveStream = () => {
           <Title>Setup Livestream</Title>
         </Typography>
 
-        {isOnboarding && <Link href={Routes.session}>Do it later</Link>}
+        {isOnboarding && <Link href={Routes.sessionCreate}>Do it later</Link>}
       </Space>
 
       <Section>

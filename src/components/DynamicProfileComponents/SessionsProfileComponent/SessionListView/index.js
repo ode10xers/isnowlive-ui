@@ -1,45 +1,23 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 
-import { Row, Col, Spin, Button, Typography } from 'antd';
-
-import apis from 'apis';
+import { Row, Col, Button, Typography } from 'antd';
 
 import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
 import SessionListCard from '../SessionListCard';
 
-import { isAPISuccess, preventDefaults } from 'utils/helper';
+import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const { Title } = Typography;
 
 // NOTE: The actual data that is shown here is inventories
-// TODO: Make this not show on viewing mode if sessions are empty
-// But still show up on editing mode
-const SessionListView = ({ limit = 4 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [sessions, setSessions] = useState([]);
+const SessionListView = ({ limit = 2, sessions = [] }) => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
 
-  const fetchUpcomingSessions = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.user.getSessionsByUsername('upcoming');
-
-      if (isAPISuccess(status) && data) {
-        setSessions(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    fetchUpcomingSessions();
-  }, [fetchUpcomingSessions]);
+  if (!sessions || !sessions.length) {
+    return null;
+  }
 
   const showMoreSessionCards = (e) => {
     preventDefaults(e);
@@ -61,24 +39,20 @@ const SessionListView = ({ limit = 4 }) => {
 
   return (
     <div>
-      <Spin spinning={isLoading} tip="Fetching sessions">
-        {sessions?.length > 0 && (
-          <Row gutter={[16, 16]}>
-            {sessions?.slice(0, limit).map(renderSessionCards)}
-            {sessions?.length > limit && (
-              <Col xs={24}>
-                <Row justify="center">
-                  <Col>
-                    <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreSessionCards}>
-                      MORE
-                    </Button>
-                  </Col>
-                </Row>
+      <Row gutter={[16, 16]}>
+        {sessions?.slice(0, limit).map(renderSessionCards)}
+        {sessions?.length > limit && (
+          <Col xs={24}>
+            <Row justify="center">
+              <Col>
+                <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreSessionCards}>
+                  MORE
+                </Button>
               </Col>
-            )}
-          </Row>
+            </Row>
+          </Col>
         )}
-      </Spin>
+      </Row>
       <DetailsDrawer
         visible={detailsDrawerVisible}
         onClose={handleDrawerClose}

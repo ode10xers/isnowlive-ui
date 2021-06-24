@@ -33,19 +33,36 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
+import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
 
 const { Paragraph } = Typography;
 
 // TODO: Define the Profile UI Configurations Sample Data here
 const sampleUIConfig = [
   {
-    key: 'OTHER_LINKS',
-    title: 'My other links',
-    values: null,
+    key: 'PRODUCTS',
+    title: '',
+    values: [
+      {
+        key: 'SESSIONS',
+        title: 'My Sessions',
+        values: null,
+      },
+      {
+        key: 'COURSES',
+        title: 'My Courses',
+        values: null,
+      },
+      {
+        key: 'VIDEOS',
+        title: 'My Videos',
+        values: null,
+      },
+    ],
   },
   {
-    key: 'COURSES',
-    title: 'My Courses',
+    key: 'OTHER_LINKS',
+    title: 'My other links',
     values: null,
   },
   {
@@ -54,20 +71,25 @@ const sampleUIConfig = [
     values: null,
   },
   {
-    key: 'SESSIONS',
-    title: 'My Sessions',
-    values: null,
-  },
-  {
     key: 'PASSES',
     title: 'My Passes',
     values: null,
   },
-  {
-    key: 'VIDEOS',
-    title: 'My Videos',
-    values: null,
-  },
+  // {
+  //   key: 'SESSIONS',
+  //   title: 'My Sessions',
+  //   values: null,
+  // },
+  // {
+  //   key: 'COURSES',
+  //   title: 'My Courses',
+  //   values: null,
+  // },
+  // {
+  //   key: 'VIDEOS',
+  //   title: 'My Videos',
+  //   values: null,
+  // },
   // {
   //   "key": "DONATIONS",
   //   "title": "Buy me a coffee!",
@@ -81,9 +103,19 @@ const sampleUIConfig = [
 ];
 
 const componentsMap = {
+  PRODUCTS: {
+    icon: <LikeOutlined />,
+    component: ProductsProfileComponent,
+    label: 'Products',
+    optional: false,
+    defaultProps: {
+      title: '',
+    },
+  },
   SESSIONS: {
     icon: <VideoCameraOutlined />,
     label: 'Sessions',
+    optional: false,
     component: SessionsProfileComponent,
     defaultProps: {
       title: 'SESSIONS',
@@ -92,30 +124,34 @@ const componentsMap = {
   VIDEOS: {
     icon: <PlayCircleOutlined />,
     label: 'Videos',
+    optional: false,
     component: VideoProfileComponent,
     defaultProps: {
       title: 'VIDEOS',
     },
   },
-  PASSES: {
-    icon: <LikeOutlined />,
-    label: 'Passes',
-    component: PassesProfileComponent,
-    defaultProps: {
-      title: 'CREDIT PASSES',
-    },
-  },
   COURSES: {
     icon: <BookOutlined />,
     label: 'Courses',
+    optional: false,
     component: CoursesProfileComponent,
     defaultProps: {
       title: 'COURSES',
     },
   },
+  PASSES: {
+    icon: <LikeOutlined />,
+    label: 'Passes',
+    optional: false,
+    component: PassesProfileComponent,
+    defaultProps: {
+      title: 'CREDIT PASSES',
+    },
+  },
   SUBSCRIPTIONS: {
     icon: <LikeOutlined />,
     label: 'Memberships',
+    optional: false,
     component: SubscriptionProfileComponent,
     defaultProps: {
       title: 'MEMBERSHIPS',
@@ -124,6 +160,7 @@ const componentsMap = {
   OTHER_LINKS: {
     icon: <LinkOutlined />,
     label: 'Other Links',
+    optional: true,
     component: OtherLinksProfileComponent,
     defaultProps: {
       title: 'OTHER LINKS',
@@ -371,6 +408,18 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   const renderDraggableCustomComponents = (component, idx) => {
     const RenderedComponent = componentsMap[component.key].component;
+
+    if (component.key === 'PRODUCTS') {
+      return (
+        <RenderedComponent
+          identifier={component.key}
+          isEditing={editingMode && !previewMode}
+          updateConfigHandler={updateComponentConfig}
+          title={component.title}
+          values={component.values}
+        />
+      );
+    }
 
     return (
       <Draggable
