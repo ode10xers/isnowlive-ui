@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, Typography } from 'antd';
+import { Card, Typography, Row, Col } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 
 import styles from './style.module.scss';
@@ -40,8 +40,13 @@ const CoursesProfileComponent = ({
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12, position: 'relative' }}
       >
-        <CoursesListView />
-        {isEditing && <div className={styles.clickDisableOverlay} />}
+        {isEditing ? (
+          <Row justify="center" align="middle">
+            <Col>Courses that you have published will be shown here</Col>
+          </Row>
+        ) : (
+          <CoursesListView />
+        )}
       </Card>
       {isEditing && <CoursesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
     </div>

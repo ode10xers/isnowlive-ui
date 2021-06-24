@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Typography } from 'antd';
+import { Card, Typography, Row, Col } from 'antd';
 import { PlayCircleTwoTone } from '@ant-design/icons';
 
 import VideoListView from './VideoListView';
@@ -24,8 +24,6 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Decide which approach to take, this one with overlay disabled
-// or the passes one where we change the content displayed
 const VideoProfileComponent = ({
   identifier = null,
   isEditing = false,
@@ -42,8 +40,13 @@ const VideoProfileComponent = ({
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12, position: 'relative' }}
       >
-        <VideoListView />
-        {isEditing && <div className={styles.clickDisableOverlay} />}
+        {isEditing ? (
+          <Row justify="center" align="middle">
+            <Col className={styles.textAlignCenter}>Uploaded videos that you have published will show up here</Col>
+          </Row>
+        ) : (
+          <VideoListView />
+        )}
       </Card>
       {isEditing && <VideoEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
     </div>

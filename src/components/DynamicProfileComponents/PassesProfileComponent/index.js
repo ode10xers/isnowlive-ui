@@ -28,7 +28,6 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Create Edit Overlays (for editing)
 const PassesProfileComponent = ({
   identifier = null,
   isEditing = false,

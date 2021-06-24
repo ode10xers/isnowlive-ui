@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Typography } from 'antd';
+import { Card, Typography, Row, Col } from 'antd';
 import { VideoCameraTwoTone } from '@ant-design/icons';
 
 import SessionListView from './SessionListView';
@@ -24,8 +24,6 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Decide which approach to take, this one with overlay disabled
-// or the passes one where we change the content displayed
 const SessionsProfileComponent = ({
   identifier = null,
   isEditing = false,
@@ -42,8 +40,13 @@ const SessionsProfileComponent = ({
         className={styles.profileComponentContainer}
         bodyStyle={{ padding: 12, position: 'relative' }}
       >
-        <SessionListView />
-        {isEditing && <div className={styles.clickDisableOverlay} />}
+        {isEditing ? (
+          <Row justify="center" align="middle">
+            <Col className={styles.textAlignCenter}>Upcoming sessions that are published will be shown here</Col>
+          </Row>
+        ) : (
+          <SessionListView />
+        )}
       </Card>
       {isEditing && <SessionEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
     </div>
