@@ -411,14 +411,15 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
     if (component.key === 'PRODUCTS') {
       return (
-        <RenderedComponent
-          key={component.key}
-          identifier={component.key}
-          isEditing={editingMode && !previewMode}
-          updateConfigHandler={updateComponentConfig}
-          title={component.title}
-          values={component.values}
-        />
+        <Col xs={24} key={component.key}>
+          <RenderedComponent
+            identifier={component.key}
+            isEditing={editingMode && !previewMode}
+            updateConfigHandler={updateComponentConfig}
+            title={component.title}
+            values={component.values}
+          />
+        </Col>
       );
     }
 

@@ -22,6 +22,7 @@ import VideoListView from '../VideosProfileComponent/VideoListView';
 import CoursesListView from '../CoursesProfileComponent/CoursesListView';
 
 import styles from './style.module.scss';
+import ProductsEditView from './ProductsEditView';
 
 const { Text } = Typography;
 
@@ -58,8 +59,6 @@ const menuKeyRouteMap = {
 };
 
 const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHandler, ...customComponentProps }) => {
-  // TODO: Implement the edit
-
   const { values: innerComponents } = customComponentProps;
 
   const history = useHistory();
@@ -69,6 +68,25 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
   const [sessions, setSessions] = useState([]);
   const [videos, setVideos] = useState([]);
   const [courses, setCourses] = useState([]);
+
+  const parseConfigValues = () => {
+    let parsedConfig = {};
+
+    innerComponents.forEach((component) => {
+      parsedConfig[component.key] = {
+        title: component.title,
+      };
+    });
+
+    return parsedConfig;
+  };
+
+  const saveEditChanges = (values) => {
+    updateConfigHandler(identifier, {
+      title: '',
+      values: Object.entries(values).map(([key, data]) => ({ key, value: null, title: data.title })),
+    });
+  };
 
   const fetchUpcomingSessions = useCallback(async () => {
     try {
@@ -123,7 +141,6 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
   }, [fetchUpcomingSessions, fetchCreatorVideos, fetchCreatorCourses]);
 
   const handleMenuClick = (e) => {
-    console.log(e);
     history.push(menuKeyRouteMap[e.key]);
     window.scrollTo({
       top: 0,
@@ -236,6 +253,7 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
           </Route>
         </Switch>
       </Spin>
+      {isEditing && <ProductsEditView updateHandler={saveEditChanges} configValues={parseConfigValues()} />}
       {/* TODO: Handle highlighting */}
       {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
         <Menu
