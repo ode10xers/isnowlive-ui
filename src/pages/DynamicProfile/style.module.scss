@@ -9,9 +9,13 @@
 .editDynamicProfileButtonContainer {
   position: fixed;
   left : 20px;
-  bottom : 50px;
+  bottom : 20px;
   z-index : 30;
   padding: 8px;
+
+  @media screen and (max-width: 576px) {
+    bottom : 50px;
+  }
 
   .dynamicProfileButtons {
     border-radius: 50% !important;

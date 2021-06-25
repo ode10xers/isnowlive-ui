@@ -28,10 +28,12 @@ const OtherLinksProfileComponent = ({
   identifier = null,
   isEditing = false,
   updateConfigHandler,
+  removeComponentHandler,
   ...customComponentProps
 }) => {
   // TODO: Adjust this method since the actual form names and the data stored in API is different
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
+  const deleteComponent = () => removeComponentHandler(identifier);
 
   return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && !isEditing ? null : (
     <div className={styles.p10}>
@@ -49,7 +51,13 @@ const OtherLinksProfileComponent = ({
           <OtherLinksListView links={customComponentProps?.values ?? []} />
         )}
       </Card>
-      {isEditing && <OtherLinksEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
+      {isEditing && (
+        <OtherLinksEditView
+          configValues={customComponentProps}
+          deleteHandler={deleteComponent}
+          updateHandler={saveEditChanges}
+        />
+      )}
     </div>
   );
 };

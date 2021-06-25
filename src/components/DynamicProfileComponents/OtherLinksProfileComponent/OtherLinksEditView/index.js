@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import { Modal, Row, Col, Input, Button, Form, Typography } from 'antd';
-import { EditOutlined, MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { EditOutlined, MinusCircleOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
 
@@ -15,9 +15,9 @@ const formInitialValues = {
   values: [],
 };
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
-const OtherLinksEditView = ({ configValues, updateHandler }) => {
+const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -36,6 +36,27 @@ const OtherLinksEditView = ({ configValues, updateHandler }) => {
   const handleEditComponentClicked = (e) => {
     preventDefaults(e);
     setEditModalVisible(true);
+  };
+
+  const handleDeleteComponentClicked = (e) => {
+    preventDefaults(e);
+
+    Modal.confirm({
+      closable: true,
+      centered: true,
+      mask: true,
+      maskClosable: false,
+      title: 'Delete this component?',
+      content: <Paragraph>Are you sure you want to remove this component?</Paragraph>,
+      okText: 'Yes, remove it',
+      okButtonProps: {
+        danger: true,
+        type: 'primary',
+      },
+      cancelText: 'Cancel',
+      onOk: () => deleteHandler(),
+      afterClose: resetBodyStyle,
+    });
   };
 
   const cancelEditChanges = (e) => {
@@ -57,6 +78,11 @@ const OtherLinksEditView = ({ configValues, updateHandler }) => {
         <Col xs={12} className={styles.editViewButtonContainer}>
           <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
             <EditOutlined />
+          </button>
+        </Col>
+        <Col xs={12} className={styles.editViewButtonContainer}>
+          <button className={styles.deleteComponentButton} onClick={handleDeleteComponentClicked}>
+            <DeleteOutlined />
           </button>
         </Col>
       </Row>

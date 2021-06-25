@@ -14,11 +14,12 @@ import {
   EyeInvisibleOutlined,
   PlayCircleOutlined,
   LinkOutlined,
+  PlusCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
@@ -172,7 +173,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
-  // const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
+  const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState([]);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
@@ -217,40 +218,40 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   //#region Start Of Page Edit Button Handlers
 
-  // const getExistingComponentInstance = (identifier) => {
-  //   const currentComponentsList = tempCreatorUIConfig.components;
-  //   const duplicateComponent = currentComponentsList.find((component) => component.key === identifier);
+  const getExistingComponentInstance = (identifier) => {
+    const currentComponentsList = tempCreatorUIConfig.components;
+    const duplicateComponent = currentComponentsList.find((component) => component.key === identifier);
 
-  //   return duplicateComponent;
-  // };
+    return duplicateComponent;
+  };
 
-  // const addComponent = (identifier = null, props) => {
-  //   if (!identifier) {
-  //     showErrorModal('Invalid component identifier!');
-  //     return;
-  //   }
+  const addComponent = (identifier = null, props) => {
+    if (!identifier) {
+      showErrorModal('Invalid component identifier!');
+      return;
+    }
 
-  //   const existingComponentInstance = getExistingComponentInstance(identifier);
+    const existingComponentInstance = getExistingComponentInstance(identifier);
 
-  //   if (existingComponentInstance) {
-  //     showErrorModal('Duplicate of this component already exists!');
-  //     return;
-  //   }
+    if (existingComponentInstance) {
+      showErrorModal('Duplicate of this component already exists!');
+      return;
+    }
 
-  //   const currentComponentsList = deepCloneObject(tempCreatorUIConfig).components || [];
-  //   currentComponentsList.push({
-  //     key: identifier,
-  //     props: props,
-  //   });
+    const currentComponentsList = deepCloneObject(tempCreatorUIConfig).components || [];
+    currentComponentsList.push({
+      key: identifier,
+      props: props,
+    });
 
-  //   setTempCreatorUIConfig({
-  //     ...tempCreatorUIConfig,
-  //     components: currentComponentsList,
-  //   });
-  //   setUiConfigChanged(false);
-  //   setAddComponentModalVisible(false);
-  //   showSuccessModal('Component added', `Make sure to save so you don't lose the changes`);
-  // };
+    setTempCreatorUIConfig({
+      ...tempCreatorUIConfig,
+      components: currentComponentsList,
+    });
+    setUiConfigChanged(false);
+    setAddComponentModalVisible(false);
+    showSuccessModal('Component added', `Make sure to save so you don't lose the changes`);
+  };
 
   const disableEditingMode = () => {
     setTempCreatorUIConfig([]);
@@ -313,10 +314,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
   };
 
-  // const handleAddComponentDynamicProfileButtonClicked = (e) => {
-  //   preventDefaults(e);
-  //   setAddComponentModalVisible(true);
-  // };
+  const handleAddComponentDynamicProfileButtonClicked = (e) => {
+    preventDefaults(e);
+    setAddComponentModalVisible(true);
+  };
 
   //#endregion End of Page Edit Button Handlers
 
@@ -352,26 +353,29 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setUiConfigChanged(true);
   };
 
-  // const removeComponent = (identifier = null) => {
-  //   if (!identifier) {
-  //     showErrorModal('Invalid identifier passed');
-  //     return;
-  //   }
+  const removeComponent = (identifier = null) => {
+    if (!identifier) {
+      showErrorModal('Invalid identifier passed');
+      return;
+    }
 
-  //   const tempConfigComponents = tempCreatorUIConfig.components;
-  //   const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
+    // TODO: Check for optional flag in componentMap
+    // if not optional, cannot be removed
 
-  //   if (targetIndex === -1) {
-  //     showErrorModal(`Component with identifier ${identifier} not found!`);
-  //     return;
-  //   }
+    const tempConfigComponents = tempCreatorUIConfig.components;
+    const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
 
-  //   tempConfigComponents.splice(targetIndex, 1);
-  //   setTempCreatorUIConfig({
-  //     ...tempCreatorUIConfig,
-  //     components: tempConfigComponents,
-  //   });
-  // };
+    if (targetIndex === -1) {
+      showErrorModal(`Component with identifier ${identifier} not found!`);
+      return;
+    }
+
+    tempConfigComponents.splice(targetIndex, 1);
+    setTempCreatorUIConfig({
+      ...tempCreatorUIConfig,
+      components: tempConfigComponents,
+    });
+  };
 
   //#endregion End Of Component Edit View Handlers
 
@@ -423,6 +427,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               identifier={component.key}
               isEditing={editingMode && !previewMode}
               updateConfigHandler={updateComponentConfig}
+              removeConfigHandler={removeComponent}
               // TODO: Try to handle this later when more customization is needed
               title={component.title}
               values={component.values}
@@ -435,7 +440,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   //#endregion End Of Drag and Drop Handlers
 
-  // TODO: Make new Creator Profile
   return (
     <>
       <div className={styles.creatorProfilePage}>
@@ -481,6 +485,16 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                     icon={previewMode ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                     onClick={handleTogglePreviewMode}
                   />
+                  {!previewMode && (
+                    <Button
+                      className={classNames(styles.dynamicProfileButtons, styles.blueBtn)}
+                      type="primary"
+                      shape="round"
+                      size="large"
+                      icon={<PlusCircleOutlined />}
+                      onClick={handleAddComponentDynamicProfileButtonClicked}
+                    />
+                  )}
                 </Space>
               </Col>
               <Col xs={24}>
@@ -516,33 +530,35 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           )}
         </div>
       )}
-      {/* {editingMode && (
-            <Modal
-              visible={addComponentModalVisible}
-              title="Select a component to add"
-              centered={true}
-              footer={null}
-              width={420}
-              onCancel={() => setAddComponentModalVisible(false)}
-              afterClose={resetBodyStyle}
-            >
-              <Row gutter={[8, 8]}>
-                {Object.entries(componentsMap).map(([componentKey, componentOptions]) => (
-                  <Col xs={24} sm={12} key={componentKey}>
-                    <Button
-                      block
-                      type="text"
-                      icon={componentOptions.icon}
-                      disabled={getExistingComponentInstance(componentKey)}
-                      onClick={() => addComponent(componentKey, componentOptions.defaultProps)}
-                    >
-                      {componentOptions.label}
-                    </Button>
-                  </Col>
-                ))}
-              </Row>
-            </Modal>
-          )} */}
+      {editingMode && (
+        <Modal
+          visible={addComponentModalVisible}
+          title="Select a component to add"
+          centered={true}
+          footer={null}
+          width={420}
+          onCancel={() => setAddComponentModalVisible(false)}
+          afterClose={resetBodyStyle}
+        >
+          <Row gutter={[8, 8]}>
+            {Object.entries(componentsMap).map(([componentKey, componentOptions]) =>
+              componentOptions.optional ? (
+                <Col xs={24} sm={12} key={componentKey}>
+                  <Button
+                    block
+                    type="text"
+                    icon={componentOptions.icon}
+                    disabled={getExistingComponentInstance(componentKey)}
+                    onClick={() => addComponent(componentKey, componentOptions.defaultProps)}
+                  >
+                    {componentOptions.label}
+                  </Button>
+                </Col>
+              ) : null
+            )}
+          </Row>
+        </Modal>
+      )}
     </>
   );
 };

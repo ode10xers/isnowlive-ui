@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Route, Switch, Redirect, useHistory, useRouteMatch } from 'react-router-dom';
 
 import { Spin, Typography, Row, Col, Card, Menu } from 'antd';
 import {
@@ -224,37 +224,6 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
 
   return (
     <div className={styles.p10}>
-      <Spin spinning={isLoading} tip="Fetching data...">
-        <Switch>
-          {sessions.length > 0 && (
-            <Route exact path={Routes.sessions}>
-              {sessionsComponent}
-            </Route>
-          )}
-          {videos.length > 0 && (
-            <Route exact path={Routes.videos}>
-              {videosComponent}
-            </Route>
-          )}
-          {courses.length > 0 && (
-            <Route exact path={Routes.courses}>
-              {coursesComponent}
-            </Route>
-          )}
-          {/* Default Path */}
-          <Route exact path={Routes.root}>
-            {sessions.length > 0
-              ? sessionsComponent
-              : videos.length > 0
-              ? videosComponent
-              : courses.length > 0
-              ? coursesComponent
-              : null}
-          </Route>
-        </Switch>
-      </Spin>
-      {isEditing && <ProductsEditView updateHandler={saveEditChanges} configValues={parseConfigValues()} />}
-      {/* TODO: Handle highlighting */}
       {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
         <Menu
           onClick={handleMenuClick}
@@ -279,6 +248,30 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
           )}
         </Menu>
       )}
+      <Spin spinning={isLoading} tip="Fetching data...">
+        <Switch>
+          <Route exact path={Routes.sessions}>
+            {sessions.length > 0 ? sessionsComponent : isLoading ? null : <Redirect to={Routes.root} />}
+          </Route>
+          <Route exact path={Routes.videos}>
+            {videos.length > 0 ? videosComponent : isLoading ? null : <Redirect to={Routes.root} />}
+          </Route>
+          <Route exact path={Routes.courses}>
+            {courses.length > 0 ? coursesComponent : isLoading ? null : <Redirect to={Routes.root} />}
+          </Route>
+          {/* Default Path */}
+          <Route exact path={Routes.root}>
+            {sessions.length > 0
+              ? sessionsComponent
+              : videos.length > 0
+              ? videosComponent
+              : courses.length > 0
+              ? coursesComponent
+              : null}
+          </Route>
+        </Switch>
+      </Spin>
+      {isEditing && <ProductsEditView updateHandler={saveEditChanges} configValues={parseConfigValues()} />}
     </div>
   );
 };
