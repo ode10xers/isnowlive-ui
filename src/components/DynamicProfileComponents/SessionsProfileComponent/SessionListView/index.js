@@ -1,33 +1,36 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { Row, Col, Button, Typography } from 'antd';
+import { Row, Col, Button } from 'antd';
 
-import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
+// import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
 import SessionListCard from '../SessionListCard';
 
-import { preventDefaults } from 'utils/helper';
+// import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
+import Routes from 'routes';
 
-const { Title } = Typography;
+// const { Title } = Typography;
 
 // NOTE: The actual data that is shown here is inventories
 const SessionListView = ({ limit = 2, sessions = [] }) => {
-  const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
+  const history = useHistory();
+  // const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
 
   if (!sessions || !sessions.length) {
     return null;
   }
 
-  const showMoreSessionCards = (e) => {
-    preventDefaults(e);
-    setDetailsDrawerVisible(true);
-  };
+  // const showMoreSessionCards = (e) => {
+  //   preventDefaults(e);
+  //   setDetailsDrawerVisible(true);
+  // };
 
-  const handleDrawerClose = (e) => {
-    preventDefaults(e);
-    setDetailsDrawerVisible(false);
-  };
+  // const handleDrawerClose = (e) => {
+  //   preventDefaults(e);
+  //   setDetailsDrawerVisible(false);
+  // };
 
   const renderSessionCards = (session) => {
     return (
@@ -45,7 +48,12 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
           <Col xs={24}>
             <Row justify="center">
               <Col>
-                <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreSessionCards}>
+                <Button
+                  className={styles.moreButton}
+                  type="primary"
+                  size="large"
+                  onClick={() => history.push(Routes.list.sessions)}
+                >
                   MORE
                 </Button>
               </Col>
@@ -53,7 +61,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
           </Col>
         )}
       </Row>
-      <DetailsDrawer
+      {/* <DetailsDrawer
         visible={detailsDrawerVisible}
         onClose={handleDrawerClose}
         title={<Title level={4}> More Sessions </Title>}
@@ -61,7 +69,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
         <Row gutter={[16, 16]} className={styles.mb50}>
           {sessions.slice(0, limit * 5).map(renderSessionCards)}
         </Row>
-      </DetailsDrawer>
+      </DetailsDrawer> */}
     </div>
   );
 };
