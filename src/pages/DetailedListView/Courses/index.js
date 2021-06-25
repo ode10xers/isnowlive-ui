@@ -106,8 +106,13 @@ const CourseDetailedListView = ({ history }) => {
                 </Row>
               </div>
             </Affix>
+
             <Row className={styles.mt30} gutter={[8, 16]}>
-              {getCoursesFromSelectedType().map(renderCourseItems)}
+              {getCoursesFromSelectedType().length > 0 ? (
+                getCoursesFromSelectedType().map(renderCourseItems)
+              ) : (
+                <Empty className={styles.w100} description="No courses matches that filter" />
+              )}
             </Row>
           </>
         ) : (
