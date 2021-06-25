@@ -3,7 +3,8 @@ import React from 'react';
 import { Card, Typography, Image, Row, Col, Tag, Space, Divider } from 'antd';
 
 import dateUtil from 'utils/date';
-import { courseType, isValidFile } from 'utils/helper';
+import { courseType, isValidFile, preventDefaults } from 'utils/helper';
+import { redirectToCoursesPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -87,8 +88,13 @@ const CourseListItem = ({ course }) => {
     </Row>
   );
 
+  const handleCardClicked = (e) => {
+    preventDefaults(e);
+    redirectToCoursesPage(course);
+  };
+
   return (
-    <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }}>
+    <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
       <Row>
         <Col xs={24}>{courseName}</Col>
         <Col xs={24}>{courseContents}</Col>

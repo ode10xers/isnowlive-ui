@@ -5,7 +5,8 @@ import { Card, Space, Tag, Typography, Image, Divider, Row, Col } from 'antd';
 import { ClockCircleOutlined, HourglassOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
-import { isValidFile } from 'utils/helper';
+import { isValidFile, preventDefaults } from 'utils/helper';
+import { redirectToInventoryPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -70,8 +71,18 @@ const SessionListCard = ({ session }) => {
     </Space>
   );
 
+  const handleCardClicked = (e) => {
+    preventDefaults(e);
+    redirectToInventoryPage(session);
+  };
+
   return (
-    <Card className={styles.sessionListCard} cover={sessionImage} bodyStyle={{ padding: 0 }}>
+    <Card
+      className={styles.sessionListCard}
+      cover={sessionImage}
+      bodyStyle={{ padding: 0 }}
+      onClick={handleCardClicked}
+    >
       <Row>
         <Col xs={24}>{sessionTitle}</Col>
         <Col xs={24}>{bottomCardBar}</Col>

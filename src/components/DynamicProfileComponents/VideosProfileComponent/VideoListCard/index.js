@@ -4,7 +4,8 @@ import { Card, Space, Typography, Image, Row, Col } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
-import { isValidFile } from 'utils/helper';
+import { isValidFile, preventDefaults } from 'utils/helper';
+import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -63,8 +64,13 @@ const VideoListCard = ({ video }) => {
     </Row>
   );
 
+  const handleCardClicked = (e) => {
+    preventDefaults(e);
+    redirectToVideosPage(video);
+  };
+
   return (
-    <Card className={styles.videoListCard} cover={videoImage} bodyStyle={{ padding: 0 }}>
+    <Card className={styles.videoListCard} cover={videoImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
       <Row>
         <Col xs={24}>{videoTitle}</Col>
         <Col xs={24}>{bottomCardBar}</Col>
