@@ -61,11 +61,6 @@ const sampleUIConfig = [
     ],
   },
   {
-    key: 'OTHER_LINKS',
-    title: 'My other links',
-    values: null,
-  },
-  {
     key: 'SUBSCRIPTIONS',
     title: 'My Memberships',
     values: null,
@@ -75,32 +70,23 @@ const sampleUIConfig = [
     title: 'My Passes',
     values: null,
   },
-  // {
-  //   key: 'SESSIONS',
-  //   title: 'My Sessions',
-  //   values: null,
-  // },
-  // {
-  //   key: 'COURSES',
-  //   title: 'My Courses',
-  //   values: null,
-  // },
-  // {
-  //   key: 'VIDEOS',
-  //   title: 'My Videos',
-  //   values: null,
-  // },
-  // {
-  //   "key": "DONATIONS",
-  //   "title": "Buy me a coffee!",
-  //   "values": [
-  //     5,
-  //     10,
-  //     15,
-  //     20
-  //   ]
-  // },
+  {
+    key: 'OTHER_LINKS',
+    title: 'My other links',
+    values: null,
+  },
 ];
+
+// {
+//   "key": "DONATIONS",
+//   "title": "Buy me a coffee!",
+//   "values": [
+//     5,
+//     10,
+//     15,
+//     20
+//   ]
+// },
 
 const componentsMap = {
   PRODUCTS: {

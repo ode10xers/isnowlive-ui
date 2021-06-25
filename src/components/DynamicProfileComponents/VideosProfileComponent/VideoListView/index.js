@@ -1,30 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { Row, Col, Button, Typography } from 'antd';
+import { Row, Col, Button } from 'antd';
 
-import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
+// import DetailsDrawer from 'components/DynamicProfileComponents/DetailsDrawer';
 import VideoListCard from '../VideoListCard';
 
-import { preventDefaults } from 'utils/helper';
+// import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
+import Routes from 'routes';
 
-const { Title } = Typography;
+// const { Title } = Typography;
 
 // TODO: Make this not show on viewing mode if videos are empty
 // But still show up on editing mode
 const VideoListView = ({ limit = 2, videos = [] }) => {
-  const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
+  const history = useHistory();
+  // const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
 
-  const showMoreVideoCards = (e) => {
-    preventDefaults(e);
-    setDetailsDrawerVisible(true);
-  };
+  // const showMoreVideoCards = (e) => {
+  //   preventDefaults(e);
+  //   setDetailsDrawerVisible(true);
+  // };
 
-  const handleDrawerClose = (e) => {
-    preventDefaults(e);
-    setDetailsDrawerVisible(false);
-  };
+  // const handleDrawerClose = (e) => {
+  //   preventDefaults(e);
+  //   setDetailsDrawerVisible(false);
+  // };
 
   const renderVideoCards = (video, restrictedWidth = true) => {
     return restrictedWidth ? (
@@ -47,7 +50,13 @@ const VideoListView = ({ limit = 2, videos = [] }) => {
             <Col xs={24}>
               <Row justify="center">
                 <Col>
-                  <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreVideoCards}>
+                  {/* <Button className={styles.moreButton} type="primary" size="large" onClick={showMoreVideoCards}> */}
+                  <Button
+                    className={styles.moreButton}
+                    type="primary"
+                    size="large"
+                    onClick={() => history.push(Routes.list.videos)}
+                  >
                     MORE
                   </Button>
                 </Col>
@@ -56,7 +65,7 @@ const VideoListView = ({ limit = 2, videos = [] }) => {
           )}
         </Row>
       )}
-      <DetailsDrawer
+      {/* <DetailsDrawer
         visible={detailsDrawerVisible}
         onClose={handleDrawerClose}
         title={<Title level={4}> More Videos </Title>}
@@ -64,7 +73,7 @@ const VideoListView = ({ limit = 2, videos = [] }) => {
         <Row gutter={[16, 16]} className={styles.mb50}>
           {videos.slice(0, limit * 5).map((video) => renderVideoCards(video, false))}
         </Row>
-      </DetailsDrawer>
+      </DetailsDrawer> */}
     </div>
   );
 };

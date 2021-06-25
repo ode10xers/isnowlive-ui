@@ -48,6 +48,7 @@ import { storeCreatorDetailsToLS } from 'utils/storage';
 import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
 import MobileLayout from 'layouts/MobileLayout';
 import NewHome from 'pages/NewHome';
+import VideoDetailedListView from 'pages/DetailedListView/Videos';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -246,6 +247,7 @@ function App() {
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
+            <RouteWithLayout layout={MobileLayout} exact path={Routes.list.videos} component={VideoDetailedListView} />
             <RouteWithLayout
               layout={MobileLayout}
               exact
