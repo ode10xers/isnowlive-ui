@@ -68,7 +68,16 @@ const VideoDetailedListView = ({ history }) => {
             </Row>
           </>
         ) : (
-          <Empty className={styles.w100} description="No videos found for creator" />
+          <Empty className={styles.w100} description="No videos found for creator">
+            <Button
+              className={styles.blueText}
+              size="large"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => history.push(Routes.root)}
+            >
+              Back to home
+            </Button>
+          </Empty>
         )}
       </Spin>
     </div>

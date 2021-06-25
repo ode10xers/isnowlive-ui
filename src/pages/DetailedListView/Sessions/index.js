@@ -136,11 +136,24 @@ const SessionDetailedListView = ({ history }) => {
               </div>
             </Affix>
             <Row className={styles.mt30} gutter={[16, 16]}>
-              {filteredByDateSessions.map(renderSessionDateList)}
+              {filteredByDateSessions.length > 0 ? (
+                filteredByDateSessions.map(renderSessionDateList)
+              ) : (
+                <Empty className={styles.w100} description="No sessions found starting from that date" />
+              )}
             </Row>
           </>
         ) : (
-          <Empty className={styles.w100} description="No sessions found for creator" />
+          <Empty className={styles.w100} description="No sessions found for creator">
+            <Button
+              className={styles.blueText}
+              size="large"
+              icon={<ArrowLeftOutlined />}
+              onClick={() => history.push(Routes.root)}
+            >
+              Back to home
+            </Button>
+          </Empty>
         )}
       </Spin>
     </div>
