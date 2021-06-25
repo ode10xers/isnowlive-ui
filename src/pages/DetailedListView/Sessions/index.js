@@ -110,7 +110,7 @@ const SessionDetailedListView = ({ history }) => {
           <>
             <Affix offsetTop={80}>
               <Row gutter={8} className={styles.stickyHeader}>
-                <Col xs={4}>
+                <Col xs={4} md={2}>
                   <Button
                     className={styles.blueText}
                     size="large"
@@ -118,7 +118,7 @@ const SessionDetailedListView = ({ history }) => {
                     onClick={handleBackClicked}
                   />
                 </Col>
-                <Col xs={20}>
+                <Col xs={20} md={22}>
                   <DatePicker
                     size="large"
                     inputReadOnly={true}
