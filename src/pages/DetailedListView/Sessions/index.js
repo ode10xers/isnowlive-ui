@@ -5,6 +5,7 @@ import { Row, Col, Spin, Empty, Button, Affix, Space, Typography, DatePicker, me
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
@@ -48,7 +49,7 @@ const SessionDetailedListView = ({ history }) => {
     fetchUpcomingSessions();
   }, [fetchUpcomingSessions]);
 
-  const handleBackClicked = () => history.goBack();
+  const handleBackClicked = () => history.push(Routes.sessions);
 
   const filteredByDateSessions = useMemo(() => {
     let filteredByDate = [];
@@ -108,29 +109,31 @@ const SessionDetailedListView = ({ history }) => {
       <Spin size="large" spinning={isLoading} tip="Fetching creator sessions...">
         {sessions.length > 0 ? (
           <>
-            <Affix offsetTop={80}>
-              <Row gutter={8} className={styles.stickyHeader}>
-                <Col xs={4} md={2}>
-                  <Button
-                    className={styles.blueText}
-                    size="large"
-                    icon={<ArrowLeftOutlined />}
-                    onClick={handleBackClicked}
-                  />
-                </Col>
-                <Col xs={20} md={22}>
-                  <DatePicker
-                    size="large"
-                    inputReadOnly={true}
-                    allowClear={false}
-                    className={styles.sessionDatePicker}
-                    value={selectedDatePickerDate}
-                    format="ddd, DD MMM YYYY"
-                    disabledDate={handleDisabledDate}
-                    onChange={handleChangeDate}
-                  />
-                </Col>
-              </Row>
+            <Affix offsetTop={60}>
+              <div className={styles.stickyHeader}>
+                <Row gutter={8}>
+                  <Col xs={4} md={2}>
+                    <Button
+                      className={styles.blueText}
+                      size="large"
+                      icon={<ArrowLeftOutlined />}
+                      onClick={handleBackClicked}
+                    />
+                  </Col>
+                  <Col xs={20} md={22}>
+                    <DatePicker
+                      size="large"
+                      inputReadOnly={true}
+                      allowClear={false}
+                      className={styles.sessionDatePicker}
+                      value={selectedDatePickerDate}
+                      format="ddd, DD MMM YYYY"
+                      disabledDate={handleDisabledDate}
+                      onChange={handleChangeDate}
+                    />
+                  </Col>
+                </Row>
+              </div>
             </Affix>
             <Row className={styles.mt30} gutter={[16, 16]} justify="center">
               {filteredByDateSessions.map(renderSessionDateList)}

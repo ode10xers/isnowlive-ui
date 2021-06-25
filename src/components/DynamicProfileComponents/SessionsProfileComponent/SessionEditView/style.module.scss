@@ -14,9 +14,3 @@
   color: map-get($map: $colors, $key: 'White');
   cursor: pointer;
 }
-
-.deleteComponentButton {
-  @extend .editComponentButton;
-  background-color: map-get($map: $colors, $key: 'SunsetOrange');
-  border: 1px solid map-get($map: $colors, $key: 'SunsetOrange');
-}

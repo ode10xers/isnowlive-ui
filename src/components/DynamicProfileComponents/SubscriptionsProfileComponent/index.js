@@ -30,6 +30,7 @@ const SubscriptionProfileComponent = ({
   identifier = null,
   isEditing = false,
   updateConfigHandler,
+  removeComponentHandler,
   ...customComponentProps
 }) => {
   const [isLoading, setIsLoading] = useState(false);

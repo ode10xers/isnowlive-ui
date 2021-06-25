@@ -67,13 +67,11 @@ const SessionListCard = ({ session }) => {
       className={styles.cardFooter}
     >
       <Text className={styles.footerText}>
-        {' '}
-        <HourglassOutlined className={styles.textIcons} />{' '}
-        {getTimeDiff(session?.end_time, session?.start_time, 'minutes')} mins{' '}
+        <HourglassOutlined className={styles.textIcons} />
+        {getTimeDiff(session?.end_time, session?.start_time, 'minutes')} mins
       </Text>
       <Text className={styles.footerText}>
-        {' '}
-        <ClockCircleOutlined className={styles.textIcons} /> {toShortTimeWithPeriod(session?.start_time)}{' '}
+        <ClockCircleOutlined className={styles.textIcons} /> {toShortTimeWithPeriod(session?.start_time)}
       </Text>
       <Text className={styles.priceText}> {renderSessionPrice()} </Text>
     </Space>

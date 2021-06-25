@@ -32,6 +32,7 @@ const PassesProfileComponent = ({
   identifier = null,
   isEditing = false,
   updateConfigHandler,
+  removeComponentHandler,
   ...customComponentProps
 }) => {
   const [passes, setPasses] = useState([]);

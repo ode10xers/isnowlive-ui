@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Spin, Empty, Button, Affix, Space, Typography, message } from 'antd';
-import { LeftOutlined } from '@ant-design/icons';
+import { Row, Col, Spin, Empty, Button, message } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
@@ -11,7 +12,7 @@ import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Text } = Typography;
+// const { Text } = Typography;
 
 // TODO: Consider adding virtualized scroll later
 // See react-infinite-load or react-virtualized
@@ -46,19 +47,22 @@ const VideoDetailedListView = ({ history }) => {
     </Col>
   );
 
-  const handleBackClicked = () => history.goBack();
+  const handleBackClicked = () => history.push(Routes.videos);
 
   return (
     <div className={styles.p10}>
       <Spin size="large" spinning={isLoading} tip="Fetching creator videos...">
         {videos.length > 0 ? (
           <>
-            <Affix offsetTop={80}>
+            {/* <Affix offsetTop={80}>
               <Space className={styles.stickyHeader}>
-                <Button icon={<LeftOutlined />} onClick={handleBackClicked} />
+                <Button icon={<ArrowLeftOutlined />} onClick={handleBackClicked} />
                 <Text> Can put filters here </Text>
               </Space>
-            </Affix>
+            </Affix> */}
+            <Button size="large" className={styles.blueText} icon={<ArrowLeftOutlined />} onClick={handleBackClicked}>
+              Back
+            </Button>
             <Row className={styles.mt30} gutter={[8, 16]} justify="center">
               {videos.map(renderVideoCards)}
             </Row>
