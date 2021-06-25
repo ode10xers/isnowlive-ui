@@ -1,9 +1,10 @@
 import React from 'react';
 
-import { Card, Typography, Image, Row, Col, Space, Divider } from 'antd';
+import { Card, Typography, Image, Row, Col, Tag, Space, Divider } from 'antd';
 
 import dateUtil from 'utils/date';
-import { courseType, isValidFile } from 'utils/helper';
+import { courseType, isValidFile, preventDefaults } from 'utils/helper';
+import { redirectToCoursesPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
@@ -15,13 +16,23 @@ const {
 const { Text, Title } = Typography;
 
 const CourseListItem = ({ course }) => {
+  const extraTags = (
+    <Space>
+      {course.type === courseType.MIXED && <Tag color="green"> Live Course </Tag>}
+      {course.type !== courseType.MIXED && <Tag color="cyan"> Video Course </Tag>}
+    </Space>
+  );
+
   const courseImage = (
-    <div className={styles.courseImageContainer}>
-      <Image
-        preview={false}
-        className={styles.courseImage}
-        src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
-      />
+    <div className={styles.courseCoverContainer}>
+      <div className={styles.extraTagsContainer}> {extraTags} </div>
+      <div className={styles.courseImageContainer}>
+        <Image
+          preview={false}
+          className={styles.courseImage}
+          src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
+        />
+      </div>
     </div>
   );
 
@@ -77,8 +88,13 @@ const CourseListItem = ({ course }) => {
     </Row>
   );
 
+  const handleCardClicked = (e) => {
+    preventDefaults(e);
+    redirectToCoursesPage(course);
+  };
+
   return (
-    <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }}>
+    <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
       <Row>
         <Col xs={24}>{courseName}</Col>
         <Col xs={24}>{courseContents}</Col>

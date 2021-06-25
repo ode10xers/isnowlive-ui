@@ -17,8 +17,10 @@ $card-border-radius : 8px;
     }
 
     .sessionImageContainer {
+      text-align: center;
+      
       .sessionImage {
-        border-radius: 8px 8px 0 0;
+        border-radius: $card-border-radius $card-border-radius 0 0;
         object-fit: scale-down;
         height: 100%;
       }
