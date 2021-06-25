@@ -40,6 +40,8 @@ const Routes = {
     manageSessions: '/manage/sessions',
     createSessions: '/manage/session',
     updateSessions: '/manage/session/:id/edit',
+    updateCourse: '/courses/:id/edit',
+    createCourse: '/courses/new',
     livestream: '/livestream',
     coupons: '/coupons',
     documents: '/documents',

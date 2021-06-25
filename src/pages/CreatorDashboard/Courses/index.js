@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
+import Routes from 'routes';
 import { Row, Col, Tabs, Typography, Button } from 'antd';
 
 import Loader from 'components/Loader';
@@ -18,7 +18,7 @@ import apis from 'apis';
 const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
-const Courses = () => {
+const Courses = ({ history }) => {
   const { showSendEmailPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
@@ -122,7 +122,7 @@ const Courses = () => {
 
   const openCreateCourseModal = (type = 'mixed') => {
     setIsVideoModal(type === 'video');
-    setCreateModalVisible(true);
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourse);
   };
 
   const hideCreateCourseModal = (shouldRefresh = false) => {
@@ -137,18 +137,11 @@ const Courses = () => {
 
   const openEditCourseModal = (course) => {
     setTargetCourse(course);
-    openCreateCourseModal(course.type === courseType.MIXED ? 'mixed' : 'video');
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.updateCourse);
   };
 
   return (
     <div className={styles.box}>
-      <CreateCourseModal
-        visible={createModalVisible}
-        closeModal={hideCreateCourseModal}
-        editedCourse={targetCourse}
-        isVideoModal={isVideoModal}
-        creatorMemberTags={creatorMemberTags}
-      />
       <Row gutter={[8, 8]}>
         <Col xs={24}>
           <Title level={3}> Courses </Title>
