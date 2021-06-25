@@ -164,7 +164,7 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
         if (videos.length > 0) {
           return ['VIDEOS'];
         }
-        if (sessions.length > 0) {
+        if (courses.length > 0) {
           return ['COURSES'];
         }
         return [];
