@@ -26,6 +26,11 @@ const Routes = {
   stripePaymentSuccess: '/stripe/payment/success',
   paymentRetry: '/payment/retry/:retry_token',
   paymentConfirm: '/payment/redirect/verify',
+  list: {
+    sessions: '/list/sessions',
+    videos: '/list/videos',
+    courses: '/list/courses',
+  },
   creatorDashboard: {
     rootPath: '/creator/dashboard',
     defaultPath: '/sessions/upcoming',
