@@ -6,13 +6,13 @@ import {
   EditOutlined,
   MenuOutlined,
   SaveOutlined,
-  BookOutlined,
+  // BookOutlined,
+  // PlayCircleOutlined,
+  // VideoCameraOutlined,
   CloseCircleOutlined,
-  VideoCameraOutlined,
   LikeOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
-  PlayCircleOutlined,
   LinkOutlined,
   PlusCircleOutlined,
 } from '@ant-design/icons';
@@ -20,11 +20,11 @@ import {
 import apis from 'apis';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
-import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
-import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
+// import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
+// import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
+// import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 
 import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
@@ -37,46 +37,6 @@ import CreatorProfileComponent from 'components/DynamicProfileComponents/Creator
 import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
 
 const { Paragraph } = Typography;
-
-// TODO: Define the Profile UI Configurations Sample Data here
-const sampleUIConfig = [
-  {
-    key: 'PRODUCTS',
-    title: '',
-    values: [
-      {
-        key: 'SESSIONS',
-        title: 'My Sessions',
-        values: null,
-      },
-      {
-        key: 'COURSES',
-        title: 'My Courses',
-        values: null,
-      },
-      {
-        key: 'VIDEOS',
-        title: 'My Videos',
-        values: null,
-      },
-    ],
-  },
-  {
-    key: 'SUBSCRIPTIONS',
-    title: 'My Memberships',
-    values: null,
-  },
-  {
-    key: 'PASSES',
-    title: 'My Passes',
-    values: null,
-  },
-  {
-    key: 'OTHER_LINKS',
-    title: 'My other links',
-    values: null,
-  },
-];
 
 // {
 //   "key": "DONATIONS",
@@ -97,35 +57,52 @@ const componentsMap = {
     optional: false,
     defaultProps: {
       title: '',
+      values: [
+        {
+          key: 'SESSIONS',
+          title: 'My Sessions',
+          values: null,
+        },
+        {
+          key: 'COURSES',
+          title: 'My Courses',
+          values: null,
+        },
+        {
+          key: 'VIDEOS',
+          title: 'My Videos',
+          values: null,
+        },
+      ],
     },
   },
-  SESSIONS: {
-    icon: <VideoCameraOutlined />,
-    label: 'Sessions',
-    optional: false,
-    component: SessionsProfileComponent,
-    defaultProps: {
-      title: 'SESSIONS',
-    },
-  },
-  VIDEOS: {
-    icon: <PlayCircleOutlined />,
-    label: 'Videos',
-    optional: false,
-    component: VideoProfileComponent,
-    defaultProps: {
-      title: 'VIDEOS',
-    },
-  },
-  COURSES: {
-    icon: <BookOutlined />,
-    label: 'Courses',
-    optional: false,
-    component: CoursesProfileComponent,
-    defaultProps: {
-      title: 'COURSES',
-    },
-  },
+  // SESSIONS: {
+  //   icon: <VideoCameraOutlined />,
+  //   label: 'Sessions',
+  //   optional: false,
+  //   component: SessionsProfileComponent,
+  //   defaultProps: {
+  //     title: 'SESSIONS',
+  //   },
+  // },
+  // VIDEOS: {
+  //   icon: <PlayCircleOutlined />,
+  //   label: 'Videos',
+  //   optional: false,
+  //   component: VideoProfileComponent,
+  //   defaultProps: {
+  //     title: 'VIDEOS',
+  //   },
+  // },
+  // COURSES: {
+  //   icon: <BookOutlined />,
+  //   label: 'Courses',
+  //   optional: false,
+  //   component: CoursesProfileComponent,
+  //   defaultProps: {
+  //     title: 'COURSES',
+  //   },
+  // },
   PASSES: {
     icon: <LikeOutlined />,
     label: 'Passes',
@@ -133,6 +110,7 @@ const componentsMap = {
     component: PassesProfileComponent,
     defaultProps: {
       title: 'CREDIT PASSES',
+      values: null,
     },
   },
   SUBSCRIPTIONS: {
@@ -142,6 +120,7 @@ const componentsMap = {
     component: SubscriptionProfileComponent,
     defaultProps: {
       title: 'MEMBERSHIPS',
+      values: null,
     },
   },
   OTHER_LINKS: {
@@ -151,7 +130,7 @@ const componentsMap = {
     component: OtherLinksProfileComponent,
     defaultProps: {
       title: 'OTHER LINKS',
-      links: [],
+      values: null,
     },
   },
 };
@@ -174,7 +153,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
-  const [creatorUIConfig, setCreatorUIConfig] = useState(sampleUIConfig);
+  const [creatorUIConfig, setCreatorUIConfig] = useState([]);
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState([]);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
@@ -203,27 +182,27 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     fetchCreatorProfileData(creatorUsername);
   }, [fetchCreatorProfileData, creatorUsername]);
 
+  useEffect(() => {
+    setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
+    // setCreatorUIConfig(sampleUIConfig);
+  }, [creatorProfileData]);
+
   // Handle state adjustments when user logs in from the page
   useEffect(() => {
     if (creatorProfileData?.external_id === userDetails?.external_id) {
       setEditable(true);
     } else {
       setEditable(false);
+      setEditingMode(false);
     }
-
-    setEditingMode(false);
   }, [userDetails, creatorProfileData]);
 
   //#endregion End of Use Effects
 
   //#region Start Of Page Edit Button Handlers
 
-  const getExistingComponentInstance = (identifier) => {
-    const currentComponentsList = tempCreatorUIConfig.components;
-    const duplicateComponent = currentComponentsList.find((component) => component.key === identifier);
-
-    return duplicateComponent;
-  };
+  const getExistingComponentInstance = (identifier) =>
+    tempCreatorUIConfig.find((component) => component.key === identifier);
 
   const addComponent = (identifier = null, props) => {
     if (!identifier) {
@@ -238,16 +217,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       return;
     }
 
-    const currentComponentsList = deepCloneObject(tempCreatorUIConfig).components || [];
+    const currentComponentsList = deepCloneObject(tempCreatorUIConfig) || [];
     currentComponentsList.push({
       key: identifier,
-      props: props,
+      ...props,
     });
 
-    setTempCreatorUIConfig({
-      ...tempCreatorUIConfig,
-      components: currentComponentsList,
-    });
+    setTempCreatorUIConfig(currentComponentsList);
     setUiConfigChanged(false);
     setAddComponentModalVisible(false);
     showSuccessModal('Component added', `Make sure to save so you don't lose the changes`);
@@ -273,13 +249,36 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setUiConfigChanged(false);
   };
 
-  const handleSaveDynamicProfileButtonClicked = (e) => {
+  const handleSaveDynamicProfileButtonClicked = async (e) => {
     preventDefaults(e);
 
+    const newCreatorUIConfig = deepCloneObject(tempCreatorUIConfig);
+
+    try {
+      // NOTE: the API requires some fields, so we'll just pre-fill
+      // with existing data
+      const payload = {
+        cover_image_url: creatorProfileData.cover_image_url,
+        profile_image_url: creatorProfileData.profile_image_url,
+        first_name: creatorProfileData.first_name,
+        last_name: creatorProfileData.last_name,
+        username: creatorProfileData.username,
+        profile: {
+          sections: newCreatorUIConfig,
+        },
+      };
+
+      const { status } = await apis.user.updateProfile(payload);
+
+      if (isAPISuccess(status)) {
+        setCreatorUIConfig(newCreatorUIConfig);
+        setUiConfigChanged(false);
+        disableEditingMode();
+      }
+    } catch (error) {
+      showErrorModal('Failed updating Creator Profile UI', error?.response?.data?.message || 'Something went wrong.');
+    }
     // TODO: Save the data here to API
-    setCreatorUIConfig(deepCloneObject(tempCreatorUIConfig));
-    setUiConfigChanged(false);
-    disableEditingMode();
   };
 
   const handleCancelDynamicProfileButtonClicked = (e) => {
@@ -345,7 +344,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
 
     // TODO: Adjust here when more customizability is required
-    console.log(newConfig);
     targetComponent.title = newConfig.title;
     targetComponent.values = newConfig.values ?? null;
     tempConfigComponents.splice(targetIndex, 1, targetComponent);
@@ -359,10 +357,12 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       return;
     }
 
-    // TODO: Check for optional flag in componentMap
-    // if not optional, cannot be removed
+    if (!componentsMap[identifier].optional) {
+      showErrorModal('Component is not optional, cannot be removed!');
+      return;
+    }
 
-    const tempConfigComponents = tempCreatorUIConfig.components;
+    const tempConfigComponents = deepCloneObject(tempCreatorUIConfig);
     const targetIndex = tempConfigComponents.findIndex((component) => component.key === identifier);
 
     if (targetIndex === -1) {
@@ -371,10 +371,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
 
     tempConfigComponents.splice(targetIndex, 1);
-    setTempCreatorUIConfig({
-      ...tempCreatorUIConfig,
-      components: tempConfigComponents,
-    });
+    setTempCreatorUIConfig(tempConfigComponents);
   };
 
   //#endregion End Of Component Edit View Handlers
@@ -397,6 +394,11 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   };
 
   const renderDraggableCustomComponents = (component, idx) => {
+    // TODO: Remove this once Donations Component is implemented
+    if (component.key === 'DONATIONS') {
+      return null;
+    }
+
     const RenderedComponent = componentsMap[component.key].component;
 
     if (component.key === 'PRODUCTS') {
@@ -427,7 +429,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               identifier={component.key}
               isEditing={editingMode && !previewMode}
               updateConfigHandler={updateComponentConfig}
-              removeConfigHandler={removeComponent}
+              removeComponentHandler={removeComponent}
               // TODO: Try to handle this later when more customization is needed
               title={component.title}
               values={component.values}
@@ -446,7 +448,11 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
           <Row gutter={8} justify="center">
             <Col xs={24}>
-              <CreatorProfileComponent creatorProfile={creatorProfileData} isEditing={editingMode && !previewMode} />
+              <CreatorProfileComponent
+                creatorProfile={creatorProfileData}
+                isEditing={editingMode && !previewMode}
+                refetchCreatorProfileData={() => fetchCreatorProfileData(creatorUsername)}
+              />
             </Col>
             <Col xs={24} className={styles.mb20}>
               <DragDropContext onDragEnd={handleDragEnd}>
