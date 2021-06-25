@@ -3,7 +3,6 @@ import Routes from 'routes';
 import { Row, Col, Tabs, Typography, Button } from 'antd';
 
 import Loader from 'components/Loader';
-import CreateCourseModal from 'components/CreateCourseModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
 import VideoCourses from 'pages/CreatorDashboard/Courses/VideoCourses';
@@ -24,9 +23,8 @@ const Courses = ({ history }) => {
   const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('liveClassCourse');
-  const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [targetCourse, setTargetCourse] = useState(null);
-  const [isVideoModal, setIsVideoModal] = useState(false);
+  // const [targetCourse, setTargetCourse] = useState(null);
+  // const [isVideoModal, setIsVideoModal] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const fetchCreatorMemberTags = useCallback(async () => {
@@ -121,22 +119,12 @@ const Courses = ({ history }) => {
   };
 
   const openCreateCourseModal = (type = 'mixed') => {
-    setIsVideoModal(type === 'video');
+    //setIsVideoModal(type === 'video');
     history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourse);
   };
 
-  const hideCreateCourseModal = (shouldRefresh = false) => {
-    setCreateModalVisible(false);
-    setTargetCourse(null);
-    setIsVideoModal(false);
-
-    if (shouldRefresh) {
-      fetchAllCoursesForCreator();
-    }
-  };
-
   const openEditCourseModal = (course) => {
-    setTargetCourse(course);
+    //setTargetCourse(course);
     history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.updateCourse);
   };
 

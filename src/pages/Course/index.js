@@ -27,7 +27,7 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
-import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
