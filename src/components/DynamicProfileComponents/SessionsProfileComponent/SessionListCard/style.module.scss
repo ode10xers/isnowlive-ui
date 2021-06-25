@@ -1,7 +1,9 @@
 @import '../../../../styles/variables.scss';
 
+$card-border-radius : 8px;
+
 .sessionListCard {
-  border-radius: 8px !important;
+  border-radius: $card-border-radius !important;
 
   .sessionCoverContainer {
     height: 100%;
@@ -42,6 +44,7 @@
     font-size: 16px;
     background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
     box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+    border-radius: 0 0 $card-border-radius $card-border-radius;
 
     .footerText {
       color: map-get($map: $colors, $key: 'PrussianBlue') !important;
