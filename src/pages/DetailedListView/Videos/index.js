@@ -56,14 +56,14 @@ const VideoDetailedListView = ({ history }) => {
           <>
             {/* <Affix offsetTop={80}>
               <Space className={styles.stickyHeader}>
-                <Button icon={<ArrowLeftOutlined />} onClick={handleBackClicked} />
+                <Button size="large" icon={<ArrowLeftOutlined />} onClick={handleBackClicked} />
                 <Text> Can put filters here </Text>
               </Space>
             </Affix> */}
             <Button size="large" className={styles.blueText} icon={<ArrowLeftOutlined />} onClick={handleBackClicked}>
               Back
             </Button>
-            <Row className={styles.mt30} gutter={[8, 16]} justify="center">
+            <Row className={styles.mt30} gutter={[8, 16]}>
               {videos.map(renderVideoCards)}
             </Row>
           </>

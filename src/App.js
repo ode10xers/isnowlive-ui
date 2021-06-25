@@ -50,6 +50,7 @@ import MobileLayout from 'layouts/MobileLayout';
 import NewHome from 'pages/NewHome';
 import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
+import CourseDetailedListView from 'pages/DetailedListView/Courses';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -255,6 +256,12 @@ function App() {
               component={SessionDetailedListView}
             />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.list.videos} component={VideoDetailedListView} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.list.courses}
+              component={CourseDetailedListView}
+            />
             <RouteWithLayout
               layout={MobileLayout}
               exact

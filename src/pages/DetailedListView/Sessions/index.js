@@ -135,7 +135,7 @@ const SessionDetailedListView = ({ history }) => {
                 </Row>
               </div>
             </Affix>
-            <Row className={styles.mt30} gutter={[16, 16]} justify="center">
+            <Row className={styles.mt30} gutter={[16, 16]}>
               {filteredByDateSessions.map(renderSessionDateList)}
             </Row>
           </>

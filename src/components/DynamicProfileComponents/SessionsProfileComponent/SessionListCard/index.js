@@ -37,13 +37,6 @@ const SessionListCard = ({ session }) => {
     </div>
   );
 
-  // // TODO: Manage overflowing content here later
-  // const sessionDescription = (
-  //   <div className={styles.sessionDescriptionContainer}>
-  //     {ReactHtmlParser(session?.description)}
-  //   </div>
-  // );
-
   const sessionTitle = (
     <Title level={4} className={styles.sessionTitle}>
       {session?.name}

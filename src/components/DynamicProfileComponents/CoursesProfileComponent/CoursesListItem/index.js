@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Card, Typography, Image, Row, Col, Space, Divider } from 'antd';
+import { Card, Typography, Image, Row, Col, Tag, Space, Divider } from 'antd';
 
 import dateUtil from 'utils/date';
 import { courseType, isValidFile } from 'utils/helper';
@@ -15,13 +15,23 @@ const {
 const { Text, Title } = Typography;
 
 const CourseListItem = ({ course }) => {
+  const extraTags = (
+    <Space>
+      {course.type === courseType.MIXED && <Tag color="green"> Live Course </Tag>}
+      {course.type !== courseType.MIXED && <Tag color="cyan"> Video Course </Tag>}
+    </Space>
+  );
+
   const courseImage = (
-    <div className={styles.courseImageContainer}>
-      <Image
-        preview={false}
-        className={styles.courseImage}
-        src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
-      />
+    <div className={styles.courseCoverContainer}>
+      <div className={styles.extraTagsContainer}> {extraTags} </div>
+      <div className={styles.courseImageContainer}>
+        <Image
+          preview={false}
+          className={styles.courseImage}
+          src={isValidFile(course?.course_image_url) ? course?.course_image_url : DefaultImage}
+        />
+      </div>
     </div>
   );
 
