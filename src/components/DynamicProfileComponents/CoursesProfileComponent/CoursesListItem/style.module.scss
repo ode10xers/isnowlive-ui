@@ -1,0 +1,74 @@
+@import '../../../../styles/variables.scss';
+
+$card-border-radius: 8px;
+
+.courseListItem {
+  border-radius: $card-border-radius !important;
+  cursor: pointer;
+
+
+  .courseCoverContainer {
+    height: 100%;
+    position: relative;
+
+    .extraTagsContainer {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 5;
+    }
+
+    .courseImageContainer {
+      text-align: center;
+  
+      .courseImage {
+        border-radius: $card-border-radius $card-border-radius 0 0;
+        object-fit: scale-down;
+        height: 100%;
+      }
+    }
+  }
+
+  .courseName {
+    height: 48px;
+    padding: 12px;
+    overflow: hidden;
+    color: map-get($map: $colors, $key: 'ResolutionBlue');
+    margin-bottom: 0 !important;
+  }
+
+  .courseContentContainer {
+    padding: 0 12px 12px 12px;
+
+    .courseDivider {
+      margin: 0 12px;
+      height: 24px;
+    }
+
+    .courseContents {
+      font-size: 16px;
+      color: map-get($map: $colors, $key: 'ResolutionBlue');
+    }
+  }
+
+  .cardFooter {
+    border-top: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+    padding: 12px;
+    width: 100%;
+    justify-content: center;
+    font-size: 16px;
+    color: map-get($map: $colors, $key: 'Chambray');
+    background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
+    box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+    border-radius: 0 0 $card-border-radius $card-border-radius;
+
+    .timeText {
+      font-weight: 500;
+    }
+
+    .priceText {
+      text-align: right;
+      font-weight: 600;
+    }
+  }
+}

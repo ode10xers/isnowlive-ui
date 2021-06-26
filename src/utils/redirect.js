@@ -69,3 +69,20 @@ export const redirectToCoursesPage = (course) => {
     window.open(targetUrl);
   }
 };
+
+export const redirectToPassesPage = (pass) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    urlUsername = 'app';
+  }
+
+  const baseUrl = generateUrlFromUsername(pass.creator_username || urlUsername);
+  const targetUrl = `${baseUrl}/p/${pass.id}`;
+
+  if (isInIframeWidget() || isWidgetUrl()) {
+    window.open(targetUrl, '_self');
+  } else {
+    window.open(targetUrl);
+  }
+};
