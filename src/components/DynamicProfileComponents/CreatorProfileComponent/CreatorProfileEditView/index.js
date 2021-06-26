@@ -302,8 +302,8 @@ const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = ()
               </Col>
 
               <Col xs={24}>
-                <Row gutter={12}>
-                  <Col xs={24} md={[12, 8]}>
+                <Row gutter={[12, 8]}>
+                  <Col xs={24} md={12}>
                     <Button block size="large" type="default" onClick={cancelEditChanges}>
                       Cancel
                     </Button>

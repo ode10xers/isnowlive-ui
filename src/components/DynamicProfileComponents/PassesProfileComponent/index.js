@@ -7,6 +7,7 @@ import Routes from 'routes';
 
 import PassesListView from './PassesListView';
 import PassesEditView from './PassesEditView';
+import DragAndDropHandle from '../DragAndDropHandle';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -32,6 +33,7 @@ const cardHeadingStyle = {
 const PassesProfileComponent = ({
   identifier = null,
   isEditing = false,
+  dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
   ...customComponentProps
@@ -63,6 +65,7 @@ const PassesProfileComponent = ({
 
   return passes.length > 0 || isEditing ? (
     <div className={styles.p10}>
+      {isEditing && <DragAndDropHandle {...dragHandleProps} />}
       <Card
         title={<ContainerTitle title={customComponentProps?.title} />}
         headStyle={cardHeadingStyle}

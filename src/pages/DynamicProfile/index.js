@@ -4,8 +4,8 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
   EditOutlined,
-  MenuOutlined,
   SaveOutlined,
+  // MenuOutlined,
   // BookOutlined,
   // PlayCircleOutlined,
   // VideoCameraOutlined,
@@ -15,6 +15,8 @@ import {
   EyeInvisibleOutlined,
   LinkOutlined,
   PlusCircleOutlined,
+  ArrowLeftOutlined,
+  GlobalOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -27,7 +29,13 @@ import SubscriptionProfileComponent from 'components/DynamicProfileComponents/Su
 // import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 
-import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
+import {
+  deepCloneObject,
+  isAPISuccess,
+  preventDefaults,
+  isInCreatorDashboard,
+  generateUrlFromUsername,
+} from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -35,6 +43,8 @@ import { useGlobalContext } from 'services/globalContext';
 import styles from './style.module.scss';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
 import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
+import { useHistory } from 'react-router-dom';
+import Routes from 'routes';
 
 const { Paragraph } = Typography;
 
@@ -76,33 +86,6 @@ const componentsMap = {
       ],
     },
   },
-  // SESSIONS: {
-  //   icon: <VideoCameraOutlined />,
-  //   label: 'Sessions',
-  //   optional: false,
-  //   component: SessionsProfileComponent,
-  //   defaultProps: {
-  //     title: 'SESSIONS',
-  //   },
-  // },
-  // VIDEOS: {
-  //   icon: <PlayCircleOutlined />,
-  //   label: 'Videos',
-  //   optional: false,
-  //   component: VideoProfileComponent,
-  //   defaultProps: {
-  //     title: 'VIDEOS',
-  //   },
-  // },
-  // COURSES: {
-  //   icon: <BookOutlined />,
-  //   label: 'Courses',
-  //   optional: false,
-  //   component: CoursesProfileComponent,
-  //   defaultProps: {
-  //     title: 'COURSES',
-  //   },
-  // },
   PASSES: {
     icon: <LikeOutlined />,
     label: 'Passes',
@@ -135,20 +118,22 @@ const componentsMap = {
   },
 };
 
-const DragAndDropHandle = ({ visible = false, ...props }) =>
-  visible ? (
-    <div className={styles.dndHandle} {...props}>
-      <MenuOutlined />
-    </div>
-  ) : null;
+// const DragAndDropHandle = ({ visible = false, ...props }) =>
+//   visible ? (
+//     <div className={styles.dndHandle} {...props}>
+//       <MenuOutlined />
+//     </div>
+//   ) : null;
 
 const DynamicProfile = ({ creatorUsername = null }) => {
   const {
     state: { userDetails },
   } = useGlobalContext();
 
+  const history = useHistory();
+
   const [isLoading, setIsLoading] = useState(true);
-  const [creatorProfileData, setCreatorProfileData] = useState({});
+  const [creatorProfileData, setCreatorProfileData] = useState(null);
   const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
@@ -158,6 +143,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
+    if (!username) {
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { status, data } = username ? await apis.user.getProfileByUsername(username) : await apis.user.getProfile();
@@ -179,7 +168,11 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   //#region Start of Use Effects
 
   useEffect(() => {
-    fetchCreatorProfileData(creatorUsername);
+    if (!creatorUsername) {
+      fetchCreatorProfileData(getLocalUserDetails()?.username ?? '');
+    } else {
+      fetchCreatorProfileData(creatorUsername);
+    }
   }, [fetchCreatorProfileData, creatorUsername]);
 
   useEffect(() => {
@@ -258,11 +251,11 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       // NOTE: the API requires some fields, so we'll just pre-fill
       // with existing data
       const payload = {
-        cover_image_url: creatorProfileData.cover_image_url,
-        profile_image_url: creatorProfileData.profile_image_url,
-        first_name: creatorProfileData.first_name,
-        last_name: creatorProfileData.last_name,
-        username: creatorProfileData.username,
+        cover_image_url: creatorProfileData?.cover_image_url,
+        profile_image_url: creatorProfileData?.profile_image_url,
+        first_name: creatorProfileData?.first_name,
+        last_name: creatorProfileData?.last_name,
+        username: creatorProfileData?.username,
         profile: {
           sections: newCreatorUIConfig,
         },
@@ -278,7 +271,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     } catch (error) {
       showErrorModal('Failed updating Creator Profile UI', error?.response?.data?.message || 'Something went wrong.');
     }
-    // TODO: Save the data here to API
   };
 
   const handleCancelDynamicProfileButtonClicked = (e) => {
@@ -319,6 +311,84 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   };
 
   //#endregion End of Page Edit Button Handlers
+
+  //#region Start of Dashboard Button Handlers
+
+  const handleNavigateToDashboard = (e) => {
+    preventDefaults(e);
+
+    const navigateToDashboard = () => {
+      disableEditingMode();
+      history.push(Routes.creatorDashboard.rootPath);
+    };
+
+    if (uiConfigChanged) {
+      Modal.confirm({
+        mask: true,
+        maskClosable: false,
+        centered: true,
+        width: 420,
+        title: 'Unsaved changes detected',
+        content: (
+          <Paragraph>
+            Are you sure you want to leave? You have made changes that will not be saved if you close now.
+          </Paragraph>
+        ),
+        onOk: navigateToDashboard,
+        okText: 'Close without saving',
+        okButtonProps: {
+          type: 'primary',
+          danger: true,
+        },
+        cancelText: 'Cancel',
+        cancelButtonProps: {
+          type: 'default',
+        },
+        afterClose: resetBodyStyle,
+      });
+    } else {
+      navigateToDashboard();
+    }
+  };
+
+  const handleNavigateToPublicPage = (e) => {
+    preventDefaults(e);
+
+    const openPublicPage = () => {
+      disableEditingMode();
+      window.open(generateUrlFromUsername(creatorProfileData?.username ?? 'app'));
+    };
+
+    if (uiConfigChanged) {
+      Modal.confirm({
+        mask: true,
+        maskClosable: false,
+        centered: true,
+        width: 420,
+        title: 'Unsaved changes detected',
+        content: (
+          <Paragraph>
+            Are you sure you want to leave? You have made changes that will not be saved if you close now.
+          </Paragraph>
+        ),
+        onOk: openPublicPage,
+        okText: 'Close without saving',
+        okButtonProps: {
+          type: 'primary',
+          danger: true,
+        },
+        cancelText: 'Cancel',
+        cancelButtonProps: {
+          type: 'default',
+        },
+        afterClose: resetBodyStyle,
+      });
+    } else {
+      openPublicPage();
+    }
+  };
+
+  //#endregion End of Dashboard Button Handlers
 
   //#region Start Of Component Edit View Handlers
 
@@ -407,6 +477,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             identifier={component.key}
             isEditing={editingMode && !previewMode}
             updateConfigHandler={updateComponentConfig}
+            removeComponentHandler={removeComponent}
             title={component.title}
             values={component.values}
           />
@@ -423,12 +494,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       >
         {(provided) => (
           <Col xs={24} {...provided.draggableProps} ref={provided.innerRef}>
-            <DragAndDropHandle {...provided.dragHandleProps} visible={editingMode && !previewMode} />
+            {/* <DragAndDropHandle {...provided.dragHandleProps} visible={editingMode && !previewMode} /> */}
             <RenderedComponent
               identifier={component.key}
               isEditing={editingMode && !previewMode}
               updateConfigHandler={updateComponentConfig}
               removeComponentHandler={removeComponent}
+              dragHandleProps={provided.dragHandleProps}
               // TODO: Try to handle this later when more customization is needed
               title={component.title}
               values={component.values}
@@ -443,6 +515,54 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   return (
     <>
+      {isInCreatorDashboard() && (
+        <Row className={styles.mb30} align="center">
+          <Col xs={24}>
+            <Space size="large" className={styles.p10}>
+              <Button icon={<ArrowLeftOutlined />} onClick={handleNavigateToDashboard}>
+                Dashboard
+              </Button>
+              {editingMode ? (
+                <>
+                  <Button
+                    type="primary"
+                    className={styles.blueBtn}
+                    icon={<PlusCircleOutlined />}
+                    onClick={handleAddComponentDynamicProfileButtonClicked}
+                  >
+                    Add Component
+                  </Button>
+                  <Button
+                    type="primary"
+                    className={styles.greenBtn}
+                    icon={<SaveOutlined />}
+                    onClick={handleSaveDynamicProfileButtonClicked}
+                  >
+                    Save Changes
+                  </Button>
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<CloseCircleOutlined />}
+                    onClick={handleCancelDynamicProfileButtonClicked}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button type="primary" icon={<EditOutlined />} onClick={handleEditDynamicProfileButtonClicked}>
+                    Edit
+                  </Button>
+                  <Button ghost type="primary" icon={<GlobalOutlined />} onClick={handleNavigateToPublicPage}>
+                    Public Page
+                  </Button>
+                </>
+              )}
+            </Space>
+          </Col>
+        </Row>
+      )}
       <div className={styles.creatorProfilePage}>
         <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
           <Row gutter={8} justify="center">
@@ -450,7 +570,9 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               <CreatorProfileComponent
                 creatorProfile={creatorProfileData}
                 isEditing={editingMode && !previewMode}
-                refetchCreatorProfileData={() => fetchCreatorProfileData(creatorUsername)}
+                refetchCreatorProfileData={() =>
+                  fetchCreatorProfileData(creatorUsername ?? getLocalUserDetails()?.username ?? '')
+                }
               />
             </Col>
             <Col xs={24} className={styles.mb20}>
@@ -473,7 +595,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Row>
         </Spin>
       </div>
-      {(editable || true) && (
+      {editable && !isInCreatorDashboard() && (
         <div className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
             <Row gutter={[8, 8]}>

@@ -10,6 +10,7 @@ import { isAPISuccess } from 'utils/helper';
 import styles from './style.module.scss';
 import SubscriptionsListView from './SubscriptionListView';
 import SubscriptionsEditView from './SubscriptionEditView';
+import DragAndDropHandle from '../DragAndDropHandle';
 
 const { Text, Paragraph } = Typography;
 
@@ -31,6 +32,7 @@ const cardHeadingStyle = {
 const SubscriptionProfileComponent = ({
   identifier = null,
   isEditing = false,
+  dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
   ...customComponentProps
@@ -61,42 +63,53 @@ const SubscriptionProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
   return subscriptions.length > 0 || isEditing ? (
-    <div className={styles.p10}>
-      <Card
-        title={<ContainerTitle title={customComponentProps?.title} />}
-        headStyle={cardHeadingStyle}
-        className={styles.profileComponentContainer}
-        bodyStyle={{ padding: 12 }}
-      >
-        {isEditing ? (
-          <Row gutter={[8, 8]} justify="center" align="center">
-            <Col xs={24} className={styles.textAlignCenter}>
-              <Paragraph>Memberships that you have created and published will show up here.</Paragraph>
-              <Paragraph>You can manage your memberships in the dashboard by clicking the button below</Paragraph>
-            </Col>
-            <Col xs={24}>
-              <Row justify="center">
-                <Col>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
-                    }
-                  >
-                    Manage my memberships
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        ) : (
-          <Spin spinning={isLoading} tip="Fetching memberships">
-            <SubscriptionsListView subscriptions={subscriptions} />
-          </Spin>
-        )}
-      </Card>
-      {isEditing && <SubscriptionsEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
-    </div>
+    <Row className={styles.p10} align="middle" justify="center">
+      {isEditing && (
+        <Col xs={1}>
+          <DragAndDropHandle {...dragHandleProps} />{' '}
+        </Col>
+      )}
+      <Col xs={isEditing ? 22 : 24}>
+        <Card
+          title={<ContainerTitle title={customComponentProps?.title} />}
+          headStyle={cardHeadingStyle}
+          className={styles.profileComponentContainer}
+          bodyStyle={{ padding: 12 }}
+        >
+          {isEditing ? (
+            <Row gutter={[8, 8]} justify="center" align="center">
+              <Col xs={24} className={styles.textAlignCenter}>
+                <Paragraph>Memberships that you have created and published will show up here.</Paragraph>
+                <Paragraph>You can manage your memberships in the dashboard by clicking the button below</Paragraph>
+              </Col>
+              <Col xs={24}>
+                <Row justify="center">
+                  <Col>
+                    <Button
+                      type="primary"
+                      onClick={() =>
+                        window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
+                      }
+                    >
+                      Manage my memberships
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+          ) : (
+            <Spin spinning={isLoading} tip="Fetching memberships">
+              <SubscriptionsListView subscriptions={subscriptions} />
+            </Spin>
+          )}
+        </Card>
+      </Col>
+      {isEditing && (
+        <Col xs={1}>
+          <SubscriptionsEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
+        </Col>
+      )}
+    </Row>
   ) : null;
 };
 

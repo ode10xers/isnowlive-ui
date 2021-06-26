@@ -18,6 +18,9 @@ export const isUnapprovedUserError = (errorResponse) =>
 export const isInCustomDomain = () =>
   !window.location.hostname.includes('passion.do') && !window.location.hostname.includes('localhost');
 
+// TODO: Might want to adjust the string here once the decision on Onboarding is decided
+export const isInCreatorDashboard = () => window.location.pathname.includes('creator/dashboard');
+
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
 export const getUsernameFromUrl = () => {

@@ -15,7 +15,7 @@ import {
 import apis from 'apis';
 import Routes from 'routes';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
 
 import SessionListView from '../SessionsProfileComponent/SessionListView';
 import VideoListView from '../VideosProfileComponent/VideoListView';
@@ -65,12 +65,25 @@ const CardContainer = ({ isEditing, productName, route = Routes.creatorDashboard
 );
 
 const menuKeyRouteMap = {
-  SESSIONS: Routes.sessions,
-  VIDEOS: Routes.videos,
-  COURSES: Routes.courses,
+  SESSIONS: isInCreatorDashboard()
+    ? Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.sessions
+    : Routes.sessions,
+  VIDEOS: isInCreatorDashboard()
+    ? Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.videos
+    : Routes.videos,
+  COURSES: isInCreatorDashboard()
+    ? Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.courses
+    : Routes.courses,
 };
 
-const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHandler, ...customComponentProps }) => {
+// NOTE : Remove handler is not used since this component is mandatory
+const ProductsProfileComponent = ({
+  identifier = null,
+  isEditing,
+  updateConfigHandler,
+  removeComponentHandler,
+  ...customComponentProps
+}) => {
   const { values: innerComponents } = customComponentProps;
 
   const history = useHistory();
@@ -164,12 +177,16 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
   const getSelectedKeysForMenu = () => {
     switch (match.path) {
       case Routes.sessions:
+      case Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.sessions:
         return ['SESSIONS'];
       case Routes.videos:
+      case Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.videos:
         return ['VIDEOS'];
       case Routes.courses:
+      case Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.courses:
         return ['COURSES'];
       case Routes.root:
+      case Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile:
         if (sessions.length > 0) {
           return ['SESSIONS'];
         }
@@ -265,17 +282,32 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
       )}
       <Spin spinning={isLoading} tip="Fetching data...">
         <Switch>
-          <Route exact path={Routes.sessions}>
+          <Route
+            exact
+            path={[
+              Routes.sessions,
+              Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.sessions,
+            ]}
+          >
             {sessions.length > 0 ? sessionsComponent : isLoading ? null : <Redirect to={Routes.root} />}
           </Route>
-          <Route exact path={Routes.videos}>
+          <Route
+            exact
+            path={[Routes.videos, Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.videos]}
+          >
             {videos.length > 0 ? videosComponent : isLoading ? null : <Redirect to={Routes.root} />}
           </Route>
-          <Route exact path={Routes.courses}>
+          <Route
+            exact
+            path={[
+              Routes.courses,
+              Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.courses,
+            ]}
+          >
             {courses.length > 0 ? coursesComponent : isLoading ? null : <Redirect to={Routes.root} />}
           </Route>
           {/* Default Path */}
-          <Route exact path={Routes.root}>
+          <Route exact path={[Routes.root, Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile]}>
             {sessions.length > 0
               ? sessionsComponent
               : videos.length > 0

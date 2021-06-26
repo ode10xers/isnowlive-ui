@@ -2,9 +2,11 @@ import React from 'react';
 import { Card, Typography, Row, Col } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 
-import styles from './style.module.scss';
 import OtherLinksEditView from './OtherLinksEditView';
 import OtherLinksListView from './OtherLinksListView';
+import DragAndDropHandle from '../DragAndDropHandle';
+
+import styles from './style.module.scss';
 
 const { Text } = Typography;
 
@@ -27,6 +29,7 @@ const cardHeadingStyle = {
 const OtherLinksProfileComponent = ({
   identifier = null,
   isEditing = false,
+  dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
   ...customComponentProps
@@ -37,6 +40,7 @@ const OtherLinksProfileComponent = ({
 
   return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && !isEditing ? null : (
     <div className={styles.p10}>
+      {isEditing && <DragAndDropHandle {...dragHandleProps} />}
       <Card
         title={<ContainerTitle title={customComponentProps?.title} />}
         headStyle={cardHeadingStyle}

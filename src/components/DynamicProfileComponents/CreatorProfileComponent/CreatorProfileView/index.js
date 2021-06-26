@@ -22,7 +22,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
   const query = new URLSearchParams(search);
   localStorage.setItem('ref', JSON.stringify(query.get('ref')));
 
-  const { cover_image_url, profile_image_url, profile: profileData } = creatorProfile;
+  const { cover_image_url, profile_image_url, profile: profileData } = creatorProfile ?? {};
 
   const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
 

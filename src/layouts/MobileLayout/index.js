@@ -1,19 +1,23 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Layout, Row, Col } from 'antd';
 
 import NavbarHeader from 'components/NavbarHeader';
 
 import styles from './style.module.scss';
+import { isInCreatorDashboard } from 'utils/helper';
 
 const { Content, Header } = Layout;
 
 const MobileLayout = ({ children }) => {
   return (
     <Layout>
-      <Header className={styles.topHeader}>
-        <NavbarHeader />
-      </Header>
-      <Content className={styles.mainContainer}>
+      {!isInCreatorDashboard() && (
+        <Header className={styles.topHeader}>
+          <NavbarHeader />
+        </Header>
+      )}
+      <Content className={classNames(styles.mainContainer, isInCreatorDashboard() ? undefined : styles.withTopHeader)}>
         <Row justify="center">
           <Col className={styles.mainContent}>{children}</Col>
         </Row>
