@@ -1,15 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
-
+import classNames from 'classnames';
 import { Route, Switch, Redirect, useHistory, useRouteMatch } from 'react-router-dom';
 
-import { Spin, Typography, Row, Col, Card, Menu, Button } from 'antd';
+import { Spin, Typography, Row, Col, Card, Button, Space } from 'antd';
 import {
   VideoCameraTwoTone,
   PlayCircleTwoTone,
   BookTwoTone,
-  PlayCircleOutlined,
-  VideoCameraOutlined,
-  BookOutlined,
+  VideoCameraFilled,
+  PlayCircleFilled,
+  BookFilled,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -24,7 +24,7 @@ import CoursesListView from '../CoursesProfileComponent/CoursesListView';
 import styles from './style.module.scss';
 import ProductsEditView from './ProductsEditView';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 const ContainerTitle = ({ title = '', icon = null }) => (
   <Text style={{ color: '#0050B3' }}>
@@ -43,19 +43,14 @@ const cardHeadingStyle = {
 const CardContainer = ({ isEditing, productName, route = Routes.creatorDashboard.rootPath, cardHeader, children }) => (
   <Card {...cardHeader} className={styles.profileComponentContainer} bodyStyle={{ padding: 12 }}>
     {isEditing ? (
-      <Row gutter={[8, 8]} justify="center" align="middle">
-        <Col className={styles.textAlignCenter} xs={24}>
-          <Paragraph>Any {productName} that you created and published will be shown here</Paragraph>
-          <Paragraph>You can manage your {productName} in your dashboard by clicking the button below</Paragraph>
-        </Col>
-        <Col xs={24}>
-          <Row justify="center">
-            <Col>
-              <Button type="primary" onClick={() => window.open(route, '_blank')}>
-                Manage my {productName}
-              </Button>
-            </Col>
-          </Row>
+      <Row justify="center" align="middle">
+        <Col className={styles.textAlignCenter}>
+          <Space align="center" className={styles.textAlignCenter}>
+            <Text> The {productName} you have created will show up here </Text>
+            <Button type="primary" onClick={() => window.open(route, '_blank')}>
+              Manage my {productName}
+            </Button>
+          </Space>
         </Col>
       </Row>
     ) : (
@@ -165,8 +160,8 @@ const ProductsProfileComponent = ({
     fetchAllProductsData();
   }, [fetchUpcomingSessions, fetchCreatorVideos, fetchCreatorCourses]);
 
-  const handleMenuClick = (e) => {
-    history.push(menuKeyRouteMap[e.key]);
+  const handleMenuClick = (key) => {
+    history.push(menuKeyRouteMap[key]);
     window.scrollTo({
       top: 0,
       left: 0,
@@ -257,28 +252,47 @@ const ProductsProfileComponent = ({
   return (
     <div className={styles.p10}>
       {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
-        <Menu
-          onClick={handleMenuClick}
-          mode="horizontal"
-          className={styles.bottomBarMenu}
-          selectedKeys={getSelectedKeysForMenu()}
-        >
+        <Row gutter={[12, 12]} justify="center" align="center" className={styles.bottomBarMenu}>
           {sessions.length > 0 && (
-            <Menu.Item key="SESSIONS" icon={<VideoCameraOutlined />}>
-              Sessions
-            </Menu.Item>
+            <Col xs={8} onClick={() => handleMenuClick('SESSIONS')}>
+              <div
+                className={classNames(
+                  styles.menuItem,
+                  getSelectedKeysForMenu().includes('SESSIONS') ? styles.selectedMenu : undefined
+                )}
+              >
+                <VideoCameraFilled className={styles.mr10} />
+                Sessions
+              </div>
+            </Col>
           )}
           {videos.length > 0 && (
-            <Menu.Item key="VIDEOS" icon={<PlayCircleOutlined />}>
-              Videos
-            </Menu.Item>
+            <Col xs={8} onClick={() => handleMenuClick('VIDEOS')}>
+              <div
+                className={classNames(
+                  styles.menuItem,
+                  getSelectedKeysForMenu().includes('VIDEOS') ? styles.selectedMenu : undefined
+                )}
+              >
+                <PlayCircleFilled className={styles.mr10} />
+                Videos
+              </div>
+            </Col>
           )}
           {courses.length > 0 && (
-            <Menu.Item key="COURSES" icon={<BookOutlined />}>
-              Courses
-            </Menu.Item>
+            <Col xs={8} onClick={() => handleMenuClick('COURSES')}>
+              <div
+                className={classNames(
+                  styles.menuItem,
+                  getSelectedKeysForMenu().includes('COURSES') ? styles.selectedMenu : undefined
+                )}
+              >
+                <BookFilled className={styles.mr10} />
+                Courses
+              </div>
+            </Col>
           )}
-        </Menu>
+        </Row>
       )}
       <Spin spinning={isLoading} tip="Fetching data...">
         <Switch>
