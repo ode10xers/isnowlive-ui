@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { Card, Typography, Image, Row, Col, Space, Divider } from 'antd';
 
@@ -37,7 +38,17 @@ const CourseListItem = ({ course }) => {
   );
 
   const courseName = (
-    <Title level={4} className={styles.courseName}>
+    <Title
+      level={4}
+      className={classNames(
+        styles.courseName,
+        course?.name.length <= 28
+          ? styles.textLength28
+          : course?.name.length <= 56
+          ? styles.textLength56
+          : styles.textLength84
+      )}
+    >
       {course?.name}
     </Title>
   );
