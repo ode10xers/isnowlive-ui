@@ -450,21 +450,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
     const RenderedComponent = componentsMap[component.key].component;
 
-    if (component.key === 'PRODUCTS') {
-      return (
-        <Col xs={24} key={component.key}>
-          <RenderedComponent
-            identifier={component.key}
-            isEditing={editingMode && !previewMode}
-            updateConfigHandler={updateComponentConfig}
-            removeComponentHandler={removeComponent}
-            title={component.title}
-            values={component.values}
-          />
-        </Col>
-      );
-    }
-
     return (
       <Draggable
         isDragDisabled={!editingMode || previewMode}

@@ -23,6 +23,7 @@ import CoursesListView from '../CoursesProfileComponent/CoursesListView';
 
 import styles from './style.module.scss';
 import ProductsEditView from './ProductsEditView';
+import DragAndDropHandle from '../DragAndDropHandle';
 
 const { Text } = Typography;
 
@@ -75,6 +76,7 @@ const menuKeyRouteMap = {
 const ProductsProfileComponent = ({
   identifier = null,
   isEditing,
+  dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
   ...customComponentProps
@@ -250,90 +252,111 @@ const ProductsProfileComponent = ({
   );
 
   return (
-    <div className={styles.p10}>
-      {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
-        <Row gutter={[12, 12]} justify="center" align="center" className={styles.bottomBarMenu}>
-          {sessions.length > 0 && (
-            <Col xs={8} onClick={() => handleMenuClick('SESSIONS')}>
-              <div
-                className={classNames(
-                  styles.menuItem,
-                  getSelectedKeysForMenu().includes('SESSIONS') ? styles.selectedMenu : undefined
-                )}
-              >
-                <VideoCameraFilled className={styles.mr10} />
-                Sessions
-              </div>
+    <Row>
+      <Col xs={24}>
+        {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
+          <Row gutter={[12, 12]} justify="center" align="center" className={styles.bottomBarMenu}>
+            {sessions.length > 0 && (
+              <Col xs={8} onClick={() => handleMenuClick('SESSIONS')}>
+                <div
+                  className={classNames(
+                    styles.menuItem,
+                    getSelectedKeysForMenu().includes('SESSIONS') ? styles.selectedMenu : undefined
+                  )}
+                >
+                  <VideoCameraFilled className={styles.mr10} />
+                  Sessions
+                </div>
+              </Col>
+            )}
+            {videos.length > 0 && (
+              <Col xs={8} onClick={() => handleMenuClick('VIDEOS')}>
+                <div
+                  className={classNames(
+                    styles.menuItem,
+                    getSelectedKeysForMenu().includes('VIDEOS') ? styles.selectedMenu : undefined
+                  )}
+                >
+                  <PlayCircleFilled className={styles.mr10} />
+                  Videos
+                </div>
+              </Col>
+            )}
+            {courses.length > 0 && (
+              <Col xs={8} onClick={() => handleMenuClick('COURSES')}>
+                <div
+                  className={classNames(
+                    styles.menuItem,
+                    getSelectedKeysForMenu().includes('COURSES') ? styles.selectedMenu : undefined
+                  )}
+                >
+                  <BookFilled className={styles.mr10} />
+                  Courses
+                </div>
+              </Col>
+            )}
+          </Row>
+        )}
+      </Col>
+      <Col xs={24}>
+        <Row className={styles.p10} align="middle" justify="center">
+          {isEditing && (
+            <Col xs={1}>
+              <DragAndDropHandle {...dragHandleProps} />
             </Col>
           )}
-          {videos.length > 0 && (
-            <Col xs={8} onClick={() => handleMenuClick('VIDEOS')}>
-              <div
-                className={classNames(
-                  styles.menuItem,
-                  getSelectedKeysForMenu().includes('VIDEOS') ? styles.selectedMenu : undefined
-                )}
-              >
-                <PlayCircleFilled className={styles.mr10} />
-                Videos
-              </div>
-            </Col>
-          )}
-          {courses.length > 0 && (
-            <Col xs={8} onClick={() => handleMenuClick('COURSES')}>
-              <div
-                className={classNames(
-                  styles.menuItem,
-                  getSelectedKeysForMenu().includes('COURSES') ? styles.selectedMenu : undefined
-                )}
-              >
-                <BookFilled className={styles.mr10} />
-                Courses
-              </div>
+          <Col xs={isEditing ? 22 : 24}>
+            <Spin spinning={isLoading} tip="Fetching data...">
+              <Switch>
+                <Route
+                  exact
+                  path={[
+                    Routes.sessions,
+                    Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.sessions,
+                  ]}
+                >
+                  {sessions.length > 0 ? sessionsComponent : isLoading ? null : <Redirect to={Routes.root} />}
+                </Route>
+                <Route
+                  exact
+                  path={[
+                    Routes.videos,
+                    Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.videos,
+                  ]}
+                >
+                  {videos.length > 0 ? videosComponent : isLoading ? null : <Redirect to={Routes.root} />}
+                </Route>
+                <Route
+                  exact
+                  path={[
+                    Routes.courses,
+                    Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.courses,
+                  ]}
+                >
+                  {courses.length > 0 ? coursesComponent : isLoading ? null : <Redirect to={Routes.root} />}
+                </Route>
+                {/* Default Path */}
+                <Route exact path={[Routes.root, Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile]}>
+                  {sessions.length > 0
+                    ? sessionsComponent
+                    : videos.length > 0
+                    ? videosComponent
+                    : courses.length > 0
+                    ? coursesComponent
+                    : null}
+                </Route>
+              </Switch>
+            </Spin>
+          </Col>
+          {isEditing && (
+            <Col xs={1}>
+              {' '}
+              <ProductsEditView updateHandler={saveEditChanges} configValues={parseConfigValues()} />{' '}
             </Col>
           )}
         </Row>
-      )}
-      <Spin spinning={isLoading} tip="Fetching data...">
-        <Switch>
-          <Route
-            exact
-            path={[
-              Routes.sessions,
-              Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.sessions,
-            ]}
-          >
-            {sessions.length > 0 ? sessionsComponent : isLoading ? null : <Redirect to={Routes.root} />}
-          </Route>
-          <Route
-            exact
-            path={[Routes.videos, Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.videos]}
-          >
-            {videos.length > 0 ? videosComponent : isLoading ? null : <Redirect to={Routes.root} />}
-          </Route>
-          <Route
-            exact
-            path={[
-              Routes.courses,
-              Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profileComponents.courses,
-            ]}
-          >
-            {courses.length > 0 ? coursesComponent : isLoading ? null : <Redirect to={Routes.root} />}
-          </Route>
-          {/* Default Path */}
-          <Route exact path={[Routes.root, Routes.creatorDashboard.rootPath + Routes.creatorDashboard.profile]}>
-            {sessions.length > 0
-              ? sessionsComponent
-              : videos.length > 0
-              ? videosComponent
-              : courses.length > 0
-              ? coursesComponent
-              : null}
-          </Route>
-        </Switch>
-      </Spin>
-      {isEditing && <ProductsEditView updateHandler={saveEditChanges} configValues={parseConfigValues()} />}
-    </div>
+      </Col>
+    </Row>
   );
 };
 

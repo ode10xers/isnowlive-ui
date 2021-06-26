@@ -41,7 +41,7 @@ const ProductsEditView = ({ configValues, updateHandler }) => {
   return (
     <>
       <Row justify="center">
-        <Col xs={12} className={styles.editViewButtonContainer}>
+        <Col xs={24} className={styles.editViewButtonContainer}>
           <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
             <EditOutlined />
           </button>
