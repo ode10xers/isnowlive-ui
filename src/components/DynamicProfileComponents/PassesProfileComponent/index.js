@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Card, Typography, Spin, Row, Col, Button } from 'antd';
+import { Card, Typography, Spin, Row, Col, Space, Button } from 'antd';
 import { LikeTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -13,7 +13,7 @@ import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 const ContainerTitle = ({ title = 'CREDIT PASSES' }) => (
   <Text style={{ color: '#0050B3' }}>
@@ -64,23 +64,25 @@ const PassesProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
   return passes.length > 0 || isEditing ? (
-    <div className={styles.p10}>
-      {isEditing && <DragAndDropHandle {...dragHandleProps} />}
-      <Card
-        title={<ContainerTitle title={customComponentProps?.title} />}
-        headStyle={cardHeadingStyle}
-        className={styles.profileComponentContainer}
-        bodyStyle={{ padding: 12 }}
-      >
-        {isEditing ? (
-          <Row gutter={[8, 8]} justify="center" align="center">
-            <Col xs={24} className={styles.textAlignCenter}>
-              <Paragraph>Passes that you have created and published will show up here.</Paragraph>
-              <Paragraph>You can manage your passes in the dashboard by clicking the button below</Paragraph>
-            </Col>
-            <Col xs={24}>
-              <Row justify="center">
-                <Col>
+    <Row className={styles.p10} align="middle" justify="center">
+      {isEditing && (
+        <Col xs={1}>
+          {' '}
+          <DragAndDropHandle {...dragHandleProps} />{' '}
+        </Col>
+      )}
+      <Col xs={isEditing ? 22 : 24}>
+        <Card
+          title={<ContainerTitle title={customComponentProps?.title} />}
+          headStyle={cardHeadingStyle}
+          className={styles.profileComponentContainer}
+          bodyStyle={{ padding: 12 }}
+        >
+          {isEditing ? (
+            <Row gutter={[8, 8]} justify="center" align="center">
+              <Col className={styles.textAlignCenter}>
+                <Space align="center" className={styles.textAlignCenter}>
+                  <Text> The passes you have created will show up here </Text>
                   <Button
                     type="primary"
                     onClick={() =>
@@ -89,18 +91,23 @@ const PassesProfileComponent = ({
                   >
                     Manage my passes
                   </Button>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        ) : (
-          <Spin spinning={isLoading} tip="Fetching Passes">
-            <PassesListView passes={passes || []} />
-          </Spin>
-        )}
-      </Card>
-      {isEditing && <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
-    </div>
+                </Space>
+              </Col>
+            </Row>
+          ) : (
+            <Spin spinning={isLoading} tip="Fetching Passes">
+              <PassesListView passes={passes || []} />
+            </Spin>
+          )}
+        </Card>
+      </Col>
+      {isEditing && (
+        <Col xs={1}>
+          {' '}
+          <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
+        </Col>
+      )}
+    </Row>
   ) : null;
 };
 

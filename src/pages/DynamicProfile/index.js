@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import classNames from 'classnames';
+// import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
@@ -9,10 +9,10 @@ import {
   // BookOutlined,
   // PlayCircleOutlined,
   // VideoCameraOutlined,
+  // EyeOutlined,
+  // EyeInvisibleOutlined,
   CloseCircleOutlined,
   LikeOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined,
   LinkOutlined,
   PlusCircleOutlined,
   ArrowLeftOutlined,
@@ -37,8 +37,6 @@ import {
   generateUrlFromUsername,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-
-import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
@@ -126,15 +124,11 @@ const componentsMap = {
 //   ) : null;
 
 const DynamicProfile = ({ creatorUsername = null }) => {
-  const {
-    state: { userDetails },
-  } = useGlobalContext();
-
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(true);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
-  const [editable, setEditable] = useState(false);
+  // const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
@@ -153,10 +147,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
-
-        if (data.external_id === getLocalUserDetails()?.external_id) {
-          setEditable(true);
-        }
       }
     } catch (error) {
       message.error('Failed to load creator profile details');
@@ -179,16 +169,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
     // setCreatorUIConfig(sampleUIConfig);
   }, [creatorProfileData]);
-
-  // Handle state adjustments when user logs in from the page
-  useEffect(() => {
-    if (creatorProfileData?.external_id === userDetails?.external_id) {
-      setEditable(true);
-    } else {
-      setEditable(false);
-      setEditingMode(false);
-    }
-  }, [userDetails, creatorProfileData]);
 
   //#endregion End of Use Effects
 
@@ -228,10 +208,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setPreviewMode(false);
   };
 
-  const handleTogglePreviewMode = (e) => {
-    preventDefaults(e);
-    setPreviewMode(!previewMode);
-  };
+  // const handleTogglePreviewMode = (e) => {
+  //   preventDefaults(e);
+  //   setPreviewMode(!previewMode);
+  // };
 
   const handleEditDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);
@@ -595,7 +575,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Row>
         </Spin>
       </div>
-      {editable && !isInCreatorDashboard() && (
+      {/* {editable && !isInCreatorDashboard() && (
         <div className={styles.editDynamicProfileButtonContainer}>
           {editingMode ? (
             <Row gutter={[8, 8]}>
@@ -656,7 +636,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             />
           )}
         </div>
-      )}
+      )} */}
       {editingMode && (
         <Modal
           visible={addComponentModalVisible}

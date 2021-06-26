@@ -39,30 +39,39 @@ const OtherLinksProfileComponent = ({
   const deleteComponent = () => removeComponentHandler(identifier);
 
   return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && !isEditing ? null : (
-    <div className={styles.p10}>
-      {isEditing && <DragAndDropHandle {...dragHandleProps} />}
-      <Card
-        title={<ContainerTitle title={customComponentProps?.title} />}
-        headStyle={cardHeadingStyle}
-        className={styles.profileComponentContainer}
-        bodyStyle={{ padding: 12 }}
-      >
-        {isEditing ? (
-          <Row justify="center" align="center">
-            <Col className={styles.textAlignCenter}>Links that you've entered will show up here</Col>
-          </Row>
-        ) : (
-          <OtherLinksListView links={customComponentProps?.values ?? []} />
-        )}
-      </Card>
+    <Row className={styles.p10} align="middle" justify="center">
       {isEditing && (
-        <OtherLinksEditView
-          configValues={customComponentProps}
-          deleteHandler={deleteComponent}
-          updateHandler={saveEditChanges}
-        />
+        <Col xs={1}>
+          {' '}
+          <DragAndDropHandle {...dragHandleProps} />{' '}
+        </Col>
       )}
-    </div>
+      <Col xs={isEditing ? 22 : 24}>
+        <Card
+          title={<ContainerTitle title={customComponentProps?.title} />}
+          headStyle={cardHeadingStyle}
+          className={styles.profileComponentContainer}
+          bodyStyle={{ padding: 12 }}
+        >
+          {isEditing ? (
+            <Row justify="center" align="center">
+              <Col className={styles.textAlignCenter}>Links that you've entered will show up here</Col>
+            </Row>
+          ) : (
+            <OtherLinksListView links={customComponentProps?.values ?? []} />
+          )}
+        </Card>
+      </Col>
+      {isEditing && (
+        <Col xs={1}>
+          <OtherLinksEditView
+            configValues={customComponentProps}
+            deleteHandler={deleteComponent}
+            updateHandler={saveEditChanges}
+          />
+        </Col>
+      )}
+    </Row>
   );
 };
 
