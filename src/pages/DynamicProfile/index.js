@@ -1,16 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-// import classNames from 'classnames';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
   EditOutlined,
   SaveOutlined,
-  // MenuOutlined,
-  // BookOutlined,
-  // PlayCircleOutlined,
-  // VideoCameraOutlined,
-  // EyeOutlined,
-  // EyeInvisibleOutlined,
   CloseCircleOutlined,
   LikeOutlined,
   LinkOutlined,
@@ -24,9 +17,6 @@ import apis from 'apis';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
-// import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
-// import VideoProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
-// import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 
 import {
@@ -116,19 +106,11 @@ const componentsMap = {
   },
 };
 
-// const DragAndDropHandle = ({ visible = false, ...props }) =>
-//   visible ? (
-//     <div className={styles.dndHandle} {...props}>
-//       <MenuOutlined />
-//     </div>
-//   ) : null;
-
 const DynamicProfile = ({ creatorUsername = null }) => {
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(true);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
-  // const [editable, setEditable] = useState(false);
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
@@ -167,7 +149,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   useEffect(() => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
-    // setCreatorUIConfig(sampleUIConfig);
   }, [creatorProfileData]);
 
   //#endregion End of Use Effects
@@ -459,7 +440,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       >
         {(provided) => (
           <Col xs={24} {...provided.draggableProps} ref={provided.innerRef}>
-            {/* <DragAndDropHandle {...provided.dragHandleProps} visible={editingMode && !previewMode} /> */}
             <RenderedComponent
               identifier={component.key}
               isEditing={editingMode && !previewMode}
@@ -560,68 +540,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
           </Row>
         </Spin>
       </div>
-      {/* {editable && !isInCreatorDashboard() && (
-        <div className={styles.editDynamicProfileButtonContainer}>
-          {editingMode ? (
-            <Row gutter={[8, 8]}>
-              <Col xs={24}>
-                <Space align="bottom" size="small">
-                  <Button
-                    className={classNames(
-                      styles.dynamicProfileButtons,
-                      previewMode ? styles.orangeBtn : styles.darkBlueBtn
-                    )}
-                    type="primary"
-                    shape="round"
-                    size="large"
-                    icon={previewMode ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                    onClick={handleTogglePreviewMode}
-                  />
-                  {!previewMode && (
-                    <Button
-                      className={classNames(styles.dynamicProfileButtons, styles.blueBtn)}
-                      type="primary"
-                      shape="round"
-                      size="large"
-                      icon={<PlusCircleOutlined />}
-                      onClick={handleAddComponentDynamicProfileButtonClicked}
-                    />
-                  )}
-                </Space>
-              </Col>
-              <Col xs={24}>
-                <Space align="bottom" size="small">
-                  <Button
-                    className={classNames(styles.dynamicProfileButtons, styles.greenBtn)}
-                    type="primary"
-                    shape="round"
-                    size="large"
-                    icon={<SaveOutlined />}
-                    onClick={handleSaveDynamicProfileButtonClicked}
-                  />
-                  <Button
-                    className={classNames(styles.dynamicProfileButtons, styles.redBtn)}
-                    type="primary"
-                    shape="round"
-                    size="large"
-                    icon={<CloseCircleOutlined />}
-                    onClick={handleCancelDynamicProfileButtonClicked}
-                  />
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Button
-              className={styles.dynamicProfileButtons}
-              type="primary"
-              shape="round"
-              size="large"
-              icon={<EditOutlined />}
-              onClick={handleEditDynamicProfileButtonClicked}
-            />
-          )}
-        </div>
-      )} */}
       {editingMode && (
         <Modal
           visible={addComponentModalVisible}
