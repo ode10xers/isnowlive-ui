@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 
 import { Route, Switch, Redirect, useHistory, useRouteMatch } from 'react-router-dom';
 
-import { Spin, Typography, Row, Col, Card, Menu } from 'antd';
+import { Spin, Typography, Row, Col, Card, Menu, Button } from 'antd';
 import {
   VideoCameraTwoTone,
   PlayCircleTwoTone,
@@ -24,7 +24,7 @@ import CoursesListView from '../CoursesProfileComponent/CoursesListView';
 import styles from './style.module.scss';
 import ProductsEditView from './ProductsEditView';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const ContainerTitle = ({ title = '', icon = null }) => (
   <Text style={{ color: '#0050B3' }}>
@@ -40,11 +40,23 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-const CardContainer = ({ isEditing, placeholderText, cardHeader, children }) => (
+const CardContainer = ({ isEditing, productName, route = Routes.creatorDashboard.rootPath, cardHeader, children }) => (
   <Card {...cardHeader} className={styles.profileComponentContainer} bodyStyle={{ padding: 12 }}>
     {isEditing ? (
-      <Row justify="center" align="middle">
-        <Col>{placeholderText || 'Placeholder text to represent the content'}</Col>
+      <Row gutter={[8, 8]} justify="center" align="middle">
+        <Col className={styles.textAlignCenter} xs={24}>
+          <Paragraph>Any {productName} that you created and published will be shown here</Paragraph>
+          <Paragraph>You can manage your {productName} in your dashboard by clicking the button below</Paragraph>
+        </Col>
+        <Col xs={24}>
+          <Row justify="center">
+            <Col>
+              <Button type="primary" onClick={() => window.open(route, '_blank')}>
+                Manage my {productName}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
       </Row>
     ) : (
       children
@@ -186,7 +198,8 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
   const sessionsComponent = (
     <CardContainer
       isEditing={isEditing}
-      placeholderText="Upcoming sessions that are published will be shown here"
+      productName="sessions"
+      route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions}
       cardHeader={generateCardHeader(
         getComponentTitle('SESSIONS'),
         <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
@@ -199,7 +212,8 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
   const videosComponent = (
     <CardContainer
       isEditing={isEditing}
-      placeholderText="Uploaded videos that are published will be shown here"
+      productName="videos"
+      route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos}
       cardHeader={generateCardHeader(
         getComponentTitle('VIDEOS'),
         <PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />
@@ -212,7 +226,8 @@ const ProductsProfileComponent = ({ identifier = null, isEditing, updateConfigHa
   const coursesComponent = (
     <CardContainer
       isEditing={isEditing}
-      placeholderText="Courses that you have published will be shown here"
+      productName="courses"
+      route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses}
       cardHeader={generateCardHeader(
         getComponentTitle('COURSES'),
         <BookTwoTone className={styles.mr10} twoToneColor="#0050B3" />

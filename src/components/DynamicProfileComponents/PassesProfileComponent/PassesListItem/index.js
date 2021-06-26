@@ -30,13 +30,19 @@ const PassesListItem = ({ pass }) => {
             <Text className={styles.passPrice}> {renderPassPrice()} </Text>
           </Space> */}
           <Row gutter={8} className={styles.passDetails}>
-            <Col xs={11} className={styles.textAlignCenter}>
+            {/* <Col xs={11} className={styles.textAlignCenter}>
               <Text className={styles.passValidity}> {`${pass.validity} day${pass.validity > 1 ? 's' : ''}`} </Text>
+            </Col> */}
+            <Col xs={11} className={styles.textAlignCenter}>
+              <Text className={styles.passValidity}>
+                {' '}
+                {pass.limited ? `${pass.class_count} Credits` : 'Unlimited'}{' '}
+              </Text>
             </Col>
-            <Col xs={2} className={styles.textAlignCenter}>
+            <Col xs={1} className={styles.textAlignCenter}>
               <Divider type="vertical" className={styles.passDivider} />
             </Col>
-            <Col xs={11} className={styles.textAlignCenter}>
+            <Col xs={12} className={styles.textAlignCenter}>
               <Text className={styles.passPrice}> {renderPassPrice()} </Text>
             </Col>
           </Row>

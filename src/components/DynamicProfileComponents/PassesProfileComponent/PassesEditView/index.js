@@ -57,7 +57,7 @@ const PassesEditView = ({ configValues, updateHandler }) => {
         title="Edit this component"
         visible={editModalVisible}
         centered={true}
-        width={380}
+        width={640}
         footer={null}
         afterClose={resetBodyStyle}
         onCancel={cancelEditChanges}
@@ -76,14 +76,18 @@ const PassesEditView = ({ configValues, updateHandler }) => {
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Button block size="large" type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </Col>
-            <Col xs={24}>
-              <Button block size="large" type="default" onClick={cancelEditChanges}>
-                Cancel
-              </Button>
+              <Row gutter={[12, 8]}>
+                <Col xs={24} md={12}>
+                  <Button block size="large" type="default" onClick={cancelEditChanges}>
+                    Cancel
+                  </Button>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Button block size="large" type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </Form>

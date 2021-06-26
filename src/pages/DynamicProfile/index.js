@@ -394,7 +394,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   };
 
   const renderDraggableCustomComponents = (component, idx) => {
-    // TODO: Remove this once Donations Component is implemented
     if (component.key === 'DONATIONS') {
       return null;
     }

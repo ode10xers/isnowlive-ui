@@ -127,9 +127,13 @@ const SendCustomerEmailModal = () => {
         ],
       });
     }
+  }, [emailPopupVisible, recipients, form]);
 
-    fetchCreatorEmailTemplates();
-  }, [emailPopupVisible, recipients, form, fetchCreatorEmailTemplates]);
+  useEffect(() => {
+    if (emailPopupVisible) {
+      fetchCreatorEmailTemplates();
+    }
+  }, [fetchCreatorEmailTemplates, emailPopupVisible]);
 
   const normFile = (e) => {
     if (Array.isArray(e)) {

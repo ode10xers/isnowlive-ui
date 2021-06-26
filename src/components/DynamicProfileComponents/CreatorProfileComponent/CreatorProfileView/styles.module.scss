@@ -18,7 +18,7 @@
     .profileImageWrapper {
       $profile-image-size : 100px;
       background: transparent;
-      margin-top: calc(-1 * (#{$profile-image-size} * 0.25));
+      margin-top: calc(-1 * (#{$profile-image-size} * 0.60));
   
       .profileImage {
         width: $profile-image-size;

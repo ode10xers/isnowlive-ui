@@ -1,15 +1,17 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { Card, Typography, Spin, Row, Col } from 'antd';
+import { Card, Typography, Spin, Row, Col, Button } from 'antd';
 import { LikeTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
+
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
 import SubscriptionsListView from './SubscriptionListView';
 import SubscriptionsEditView from './SubscriptionEditView';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const ContainerTitle = ({ title = 'MEMBERSHIPS' }) => (
   <Text style={{ color: '#0050B3' }}>
@@ -67,8 +69,25 @@ const SubscriptionProfileComponent = ({
         bodyStyle={{ padding: 12 }}
       >
         {isEditing ? (
-          <Row justify="center" align="center">
-            <Col className={styles.textAlignCenter}>Memberships that you have published will show up here</Col>
+          <Row gutter={[8, 8]} justify="center" align="center">
+            <Col xs={24} className={styles.textAlignCenter}>
+              <Paragraph>Memberships that you have created and published will show up here.</Paragraph>
+              <Paragraph>You can manage your memberships in the dashboard by clicking the button below</Paragraph>
+            </Col>
+            <Col xs={24}>
+              <Row justify="center">
+                <Col>
+                  <Button
+                    type="primary"
+                    onClick={() =>
+                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
+                    }
+                  >
+                    Manage my memberships
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
           </Row>
         ) : (
           <Spin spinning={isLoading} tip="Fetching memberships">

@@ -302,14 +302,18 @@ const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = ()
               </Col>
 
               <Col xs={24}>
-                <Button block size="large" type="primary" htmlType="submit">
-                  Submit
-                </Button>
-              </Col>
-              <Col xs={24}>
-                <Button block size="large" type="default" onClick={cancelEditChanges}>
-                  Cancel
-                </Button>
+                <Row gutter={12}>
+                  <Col xs={24} md={[12, 8]}>
+                    <Button block size="large" type="default" onClick={cancelEditChanges}>
+                      Cancel
+                    </Button>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Button block size="large" type="primary" htmlType="submit">
+                      Submit
+                    </Button>
+                  </Col>
+                </Row>
               </Col>
             </Row>
           </Spin>
