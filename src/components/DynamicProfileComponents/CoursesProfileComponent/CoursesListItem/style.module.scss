@@ -30,11 +30,20 @@ $card-border-radius: 8px;
   }
 
   .courseName {
-    height: 48px;
+    height: 52px;
     padding: 12px;
     overflow: hidden;
     color: map-get($map: $colors, $key: 'ResolutionBlue');
-    margin-bottom: 0 !important;
+
+    &.textLength28 {
+      font-size: 20px;
+    }
+    &.textLength56 {
+      font-size: 14px;
+    }
+    &.textLength84 {
+      font-size: 12px;
+    }
   }
 
   .courseContentContainer {

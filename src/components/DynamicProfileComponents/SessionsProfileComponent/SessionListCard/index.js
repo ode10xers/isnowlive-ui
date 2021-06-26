@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { Card, Space, Typography, Image, Divider, Row, Col } from 'antd';
 import { ClockCircleOutlined, HourglassOutlined } from '@ant-design/icons';
@@ -38,7 +39,17 @@ const SessionListCard = ({ session }) => {
   );
 
   const sessionTitle = (
-    <Title level={4} className={styles.sessionTitle}>
+    <Title
+      level={4}
+      className={classNames(
+        styles.sessionTitle,
+        session?.name.length <= 28
+          ? styles.textLength28
+          : session?.name.length <= 56
+          ? styles.textLength56
+          : styles.textLength84
+      )}
+    >
       {session?.name}
     </Title>
   );
