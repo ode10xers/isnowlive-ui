@@ -4,6 +4,7 @@ $card-border-radius : 8px;
 
 .sessionListCard {
   border-radius: $card-border-radius !important;
+  cursor: pointer;
 
   .sessionCoverContainer {
     height: 100%;

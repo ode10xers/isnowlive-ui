@@ -4,6 +4,8 @@ $card-border-radius: 8px;
 
 .courseListItem {
   border-radius: $card-border-radius !important;
+  cursor: pointer;
+
 
   .courseCoverContainer {
     height: 100%;

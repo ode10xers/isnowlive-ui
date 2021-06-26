@@ -3,6 +3,8 @@ import React from 'react';
 import { Row, Col, Divider, Typography } from 'antd';
 
 import styles from './style.module.scss';
+import { preventDefaults } from 'utils/helper';
+import { redirectToPassesPage } from 'utils/redirect';
 
 const { Text, Title } = Typography;
 
@@ -16,9 +18,14 @@ const PassesListItem = ({ pass }) => {
     }
   };
 
+  const handlePassItemClicked = (e) => {
+    preventDefaults(e);
+    redirectToPassesPage(pass);
+  };
+
   return (
-    <div className={styles.passItem}>
-      <Row gutter={[8, 4]}>
+    <div className={styles.passItem} onClick={handlePassItemClicked}>
+      <Row gutter={[4, 4]} justify="center">
         <Col xs={24}>
           <Title level={5} ellipsis={{ rows: 1 }} className={styles.passTitle}>
             {pass.name}
@@ -29,7 +36,7 @@ const PassesListItem = ({ pass }) => {
             <Text className={styles.passValidity}> {`${pass.validity} day${pass.validity > 1 ? 's' : ''}`} </Text>
             <Text className={styles.passPrice}> {renderPassPrice()} </Text>
           </Space> */}
-          <Row gutter={8} className={styles.passDetails}>
+          <Row gutter={8} justify="center" className={styles.passDetails}>
             {/* <Col xs={11} className={styles.textAlignCenter}>
               <Text className={styles.passValidity}> {`${pass.validity} day${pass.validity > 1 ? 's' : ''}`} </Text>
             </Col> */}
@@ -39,10 +46,10 @@ const PassesListItem = ({ pass }) => {
                 {pass.limited ? `${pass.class_count} Credits` : 'Unlimited'}{' '}
               </Text>
             </Col>
-            <Col xs={1} className={styles.textAlignCenter}>
+            <Col xs={2} className={styles.textAlignCenter}>
               <Divider type="vertical" className={styles.passDivider} />
             </Col>
-            <Col xs={12} className={styles.textAlignCenter}>
+            <Col xs={11} className={styles.textAlignCenter}>
               <Text className={styles.passPrice}> {renderPassPrice()} </Text>
             </Col>
           </Row>

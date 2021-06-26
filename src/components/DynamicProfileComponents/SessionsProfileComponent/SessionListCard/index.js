@@ -1,7 +1,6 @@
 import React from 'react';
-// import ReactHtmlParser from 'react-html-parser';
 
-import { Card, Space, Tag, Typography, Image, Divider, Row, Col } from 'antd';
+import { Card, Space, Typography, Image, Divider, Row, Col } from 'antd';
 import { ClockCircleOutlined, HourglassOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
@@ -18,16 +17,16 @@ const {
 const { Text, Title } = Typography;
 
 const SessionListCard = ({ session }) => {
-  const extraTags = (
-    <Space>
-      <Tag color="green"> Everyone </Tag>
-      <Tag color="cyan"> {session?.group ? 'Group' : '1-on-1'} </Tag>
-    </Space>
-  );
+  // const extraTags = (
+  //   <Space>
+  //     <Tag color="green"> Everyone </Tag>
+  //     <Tag color="cyan"> {session?.group ? 'Group' : '1-on-1'} </Tag>
+  //   </Space>
+  // );
 
   const sessionImage = (
     <div className={styles.sessionCoverContainer}>
-      <div className={styles.extraTagsContainer}>{extraTags}</div>
+      {/* <div className={styles.extraTagsContainer}>{extraTags}</div> */}
       <div className={styles.sessionImageContainer}>
         <Image
           preview={false}

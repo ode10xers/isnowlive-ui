@@ -18,9 +18,10 @@
     border-radius : 12px;
     text-align: center; 
     color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+    cursor: pointer;
 
-    @media screen and (max-width: 375px) {
-      font-size: 12px !important;
+    @media screen and (max-width: 376px) {
+      font-size: 14.5px !important;
     }
 
     &.selectedMenu {
