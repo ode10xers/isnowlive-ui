@@ -2,6 +2,11 @@ import config from 'config';
 
 export const initFreshChatWidget = (userData = null) => {
   let freshChatConfig = {
+    config: {
+      cssNames: {
+        widget: 'custom_fc_frame',
+      },
+    },
     token: config.freshChat.appToken,
     host: config.freshChat.hostUrl,
   };

@@ -7,6 +7,8 @@ const {
   formatDate: { getTimeDiff },
 } = dateUtil;
 
+export const deepCloneObject = (objData) => JSON.parse(JSON.stringify(objData));
+
 // Will occur if a member that is not yet approved tries to access secure APIS
 const FORBIDDEN = 403;
 const UNAPPROVED_USER_ERROR_MESSAGE = 'user needs approval before performing this action';
@@ -15,6 +17,9 @@ export const isUnapprovedUserError = (errorResponse) =>
 
 export const isInCustomDomain = () =>
   !window.location.hostname.includes('passion.do') && !window.location.hostname.includes('localhost');
+
+// TODO: Might want to adjust the string here once the decision on Onboarding is decided
+export const isInCreatorDashboard = () => window.location.pathname.includes('creator/dashboard');
 
 export const tagColors = ['magenta', 'red', 'volcano', 'orange', 'gold', 'green', 'cyan', 'blue', 'geekblue', 'purple'];
 
@@ -150,7 +155,7 @@ export const isAPISuccess = (statusCode) => {
 
 export const isValidFile = (url) => {
   const extension = url?.split('.')?.pop();
-  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf'].includes(extension)) {
+  if (url?.startsWith('https://') && ['png', 'jpeg', 'jpg', 'pdf', 'gif'].includes(extension)) {
     return true;
   }
   return false;
@@ -254,6 +259,11 @@ export const copyToClipboard = (link) => {
       }
     );
   }
+};
+
+export const preventDefaults = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 };
 
 export const ZoomAuthType = {

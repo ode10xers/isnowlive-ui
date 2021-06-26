@@ -1,0 +1,6 @@
+@import '../../../styles/variables';
+
+.customDrawerCloseButton {
+  color: map-get($map: $colors, $key: 'Cobalt') !important;
+  font-weight: 400;
+}

@@ -1,0 +1,42 @@
+@import '../../../../styles/variables.scss';
+
+.passItem {
+  background: map-get($map: $colors, $key: 'Ivory');
+  border: 1px dashed map-get($map: $colors, $key: 'Sulu');
+  box-sizing: border-box;
+  border-radius: 4px;
+  padding: 6px;
+  cursor: pointer;
+
+  .passTitle {
+    @extend .greenText;
+    text-align: center;
+    margin: 0;
+    font-size: 20px;
+    line-height: 31px;
+  }
+
+  .passDetails {
+    padding: 4px;
+    width: 100%;
+    
+    .passDivider {
+      margin: 0 auto;
+      min-height: 18px;
+    }
+
+    .passValidity {
+      @extend .greenText;
+      font-size : 15px;
+
+      @media screen and (max-width: 376px) {
+        font-size : 12px;
+      }
+    }
+
+    .passPrice {
+      @extend .passValidity;
+      font-weight: 500;
+    }
+  }
+}

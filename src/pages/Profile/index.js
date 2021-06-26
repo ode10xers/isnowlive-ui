@@ -169,7 +169,7 @@ const Profile = () => {
                         type="primary"
                         className={styles.greenBtn}
                         onClick={() => {
-                          history.push(Routes.session);
+                          history.push(Routes.sessionCreate);
                           window.scrollTo(0, 0);
                           modalRef.destroy();
                         }}
@@ -218,6 +218,7 @@ const Profile = () => {
     values.profile_image_url = profileImage;
     values.profile.testimonials = testimonials;
     if (isPublicUrlAvaiable) {
+      console.log(values);
       updateProfileDetails(values);
     } else {
       setIsLoading(false);
