@@ -20,8 +20,9 @@
     color: map-get($map: $colors, $key: 'DodgerBlue') !important;
     cursor: pointer;
 
-    @media screen and (max-width: 376px) {
-      font-size: 14.5px !important;
+    @media screen and (max-width: 425px) {
+      padding: 12px 4px;
+      font-size: 14px !important;
     }
 
     &.selectedMenu {
