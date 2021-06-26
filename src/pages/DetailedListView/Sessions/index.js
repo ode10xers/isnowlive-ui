@@ -83,7 +83,7 @@ const SessionDetailedListView = ({ history }) => {
   const renderSessionDateList = (sessionDateData) => (
     <Col xs={24} key={sessionDateData.key}>
       <Space direction="vertical">
-        <Title level={4} className={styles.blueText}>
+        <Title level={4} className={styles.redText}>
           {' '}
           {sessionDateData.title}{' '}
         </Title>
