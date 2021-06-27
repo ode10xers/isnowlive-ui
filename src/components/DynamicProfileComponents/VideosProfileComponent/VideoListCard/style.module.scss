@@ -59,6 +59,7 @@
     // background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
     background-color: var(--new-video-card-background-color);
     box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+    border-radius: 0px 0px 8px 8px;
 
     .videoValidity {
       // color: map-get($map: $colors, $key: 'Chambray');
