@@ -20,5 +20,15 @@ export default function EmbeddablePage({ widget }) {
     componentToLoad = <Subscriptions />;
   }
 
-  return <div style={{ padding: '20px' }}>{componentToLoad}</div>;
+  window.addEventListener('message', (e) => {
+    const { command, data: customStyles } = e.data;
+
+    if (command && command === 'add-custom-styling') {
+      console.log('Adding custom styling...');
+      console.log(customStyles);
+      document.head.insertAdjacentHTML('beforeend', `<style>${customStyles}</style>`);
+    }
+  });
+
+  return <div>{componentToLoad}</div>;
 }

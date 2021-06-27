@@ -189,6 +189,13 @@ export const generateUrl = (targetDomain = 'app') => {
   return newUrl;
 };
 
+// TODO: Currently it's only for hex colors, adjust when implementing other styling (fonts, etc)
+export const generateWidgetCSSVarsFromJSON = (objData) => {
+  const stylesData = Object.entries(objData).filter(([key, val]) => val);
+
+  return '* { ' + stylesData.map(([key, val]) => `${key} : #${val}`).join('; ') + '}';
+};
+
 export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
 export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];

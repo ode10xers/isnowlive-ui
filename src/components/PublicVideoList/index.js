@@ -127,7 +127,7 @@ const PublicVideoList = ({ videos }) => {
   };
 
   return (
-    <div className={styles.box}>
+    <div className={styles.publicVideoListContainer}>
       <AuthModal
         visible={showPurchaseVideoModal}
         closeModal={closeAuthModal}

@@ -52,6 +52,8 @@ import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
 import CourseDetailedListView from 'pages/DetailedListView/Courses';
 
+import './styles/globals.scss';
+
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
     <Route
