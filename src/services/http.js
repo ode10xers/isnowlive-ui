@@ -37,11 +37,10 @@ class HttpService {
           localStorage.removeItem('user-details');
           deleteAuthCookie();
           clearGTMUserAttributes();
+          deleteAuthTokenFromLS();
           if (!isInIframeWidget()) {
             window.open(`${window.location.origin}/login?ref=${window.location.pathname}`, '_self');
           } else {
-            deleteAuthTokenFromLS();
-            // TODO: probably should reload
             window.location.reload();
           }
         } else if (isUnapprovedUserError(error.response)) {
