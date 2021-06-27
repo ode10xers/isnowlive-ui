@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Row, Col, Button, Typography, Input, Form, Modal } from 'antd';
 
@@ -7,9 +7,11 @@ import apis from 'apis';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
+import validationRules from 'utils/validation';
+
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import validationRules from 'utils/validation';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -18,6 +20,10 @@ const { Title, Paragraph, Text } = Typography;
 const validDomainNameRegexp = new RegExp('(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{0,62}[a-zA-Z0-9].)+[a-zA-Z]{2,63}$)');
 
 const CustomDomain = () => {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
   const [form] = Form.useForm();
 
   const [submitting, setSubmitting] = useState(false);
@@ -75,6 +81,29 @@ const CustomDomain = () => {
     }
   };
 
+  useEffect(() => {
+    if (userDetails?.profile?.custom_domain) {
+      const creatorCustomDomainSegments = userDetails?.profile?.custom_domain.split('.');
+
+      if (creatorCustomDomainSegments.length > 1) {
+        const creatorDomain = creatorCustomDomainSegments.pop();
+
+        console.log(creatorCustomDomainSegments);
+        console.log(creatorDomain);
+
+        form.setFieldsValue({
+          subdomain: creatorCustomDomainSegments.join('.'),
+          domain: creatorDomain,
+        });
+      } else {
+        form.setFieldsValue({
+          subdomain: '',
+          domain: creatorCustomDomainSegments[0],
+        });
+      }
+    }
+  }, [userDetails, form]);
+
   return (
     <div className={styles.box}>
       <Row gutter={[8, 16]}>
@@ -96,19 +125,28 @@ const CustomDomain = () => {
               <Col>
                 <Form.Item label="Custom Domain" required>
                   <Form.Item name="subdomain" className={styles.inlineFormItem}>
-                    <Input placeholder="Your subdomain here" disabled={submitting} />
+                    <Input
+                      placeholder="Your subdomain here"
+                      disabled={submitting || userDetails.profile?.custom_domain}
+                    />
                   </Form.Item>
                   <span className={styles.inlineFormSeparator}>.</span>
                   <Form.Item name="domain" className={styles.inlineFormItem} rules={validationRules.requiredValidation}>
-                    <Input placeholder="Your domain here" disabled={submitting} />
+                    <Input placeholder="Your domain here" disabled={submitting || userDetails.profile?.custom_domain} />
                   </Form.Item>
                 </Form.Item>
               </Col>
               <Col>
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" loading={submitting}>
-                    Connect Domain
-                  </Button>
+                  {userDetails?.profile?.custom_domain ? (
+                    <Button className={styles.disabledBuyBtn} type="primary" htmlType="submit" disabled={true}>
+                      Domain Configured
+                    </Button>
+                  ) : (
+                    <Button className={styles.greenBtn} type="primary" htmlType="submit" loading={submitting}>
+                      Connect Domain
+                    </Button>
+                  )}
                 </Form.Item>
               </Col>
             </Row>
