@@ -12,6 +12,7 @@ import validationRules from 'utils/validation';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
+import { getLocalUserDetails } from 'utils/storage';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -22,6 +23,7 @@ const validDomainNameRegexp = new RegExp('(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{0,6
 const CustomDomain = () => {
   const {
     state: { userDetails },
+    setUserDetails,
   } = useGlobalContext();
 
   const [form] = Form.useForm();
@@ -42,6 +44,11 @@ const CustomDomain = () => {
 
       if (isAPISuccess(status)) {
         showSuccessModal('Custom Domain Connected');
+        const localUserDetails = getLocalUserDetails();
+        localUserDetails.profile.custom_domain = customDomain;
+
+        setUserDetails(localUserDetails);
+        localStorage.setItem('user-details', JSON.stringify(localUserDetails));
       }
     } catch (error) {
       showErrorModal('Failed connecting custom domain', error?.response?.data?.message || 'Something went wrong.');
