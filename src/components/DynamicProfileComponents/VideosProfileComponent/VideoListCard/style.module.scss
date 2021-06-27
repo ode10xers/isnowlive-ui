@@ -3,6 +3,7 @@
 .videoListCard {
   border-radius: 8px !important;
   cursor: pointer;
+  background-color: var(--new-video-card-background-color) !important;
 
   .videoCoverContainer {
     height: 100%;
@@ -43,7 +44,8 @@
     height: 68px;
     padding: 12px;
     overflow: hidden;
-    color: map-get($map: $colors, $key: 'ResolutionBlue');
+    // color: map-get($map: $colors, $key: 'ResolutionBlue');
+    color: var(--new-video-card-font-color);
   }
 
   .cardFooter {
@@ -52,12 +54,16 @@
     width: 100%;
     justify-content: center;
     font-size: 16px;
-    color: map-get($map: $colors, $key: 'Chambray');
-    background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
+    // color: map-get($map: $colors, $key: 'Chambray');
+    color: var(--new-video-card-font-color);
+    // background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
+    background-color: var(--new-video-card-background-color);
     box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+    border-radius: 0px 0px 8px 8px;
 
     .videoValidity {
-      color: map-get($map: $colors, $key: 'Chambray');
+      // color: map-get($map: $colors, $key: 'Chambray');
+      color: var(--new-video-card-font-color);
       font-weight: 500;
     }
 

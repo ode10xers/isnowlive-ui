@@ -6,7 +6,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie, setAuthCookie } from 'services/authCookie';
-import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
+import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import http from 'services/http';
 import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
@@ -51,6 +51,8 @@ import NewHome from 'pages/NewHome';
 import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
 import CourseDetailedListView from 'pages/DetailedListView/Courses';
+
+import './styles/globals.scss';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -147,6 +149,7 @@ function App() {
       setUserAuthentication(false);
       setUserDetails(null);
       setIsReadyToLoad(true);
+      deleteAuthTokenFromLS();
     };
 
     const getUserDetails = async () => {

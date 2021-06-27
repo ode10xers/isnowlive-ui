@@ -40,22 +40,24 @@ const Courses = () => {
   }, []);
 
   return (
-    <Tabs defaultActiveKey={liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''}>
-      <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
-        <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
-          <div className={styles.p10}>
-            <ShowcaseCourseCard courses={liveCourses} />
-          </div>
-        </Loader>
-      </Tabs.TabPane>
-      <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
-        <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
-          <div className={styles.p10}>
-            <ShowcaseCourseCard courses={videoCourses} />
-          </div>
-        </Loader>
-      </Tabs.TabPane>
-    </Tabs>
+    <div className={styles.coursePluginContainer}>
+      <Tabs defaultActiveKey={liveCourses.length > 0 ? 'liveCourses' : videoCourses.length > 0 ? 'videoCourses' : ''}>
+        <Tabs.TabPane tab={<Title level={5}> Live Courses </Title>} key="liveCourses">
+          <Loader loading={isCoursesLoading} size="large" text="Loading live courses">
+            <div className={styles.p10}>
+              <ShowcaseCourseCard courses={liveCourses} />
+            </div>
+          </Loader>
+        </Tabs.TabPane>
+        <Tabs.TabPane tab={<Title level={5}> Video Courses </Title>} key="videoCourses">
+          <Loader loading={isCoursesLoading} size="large" text="Loading video courses">
+            <div className={styles.p10}>
+              <ShowcaseCourseCard courses={videoCourses} />
+            </div>
+          </Loader>
+        </Tabs.TabPane>
+      </Tabs>
+    </div>
   );
 };
 

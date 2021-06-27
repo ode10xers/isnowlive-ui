@@ -6,22 +6,64 @@ export const widgetComponentsName = {
   CALENDAR: {
     value: 'calendar',
     label: 'Calendar',
+    styling: [],
   },
   PASSES: {
     value: 'passes',
     label: 'Passes',
+    styling: [],
   },
   VIDEOS: {
     value: 'videos',
     label: 'Videos',
+    styling: [
+      {
+        key: '--new-video-card-background-color',
+        label: 'Card Background',
+      },
+      {
+        key: '--new-video-card-font-color ',
+        label: 'Card Text Color',
+      },
+      // {
+      //   key: '--video-card-background-color',
+      //   label: 'Card Background',
+      // },
+      // {
+      //   key: '--video-card-font-color',
+      //   label: 'Card Text Color',
+      // },
+      // {
+      //   key: '--primary-button-color',
+      //   label: 'Buy Button Color',
+      // },
+      // {
+      //   key: '--primary-button-font-color',
+      //   label: 'Buy Button Text Color',
+      // },
+      // {
+      //   key: '--secondary-button-color',
+      //   label: 'Details Button Color',
+      // },
+      // {
+      //   key: '--secondary-button-font-color',
+      //   label: 'Details Button Text Color',
+      // },
+      {
+        key: '--video-widget-background-color',
+        label: 'Plugin Background',
+      },
+    ],
   },
   COURSES: {
     value: 'courses',
     label: 'Courses',
+    styling: [],
   },
   MEMBERSHIPS: {
     value: 'memberships',
     label: 'Memberships',
+    styling: [],
   },
 };
 
