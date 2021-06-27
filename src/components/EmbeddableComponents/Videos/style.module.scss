@@ -3,4 +3,10 @@
 .videoPluginContainer {
   background-color: var(--video-widget-background-color);
   padding: 20px;
+  width: 100%;
+
+  .videoListContainer {
+    max-width: 767px;
+    margin : 0 auto;
+  }
 }

@@ -18,29 +18,37 @@ export const widgetComponentsName = {
     label: 'Videos',
     styling: [
       {
-        key: '--video-card-background-color',
+        key: '--new-video-card-background-color',
         label: 'Card Background',
       },
       {
-        key: '--video-card-font-color',
+        key: '--new-video-card-font-color ',
         label: 'Card Text Color',
       },
-      {
-        key: '--primary-button-color',
-        label: 'Buy Button Color',
-      },
-      {
-        key: '--primary-button-font-color',
-        label: 'Buy Button Text Color',
-      },
-      {
-        key: '--secondary-button-color',
-        label: 'Details Button Color',
-      },
-      {
-        key: '--secondary-button-font-color',
-        label: 'Details Button Text Color',
-      },
+      // {
+      //   key: '--video-card-background-color',
+      //   label: 'Card Background',
+      // },
+      // {
+      //   key: '--video-card-font-color',
+      //   label: 'Card Text Color',
+      // },
+      // {
+      //   key: '--primary-button-color',
+      //   label: 'Buy Button Color',
+      // },
+      // {
+      //   key: '--primary-button-font-color',
+      //   label: 'Buy Button Text Color',
+      // },
+      // {
+      //   key: '--secondary-button-color',
+      //   label: 'Details Button Color',
+      // },
+      // {
+      //   key: '--secondary-button-font-color',
+      //   label: 'Details Button Text Color',
+      // },
       {
         key: '--video-widget-background-color',
         label: 'Plugin Background',
