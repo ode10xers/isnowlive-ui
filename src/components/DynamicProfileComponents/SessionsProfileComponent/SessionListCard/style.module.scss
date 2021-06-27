@@ -1,0 +1,75 @@
+@import '../../../../styles/variables.scss';
+
+$card-border-radius : 8px;
+
+.sessionListCard {
+  border-radius: $card-border-radius !important;
+  cursor: pointer;
+
+  .sessionCoverContainer {
+    height: 100%;
+    position: relative;
+
+    .extraTagsContainer {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 5;
+    }
+
+    .sessionImageContainer {
+      text-align: center;
+      
+      .sessionImage {
+        border-radius: $card-border-radius $card-border-radius 0 0;
+        object-fit: scale-down;
+        height: 100%;
+      }
+    }
+  }
+
+  .sessionTitle {
+    height: 52px;
+    padding: 12px;
+    overflow: hidden;
+    color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+
+    &.textLength28 {
+      font-size: 20px;
+    }
+    &.textLength56 {
+      font-size: 14px;
+    }
+    &.textLength84 {
+      font-size: 12px;
+    }
+  }
+
+  .sessionDescriptionContainer {
+    padding: 8px 12px;
+  }
+
+  .cardFooter {
+    border-top: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+    padding: 8px 4px;
+    width: 100%;
+    justify-content: center;
+    font-size: 16px;
+    background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
+    box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+    border-radius: 0 0 $card-border-radius $card-border-radius;
+
+    .footerText {
+      color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+    }
+
+    .footerDivider {
+      margin: 0 12px;
+    }
+
+    .priceText {
+      @extend .footerText;
+      font-weight: 500;
+    }
+  }
+}

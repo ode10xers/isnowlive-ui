@@ -1,0 +1,61 @@
+@import '../../../../styles/variables.scss';
+
+.linkPreviewItem {
+  border-radius: 8px;
+  background-color: #1890ff10;
+  border: 1px solid #1890ff50;
+  cursor: pointer;
+
+  .linkPreviewDetailsContainer {
+    padding: 12px;
+
+    .placeholderImage {
+      width: 130px;
+      height: 86px;
+      object-fit: cover;
+      margin: auto;
+    }
+
+    .linkPreviewImageContainer {
+      width: 130px;
+      vertical-align: center;
+
+      .linkPreviewImage {
+        border-radius : 8px;
+        height: 86px;
+        object-fit: scale-down;
+      }
+    }
+
+    .titlePlaceholder {
+      max-height: 84px;
+    }
+
+    .linkPreviewTitleContainer {
+      height: 100%;
+      
+      .linkPreviewTitle {
+        font-size : 14px;
+        font-weight : 500;
+        color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+      }
+    }
+
+    @media screen and (max-width: 769px) {
+      padding: 6px;
+    }
+  }
+
+  .linkPreviewArrowContainer {
+    background-color: #1890ff30;
+    font-size: 12px;
+    text-align: center;
+    padding: 0px;
+    border-radius: 0 8px 8px 0;
+
+    .linkPreviewArrow {
+      height: 100%;
+      color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+    }
+  }
+}

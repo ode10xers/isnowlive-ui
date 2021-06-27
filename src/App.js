@@ -46,6 +46,11 @@ import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
 import { mapUserToPendo } from 'services/integrations/pendo';
 import { storeCreatorDetailsToLS } from 'utils/storage';
 import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
+import MobileLayout from 'layouts/MobileLayout';
+import NewHome from 'pages/NewHome';
+import VideoDetailedListView from 'pages/DetailedListView/Videos';
+import SessionDetailedListView from 'pages/DetailedListView/Sessions';
+import CourseDetailedListView from 'pages/DetailedListView/Courses';
 
 import './styles/globals.scss';
 
@@ -215,7 +220,7 @@ function App() {
             />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
-            <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
@@ -244,7 +249,27 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+            {/* New Pages are put higher for more priority matching */}
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.list.sessions}
+              component={SessionDetailedListView}
+            />
+            <RouteWithLayout layout={MobileLayout} exact path={Routes.list.videos} component={VideoDetailedListView} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.list.courses}
+              component={CourseDetailedListView}
+            />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={[Routes.root, Routes.sessions, Routes.videos, Routes.courses]}
+              component={NewHome}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
             <Route path={Routes.stripeAccountValidate}>
               <Redirect

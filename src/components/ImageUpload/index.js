@@ -19,6 +19,7 @@ const ImageUpload = ({
   aspect = 2.7015 / 1,
   overlayHelpText = 'Click here to change the image',
   className,
+  shape = 'rect',
 }) => {
   const [loading] = useState(false);
 
@@ -53,7 +54,7 @@ const ImageUpload = ({
   };
 
   return (
-    <ImgCrop shape="rect" aspect={aspect}>
+    <ImgCrop shape={shape} aspect={aspect}>
       <Upload
         className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType="picture-card"

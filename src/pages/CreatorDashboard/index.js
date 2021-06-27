@@ -2,12 +2,14 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import Routes from 'routes';
 
+import MobileLayout from 'layouts/MobileLayout';
+
 import SessionsInventories from 'pages/CreatorDashboard/SessionsInventories';
 import SessionsDetails from 'pages/CreatorDashboard/SessionsDetails';
 import ManageSessions from 'pages/CreatorDashboard/ManageSessions';
 import Session from 'pages/Session';
 import Profile from 'pages/Profile';
-import ProfilePreview from 'pages/ProfilePreview';
+// import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
 import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
 import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
@@ -28,6 +30,7 @@ import MembersTags from 'pages/CreatorDashboard/AdvancedSettings/MembersTags';
 import MemberSettings from 'pages/CreatorDashboard/AdvancedSettings/MembersSettings';
 import Referral from 'pages/CreatorDashboard/Referral';
 import Affiliates from 'pages/CreatorDashboard/Affiliates';
+import DynamicProfile from 'pages/DynamicProfile';
 
 const CreatorDashboard = ({ match }) => {
   return (
@@ -37,7 +40,20 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.manageSessions} component={ManageSessions} />
       <Route exact path={match.url + Routes.creatorDashboard.createSessions} component={Session} />
       <Route exact path={match.url + Routes.creatorDashboard.updateSessions} component={Session} />
-      <Route exact path={match.url + Routes.creatorDashboard.profile} component={ProfilePreview} />
+      <Route
+        exact
+        path={[
+          match.url + Routes.creatorDashboard.profile,
+          ...Object.entries(Routes.creatorDashboard.profileComponents).map(([key, val]) => match.url + val),
+        ]}
+        render={({ props }) => (
+          <MobileLayout>
+            {' '}
+            <DynamicProfile />{' '}
+          </MobileLayout>
+        )}
+      />
+      {/* <Route exact path={match.url + Routes.creatorDashboard.profile} component={ProfilePreview} /> */}
       <Route exact path={match.url + Routes.creatorDashboard.editProfile} component={Profile} />
       <Route exact path={match.url + Routes.creatorDashboard.livestream} component={LiveStream} />
       <Route exact path={match.url + Routes.creatorDashboard.paymentAccount} component={PaymentAccount} />

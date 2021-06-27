@@ -6,12 +6,13 @@ pipelines:
     master:
       - step:
           name: Build
-          image: node:11
+          image: node:12
           caches:
             - node
             - npm
           script:
             - npm install --cache .npmcache
+            - npm rebuild node-sass #required since the version in cache is different because node version change
             - npm run build:prod
           artifacts:
             - build/**
@@ -23,22 +24,23 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${PD_PROD_S3_BUCKET} --region ${PD_PROD_AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${PD_PROD_CLOUDFRONT_ID} --paths "/*"
-            # - echo "deploying to ec2"
-            # - apk add openssh-client
-            # - apk add rsync
-            # - mkdir -p ~/.ssh
-            # - (umask  077 ; echo ${PROD_KEY} | base64 -d > ~/.ssh/id_rsa)
-            # - cat known_hosts >> ~/.ssh/known_hosts
-            # - rsync -a build/ ${PROD_USER}@${PROD_SERVER}:${PROD_DEPLOYMENT_PATH}/
+            - echo "deploying to ec2"
+            - apk add openssh-client
+            - apk add rsync
+            - mkdir -p ~/.ssh
+            - (umask  077 ; echo ${PROD_KEY} | base64 -d > ~/.ssh/id_rsa)
+            - cat known_hosts >> ~/.ssh/known_hosts
+            - rsync -a build/ ${PROD_USER}@${PROD_SERVER}:${PROD_DEPLOYMENT_PATH}/
     develop:
       - step:
           name: Build
-          image: node:11
+          image: node:12
           caches:
             - node
             - npm
           script:
             - npm install --cache .npmcache
+            - npm rebuild node-sass #required since the version in cache is different because node version change
             - npm run build:stage
           artifacts:
             - build/**
@@ -49,21 +51,22 @@ pipelines:
           script:
             - aws s3 sync build/ s3://${S3_BUCKET} --region ${AWS_S3_REGION} --delete
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_ID} --paths "/*"
-            # - echo "deploying to ec2"
-            # - apk add openssh-client
-            # - apk add rsync
-            # - mkdir -p ~/.ssh
-            # - (umask  077 ; echo ${STAGE_KEY} | base64 -d > ~/.ssh/id_rsa)
-            # - cat known_hosts >> ~/.ssh/known_hosts
-            # - rsync -a build/ ${STAGE_USER}@${STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/
+            - echo "deploying to ec2"
+            - apk add openssh-client
+            - apk add rsync
+            - mkdir -p ~/.ssh
+            - (umask  077 ; echo ${STAGE_KEY} | base64 -d > ~/.ssh/id_rsa)
+            - cat known_hosts >> ~/.ssh/known_hosts
+            - rsync -a build/ ${STAGE_USER}@${STAGE_SERVER}:${STAGE_DEPLOYMENT_PATH}/
   pull-requests:
     '**':
       - step:
           name: Build
-          image: node:11
+          image: node:12
           caches:
             - node
             - npm
           script:
             - npm install --cache .npmcache
+            - npm rebuild node-sass #required since the version in cache is different because node version change
             - npm run build
