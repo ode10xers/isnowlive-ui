@@ -13,8 +13,10 @@
 .sessionDatePicker {
   width: 100%;
   border-radius: 8px !important;
+  cursor: pointer !important;
 
   input, span, div {
+    cursor: pointer !important;
     text-align: center;
     font-size : 18px !important;
     color: map-get($map: $colors, $key: 'Smalt') !important;

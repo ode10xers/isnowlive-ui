@@ -2,9 +2,10 @@ import React from 'react';
 
 import { Row, Col, Divider, Typography } from 'antd';
 
-import styles from './style.module.scss';
 import { preventDefaults } from 'utils/helper';
 import { redirectToPassesPage } from 'utils/redirect';
+
+import styles from './style.module.scss';
 
 const { Text, Title } = Typography;
 

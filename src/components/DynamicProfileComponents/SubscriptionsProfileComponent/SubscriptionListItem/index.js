@@ -1,11 +1,11 @@
 import React from 'react';
 
 import { Row, Col, Typography, Space } from 'antd';
+import { CaretRightOutlined } from '@ant-design/icons';
 
 import { generateBaseCreditsText } from 'utils/subscriptions';
 
 import styles from './style.module.scss';
-import { CaretRightOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 

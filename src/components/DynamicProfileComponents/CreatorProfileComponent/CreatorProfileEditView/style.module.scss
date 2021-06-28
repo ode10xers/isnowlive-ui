@@ -39,9 +39,10 @@
     background-color: transparent;
     height: $profile-picture-height;
     text-align: center;
-
+    
     .profileImage {
       > div {
+        border-radius: 50%;
         height: $profile-picture-height;
         width: $profile-picture-height;
       }

@@ -3,25 +3,35 @@ import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Button } from 'antd';
 
+import Routes from 'routes';
+
 import SessionListCard from '../SessionListCard';
 
+import { getLocalUserDetails } from 'utils/storage';
+import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from 'utils/helper';
+
 import styles from './style.module.scss';
-import Routes from 'routes';
 
 // NOTE: The actual data that is shown here is inventories
 const SessionListView = ({ limit = 2, sessions = [] }) => {
   const history = useHistory();
 
-  if (!sessions || !sessions.length) {
-    return null;
-  }
+  const renderSessionCards = (session) => (
+    <Col xs={24} sm={12} key={`${session.session_external_id}_${session.inventory_id}`}>
+      <SessionListCard session={session} />
+    </Col>
+  );
 
-  const renderSessionCards = (session) => {
-    return (
-      <Col xs={24} sm={12} key={`${session.session_external_id}_${session.inventory_id}`}>
-        <SessionListCard session={session} />
-      </Col>
-    );
+  const handleMoreClicked = (e) => {
+    preventDefaults(e);
+
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      window.open(generateUrlFromUsername(localUserDetails?.username ?? 'app') + Routes.list.sessions);
+    } else {
+      history.push(Routes.list.sessions);
+    }
   };
 
   return (
@@ -32,7 +42,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
           <Col xs={24}>
             <Row justify="center">
               <Col>
-                <Button className={styles.moreButton} type="primary" onClick={() => history.push(Routes.list.sessions)}>
+                <Button className={styles.moreButton} type="primary" onClick={handleMoreClicked}>
                   MORE
                 </Button>
               </Col>

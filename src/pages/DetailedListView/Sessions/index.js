@@ -10,9 +10,9 @@ import Routes from 'routes';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 import { isAPISuccess } from 'utils/helper';
+import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
-import dateUtil from 'utils/date';
 
 const { Title } = Typography;
 
