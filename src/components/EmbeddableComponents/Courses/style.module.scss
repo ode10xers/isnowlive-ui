@@ -1,5 +1,11 @@
 @import '../../../styles/variables.scss';
 
 .coursePluginContainer {
-  padding : 20px;
+  background-color: var(--course-widget-background-color);
+  width: 100%;
+
+  .courseListContainer {
+    max-width: 767px;
+    margin : 0 auto;
+  }
 }

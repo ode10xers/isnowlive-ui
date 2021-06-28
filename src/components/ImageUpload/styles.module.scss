@@ -33,6 +33,10 @@
   }
 }
 
+.roundImage {
+  border-radius: 50%;
+}
+
 .showBorder {
   :global {
     .ant-upload-select-picture-card {

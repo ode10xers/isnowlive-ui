@@ -15,15 +15,15 @@ import {
 import apis from 'apis';
 import Routes from 'routes';
 
-import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
-
 import SessionListView from '../SessionsProfileComponent/SessionListView';
 import VideoListView from '../VideosProfileComponent/VideoListView';
 import CoursesListView from '../CoursesProfileComponent/CoursesListView';
-
-import styles from './style.module.scss';
 import ProductsEditView from './ProductsEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+
+import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const { Text } = Typography;
 
@@ -253,7 +253,7 @@ const ProductsProfileComponent = ({
 
   return (
     <Row>
-      <Col xs={24}>
+      <Col xs={24} className={styles.p10}>
         {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
           <Row gutter={[12, 12]} justify="center" align="center" className={styles.bottomBarMenu}>
             {sessions.length > 0 && (

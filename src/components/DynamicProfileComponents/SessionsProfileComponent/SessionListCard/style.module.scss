@@ -5,6 +5,7 @@ $card-border-radius : 8px;
 .sessionListCard {
   border-radius: $card-border-radius !important;
   cursor: pointer;
+  background-color: var(--session-list-card-background-color) !important;
 
   .sessionCoverContainer {
     height: 100%;
@@ -32,7 +33,7 @@ $card-border-radius : 8px;
     height: 52px;
     padding: 12px;
     overflow: hidden;
-    color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+    color: var(--session-list-card-font-color) !important;
 
     &.textLength28 {
       font-size: 20px;
@@ -55,12 +56,12 @@ $card-border-radius : 8px;
     width: 100%;
     justify-content: center;
     font-size: 16px;
-    background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
+    background-color: var(--session-list-card-background-color) !important;
     box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
 
     .footerText {
-      color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+      color: var(--session-list-card-font-color) !important;
     }
 
     .footerDivider {
