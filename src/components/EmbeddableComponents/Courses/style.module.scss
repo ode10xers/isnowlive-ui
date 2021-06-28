@@ -1,5 +1,15 @@
 @import '../../../styles/variables.scss';
 
 .coursePluginContainer {
+  // Old Plugin Styling, also there in the new one
   padding : 20px;
+
+  // New Plugin Styling
+  background-color: var(--course-widget-background-color);
+  width: 100%;
+
+  .courseListContainer {
+    max-width: 767px;
+    margin : 0 auto;
+  }
 }

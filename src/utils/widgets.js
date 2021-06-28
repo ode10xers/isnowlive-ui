@@ -58,7 +58,24 @@ export const widgetComponentsName = {
   COURSES: {
     value: 'courses',
     label: 'Courses',
-    styling: [],
+    styling: [
+      {
+        key: '--course-widget-background-color',
+        label: 'Plugin Background',
+      },
+      {
+        key: '--course-widget-bar-color',
+        label: 'Top Bar Color',
+      },
+      {
+        key: '--course-card-background-color',
+        label: 'Card Background Color',
+      },
+      {
+        key: '--course-card-font-color',
+        label: 'Card Text Color',
+      },
+    ],
   },
   MEMBERSHIPS: {
     value: 'memberships',
@@ -79,7 +96,7 @@ export const widgetComponentsName = {
       },
       {
         key: '--session-list-bar-color',
-        label: 'Bar Color',
+        label: 'Top Bar Color',
       },
       {
         key: '--session-list-date-font-color',

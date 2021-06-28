@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 import moment from 'moment';
 
 import { Row, Col, Spin, Empty, Button, Affix, Space, Typography, DatePicker, message } from 'antd';
@@ -9,12 +10,11 @@ import Routes from 'routes';
 
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
-import { isAPISuccess } from 'utils/helper';
 import dateUtil from 'utils/date';
+import { isAPISuccess } from 'utils/helper';
+import { isInIframeWidget } from 'utils/widgets';
 
 import styles from './style.module.scss';
-import { useHistory } from 'react-router-dom';
-import { isInIframeWidget } from 'utils/widgets';
 
 const { Title } = Typography;
 

@@ -2,6 +2,12 @@
 
 // Widget CSS Variables Styling
 * {
+
+  // For Course Plugin
+  --course-widget-background-color: #{map-get($map: $colors, $key: 'WhiteSmoke1')};
+  --course-widget-bar-color : #{map-get($map: $colors, $key: 'ColumbiaBlue')};
+  --course-card-background-color : #{map-get($map: $colors, $key: 'White')};
+  --course-card-font-color : #{map-get($map: $colors, $key: 'Chambray')};
   
   // For Video Plugin
   --video-widget-background-color: #{map-get($map: $colors, $key: 'White')};
@@ -18,7 +24,7 @@
   --new-video-card-font-color : #{map-get($map: $colors, $key : 'ResolutionBlue')};
 
   // Session List Variables
-  --session-list-widget-background-color : #{map-get($map: $colors, $key : 'White1')};
+  --session-list-widget-background-color : #{map-get($map: $colors, $key : 'WhiteSmoke1')};
   --session-list-bar-color : #{map-get($map: $colors, $key: 'ColumbiaBlue')};
   --session-list-card-background-color : #{map-get($map: $colors, $key : 'White')};
   --session-list-card-font-color : #{map-get($map: $colors, $key : 'PrussianBlue')};

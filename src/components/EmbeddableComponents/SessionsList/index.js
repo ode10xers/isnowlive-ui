@@ -1,5 +1,6 @@
-import SessionDetailedListView from 'pages/DetailedListView/Sessions';
 import React from 'react';
+
+import SessionDetailedListView from 'pages/DetailedListView/Sessions';
 
 import styles from './style.module.scss';
 
