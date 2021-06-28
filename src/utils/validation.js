@@ -7,6 +7,13 @@ const validationRules = {
       message: 'Public URL can only contain lowercase letters',
     },
   ],
+  urlValidation: [
+    {
+      required: true,
+      type: 'url',
+      message: 'Please input a valid URL',
+    },
+  ],
   emailValidation: [{ type: 'email', required: true, message: 'Please input your email' }],
   passwordValidation: [{ required: true, message: 'Please input your password' }],
   requiredValidation: [{ required: true, message: 'This field is required.' }],

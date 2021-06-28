@@ -34,11 +34,11 @@ const OtherLinksProfileComponent = ({
   removeComponentHandler,
   ...customComponentProps
 }) => {
-  // TODO: Adjust this method since the actual form names and the data stored in API is different
+  // TODO: Render this properly once confirmed with BE
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
   const deleteComponent = () => removeComponentHandler(identifier);
 
-  return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && !isEditing ? null : (
+  return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && false && !isEditing ? null : (
     <Row className={styles.p10} align="middle" justify="center">
       {isEditing && (
         <Col xs={1}>
@@ -58,7 +58,8 @@ const OtherLinksProfileComponent = ({
               <Col className={styles.textAlignCenter}>Links that you've entered will show up here</Col>
             </Row>
           ) : (
-            <OtherLinksListView links={customComponentProps?.values ?? []} />
+            // <OtherLinksListView links={customComponentProps?.values ?? []} />
+            <OtherLinksListView />
           )}
         </Card>
       </Col>
