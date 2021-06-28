@@ -65,9 +65,35 @@ export const widgetComponentsName = {
     label: 'Memberships',
     styling: [],
   },
+  LIST: {
+    value: 'list',
+    label: 'Sessions List',
+    styling: [
+      {
+        key: '--session-list-card-background-color',
+        label: 'Card Background',
+      },
+      {
+        key: '--session-list-card-font-color',
+        label: 'Card Text Color',
+      },
+      {
+        key: '--session-list-bar-color',
+        label: 'Bar Color',
+      },
+      {
+        key: '--session-list-date-font-color',
+        label: 'Date Color',
+      },
+      {
+        key: '--session-list-widget-background-color',
+        label: 'Plugin Background',
+      },
+    ],
+  },
 };
 
-export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses', 'memberships'];
+export const publishedWidgets = ['calendar', 'passes', 'videos', 'courses', 'memberships', 'list'];
 
 export const generateWidgetLink = (widgetName, userNameValue = '') => {
   const username = userNameValue !== '' ? userNameValue : getLocalUserDetails()?.username || getUsernameFromUrl();

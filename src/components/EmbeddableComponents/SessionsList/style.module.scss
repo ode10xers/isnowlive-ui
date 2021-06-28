@@ -1,0 +1,12 @@
+@import '../../../styles/variables.scss';
+
+.sessionListPluginContainer {
+  background-color: var(--session-list-widget-background-color);
+  padding: 20px;
+  width: 100%;
+
+  .sessionListContainer {
+    max-width: 767px;
+    margin : 0 auto;
+  }
+}
