@@ -90,7 +90,7 @@ const Plugins = () => {
         <Col xs={24} md={12} lg={14}>
           <Row gutter={[20, 16]}>
             <Col xs={24}>
-              <Title level={4}> Plugins </Title>
+              <Title level={4}> Add plugins to your website </Title>
             </Col>
             <Col xs={24}>
               <Row gutter={[8, 16]}>

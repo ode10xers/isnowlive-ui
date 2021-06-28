@@ -2,4 +2,12 @@
   min-height: 100%;
   height: fit-content;
   border-right: 0;
+
+  .navItem {
+    font-weight: 600; 
+  }
+
+  .subNavItem {
+    font-weight: 400 !important;
+  }
 }
