@@ -93,14 +93,11 @@ const CustomDomain = () => {
       const creatorCustomDomainSegments = userDetails?.profile?.custom_domain.split('.');
 
       if (creatorCustomDomainSegments.length > 1) {
-        const creatorDomain = creatorCustomDomainSegments.pop();
-
-        console.log(creatorCustomDomainSegments);
-        console.log(creatorDomain);
+        const creatorSubdomain = creatorCustomDomainSegments.shift();
 
         form.setFieldsValue({
-          subdomain: creatorCustomDomainSegments.join('.'),
-          domain: creatorDomain,
+          subdomain: creatorSubdomain,
+          domain: creatorCustomDomainSegments.join('.'),
         });
       } else {
         form.setFieldsValue({

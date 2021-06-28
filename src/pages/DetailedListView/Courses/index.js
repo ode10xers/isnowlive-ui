@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Button, Affix, Select, Spin, Empty, message } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -9,6 +10,7 @@ import Routes from 'routes';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
 import { isAPISuccess } from 'utils/helper';
+import { isInIframeWidget } from 'utils/widgets';
 import { getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
 
 import styles from './style.module.scss';
@@ -28,7 +30,8 @@ const filterOptions = [
   },
 ];
 
-const CourseDetailedListView = ({ history }) => {
+const CourseDetailedListView = () => {
+  const history = useHistory();
   const [isLoading, setIsLoading] = useState(false);
   const [courses, setCourses] = useState([]);
   const [selectedCourseType, setSelectedCourseType] = useState('all');
@@ -81,28 +84,44 @@ const CourseDetailedListView = ({ history }) => {
       <Spin size="large" spinning={isLoading} tip="Fetching creator courses...">
         {courses.length > 0 ? (
           <>
-            <Affix offsetTop={60}>
+            <Affix offsetTop={isInIframeWidget() ? 0 : 60}>
               <div className={styles.stickyHeader}>
                 <Row gutter={8}>
-                  <Col xs={4} md={2}>
-                    <Button
-                      className={styles.blueText}
-                      size="large"
-                      icon={<ArrowLeftOutlined />}
-                      onClick={handleBackClicked}
-                    />
-                  </Col>
-                  <Col xs={20} md={22}>
-                    <Select
-                      size="large"
-                      defaultValue="all"
-                      className={styles.courseFilter}
-                      onChange={setSelectedCourseType}
-                      onClear={() => setSelectedCourseType('all')}
-                      value={selectedCourseType}
-                      options={filterOptions}
-                    />
-                  </Col>
+                  {isInIframeWidget() ? (
+                    <Col xs={24}>
+                      <Select
+                        size="large"
+                        defaultValue="all"
+                        className={styles.courseFilter}
+                        onChange={setSelectedCourseType}
+                        onClear={() => setSelectedCourseType('all')}
+                        value={selectedCourseType}
+                        options={filterOptions}
+                      />
+                    </Col>
+                  ) : (
+                    <>
+                      <Col xs={4} md={2}>
+                        <Button
+                          className={styles.blueText}
+                          size="large"
+                          icon={<ArrowLeftOutlined />}
+                          onClick={handleBackClicked}
+                        />
+                      </Col>
+                      <Col xs={20} md={22}>
+                        <Select
+                          size="large"
+                          defaultValue="all"
+                          className={styles.courseFilter}
+                          onChange={setSelectedCourseType}
+                          onClear={() => setSelectedCourseType('all')}
+                          value={selectedCourseType}
+                          options={filterOptions}
+                        />
+                      </Col>
+                    </>
+                  )}
                 </Row>
               </div>
             </Affix>
