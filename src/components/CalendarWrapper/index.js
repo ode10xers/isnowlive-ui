@@ -16,7 +16,7 @@ const {
 } = dateUtil;
 
 // This component may be eliminated but adding it for now as have limited time
-const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClick }) => {
+const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClick, startDate = null }) => {
   const [calendarView, setCalendarView] = useState(isMobileDevice ? 'day' : 'week');
   const [explicitUpdateCalendarDate, setExplicitUpdateCalendarDate] = useState(false);
 
@@ -97,6 +97,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
       }}
       step={40}
       updateCalendarDate={explicitUpdateCalendarDate}
+      startDate={startDate}
     />
   );
 };

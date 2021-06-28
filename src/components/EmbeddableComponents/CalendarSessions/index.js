@@ -32,6 +32,7 @@ const CalendarSessions = () => {
   const [sessionCountByDate, setSessionCountByDate] = useState({});
   const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
+  const [calendarStartDate, setCalendarStartDate] = useState(new Date());
 
   const getCalendarSessions = async () => {
     try {
@@ -52,6 +53,9 @@ const CalendarSessions = () => {
             isPast: true,
           })),
         ]);
+        if (UpcomingRes.data.length > 0) {
+          setCalendarStartDate(new Date(UpcomingRes.data[0].start_time));
+        }
         setReadyToPaint(true);
         setIsSessionLoading(false);
       }
@@ -210,6 +214,7 @@ const CalendarSessions = () => {
               calendarSessions={calendarSession}
               sessionCountByDate={sessionCountByDate}
               onEventBookClick={onEventBookClick}
+              startDate={calendarStartDate}
             />
           </>
         ) : (
