@@ -374,7 +374,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       return;
     }
 
-    // TODO: Adjust here when more customizability is required
     targetComponent.title = newConfig.title;
     targetComponent.values = newConfig.values ?? null;
     tempConfigComponents.splice(targetIndex, 1, targetComponent);
@@ -446,7 +445,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               updateConfigHandler={updateComponentConfig}
               removeComponentHandler={removeComponent}
               dragHandleProps={provided.dragHandleProps}
-              // TODO: Try to handle this later when more customization is needed
               title={component.title}
               values={component.values}
             />
