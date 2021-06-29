@@ -3,7 +3,11 @@
 .membershipDetailsContainer {
   padding: 8px;
   height: 100%;
-
+  
+  .pageContent {
+    min-height: calc(100vh - 32px);
+    margin-bottom : 30px;
+    
     .highlightedMembershipCard {
       margin : 4px;
       background: linear-gradient(45deg, var(--primary-color) 20%, var(--primary-color-pale)  80%);
@@ -11,21 +15,22 @@
       padding: 12px;
       border-radius: 8px;
       min-height: 200px;
-
+  
       .highlightedMembershipName {
         font-size: 20px;
         color: var(--ternary-color);
       }
-
+  
       .highlightedMembershipDetails {
         color: var(--ternary-color);
       }
-
+  
       .highlightedMembershipPrice {
         text-align: right;
         color: var(--ternary-color);
       }
     }
+  }
 }
 
 
