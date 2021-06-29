@@ -1,5 +1,8 @@
 @import '../../../../styles/variables.scss';
 
+
+/*
+  Old styling
 .subscriptionItem {
   --title-height : 40px;
   background-color: var(--primary-color-01);
@@ -52,5 +55,43 @@
     .subscriptionDetailsArrow {
       height: 100%;
     }
+  }
+}
+*/
+
+.membershipItem {
+  background-color: var(--primary-color);
+  border: 1px solid var(--secondary-color);
+  border-radius: 8px;
+  padding: 8px 16px;
+
+  .membershipName {
+    width: fit-content;
+    color : var(--ternary-color);
+    font-size : 20px;
+    font-weight : 600;
+    border-bottom : 1px solid var(--secondary-color);
+  }
+
+  .arrowSignContainer {
+    max-width: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+
+    .arrowSign {
+      color: var(--secondary-color);
+      font-size: 16px;
+    }
+  }
+
+  .membershipDetails {
+    font-size : 13px;
+    color : var(--ternary-color);
+  }
+
+  .membershipPrice {
+    color : var(--ternary-color);
+    text-align: right;
   }
 }

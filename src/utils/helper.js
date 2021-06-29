@@ -198,6 +198,24 @@ export const generateWidgetCSSVarsFromJSON = (objData) => {
 
 export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
+export const convertHexToRGB = (hexColor) => {
+  const color = +('0x' + hexColor.slice(1).replace(hexColor.length < 5 && /./g, '$&$&'));
+
+  const r = color >> 16;
+  const g = (color >> 8) & 255;
+  const b = color & 255;
+
+  return [r, g, b];
+};
+
+export const isBrightColorShade = ([r, g, b]) => {
+  // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
+  const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
+
+  // Using the HSP value, determine whether the color is light or dark
+  return hsp > 127.5;
+};
+
 export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
 
 export const getDuration = (start_time, end_time) => {
