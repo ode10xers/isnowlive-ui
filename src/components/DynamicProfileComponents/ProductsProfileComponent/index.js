@@ -343,6 +343,8 @@ const ProductsProfileComponent = ({
                     ? videosComponent
                     : courses.length > 0
                     ? coursesComponent
+                    : isEditing
+                    ? sessionsComponent
                     : null}
                 </Route>
               </Switch>
