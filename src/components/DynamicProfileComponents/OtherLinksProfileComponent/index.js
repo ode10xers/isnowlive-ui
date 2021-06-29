@@ -36,7 +36,7 @@ const OtherLinksProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
   const deleteComponent = () => removeComponentHandler(identifier);
 
-  return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && false && !isEditing ? null : (
+  return (!customComponentProps?.values || customComponentProps?.values?.length === 0) && !isEditing ? null : (
     <Row className={styles.p10} align="middle" justify="center">
       {isEditing && (
         <Col xs={1}>
@@ -56,8 +56,7 @@ const OtherLinksProfileComponent = ({
               <Col className={styles.textAlignCenter}>Links that you've entered will show up here</Col>
             </Row>
           ) : (
-            // <OtherLinksListView links={customComponentProps?.values ?? []} />
-            <OtherLinksListView />
+            <OtherLinksListView links={customComponentProps?.values ?? []} />
           )}
         </Card>
       </Col>
