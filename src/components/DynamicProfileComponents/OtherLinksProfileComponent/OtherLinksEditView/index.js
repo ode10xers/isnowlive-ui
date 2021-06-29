@@ -27,7 +27,12 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
     if (configValues) {
       form.setFieldsValue({
         title: configValues.title,
-        links: configValues.values ?? [],
+        links:
+          configValues.values.map((linkData) => ({
+            ...linkData,
+            textColor: linkData.textColor?.slice(1),
+            backgroundColor: linkData.backgroundColor?.slice(1),
+          })) ?? [],
       });
     } else {
       form.resetFields();
