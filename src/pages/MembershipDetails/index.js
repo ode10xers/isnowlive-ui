@@ -346,17 +346,17 @@ const MembershipDetails = ({ match, history }) => {
             )}
 
             {/* Sessions List */}
-            {selectedSubscription?.product_details?.SESSION && false && (
+            {selectedSubscription?.product_details?.SESSION && (
               <Col xs={24}>{renderSessionsComponent(selectedSubscription?.product_details?.SESSION)}</Col>
             )}
 
             {/* Videos List */}
-            {selectedSubscription?.product_details?.VIDEO && false && (
+            {selectedSubscription?.product_details?.VIDEO && (
               <Col xs={24}>{renderVideosComponent(selectedSubscription?.product_details?.VIDEO)}</Col>
             )}
 
             {/* Other Memberships List */}
-            {otherSubscriptions.length > 0 && false && <Col xs={24}>{otherSubscriptionsComponent}</Col>}
+            {otherSubscriptions.length > 0 && <Col xs={24}>{otherSubscriptionsComponent}</Col>}
           </Row>
         </div>
       </Spin>
