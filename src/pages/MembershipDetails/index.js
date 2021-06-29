@@ -364,7 +364,7 @@ const MembershipDetails = ({ match, history }) => {
         placement="bottom"
         height={560}
         bodyStyle={{ padding: 10 }}
-        {...generateDrawerHeader(`INCLUDED ${moreView.toUpperCase()}`)}
+        {...generateDrawerHeader(`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this membership`)}
         onClose={handleCloseBottomSheets}
         className={styles.detailsDrawer}
       >

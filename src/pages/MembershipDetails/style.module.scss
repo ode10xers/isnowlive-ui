@@ -29,18 +29,20 @@
 }
 
 
-  .detailsDrawer {
-    :global {
-      .ant-drawer-content {
-        border-radius : 12px 12px 0 0;
-      }
+.detailsDrawer {
+  :global {
+    .ant-drawer-content {
+      border-radius : 12px 12px 0 0;
     }
   }
+}
 
 .stickyBottomBar {
   padding: 12px;
-  margin : 0;
-  background-color: map-get($map: $colors, $key: 'PaleCornflowerBlue');
+  border-radius : 12px 12px 0 0;
+  margin : 0 auto -10px;
+  background-color: map-get($map: $colors, $key: 'White');
+  border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
 
   .bottomBarPrice {
     color: map-get($map: $colors, $key: 'PrussianBlue');

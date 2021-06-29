@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import moment from 'moment';
 
@@ -24,8 +24,7 @@ const { Title } = Typography;
 const SessionListView = ({ limit = 2, sessions = [] }) => {
   const history = useHistory();
 
-  const [selectedStartDate, setSelectedStartDate] = useState(moment());
-  const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(moment());
+  const selectedStartDate = moment();
 
   const handleMoreClicked = (e) => {
     preventDefaults(e);
@@ -43,8 +42,8 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
     let filteredByDate = [];
 
     sessions
-      .slice(0, limit)
       .filter((session) => moment(session.start_time).isSameOrAfter(selectedStartDate.startOf('day')))
+      .slice(0, limit)
       .forEach((session) => {
         const formattedStartTime = toLongDateWithDay(session.start_time);
         const foundIndex = filteredByDate.findIndex((val) => val.key === formattedStartTime);
@@ -83,13 +82,17 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
   const handleDisabledDate = (current) => current.isBefore(moment().startOf('day'));
 
   const handleChangeDate = (date, dateString) => {
-    setSelectedStartDate(date);
-    setSelectedDatePickerDate(date);
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      window.open(
+        generateUrlFromUsername(localUserDetails?.username ?? 'app') +
+          Routes.list.sessions +
+          `?start_date=${date.utc().format()}`
+      );
+    } else {
+      history.push(`${Routes.list.sessions}?start_date=${date.utc().format()}`);
+    }
   };
 
   return (
@@ -102,7 +105,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
               inputReadOnly={true}
               allowClear={false}
               className={styles.sessionDatePicker}
-              value={selectedDatePickerDate}
+              value={selectedStartDate}
               format="ddd, DD MMM YYYY"
               disabledDate={handleDisabledDate}
               onChange={handleChangeDate}
