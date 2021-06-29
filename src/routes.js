@@ -19,6 +19,7 @@ const Routes = {
   passDetails: '/p/:pass_id',
   inventoryDetails: '/e/:inventory_id',
   sessionDetails: '/s/:session_id',
+  membershipDetails: '/m/:membership_id',
   sessionUpdate: '/creator/session/:id/edit',
   sessionReschedule: '/reschedule',
   profilePreview: '/profile/preview',

@@ -60,6 +60,18 @@ $card-border-radius : 8px;
     box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
 
+    .sessionDayTagsContainer {
+      .sessionTags {
+        text-align: center;
+        font-size: 12px;
+      }
+    
+      .sessionTagsDisabled {
+        @extend .sessionTags;
+        opacity: 0.4;
+      }
+    }
+
     .footerText {
       color: var(--session-list-card-font-color) !important;
     }
