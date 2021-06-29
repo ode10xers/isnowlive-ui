@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Modal, Row, Col, Input, Button, Form, Typography, Space, Tooltip } from 'antd';
+import { Modal, Row, Col, Input, Button, Form, Typography, Space, Tooltip, Collapse } from 'antd';
 import { EditOutlined, MinusCircleOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
@@ -16,6 +16,7 @@ const formInitialValues = {
 };
 
 const { Text, Title, Paragraph } = Typography;
+const { Panel } = Collapse;
 
 const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
   const [form] = Form.useForm();
@@ -117,78 +118,87 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
                 <Form.List name="links" rules={validationRules.otherLinksValidation}>
                   {(fields, { add, remove }, { errors }) => (
                     <Row className={styles.ml10} gutter={[8, 12]}>
-                      {fields.map(({ key, name, fieldKey, ...restField }) => (
-                        <Col xs={24} key={key}>
-                          <Row gutter={[8, 4]}>
-                            <Col xs={24}>
-                              <Space>
-                                <Title level={5} className={styles.blueText}>
-                                  {' '}
-                                  Link Item{' '}
-                                </Title>
-                                {fields.length > 1 ? (
-                                  <Tooltip title="Remove this link item">
-                                    <MinusCircleOutlined className={styles.redText} onClick={() => remove(name)} />
-                                  </Tooltip>
-                                ) : null}
-                              </Space>
-                            </Col>
-
-                            <Col xs={24}>{/* Color Picker Assistant */}</Col>
-                            <Col xs={24} md={12}>
-                              <Form.Item
-                                className={styles.compactFormItem}
-                                {...restField}
-                                label="Link Title"
-                                fieldKey={[fieldKey, 'title']}
-                                name={[name, 'title']}
-                                rules={validationRules.requiredValidation}
-                              >
-                                <Input placeholder="Text to show (max. 30)" maxLength={30} />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24} md={12}>
-                              <Form.Item
-                                className={styles.compactFormItem}
-                                {...restField}
-                                label="Link URL"
-                                fieldKey={[fieldKey, 'url']}
-                                name={[name, 'url']}
-                                rules={validationRules.urlValidation}
-                              >
-                                <Input placeholder="Paste your URL here" type="url" />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24} md={12}>
-                              <Form.Item
-                                className={styles.compactFormItem}
-                                {...restField}
-                                label="Title Color"
-                                fieldKey={[fieldKey, 'textColor']}
-                                name={[name, 'textColor']}
-                                rules={[...validationRules.requiredValidation, ...validationRules.hexColorValidation()]}
-                              >
-                                <Input placeholder="Hex color code of the title" prefix={<Text strong> # </Text>} />
-                              </Form.Item>
-                            </Col>
-                            <Col xs={24} md={12}>
-                              <Form.Item
-                                className={styles.compactFormItem}
-                                {...restField}
-                                label="Background Color"
-                                fieldKey={[fieldKey, 'backgroundColor']}
-                                name={[name, 'backgroundColor']}
-                                rules={[...validationRules.requiredValidation, ...validationRules.hexColorValidation()]}
-                              >
-                                <Input
-                                  placeholder="Hex color code of the background"
-                                  prefix={<Text strong> # </Text>}
-                                />
-                              </Form.Item>
-                            </Col>
-                          </Row>
-                        </Col>
-                      ))}
+                      <Col xs={24}>
+                        <Collapse>
+                          {fields.map(({ key, name, fieldKey, ...restField }) => (
+                            <Panel
+                              key={key}
+                              header={
+                                <Space align="baseline">
+                                  <Title level={5} className={styles.blueText}>
+                                    Link Item
+                                  </Title>
+                                  {fields.length > 1 ? (
+                                    <Tooltip title="Remove this link item">
+                                      <MinusCircleOutlined className={styles.redText} onClick={() => remove(name)} />
+                                    </Tooltip>
+                                  ) : null}
+                                </Space>
+                              }
+                            >
+                              <Row gutter={[8, 4]}>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Link Title"
+                                    fieldKey={[fieldKey, 'title']}
+                                    name={[name, 'title']}
+                                    rules={validationRules.requiredValidation}
+                                  >
+                                    <Input placeholder="Text to show (max. 30)" maxLength={30} />
+                                  </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Link URL"
+                                    fieldKey={[fieldKey, 'url']}
+                                    name={[name, 'url']}
+                                    rules={validationRules.urlValidation}
+                                  >
+                                    <Input placeholder="Paste your URL here" type="url" />
+                                  </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Title Color"
+                                    fieldKey={[fieldKey, 'textColor']}
+                                    name={[name, 'textColor']}
+                                    rules={[
+                                      ...validationRules.requiredValidation,
+                                      ...validationRules.hexColorValidation(),
+                                    ]}
+                                  >
+                                    <Input placeholder="Hex color code of the title" prefix={<Text strong> # </Text>} />
+                                  </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Background Color"
+                                    fieldKey={[fieldKey, 'backgroundColor']}
+                                    name={[name, 'backgroundColor']}
+                                    rules={[
+                                      ...validationRules.requiredValidation,
+                                      ...validationRules.hexColorValidation(),
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder="Hex color code of the background"
+                                      prefix={<Text strong> # </Text>}
+                                    />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
+                            </Panel>
+                          ))}
+                        </Collapse>
+                      </Col>
                       <Col xs={24}>
                         <Button block type="dashed" onClick={() => add()} icon={<PlusCircleOutlined />}>
                           Add more links
