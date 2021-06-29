@@ -53,6 +53,7 @@ import SessionDetailedListView from 'pages/DetailedListView/Sessions';
 import CourseDetailedListView from 'pages/DetailedListView/Courses';
 
 import './styles/globals.scss';
+import MembershipDetails from 'pages/MembershipDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -233,6 +234,12 @@ function App() {
               component={PaymentVerification}
             />
             <PrivateRoute layout={NavbarLayout} exact path={Routes.paymentConfirm} component={PaymentRedirectVerify} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.membershipDetails}
+              component={MembershipDetails}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />

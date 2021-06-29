@@ -208,6 +208,19 @@ export const convertHexToRGB = (hexColor) => {
   return [r, g, b];
 };
 
+// NOTE: make sure the scale and value is inversely proportional
+// e.g. if we want big scale numbers, value should be small
+export const getShadeForHexColor = (hexColor, scale = 1, value = 44) => {
+  const rgbColor = convertHexToRGB(hexColor);
+
+  //NOTE: If it's bright, we want a darker shade, vice versa
+  // const scaleMultiplier = isBrightColorShade(rgbColor) ? -1 : 1;
+  const scaleMultiplier = -1;
+
+  const colorShade = rgbColor.map((color) => Math.min(Math.max(color + scaleMultiplier * scale * value, 0), 255));
+  return `#${colorShade.map((color) => color.toString(16).padStart(2, '0')).join('')}`;
+};
+
 export const isBrightColorShade = ([r, g, b]) => {
   // HSP (Highly Sensitive Poo) equation from http://alienryderflex.com/hsp.html
   const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));

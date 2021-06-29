@@ -3,27 +3,20 @@ import React from 'react';
 import { Row, Col } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 
-import { convertHexToRGB } from 'utils/helper';
+import { getShadeForHexColor, preventDefaults } from 'utils/helper';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 
 import styles from './style.module.scss';
+import { redirectToMembershipPage } from 'utils/redirect';
 
 // const { Text } = Typography;
 
 const SubscriptionListItem = ({ subscription }) => {
   const getSubscriptionColorCode = () => subscription.color_code ?? '#accbab';
 
-  // NOTE: make sure the scale and value is inversely proportional
-  // e.g. if we want big scale numbers, value should be small
-  const getShadeForHexColor = (hexColor, scale = 1, value = 44) => {
-    const rgbColor = convertHexToRGB(hexColor);
-
-    //NOTE: If it's bright, we want a darker shade, vice versa
-    // const scaleMultiplier = isBrightColorShade(rgbColor) ? -1 : 1;
-    const scaleMultiplier = -1;
-
-    const colorShade = rgbColor.map((color) => Math.min(Math.max(color + scaleMultiplier * scale * value, 0), 255));
-    return `#${colorShade.map((color) => color.toString(16).padStart(2, '0')).join('')}`;
+  const handleMembershipItemClicked = (e) => {
+    preventDefaults(e);
+    redirectToMembershipPage(subscription);
   };
 
   // TODO: Do dynamic font size adjust here later
@@ -35,6 +28,7 @@ const SubscriptionListItem = ({ subscription }) => {
         '--secondary-color': getShadeForHexColor(getSubscriptionColorCode(), 1),
         '--ternary-color': getShadeForHexColor(getSubscriptionColorCode(), 2),
       }}
+      onClick={handleMembershipItemClicked}
     >
       <Row gutter={[8, 12]}>
         <Col xs={24}>
