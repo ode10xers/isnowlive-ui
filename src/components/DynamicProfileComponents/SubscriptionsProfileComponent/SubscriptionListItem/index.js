@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { Row, Col } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
@@ -34,7 +35,14 @@ const SubscriptionListItem = ({ subscription }) => {
         <Col xs={24}>
           <Row gutter={8}>
             <Col xs={22}>
-              <div className={styles.membershipName}>{subscription?.name}</div>
+              <div
+                className={classNames(
+                  styles.membershipName,
+                  subscription?.name?.length > 25 ? styles.textLength50 : styles.textLength25
+                )}
+              >
+                {subscription?.name}
+              </div>
             </Col>
             <Col xs={2}>
               <div className={styles.arrowSignContainer}>

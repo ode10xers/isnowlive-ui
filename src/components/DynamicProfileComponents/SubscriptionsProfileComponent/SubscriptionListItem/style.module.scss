@@ -68,9 +68,16 @@
   .membershipName {
     width: fit-content;
     color : var(--ternary-color);
-    font-size : 20px;
     font-weight : 600;
     border-bottom : 1px solid var(--secondary-color);
+
+    &.textLength25 {
+      font-size : 20px;
+    }
+
+    &.textLength50 {
+      font-size : 14px;
+    }
   }
 
   .arrowSignContainer {

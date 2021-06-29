@@ -28,6 +28,15 @@
     }
 }
 
+
+  .detailsDrawer {
+    :global {
+      .ant-drawer-content {
+        border-radius : 12px 12px 0 0;
+      }
+    }
+  }
+
 .stickyBottomBar {
   padding: 12px;
   margin : 0;

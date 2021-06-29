@@ -366,6 +366,7 @@ const MembershipDetails = ({ match, history }) => {
         bodyStyle={{ padding: 10 }}
         {...generateDrawerHeader(`INCLUDED ${moreView.toUpperCase()}`)}
         onClose={handleCloseBottomSheets}
+        className={styles.detailsDrawer}
       >
         {moreView === 'videos' ? moreVideosListView : moreSessionsListView}
       </Drawer>
@@ -391,7 +392,7 @@ const MembershipDetails = ({ match, history }) => {
                 </div>
               </Col>
               <Col xs={10}>
-                <Button block size="large" type="primary" onClick={openPurchaseModal}>
+                <Button block size="large" type="primary" className={styles.greenBtn} onClick={openPurchaseModal}>
                   SUBSCRIBE
                 </Button>
               </Col>
