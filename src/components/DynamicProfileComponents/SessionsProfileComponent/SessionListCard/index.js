@@ -20,7 +20,7 @@ const { Text, Title } = Typography;
 
 // NOTE : Now this component also supports rendering Session Objects
 // (previously it was rendering inventory objects only), we differentiate
-// based on whether inventory_external_id is present or not
+// based on whether inventory_id is present or not
 const SessionListCard = ({ session }) => {
   // const extraTags = (
   //   <Space>
@@ -50,7 +50,7 @@ const SessionListCard = ({ session }) => {
   }, []);
 
   useEffect(() => {
-    if (session && !session.inventory_external_id) {
+    if (session && !session.inventory_id) {
       adjustSession(session);
     }
   }, [session, adjustSession]);
@@ -96,13 +96,11 @@ const SessionListCard = ({ session }) => {
 
   const bottomCardBar = (
     <Space
-      split={
-        adjustedSession?.inventory_external_id ? <Divider type="vertical" className={styles.footerDivider} /> : null
-      }
+      split={adjustedSession?.inventory_id ? <Divider type="vertical" className={styles.footerDivider} /> : null}
       align="center"
       className={styles.cardFooter}
     >
-      {adjustedSession?.inventory_external_id ? (
+      {adjustedSession?.inventory_id ? (
         <>
           <Text className={styles.footerText}>
             <HourglassOutlined className={styles.textIcons} />
@@ -134,7 +132,7 @@ const SessionListCard = ({ session }) => {
   const handleCardClicked = (e) => {
     preventDefaults(e);
 
-    if (adjustedSession.inventory_external_id) {
+    if (adjustedSession.inventory_id) {
       redirectToInventoryPage(session);
     } else {
       redirectToSessionsPage(session);
