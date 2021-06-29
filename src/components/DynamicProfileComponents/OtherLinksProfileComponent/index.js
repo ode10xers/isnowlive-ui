@@ -25,7 +25,6 @@ const cardHeadingStyle = {
   borderRadius: '12px 12px 0 0',
 };
 
-// TODO: Adjust Custom Component Props since this form will be different
 const OtherLinksProfileComponent = ({
   identifier = null,
   isEditing = false,
@@ -34,7 +33,6 @@ const OtherLinksProfileComponent = ({
   removeComponentHandler,
   ...customComponentProps
 }) => {
-  // TODO: Adjust this method since the actual form names and the data stored in API is different
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
   const deleteComponent = () => removeComponentHandler(identifier);
 

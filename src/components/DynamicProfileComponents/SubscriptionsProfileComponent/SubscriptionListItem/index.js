@@ -10,8 +10,6 @@ import { generateBaseCreditsText } from 'utils/subscriptions';
 import styles from './style.module.scss';
 import { redirectToMembershipPage } from 'utils/redirect';
 
-// const { Text } = Typography;
-
 const SubscriptionListItem = ({ subscription }) => {
   const getSubscriptionColorCode = () => subscription.color_code ?? '#accbab';
 
@@ -20,7 +18,6 @@ const SubscriptionListItem = ({ subscription }) => {
     redirectToMembershipPage(subscription);
   };
 
-  // TODO: Do dynamic font size adjust here later
   return (
     <div
       className={styles.membershipItem}
