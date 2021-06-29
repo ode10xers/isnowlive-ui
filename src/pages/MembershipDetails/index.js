@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Button, Spin, Typography, Card, message, Affix } from 'antd';
-import { ArrowLeftOutlined, ScheduleTwoTone, PlayCircleTwoTone } from '@ant-design/icons';
+import { Row, Col, Button, Spin, Typography, Card, message, Affix, Drawer } from 'antd';
+import { ArrowLeftOutlined, ScheduleTwoTone, PlayCircleTwoTone, VideoCameraTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import AuthModal from 'components/AuthModal';
-import VideoListView from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListView';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
@@ -24,6 +24,7 @@ import {
 
 import styles from './style.module.scss';
 import { useGlobalContext } from 'services/globalContext';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 const { Title, Text } = Typography;
 
@@ -57,7 +58,14 @@ const generateCardHeader = (title, icon) => ({
   headStyle: cardHeadingStyle,
 });
 
+const generateDrawerHeader = (title, icon) => ({
+  title: <ContainerTitle title={title} icon={icon} />,
+  headerStyle: cardHeadingStyle,
+});
+
 const MembershipDetails = ({ match, history }) => {
+  const membershipId = match.params.membership_id;
+
   const { showPaymentPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +73,10 @@ const MembershipDetails = ({ match, history }) => {
   const [otherSubscriptions, setOtherSubscriptions] = useState([]);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
-  const fetchCreatorSubscriptions = useCallback(async (subscriptionId) => {
+  const [moreView, setMoreView] = useState('sessions');
+  const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
+
+  const fetchCreatorSubscriptions = useCallback(async (subscriptionId = null) => {
     setIsLoading(true);
 
     try {
@@ -76,7 +87,7 @@ const MembershipDetails = ({ match, history }) => {
 
         const targetSubsIndex = sortedSubs.findIndex((subs) => subs.external_id === subscriptionId);
 
-        if (targetSubsIndex) {
+        if (targetSubsIndex >= 0) {
           const targetSubscription = sortedSubs.splice(targetSubsIndex, 1)[0];
 
           setSelectedSubscription(targetSubscription);
@@ -93,10 +104,8 @@ const MembershipDetails = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
-    if (match.params.membership_id) {
-      fetchCreatorSubscriptions(match.params.membership_id);
-    }
-  }, [fetchCreatorSubscriptions, match.params.membership_id]);
+    fetchCreatorSubscriptions(membershipId);
+  }, [fetchCreatorSubscriptions, membershipId]);
 
   //#region Start of Purchase Business Logic
 
@@ -194,19 +203,87 @@ const MembershipDetails = ({ match, history }) => {
     setShowAuthModal(false);
   };
 
+  const handleMoreSessionsClicked = (e) => {
+    preventDefaults(e);
+
+    setMoreView('sessions');
+    setBottomSheetsVisible(true);
+  };
+
+  const handleMoreVideoClicked = (e) => {
+    preventDefaults(e);
+
+    setMoreView('videos');
+    setBottomSheetsVisible(true);
+  };
+
+  const handleCloseBottomSheets = () => {
+    setBottomSheetsVisible(false);
+  };
+
   //#endregion End of UI Handlers
 
   //#region Start of UI Components
+
+  const renderSessionCards = (session) => (
+    <Col xs={24} sm={12} key={session.session_external_id}>
+      <SessionListCard session={session} />
+    </Col>
+  );
+
+  const renderSessionsComponent = (sessions = []) =>
+    sessions.length > 0 ? (
+      <CardContainer
+        cardHeader={generateCardHeader(
+          'SESSIONS INCLUDED',
+          <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
+        )}
+      >
+        <Row gutter={[16, 16]}>
+          {sessions.slice(0, 2).map(renderSessionCards)}
+          {sessions?.length > 2 && (
+            <Col xs={24}>
+              <Row justify="center">
+                <Col>
+                  <Button size="large" type="primary" onClick={handleMoreSessionsClicked}>
+                    MORE
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          )}
+        </Row>
+      </CardContainer>
+    ) : null;
+
+  const renderVideoCards = (video) => (
+    <Col xs={24} sm={12} key={video.external_id}>
+      <VideoListCard video={video} />
+    </Col>
+  );
 
   const renderVideosComponent = (videos = []) =>
     videos.length > 0 ? (
       <CardContainer
         cardHeader={generateCardHeader(
-          'VIDEO INCLUDED',
+          'VIDEOS INCLUDED',
           <PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />
         )}
       >
-        <VideoListView videos={videos} />
+        <Row gutter={[16, 16]}>
+          {videos.slice(0, 2).map(renderVideoCards)}
+          {videos?.length > 2 && (
+            <Col xs={24}>
+              <Row justify="center">
+                <Col>
+                  <Button size="large" type="primary" onClick={handleMoreVideoClicked}>
+                    MORE
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          )}
+        </Row>
       </CardContainer>
     ) : null;
 
@@ -219,6 +296,14 @@ const MembershipDetails = ({ match, history }) => {
     >
       <SubscriptionsListView subscriptions={otherSubscriptions} />
     </CardContainer>
+  );
+
+  const moreVideosListView = (
+    <Row gutter={[16, 16]}>{selectedSubscription?.product_details?.VIDEO?.map(renderVideoCards)}</Row>
+  );
+
+  const moreSessionsListView = (
+    <Row gutter={[16, 16]}>{selectedSubscription?.product_details?.SESSION?.map(renderSessionCards)}</Row>
   );
 
   //#endregion End of UI Components
@@ -260,19 +345,31 @@ const MembershipDetails = ({ match, history }) => {
           )}
 
           {/* Sessions List */}
+          {selectedSubscription?.product_details?.SESSION && (
+            <Col xs={24}>{renderSessionsComponent(selectedSubscription?.product_details?.SESSION)}</Col>
+          )}
 
-          <Col xs={24}>
-            {/* Videos List */}
-            {selectedSubscription?.product_details?.VIDEO &&
-              renderVideosComponent(selectedSubscription?.product_details?.VIDEO)}
-          </Col>
+          {/* Videos List */}
+          {selectedSubscription?.product_details?.VIDEO && (
+            <Col xs={24}>{renderVideosComponent(selectedSubscription?.product_details?.VIDEO)}</Col>
+          )}
 
-          <Col xs={24}>
-            {/* Other Memberships List */}
-            {otherSubscriptions.length > 0 && otherSubscriptionsComponent}
-          </Col>
+          {/* Other Memberships List */}
+          {otherSubscriptions.length > 0 && <Col xs={24}>{otherSubscriptionsComponent}</Col>}
         </Row>
       </Spin>
+      {/* Bottom Sheets List */}
+      <Drawer
+        visible={bottomSheetsVisible}
+        placement="bottom"
+        height={560}
+        bodyStyle={{ padding: 10 }}
+        {...generateDrawerHeader(`INCLUDED ${moreView.toUpperCase()}`)}
+        onClose={handleCloseBottomSheets}
+      >
+        {moreView === 'videos' ? moreVideosListView : moreSessionsListView}
+      </Drawer>
+
       {/* Sticky Bottom Buy UI */}
       {selectedSubscription && (
         <Affix offsetBottom={0}>

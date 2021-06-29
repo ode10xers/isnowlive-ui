@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 
-import { Card, Space, Typography, Image, Divider, Row, Col } from 'antd';
+import { Card, Space, Typography, Image, Divider, Row, Col, Spin, Tag } from 'antd';
 import { ClockCircleOutlined, HourglassOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
-import { isValidFile, preventDefaults } from 'utils/helper';
-import { redirectToInventoryPage } from 'utils/redirect';
+import { isValidFile, preventDefaults, isoDayOfWeek } from 'utils/helper';
+import { redirectToInventoryPage, redirectToSessionsPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
+import { getDaysForSession, mapInventoryDays } from 'utils/session';
 const DefaultImage = require('assets/images/greybg.jpg');
 
 const {
@@ -17,13 +18,42 @@ const {
 
 const { Text, Title } = Typography;
 
+// NOTE : Now this component also supports rendering Session Objects
+// (previously it was rendering inventory objects only), we differentiate
+// based on whether inventory_external_id is present or not
 const SessionListCard = ({ session }) => {
   // const extraTags = (
   //   <Space>
   //     <Tag color="green"> Everyone </Tag>
-  //     <Tag color="cyan"> {session?.group ? 'Group' : '1-on-1'} </Tag>
+  //     <Tag color="cyan"> {adjustedSession?.group ? 'Group' : '1-on-1'} </Tag>
   //   </Space>
   // );
+  const [isLoading, setIsLoading] = useState(false);
+  const [adjustedSession, setAdjustedSession] = useState(session);
+
+  const adjustSession = useCallback(async (sessionData) => {
+    setIsLoading(true);
+
+    if (sessionData.inventory) {
+      setAdjustedSession({
+        ...sessionData,
+        inventory_days: mapInventoryDays(sessionData.inventory),
+      });
+    } else {
+      setAdjustedSession({
+        ...sessionData,
+        inventory_days: await getDaysForSession(sessionData.session_id),
+      });
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (session && !session.inventory_external_id) {
+      adjustSession(session);
+    }
+  }, [session, adjustSession]);
 
   const sessionImage = (
     <div className={styles.sessionCoverContainer}>
@@ -32,7 +62,7 @@ const SessionListCard = ({ session }) => {
         <Image
           preview={false}
           className={styles.sessionImage}
-          src={isValidFile(session?.session_image_url) ? session?.session_image_url : DefaultImage}
+          src={isValidFile(adjustedSession?.session_image_url) ? adjustedSession?.session_image_url : DefaultImage}
         />
       </div>
     </div>
@@ -43,47 +73,72 @@ const SessionListCard = ({ session }) => {
       level={4}
       className={classNames(
         styles.sessionTitle,
-        session?.name.length <= 28
+        adjustedSession?.name.length <= 28
           ? styles.textLength28
-          : session?.name.length <= 56
+          : adjustedSession?.name.length <= 56
           ? styles.textLength56
           : styles.textLength84
       )}
     >
-      {session?.name}
+      {adjustedSession?.name}
     </Title>
   );
 
   const renderSessionPrice = () => {
-    if (session?.pay_what_you_want) {
+    if (adjustedSession?.pay_what_you_want) {
       return 'Flexible';
-    } else if (session?.price === 0 || session?.currency === '') {
+    } else if (adjustedSession?.price === 0 || adjustedSession?.currency === '') {
       return 'Free';
     } else {
-      return `${session?.currency.toUpperCase()} ${session?.price}`;
+      return `${adjustedSession?.currency.toUpperCase()} ${adjustedSession?.price}`;
     }
   };
 
   const bottomCardBar = (
     <Space
-      split={<Divider type="vertical" className={styles.footerDivider} />}
+      split={
+        adjustedSession?.inventory_external_id ? <Divider type="vertical" className={styles.footerDivider} /> : null
+      }
       align="center"
       className={styles.cardFooter}
     >
-      <Text className={styles.footerText}>
-        <HourglassOutlined className={styles.textIcons} />
-        {getTimeDiff(session?.end_time, session?.start_time, 'minutes')} mins
-      </Text>
-      <Text className={styles.footerText}>
-        <ClockCircleOutlined className={styles.textIcons} /> {toShortTimeWithPeriod(session?.start_time)}
-      </Text>
+      {adjustedSession?.inventory_external_id ? (
+        <>
+          <Text className={styles.footerText}>
+            <HourglassOutlined className={styles.textIcons} />
+            {getTimeDiff(adjustedSession?.end_time, adjustedSession?.start_time, 'minutes')} mins
+          </Text>
+          <Text className={styles.footerText}>
+            <ClockCircleOutlined className={styles.textIcons} /> {toShortTimeWithPeriod(adjustedSession?.start_time)}
+          </Text>
+        </>
+      ) : (
+        <Space size={2} className={styles.sessionDayTagsContainer}>
+          {isoDayOfWeek.map((day, index) => (
+            <Tag
+              key={`${adjustedSession.session_id}_${day}`}
+              className={
+                adjustedSession.inventory_days?.includes(index + 1) ? styles.sessionTags : styles.sessionTagsDisabled
+              }
+              color={adjustedSession.inventory_days?.includes(index + 1) ? 'blue' : 'default'}
+            >
+              {day[0]}
+            </Tag>
+          ))}
+        </Space>
+      )}
       <Text className={styles.priceText}> {renderSessionPrice()} </Text>
     </Space>
   );
 
   const handleCardClicked = (e) => {
     preventDefaults(e);
-    redirectToInventoryPage(session);
+
+    if (adjustedSession.inventory_external_id) {
+      redirectToInventoryPage(session);
+    } else {
+      redirectToSessionsPage(session);
+    }
   };
 
   return (
@@ -93,10 +148,12 @@ const SessionListCard = ({ session }) => {
       bodyStyle={{ padding: 0 }}
       onClick={handleCardClicked}
     >
-      <Row>
-        <Col xs={24}>{sessionTitle}</Col>
-        <Col xs={24}>{bottomCardBar}</Col>
-      </Row>
+      <Spin spinning={isLoading}>
+        <Row>
+          <Col xs={24}>{sessionTitle}</Col>
+          <Col xs={24}>{bottomCardBar}</Col>
+        </Row>
+      </Spin>
     </Card>
   );
 };
