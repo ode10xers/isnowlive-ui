@@ -312,51 +312,53 @@ const MembershipDetails = ({ match, history }) => {
     <div className={styles.membershipDetailsContainer}>
       <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Spin spinning={isLoading} tip="Fetching membership details..." size="large">
-        <Row className={styles.mb30} gutter={[8, 16]} justify="center">
-          {/* Membership Card */}
-          {selectedSubscription && (
-            <Col
-              xs={24}
-              style={{
-                '--primary-color': `${selectedSubscription?.color_code ?? '#1890ff'}80`,
-                '--primary-color-pale': `${selectedSubscription?.color_code ?? '#1890ff'}40`,
-                '--secondary-color': getShadeForHexColor(selectedSubscription?.color_code ?? '#1890ff', 1),
-                '--ternary-color': getShadeForHexColor(selectedSubscription?.color_code ?? '#1890ff', 2),
-              }}
-            >
-              <Row className={styles.highlightedMembershipCard} gutter={[8, 8]} justify="end" align="bottom">
-                <Col xs={24}>
-                  <Title level={5} className={styles.highlightedMembershipName}>
-                    {selectedSubscription?.name}
-                  </Title>
-                </Col>
-                <Col xs={24}>
-                  <Row gutter={8} align="bottom">
-                    <Col xs={14} className={styles.highlightedMembershipDetails}>
-                      {generateBaseCreditsText(selectedSubscription, false)}
-                    </Col>
-                    <Col xs={10} className={styles.highlightedMembershipPrice}>
-                      {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.price} / month
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            </Col>
-          )}
+        <div className={styles.pageContent}>
+          <Row gutter={[8, 16]} justify="center">
+            {/* Membership Card */}
+            {selectedSubscription && (
+              <Col
+                xs={24}
+                style={{
+                  '--primary-color': `${selectedSubscription?.color_code ?? '#1890ff'}80`,
+                  '--primary-color-pale': `${selectedSubscription?.color_code ?? '#1890ff'}40`,
+                  '--secondary-color': getShadeForHexColor(selectedSubscription?.color_code ?? '#1890ff', 1),
+                  '--ternary-color': getShadeForHexColor(selectedSubscription?.color_code ?? '#1890ff', 2),
+                }}
+              >
+                <Row className={styles.highlightedMembershipCard} gutter={[8, 8]} justify="end" align="bottom">
+                  <Col xs={24}>
+                    <Title level={5} className={styles.highlightedMembershipName}>
+                      {selectedSubscription?.name}
+                    </Title>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={8} align="bottom">
+                      <Col xs={14} className={styles.highlightedMembershipDetails}>
+                        {generateBaseCreditsText(selectedSubscription, false)}
+                      </Col>
+                      <Col xs={10} className={styles.highlightedMembershipPrice}>
+                        {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.price} / month
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
+              </Col>
+            )}
 
-          {/* Sessions List */}
-          {selectedSubscription?.product_details?.SESSION && (
-            <Col xs={24}>{renderSessionsComponent(selectedSubscription?.product_details?.SESSION)}</Col>
-          )}
+            {/* Sessions List */}
+            {selectedSubscription?.product_details?.SESSION && false && (
+              <Col xs={24}>{renderSessionsComponent(selectedSubscription?.product_details?.SESSION)}</Col>
+            )}
 
-          {/* Videos List */}
-          {selectedSubscription?.product_details?.VIDEO && (
-            <Col xs={24}>{renderVideosComponent(selectedSubscription?.product_details?.VIDEO)}</Col>
-          )}
+            {/* Videos List */}
+            {selectedSubscription?.product_details?.VIDEO && false && (
+              <Col xs={24}>{renderVideosComponent(selectedSubscription?.product_details?.VIDEO)}</Col>
+            )}
 
-          {/* Other Memberships List */}
-          {otherSubscriptions.length > 0 && <Col xs={24}>{otherSubscriptionsComponent}</Col>}
-        </Row>
+            {/* Other Memberships List */}
+            {otherSubscriptions.length > 0 && false && <Col xs={24}>{otherSubscriptionsComponent}</Col>}
+          </Row>
+        </div>
       </Spin>
       {/* Bottom Sheets List */}
       <Drawer
