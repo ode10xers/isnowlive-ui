@@ -13,6 +13,7 @@ import SessionListCard from 'components/DynamicProfileComponents/SessionsProfile
 import dateUtil from 'utils/date';
 import { isAPISuccess } from 'utils/helper';
 import { isInIframeWidget } from 'utils/widgets';
+import parseQueryString from 'utils/parseQueryString';
 
 import styles from './style.module.scss';
 
@@ -27,10 +28,12 @@ const {
 const SessionDetailedListView = () => {
   const history = useHistory();
 
+  const { start_date } = parseQueryString(window.location.href);
+
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
-  const [selectedStartDate, setSelectedStartDate] = useState(moment());
-  const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(moment());
+  const [selectedStartDate, setSelectedStartDate] = useState(start_date ? moment(start_date) : moment());
+  const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(start_date ? moment(start_date) : moment());
 
   const fetchUpcomingSessions = useCallback(async () => {
     setIsLoading(true);
