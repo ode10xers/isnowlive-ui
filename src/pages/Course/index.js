@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
-
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Row,
   Col,
@@ -17,8 +17,12 @@ import {
   Tag,
   Checkbox,
   Radio,
+  Tooltip,
+  Space,
+  Collapse,
 } from 'antd';
-import { BookTwoTone, TagOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
+import { BookTwoTone, TagOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
@@ -38,7 +42,7 @@ import { fetchCreatorCurrency } from 'utils/payment';
 import { courseModalFormLayout, courseModalTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-
+const { Panel } = Collapse;
 const courseTypes = {
   MIXED: {
     name: 'MIXED',
@@ -286,6 +290,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
   const unselectAllInventory = () => setSelectedInventories([]);
 
   useEffect(() => {
+    visible = true;
     if (visible) {
       if (!isVideoModal) {
         fetchAllCourseClassForCreator();
@@ -485,7 +490,8 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
 
   const handleFinish = async (values) => {
     setSubmitting(true);
-
+    console.log(values);
+    return;
     let payload = {};
 
     if (isVideoModal) {
@@ -690,7 +696,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
 
   const renderLiveCourseInputs = () => (
     <>
-      <Col xs={isVideoModal ? 0 : 24}>
+      <Col xs={isVideoModal ? 0 : 16}>
         <Form.Item
           {...courseModalFormLayout}
           id="selectedCourseClass"
@@ -788,7 +794,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
           </Select>
         </Form.Item>
       </Col>
-      <Col xs={isVideoModal ? 0 : 24}>
+      <Col xs={isVideoModal ? 0 : 16}>
         <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={isVideoModal}>
           <Row gutter={8}>
             <Col xs={12}>
@@ -825,7 +831,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
           </Row>
         </Form.Item>
       </Col>
-      <Col xs={isVideoModal ? 0 : 24}>
+      <Col xs={isVideoModal ? 0 : 16}>
         <Form.Item
           {...courseModalFormLayout}
           id="maxParticipants"
@@ -848,7 +854,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
           <InputNumber min={0} placeholder="Max Participants" className={styles.numericInput} />
         </Form.Item>
       </Col>
-      <Col xs={isVideoModal ? 0 : 24}>
+      <Col xs={isVideoModal ? 0 : 16}>
         <Row gutter={[8, 4]}>
           <Col xs={24} className={styles.courseDatesText}>
             Course Classes Date & Time :{' '}
@@ -924,6 +930,95 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
       >
         <Row className={styles.courseRow} gutter={[8, 16]}>
           <Col xs={24}>
+            <Form.Item required={true}>
+              <Form.List name="module" rules={validationRules.otherLinksValidation}>
+                {(fields, { add, remove }, { errors }) => (
+                  <Row className={styles.ml10} gutter={[8, 12]}>
+                    <Col xs={24}>
+                      <Collapse>
+                        {fields.map(({ key, name, fieldKey, ...restField }) => (
+                          <Panel
+                            key={key}
+                            header={
+                              <Space align="baseline">
+                                <Title level={5} className={styles.blueText}>
+                                  Module
+                                </Title>
+                                <Tooltip title="Remove this link item">
+                                  <MinusCircleOutlined className={styles.redText} onClick={() => remove(name)} />
+                                </Tooltip>
+                              </Space>
+                            }
+                          >
+                            <Row>
+                              <Col xs={24}>
+                                <Form.Item required={true}>
+                                  <Form.List name="content" rules={validationRules.otherLinksValidation}>
+                                    {(fields, { add, remove }, { errors }) => (
+                                      <Row className={styles.ml10} gutter={[8, 12]}>
+                                        <Col xs={24}>
+                                          <Collapse>
+                                            {fields.map(({ key, name, fieldKey, ...restField }) => (
+                                              <Panel
+                                                key={key}
+                                                header={
+                                                  <Space align="baseline">
+                                                    <Title level={5} className={styles.blueText}>
+                                                      Content
+                                                    </Title>
+                                                    <Tooltip title="Remove this link item">
+                                                      <MinusCircleOutlined
+                                                        className={styles.redText}
+                                                        onClick={() => remove(name)}
+                                                      />
+                                                    </Tooltip>
+                                                  </Space>
+                                                }
+                                              ></Panel>
+                                            ))}
+                                          </Collapse>
+                                        </Col>
+                                        <Col xs={24}>
+                                          <Button
+                                            block
+                                            type="dashed"
+                                            onClick={() => add()}
+                                            icon={<PlusCircleOutlined />}
+                                          >
+                                            Add more Content
+                                          </Button>
+                                        </Col>
+                                        {errors && (
+                                          <Col xs={24}>
+                                            <Text type="danger"> {errors} </Text>
+                                          </Col>
+                                        )}
+                                      </Row>
+                                    )}
+                                  </Form.List>
+                                </Form.Item>
+                              </Col>
+                            </Row>
+                          </Panel>
+                        ))}
+                      </Collapse>
+                    </Col>
+                    <Col xs={24}>
+                      <Button block type="dashed" onClick={() => add()} icon={<PlusCircleOutlined />}>
+                        Add more Modules
+                      </Button>
+                    </Col>
+                    {errors && (
+                      <Col xs={24}>
+                        <Text type="danger"> {errors} </Text>
+                      </Col>
+                    )}
+                  </Row>
+                )}
+              </Form.List>
+            </Form.Item>
+          </Col>
+          <Col xs={16}>
             <Form.Item
               id="courseImageUrl"
               name="courseImageUrl"
@@ -943,7 +1038,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               </div>
             </Form.Item>
           </Col>
-          <Col xs={24}>
+          <Col xs={16}>
             <Form.Item
               {...courseModalFormLayout}
               id="courseName"
@@ -956,7 +1051,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
           </Col>
           {renderVideoCourseInputs()}
           {renderLiveCourseInputs()}
-          <Col xs={24}>
+          <Col xs={16}>
             <Form.Item
               {...courseModalFormLayout}
               id="videoList"
@@ -1054,7 +1149,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24}>
+          <Col xs={16}>
             <Form.Item {...courseModalFormLayout} label="Course Price" required={true}>
               <Row gutter={8}>
                 <Col xs={20}>
@@ -1080,7 +1175,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               </Row>
             </Form.Item>
           </Col>
-          <Col xs={24}>
+          <Col xs={16}>
             <Form.Item
               label="Bookable by member with Tag"
               required
@@ -1134,19 +1229,51 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               />
             </Form.Item>
           </Col>
-          <Col xs={24}>
-            <Form.Item {...courseModalFormLayout} name="colorCode" label="Color Tag">
-              <div className={styles.colorPickerPreview} style={{ borderColor: colorCode }}>
-                <TwitterPicker
-                  triangle="hide"
-                  color={colorCode}
-                  colors={colorPickerChoices}
-                  className={styles.colorPicker}
-                  onChangeComplete={handleColorChange}
-                  width={isMobileDevice ? 290 : 300}
-                />
-              </div>
-            </Form.Item>
+          <Col xs={16}>
+            <Form.List name="FAQS">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, fieldKey, ...restField }) => (
+                    <Row key={key}>
+                      <Col xs={24}>
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'FAQ_QUESTION']}
+                          {...courseModalFormLayout}
+                          fieldKey={[fieldKey, 'first']}
+                          rules={[{ required: true, message: 'Missing Question' }]}
+                          id="FAQ_QUESTION"
+                          label="FAQ QUESTION"
+                          rules={validationRules.nameValidation}
+                        >
+                          <Input placeholder="Enter Question" maxLength={50} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24}>
+                        <Form.Item
+                          {...restField}
+                          name={[name, 'FAQ_ANSWER']}
+                          {...courseModalFormLayout}
+                          fieldKey={[fieldKey, 'first']}
+                          rules={[{ required: true, message: 'Missing Answer' }]}
+                          id="FAQ_ANSWER"
+                          label="FAQ ANSWER"
+                          rules={validationRules.nameValidation}
+                        >
+                          <Input placeholder="Enter Answer" maxLength={50} />
+                        </Form.Item>
+                      </Col>
+                      <MinusCircleOutlined onClick={() => remove(name)} />
+                    </Row>
+                  ))}
+                  <Form.Item>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                      Add New FAQ
+                    </Button>
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
           </Col>
         </Row>
         <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
