@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 
-import Loader from 'components/Loader';
-import PublicVideoList from 'components/PublicVideoList';
+import { Row, Col, Empty, message } from 'antd';
+
 import apis from 'apis';
+
+import Loader from 'components/Loader';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+
 import { isAPISuccess } from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const Videos = () => {
   const [videos, setVideos] = useState([]);
@@ -21,16 +27,32 @@ const Videos = () => {
         }
       } catch (error) {
         setIsVideosLoading(false);
+        message.error('Failed to fetch videos for creator');
         console.error('Failed to load video details');
       }
     };
     getVideosDetails();
   }, []);
 
+  const renderVideoCards = (video) => (
+    <Col xs={24} sm={12} key={video.external_id}>
+      <VideoListCard video={video} />
+    </Col>
+  );
+
   return (
-    <Loader loading={isVideosLoading} size="large" text="Loading videos">
-      <PublicVideoList videos={videos} />
-    </Loader>
+    <div className={styles.videoPluginContainer}>
+      <Loader loading={isVideosLoading} size="large" text="Loading videos">
+        {/* <PublicVideoList videos={videos} /> */}
+        {videos.length > 0 ? (
+          <div className={styles.videoListContainer}>
+            <Row gutter={[8, 16]}>{videos.map(renderVideoCards)}</Row>
+          </div>
+        ) : (
+          <Empty className={styles.w100} description="No videos found for creator" />
+        )}
+      </Loader>
+    </div>
   );
 };
 

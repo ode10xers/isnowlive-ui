@@ -1,41 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Card, Image, Row, Col, Typography, Empty, Tag, message } from 'antd';
+import { Card, Image, Row, Col, Typography, Empty, Tag } from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
-
-import apis from 'apis';
 
 import Loader from 'components/Loader';
 
-import dateUtil from 'utils/date';
 import { isValidFile, isoDayOfWeek } from 'utils/helper';
 import { redirectToSessionsPage } from 'utils/redirect';
 import { isMobileDevice } from 'utils/device';
+import { mapInventoryDays, getDaysForSession } from 'utils/session';
 
 import styles from './styles.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
 const { Title } = Typography;
-const {
-  formatDate: { getISODayOfWeek },
-} = dateUtil;
 
 const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = false }) => {
   const [adjustedSessions, setAdjustedSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const mapInventoryDays = (inventories) =>
-    [...new Set(inventories.map((inventory) => getISODayOfWeek(inventory.start_time)))].sort();
-
-  const getDaysForSession = async (sessionId) => {
-    try {
-      const { data } = await apis.session.getSessionDetails(sessionId);
-      return mapInventoryDays(data.inventory);
-    } catch (error) {
-      message.error('Something wrong happened!');
-    }
-  };
 
   const adjustSession = async () => {
     setIsLoading(true);
@@ -62,7 +45,7 @@ const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = f
   }, [sessions]);
 
   return (
-    <div>
+    <div className={styles.w100}>
       <Loader loading={isLoading} text="Fetching session informations">
         <Row gutter={[8, 8]}>
           {adjustedSessions && adjustedSessions.length > 0 ? (

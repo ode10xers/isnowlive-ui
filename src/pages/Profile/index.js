@@ -169,7 +169,7 @@ const Profile = () => {
                         type="primary"
                         className={styles.greenBtn}
                         onClick={() => {
-                          history.push(Routes.session);
+                          history.push(Routes.sessionCreate);
                           window.scrollTo(0, 0);
                           modalRef.destroy();
                         }}

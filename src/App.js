@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+
 import Routes from 'routes';
 import apis from 'apis';
+
 import { useGlobalContext } from 'services/globalContext';
 import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie, setAuthCookie } from 'services/authCookie';
-import { getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
+import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
+import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
+import { mapUserToPendo } from 'services/integrations/pendo';
 import http from 'services/http';
+
 import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 import parseQueryString from 'utils/parseQueryString';
+
+import { storeCreatorDetailsToLS } from 'utils/storage';
 
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
 import SideNavWithHeaderLayout from 'layouts/SideNavWithHeaderLayout';
 import NavbarLayout from 'layouts/NavbarLayout';
+import MobileLayout from 'layouts/MobileLayout';
 
 import Home from 'pages/Home';
 import Profile from 'pages/Profile';
@@ -31,21 +39,26 @@ import CreatorDashboard from 'pages/CreatorDashboard';
 import AttendeeDashboard from 'pages/AttendeeDashboard';
 import ResetPassword from 'pages/ResetPassword';
 import EmailVerification from 'pages/EmailVerification';
+import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
 import PaymentVerification from 'pages/PaymentVerification';
 import PaymentRetry from 'pages/PaymentRetry';
 import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
 import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
+import MembershipDetails from 'pages/MembershipDetails';
+import NewHome from 'pages/NewHome';
+import VideoDetailedListView from 'pages/DetailedListView/Videos';
+import SessionDetailedListView from 'pages/DetailedListView/Sessions';
+import CourseDetailedListView from 'pages/DetailedListView/Courses';
+import EmbeddablePage from 'pages/EmbeddablePage';
+import Legals from 'pages/Legals';
+
 // import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
-import EmbeddablePage from 'pages/EmbeddablePage';
-import Legals from 'pages/Legals';
-import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
-import { mapUserToPendo } from 'services/integrations/pendo';
-import { storeCreatorDetailsToLS } from 'utils/storage';
-import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
+
+import './styles/globals.scss';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -142,6 +155,7 @@ function App() {
       setUserAuthentication(false);
       setUserDetails(null);
       setIsReadyToLoad(true);
+      deleteAuthTokenFromLS();
     };
 
     const getUserDetails = async () => {
@@ -213,7 +227,7 @@ function App() {
             />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
-            <PrivateRoute layout={DefaultLayout} exact path={Routes.session} component={Session} />
+            <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionReschedule} component={SessionReschedule} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.profilePreview} component={ProfilePreview} />
@@ -225,6 +239,12 @@ function App() {
               component={PaymentVerification}
             />
             <PrivateRoute layout={NavbarLayout} exact path={Routes.paymentConfirm} component={PaymentRedirectVerify} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.membershipDetails}
+              component={MembershipDetails}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
@@ -242,7 +262,27 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root} component={Home} />
+            {/* New Pages are put higher for more priority matching */}
+            <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.list.sessions}
+              component={SessionDetailedListView}
+            />
+            <RouteWithLayout layout={MobileLayout} exact path={Routes.list.videos} component={VideoDetailedListView} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.list.courses}
+              component={CourseDetailedListView}
+            />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={[Routes.root, Routes.sessions, Routes.videos, Routes.courses]}
+              component={NewHome}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />
             <Route path={Routes.stripeAccountValidate}>
               <Redirect

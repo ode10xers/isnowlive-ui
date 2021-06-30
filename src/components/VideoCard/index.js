@@ -82,7 +82,7 @@ const VideoCard = ({
       bordered={false}
       footer={null}
       onClick={() => onCardClick(video)}
-      bodyStyle={{ padding: '10px 20px' }}
+      bodyStyle={{ padding: '10px 20px', backgroundColor: 'var(--video-card-background-color)' }}
       cover={
         cover || (
           <Image
@@ -161,6 +161,7 @@ const VideoCard = ({
                       <Button
                         block
                         type="primary"
+                        className={styles.buyBtn}
                         onClick={(e) => {
                           e.stopPropagation();
                           showAuthModal(video);

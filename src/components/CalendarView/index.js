@@ -24,8 +24,9 @@ const CalendarView = ({
   customComponents = {},
   step = 60,
   updateCalendarDate = false,
+  startDate = new Date(),
 }) => {
-  const [viewDate, setViewDate] = useState(new Date());
+  const [viewDate, setViewDate] = useState(startDate);
 
   const onCalendarNavigate = (...props) => {
     setViewDate(props[0]);

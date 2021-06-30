@@ -29,6 +29,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-add-to-calendar": "^0.1.5",
+    "react-beautiful-dnd": "^13.1.0",
     "react-big-calendar": "^0.30.0",
     "react-color": "^2.19.3",
     "react-cookie-consent": "^6.2.3",

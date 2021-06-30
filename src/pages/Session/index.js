@@ -257,7 +257,7 @@ const Session = ({ match, history }) => {
         message.error(error.response?.data?.message || 'Something went wrong.');
         setIsLoading(false);
         if (isOnboarding) {
-          history.push(Routes.session);
+          history.push(Routes.sessionCreate);
         } else {
           history.push('/creator/dashboard' + Routes.creatorDashboard.createSessions);
         }

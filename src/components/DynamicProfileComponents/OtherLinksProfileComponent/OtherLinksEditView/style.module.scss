@@ -1,0 +1,31 @@
+@import '../../../../styles/variables.scss';
+
+.dynamicFormItemContainer {
+  width: 100%;
+}
+
+.compactFormItem {
+  margin-bottom : 0 !important;
+}
+
+.editViewButtonContainer {
+  overflow: hidden;
+}
+
+.editComponentButton {
+  background-color: map-get($map: $colors, $key: 'EasternBlue');
+  border: 1px solid map-get($map: $colors, $key: 'EasternBlue');
+  width: 100%;
+  height: 100%;
+  min-height: 40px;
+  max-height: 80px;
+  border-radius: 0 12px 12px 0;
+  color: map-get($map: $colors, $key: 'White');
+  cursor: pointer;
+}
+
+.deleteComponentButton {
+  @extend .editComponentButton;
+  background-color: map-get($map: $colors, $key: 'SunsetOrange');
+  border: 1px solid map-get($map: $colors, $key: 'SunsetOrange');
+}

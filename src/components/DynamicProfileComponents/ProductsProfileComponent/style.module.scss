@@ -1,0 +1,47 @@
+@import '../../../styles/variables.scss';
+
+.bottomBarMenu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: none !important;
+  background-color: map-get($map: $colors, $key: 'White') !important;
+  padding: 8px 8px 12px 8px !important;
+  border-radius: 8px;
+  margin: 0 auto !important;
+  
+  .menuItem {
+    font-size: 18px !important;
+    font-weight: 600;
+    padding: 12px;
+    border-radius : 12px;
+    text-align: center; 
+    color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+    cursor: pointer;
+
+    @media screen and (max-width: 425px) {
+      padding: 12px 4px;
+      font-size: 14px !important;
+    }
+
+    &.selectedMenu {
+      background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+      color: map-get($map: $colors, $key: 'White') !important;
+    }
+    &:hover {
+      transition: 0.2s linear;
+      @extend .selectedMenu;
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    position: fixed;
+    width: 100vw;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    padding: 6px !important;
+    margin: 0 !important;
+  }
+}

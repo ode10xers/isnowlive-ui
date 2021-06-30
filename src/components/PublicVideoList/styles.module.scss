@@ -1,5 +1,10 @@
 @import '../../styles/variables.scss';
 
+.publicVideoListContainer {
+  background-color: var(--video-widget-background-color);
+  padding: 20px;
+}
+
 .cleanCard {
   box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
 

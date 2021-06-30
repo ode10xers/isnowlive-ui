@@ -32,6 +32,7 @@ const CalendarSessions = () => {
   const [sessionCountByDate, setSessionCountByDate] = useState({});
   const [purchaseModalVisible, setAuthModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
+  const [calendarStartDate, setCalendarStartDate] = useState(new Date());
 
   const getCalendarSessions = async () => {
     try {
@@ -52,6 +53,9 @@ const CalendarSessions = () => {
             isPast: true,
           })),
         ]);
+        if (UpcomingRes.data.length > 0) {
+          setCalendarStartDate(new Date(UpcomingRes.data[0].start_time));
+        }
         setReadyToPaint(true);
         setIsSessionLoading(false);
       }
@@ -186,35 +190,38 @@ const CalendarSessions = () => {
   }, []);
 
   return (
-    <Loader loading={isSessionLoading} size="large" text="Loading sessions">
-      <AuthModal
-        visible={purchaseModalVisible}
-        closeModal={closeAuthModal}
-        onLoggedInCallback={showConfirmPaymentPopup}
-      />
-      {calendarSession.length > 0 && readyToPaint ? (
-        <>
-          <Row>
-            <Col xs={14}>
-              <Text type="primary" strong>
-                All event times shown below are in your local time zone ({getCurrentLongTimezone()})
-              </Text>
-            </Col>
-            <Col xs={10}>
-              <img src={logo} alt="Passion.do" className={styles.passionLogo} />
-            </Col>
-          </Row>
+    <div className={styles.calendarSessionPluginContainer}>
+      <Loader loading={isSessionLoading} size="large" text="Loading sessions">
+        <AuthModal
+          visible={purchaseModalVisible}
+          closeModal={closeAuthModal}
+          onLoggedInCallback={showConfirmPaymentPopup}
+        />
+        {calendarSession.length > 0 && readyToPaint ? (
+          <>
+            <Row>
+              <Col xs={14}>
+                <Text type="primary" strong>
+                  All event times shown below are in your local time zone ({getCurrentLongTimezone()})
+                </Text>
+              </Col>
+              <Col xs={10}>
+                <img src={logo} alt="Passion.do" className={styles.passionLogo} />
+              </Col>
+            </Row>
 
-          <CalendarWrapper
-            calendarSessions={calendarSession}
-            sessionCountByDate={sessionCountByDate}
-            onEventBookClick={onEventBookClick}
-          />
-        </>
-      ) : (
-        <Empty />
-      )}
-    </Loader>
+            <CalendarWrapper
+              calendarSessions={calendarSession}
+              sessionCountByDate={sessionCountByDate}
+              onEventBookClick={onEventBookClick}
+              startDate={calendarStartDate}
+            />
+          </>
+        ) : (
+          <Empty />
+        )}
+      </Loader>
+    </div>
   );
 };
 

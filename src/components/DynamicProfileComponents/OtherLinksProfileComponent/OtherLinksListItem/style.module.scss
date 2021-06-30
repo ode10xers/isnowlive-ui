@@ -1,0 +1,88 @@
+@import '../../../../styles/variables.scss';
+
+// Old Styling
+/*
+.linkPreviewItem {
+  border-radius: 8px;
+  background-color: #1890ff10;
+  border: 1px solid #1890ff50;
+  cursor: pointer;
+
+  .linkPreviewDetailsContainer {
+    padding: 12px;
+
+    .placeholderImage {
+      width: 130px;
+      height: 86px;
+      object-fit: cover;
+      margin: auto;
+    }
+
+    .linkPreviewImageContainer {
+      width: 130px;
+      vertical-align: center;
+
+      .linkPreviewImage {
+        border-radius : 8px;
+        height: 86px;
+        object-fit: scale-down;
+      }
+    }
+
+    .titlePlaceholder {
+      max-height: 84px;
+    }
+
+    .linkPreviewTitleContainer {
+      height: 100%;
+      
+      .linkPreviewTitle {
+        font-size : 14px;
+        font-weight : 500;
+        color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+      }
+    }
+
+    @media screen and (max-width: 769px) {
+      padding: 6px;
+    }
+  }
+
+  .linkPreviewArrowContainer {
+    background-color: #1890ff30;
+    font-size: 12px;
+    text-align: center;
+    padding: 0px;
+    border-radius: 0 8px 8px 0;
+
+    .linkPreviewArrow {
+      height: 100%;
+      color: map-get($map: $colors, $key: 'PrussianBlue') !important;
+    }
+  }
+}
+*/
+
+.linkItem {
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+  -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
+  border-radius: 48px;
+  width: 100%;
+  padding: 8px 12px;
+  margin : 4px auto;
+  cursor: pointer;
+
+  &:hover {
+    transition: 0.2s linear;
+    opacity : 0.95;
+    box-shadow: 1px 1px 4px 2px rgba(0,0,0,0.4);
+    -webkit-box-shadow: 1px 1px 4px 2px rgba(0,0,0,0.4);
+    -moz-box-shadow: 1px 1px 4px 2px rgba(0,0,0,0.4);
+  }
+
+  .linkItemTitle {
+    margin-bottom: 0;
+    text-align: center;
+  }
+}

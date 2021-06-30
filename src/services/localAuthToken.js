@@ -17,6 +17,10 @@ const getAuthTokenFromLS = () => {
   return localStorage.getItem(getLSTokenNameForSite());
 };
 
+const deleteAuthTokenFromLS = () => {
+  localStorage.removeItem(getLSTokenNameForSite());
+};
+
 // const safeDeleteAuthTokenFromLS = () => {
 //   // This is to make sure if the same site is opened in new window, then existing local storage token gets destroyed
 //   const value = localStorage.getItem(getLSTokenNameForSite());
@@ -25,4 +29,4 @@ const getAuthTokenFromLS = () => {
 //   }
 // }
 
-export { getAuthTokenFromLS, setAuthTokenInLS };
+export { getAuthTokenFromLS, setAuthTokenInLS, deleteAuthTokenFromLS };

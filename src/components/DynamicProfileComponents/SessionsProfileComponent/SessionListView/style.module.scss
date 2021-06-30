@@ -1,0 +1,33 @@
+@import '../../../../styles/variables.scss';
+
+.moreButton {
+  height: 100% !important;
+  min-width: 144px;
+  font-size: 16px !important;
+}
+
+.sessionDateSeparator {
+  color : var(--session-list-date-font-color) !important;
+  font-size: 16px !important;
+}
+
+.sessionDatePickerContainer {
+  background-color: var(--session-list-bar-color);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 16px 12px;
+  width: 100%;
+
+  .sessionDatePicker {
+    width: 100%;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+  
+    input, span, div {
+      cursor: pointer !important;
+      text-align: center;
+      font-size : 18px !important;
+      color: map-get($map: $colors, $key: 'Smalt') !important;
+    }
+  }
+}

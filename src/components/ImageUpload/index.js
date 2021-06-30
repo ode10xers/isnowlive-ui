@@ -19,6 +19,7 @@ const ImageUpload = ({
   aspect = 2.7015 / 1,
   overlayHelpText = 'Click here to change the image',
   className,
+  shape = 'rect',
 }) => {
   const [loading] = useState(false);
 
@@ -53,7 +54,7 @@ const ImageUpload = ({
   };
 
   return (
-    <ImgCrop shape="rect" aspect={aspect}>
+    <ImgCrop shape={shape} aspect={aspect}>
       <Upload
         className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType="picture-card"
@@ -65,10 +66,18 @@ const ImageUpload = ({
       >
         {value ? (
           <div className={styles.imageContainer}>
-            <Row className={styles.imageHoverOverlay} justify="center" align="middle">
+            <Row
+              className={classNames(styles.imageHoverOverlay, shape === 'round' ? styles.roundImage : undefined)}
+              justify="center"
+              align="middle"
+            >
               <Col className={styles.helpText}>{overlayHelpText}</Col>
             </Row>
-            <img src={value} alt={label} className={classNames(styles.w100, styles.image)} />
+            <img
+              src={value}
+              alt={label}
+              className={classNames(styles.w100, styles.image, shape === 'round' ? styles.roundImage : undefined)}
+            />
           </div>
         ) : (
           <div>

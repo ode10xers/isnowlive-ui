@@ -7,6 +7,13 @@ const validationRules = {
       message: 'Public URL can only contain lowercase letters',
     },
   ],
+  urlValidation: [
+    {
+      required: true,
+      type: 'url',
+      message: 'Please input a valid URL',
+    },
+  ],
   emailValidation: [{ type: 'email', required: true, message: 'Please input your email' }],
   passwordValidation: [{ required: true, message: 'Please input your password' }],
   requiredValidation: [{ required: true, message: 'This field is required.' }],
@@ -39,6 +46,25 @@ const validationRules = {
     {
       pattern: new RegExp('^[a-zA-Z0-9]*$'),
       message: 'Discount code should only contain letters or numbers',
+    },
+  ],
+  hexColorValidation: (message = 'Please input a valid hex color code') => {
+    const regexTester = new RegExp(/^[0-9A-Fa-f]{6}$/);
+
+    return [
+      {
+        validator: (_, value) =>
+          !value ? Promise.resolve() : regexTester.test(value) ? Promise.resolve() : Promise.reject(message),
+      },
+    ];
+  },
+  otherLinksValidation: [
+    {
+      validator: async (_, values) => {
+        if (!values || values.length < 1) {
+          return Promise.reject('Need at least 1 value');
+        }
+      },
     },
   ],
 };

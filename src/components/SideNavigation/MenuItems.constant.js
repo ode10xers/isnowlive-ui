@@ -252,7 +252,7 @@ export const creatorMenuItems = [
       {
         order: 1,
         key: 'plugins',
-        title: 'Plugins',
+        title: 'Add to your website',
         mixPanelTag: creator.click.dashboard.pluginsNav,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.plugins,
       },
