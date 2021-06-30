@@ -15,7 +15,7 @@ import CreatorProfile from 'components/CreatorProfile';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import VideoCard from 'components/VideoCard';
-import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+import NewShowcaseCourseCard from 'components/NewShowcaseCourseCard';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -234,21 +234,14 @@ const CourseDetails = ({ match, history }) => {
             </Col>
           )}
 
-          <Col xs={24} className={styles.creatorProfileWrapper}>
-            {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
+          <Col xs={24}>
+            {course && <NewShowcaseCourseCard courses={[course]} username={username} onCardClick={() => {}} />}
           </Col>
+
           <Col xs={24}>
             {course && (
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
-                <Col xs={24}>
-                  <Title level={3} className={styles.ml20}>
-                    {' '}
-                    Course Details{' '}
-                  </Title>
-                </Col>
-                <Col xs={24}>
-                  <ShowcaseCourseCard courses={[course]} username={username} onCardClick={() => {}} />
-                </Col>
+                <Col xs={24}></Col>
 
                 {courseSessions?.length > 0 && (
                   <>
