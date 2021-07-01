@@ -1,29 +1,13 @@
 import React from 'react';
-import { Card, Typography, Row, Col } from 'antd';
+import { Row, Col } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 
+import ContainerCard from 'components/ContainerCard';
 import OtherLinksEditView from './OtherLinksEditView';
 import OtherLinksListView from './OtherLinksListView';
 import DragAndDropHandle from '../DragAndDropHandle';
 
 import styles from './style.module.scss';
-
-const { Text } = Typography;
-
-const ContainerTitle = ({ title = 'MY OTHER LINKS' }) => (
-  <Text style={{ color: '#0050B3' }}>
-    <LinkOutlined className={styles.mr10} />
-    {title}
-  </Text>
-);
-
-// TODO : Later we might want these colors to be customized
-const cardHeadingStyle = {
-  background: '#F1FBFF',
-  boxShadow: 'inset 0px -1px 0px #E6F5FB',
-  color: '#0050B3',
-  borderRadius: '12px 12px 0 0',
-};
 
 const OtherLinksProfileComponent = ({
   identifier = null,
@@ -45,11 +29,9 @@ const OtherLinksProfileComponent = ({
         </Col>
       )}
       <Col xs={isEditing ? 22 : 24}>
-        <Card
-          title={<ContainerTitle title={customComponentProps?.title} />}
-          headStyle={cardHeadingStyle}
-          className={styles.profileComponentContainer}
-          bodyStyle={{ padding: 12 }}
+        <ContainerCard
+          title={customComponentProps?.title ?? 'OTHER LINKS'}
+          icon={<LinkOutlined className={styles.mr10} />}
         >
           {isEditing ? (
             <Row justify="center" align="center">
@@ -58,7 +40,7 @@ const OtherLinksProfileComponent = ({
           ) : (
             <OtherLinksListView links={customComponentProps?.values ?? []} />
           )}
-        </Card>
+        </ContainerCard>
       </Col>
       {isEditing && (
         <Col xs={1}>
