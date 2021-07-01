@@ -46,6 +46,7 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
+// NOTE : Will be deprecated soon, to be replaced with NewVideoDetails
 const VideoDetails = ({ match }) => {
   const {
     showPaymentPopup,

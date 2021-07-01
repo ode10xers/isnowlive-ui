@@ -46,7 +46,7 @@ import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
 import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
-import MembershipDetails from 'pages/MembershipDetails';
+import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
 import NewHome from 'pages/NewHome';
 import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
