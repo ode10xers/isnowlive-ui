@@ -94,6 +94,10 @@
           .buyVideoBtnText {
             font-size: 16px;
             color: map-get($map: $colors, $key: 'White') !important;
+
+            del {
+              text-decoration: solid line-through map-get($map: $colors, $key: 'Razzmatazz') 2px;
+            }
           }
         }
       }
@@ -105,12 +109,12 @@
       }
     }
   }
+}
 
-  .videoBottomSheets {
-    :global {
-      .ant-drawer-content {
-        border-radius : 12px 12px 0 0;
-      }
+.videoBottomSheets {
+  :global {
+    .ant-drawer-content {
+      border-radius : 12px 12px 0 0;
     }
   }
 }

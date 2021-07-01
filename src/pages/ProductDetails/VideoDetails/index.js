@@ -611,7 +611,7 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usableSubscription.subscription_name} </b> Pass. You'll be left with{' '}
+                            purchased <b> {usableSubscription.subscription_name} </b> membership. You'll be left with{' '}
                             {usableSubscription.products['VIDEO'].credits -
                               usableSubscription.products['VIDEO'].credits_used -
                               1}{' '}
@@ -642,7 +642,6 @@ const VideoDetails = ({ match, history }) => {
                                   'Flexible'
                                 ) : videoData?.price > 0 ? (
                                   <>
-                                    {' '}
                                     {videoData?.currency?.toUpperCase()} <del>{videoData?.price}</del> 0{' '}
                                   </>
                                 ) : (
