@@ -67,7 +67,7 @@ const MembershipDetails = ({ match, history }) => {
       }
     } catch (error) {
       console.error(error);
-      console.error('Failed to load subscription details');
+      message.error(error?.response?.data?.message || 'Failed to load subscription details');
     }
 
     setIsLoading(false);
@@ -169,7 +169,7 @@ const MembershipDetails = ({ match, history }) => {
     setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setShowAuthModal(false);
   };
 
@@ -271,7 +271,7 @@ const MembershipDetails = ({ match, history }) => {
 
   return (
     <div className={styles.membershipDetailsContainer}>
-      <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} onLoggedInCallback={showConfirmPaymentPopup} />
+      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Spin spinning={isLoading} tip="Fetching membership details..." size="large">
         <div className={styles.pageContent}>
           <Row gutter={[8, 16]} justify="center">

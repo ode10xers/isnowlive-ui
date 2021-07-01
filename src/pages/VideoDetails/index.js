@@ -91,7 +91,7 @@ const VideoDetails = ({ match }) => {
       }
     } catch (error) {
       console.error(
-        'Failed to fetch courses data for session',
+        'Failed to fetch courses data for video',
         error?.response?.data?.message || 'Something went wrong.'
       );
     }
