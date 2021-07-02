@@ -28,6 +28,7 @@ import {
   isAPISuccess,
   isUnapprovedUserError,
   getUsernameFromUrl,
+  reservedDomainName,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -100,12 +101,18 @@ const PaymentPopup = () => {
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0) || 0;
 
   const fetchCreatorCountry = useCallback(async () => {
+    const creatorUsername = getUsernameFromUrl();
+
+    if (reservedDomainName.includes(creatorUsername)) {
+      return;
+    }
+
     try {
-      const { status, data } = await apis.user.getProfileByUsername(getUsernameFromUrl());
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
 
       if (isAPISuccess(status) && data) {
-        setCreatorCountry(data.country);
-        setCreatorCurrency(data.currency);
+        setCreatorCountry(data.profile.country);
+        setCreatorCurrency(data.profile.currency);
       }
     } catch (error) {
       console.error('Failed fetching creator profile for country', error?.response);

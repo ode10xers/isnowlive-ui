@@ -196,7 +196,7 @@ const Earnings = () => {
   const checkAndSendCreatorConversionEvent = useCallback(async () => {
     const userState = userDetails;
 
-    if (userState.ga_data && userState.ga_data?.payment_verified === false) {
+    if (userState.profile.ga_data && userState.profile.ga_data?.payment_verified === false) {
       try {
         const { status } = await apis.user.confirmCreatorPaymentStatusUpdated({
           payment_verified: true,
@@ -204,9 +204,9 @@ const Earnings = () => {
 
         if (isAPISuccess(status)) {
           pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_VERIFIED, {
-            creator_payment_account_status: userDetails.payment_account_status,
+            creator_payment_account_status: userDetails.profile.payment_account_status,
           });
-          userState.ga_data.payment_verified = true;
+          userState.profile.ga_data.payment_verified = true;
           setUserDetails(userState);
         }
       } catch (error) {
@@ -219,11 +219,11 @@ const Earnings = () => {
     getCreatorBalance();
     getCreatorEarnings();
 
-    if (userDetails.payment_account_status === StripeAccountStatus.CONNECTED) {
+    if (userDetails.profile.payment_account_status === StripeAccountStatus.CONNECTED) {
       checkAndSendCreatorConversionEvent();
     } else {
       pushToDataLayer(gtmTriggerEvents.CREATOR_PAY_STATUS, {
-        creator_payment_account_status: userDetails.payment_account_status,
+        creator_payment_account_status: userDetails.profile.payment_account_status,
       });
     }
   }, [getCreatorBalance, getCreatorEarnings, checkAndSendCreatorConversionEvent, userDetails]);
@@ -314,11 +314,13 @@ const Earnings = () => {
         <Col xs={24}>
           <Button
             className={styles.mt10}
-            danger={userDetails.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING ? true : false}
+            danger={
+              userDetails.profile.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING ? true : false
+            }
             type="primary"
             onClick={() => openStripeDashboard()}
           >
-            {userDetails.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING
+            {userDetails.profile.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING
               ? 'Verify Bank Account'
               : 'Edit Bank Account'}
           </Button>

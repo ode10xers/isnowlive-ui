@@ -147,7 +147,9 @@ const Session = ({ match, history }) => {
 
   const {
     state: {
-      userDetails: { zoom_connected = 'NOT_CONNECTED' },
+      userDetails: {
+        profile: { zoom_connected = 'NOT_CONNECTED' },
+      },
     },
   } = useGlobalContext();
 
