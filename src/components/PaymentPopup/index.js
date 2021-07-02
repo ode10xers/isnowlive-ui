@@ -370,11 +370,10 @@ const PaymentPopup = () => {
     } else if (paymentInstrumentDetails.type === paymentSource.SUBSCRIPTION) {
       const subscriptionDetails = paymentInstrumentDetails;
 
-      textContent = `Will use ${subscriptionDetails.subscription_name} to book this and you'll be left with ${
+      textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${
         subscriptionDetails.products[productType.toUpperCase()].credits -
-        subscriptionDetails.products[productType.toUpperCase()].credits_used -
-        1
-      }/${subscriptionDetails.products[productType.toUpperCase()].credits} credits`;
+        subscriptionDetails.products[productType.toUpperCase()].credits_used
+      } credits`;
     }
 
     return (
