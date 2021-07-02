@@ -29,14 +29,14 @@ import {
   isUnapprovedUserError,
   getUsernameFromUrl,
   reservedDomainName,
+  isInCreatorDashboard,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 import validationRules from 'utils/validation';
-
-const stripePromise = loadStripe(config.stripe.secretKey);
+import { getLocalUserDetails } from 'utils/storage';
 
 const { Text, Title } = Typography;
 const {
@@ -90,6 +90,18 @@ const PaymentPopup = () => {
   // TODO: Defaults to SG, confirm with Rahul what should be the default here
   const [creatorCountry, setCreatorCountry] = useState('SG');
   const [creatorCurrency, setCreatorCurrency] = useState('SGD');
+  const [creatorStripeAccountID, setCreatorStripeAccountID] = useState(null);
+  const [stripePromise, setStripePromise] = useState(null);
+
+  // const stripePromise = useMemo(() => {
+  //   if (!creatorStripeAccountID) {
+  //     return loadStripe(config.stripe.secretKey);
+  //   } else {
+  //     return loadStripe(config.stripe.secretKey, {
+  //       stripeAccount: creatorStripeAccountID,
+  //     });
+  //   }
+  // }, [creatorStripeAccountID]);
 
   const {
     itemList = [],
@@ -100,8 +112,18 @@ const PaymentPopup = () => {
   } = paymentPopupData || {};
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0) || 0;
 
-  const fetchCreatorCountry = useCallback(async () => {
-    const creatorUsername = getUsernameFromUrl();
+  const fetchCreatorDetailsForPayment = useCallback(async () => {
+    let creatorUsername = 'app';
+
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      if (localUserDetails.is_creator) {
+        creatorUsername = localUserDetails.username;
+      }
+    } else {
+      creatorUsername = getUsernameFromUrl();
+    }
 
     if (reservedDomainName.includes(creatorUsername)) {
       return;
@@ -113,16 +135,34 @@ const PaymentPopup = () => {
       if (isAPISuccess(status) && data) {
         setCreatorCountry(data.profile.country);
         setCreatorCurrency(data.profile.currency);
+
+        if (data.profile.connect_account_id) {
+          setCreatorStripeAccountID(data.profile.connect_account_id);
+        }
       }
     } catch (error) {
-      console.error('Failed fetching creator profile for country', error?.response);
+      console.error('Failed fetching creator details for payment', error?.response);
     }
   }, []);
 
   useEffect(() => {
-    fetchCreatorCountry();
+    fetchCreatorDetailsForPayment();
     //eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (creatorStripeAccountID) {
+      console.log('Initializing Stripe Promise with account ID ', creatorStripeAccountID);
+      setStripePromise(
+        loadStripe(config.stripe.secretKey, {
+          stripeAccount: creatorStripeAccountID,
+        })
+      );
+    } else {
+      console.log('Initializing Stripe Promise without account ID');
+      setStripePromise(loadStripe(config.stripe.secretKey));
+    }
+  }, [creatorStripeAccountID]);
 
   useEffect(() => {
     if (!paymentPopupVisible) {
