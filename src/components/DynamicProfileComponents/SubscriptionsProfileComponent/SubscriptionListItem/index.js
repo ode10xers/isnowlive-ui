@@ -59,7 +59,7 @@ const SubscriptionListItem = ({ subscription }) => {
             </Col>
             <Col xs={10}>
               <div className={styles.membershipPrice}>
-                {subscription?.currency?.toUpperCase()} {subscription?.price} / month
+                {subscription?.currency?.toUpperCase()} {subscription?.total_price} / month
               </div>
             </Col>
           </Row>

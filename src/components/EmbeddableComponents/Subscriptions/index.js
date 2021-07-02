@@ -25,7 +25,7 @@ const Subscriptions = () => {
         const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
 
         if (isAPISuccess(status) && data) {
-          setSubscriptions(data.sort((a, b) => a.price - b.price));
+          setSubscriptions(data.sort((a, b) => a.total_price - b.total_price));
         }
       } catch (error) {
         console.error('Failed to load subscription details');

@@ -59,7 +59,7 @@ const PublicVideoList = ({ videos }) => {
           name: selectedVideo.title,
           description: desc,
           currency: selectedVideo.currency,
-          price: selectedVideo.price,
+          price: selectedVideo.total_price,
           pay_what_you_want: selectedVideo.pay_what_you_want,
         },
       ],

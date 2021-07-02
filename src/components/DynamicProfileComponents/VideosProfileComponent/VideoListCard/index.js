@@ -46,10 +46,10 @@ const VideoListCard = ({ video }) => {
   // const renderVideoPrice = () => {
   //   if (video?.pay_what_you_want) {
   //     return 'Flexible';
-  //   } else if (video?.price === 0 || video?.currency === '') {
+  //   } else if (video?.total_price === 0 || video?.currency === '') {
   //     return 'Free';
   //   } else {
-  //     return `${video?.currency?.toUpperCase()} ${video?.price}`;
+  //     return `${video?.currency?.toUpperCase()} ${video?total_.price}`;
   //   }
   // };
 

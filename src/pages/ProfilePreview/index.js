@@ -206,7 +206,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
       const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
 
       if (isAPISuccess(status) && data) {
-        setSubscriptions(data.sort((a, b) => a.price - b.price));
+        setSubscriptions(data.sort((a, b) => a.total_price - b.total_price));
         setIsSubscriptionsLoading(false);
       }
     } catch (error) {
@@ -424,7 +424,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
           name: selectedInventory.name,
           description: desc,
           currency: selectedInventory.currency,
-          price: selectedInventory.price,
+          price: selectedInventory.total_price,
           pay_what_you_want: selectedInventory.pay_what_you_want,
         },
       ],
