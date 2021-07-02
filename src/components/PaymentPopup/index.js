@@ -153,8 +153,6 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      //TODO: Use productType here to adjust the payload
-      // e.g. if productType === PASS it should be pass_id (match the BE implementation)
       let couponStatus = null;
       let couponData = null;
       switch (productType) {
@@ -320,9 +318,7 @@ const PaymentPopup = () => {
     if (paymentInstrumentDetails.type === paymentSource.PASS) {
       const passDetails = paymentInstrumentDetails;
       textContent = `Will use ${passDetails.pass_name} to book this ${
-        passDetails.limited
-          ? `and you'll be left with ${passDetails.classes_remaining - 1}/${passDetails.class_count} credits`
-          : ''
+        passDetails.limited ? `. You currently have ${passDetails.classes_remaining} credits.` : ''
       }`;
     } else if (paymentInstrumentDetails.type === paymentSource.SUBSCRIPTION) {
       const subscriptionDetails = paymentInstrumentDetails;
