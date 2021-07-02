@@ -26,15 +26,15 @@ import { followUpBookSession, followUpGetVideo } from 'utils/orderHelper';
 // Taken from the link below
 // https://stripe.com/docs/payments/payment-intents/verifying-status#checking-status-retrieve
 // or more detailed one https://stripe.com/docs/api/payment_intents/object#payment_intent_object-status
-const STRIPE_PAYMENT_STATUS = {
-  SUCCESS: 'succeeded',
-  CANCELLED: 'canceled',
-  PRODCESSING: 'processing',
-  REQUIRES_ACTION: 'requires_action',
-  REQUIRES_CAPTURE: 'requires_capture',
-  REQUIRES_CONFIRMATION: 'requires_confirmation',
-  REQUIRES_PAYMENT_METHOD: 'requires_payment_method',
-};
+// const STRIPE_PAYMENT_STATUS = {
+//   SUCCESS: 'succeeded',
+//   CANCELLED: 'canceled',
+//   PRODCESSING: 'processing',
+//   REQUIRES_ACTION: 'requires_action',
+//   REQUIRES_CAPTURE: 'requires_capture',
+//   REQUIRES_CONFIRMATION: 'requires_confirmation',
+//   REQUIRES_PAYMENT_METHOD: 'requires_payment_method',
+// };
 
 const {
   timezoneUtils: { getCurrentLongTimezone, getTimezoneLocation },
@@ -138,26 +138,27 @@ const PaymentRedirectVerify = () => {
 
   useEffect(() => {
     if (stripe) {
-      const verifyStripePayment = async () => {
-        setIsLoading(true);
+      // const verifyStripePayment = async () => {
+      //   setIsLoading(true);
 
-        try {
-          const { paymentIntent, error: stripeError } = await stripe.retrievePaymentIntent(clientSecret);
+      //   try {
+      //     const { paymentIntent, error: stripeError } = await stripe.retrievePaymentIntent(clientSecret);
 
-          if (paymentIntent && paymentIntent.status === STRIPE_PAYMENT_STATUS.SUCCESS) {
-            // Handle successful payment here
-            await verifyOrderStatus();
-          } else {
-            // Handle unsuccessful, processing, or canceled payments and API errors here
-            console.error(stripeError);
-            handleError(stripeError.message);
-          }
-        } catch (error) {
-          handleError(error?.response?.data?.message);
-        }
-      };
+      //     if (paymentIntent && paymentIntent.status === STRIPE_PAYMENT_STATUS.SUCCESS) {
+      //       // Handle successful payment here
+      //       await verifyOrderStatus();
+      //     } else {
+      //       // Handle unsuccessful, processing, or canceled payments and API errors here
+      //       console.error(stripeError);
+      //       handleError(stripeError.message);
+      //     }
+      //   } catch (error) {
+      //     handleError(error?.response?.data?.message);
+      //   }
+      // };
 
-      verifyStripePayment();
+      // verifyStripePayment();
+      verifyOrderStatus();
     }
   }, [stripe, clientSecret, verifyOrderStatus, handleError]);
 

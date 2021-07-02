@@ -69,7 +69,9 @@ const IDealPayment = ({ disabled = false, onBeforePayment, onAfterPayment, payme
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  const buyerName = useMemo(() => `${userDetails.first_name} ${userDetails.last_name}`, [userDetails]);
+  const buyerName = useMemo(() => (userDetails ? `${userDetails.first_name} ${userDetails.last_name}` : ''), [
+    userDetails,
+  ]);
 
   useEffect(() => {
     if (paymentPopupVisible) {
