@@ -70,6 +70,9 @@ const validationRules = {
     //     }
     //   },
     // },
+    // Reference for below rule :
+    // https://github.com/ant-design/ant-design/issues/14275#issuecomment-678800190
+    // https://github.com/yiminghe/async-validator#deep-rules
     {
       type: 'array',
       min: 1,
