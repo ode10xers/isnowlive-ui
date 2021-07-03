@@ -49,7 +49,7 @@ const VideoListCard = ({ video }) => {
   //   } else if (video?.total_price === 0 || video?.currency === '') {
   //     return 'Free';
   //   } else {
-  //     return `${video?.currency?.toUpperCase()} ${video?total_.price}`;
+  //     return `${video?.currency?.toUpperCase()} ${video?.total_price}`;
   //   }
   // };
 

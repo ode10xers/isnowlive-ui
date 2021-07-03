@@ -365,7 +365,7 @@ const PaymentPopup = () => {
     if (paymentInstrumentDetails.type === paymentSource.PASS) {
       const passDetails = paymentInstrumentDetails;
       textContent = `Will use ${passDetails.pass_name} to book this ${
-        passDetails.limited ? `. You currently have ${passDetails.classes_remaining} credits.` : ''
+        passDetails.limited ? `. You currently have ${passDetails.classes_remaining} credits left.` : ''
       }`;
     } else if (paymentInstrumentDetails.type === paymentSource.SUBSCRIPTION) {
       const subscriptionDetails = paymentInstrumentDetails;
@@ -373,7 +373,7 @@ const PaymentPopup = () => {
       textContent = `Will use ${subscriptionDetails.subscription_name} to book this. You currently have ${
         subscriptionDetails.products[productType.toUpperCase()].credits -
         subscriptionDetails.products[productType.toUpperCase()].credits_used
-      } credits`;
+      } credits left`;
     }
 
     return (

@@ -3,7 +3,8 @@
 .videoListCard {
   border-radius: 8px !important;
   cursor: pointer;
-  background-color: var(--new-video-card-background-color) !important;
+  background-color : transparent !important;
+  // background-color: var(--new-video-card-background-color) !important;
 
   .videoCoverContainer {
     height: 100%;
@@ -35,21 +36,21 @@
       }
 
       .videoStaticImage {
-        // height: 100%;
+        // height: 150px;
         border-radius: 12px;
         object-fit: cover;
         width: 100%;
-
       }
     }
   }
 
   .videoTitle {
     // height: 68px;
-    padding: 12px;
     // overflow: hidden;
     // color: map-get($map: $colors, $key: 'ResolutionBlue');
     color: var(--new-video-card-font-color);
+    padding: 12px;
+
     margin-top: -10px;
     font-size: 18px;
     text-align: center;
@@ -59,28 +60,28 @@
     }
   }
 
-  .cardFooter {
-    border-top: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
-    padding: 12px;
-    width: 100%;
-    justify-content: center;
-    font-size: 16px;
-    // color: map-get($map: $colors, $key: 'Chambray');
-    color: var(--new-video-card-font-color);
-    // background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
-    background-color: var(--new-video-card-background-color);
-    box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
-    border-radius: 0px 0px 8px 8px;
+  // .cardFooter {
+  //   border-top: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+  //   padding: 12px;
+  //   width: 100%;
+  //   justify-content: center;
+  //   font-size: 16px;
+  //   // color: map-get($map: $colors, $key: 'Chambray');
+  //   color: var(--new-video-card-font-color);
+  //   // background-color: map-get($map: $colors, $key: 'PaleAliceBlue');
+  //   background-color: var(--new-video-card-background-color);
+  //   box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+  //   border-radius: 0px 0px 8px 8px;
 
-    .videoValidity {
-      // color: map-get($map: $colors, $key: 'Chambray');
-      color: var(--new-video-card-font-color);
-      font-weight: 500;
-    }
+  //   .videoValidity {
+  //     // color: map-get($map: $colors, $key: 'Chambray');
+  //     color: var(--new-video-card-font-color);
+  //     font-weight: 500;
+  //   }
 
-    .priceText {
-      text-align: right;
-      font-weight: 600;
-    }
-  }
+  //   .priceText {
+  //     text-align: right;
+  //     font-weight: 600;
+  //   }
+  // }
 }
