@@ -678,7 +678,7 @@ const VideoDetails = ({ match, history }) => {
                             </Col>
                             <Col xs={24}>
                               <Paragraph className={styles.buyMembershipDesc}>
-                                Subscribe and never miss a video.
+                                Subscribe to a membership for discounted price.
                               </Paragraph>
                             </Col>
                           </Row>
@@ -711,10 +711,7 @@ const VideoDetails = ({ match, history }) => {
                             </Button>
                           </Col>
                           <Col xs={24}>
-                            <Paragraph className={styles.buyVideoDesc}>
-                              Get the flexibility of choosing different <br />
-                              videos as per your convenience.
-                            </Paragraph>
+                            <Paragraph className={styles.buyVideoDesc}>Just buy this video</Paragraph>
                           </Col>
                         </Row>
                       </Col>

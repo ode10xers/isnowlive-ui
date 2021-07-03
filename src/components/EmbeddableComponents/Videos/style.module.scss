@@ -2,11 +2,11 @@
 
 .videoPluginContainer {
   background-color: var(--video-widget-background-color);
+  min-height: 700px;
   width: 100%;
 
   .videoListContainer {
     max-width: 767px;
-    min-height: 700px;
     margin : 0 auto;
     padding : 8px 0;
   }
