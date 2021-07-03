@@ -611,11 +611,10 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usableSubscription.subscription_name} </b> membership. You'll be left with{' '}
+                            purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have{' '}
                             {usableSubscription.products['VIDEO'].credits -
-                              usableSubscription.products['VIDEO'].credits_used -
-                              1}{' '}
-                            credits.
+                              usableSubscription.products['VIDEO'].credits_used}{' '}
+                            credits left.
                           </Paragraph>
                         </Col>
                       </Row>
@@ -654,8 +653,8 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usablePass.pass_name} </b> Pass. You'll be left with{' '}
-                            {usablePass.classes_remaining} credits.
+                            purchased <b> {usablePass.pass_name} </b> Pass. You currently have{' '}
+                            {usablePass.classes_remaining} credits left.
                           </Paragraph>
                         </Col>
                       </Row>
