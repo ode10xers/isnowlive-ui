@@ -52,7 +52,7 @@ const SubscriptionCards = ({
 
   const cardData = [
     {
-      label: `${subscription.currency?.toUpperCase()} ${subscription.total_price}`,
+      label: `${subscription.currency?.toUpperCase()} ${subscription.price}`,
       className: undefined,
     },
     {
