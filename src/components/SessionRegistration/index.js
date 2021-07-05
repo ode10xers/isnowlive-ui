@@ -335,8 +335,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             </Item>
             <span className="ant-form-text"> {record.currency.toUpperCase()} </span>
           </Item>
-        ) : (
+        ) : record.total_price > 0 ? (
           `${record.total_price} ${record.currency.toUpperCase()}`
+        ) : (
+          'Free'
         ),
     },
   ];
@@ -376,7 +378,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       key: 'price',
       align: 'left',
       width: '15%',
-      render: (text, record) => (parseInt(text) > 0 ? `${text} ${record.currency.toUpperCase()}` : 'Free'),
+      render: (text, record) =>
+        record.total_price > 0 ? `${record.total_price} ${record.currency.toUpperCase()}` : 'Free',
     },
     {
       title: 'Credit Count',

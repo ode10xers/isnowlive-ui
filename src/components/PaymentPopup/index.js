@@ -495,9 +495,7 @@ const PaymentPopup = () => {
                     <Text>{creatorCurrency.toUpperCase()} 0</Text>
                   </>
                 ) : (
-                  <Text>
-                    {creatorCurrency.toUpperCase()} {totalPrice}
-                  </Text>
+                  <Text>{totalPrice > 0 ? `${creatorCurrency.toUpperCase()} ${totalPrice}` : 'Free'}</Text>
                 ))}
             </Col>
             {!flexiblePaymentDetails?.enabled && !paymentInstrumentDetails && totalPrice > 0 && (

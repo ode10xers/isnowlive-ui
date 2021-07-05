@@ -6,13 +6,12 @@
 
   .atcWrapper {
     font-size: 14px;
-    height: 24px;
 
     &.button {
       border-radius: 5px;
       border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
       color: map-get($map: $colors, $key: 'DodgerBlue');
-      padding: 0 7px;
+      padding: 4px 15px;
       margin-top: 0px;      
     }
   }
