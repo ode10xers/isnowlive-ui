@@ -36,7 +36,7 @@ export const fetchCreatorCurrency = async () => {
       // since it's not possible to call for context here
       // Find better solution for this
       localStorage.setItem('user-details', JSON.stringify(data));
-      return data.profile.currency || null;
+      return data.profile?.currency || null;
     }
   } catch (error) {
     console.error(error?.response?.data?.message || 'Something went wrong');

@@ -133,11 +133,16 @@ const PaymentPopup = () => {
       const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
 
       if (isAPISuccess(status) && data) {
-        setCreatorCountry(data.profile.country);
-        setCreatorCurrency(data.profile.currency);
+        if (data.profile?.country) {
+          setCreatorCountry(data.profile?.country);
+        }
 
-        if (data.profile.connect_account_id) {
-          setCreatorStripeAccountID(data.profile.connect_account_id);
+        if (data.profile?.currency) {
+          setCreatorCurrency(data.profile?.currency);
+        }
+
+        if (data.profile?.connect_account_id) {
+          setCreatorStripeAccountID(data.profile?.connect_account_id);
         }
       }
     } catch (error) {

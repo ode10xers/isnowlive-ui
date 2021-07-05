@@ -119,8 +119,8 @@ function setAuthToken(userData, isSignup = false) {
     creator_zoom_connected: userData.profile?.zoom_connected || 'NA',
   });
 
-  if (userData.profile && userData.profile.custom_domain) {
-    window.location.href = `https://${userData.profile.custom_domain}/creator/${
+  if (userData.profile && userData.profile?.custom_domain) {
+    window.location.href = `https://${userData.profile?.custom_domain}/creator/${
       isSignup ? 'profile' : 'dashboard'
     }?signupAuthToken=${userData.auth_token}`;
   } else {

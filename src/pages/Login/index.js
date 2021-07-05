@@ -39,7 +39,7 @@ const Login = ({ history }) => {
         if (user.is_creator) {
           if (user.profile_complete === false) {
             history.push(Routes.profile);
-            // } else if (user.profile.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
+            // } else if (user.profile?.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
             //   history.push(Routes.livestream);
           } else {
             history.push(Routes.creatorDashboard.rootPath);

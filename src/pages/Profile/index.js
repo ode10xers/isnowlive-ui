@@ -219,6 +219,7 @@ const Profile = () => {
     setIsLoading(true);
     values.cover_image_url = coverImage;
     values.profile_image_url = profileImage;
+    values.profile.testimonials = testimonials;
     if (isPublicUrlAvaiable) {
       updateProfileDetails(values);
     } else {
@@ -460,7 +461,7 @@ const Profile = () => {
                 social media and see the preview once you add it
               </p>
 
-              <Form.Item label="Embed code" name={['profile', 'testimonials']}>
+              <Form.Item label="Embed code" name="testimonials">
                 <Input.TextArea rows={4} placeholder="Please input your short bio" />
               </Form.Item>
               <Form.Item {...profileFormTailLayout}>

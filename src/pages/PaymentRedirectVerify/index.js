@@ -47,7 +47,7 @@ const PaymentRedirectVerify = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const {
-    payment_intent_client_secret: clientSecret,
+    // payment_intent_client_secret: clientSecret,
     order_id,
     order_type,
     transaction_id,
@@ -160,7 +160,7 @@ const PaymentRedirectVerify = () => {
       // verifyStripePayment();
       verifyOrderStatus();
     }
-  }, [stripe, clientSecret, verifyOrderStatus, handleError]);
+  }, [stripe, verifyOrderStatus]);
 
   return (
     <Row justify="center">

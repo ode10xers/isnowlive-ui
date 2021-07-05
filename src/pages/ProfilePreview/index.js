@@ -462,7 +462,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
               className={styles.headButton}
               icon={<GlobalOutlined />}
               onClick={() =>
-                trackAndNavigate(generateUrlFromUsername(profile.username), creator.click.profile.publicPage, true)
+                trackAndNavigate(generateUrlFromUsername(profile?.username), creator.click.profile.publicPage, true)
               }
             >
               Public Page
@@ -639,7 +639,7 @@ const ProfilePreview = ({ username = getLocalUserDetails().username || null }) =
             <Col span={24}>
               <ResponsiveMasonry columnsCount={2} columnsCountBreakPoints={{ 350: 1, 650: 3 }}>
                 <Masonry>
-                  {profile.profile.testimonials.map((testimonial, index) => (
+                  {profile?.profile?.testimonials.map((testimonial, index) => (
                     <Card key={index} bordered={false} className={styles.card} bodyStyle={{ padding: '0px' }}>
                       <EMCode>{parseEmbedCode(parse(testimonial))}</EMCode>
                     </Card>
