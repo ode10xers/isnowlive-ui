@@ -38,7 +38,7 @@ export const setGTMUserAttributes = async (userDetails) => {
     creator_username: userDetails.username || customNullValue,
     creator_profile_complete: userDetails.profile_complete,
     creator_payment_account_status: userDetails.profile.payment_account_status,
-    creator_payment_currency: userDetails.currency || customNullValue,
+    creator_payment_currency: userDetails.profile.currency || customNullValue,
     creator_zoom_connected: userDetails.profile.zoom_connected,
   });
 };
@@ -72,7 +72,7 @@ export const trackUserLoginInGTM = async (userDetails) => {
     creator_username: userDetails.username || customNullValue,
     creator_profile_complete: userDetails.profile_complete,
     creator_payment_account_status: userDetails.profile.payment_account_status,
-    creator_payment_currency: userDetails.currency || customNullValue,
+    creator_payment_currency: userDetails.profile.currency || customNullValue,
     creator_zoom_connected: userDetails.profile.zoom_connected,
   });
 };

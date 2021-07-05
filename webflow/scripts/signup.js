@@ -115,7 +115,7 @@ function setAuthToken(userData, isSignup = false) {
     creator_username: userData.username || 'NA',
     creator_profile_complete: userData.profile_complete,
     creator_payment_account_status: userData.profile.payment_account_status,
-    creator_payment_currency: userData.currency || 'NA',
+    creator_payment_currency: userData.profile.currency || 'NA',
     creator_zoom_connected: userData.profile.zoom_connected,
   });
 

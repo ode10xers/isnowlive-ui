@@ -104,7 +104,7 @@ const Profile = () => {
           creator_username: values.username || customNullValue,
           creator_profile_complete: localUserDetails.profile_complete,
           creator_payment_account_status: localUserDetails.profile.payment_account_status,
-          creator_payment_currency: localUserDetails.currency || customNullValue,
+          creator_payment_currency: localUserDetails.profile.currency || customNullValue,
           creator_zoom_connected: localUserDetails.profile.zoom_connected,
         });
 
