@@ -76,11 +76,11 @@ const Videos = () => {
                 </Title>
               </Col>
               <Col xs={24}>
-                {video.total_price === 0 ? (
+                {video.price === 0 ? (
                   <Text type="secondary">Free video</Text>
                 ) : (
                   <Text type="secondary">
-                    {video.currency.toUpperCase()} {video.total_price}
+                    {video.currency.toUpperCase()} {video.price}
                   </Text>
                 )}
               </Col>

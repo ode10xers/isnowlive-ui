@@ -68,7 +68,6 @@ const SessionsInventories = ({ match }) => {
           max_participants: i?.max_participants,
           username: i?.creator_username,
           price: i?.price,
-          total_price: i?.total_price,
           currency: i?.currency.toUpperCase() || 'SGD',
           refund_amount: i?.refund_amount || 0,
           is_refundable: i?.is_refundable || false,
@@ -239,7 +238,6 @@ const SessionsInventories = ({ match }) => {
   };
 
   const rescheduleSession = (data) => {
-    // TODO: Since currently there's price and total_price, decide which one will this API use
     const passedData = {
       inventory_id: data.inventory_id,
       order_id: data.order_id,
