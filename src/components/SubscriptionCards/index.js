@@ -8,6 +8,7 @@ import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone, EditOutlined } fro
 import TagListPopup from 'components/TagListPopup';
 
 import styles from './styles.module.scss';
+import { generateSubscriptionDuration } from 'utils/subscriptions';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -64,7 +65,8 @@ const SubscriptionCards = ({
       className: undefined,
     },
     {
-      label: `${subscription.validity} days`,
+      label: generateSubscriptionDuration(subscription, true),
+      className: undefined,
     },
     {
       label: (

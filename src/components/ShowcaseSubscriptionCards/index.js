@@ -5,7 +5,7 @@ import { Row, Col, Card, Typography, Button, Drawer, Divider } from 'antd';
 import SessionCards from 'components/SessionCards';
 import VideoCard from 'components/VideoCard';
 
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 
 import styles from './styles.module.scss';
 import { isMobileDevice } from 'utils/device';
@@ -103,7 +103,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
               <span className={styles.subscriptionPriceText}>
                 {subscription?.currency?.toUpperCase()} {subscription?.total_price}{' '}
               </span>
-              / {subscription?.validity} days
+              / {generateSubscriptionDuration(subscription)}
             </div>
           </Col>
           <Col xs={24} className={styles.buyButtonWrapper}>

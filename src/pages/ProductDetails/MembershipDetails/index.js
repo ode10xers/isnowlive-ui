@@ -14,7 +14,7 @@ import SubscriptionsListView from 'components/DynamicProfileComponents/Subscript
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import {
   getShadeForHexColor,
   preventDefaults,
@@ -299,7 +299,7 @@ const MembershipDetails = ({ match, history }) => {
                       </Col>
                       <Col xs={10} className={styles.highlightedMembershipPrice}>
                         {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}
-                        {selectedSubscription?.validity} days
+                        {generateSubscriptionDuration(selectedSubscription)}
                       </Col>
                     </Row>
                   </Col>
@@ -359,7 +359,7 @@ const MembershipDetails = ({ match, history }) => {
               <Col xs={11}>
                 <div className={styles.bottomBarPrice}>
                   {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}
-                  {selectedSubscription?.validity} days
+                  {generateSubscriptionDuration(selectedSubscription)}
                 </div>
               </Col>
               <Col xs={10}>
