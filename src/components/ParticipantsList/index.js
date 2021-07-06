@@ -31,7 +31,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
       ),
     },
     {
-      title: 'Net Price',
+      title: 'Earnings',
       dataIndex: 'net_price',
       key: 'net_price',
       width: '12%',
@@ -68,7 +68,7 @@ const ParticipantsList = ({ participants, isPast, currency }) => {
         {layout('Name', item?.name)}
         {layout('Registered on', item?.booking_time && toLongDate(item?.booking_time))}
         {layout('Total Fee Paid', `${currency.toUpperCase()} ${item?.total_price}`)}
-        {layout('Net Price', `${currency.toUpperCase()} ${item?.net_price}`)}
+        {layout('Earnings', `${currency.toUpperCase()} ${item?.net_price}`)}
         {layout('Platform Fees', `${currency.toUpperCase()} ${item?.platform_fees}`)}
         {layout('Status', getPaymentStatus(item?.status))}
       </Card>

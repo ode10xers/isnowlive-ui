@@ -158,6 +158,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
         price: editedSubscription?.price,
         subscriptionTagType: editedSubscription?.tag?.external_id ? 'selected' : 'anyone',
         selectedMemberTag: editedSubscription?.tag?.external_id || null,
+        subscriptionPeriod: editedSubscription?.validity || 30,
         subscriptionCredits:
           (editedSubscription?.products['SESSION']?.credits || 0) +
           (editedSubscription?.products['VIDEO']?.credits || 0),

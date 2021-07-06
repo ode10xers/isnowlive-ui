@@ -163,7 +163,7 @@ const EarningDetails = ({ match }) => {
       ),
     },
     {
-      title: 'Net',
+      title: 'Earnings',
       dataIndex: 'net_price',
       key: 'net_price',
       width: '120px',
@@ -208,7 +208,7 @@ const EarningDetails = ({ match }) => {
           </Text>
         )}
         {layout(
-          'Net',
+          'Earnings',
           <Text>
             {item.currency.toUpperCase()} {item.net_price}
           </Text>
