@@ -17,10 +17,13 @@ import {
   Tag,
   Checkbox,
   Radio,
+  Tooltip,
+  Space,
   Collapse,
 } from 'antd';
 
 import { BookTwoTone, TagOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { TwitterPicker } from 'react-color';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -32,6 +35,7 @@ import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'com
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
+import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
 
@@ -54,6 +58,26 @@ const initialColor = generateRandomColor();
 
 const whiteColor = '#ffffff';
 
+const colorPickerChoices = [
+  '#f44336',
+  '#e91e63',
+  '#9c27b0',
+  '#673ab7',
+  '#1890ff',
+  '#009688',
+  '#4caf50',
+  '#ffc107',
+  '#ff9800',
+  '#ff5722',
+  '#795548',
+  '#607d8b',
+  '#9ae2b6',
+  '#bf6d11',
+  '#f379b2',
+  '#34727c',
+  '#5030fd',
+];
+
 const formInitialValues = {
   courseName: '',
   price: 10,
@@ -70,7 +94,13 @@ const {
   formatDate: { toLocaleTime, toLocaleDate, toLongDateWithDay, toLongDateWithLongDay },
 } = dateUtil;
 
-const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false, creatorMemberTags = [] }) => {
+const CreateCourseModule = ({
+  visible,
+  closeModal,
+  editedCourse = null,
+  isVideoModal = false,
+  creatorMemberTags = [],
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -374,6 +404,11 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
     }
   }, [selectedCourseClass, getSelectedCourseClasses, editedCourse, form]);
 
+  const handleColorChange = (color) => {
+    setColorCode(color.hex || whiteColor);
+    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
+  };
+
   const handleStartDateChange = (date) => {
     setCourseStartDate(date);
 
@@ -461,6 +496,8 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
 
   const handleFinish = async (values) => {
     setSubmitting(true);
+    console.log(values);
+    return;
     let payload = {};
 
     if (isVideoModal) {
@@ -837,10 +874,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
     </>
   );
 
-  const gotoModulePage = () => {
-    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourseModule);
-  };
-
   const renderVideoCourseInputs = () => (
     <>
       {/*<Col xs={!isVideoModal ? 0 : 24}> 
@@ -973,271 +1006,11 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               </Form.List>
             </Form.Item>
           </Col>
-          <Col xs={16}>
-            <Form.Item
-              id="courseImageUrl"
-              name="courseImageUrl"
-              rules={validationRules.requiredValidation}
-              wrapperCol={{ span: 24 }}
-            >
-              <div className={styles.imageWrapper}>
-                <ImageUpload
-                  className={classNames('avatar-uploader', styles.coverImage)}
-                  name="courseImageUrl"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  onChange={handleCourseImageUpload}
-                  value={courseImageUrl}
-                  label="Course Image (size of Facebook Cover Image)"
-                  overlayHelpText="Click to change image (size of Facebook Cover Image)"
-                />
-              </div>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item
-              {...courseModalFormLayout}
-              id="courseName"
-              name="courseName"
-              label="Course Name"
-              rules={validationRules.nameValidation}
-            >
-              <Input placeholder="Enter Course Name" maxLength={50} />
-            </Form.Item>
-          </Col>
-          {renderVideoCourseInputs()}
-          {renderLiveCourseInputs()}
-          <Col xs={16}>
-            <Form.Item
-              {...courseModalFormLayout}
-              id="videoList"
-              name="videoList"
-              label="Course Video(s)"
-              rules={isVideoModal ? validationRules.arrayValidation : []}
-            >
-              <Select
-                showArrow
-                showSearch={false}
-                placeholder="Select Video(s)"
-                mode="multiple"
-                maxTagCount={2}
-                value={selectedVideos}
-                onChange={(val) => setSelectedVideos(val)}
-                optionLabelProp="label"
-              >
-                <Select.OptGroup
-                  label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-                  key="Published Videos"
-                >
-                  {videos
-                    ?.filter((video) => video.is_published)
-                    .map((video) => (
-                      <Select.Option
-                        value={video.external_id}
-                        key={video.external_id}
-                        label={
-                          <>
-                            {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                          </>
-                        }
-                      >
-                        <Row gutter={[8, 8]}>
-                          <Col xs={17} className={styles.productName}>
-                            {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                          </Col>
-                          <Col xs={7} className={styles.textAlignRight}>
-                            <Text strong>
-                              {video.pay_what_you_want
-                                ? `min. ${video.price}`
-                                : video.price > 0
-                                ? `${video.currency?.toUpperCase()} ${video.price}`
-                                : 'Free'}
-                            </Text>
-                          </Col>
-                        </Row>
-                      </Select.Option>
-                    ))}
-                  {videos?.filter((video) => video.is_published).length <= 0 && (
-                    <Select.Option disabled value="no_published_video">
-                      <Text disabled> No published video </Text>
-                    </Select.Option>
-                  )}
-                </Select.OptGroup>
-                <Select.OptGroup
-                  label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-                  key="Unpublished Videos"
-                >
-                  {videos
-                    ?.filter((video) => !video.is_published)
-                    .map((video) => (
-                      <Select.Option
-                        value={video.external_id}
-                        key={video.external_id}
-                        label={
-                          <>
-                            {' '}
-                            {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}{' '}
-                          </>
-                        }
-                      >
-                        <Row gutter={[8, 8]}>
-                          <Col xs={17} className={styles.productName}>
-                            {video.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {video.title}
-                          </Col>
-                          <Col xs={7} className={styles.textAlignRight}>
-                            <Text strong>
-                              {video.pay_what_you_want
-                                ? `min. ${video.price}`
-                                : video.price > 0
-                                ? `${video.currency?.toUpperCase()} ${video.price}`
-                                : 'Free'}
-                            </Text>
-                          </Col>
-                        </Row>
-                      </Select.Option>
-                    ))}
-                  {videos?.filter((video) => !video.is_published).length <= 0 && (
-                    <Select.Option disabled value="no_unpublished_video">
-                      <Text disabled> No unpublished video </Text>
-                    </Select.Option>
-                  )}
-                </Select.OptGroup>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item {...courseModalFormLayout} label="Course Price" required={true}>
-              <Row gutter={8}>
-                <Col xs={20}>
-                  <Form.Item
-                    id="price"
-                    name="price"
-                    rules={validationRules.numberValidation('Please Input Course Price', 0, false)}
-                    noStyle
-                  >
-                    <InputNumber
-                      min={0}
-                      disabled={currency === ''}
-                      placeholder="Course Price"
-                      className={styles.numericInput}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={4} className={styles.textAlignCenter}>
-                  <Text strong className={styles.currencyWrapper}>
-                    {currency?.toUpperCase() || ''}
-                  </Text>
-                </Col>
-              </Row>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item
-              label="Bookable by member with Tag"
-              required
-              {...courseModalFormLayout}
-              hidden={creatorMemberTags.length === 0}
-            >
-              <Form.Item
-                name="courseTagType"
-                rules={validationRules.requiredValidation}
-                onChange={handleCourseTagTypeChange}
-                className={styles.inlineFormItem}
-              >
-                <Radio.Group>
-                  <Radio value="anyone"> Anyone </Radio>
-                  <Radio value="selected"> Selected Member Tags </Radio>
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item className={styles.inlineFormItem}>
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() => showTagOptionsHelperModal('course')}
-                  icon={<InfoCircleOutlined />}
-                >
-                  Understanding the options
-                </Button>
-              </Form.Item>
-            </Form.Item>
-
-            <Form.Item
-              name="selectedMemberTags"
-              id="selectedMemberTags"
-              {...courseModalTailLayout}
-              hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
-            >
-              <Select
-                showArrow
-                mode="multiple"
-                maxTagCount={2}
-                placeholder="Select a member tag"
-                disabled={selectedTagType === 'anyone'}
-                options={creatorMemberTags.map((tag) => ({
-                  label: (
-                    <>
-                      {' '}
-                      {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
-                    </>
-                  ),
-                  value: tag.external_id,
-                }))}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.List name="FAQS">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, fieldKey, ...restField }) => (
-                    <Row key={key}>
-                      <Col xs={24}>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'FAQ_QUESTION']}
-                          {...courseModalFormLayout}
-                          fieldKey={[fieldKey, 'first']}
-                          rules={[{ required: true, message: 'Missing Question' }]}
-                          id="FAQ_QUESTION"
-                          label="FAQ QUESTION"
-                        >
-                          <Input placeholder="Enter Question" maxLength={50} />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24}>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'FAQ_ANSWER']}
-                          {...courseModalFormLayout}
-                          fieldKey={[fieldKey, 'first']}
-                          rules={[{ required: true, message: 'Missing Answer' }]}
-                          id="FAQ_ANSWER"
-                          label="FAQ ANSWER"
-                        >
-                          <Input placeholder="Enter Answer" maxLength={50} />
-                        </Form.Item>
-                      </Col>
-                      <MinusCircleOutlined onClick={() => remove(name)} />
-                    </Row>
-                  ))}
-                  <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      Add New FAQ
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
-          </Col>
         </Row>
         <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
-          <Col xs={12} md={6}>
-            <Button block type="default" onClick={() => gotoModulePage()} loading={submitting}>
-              Add Modules
-            </Button>
-          </Col>
           <Col xs={12} md={8}>
             <Button block type="primary" htmlType="submit" loading={submitting}>
-              Create Course
+              Update Course
             </Button>
           </Col>
         </Row>
@@ -1246,4 +1019,4 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
   );
 };
 
-export default Course;
+export default CreateCourseModule;

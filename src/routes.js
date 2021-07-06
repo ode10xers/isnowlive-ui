@@ -59,6 +59,7 @@ const Routes = {
     updateSessions: '/manage/session/:id/edit',
     updateCourse: '/courses/:id/edit',
     createCourse: '/courses/new',
+    createCourseModule: '/courses/add-module',
     livestream: '/livestream',
     coupons: '/coupons',
     documents: '/documents',
