@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
-import { Row, Col, Button, Spin, Typography, Card, message, Affix, Drawer } from 'antd';
+import { Row, Col, Button, Spin, Typography, message, Affix, Drawer } from 'antd';
 import { ArrowLeftOutlined, ScheduleTwoTone, PlayCircleTwoTone, VideoCameraTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import AuthModal from 'components/AuthModal';
+import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
@@ -24,44 +26,12 @@ import {
 
 import styles from './style.module.scss';
 import { useGlobalContext } from 'services/globalContext';
-import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 const { Title, Text } = Typography;
 
 const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
-
-const ContainerTitle = ({ title = '', icon = null }) => (
-  <Text style={{ color: '#0050B3' }}>
-    {icon}
-    {title}
-  </Text>
-);
-
-// TODO : Later we might want these colors to be customized
-const cardHeadingStyle = {
-  background: '#F1FBFF',
-  boxShadow: 'inset 0px -1px 0px #E6F5FB',
-  color: '#0050B3',
-  borderRadius: '12px 12px 0 0',
-};
-
-const CardContainer = ({ cardHeader, children }) => (
-  <Card {...cardHeader} className={styles.profileComponentContainer} bodyStyle={{ padding: 12 }}>
-    {children}
-  </Card>
-);
-
-const generateCardHeader = (title, icon) => ({
-  title: <ContainerTitle title={title} icon={icon} />,
-  headStyle: cardHeadingStyle,
-});
-
-const generateDrawerHeader = (title, icon) => ({
-  title: <ContainerTitle title={title} icon={icon} />,
-  headerStyle: cardHeadingStyle,
-});
 
 const MembershipDetails = ({ match, history }) => {
   const membershipId = match.params.membership_id;
@@ -97,7 +67,7 @@ const MembershipDetails = ({ match, history }) => {
       }
     } catch (error) {
       console.error(error);
-      console.error('Failed to load subscription details');
+      message.error(error?.response?.data?.message || 'Failed to load subscription details');
     }
 
     setIsLoading(false);
@@ -199,7 +169,7 @@ const MembershipDetails = ({ match, history }) => {
     setShowAuthModal(true);
   };
 
-  const closePurchaseModal = () => {
+  const closeAuthModal = () => {
     setShowAuthModal(false);
   };
 
@@ -233,11 +203,9 @@ const MembershipDetails = ({ match, history }) => {
 
   const renderSessionsComponent = (sessions = []) =>
     sessions.length > 0 ? (
-      <CardContainer
-        cardHeader={generateCardHeader(
-          'SESSIONS INCLUDED',
-          <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-        )}
+      <ContainerCard
+        title="SESSIONS INCLUDED"
+        icon={<VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
       >
         <Row gutter={[16, 16]}>
           {sessions.slice(0, 2).map(renderSessionCards)}
@@ -253,7 +221,7 @@ const MembershipDetails = ({ match, history }) => {
             </Col>
           )}
         </Row>
-      </CardContainer>
+      </ContainerCard>
     ) : null;
 
   const renderVideoCards = (video) => (
@@ -264,11 +232,9 @@ const MembershipDetails = ({ match, history }) => {
 
   const renderVideosComponent = (videos = []) =>
     videos.length > 0 ? (
-      <CardContainer
-        cardHeader={generateCardHeader(
-          'VIDEOS INCLUDED',
-          <PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-        )}
+      <ContainerCard
+        title="VIDEOS INCLUDED"
+        icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
       >
         <Row gutter={[16, 16]}>
           {videos.slice(0, 2).map(renderVideoCards)}
@@ -284,18 +250,13 @@ const MembershipDetails = ({ match, history }) => {
             </Col>
           )}
         </Row>
-      </CardContainer>
+      </ContainerCard>
     ) : null;
 
   const otherSubscriptionsComponent = (
-    <CardContainer
-      cardHeader={generateCardHeader(
-        'OTHER MEMBERSHIPS',
-        <ScheduleTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-      )}
-    >
+    <ContainerCard title="OTHER MEMBERSHIPS" icon={<ScheduleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}>
       <SubscriptionsListView subscriptions={otherSubscriptions} />
-    </CardContainer>
+    </ContainerCard>
   );
 
   const moreVideosListView = (
@@ -310,7 +271,7 @@ const MembershipDetails = ({ match, history }) => {
 
   return (
     <div className={styles.membershipDetailsContainer}>
-      <AuthModal visible={showAuthModal} closeModal={closePurchaseModal} onLoggedInCallback={showConfirmPaymentPopup} />
+      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Spin spinning={isLoading} tip="Fetching membership details..." size="large">
         <div className={styles.pageContent}>
           <Row gutter={[8, 16]} justify="center">
@@ -366,7 +327,13 @@ const MembershipDetails = ({ match, history }) => {
         placement="bottom"
         height={560}
         bodyStyle={{ padding: 10 }}
-        {...generateDrawerHeader(`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this membership`)}
+        title={
+          <Text style={{ color: '#0050B3' }}>
+            {' '}
+            {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this membership`}{' '}
+          </Text>
+        }
+        headerStyle={generateCardHeadingStyle()}
         onClose={handleCloseBottomSheets}
         className={styles.detailsDrawer}
       >

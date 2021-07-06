@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { Card, Typography, Spin, Row, Col, Button, Space } from 'antd';
-import { LikeTwoTone } from '@ant-design/icons';
+import { Typography, Spin, Row, Col, Button, Space } from 'antd';
+import { ScheduleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -12,23 +12,9 @@ import DragAndDropHandle from '../DragAndDropHandle';
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
+import ContainerCard from 'components/ContainerCard';
 
 const { Text } = Typography;
-
-const ContainerTitle = ({ title = 'MEMBERSHIPS' }) => (
-  <Text style={{ color: '#0050B3' }}>
-    <LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-    {title}
-  </Text>
-);
-
-// TODO : Later we might want these colors to be customized
-const cardHeadingStyle = {
-  background: '#F1FBFF',
-  boxShadow: 'inset 0px -1px 0px #E6F5FB',
-  color: '#0050B3',
-  borderRadius: '12px 12px 0 0',
-};
 
 const SubscriptionProfileComponent = ({
   identifier = null,
@@ -71,11 +57,9 @@ const SubscriptionProfileComponent = ({
         </Col>
       )}
       <Col xs={isEditing ? 22 : 24}>
-        <Card
-          title={<ContainerTitle title={customComponentProps?.title} />}
-          headStyle={cardHeadingStyle}
-          className={styles.profileComponentContainer}
-          bodyStyle={{ padding: 12 }}
+        <ContainerCard
+          title={customComponentProps?.title ?? 'MEMBERSHIPS'}
+          icon={<ScheduleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
         >
           {isEditing ? (
             <Row gutter={[8, 8]} justify="center" align="center">
@@ -98,7 +82,7 @@ const SubscriptionProfileComponent = ({
               <SubscriptionsListView subscriptions={subscriptions} />
             </Spin>
           )}
-        </Card>
+        </ContainerCard>
       </Col>
       {isEditing && (
         <Col xs={1}>

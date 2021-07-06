@@ -43,26 +43,26 @@ const VideoListCard = ({ video }) => {
     </Title>
   );
 
-  const renderVideoPrice = () => {
-    if (video?.pay_what_you_want) {
-      return 'Flexible';
-    } else if (video?.price === 0 || video?.currency === '') {
-      return 'Free';
-    } else {
-      return `${video?.currency?.toUpperCase()} ${video?.price}`;
-    }
-  };
+  // const renderVideoPrice = () => {
+  //   if (video?.pay_what_you_want) {
+  //     return 'Flexible';
+  //   } else if (video?.price === 0 || video?.currency === '') {
+  //     return 'Free';
+  //   } else {
+  //     return `${video?.currency?.toUpperCase()} ${video?.price}`;
+  //   }
+  // };
 
-  const bottomCardBar = (
-    <Row className={styles.cardFooter}>
-      <Col xs={14} className={styles.videoValidity}>
-        VALIDITY : {video?.validity} DAY{video?.validity > 1 ? 'S' : ''}
-      </Col>
-      <Col xs={10} className={styles.priceText}>
-        {renderVideoPrice()}
-      </Col>
-    </Row>
-  );
+  // const bottomCardBar = (
+  //   <Row className={styles.cardFooter}>
+  //     <Col xs={14} className={styles.videoValidity}>
+  //       VALIDITY : {video?.validity} DAY{video?.validity > 1 ? 'S' : ''}
+  //     </Col>
+  //     <Col xs={10} className={styles.priceText}>
+  //       {renderVideoPrice()}
+  //     </Col>
+  //   </Row>
+  // );
 
   const handleCardClicked = (e) => {
     preventDefaults(e);
@@ -70,10 +70,16 @@ const VideoListCard = ({ video }) => {
   };
 
   return (
-    <Card className={styles.videoListCard} cover={videoImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
+    <Card
+      bordered={false}
+      className={styles.videoListCard}
+      cover={videoImage}
+      bodyStyle={{ padding: 0 }}
+      onClick={handleCardClicked}
+    >
       <Row>
         <Col xs={24}>{videoTitle}</Col>
-        <Col xs={24}>{bottomCardBar}</Col>
+        {/* <Col xs={24}>{bottomCardBar}</Col> */}
       </Row>
     </Card>
   );
