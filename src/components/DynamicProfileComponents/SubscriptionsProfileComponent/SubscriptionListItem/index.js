@@ -52,14 +52,14 @@ const SubscriptionListItem = ({ subscription }) => {
           <Row gutter={8}>
             <Col xs={14}>
               <div className={styles.membershipDetails}>
-                {generateBaseCreditsText(subscription, false).replace(' credits/month', '')}
+                {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
                 <br />
-                per month
+                per {subscription?.validity} days
               </div>
             </Col>
             <Col xs={10}>
               <div className={styles.membershipPrice}>
-                {subscription?.currency?.toUpperCase()} {subscription?.total_price} / month
+                {subscription?.currency?.toUpperCase()} {subscription?.total_price} / {subscription?.validity} days
               </div>
             </Col>
           </Row>

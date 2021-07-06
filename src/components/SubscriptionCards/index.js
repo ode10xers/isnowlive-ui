@@ -52,7 +52,7 @@ const SubscriptionCards = ({
 
   const cardData = [
     {
-      label: `${subscription.currency?.toUpperCase()} ${subscription.price}`,
+      label: subscription.price > 0 ? `${subscription.currency?.toUpperCase()} ${subscription.price}` : 'Free',
       className: undefined,
     },
     {
@@ -60,8 +60,11 @@ const SubscriptionCards = ({
       className: undefined,
     },
     {
-      label: `${getBaseCreditsCount()} Credits/Month`,
+      label: `${getBaseCreditsCount()} credits/period`,
       className: undefined,
+    },
+    {
+      label: `${subscription.validity} days`,
     },
     {
       label: (
@@ -93,7 +96,7 @@ const SubscriptionCards = ({
     //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
     // },
     // {
-    //   label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/Month` : 'None',
+    //   label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/period` : 'None',
     //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
     // },
     // {

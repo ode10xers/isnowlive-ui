@@ -33,7 +33,7 @@ export const generateBaseCreditsText = (subscription, isCourse = false) => {
     productText = availableProducts.join(' or ');
   }
 
-  return `${calculatedBaseCredits} ${productText} credits/month`;
+  return `${calculatedBaseCredits} ${productText} credits/period`;
 };
 
 export const generateIncludedProducts = (subscription, isCourse = false) => {

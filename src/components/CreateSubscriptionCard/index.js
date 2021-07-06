@@ -347,7 +347,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
       let payload = {
         name: values.subscriptionName,
         price: values.price,
-        validity: 30,
+        validity: values.subscriptionPeriod,
         tag_id: selectedTagType === 'anyone' ? '' : values.selectedMemberTag || selectedMemberTag || '',
         color_code: values.colorCode || colorCode || defaultBorderColor,
         products: productsData,
@@ -490,14 +490,33 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                     <Form.Item
                       id="subscriptionCredits"
                       name="subscriptionCredits"
-                      rules={validationRules.numberValidation('Please Input Base Credits/Month', 1, false)}
+                      rules={validationRules.numberValidation('Please Input base credits/period', 1, false)}
                       noStyle
                     >
                       <InputNumber min={1} placeholder="Enter Credits" className={styles.numericInput} />
                     </Form.Item>
                   </Col>
                   <Col xs={14} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
-                    <Text strong>Credits/Month</Text>
+                    <Text strong>credits/period</Text>
+                  </Col>
+                </Row>
+              </Form.Item>
+            </List.Item>
+            <List.Item>
+              <Form.Item className={styles.compactFormItem}>
+                <Row gutter={4}>
+                  <Col xs={18}>
+                    <Form.Item
+                      id="subscriptionPeriod"
+                      name="subscriptionPeriod"
+                      rules={validationRules.numberValidation('Please Input membership period duration', 1, false)}
+                      noStyle
+                    >
+                      <InputNumber min={1} placeholder="Enter duration" className={styles.numericInput} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={6} className={classNames(styles.textAlignCenter, styles.helpTextWrapper)}>
+                    <Text strong> days </Text>
                   </Col>
                 </Row>
               </Form.Item>
@@ -775,13 +794,13 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
                     <InputNumber
                       disabled={!isCourseIncluded}
                       min={1}
-                      placeholder="Course Credits/Month"
+                      placeholder="Course Credits/period"
                       className={styles.numericInput}
                     />
                   </Form.Item>
                 </Col>
                 <Col xs={14} className={classNames(styles.helpTextWrapper, styles.textAlignCenter)}>
-                  <Text strong>Credits/Month</Text>
+                  <Text strong>Credits/period</Text>
                 </Col>
               </Row>
             </List.Item>

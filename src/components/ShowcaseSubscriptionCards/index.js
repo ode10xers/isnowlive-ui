@@ -103,7 +103,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
               <span className={styles.subscriptionPriceText}>
                 {subscription?.currency?.toUpperCase()} {subscription?.total_price}{' '}
               </span>
-              / month
+              / {subscription?.validity} days
             </div>
           </Col>
           <Col xs={24} className={styles.buyButtonWrapper}>

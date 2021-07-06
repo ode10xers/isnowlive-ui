@@ -40,7 +40,7 @@ const Subscriptions = () => {
     <div className={styles.subscriptionPluginContainer}>
       <Row className={styles.mt20} gutter={[8, 16]}>
         <Col span={14}>
-          <Title level={5}> Monthly Memberships </Title>
+          <Title level={5}> Memberships </Title>
         </Col>
         <Col span={10}>
           <img src={logo} alt="Passion.do" className={styles.passionLogo} />

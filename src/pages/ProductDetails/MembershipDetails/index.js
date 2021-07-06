@@ -298,7 +298,8 @@ const MembershipDetails = ({ match, history }) => {
                         {generateBaseCreditsText(selectedSubscription, false)}
                       </Col>
                       <Col xs={10} className={styles.highlightedMembershipPrice}>
-                        {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} / month
+                        {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}
+                        {selectedSubscription?.validity} days
                       </Col>
                     </Row>
                   </Col>
@@ -357,7 +358,8 @@ const MembershipDetails = ({ match, history }) => {
               </Col>
               <Col xs={11}>
                 <div className={styles.bottomBarPrice}>
-                  {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} / month
+                  {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}
+                  {selectedSubscription?.validity} days
                 </div>
               </Col>
               <Col xs={10}>
