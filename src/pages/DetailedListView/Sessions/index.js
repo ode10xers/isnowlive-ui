@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 import moment from 'moment';
 
 import { Row, Col, Spin, Empty, Button, Affix, Space, Typography, DatePicker, message } from 'antd';
@@ -9,10 +10,12 @@ import Routes from 'routes';
 
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
+import dateUtil from 'utils/date';
 import { isAPISuccess } from 'utils/helper';
+import { isInIframeWidget } from 'utils/widgets';
+import parseQueryString from 'utils/parseQueryString';
 
 import styles from './style.module.scss';
-import dateUtil from 'utils/date';
 
 const { Title } = Typography;
 
@@ -22,11 +25,15 @@ const {
 
 // TODO: Consider adding virtualized scroll later
 // See react-infinite-load or react-virtualized
-const SessionDetailedListView = ({ history }) => {
+const SessionDetailedListView = () => {
+  const history = useHistory();
+
+  const { start_date } = parseQueryString(window.location.href);
+
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
-  const [selectedStartDate, setSelectedStartDate] = useState(moment());
-  const [selectedDatePickerDate, setselectedDatePickerDate] = useState(moment());
+  const [selectedStartDate, setSelectedStartDate] = useState(start_date ? moment(start_date) : moment());
+  const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(start_date ? moment(start_date) : moment());
 
   const fetchUpcomingSessions = useCallback(async () => {
     setIsLoading(true);
@@ -82,8 +89,8 @@ const SessionDetailedListView = ({ history }) => {
 
   const renderSessionDateList = (sessionDateData) => (
     <Col xs={24} key={sessionDateData.key}>
-      <Space direction="vertical">
-        <Title level={4} className={styles.redText}>
+      <Space direction="vertical" className={styles.w100}>
+        <Title level={4} className={styles.sessionDateSeparator}>
           {' '}
           {sessionDateData.title}{' '}
         </Title>
@@ -96,7 +103,7 @@ const SessionDetailedListView = ({ history }) => {
 
   const handleChangeDate = (date, dateString) => {
     setSelectedStartDate(date);
-    setselectedDatePickerDate(date);
+    setSelectedDatePickerDate(date);
     window.scrollTo({
       top: 0,
       left: 0,
@@ -109,29 +116,46 @@ const SessionDetailedListView = ({ history }) => {
       <Spin size="large" spinning={isLoading} tip="Fetching creator sessions...">
         {sessions.length > 0 ? (
           <>
-            <Affix offsetTop={60}>
+            <Affix offsetTop={isInIframeWidget() ? 0 : 60}>
               <div className={styles.stickyHeader}>
                 <Row gutter={8}>
-                  <Col xs={4} md={2}>
-                    <Button
-                      className={styles.blueText}
-                      size="large"
-                      icon={<ArrowLeftOutlined />}
-                      onClick={handleBackClicked}
-                    />
-                  </Col>
-                  <Col xs={20} md={22}>
-                    <DatePicker
-                      size="large"
-                      inputReadOnly={true}
-                      allowClear={false}
-                      className={styles.sessionDatePicker}
-                      value={selectedDatePickerDate}
-                      format="ddd, DD MMM YYYY"
-                      disabledDate={handleDisabledDate}
-                      onChange={handleChangeDate}
-                    />
-                  </Col>
+                  {isInIframeWidget() ? (
+                    <Col xs={24}>
+                      <DatePicker
+                        size="large"
+                        inputReadOnly={true}
+                        allowClear={false}
+                        className={styles.sessionDatePicker}
+                        value={selectedDatePickerDate}
+                        format="ddd, DD MMM YYYY"
+                        disabledDate={handleDisabledDate}
+                        onChange={handleChangeDate}
+                      />
+                    </Col>
+                  ) : (
+                    <>
+                      <Col xs={4} md={2}>
+                        <Button
+                          className={styles.blueText}
+                          size="large"
+                          icon={<ArrowLeftOutlined />}
+                          onClick={handleBackClicked}
+                        />
+                      </Col>
+                      <Col xs={20} md={22}>
+                        <DatePicker
+                          size="large"
+                          inputReadOnly={true}
+                          allowClear={false}
+                          className={styles.sessionDatePicker}
+                          value={selectedDatePickerDate}
+                          format="ddd, DD MMM YYYY"
+                          disabledDate={handleDisabledDate}
+                          onChange={handleChangeDate}
+                        />
+                      </Col>
+                    </>
+                  )}
                 </Row>
               </div>
             </Affix>

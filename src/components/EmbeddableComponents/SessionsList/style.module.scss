@@ -1,10 +1,10 @@
 @import '../../../styles/variables.scss';
 
-.coursePluginContainer {
-  background-color: var(--course-widget-background-color);
+.sessionListPluginContainer {
+  background-color: var(--session-list-widget-background-color);
   width: 100%;
 
-  .courseListContainer {
+  .sessionListContainer {
     max-width: 767px;
     min-height: 700px;
     margin : 0 auto;

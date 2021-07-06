@@ -1,5 +1,6 @@
 import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+import { getLocalUserDetails } from 'utils/storage';
 
 export const redirectToInventoryPage = (inventory) => {
   let urlUsername = getUsernameFromUrl();
@@ -79,6 +80,29 @@ export const redirectToPassesPage = (pass) => {
 
   const baseUrl = generateUrlFromUsername(pass.creator_username || urlUsername);
   const targetUrl = `${baseUrl}/p/${pass.id}`;
+
+  if (isInIframeWidget() || isWidgetUrl()) {
+    window.open(targetUrl, '_self');
+  } else {
+    window.open(targetUrl);
+  }
+};
+
+export const redirectToMembershipPage = (subscription) => {
+  let urlUsername = getUsernameFromUrl();
+
+  if (reservedDomainName.includes(urlUsername)) {
+    const localUserDetails = getLocalUserDetails();
+
+    if (localUserDetails?.is_creator) {
+      urlUsername = localUserDetails.username;
+    } else {
+      urlUsername = 'app';
+    }
+  }
+
+  const baseUrl = generateUrlFromUsername(subscription.creator_username || urlUsername);
+  const targetUrl = `${baseUrl}/m/${subscription.external_id}`;
 
   if (isInIframeWidget() || isWidgetUrl()) {
     window.open(targetUrl, '_self');

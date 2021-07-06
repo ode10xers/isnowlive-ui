@@ -1,56 +1,45 @@
 @import '../../../../styles/variables.scss';
 
-.subscriptionItem {
-  --title-height : 40px;
-  background-color: var(--primary-color-01);
-  border: 1px solid var(--primary-color-03);
+.membershipItem {
+  background-color: var(--primary-color);
+  border: 1px solid var(--secondary-color);
   border-radius: 8px;
-  color: var(--primary-color);
-  
-  .subscriptionDetailsContainer {
-    padding: 12px;
+  padding: 8px 16px;
 
-    .subscriptionTitleContainer {
-      align-items: middle;
-  
-      .subscriptionTitle {
-        display: inline-block;
-        height: var(--title-height);
-        background-color: var(--primary-color-05);
-        font-weight: 500;
-        font-size: 16px;
-        padding: 6px 10px;
-        width: 150px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        vertical-align: bottom;
-      }
-    
-      .subscriptionPrice {
-        height: var(--title-height);
-        display: inline-block;
-        padding: 10px 12px;
-        font-size: 14px;
-        background-color: var(--primary-color-03);
-      }
+  .membershipName {
+    width: fit-content;
+    color : var(--ternary-color);
+    font-weight : 600;
+    border-bottom : 1px solid var(--secondary-color);
+
+    &.textLength25 {
+      font-size : 20px;
     }
-  
-    .subscriptionDetails {
-      color: var(--primary-color);
+
+    &.textLength50 {
+      font-size : 14px;
+    }
+  }
+
+  .arrowSignContainer {
+    max-width: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+
+    .arrowSign {
+      color: var(--secondary-color);
       font-size: 16px;
     }
   }
 
-  .subscriptionDetailsArrowContainer {
-    background-color: var(--primary-color-03);
-    font-size: 12px;
-    text-align: center;
-    padding: 0px;
-    border-radius: 0 8px 8px 0;
+  .membershipDetails {
+    font-size : 13px;
+    color : var(--ternary-color);
+  }
 
-    .subscriptionDetailsArrow {
-      height: 100%;
-    }
+  .membershipPrice {
+    color : var(--ternary-color);
+    text-align: right;
   }
 }

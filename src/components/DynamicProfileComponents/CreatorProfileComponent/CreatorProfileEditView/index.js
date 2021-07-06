@@ -5,9 +5,9 @@ import { EditOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 import ImageUpload from 'components/ImageUpload';
 import TextEditor from 'components/TextEditor';
+import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';

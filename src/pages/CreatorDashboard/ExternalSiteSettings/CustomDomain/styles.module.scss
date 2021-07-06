@@ -5,6 +5,10 @@
   width: calc(50% - 12px);
   max-width: 240px;
   margin-bottom: 0 !important;
+
+  input[disabled] {
+    color: map-get($map: $colors, $key: 'Charcoal') !important;
+  }
 }
 
 .inlineFormSeparator {

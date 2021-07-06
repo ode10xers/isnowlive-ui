@@ -1,0 +1,121 @@
+@import '../../../styles/variables.scss';
+
+.videoDetailsPage {
+  padding: 10px;
+
+  .videoDataContainer {
+    .videoImageContainer {
+      text-align: center;
+    
+      .videoImage {
+        height: 100%;
+        object-fit: scale-down;
+        border-radius: 12px;
+      }
+    }
+    
+    .videoTitle {
+      font-size: 24px;
+      font-weight: 500;
+    }
+    
+    .videoDetailsContainer {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+      padding: 8px;
+      background-color: map-get($map: $colors, $key: 'AliceBlue');
+      border: 1px solid map-get($map: $colors, $key: 'ColumbiaBlue');
+      justify-content: space-evenly;
+      text-align: center;
+    
+      .videoDetailsDivider {
+        min-height: 40px;
+        height: 100%;
+        border-left : 1px solid map-get($map: $colors, $key: 'ColumbiaBlue');
+      }
+    
+      .videoDetailItem {
+        color : map-get($map: $colors, $key: 'DodgerBlue');
+        font-size: 20px;
+        font-weight: 600;
+      }
+    }
+    
+    .videoDescription {
+      margin: 20px 0;
+
+      p,
+        span {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+          background: transparent !important;
+        }
+    }
+  }
+
+  .buyContainer {
+    .buyMembershipContainer {
+      padding: 12px;
+      width: 100%;
+      background-color: map-get($map: $colors, $key: 'Ivory');
+      border-radius: 8px;
+
+      .buyMembershipBtn {
+        background-color: map-get($map: $colors, $key: 'PolarGreen') !important;
+        color: map-get($map: $colors, $key: 'White') !important;
+        font-size: 16px;
+      }
+
+      .buyMembershipDesc {
+        text-align: center;
+        font-size: 14px;
+        color: map-get($map: $colors, $key: 'PolarGreen') !important;
+      }
+    }
+
+    .buyVideoContainer {
+      @extend .buyMembershipContainer;
+      background-color: map-get($map: $colors, $key: 'AliceBlue');
+
+      .buyVideoBtn {
+        background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+        
+        .buyVideoBtnContent {
+          height: 24px;
+          margin-left: 10px;
+
+          .buyBtnDivider {
+            border-left: 1px solid map-get($map: $colors, $key: 'White') !important;
+            height: 20px;
+            margin: 0 8px;
+          }
+          
+          .buyVideoBtnText {
+            font-size: 16px;
+            color: map-get($map: $colors, $key: 'White') !important;
+
+            del {
+              text-decoration: solid line-through map-get($map: $colors, $key: 'Razzmatazz') 2px;
+            }
+          }
+        }
+      }
+
+      .buyVideoDesc {
+        color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+        text-align: center;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.videoBottomSheets {
+  :global {
+    .ant-drawer-content {
+      border-radius : 12px 12px 0 0;
+    }
+  }
+}
+

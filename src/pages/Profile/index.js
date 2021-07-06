@@ -218,7 +218,6 @@ const Profile = () => {
     values.profile_image_url = profileImage;
     values.profile.testimonials = testimonials;
     if (isPublicUrlAvaiable) {
-      console.log(values);
       updateProfileDetails(values);
     } else {
       setIsLoading(false);

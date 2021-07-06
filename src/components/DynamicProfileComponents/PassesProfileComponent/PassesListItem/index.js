@@ -2,13 +2,14 @@ import React from 'react';
 
 import { Row, Col, Divider, Typography } from 'antd';
 
-import styles from './style.module.scss';
 import { preventDefaults } from 'utils/helper';
 import { redirectToPassesPage } from 'utils/redirect';
 
+import styles from './style.module.scss';
+
 const { Text, Title } = Typography;
 
-const PassesListItem = ({ pass }) => {
+const PassesListItem = ({ pass, handleClick = null }) => {
   const renderPassPrice = () => {
     // TODO: Might also want to adjust here when PWYW is implemented
     if (pass.price > 0 && pass.currency !== '') {
@@ -24,7 +25,7 @@ const PassesListItem = ({ pass }) => {
   };
 
   return (
-    <div className={styles.passItem} onClick={handlePassItemClicked}>
+    <div className={styles.passItem} onClick={handleClick ?? handlePassItemClicked}>
       <Row gutter={[4, 4]} justify="center">
         <Col xs={24}>
           <Title level={5} ellipsis={{ rows: 1 }} className={styles.passTitle}>

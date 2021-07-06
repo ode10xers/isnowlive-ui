@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 import { Route, Switch, Redirect, useHistory, useRouteMatch } from 'react-router-dom';
 
-import { Spin, Typography, Row, Col, Card, Button, Space } from 'antd';
+import { Spin, Typography, Row, Col, Button, Space } from 'antd';
 import {
   VideoCameraTwoTone,
   PlayCircleTwoTone,
@@ -15,34 +15,28 @@ import {
 import apis from 'apis';
 import Routes from 'routes';
 
-import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
-
 import SessionListView from '../SessionsProfileComponent/SessionListView';
 import VideoListView from '../VideosProfileComponent/VideoListView';
 import CoursesListView from '../CoursesProfileComponent/CoursesListView';
-
-import styles from './style.module.scss';
 import ProductsEditView from './ProductsEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
 
+import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
+
+import styles from './style.module.scss';
+import ContainerCard from 'components/ContainerCard';
+
 const { Text } = Typography;
 
-const ContainerTitle = ({ title = '', icon = null }) => (
-  <Text style={{ color: '#0050B3' }}>
-    {icon}
-    {title}
-  </Text>
-);
-
-const cardHeadingStyle = {
-  background: '#F1FBFF',
-  boxShadow: 'inset 0px -1px 0px #E6F5FB',
-  color: '#0050B3',
-  borderRadius: '12px 12px 0 0',
-};
-
-const CardContainer = ({ isEditing, productName, route = Routes.creatorDashboard.rootPath, cardHeader, children }) => (
-  <Card {...cardHeader} className={styles.profileComponentContainer} bodyStyle={{ padding: 12 }}>
+const ProductCardTemplate = ({
+  title = '',
+  icon = null,
+  isEditing,
+  productName,
+  route = Routes.creatorDashboard.rootPath,
+  children,
+}) => (
+  <ContainerCard title={title} icon={icon}>
     {isEditing ? (
       <Row justify="center" align="middle">
         <Col className={styles.textAlignCenter}>
@@ -57,7 +51,7 @@ const CardContainer = ({ isEditing, productName, route = Routes.creatorDashboard
     ) : (
       children
     )}
-  </Card>
+  </ContainerCard>
 );
 
 const menuKeyRouteMap = {
@@ -199,63 +193,52 @@ const ProductsProfileComponent = ({
     }
   };
 
-  const generateCardHeader = (title, icon) => ({
-    title: <ContainerTitle title={title} icon={icon} />,
-    headStyle: cardHeadingStyle,
-  });
-
   const getComponentTitle = (key) => {
     const targetComponent = innerComponents.find((component) => component.key === key);
     return targetComponent?.title ?? '';
   };
 
   const sessionsComponent = (
-    <CardContainer
+    <ProductCardTemplate
       isEditing={isEditing}
       productName="sessions"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions}
-      cardHeader={generateCardHeader(
-        getComponentTitle('SESSIONS'),
-        <VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-      )}
+      title={getComponentTitle('SESSIONS')}
+      icon={<VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
     >
       <SessionListView sessions={sessions} />
-    </CardContainer>
+    </ProductCardTemplate>
   );
 
   const videosComponent = (
-    <CardContainer
+    <ProductCardTemplate
       isEditing={isEditing}
       productName="videos"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos}
-      cardHeader={generateCardHeader(
-        getComponentTitle('VIDEOS'),
-        <PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-      )}
+      title={getComponentTitle('VIDEOS')}
+      icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
     >
       <VideoListView videos={videos} />
-    </CardContainer>
+    </ProductCardTemplate>
   );
 
   const coursesComponent = (
-    <CardContainer
+    <ProductCardTemplate
       isEditing={isEditing}
       productName="courses"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses}
-      cardHeader={generateCardHeader(
-        getComponentTitle('COURSES'),
-        <BookTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-      )}
+      title={getComponentTitle('COURSES')}
+      icon={<BookTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
     >
       <CoursesListView courses={courses} />
-    </CardContainer>
+    </ProductCardTemplate>
   );
 
   return (
     <Row>
-      <Col xs={24}>
+      <Col xs={24} className={styles.navigationBarContainer}>
         {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
-          <Row gutter={[12, 12]} justify="center" align="center" className={styles.bottomBarMenu}>
+          <Row gutter={[12, 12]} justify="center" align="center" className={styles.navigationBarMenu}>
             {sessions.length > 0 && (
               <Col xs={8} onClick={() => handleMenuClick('SESSIONS')}>
                 <div
@@ -343,6 +326,8 @@ const ProductsProfileComponent = ({
                     ? videosComponent
                     : courses.length > 0
                     ? coursesComponent
+                    : isEditing
+                    ? sessionsComponent
                     : null}
                 </Route>
               </Switch>

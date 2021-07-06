@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Modal, Row, Col, Input, Button, Form, Typography } from 'antd';
+import { Modal, Row, Col, Input, Button, Form, Typography, Space, Tooltip, Collapse } from 'antd';
 import { EditOutlined, MinusCircleOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
@@ -15,18 +15,25 @@ const formInitialValues = {
   values: [],
 };
 
-const { Text, Paragraph } = Typography;
+const { Text, Title, Paragraph } = Typography;
+const { Panel } = Collapse;
 
 const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([0]);
 
   useEffect(() => {
     if (configValues) {
       form.setFieldsValue({
         title: configValues.title,
-        links: configValues.values ?? [],
+        links:
+          configValues.values?.map((linkData) => ({
+            ...linkData,
+            textColor: linkData.textColor?.slice(1),
+            backgroundColor: linkData.backgroundColor?.slice(1),
+          })) ?? [],
       });
     } else {
       form.resetFields();
@@ -67,9 +74,26 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
   const handleFinishEditComponent = (values) => {
     updateHandler({
       title: values.title,
-      values: values.links,
+      values: values.links.map((linkData) => ({
+        ...linkData,
+        textColor: `#${linkData.textColor}`,
+        backgroundColor: `#${linkData.backgroundColor}`,
+      })),
     });
     setEditModalVisible(false);
+  };
+
+  const handleFinishFailed = ({ errorFields }) => {
+    let accordionToExpand = [];
+
+    errorFields.forEach((error) => {
+      if (error.name.length > 1 && error.name.includes('links')) {
+        // NOTE : The second element contains the key/index of the link item that is failing
+        accordionToExpand.push(error.name[1]);
+      }
+    });
+
+    setExpandedAccordionKeys([...new Set([...expandedAccordionKeys, ...new Set(accordionToExpand)])]);
   };
 
   return (
@@ -100,6 +124,8 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
           layout="vertical"
           scrollToFirstError={true}
           initialValues={formInitialValues}
+          // onFieldsChange={handleFormFieldsChanged}
+          onFinishFailed={handleFinishFailed}
           onFinish={handleFinishEditComponent}
         >
           <Row gutter={[8, 16]}>
@@ -110,35 +136,124 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
             </Col>
             <Col xs={24}>
               <Form.Item label="Your Links" required={true}>
+                {/* NOTE : The rule here is quite complex and tied to the children Form.Item names, so if the names changes here, also change it in the rules */}
                 <Form.List name="links" rules={validationRules.otherLinksValidation}>
                   {(fields, { add, remove }, { errors }) => (
-                    <Row>
-                      {fields.map((field, index) => (
-                        <Col xs={24} key={index}>
-                          <Row gutter={10}>
-                            <Col xs={22}>
-                              <Form.Item {...field} key={field.key} rules={validationRules.requiredValidation}>
-                                <Input placeholder="Paste your link here" />
-                              </Form.Item>
-                            </Col>
-                            {fields.length > 1 ? (
-                              <Col xs={2}>
-                                <MinusCircleOutlined onClick={() => remove(field.name)} />
-                              </Col>
-                            ) : null}
-                          </Row>
-                        </Col>
-                      ))}
+                    <Row className={styles.ml10} gutter={[8, 12]}>
                       <Col xs={24}>
-                        <Button block type="dashed" onClick={() => add()} icon={<PlusCircleOutlined />}>
+                        <Collapse
+                          defaultActiveKey={fields[0]?.name ?? 0}
+                          activeKey={expandedAccordionKeys}
+                          onChange={setExpandedAccordionKeys}
+                        >
+                          {fields.map(({ name, fieldKey, ...restField }) => (
+                            <Panel
+                              key={name}
+                              header={
+                                <Space align="baseline">
+                                  <Title level={5} className={styles.blueText}>
+                                    Link Item
+                                  </Title>
+                                  {fields.length > 1 ? (
+                                    <Tooltip title="Remove this link item">
+                                      <MinusCircleOutlined
+                                        className={styles.redText}
+                                        onClick={(e) => {
+                                          preventDefaults(e);
+                                          // NOTE : We use the name as Panel key
+                                          setExpandedAccordionKeys((prevKeys) =>
+                                            prevKeys.filter((val) => val !== name)
+                                          );
+                                          remove(name);
+                                        }}
+                                      />
+                                    </Tooltip>
+                                  ) : null}
+                                </Space>
+                              }
+                            >
+                              <Row gutter={[8, 4]}>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Link Title"
+                                    fieldKey={[fieldKey, 'title']}
+                                    name={[name, 'title']}
+                                    rules={validationRules.requiredValidation}
+                                  >
+                                    <Input placeholder="Text to show (max. 30)" maxLength={30} />
+                                  </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Link URL"
+                                    fieldKey={[fieldKey, 'url']}
+                                    name={[name, 'url']}
+                                    rules={validationRules.urlValidation}
+                                  >
+                                    <Input placeholder="Paste your URL here" type="url" />
+                                  </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Title Color"
+                                    fieldKey={[fieldKey, 'textColor']}
+                                    name={[name, 'textColor']}
+                                    rules={[
+                                      ...validationRules.requiredValidation,
+                                      ...validationRules.hexColorValidation(),
+                                    ]}
+                                  >
+                                    <Input placeholder="Hex color code of the title" prefix={<Text strong> # </Text>} />
+                                  </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                  <Form.Item
+                                    className={styles.compactFormItem}
+                                    {...restField}
+                                    label="Background Color"
+                                    fieldKey={[fieldKey, 'backgroundColor']}
+                                    name={[name, 'backgroundColor']}
+                                    rules={[
+                                      ...validationRules.requiredValidation,
+                                      ...validationRules.hexColorValidation(),
+                                    ]}
+                                  >
+                                    <Input
+                                      placeholder="Hex color code of the background"
+                                      prefix={<Text strong> # </Text>}
+                                    />
+                                  </Form.Item>
+                                </Col>
+                              </Row>
+                            </Panel>
+                          ))}
+                        </Collapse>
+                      </Col>
+                      <Col xs={24}>
+                        <Button
+                          block
+                          type="dashed"
+                          onClick={(e) => {
+                            preventDefaults(e);
+                            // NOTE : Since the new one will be added at the last place
+                            // We ad the length of current array to the expanded keys
+                            setExpandedAccordionKeys((prevKeys) => [...new Set([...prevKeys, fields.length])]);
+                            add();
+                          }}
+                          icon={<PlusCircleOutlined />}
+                        >
                           Add more links
                         </Button>
                       </Col>
-                      {errors && (
-                        <Col xs={24}>
-                          <Text type="danger"> {errors} </Text>
-                        </Col>
-                      )}
+                      <Col xs={24}>
+                        <Form.ErrorList errors={errors} />
+                      </Col>
                     </Row>
                   )}
                 </Form.List>
@@ -153,7 +268,7 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
                 </Col>
                 <Col xs={24} md={12}>
                   <Button block size="large" type="primary" htmlType="submit">
-                    Submit
+                    Publish
                   </Button>
                 </Col>
               </Row>

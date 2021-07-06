@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
@@ -13,11 +14,14 @@ import {
 } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
+import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
+import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
 
 import {
   deepCloneObject,
@@ -29,10 +33,6 @@ import {
 import { getLocalUserDetails } from 'utils/storage';
 
 import styles from './style.module.scss';
-import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
-import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
-import { useHistory } from 'react-router-dom';
-import Routes from 'routes';
 
 const { Paragraph } = Typography;
 
@@ -374,7 +374,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       return;
     }
 
-    // TODO: Adjust here when more customizability is required
     targetComponent.title = newConfig.title;
     targetComponent.values = newConfig.values ?? null;
     tempConfigComponents.splice(targetIndex, 1, targetComponent);
@@ -446,7 +445,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               updateConfigHandler={updateComponentConfig}
               removeComponentHandler={removeComponent}
               dragHandleProps={provided.dragHandleProps}
-              // TODO: Try to handle this later when more customization is needed
               title={component.title}
               values={component.values}
             />

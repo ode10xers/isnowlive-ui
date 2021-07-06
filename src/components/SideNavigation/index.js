@@ -8,6 +8,7 @@ import { creatorMenuItems, attendeeMenuItems } from './MenuItems.constant';
 import { trackSimpleEvent } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
+import classNames from 'classnames';
 
 const { SubMenu, Item } = Menu;
 
@@ -32,9 +33,18 @@ const SideNavigation = () => {
     <Menu mode="inline" className={styles.sideNavMenu}>
       {showMenu.map((navItem) =>
         navItem.children ? (
-          <SubMenu key={navItem.key} className={navItem.key} title={navItem.title} icon={navItem.icon}>
+          <SubMenu
+            key={navItem.key}
+            className={classNames(navItem.key, styles.navItem)}
+            title={navItem.title}
+            icon={navItem.icon}
+          >
             {navItem.children.map((item) => (
-              <Item key={item.key} className={item.key} onClick={() => trackAndNavigate(item)}>
+              <Item
+                key={item.key}
+                className={classNames(item.key, styles.subNavItem)}
+                onClick={() => trackAndNavigate(item)}
+              >
                 {item.title}
               </Item>
             ))}
@@ -42,7 +52,7 @@ const SideNavigation = () => {
         ) : navItem.is_button ? (
           <Item
             key={navItem.key}
-            className={navItem.key}
+            className={classNames(navItem.key, styles.navItem)}
             onClick={() =>
               navItem.historyData.state
                 ? history.push(navItem.historyData.route, navItem.historyData.state)
@@ -54,7 +64,7 @@ const SideNavigation = () => {
         ) : (
           <Item
             key={navItem.key}
-            className={navItem.key}
+            className={classNames(navItem.key, styles.navItem)}
             icon={navItem?.icon || null}
             onClick={() => trackAndNavigate(navItem)}
           >

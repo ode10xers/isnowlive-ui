@@ -6,7 +6,6 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
-// import PublicVideoList from 'components/PublicVideoList';
 
 import { isAPISuccess } from 'utils/helper';
 

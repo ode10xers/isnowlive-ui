@@ -1,12 +1,16 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Button } from 'antd';
 
+import Routes from 'routes';
+
 import CoursesListItem from '../CoursesListItem';
 
+import { getLocalUserDetails } from 'utils/storage';
+import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from 'utils/helper';
+
 import styles from './style.module.scss';
-import Routes from 'routes';
-import { useHistory } from 'react-router-dom';
 
 const CoursesListView = ({ limit = 2, courses = [] }) => {
   const history = useHistory();
@@ -17,6 +21,18 @@ const CoursesListView = ({ limit = 2, courses = [] }) => {
     </Col>
   );
 
+  const handleMoreClicked = (e) => {
+    preventDefaults(e);
+
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      window.open(generateUrlFromUsername(localUserDetails?.username ?? 'app') + Routes.list.courses);
+    } else {
+      history.push(Routes.list.courses);
+    }
+  };
+
   return (
     <div>
       {courses.length > 0 && (
@@ -26,11 +42,7 @@ const CoursesListView = ({ limit = 2, courses = [] }) => {
             <Col xs={24}>
               <Row justify="center">
                 <Col>
-                  <Button
-                    className={styles.moreButton}
-                    type="primary"
-                    onClick={() => history.push(Routes.list.courses)}
-                  >
+                  <Button className={styles.moreButton} type="primary" onClick={handleMoreClicked}>
                     MORE
                   </Button>
                 </Col>
