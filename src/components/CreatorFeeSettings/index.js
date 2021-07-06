@@ -29,7 +29,6 @@ const CreatorFeeSettings = ({ text = 'Offload platform fees to me' }) => {
   }, [fetchCreatorFeeSettings]);
 
   const handleCreatorFeeSettingsChanged = async (e) => {
-    console.log(e.target);
     setIsLoading(true);
     try {
       const { status } = await apis.user.updateCreatorFeeSettings({
