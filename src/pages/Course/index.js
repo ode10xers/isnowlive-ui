@@ -922,26 +922,28 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
                                     <Form.List name={[name, 'content']} rules={validationRules.otherLinksValidation}>
                                       {(fieldss, { add, remove }, { errors1 }) => (
                                         <>
-                                          {fieldss.map(({ key1, name1, fieldKey1, ...restField }) => (
-                                            <Form.Item
-                                              {...restField}
-                                              name={[name, 'first']}
-                                              fieldKey={[fieldKey, 'first']}
-                                              rules={[{ required: true, message: 'Missing first name' }]}
-                                            >
-                                              <Row>
-                                                <Col span={20}>
-                                                  <p>Hello World</p>
-                                                </Col>
-                                                <Col span={2}>
-                                                  <PlayCircleOutlined onClick={() => remove(name)} />
-                                                </Col>
-                                                <Col span={2}>
-                                                  <VideoCameraAddOutlined onClick={() => remove(name)} />
-                                                </Col>
-                                              </Row>
-                                            </Form.Item>
-                                          ))}
+                                          {fieldss.map(
+                                            ({ key: key1, name: name1, fieldKey: fieldKey1, ...restField }) => (
+                                              <Form.Item
+                                                {...restField}
+                                                name={[name, 'first']}
+                                                fieldKey={[fieldKey, 'first']}
+                                                rules={[{ required: true, message: 'Missing first name' }]}
+                                              >
+                                                <Row>
+                                                  <Col span={20}>
+                                                    <p>Hello World</p>
+                                                  </Col>
+                                                  <Col span={2}>
+                                                    <PlayCircleOutlined onClick={() => remove(name)} />
+                                                  </Col>
+                                                  <Col span={2}>
+                                                    <VideoCameraAddOutlined onClick={() => remove(name)} />
+                                                  </Col>
+                                                </Row>
+                                              </Form.Item>
+                                            )
+                                          )}
                                           <Form.Item>
                                             <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                                               Add field
