@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm, Collapse } from 'antd';
+import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm, Collapse, Space } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -22,6 +22,7 @@ import {
 
 import styles from './styles.module.scss';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
+import CreatorFeeSettings from 'components/CreatorFeeSettings';
 
 const cashIcon = require('assets/images/cash.png');
 const checkIcon = require('assets/images/check.png');
@@ -537,7 +538,10 @@ const Earnings = () => {
       <div className={styles.box}>
         <Row>
           <Col xs={24} lg={8}>
-            <Title level={2}>Your Earnings</Title>
+            <Space direction="vertical" size="large">
+              <Title level={2}>Your Earnings</Title>
+              <CreatorFeeSettings />
+            </Space>
           </Col>
           <Col xs={24} lg={8}>
             {stripePaymentDashboard}
