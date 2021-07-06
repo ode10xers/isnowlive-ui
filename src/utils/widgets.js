@@ -17,10 +17,10 @@ export const widgetComponentsName = {
     value: 'videos',
     label: 'Videos',
     styling: [
-      {
-        key: '--new-video-card-background-color',
-        label: 'Card Background',
-      },
+      // {
+      //   key: '--new-video-card-background-color',
+      //   label: 'Card Background',
+      // },
       {
         key: '--new-video-card-font-color ',
         label: 'Card Text Color',

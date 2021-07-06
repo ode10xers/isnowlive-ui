@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Card, Typography, Spin, Row, Col, Space, Button } from 'antd';
+import { Spin, Row, Col, Space, Button, Typography } from 'antd';
 import { LikeTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
+import ContainerCard from 'components/ContainerCard';
 import PassesListView from './PassesListView';
 import PassesEditView from './PassesEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
@@ -14,21 +15,6 @@ import { isAPISuccess } from 'utils/helper';
 import styles from './style.module.scss';
 
 const { Text } = Typography;
-
-const ContainerTitle = ({ title = 'CREDIT PASSES' }) => (
-  <Text style={{ color: '#0050B3' }}>
-    <LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />
-    {title}
-  </Text>
-);
-
-// TODO : Later we might want these colors to be customized
-const cardHeadingStyle = {
-  background: '#F1FBFF',
-  boxShadow: 'inset 0px -1px 0px #E6F5FB',
-  color: '#0050B3',
-  borderRadius: '12px 12px 0 0',
-};
 
 const PassesProfileComponent = ({
   identifier = null,
@@ -72,11 +58,9 @@ const PassesProfileComponent = ({
         </Col>
       )}
       <Col xs={isEditing ? 22 : 24}>
-        <Card
-          title={<ContainerTitle title={customComponentProps?.title} />}
-          headStyle={cardHeadingStyle}
-          className={styles.profileComponentContainer}
-          bodyStyle={{ padding: 12 }}
+        <ContainerCard
+          title={customComponentProps?.title ?? 'CREDIT PASSES'}
+          icon={<LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
         >
           {isEditing ? (
             <Row gutter={[8, 8]} justify="center" align="center">
@@ -99,7 +83,7 @@ const PassesProfileComponent = ({
               <PassesListView passes={passes || []} />
             </Spin>
           )}
-        </Card>
+        </ContainerCard>
       </Col>
       {isEditing && (
         <Col xs={1}>

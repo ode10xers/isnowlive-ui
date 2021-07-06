@@ -25,6 +25,8 @@ const formatDate = {
   toUtcEndOfDay: (date) => moment(date).endOf('day').utc().format(),
   getTimeDiff: (startTime = moment(), endTime = moment(), unit = 'minutes') => moment(startTime).diff(endTime, unit),
   getISODayOfWeek: (date) => moment(date).isoWeekday(),
+  getVideoMinutesDuration: (durationSeconds) =>
+    `${Math.round(moment.duration(durationSeconds, 'seconds').asMinutes())} mins`,
   getVideoDuration: (durationSeconds) =>
     moment.utc(moment.duration(durationSeconds, 'seconds').asMilliseconds()).format('HH:mm:ss'),
 };

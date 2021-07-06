@@ -44,9 +44,10 @@ import PaymentVerification from 'pages/PaymentVerification';
 import PaymentRetry from 'pages/PaymentRetry';
 import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
-import VideoDetails from 'pages/VideoDetails';
+// import VideoDetails from 'pages/VideoDetails';
 import CourseDetails from 'pages/CourseDetails';
-import MembershipDetails from 'pages/MembershipDetails';
+import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
+import VideoDetails from 'pages/ProductDetails/VideoDetails';
 import NewHome from 'pages/NewHome';
 import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
@@ -245,10 +246,11 @@ function App() {
               path={Routes.membershipDetails}
               component={MembershipDetails}
             />
+            <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} />
             <RouteWithLayout
               layout={NavbarLayout}
