@@ -20,6 +20,7 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { getLocalUserDetails } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import {
   orderType,
@@ -36,7 +37,6 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 import validationRules from 'utils/validation';
-import { getLocalUserDetails } from 'utils/storage';
 
 const { Text, Title } = Typography;
 const {
@@ -92,16 +92,6 @@ const PaymentPopup = () => {
   const [creatorCurrency, setCreatorCurrency] = useState('SGD');
   const [creatorStripeAccountID, setCreatorStripeAccountID] = useState(null);
   const [stripePromise, setStripePromise] = useState(null);
-
-  // const stripePromise = useMemo(() => {
-  //   if (!creatorStripeAccountID) {
-  //     return loadStripe(config.stripe.secretKey);
-  //   } else {
-  //     return loadStripe(config.stripe.secretKey, {
-  //       stripeAccount: creatorStripeAccountID,
-  //     });
-  //   }
-  // }, [creatorStripeAccountID]);
 
   const {
     itemList = [],

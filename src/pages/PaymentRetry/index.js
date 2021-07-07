@@ -11,13 +11,22 @@ import config from 'config';
 import Loader from 'components/Loader';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType, StripePaymentStatus } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 import { verifyPaymentForOrder } from 'utils/payment';
+import {
+  isAPISuccess,
+  orderType,
+  StripePaymentStatus,
+  getUsernameFromUrl,
+  reservedDomainName,
+  isInCreatorDashboard,
+} from 'utils/helper';
 
 const PaymentRetry = () => {
   const location = useLocation();
   const stripe = useStripe();
   const [isLoading, setIsLoading] = useState(false);
+  const [stripePromise, setStripePromise] = useState(null);
 
   const retry_token = location.pathname.replace('/payment/retry/', '');
 
@@ -40,8 +49,53 @@ const PaymentRetry = () => {
     [stripe]
   );
 
+  const fetchCreatorDetailsForPayment = useCallback(async () => {
+    let creatorUsername = 'app';
+
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      if (localUserDetails.is_creator) {
+        creatorUsername = localUserDetails.username;
+      }
+    } else {
+      creatorUsername = getUsernameFromUrl();
+    }
+
+    if (reservedDomainName.includes(creatorUsername)) {
+      return;
+    }
+
+    try {
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
+
+      if (isAPISuccess(status) && data) {
+        if (data.profile?.connect_account_id) {
+          setStripePromise(
+            await loadStripe(config.stripe.secretKey, {
+              stripeAccount: data.profile?.connect_account_id,
+            })
+          );
+        } else {
+          showErrorModal('Creator Stripe account ID missing!');
+          setStripePromise(null);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed fetching creator details for payment',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+  }, []);
+
   useEffect(() => {
-    if (retry_token) {
+    fetchCreatorDetailsForPayment();
+  }, [fetchCreatorDetailsForPayment]);
+
+  useEffect(() => {
+    if (retry_token && stripePromise) {
       const retryPayment = async () => {
         setIsLoading(true);
 
@@ -76,32 +130,24 @@ const PaymentRetry = () => {
         setIsLoading(false);
       };
       retryPayment();
-    } else {
-      setIsLoading(false);
-      showErrorModal('Something went wrong');
     }
-  }, [retry_token, makePayment]);
+  }, [retry_token, makePayment, stripePromise]);
 
-  return (
-    <Row justify="center">
-      <Loader loading={isLoading} size="large" text="Verifying payment..."></Loader>
-    </Row>
-  );
-};
-
-const WrappedPaymentRetry = () => {
-  const stripePromise = loadStripe(config.stripe.secretKey);
-
-  if (!stripePromise) {
-    console.error('Failed to load stripe');
-    return null;
+  if (stripePromise) {
+    return (
+      <Row justify="center">
+        <Loader loading={isLoading} size="large" text="Verifying payment..."></Loader>
+      </Row>
+    );
   }
 
   return (
     <Elements stripe={stripePromise}>
-      <PaymentRetry />
+      <Row justify="center">
+        <Loader loading={isLoading} size="large" text="Verifying payment..."></Loader>
+      </Row>
     </Elements>
   );
 };
 
-export default WrappedPaymentRetry;
+export default PaymentRetry;
