@@ -26,7 +26,6 @@ const PaymentRetry = () => {
   const location = useLocation();
   const stripe = useStripe();
   const [isLoading, setIsLoading] = useState(false);
-  const [stripePromise, setStripePromise] = useState(null);
 
   const retry_token = location.pathname.replace('/payment/retry/', '');
 
@@ -49,53 +48,8 @@ const PaymentRetry = () => {
     [stripe]
   );
 
-  const fetchCreatorDetailsForPayment = useCallback(async () => {
-    let creatorUsername = 'app';
-
-    if (isInCreatorDashboard()) {
-      const localUserDetails = getLocalUserDetails();
-
-      if (localUserDetails.is_creator) {
-        creatorUsername = localUserDetails.username;
-      }
-    } else {
-      creatorUsername = getUsernameFromUrl();
-    }
-
-    if (reservedDomainName.includes(creatorUsername)) {
-      return;
-    }
-
-    try {
-      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
-
-      if (isAPISuccess(status) && data) {
-        if (data.profile?.connect_account_id) {
-          setStripePromise(
-            await loadStripe(config.stripe.secretKey, {
-              stripeAccount: data.profile?.connect_account_id,
-            })
-          );
-        } else {
-          showErrorModal('Creator Stripe account ID missing!');
-          setStripePromise(null);
-        }
-      }
-    } catch (error) {
-      console.error(error);
-      showErrorModal(
-        'Failed fetching creator details for payment',
-        error?.response?.data?.message || 'Something went wrong.'
-      );
-    }
-  }, []);
-
   useEffect(() => {
-    fetchCreatorDetailsForPayment();
-  }, [fetchCreatorDetailsForPayment]);
-
-  useEffect(() => {
-    if (retry_token && stripePromise) {
+    if (retry_token) {
       const retryPayment = async () => {
         setIsLoading(true);
 
@@ -131,23 +85,72 @@ const PaymentRetry = () => {
       };
       retryPayment();
     }
-  }, [retry_token, makePayment, stripePromise]);
+  }, [retry_token, makePayment]);
 
-  if (stripePromise) {
-    return (
-      <Row justify="center">
-        <Loader loading={isLoading} size="large" text="Verifying payment..."></Loader>
-      </Row>
-    );
+  return (
+    <Row justify="center">
+      <Loader loading={isLoading} size="large" text="Verifying payment..."></Loader>
+    </Row>
+  );
+};
+
+const WrappedPaymentRetry = () => {
+  const [stripeObj, setStripeObj] = useState(null);
+
+  const fetchCreatorDetailsForPayment = useCallback(async () => {
+    let creatorUsername = 'app';
+
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      if (localUserDetails.is_creator) {
+        creatorUsername = localUserDetails.username;
+      }
+    } else {
+      creatorUsername = getUsernameFromUrl();
+    }
+
+    if (reservedDomainName.includes(creatorUsername)) {
+      return;
+    }
+
+    try {
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
+
+      if (isAPISuccess(status) && data) {
+        if (data.profile?.connect_account_id) {
+          setStripeObj(
+            await loadStripe(config.stripe.secretKey, {
+              stripeAccount: data.profile?.connect_account_id,
+            })
+          );
+        } else {
+          showErrorModal('Creator Stripe account ID missing!');
+          setStripeObj(null);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed fetching creator details for payment',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCreatorDetailsForPayment();
+  }, [fetchCreatorDetailsForPayment]);
+
+  if (!stripeObj) {
+    return null;
   }
 
   return (
-    <Elements stripe={stripePromise}>
-      <Row justify="center">
-        <Loader loading={isLoading} size="large" text="Verifying payment..."></Loader>
-      </Row>
+    <Elements stripe={stripeObj}>
+      <PaymentRetry />
     </Elements>
   );
 };
 
-export default PaymentRetry;
+export default WrappedPaymentRetry;
