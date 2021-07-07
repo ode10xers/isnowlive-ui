@@ -108,11 +108,6 @@
     }
   }
 
-  .creatorProfileImage {
-    width: 100%;
-    object-fit: cover;
-  }
-
   .courseCurriculumSection {
     @extend .paddedContent;
 
@@ -152,6 +147,51 @@
             background-color: map-get($map: $colors, $key: 'Lavender');
             border-radius: 8px !important;
           }
+        }
+      }
+    }
+  }
+
+  .creatorProfileImage {
+    width: 100%;
+    object-fit: cover;
+  }
+
+  .coursePreviewImagesSection {
+    margin: -50px 0;
+    padding: 30px 80px !important;
+    background : linear-gradient(41.18deg, #E6F7FF 16.22%, #FFF5F6 82.56%), #F8FAFF;
+
+    .coursePreviewTitle {
+      color: map-get($colors, 'Cobalt') !important;
+      font-size: 28px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .carouselDots {
+      > li {
+        background-color: rgba(0, 108, 208, 0.2);
+      }
+
+      :global {
+        .slick-active {
+          > button {
+            background: #006CD0 !important;
+          }
+        }
+      }
+    }
+
+    .coursePreviewImagesContainer {
+      width: 100%;
+
+      .carouselItem {
+        padding-bottom: 50px;
+
+        .coursePreviewImage {
+          width: 100%;
+          object-fit: scale-down;
         }
       }
     }

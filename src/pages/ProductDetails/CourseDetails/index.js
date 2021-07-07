@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Typography, Button, message, Image, Collapse, List, Space } from 'antd';
+import { Row, Col, Typography, Button, message, Image, Collapse, List, Space, Carousel } from 'antd';
 import {
   PlayCircleOutlined,
   VideoCameraOutlined,
@@ -269,6 +269,13 @@ const sampleCourseData = {
         },
       ],
     },
+  ],
+  preview_images: [
+    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
+    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
+    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
+    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
+    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
   ],
   faqs: [
     {
@@ -589,6 +596,35 @@ const CourseDetails = ({ match }) => {
     ));
   };
 
+  const renderImagePreviews = (imageUrls = []) => {
+    const perChunk = 4;
+    const carouselItems = imageUrls.reduce((resultArray, item, index) => {
+      const chunkIndex = Math.floor(index / perChunk);
+
+      if (!resultArray[chunkIndex]) {
+        resultArray[chunkIndex] = []; // start a new chunk
+      }
+
+      resultArray[chunkIndex].push(item);
+
+      return resultArray;
+    }, []);
+
+    return carouselItems.map((carouselItem, idx) => (
+      <div className={styles.carouselItem} key={idx}>
+        <Image.PreviewGroup>
+          <Row gutter={[10, 10]}>
+            {carouselItem.map((imageUrl, imageIndex) => (
+              <Col xs={6} key={`${imageIndex}_${imageUrl}`}>
+                <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
+              </Col>
+            ))}
+          </Row>
+        </Image.PreviewGroup>
+      </div>
+    ));
+  };
+
   const renderCourseFAQs = (faqs = []) => {
     return faqs.map((faq) => (
       <Panel
@@ -690,7 +726,15 @@ const CourseDetails = ({ match }) => {
               </Col>
             </Row>
           </Col>
-          <Col xs={24}>{/* Preview Images */}</Col>
+          <Col xs={24} className={styles.coursePreviewImagesSection}>
+            <Title level={5} className={styles.coursePreviewTitle}>
+              See what happens inside the course
+            </Title>
+            {/* Preview Images */}
+            <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
+              {renderImagePreviews(course?.preview_images)}
+            </Carousel>
+          </Col>
           <Col xs={24} className={styles.courseFAQSection}>
             {/* FAQs */}
             <Row gutter={[8, 20]} className={styles.courseFAQContainer}>
