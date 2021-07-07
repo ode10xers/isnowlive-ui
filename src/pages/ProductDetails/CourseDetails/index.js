@@ -30,6 +30,7 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { isMobileDevice } from 'utils/device';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
@@ -365,20 +366,10 @@ const CourseDetails = ({ match }) => {
   );
 
   useEffect(() => {
-    console.log(courseId);
     if (courseId) {
       getCourseDetails(courseId);
     }
   }, [getCourseDetails, courseId]);
-
-  // NOTE : This logic is for when it is opened in attendee dashboard
-  // currently removing it until it is used
-  // useEffect(() => {
-  //   if (history && history.location.pathname.includes('dashboard')) {
-  //     setIsOnAttendeeDashboard(true);
-  //     setSelectedCourse(null);
-  //   }
-  // }, [history]);
 
   //#region Start of Buy Logics
 
@@ -504,13 +495,15 @@ const CourseDetails = ({ match }) => {
   };
 
   const renderCourseInfoItem = ({ icon, title, content }) => (
-    <Space direction="vertical" size="small" className={styles.courseInfoItem}>
-      <Text className={styles.courseInfoContent}> {content} </Text>
-      <Space size="small" align="center" className={styles.courseTitleContainer}>
-        {icon}
-        <Text className={styles.courseInfoTitle}> {title} </Text>
+    <Col>
+      <Space direction="vertical" size="small" className={styles.courseInfoItem}>
+        <Text className={styles.courseInfoContent}> {content} </Text>
+        <Space size="small" align="center" className={styles.courseTitleContainer}>
+          {icon}
+          <Text className={styles.courseInfoTitle}> {title} </Text>
+        </Space>
       </Space>
-    </Space>
+    </Col>
   );
 
   const renderCourseInfos = (course = null) => {
@@ -522,7 +515,7 @@ const CourseDetails = ({ match }) => {
     const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
 
     return (
-      <Space size="large" align="center">
+      <Row justify="center" align="middle">
         {sessionContentCount > 0
           ? renderCourseInfoItem({
               icon: <VideoCameraOutlined className={styles.courseInfoIcon} />,
@@ -542,7 +535,7 @@ const CourseDetails = ({ match }) => {
           title: 'Course duration',
           content: `${course?.course_duration} days`,
         })}
-      </Space>
+      </Row>
     );
   };
 
@@ -572,7 +565,7 @@ const CourseDetails = ({ match }) => {
 
   const renderModuleContents = (content) => (
     <List.Item key={content.content_id} extra={<Text type="secondary"> {renderExtraContent(content)} </Text>}>
-      <Space size="large">
+      <Space>
         {renderContentIcon(content)}
         <Text strong> {content.content_name} </Text>
       </Space>
@@ -584,10 +577,9 @@ const CourseDetails = ({ match }) => {
       <Panel
         key={courseModule.module_id}
         header={<Text className={styles.moduleHeader}> {courseModule.module_name} </Text>}
-        extra={<Text className={styles.moduleHeader}> {courseModule.contents?.length} activities </Text>}
       >
         <List
-          size="large"
+          size={isMobileDevice ? 'small' : 'large'}
           rowKey={(record) => record.content_id}
           dataSource={courseModule?.contents}
           renderItem={renderModuleContents}
@@ -615,7 +607,7 @@ const CourseDetails = ({ match }) => {
         <Image.PreviewGroup>
           <Row gutter={[10, 10]}>
             {carouselItem.map((imageUrl, imageIndex) => (
-              <Col xs={6} key={`${imageIndex}_${imageUrl}`}>
+              <Col xs={12} md={6} key={`${imageIndex}_${imageUrl}`}>
                 <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
               </Col>
             ))}
@@ -655,8 +647,7 @@ const CourseDetails = ({ match }) => {
                   <div className={styles.courseBuyContainer}>
                     <Space direction="vertical" className={styles.courseBuyDetails}>
                       <Title level={3} className={styles.courseName}>
-                        {' '}
-                        {course?.course_name}{' '}
+                        {course?.course_name}
                       </Title>
                       <div className={styles.courseDesc}>{ReactHtmlParser(course?.course_description)}</div>
                       <Button
@@ -720,8 +711,10 @@ const CourseDetails = ({ match }) => {
           <Col xs={24} className={styles.paddedContent}>
             {/* Know Your Mentor */}
             <Row gutter={[30, 12]}>
-              <Col xs={18}>{generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}</Col>
-              <Col xs={6}>
+              <Col sm={24} md={18}>
+                {generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}
+              </Col>
+              <Col sm={24} md={6}>
                 <Image className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
               </Col>
             </Row>

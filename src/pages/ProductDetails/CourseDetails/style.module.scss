@@ -2,6 +2,14 @@
 
 .longDescriptionTitle {
   color: map-get($map: $colors, $key: 'Cobalt') !important;
+
+  @media screen and (max-width: 769px) {
+    font-size: 32px !important;
+  }
+
+  @media screen and (max-width: 526px) {
+    font-size: 24px !important;
+  }
 }
 
 .longContentWrapper {
@@ -25,7 +33,7 @@
   }
 
   @media screen and (max-width: 525px) {
-    padding: 0 8px !important;
+    padding: 0 12px !important;
   }
 }
 
@@ -50,12 +58,24 @@
       .courseBuyDetails {
         margin: 120px auto 0;
         color: map-get($colors, 'White');
+
+        @media screen and (max-width: 1024px) {
+          margin: 80px auto 0;
+        }
         
         .courseName {
           font-size: 48px;
           line-height: 52px;
           font-weight: 600;
           color: map-get($colors, 'White');
+
+          @media screen and (max-width: 769px) {
+            font-size: 32px;
+          }
+
+          @media screen and (max-width: 526px) {
+            font-size: 24px;
+          }
         }
 
         .courseDesc {
@@ -79,14 +99,38 @@
     padding: 30px;
     box-shadow: 0px 4px 44px rgba(0, 0, 0, 0.08);
 
+    @media screen and (max-width: 1024px) {
+      margin: -10px auto 20px;
+    }
+
+    @media screen and (max-width: 769px) {
+      width: 100%;
+      border-radius: 0;
+      padding: 10px 8px;
+    }
+
     .courseInfoItem {
       min-width: 200px;
+      padding: 0 30px;
+
+      @media screen and (max-width: 769px) {
+        min-width: 0px;
+        padding: 0 8px;
+      }
 
       .courseInfoContent {
         font-size: 32px;
         text-align: center;
         display: block;
         font-weight: 700;
+
+        @media screen and (max-width: 769px) {
+          font-size: 20px;
+        }
+        
+        @media screen and (max-width: 526px) {
+          font-size: 16px;
+        }
       }
   
       .courseTitleContainer {
@@ -98,11 +142,31 @@
           line-height: 28px;
           margin-right: 8px;
           color:  map-get($map: $colors, $key: 'DodgerBlue');
+
+          @media screen and (max-width: 769px) {
+            font-size: 16px;
+            line-height: 20px;
+          }
+
+          @media screen and (max-width: 526px) {
+            font-size: 12px;
+            line-height: 18px;
+            margin-right: 4px;
+          }
         }
     
         .courseInfoTitle {
           font-size: 14px;
           vertical-align: super;
+
+          @media screen and (max-width: 769px) {
+            font-size: 12px;
+          }
+
+          @media screen and (max-width: 526px) {
+            font-size: 10px;
+            vertical-align: unset;
+          }
         }
       }
     }
@@ -155,12 +219,27 @@
   .creatorProfileImage {
     width: 100%;
     object-fit: cover;
+
+    // Based on Ant Design's sm breakpoint
+    @media screen and (max-width: 577px) {
+      object-fit: scale-down;
+      max-width: 320px;
+      margin: 0 auto;
+    }
   }
 
   .coursePreviewImagesSection {
     margin: -50px 0;
     padding: 30px 80px !important;
     background : linear-gradient(41.18deg, #E6F7FF 16.22%, #FFF5F6 82.56%), #F8FAFF;
+
+    @media screen and (max-width: 769px) {
+      padding: 20px !important;
+    }
+
+    @media screen and (max-width: 525px) {
+      padding: 50px 12px 12px !important;
+    }
 
     .coursePreviewTitle {
       color: map-get($colors, 'Cobalt') !important;
