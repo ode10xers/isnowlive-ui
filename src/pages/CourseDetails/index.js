@@ -11,7 +11,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Table from 'components/Table';
-import CreatorProfile from 'components/CreatorProfile';
+// import CreatorProfile from 'components/CreatorProfile';
 import Loader from 'components/Loader';
 import SessionCards from 'components/SessionCards';
 import VideoCard from 'components/VideoCard';
@@ -40,28 +40,28 @@ const { Title, Text } = Typography;
 const CourseDetails = ({ match, history }) => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
-  const [profile, setProfile] = useState({});
-  const [profileImage, setProfileImage] = useState(null);
+  // const [profile, setProfile] = useState({});
+  // const [profileImage, setProfileImage] = useState(null);
   const [course, setCourse] = useState(null);
   const [courseSessions, setCourseSessions] = useState(null);
   const [isOnAttendeeDashboard, setIsOnAttendeeDashboard] = useState(false);
   const [username, setUsername] = useState(null);
 
-  const getProfileDetails = useCallback(async (creatorUsername) => {
-    try {
-      const { data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
-      if (data) {
-        setProfile(data);
-        setProfileImage(data.profile_image_url);
-        setIsLoading(false);
-      }
-    } catch (error) {
-      message.error('Failed to load profile details');
-      setIsLoading(false);
-    }
-  }, []);
+  // const getProfileDetails = useCallback(async (creatorUsername) => {
+  //   try {
+  //     const { data } = creatorUsername
+  //       ? await apis.user.getProfileByUsername(creatorUsername)
+  //       : await apis.user.getProfile();
+  //     if (data) {
+  //       setProfile(data);
+  //       setProfileImage(data.profile_image_url);
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     message.error('Failed to load profile details');
+  //     setIsLoading(false);
+  //   }
+  // }, []);
 
   const getCourseDetails = useCallback(
     async (courseId) => {
@@ -73,7 +73,7 @@ const CourseDetails = ({ match, history }) => {
 
           const creatorUsername = data.creator_username || location.state?.username || getUsernameFromUrl();
           setUsername(creatorUsername);
-          await getProfileDetails(creatorUsername);
+          // await getProfileDetails(creatorUsername);
 
           if (data.type === courseType.MIXED && data.sessions?.length > 0) {
             const sessionResponses = await Promise.all(
@@ -89,7 +89,7 @@ const CourseDetails = ({ match, history }) => {
         message.error('Failed to load course details');
       }
     },
-    [getProfileDetails, location]
+    [location]
   );
 
   useEffect(() => {
