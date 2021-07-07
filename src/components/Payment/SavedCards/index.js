@@ -46,7 +46,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
         )}
         onClick={() => toggleSelectedCard(userCard)}
       >
-        <Row gutter={8}>
+        <Row gutter={8} align="middle">
           <Col xs={2} className={styles.radioWrapper}>
             {selectedCard && selectedCard.external_id === userCard.external_id ? (
               <div onClick={(e) => handleSelectCard(e, null)}>

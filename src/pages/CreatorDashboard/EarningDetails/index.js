@@ -261,7 +261,7 @@ const EarningDetails = ({ match }) => {
             ) : (
               <Table
                 columns={detailsColumns}
-                data={earnings?.details}
+                data={earnings?.details.sort((a, b) => new Date(b.booking_time) - new Date(a.booking_time))}
                 loading={isLoading}
                 rowKey={(record) => `${record.name}_${record.booking_time}`}
               />
