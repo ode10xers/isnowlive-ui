@@ -331,7 +331,8 @@ const CourseDetails = ({ match }) => {
         setIsLoading(false);
       }
     } catch (error) {
-      message.error('Failed to load profile details');
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Failed to load profile details');
       setIsLoading(false);
     }
   }, []);
@@ -495,7 +496,7 @@ const CourseDetails = ({ match }) => {
   };
 
   const renderCourseInfoItem = ({ icon, title, content }) => (
-    <Col>
+    <Col xs={8} className={styles.textAlignCenter}>
       <Space direction="vertical" size="small" className={styles.courseInfoItem}>
         <Text className={styles.courseInfoContent}> {content} </Text>
         <Space size="small" align="center" className={styles.courseTitleContainer}>
@@ -564,11 +565,18 @@ const CourseDetails = ({ match }) => {
     );
 
   const renderModuleContents = (content) => (
-    <List.Item key={content.content_id} extra={<Text type="secondary"> {renderExtraContent(content)} </Text>}>
-      <Space>
-        {renderContentIcon(content)}
-        <Text strong> {content.content_name} </Text>
-      </Space>
+    <List.Item key={content.content_id}>
+      <Row gutter={[8, 8]} className={styles.w100} align="middle">
+        <Col xs={14} md={18}>
+          <Space className={styles.w100}>
+            {renderContentIcon(content)}
+            <Text strong> {content.content_name} </Text>
+          </Space>
+        </Col>
+        <Col xs={10} md={6} className={styles.textAlignRight}>
+          <Text type="secondary"> {renderExtraContent(content)} </Text>
+        </Col>
+      </Row>
     </List.Item>
   );
 
@@ -710,11 +718,11 @@ const CourseDetails = ({ match }) => {
           </Col>
           <Col xs={24} className={styles.paddedContent}>
             {/* Know Your Mentor */}
-            <Row gutter={[30, 12]}>
-              <Col sm={24} md={18}>
+            <Row gutter={[30, 12]} className={styles.mb30}>
+              <Col xs={24} md={18}>
                 {generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}
               </Col>
-              <Col sm={24} md={6}>
+              <Col xs={24} md={6} className={styles.textAlignCenter}>
                 <Image className={styles.creatorProfileImage} preview={false} src={creatorImageUrl} />
               </Col>
             </Row>
