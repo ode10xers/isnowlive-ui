@@ -485,7 +485,7 @@ const Subscriptions = () => {
                       key={`${subscription?.external_id}_${key}`}
                     >
                       {' '}
-                      {val.product_ids.length} {key.toLowerCase()}s{' '}
+                      {val.product_ids?.length ?? 0} {key.toLowerCase()}s{' '}
                     </Button>
                   ))}
                 </Space>
