@@ -252,6 +252,8 @@ export const getPaymentStatus = (status) => {
       return 'Paid';
     case 'CANCELLED':
       return 'Cancel';
+    case 'CUSTOMER_CANCELLED':
+      return 'Customer Cancelled';
     default:
       return 'Unpaid';
   }

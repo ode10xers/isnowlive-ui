@@ -147,14 +147,16 @@ const Session = ({ match, history }) => {
 
   const {
     state: {
-      userDetails: { zoom_connected = 'NOT_CONNECTED' },
+      userDetails: {
+        profile: { zoom_connected = ZoomAuthType.NOT_CONNECTED },
+      },
     },
   } = useGlobalContext();
 
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
@@ -873,322 +875,329 @@ const Session = ({ match, history }) => {
             <Input placeholder="Input the event address/location" />
           </Form.Item>
 
-          <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
-            <Input placeholder="Enter Session Name" />
-          </Form.Item>
+          {(isOfflineSession || zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
+            <>
+              <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
+                <Input placeholder="Enter Session Name" />
+              </Form.Item>
 
-          <Form.Item
-            className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label={<Text> Session Description </Text>}
-            name="description"
-            id="description"
-            rules={validationRules.requiredValidation}
-          >
-            <div>
-              <TextEditor name="description" form={form} placeholder="Please input description" />
-            </div>
-          </Form.Item>
-
-          <Form.Item
-            label="Attached Files"
-            id="document_urls"
-            name="document_urls"
-            extra={
-              <Paragraph type="secondary">
-                Your documents uploaded in your{' '}
-                <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
-                  {' '}
-                  document drive{' '}
-                </Link>{' '}
-                will show up here. You can add a new doc in the{' '}
-                <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
-                  {' '}
-                  document drive{' '}
-                </Link>
-              </Paragraph>
-            }
-          >
-            <Select
-              className={styles.fileDropdown}
-              showArrow
-              placeholder="Select documents you want to include"
-              mode="multiple"
-              maxTagCount={3}
-              options={creatorDocuments.map((document) => ({
-                label: document.name,
-                value: document.url,
-              }))}
-            />
-          </Form.Item>
-
-          <Form.Item
-            className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label="Session Pre-requisite"
-            name="prerequisites"
-          >
-            <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
-          </Form.Item>
-
-          {/* ---- Session Course Type ---- */}
-          <>
-            <Form.Item label="Session Type" required>
               <Form.Item
-                name="session_course_type"
-                id="session_course_type"
+                className={classNames(styles.bgWhite, styles.textEditorLayout)}
+                label={<Text> Session Description </Text>}
+                name="description"
+                id="description"
                 rules={validationRules.requiredValidation}
-                onChange={handleSessionCourseType}
-                className={styles.inlineFormItem}
               >
-                <Radio.Group>
-                  <Radio value="normal">Normal Session</Radio>
-                  <Radio value="course">Course Session</Radio>
-                </Radio.Group>
+                <div>
+                  <TextEditor name="description" form={form} placeholder="Please input description" />
+                </div>
               </Form.Item>
-              <Form.Item className={styles.inlineFormItem}>
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() => showCourseOptionsHelperModal('session')}
-                  icon={<InfoCircleOutlined />}
-                >
-                  Understanding the options
-                </Button>
-              </Form.Item>
-            </Form.Item>
-          </>
 
-          {/* ---- Session Tag Type ---- */}
-          <>
-            <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
               <Form.Item
-                name="session_tag_type"
-                id="session_tag_type"
-                rules={validationRules.requiredValidation}
-                onChange={handleSessionTagType}
-                className={styles.inlineFormItem}
-              >
-                <Radio.Group>
-                  <Radio value="anyone"> Anyone </Radio>
-                  <Radio value="selected"> Selected Member Tags </Radio>
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item className={styles.inlineFormItem}>
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() => showTagOptionsHelperModal('session')}
-                  icon={<InfoCircleOutlined />}
-                >
-                  Understanding the tag options
-                </Button>
-              </Form.Item>
-            </Form.Item>
-            <Form.Item
-              name="selected_member_tags"
-              id="selected_member_tags"
-              hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
-              {...(!isMobileDevice && profileFormTailLayout)}
-            >
-              <Select
-                showArrow
-                mode="multiple"
-                maxTagCount={3}
-                placeholder="Select a member tag"
-                disabled={selectedTagType === 'anyone'}
-                options={creatorMemberTags.map((tag) => ({
-                  label: (
-                    <>
+                label="Attached Files"
+                id="document_urls"
+                name="document_urls"
+                extra={
+                  <Paragraph type="secondary">
+                    Your documents uploaded in your{' '}
+                    <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
                       {' '}
-                      {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
-                    </>
-                  ),
-                  value: tag.external_id,
-                }))}
-              />
-            </Form.Item>
-          </>
-
-          {/* ---- Session Type ---- */}
-          <>
-            <Form.Item
-              name="type"
-              id="type"
-              label="Attendee Type"
-              rules={validationRules.requiredValidation}
-              onChange={handleSessionType}
-            >
-              <Radio.Group>
-                <Radio value="Group">Group</Radio>
-                <Radio disabled={isCourseSession} value="1-on-1">
-                  Private (1 individual)
-                </Radio>
-              </Radio.Group>
-            </Form.Item>
-
-            <Form.Item
-              {...(!isMobileDevice && profileFormTailLayout)}
-              name="max_participants"
-              extra="Maximum 100 supported"
-              rules={validationRules.requiredValidation}
-              hidden={!isSessionTypeGroup}
-            >
-              {isSessionTypeGroup && <InputNumber min={2} max={100} />}
-            </Form.Item>
-          </>
-
-          {/* ---- Session Price ---- */}
-          <>
-            <Form.Item
-              name="price_type"
-              label="Session Price"
-              rules={validationRules.requiredValidation}
-              onChange={handleSessionPriceType}
-            >
-              <Radio.Group>
-                <Radio value={priceTypes.FREE}>Free</Radio>
-                <Radio value={priceTypes.PAID}>Paid</Radio>
-                <Radio value={priceTypes.FLEXIBLE}>Let attendees pay what they can</Radio>
-              </Radio.Group>
-            </Form.Item>
-
-            <Form.Item name="currency" label="Currency" hidden={sessionPaymentType === priceTypes.FREE}>
-              <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
-                {currencyList &&
-                  Object.entries(currencyList).map(([key, value], i) => (
-                    <Option value={key} key={key}>
-                      ({key}) {value}
-                    </Option>
-                  ))}
-              </Select>
-            </Form.Item>
-            {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
-            <Form.Item
-              {...(!isMobileDevice && profileFormTailLayout)}
-              name="price"
-              extra={
-                sessionPaymentType === priceTypes.FLEXIBLE
-                  ? `Choose your minimum price. We default to 5 ${form
-                      .getFieldsValue()
-                      .currency.toUpperCase()} as default`
-                  : 'Set your price'
-              }
-              rules={validationRules.numberValidation(
-                `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
-                sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0,
-                false
-              )}
-              hidden={sessionPaymentType === priceTypes.FREE}
-            >
-              <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
-            </Form.Item>
-
-            {sessionPaymentType !== priceTypes.FREE && (
-              <Form.Item
-                name="is_refundable"
-                label="Refundable"
-                rules={validationRules.requiredValidation}
-                onChange={handleSessionRefundable}
+                      document drive{' '}
+                    </Link>{' '}
+                    will show up here. You can add a new doc in the{' '}
+                    <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents} target="_blank">
+                      {' '}
+                      document drive{' '}
+                    </Link>
+                  </Paragraph>
+                }
               >
-                <Radio.Group>
-                  <Radio value="Yes">Yes</Radio>
-                  <Radio value="No">No</Radio>
-                </Radio.Group>
+                <Select
+                  className={styles.fileDropdown}
+                  showArrow
+                  placeholder="Select documents you want to include"
+                  mode="multiple"
+                  maxTagCount={3}
+                  options={creatorDocuments.map((document) => ({
+                    label: document.name,
+                    value: document.url,
+                  }))}
+                />
               </Form.Item>
-            )}
 
-            {sessionPaymentType !== priceTypes.FREE && sessionRefundable && (
+              <Form.Item
+                className={classNames(styles.bgWhite, styles.textEditorLayout)}
+                label="Session Pre-requisite"
+                name="prerequisites"
+              >
+                <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
+              </Form.Item>
+
+              {/* ---- Session Course Type ---- */}
               <>
-                <Form.Item
-                  {...(!isMobileDevice && profileFormItemLayout)}
-                  label="Cancellable Before"
-                  name="refund_before_hours"
-                  extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputted above"
-                  rules={validationRules.requiredValidation}
-                  onChange={handleRefundBeforeHoursChange}
-                >
-                  <InputNumber value={refundBeforeHours} min={0} placeholder="Hours limit" />
-                  <span className="ant-form-text"> hour(s) before the session starts </span>
+                <Form.Item label="Session Type" required>
+                  <Form.Item
+                    name="session_course_type"
+                    id="session_course_type"
+                    rules={validationRules.requiredValidation}
+                    onChange={handleSessionCourseType}
+                    className={styles.inlineFormItem}
+                  >
+                    <Radio.Group>
+                      <Radio value="normal">Normal Session</Radio>
+                      <Radio value="course">Course Session</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => showCourseOptionsHelperModal('session')}
+                      icon={<InfoCircleOutlined />}
+                    >
+                      Understanding the options
+                    </Button>
+                  </Form.Item>
                 </Form.Item>
               </>
-            )}
-          </>
-          <Form.Item
-            name="color_code"
-            label="Color Tag"
-            rules={validationRules.requiredValidation}
-            style={{ marginTop: 32 }}
-          >
-            <BlockPicker
-              color={colorCode}
-              onChangeComplete={handleColorChange}
-              triangle="hide"
-              width={144}
-              colors={colorPickerChoices}
-            />
-          </Form.Item>
-        </Section>
 
-        {/* ========= SESSION SCHEDULE =========== */}
-        <Section>
-          <Title level={4}>2. Session Schedule</Title>
+              {/* ---- Session Tag Type ---- */}
+              <>
+                <Form.Item label="Bookable by member with Tag" required hidden={creatorMemberTags.length === 0}>
+                  <Form.Item
+                    name="session_tag_type"
+                    id="session_tag_type"
+                    rules={validationRules.requiredValidation}
+                    onChange={handleSessionTagType}
+                    className={styles.inlineFormItem}
+                  >
+                    <Radio.Group>
+                      <Radio value="anyone"> Anyone </Radio>
+                      <Radio value="selected"> Selected Member Tags </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item className={styles.inlineFormItem}>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() => showTagOptionsHelperModal('session')}
+                      icon={<InfoCircleOutlined />}
+                    >
+                      Understanding the tag options
+                    </Button>
+                  </Form.Item>
+                </Form.Item>
+                <Form.Item
+                  name="selected_member_tags"
+                  id="selected_member_tags"
+                  hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
+                  {...(!isMobileDevice && profileFormTailLayout)}
+                >
+                  <Select
+                    showArrow
+                    mode="multiple"
+                    maxTagCount={3}
+                    placeholder="Select a member tag"
+                    disabled={selectedTagType === 'anyone'}
+                    options={creatorMemberTags.map((tag) => ({
+                      label: (
+                        <>
+                          {' '}
+                          {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                        </>
+                      ),
+                      value: tag.external_id,
+                    }))}
+                  />
+                </Form.Item>
+              </>
 
-          <Form.Item
-            name="recurring"
-            label="Session Recurrence"
-            rules={validationRules.requiredValidation}
-            onChange={handleSessionRecurrence}
-          >
-            <Radio.Group>
-              <Radio value={false}>One Time Session</Radio>
-              <Radio value={true}>Repeating Sessions</Radio>
-            </Radio.Group>
-          </Form.Item>
+              {/* ---- Session Type ---- */}
+              <>
+                <Form.Item
+                  name="type"
+                  id="type"
+                  label="Attendee Type"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleSessionType}
+                >
+                  <Radio.Group>
+                    <Radio value="Group">Group</Radio>
+                    <Radio disabled={isCourseSession} value="1-on-1">
+                      Private (1 individual)
+                    </Radio>
+                  </Radio.Group>
+                </Form.Item>
 
-          {isSessionRecurring && (
-            <Form.Item
-              rules={isSessionRecurring ? validationRules.requiredValidation : null}
-              name="recurring_dates_range"
-              {...(!isMobileDevice && profileFormTailLayout)}
-              layout="vertical"
-            >
-              <Text>First Session Date: </Text>
-              <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> Last Session Date:</Text> <br />
-              <RangePicker
-                className={styles.rangePicker}
-                defaultValue={recurringDatesRanges}
-                disabledDate={disabledDate}
-                onChange={handleDateRangeChange}
-                onFocus={handleCalenderPop}
-              />
-            </Form.Item>
-          )}
+                <Form.Item
+                  {...(!isMobileDevice && profileFormTailLayout)}
+                  name="max_participants"
+                  extra="Maximum 100 supported"
+                  rules={validationRules.requiredValidation}
+                  hidden={!isSessionTypeGroup}
+                >
+                  {isSessionTypeGroup && <InputNumber min={2} max={100} />}
+                </Form.Item>
+              </>
 
-          <Scheduler
-            sessionSlots={session?.inventory?.length ? session.inventory : []}
-            recurring={isSessionRecurring}
-            recurringDatesRange={recurringDatesRanges}
-            handleSlotsChange={handleSlotsChange}
-            handleSlotDelete={handleSlotDelete}
-          />
-        </Section>
+              {/* ---- Session Price ---- */}
+              <>
+                <Form.Item
+                  name="price_type"
+                  label="Session Price"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleSessionPriceType}
+                >
+                  <Radio.Group>
+                    <Radio value={priceTypes.FREE}>Free</Radio>
+                    <Radio value={priceTypes.PAID}>Paid</Radio>
+                    <Radio value={priceTypes.FLEXIBLE}>Let attendees pay what they can</Radio>
+                  </Radio.Group>
+                </Form.Item>
 
-        {/* ========= CREATE SESSION ============= */}
-        <Section>
-          <Row justify="center">
-            <Col flex={4}>
-              <Title level={4} className={styles.scheduleCount}>
-                {session?.inventory?.length || 0} Schedules will be created
-              </Title>
-            </Col>
-            <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
-              <Form.Item>
-                <Button htmlType="submit" type="primary">
-                  Publish
-                </Button>
+                <Form.Item name="currency" label="Currency" hidden={sessionPaymentType === priceTypes.FREE}>
+                  <Select value={form.getFieldsValue().currency} disabled={stripeCurrency !== null ? true : false}>
+                    {currencyList &&
+                      Object.entries(currencyList).map(([key, value], i) => (
+                        <Option value={key} key={key}>
+                          ({key}) {value}
+                        </Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+                {/* NOTE : Currently the minimum for PWYW is 5, adjust when necessary */}
+                <Form.Item
+                  {...(!isMobileDevice && profileFormTailLayout)}
+                  name="price"
+                  extra={
+                    sessionPaymentType === priceTypes.FLEXIBLE
+                      ? `Choose your minimum price. We default to 5 ${form
+                          .getFieldsValue()
+                          .currency.toUpperCase()} as default`
+                      : 'Set your price'
+                  }
+                  rules={validationRules.numberValidation(
+                    `Please input the price ${sessionPaymentType === priceTypes.FLEXIBLE ? '(min. 5)' : ''}`,
+                    sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0,
+                    false
+                  )}
+                  hidden={sessionPaymentType === priceTypes.FREE}
+                >
+                  <InputNumber min={sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0} placeholder="Amount" />
+                </Form.Item>
+
+                {sessionPaymentType !== priceTypes.FREE && (
+                  <Form.Item
+                    name="is_refundable"
+                    label="Refundable"
+                    rules={validationRules.requiredValidation}
+                    onChange={handleSessionRefundable}
+                  >
+                    <Radio.Group>
+                      <Radio value="Yes">Yes</Radio>
+                      <Radio value="No">No</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                )}
+
+                {sessionPaymentType !== priceTypes.FREE && sessionRefundable && (
+                  <>
+                    <Form.Item
+                      {...(!isMobileDevice && profileFormItemLayout)}
+                      label="Cancellable Before"
+                      name="refund_before_hours"
+                      extra="A customer can cancel and get a refund for this order if they cancel before the hours you have inputted above"
+                      rules={validationRules.requiredValidation}
+                      onChange={handleRefundBeforeHoursChange}
+                    >
+                      <InputNumber value={refundBeforeHours} min={0} placeholder="Hours limit" />
+                      <span className="ant-form-text"> hour(s) before the session starts </span>
+                    </Form.Item>
+                  </>
+                )}
+              </>
+              <Form.Item
+                name="color_code"
+                label="Color Tag"
+                rules={validationRules.requiredValidation}
+                style={{ marginTop: 32 }}
+              >
+                <BlockPicker
+                  color={colorCode}
+                  onChangeComplete={handleColorChange}
+                  triangle="hide"
+                  width={144}
+                  colors={colorPickerChoices}
+                />
               </Form.Item>
-            </Col>
-          </Row>
+            </>
+          )}
         </Section>
+        {(isOfflineSession || zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
+          <>
+            {/* ========= SESSION SCHEDULE =========== */}
+            <Section>
+              <Title level={4}>2. Session Schedule</Title>
+
+              <Form.Item
+                name="recurring"
+                label="Session Recurrence"
+                rules={validationRules.requiredValidation}
+                onChange={handleSessionRecurrence}
+              >
+                <Radio.Group>
+                  <Radio value={false}>One Time Session</Radio>
+                  <Radio value={true}>Repeating Sessions</Radio>
+                </Radio.Group>
+              </Form.Item>
+
+              {isSessionRecurring && (
+                <Form.Item
+                  rules={isSessionRecurring ? validationRules.requiredValidation : null}
+                  name="recurring_dates_range"
+                  {...(!isMobileDevice && profileFormTailLayout)}
+                  layout="vertical"
+                >
+                  <Text>First Session Date: </Text>
+                  <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> Last Session Date:</Text> <br />
+                  <RangePicker
+                    className={styles.rangePicker}
+                    defaultValue={recurringDatesRanges}
+                    disabledDate={disabledDate}
+                    onChange={handleDateRangeChange}
+                    onFocus={handleCalenderPop}
+                  />
+                </Form.Item>
+              )}
+
+              <Scheduler
+                sessionSlots={session?.inventory?.length ? session.inventory : []}
+                recurring={isSessionRecurring}
+                recurringDatesRange={recurringDatesRanges}
+                handleSlotsChange={handleSlotsChange}
+                handleSlotDelete={handleSlotDelete}
+              />
+            </Section>
+
+            {/* ========= CREATE SESSION ============= */}
+            <Section>
+              <Row justify="center">
+                <Col flex={4}>
+                  <Title level={4} className={styles.scheduleCount}>
+                    {session?.inventory?.length || 0} Schedules will be created
+                  </Title>
+                </Col>
+                <Col className={styles.publishBtnWrapper} flex={isMobileDevice ? 'auto' : 1}>
+                  <Form.Item>
+                    <Button htmlType="submit" type="primary">
+                      Publish
+                    </Button>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Section>
+          </>
+        )}
       </Form>
     </Loader>
   );

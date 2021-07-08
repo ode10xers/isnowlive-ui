@@ -464,6 +464,7 @@ const UploadVideoModal = ({
         thumbnail_url: imageUrl,
         watch_limit: editedVideo.watch_limit,
         is_course: isCourseVideo,
+        tag_ids: editedVideo.tags?.map((tag) => tag.external_id) ?? [],
         pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
       })
       .then(() => {
@@ -564,16 +565,14 @@ const UploadVideoModal = ({
           src={`https://videodelivery.net/${videoPreviewToken}/thumbnails/thumbnail.gif?time=${parseTimeString(
             videoPreviewTime
           )}&height=200&duration=15s`}
-          // style={{
-          //   border: 'none',
-          //   width: 400,
-          //   height: 200,
-          // }}
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
         ></iframe>
       ) : (
         <div className={styles.mt50}>
-          <Text strong> Select a timestamp below and click OK to see a preview </Text>
+          <Paragraph strong className={styles.greenText}>
+            If you wish to replace the video preview as shown on the left, Select a time from your video below and we
+            will generate a 15 second preview from that point.
+          </Paragraph>
         </div>
       ),
     [videoPreviewTime, videoPreviewToken, editedVideo]
@@ -894,7 +893,7 @@ const UploadVideoModal = ({
                 </Col>
                 <Col xs={12}>
                   <Button className={styles.ml10} block type="primary" htmlType="submit" loading={isSubmitting}>
-                    Continue
+                    Save & Continue
                   </Button>
                 </Col>
               </Row>
@@ -999,9 +998,9 @@ const UploadVideoModal = ({
                     {videoThumbnailPreview}
                   </Col>
                 )}
-                <Col xs={24}>
+                {/* <Col xs={24}>
                   We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
-                </Col>
+                </Col> */}
                 <Col xs={editedVideo?.thumbnail_url ? { span: 12, offset: 12 } : 24}>
                   Select Time:{' '}
                   <TimePicker
@@ -1010,7 +1009,12 @@ const UploadVideoModal = ({
                     onChange={handleVideoPreviewTimeChange}
                   />
                 </Col>
-                <Col xs={24}>
+                <Col xs={24} md={12}>
+                  <Button block type="default" onClick={() => closeModal(false)}>
+                    Finish changes
+                  </Button>
+                </Col>
+                <Col xs={24} md={12}>
                   <Button
                     block
                     type="primary"
@@ -1046,14 +1050,19 @@ const UploadVideoModal = ({
                     />
                   </div>
                 </Col>
-                <Col xs={24}>
+                <Col xs={24} md={12}>
+                  <Button block type="default" onClick={() => closeModal(false)}>
+                    Finish changes
+                  </Button>
+                </Col>
+                <Col xs={24} md={12}>
                   <Button
                     block
                     type="primary"
                     disabled={!coverImageUrl || coverImageUrl?.endsWith('.gif')}
                     onClick={handleUploadStaticImage}
                   >
-                    Submit
+                    Save new preview
                   </Button>
                 </Col>
               </Row>

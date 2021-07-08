@@ -114,13 +114,13 @@ function setAuthToken(userData, isSignup = false) {
     creator_last_name: userData.last_name,
     creator_username: userData.username || 'NA',
     creator_profile_complete: userData.profile_complete,
-    creator_payment_account_status: userData.payment_account_status,
-    creator_payment_currency: userData.currency || 'NA',
-    creator_zoom_connected: userData.zoom_connected,
+    creator_payment_account_status: userData.profile?.payment_account_status || 'NA',
+    creator_payment_currency: userData.profile?.currency || 'NA',
+    creator_zoom_connected: userData.profile?.zoom_connected || 'NA',
   });
 
-  if (userData.profile && userData.profile.custom_domain) {
-    window.location.href = `https://${userData.profile.custom_domain}/creator/${
+  if (userData.profile && userData.profile?.custom_domain) {
+    window.location.href = `https://${userData.profile?.custom_domain}/creator/${
       isSignup ? 'profile' : 'dashboard'
     }?signupAuthToken=${userData.auth_token}`;
   } else {

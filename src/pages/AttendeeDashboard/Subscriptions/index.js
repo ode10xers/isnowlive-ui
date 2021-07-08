@@ -6,12 +6,14 @@ import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import apis from 'apis';
 
 import Table from 'components/Table';
-import VideoCard from 'components/VideoCard';
-import SessionCards from 'components/SessionCards';
+// import VideoCard from 'components/VideoCard';
+// import SessionCards from 'components/SessionCards';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess, orderType, isUnapprovedUserError } from 'utils/helper';
+import { isAPISuccess, orderType, isUnapprovedUserError, preventDefaults } from 'utils/helper';
 import { generateBaseCreditsText } from 'utils/subscriptions';
 import { isMobileDevice } from 'utils/device';
 
@@ -42,22 +44,49 @@ const Subscriptions = () => {
     setDetailsDrawerVisible(true);
   };
 
+  const renderSessionList = (sessions = []) => (
+    <Row gutter={[8, 10]}>
+      {sessions.map((session) => (
+        <Col xs={24} key={session.session_external_id}>
+          <SessionListCard session={session} />
+        </Col>
+      ))}
+    </Row>
+  );
+
+  const renderVideoList = (videos = []) => (
+    <Row gutter={[8, 10]}>
+      {videos.map((video) => (
+        <Col xs={24} key={video.external_id}>
+          <VideoListCard video={video} />
+        </Col>
+      ))}
+    </Row>
+  );
+
   const renderProductDetails = () => {
     if (selectedSubscription) {
+      // return selectedProductDetailsKey === 'SESSION' ? (
+      //   <SessionCards
+      //     sessions={selectedSubscription?.product_details['SESSION']}
+      //     shouldFetchInventories={true}
+      //     compactView={true}
+      //   />
+      // ) : selectedProductDetailsKey === 'VIDEO' ? (
+      //   <Row gutter={[8, 8]} justify="center">
+      //     {selectedSubscription?.product_details['VIDEO'].map((video) => (
+      //       <Col xs={24} key={video.external_id}>
+      //         <VideoCard video={video} />
+      //       </Col>
+      //     ))}
+      //   </Row>
+      // ) : (
+      //   <Text disabled> No product details to show </Text>
+      // );
       return selectedProductDetailsKey === 'SESSION' ? (
-        <SessionCards
-          sessions={selectedSubscription?.product_details['SESSION']}
-          shouldFetchInventories={true}
-          compactView={true}
-        />
+        renderSessionList(selectedSubscription?.product_details['SESSION'])
       ) : selectedProductDetailsKey === 'VIDEO' ? (
-        <Row gutter={[8, 8]} justify="center">
-          {selectedSubscription?.product_details['VIDEO'].map((video) => (
-            <Col xs={24} key={video.external_id}>
-              <VideoCard video={video} />
-            </Col>
-          ))}
-        </Row>
+        renderVideoList(selectedSubscription?.product_details['VIDEO'])
       ) : (
         <Text disabled> No product details to show </Text>
       );
@@ -67,6 +96,7 @@ const Subscriptions = () => {
   };
 
   const handleDrawerClose = (e) => {
+    preventDefaults(e);
     setSelectedSubscription(null);
     setSelectedProductDetailsKey(null);
     setDetailsDrawerVisible(false);
@@ -455,7 +485,7 @@ const Subscriptions = () => {
                       key={`${subscription?.external_id}_${key}`}
                     >
                       {' '}
-                      {val.product_ids.length} {key.toLowerCase()}s{' '}
+                      {val.product_ids?.length ?? 0} {key.toLowerCase()}s{' '}
                     </Button>
                   ))}
                 </Space>

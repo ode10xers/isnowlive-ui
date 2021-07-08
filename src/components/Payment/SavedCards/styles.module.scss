@@ -88,12 +88,6 @@
 
   .cardBrandWrapper {
     text-align: center;
-
-    .cardBrandImage {
-      border-radius: 4px;
-      background-color: map-get($map: $colors, $key: 'White');
-      padding: 4px;
-      margin-bottom: 4px;
-    }
+    margin-top: -2px;
   }
 }

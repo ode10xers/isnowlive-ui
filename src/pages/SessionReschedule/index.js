@@ -57,7 +57,7 @@ const SessionReschedule = () => {
   const getAvailableSessions = useCallback(async () => {
     setIsSessionLoading(true);
     try {
-      const { data } = await apis.session.getRescheduleableSessionsByPrice(parseInt(price));
+      const { data } = await apis.session.getRescheduleableSessionsByPrice(parseFloat(price));
       if (data) {
         const unfilteredSessions = data.map((i, index) => ({
           index,

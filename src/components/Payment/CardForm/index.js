@@ -179,7 +179,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
           order_id: orderResponse.payment_order_id,
           order_type: orderResponse.payment_order_type,
           payment_method_id: selectedCard.external_id,
-          direct_charge: true,
+          use_saved_method: true,
         });
 
         if (paymentSessionRes) {

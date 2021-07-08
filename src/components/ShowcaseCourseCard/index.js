@@ -60,7 +60,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData) {
-        // TODO: Can put this as a generic helper
         // currently commented out because subscriptions does not support courses
         // const { status, data } = await apis.subscriptions.getUserSubscriptionForCourse(courseId);
 
@@ -152,7 +151,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
           name: selectedCourse.name,
           description: desc.join(', '),
           currency: selectedCourse.currency,
-          price: selectedCourse.price,
+          price: selectedCourse.total_price,
         },
       ],
     };
@@ -180,7 +179,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
     try {
       const { status, data } = await apis.courses.createOrderForUser({
         course_id: selectedCourse.id,
-        price: selectedCourse.price,
+        price: selectedCourse.total_price,
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         payment_source: paymentSource.SUBSCRIPTION,
@@ -224,7 +223,7 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
     try {
       const { status, data } = await apis.courses.createOrderForUser({
         course_id: selectedCourse.id,
-        price: selectedCourse.price,
+        price: selectedCourse.total_price,
         currency: selectedCourse.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
@@ -327,7 +326,9 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
                         </Col>
                         <Col xs={24} className={styles.coursePriceWrapper}>
                           <Text strong className={styles.blueText}>
-                            {course.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}
+                            {course.total_price > 0
+                              ? `${course?.currency?.toUpperCase()} ${course?.total_price}`
+                              : 'Free'}
                           </Text>
                         </Col>
                       </Row>

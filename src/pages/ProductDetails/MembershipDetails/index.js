@@ -14,7 +14,7 @@ import SubscriptionsListView from 'components/DynamicProfileComponents/Subscript
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import {
   getShadeForHexColor,
   preventDefaults,
@@ -53,7 +53,7 @@ const MembershipDetails = ({ match, history }) => {
       const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
 
       if (isAPISuccess(status) && data) {
-        const sortedSubs = data.sort((a, b) => a.price - b.price);
+        const sortedSubs = data.sort((a, b) => a.total_price - b.total_price);
 
         const targetSubsIndex = sortedSubs.findIndex((subs) => subs.external_id === subscriptionId);
 
@@ -101,7 +101,7 @@ const MembershipDetails = ({ match, history }) => {
           name: selectedSubscription.name,
           description: itemDescription.join(', '),
           currency: selectedSubscription.currency,
-          price: selectedSubscription.price,
+          price: selectedSubscription.total_price,
         },
       ],
     };
@@ -298,7 +298,8 @@ const MembershipDetails = ({ match, history }) => {
                         {generateBaseCreditsText(selectedSubscription, false)}
                       </Col>
                       <Col xs={10} className={styles.highlightedMembershipPrice}>
-                        {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.price} / month
+                        {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}
+                        {generateSubscriptionDuration(selectedSubscription)}
                       </Col>
                     </Row>
                   </Col>
@@ -357,7 +358,8 @@ const MembershipDetails = ({ match, history }) => {
               </Col>
               <Col xs={11}>
                 <div className={styles.bottomBarPrice}>
-                  {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.price} / month
+                  {selectedSubscription?.currency?.toUpperCase()} {selectedSubscription?.total_price} /{' '}
+                  {generateSubscriptionDuration(selectedSubscription)}
                 </div>
               </Col>
               <Col xs={10}>

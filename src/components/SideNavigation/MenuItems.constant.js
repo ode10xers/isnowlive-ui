@@ -267,8 +267,8 @@ export const creatorMenuItems = [
   },
   {
     order: 14,
-    key: 'advanced_settings',
-    title: 'Advanced Settings',
+    key: 'advanced_features',
+    title: 'Advanced Features',
     icon: <ControlOutlined />,
     children: [
       {

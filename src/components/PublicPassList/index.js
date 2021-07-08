@@ -57,7 +57,7 @@ const PublicPassList = ({ passes }) => {
           name: selectedPass.name,
           description: desc,
           currency: selectedPass.currency,
-          price: selectedPass.price,
+          price: selectedPass.total_price,
         },
       ],
     };
@@ -75,7 +75,7 @@ const PublicPassList = ({ passes }) => {
     try {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: selectedPass.external_id,
-        price: selectedPass.price,
+        price: selectedPass.total_price,
         coupon_code: couponCode,
         currency: selectedPass.currency.toLowerCase(),
       });
@@ -158,7 +158,8 @@ const PublicPassList = ({ passes }) => {
       align: 'left',
       sortOrder: 'descend',
       width: '13%',
-      render: (text, record) => (record.price > 0 ? `${record.price} ${record.currency.toUpperCase()}` : 'Free'),
+      render: (text, record) =>
+        record.total_price > 0 ? `${record.total_price} ${record.currency.toUpperCase()}` : 'Free',
     },
     {
       title: (
@@ -247,7 +248,7 @@ const PublicPassList = ({ passes }) => {
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout('Price', <Text>{`${pass.total_price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>

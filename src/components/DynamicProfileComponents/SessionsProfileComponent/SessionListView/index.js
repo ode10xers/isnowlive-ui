@@ -64,7 +64,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
 
   const renderSessionDateList = (sessionDateData) => (
     <Col xs={24} key={sessionDateData.key}>
-      <Space direction="vertical">
+      <Space direction="vertical" className={styles.w100}>
         <Title level={4} className={styles.sessionDateSeparator}>
           {sessionDateData.title}
         </Title>
@@ -74,7 +74,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
   );
 
   const renderSessionCards = (session) => (
-    <Col xs={24} sm={12} key={`${session.session_external_id}_${session.inventory_id}`}>
+    <Col xs={24} sm={12} key={`${session.session_external_id}_${session?.inventory_id}`}>
       <SessionListCard session={session} />
     </Col>
   );
