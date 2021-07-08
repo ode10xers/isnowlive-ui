@@ -216,7 +216,6 @@ const VideoDetails = ({ match, history }) => {
 
   useEffect(() => {
     if (shouldFollowUpGetVideo) {
-      console.log('Re-showing payment popup after fetch');
       showConfirmPaymentPopup();
     }
     //eslint-disable-next-line

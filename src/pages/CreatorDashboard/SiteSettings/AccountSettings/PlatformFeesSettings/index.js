@@ -63,13 +63,6 @@ const PlatformFeesSettings = ({ accountSettings, fetchUserSettings }) => {
                       />
                       <Text> Me </Text>
                     </Space>
-                    {/* <Checkbox
-                      onChange={(e) => setShouldCreatorOwnFee(e.target.checked)}
-                      checked={shouldCreatorOwnFee}
-                      disabled={!accountSettings}
-                    >
-                      change this into Switch
-                    </Checkbox> */}
                   </Spin>
                 </div>
               </Col>

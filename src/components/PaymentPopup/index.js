@@ -147,14 +147,12 @@ const PaymentPopup = () => {
 
   useEffect(() => {
     if (creatorStripeAccountID) {
-      console.log('Initializing Stripe Promise with account ID ', creatorStripeAccountID);
       setStripePromise(
         loadStripe(config.stripe.secretKey, {
           stripeAccount: creatorStripeAccountID,
         })
       );
     } else {
-      console.log('Initializing Stripe Promise without account ID');
       setStripePromise(loadStripe(config.stripe.secretKey));
     }
   }, [creatorStripeAccountID]);

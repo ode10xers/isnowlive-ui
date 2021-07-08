@@ -60,7 +60,6 @@ const ShowcaseCourseCard = ({ courses = null, onCardClick = redirectToCoursesPag
       const loggedInUserData = getLocalUserDetails();
 
       if (loggedInUserData) {
-        // TODO: Can put this as a generic helper
         // currently commented out because subscriptions does not support courses
         // const { status, data } = await apis.subscriptions.getUserSubscriptionForCourse(courseId);
 
