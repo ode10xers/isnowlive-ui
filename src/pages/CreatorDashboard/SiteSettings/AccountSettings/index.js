@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { Tabs } from 'antd';
-import { BellOutlined } from '@ant-design/icons';
+import { BellOutlined, DollarOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
 import NotificationSettings from './NotificationSettings';
+import PlatformFeesSettings from './PlatformFeesSettings';
 import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -22,7 +23,7 @@ const AccountSettings = () => {
   const getCreatorUserSettings = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setAccountSettings(data);
@@ -43,13 +44,24 @@ const AccountSettings = () => {
     <div className={classNames(styles.box, styles.settingsWrapper)}>
       <Loader size="large" text="Fetching user account settings" loading={isLoading}>
         {accountSettings && (
-          <Tabs size="large" defaultActiveKey="notifications">
+          <Tabs size="large" defaultActiveKey="fees">
+            <TabPane
+              key="fees"
+              tab={
+                <div className={styles.largeTabHeader}>
+                  <DollarOutlined />
+                  Platform Fees
+                </div>
+              }
+            >
+              <PlatformFeesSettings fetchUserSettings={getCreatorUserSettings} accountSettings={accountSettings} />
+            </TabPane>
             <TabPane
               key="notifications"
               tab={
                 <div className={styles.largeTabHeader}>
                   <BellOutlined />
-                  Notifications
+                  Email Alerts
                 </div>
               }
             >

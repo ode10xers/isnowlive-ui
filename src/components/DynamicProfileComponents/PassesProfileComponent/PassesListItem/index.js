@@ -12,8 +12,8 @@ const { Text, Title } = Typography;
 const PassesListItem = ({ pass, handleClick = null }) => {
   const renderPassPrice = () => {
     // TODO: Might also want to adjust here when PWYW is implemented
-    if (pass.price > 0 && pass.currency !== '') {
-      return `${pass.currency.toUpperCase()} ${pass.price}`;
+    if (pass.total_price > 0 && pass.currency !== '') {
+      return `${pass.currency.toUpperCase()} ${pass.total_price}`;
     } else {
       return 'Free';
     }

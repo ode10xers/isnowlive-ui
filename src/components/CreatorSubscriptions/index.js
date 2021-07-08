@@ -61,7 +61,7 @@ const CreatorSubscriptions = ({ subscriptions }) => {
           name: selectedSubscription.name,
           description: itemDescription.join(', '),
           currency: selectedSubscription.currency,
-          price: selectedSubscription.price,
+          price: selectedSubscription.total_price,
         },
       ],
     };

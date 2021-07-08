@@ -163,7 +163,7 @@ const EarningDetails = ({ match }) => {
       ),
     },
     {
-      title: 'Net',
+      title: 'Earnings',
       dataIndex: 'net_price',
       key: 'net_price',
       width: '120px',
@@ -208,7 +208,7 @@ const EarningDetails = ({ match }) => {
           </Text>
         )}
         {layout(
-          'Net',
+          'Earnings',
           <Text>
             {item.currency.toUpperCase()} {item.net_price}
           </Text>
@@ -261,7 +261,7 @@ const EarningDetails = ({ match }) => {
             ) : (
               <Table
                 columns={detailsColumns}
-                data={earnings?.details}
+                data={earnings?.details.sort((a, b) => new Date(b.booking_time) - new Date(a.booking_time))}
                 loading={isLoading}
                 rowKey={(record) => `${record.name}_${record.booking_time}`}
               />

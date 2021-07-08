@@ -124,7 +124,7 @@ const PassDetails = ({ match, history }) => {
           name: pass.name,
           description: desc,
           currency: pass.currency,
-          price: pass.price,
+          price: pass.total_price,
         },
       ],
     };
@@ -142,7 +142,7 @@ const PassDetails = ({ match, history }) => {
     try {
       const { status, data } = await apis.passes.createOrderForUser({
         pass_id: pass.external_id,
-        price: pass.price,
+        price: pass.total_price,
         coupon_code: couponCode,
         currency: pass.currency.toLowerCase(),
       });
@@ -210,7 +210,9 @@ const PassDetails = ({ match, history }) => {
                               </Text>
                               <Divider type="vertical" />
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
-                                {pass?.price > 0 ? `${pass?.price} ${pass?.currency.toUpperCase()}` : 'Free'}
+                                {pass?.total_price > 0
+                                  ? `${pass?.total_price} ${pass?.currency.toUpperCase()}`
+                                  : 'Free'}
                               </Text>
                             </Space>
                           </Col>

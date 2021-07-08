@@ -6,8 +6,10 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import SessionCards from 'components/SessionCards';
-import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
+// import SessionCards from 'components/SessionCards';
+// import SimpleVideoCardsList from 'components/SimpleVideoCardsList'
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -211,6 +213,26 @@ const ClassPassList = () => {
     },
   ];
 
+  const renderSessionList = (sessions = []) => (
+    <Row gutter={[8, 8]} className={styles.p10}>
+      {sessions.map((session) => (
+        <Col xs={24} sm={12} lg={8} key={session.session_external_id}>
+          <SessionListCard session={session} />
+        </Col>
+      ))}
+    </Row>
+  );
+
+  const renderVideoList = (videos = []) => (
+    <Row gutter={[8, 8]} className={styles.p10}>
+      {videos.map((video) => (
+        <Col xs={24} sm={12} lg={8} key={video.external_id}>
+          <VideoListCard video={video} />
+        </Col>
+      ))}
+    </Row>
+  );
+
   const renderPassDetails = (record) => (
     <Row>
       {record.sessions?.length > 0 && (
@@ -219,7 +241,8 @@ const ClassPassList = () => {
             <Text className={styles.ml20}> Sessions bookable with this pass </Text>
           </Col>
           <Col xs={24}>
-            <SessionCards sessions={record.sessions} />
+            {/* <SessionCards sessions={record.sessions} /> */}
+            {renderSessionList(record.sessions)}
           </Col>
         </>
       )}
@@ -229,7 +252,8 @@ const ClassPassList = () => {
             <Text className={styles.ml20}> Videos purchasable with this pass </Text>
           </Col>
           <Col xs={24}>
-            <SimpleVideoCardsList passDetails={record} videos={record.videos} />
+            {/* <SimpleVideoCardsList passDetails={record} videos={record.videos} /> */}
+            {renderVideoList(record.videos)}
           </Col>
         </>
       )}

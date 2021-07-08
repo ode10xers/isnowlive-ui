@@ -349,7 +349,7 @@ const VideoDetails = ({ match }) => {
     try {
       const payload = {
         pass_id: selectedPass.external_id,
-        price: selectedPass.price,
+        price: selectedPass.total_price,
         currency: selectedPass.currency.toLowerCase(),
         coupon_code: couponCode,
       };
@@ -497,7 +497,7 @@ const VideoDetails = ({ match }) => {
     const videoDesc = `Can be watched up to ${video.watch_limit} times, valid for ${video.validity} days`;
 
     const usableUserPass = getUserPurchasedPass(true);
-    if (usableUserSubscription && video?.price > 0) {
+    if (usableUserSubscription && video?.total_price > 0) {
       // Get Video using Subscription
       // If user have a subscription usable for purchasing this product
       // We prioritize using that subscription
@@ -510,7 +510,7 @@ const VideoDetails = ({ match }) => {
             name: video.title,
             description: videoDesc,
             currency: video.currency,
-            price: video.price,
+            price: video.total_price,
           },
         ],
         paymentInstrumentDetails: {
@@ -520,7 +520,7 @@ const VideoDetails = ({ match }) => {
       };
 
       showPaymentPopup(paymentPopupData, async () => await buyVideoUsingSubscription());
-    } else if (usableUserPass && video?.price > 0) {
+    } else if (usableUserPass && video?.total_price > 0) {
       // Get Video using Pass
       // If user have usable pass for this video
       // We use the pass to get the video
@@ -534,7 +534,7 @@ const VideoDetails = ({ match }) => {
             name: video.title,
             description: videoDesc,
             currency: video.currency,
-            price: video.price,
+            price: video.total_price,
           },
         ],
         paymentInstrumentDetails: {
@@ -544,7 +544,7 @@ const VideoDetails = ({ match }) => {
       };
 
       showPaymentPopup(paymentPopupData, async () => await buyVideoUsingPass());
-    } else if (selectedPass && video?.price > 0) {
+    } else if (selectedPass && video?.total_price > 0) {
       // Buy Pass and Get Video
       // If user decide to buy pass along with video
       // We first buy the pass, then followup book the video
@@ -556,7 +556,7 @@ const VideoDetails = ({ match }) => {
             name: selectedPass.name,
             description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
             currency: selectedPass.currency,
-            price: selectedPass.price,
+            price: selectedPass.total_price,
           },
           {
             name: video.title,
@@ -589,7 +589,7 @@ const VideoDetails = ({ match }) => {
             name: video.title,
             description: videoDesc,
             currency: video.currency,
-            price: video.price,
+            price: video.total_price,
             pay_what_you_want: video.pay_what_you_want,
           },
         ],
@@ -614,10 +614,10 @@ const VideoDetails = ({ match }) => {
                   <Title level={5}>
                     {purchased ? (
                       <>
-                        {pass?.currency.toUpperCase()} 0 <del>{video?.price}</del>
+                        {pass?.currency.toUpperCase()} 0 <del>{video?.total_price}</del>
                       </>
                     ) : (
-                      `${pass?.currency.toUpperCase()} ${pass?.price}`
+                      `${pass?.currency.toUpperCase()} ${pass?.total_price}`
                     )}
                   </Title>
                 </Col>
@@ -805,7 +805,8 @@ const VideoDetails = ({ match }) => {
                                       </Col>
                                       <Col xs={24} md={7} xl={5} className={styles.passPriceText}>
                                         <Title level={5}>
-                                          {usableUserSubscription?.currency.toUpperCase()} 0 <del>{video?.price}</del>
+                                          {usableUserSubscription?.currency.toUpperCase()} 0{' '}
+                                          <del>{video?.total_price}</del>
                                         </Title>
                                       </Col>
                                     </Row>
@@ -876,8 +877,8 @@ const VideoDetails = ({ match }) => {
                                       <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
                                         {video.pay_what_you_want
                                           ? 'Pay what you value this video'
-                                          : video.price > 0
-                                          ? `${video.currency?.toUpperCase()} ${video.price}`
+                                          : video.total_price > 0
+                                          ? `${video.currency?.toUpperCase()} ${video.total_price}`
                                           : 'Free'}
                                       </Text>
                                     </Space>
@@ -886,7 +887,7 @@ const VideoDetails = ({ match }) => {
                               </Col>
                               <Col xs={24} md={8} xl={6}>
                                 <Button block type="primary" onClick={() => openPurchaseVideoModal()}>
-                                  {video?.price === 0 ? 'Get' : 'Buy'} This Video
+                                  {video?.total_price === 0 ? 'Get' : 'Buy'} This Video
                                 </Button>
                               </Col>
                             </Row>

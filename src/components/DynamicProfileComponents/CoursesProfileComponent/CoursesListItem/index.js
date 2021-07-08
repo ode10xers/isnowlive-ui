@@ -79,10 +79,10 @@ const CourseListItem = ({ course }) => {
   const renderCoursePrice = () => {
     if (course?.pay_what_you_want) {
       return 'Flexible';
-    } else if (course?.price === 0 || course?.currency === '') {
+    } else if (course?.total_price === 0 || course?.currency === '') {
       return 'Free';
     } else {
-      return `${course?.currency?.toUpperCase()} ${course?.price}`;
+      return `${course?.currency?.toUpperCase()} ${course?.total_price}`;
     }
   };
 

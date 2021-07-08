@@ -113,10 +113,11 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
   return paymentRequest ? (
     <Loader loading={isLoading} text="Processing payment..." size="small">
       {disabled && (
-        <Text disabled className={styles.textAlignCenter}>
-          {' '}
-          Please confirm all the information above is correct before paying{' '}
-        </Text>
+        <div className={styles.w100}>
+          <Text disabled className={styles.textAlignCenter}>
+            Please confirm all the information above is correct before paying
+          </Text>
+        </div>
       )}
       <div className={disabled ? styles.hidden : undefined}>
         <PaymentRequestButtonElement options={{ paymentRequest }} />

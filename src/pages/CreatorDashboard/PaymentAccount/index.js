@@ -32,7 +32,9 @@ const PaymentAccount = () => {
   const countries = countryList().getData();
   const {
     state: {
-      userDetails: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
+      userDetails: {
+        profile: { payment_account_status = StripeAccountStatus.NOT_CONNECTED },
+      },
       setUserDetails,
     },
   } = useGlobalContext();
@@ -92,7 +94,7 @@ const PaymentAccount = () => {
             const paymentStatus = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
 
             const localUserDetails = getLocalUserDetails();
-            localUserDetails.payment_account_status = paymentStatus;
+            localUserDetails.profile.payment_account_status = paymentStatus;
             setUserDetails(localUserDetails);
 
             Modal.confirm({
