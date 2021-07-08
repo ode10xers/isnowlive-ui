@@ -321,7 +321,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Day',
       key: 'days',
       dataIndex: 'days',
-      width: '150px',
+      width: '100px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
@@ -335,7 +335,7 @@ const SessionsInventories = ({ match }) => {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      width: '180px',
+      width: '165px',
       render: (text, record) => renderSimpleTableCell(record.is_date, text),
     },
     {
