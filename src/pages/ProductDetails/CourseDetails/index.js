@@ -48,7 +48,8 @@ const sampleCourseData = {
   course_duration: 10,
   course_price: 75,
   course_currency: 'SGD',
-  course_description: '<p>Sample course description will show up here</p>\n',
+  course_description:
+    '<p>What should we do in case this description is super long? Because the image should not stretch vertically.</p>\n',
   students_learn:
     '<p>What the students will learn will show up here</p>\n<p> This is just a sample text to show how it will be populated </p>',
   who_is_this_for:
@@ -610,6 +611,7 @@ const CourseDetails = ({ match }) => {
       return resultArray;
     }, []);
 
+    // TODO: Currently using index as keys, rethink based on API Implementation
     return carouselItems.map((carouselItem, idx) => (
       <div className={styles.carouselItem} key={idx}>
         <Image.PreviewGroup>
