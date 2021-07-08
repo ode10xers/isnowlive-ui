@@ -36,7 +36,9 @@ const LiveStream = () => {
   const [isOnboarding, setIsOnboarding] = useState(false);
   const {
     state: {
-      userDetails: { zoom_connected = 'NOT_CONNECTED' },
+      userDetails: {
+        profile: { zoom_connected = 'NOT_CONNECTED' },
+      },
     },
     setUserDetails,
   } = useGlobalContext();
@@ -64,7 +66,7 @@ const LiveStream = () => {
         const { status } = await apis.user.authZoom(code);
         if (isAPISuccess(status)) {
           const localUserDetails = getLocalUserDetails();
-          localUserDetails.zoom_connected = ZoomAuthType.OAUTH;
+          localUserDetails.profile.zoom_connected = ZoomAuthType.OAUTH;
           setUserDetails(localUserDetails);
 
           pushToDataLayer(gtmTriggerEvents.CREATOR_ZOOM_CONNECTED, {

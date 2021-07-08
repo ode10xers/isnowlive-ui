@@ -121,19 +121,17 @@ export const showSetNewPasswordModal = (email) => {
 
 const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
   <div className={styles.mt20}>
-    <Row justify="end" gutter={10}>
+    <Row justify="end" gutter={[10, 10]}>
       {inventoryDetails && (
         <Col>
-          <div>
-            <AddToCalendarButton
-              type="button"
-              buttonText="Add to Cal"
-              eventData={{
-                ...inventoryDetails,
-                page_url: `${generateUrlFromUsername(username)}/e/${inventoryDetails.inventory_id}`,
-              }}
-            />
-          </div>
+          <AddToCalendarButton
+            type="button"
+            buttonText="Add to Cal"
+            eventData={{
+              ...inventoryDetails,
+              page_url: `${generateUrlFromUsername(username)}/e/${inventoryDetails.inventory_id}`,
+            }}
+          />
         </Col>
       )}
       <Col>
@@ -147,7 +145,7 @@ const generateCustomButtonsForSessionModals = (username, inventoryDetails) => (
             ))
           }
         >
-          Go To Dashboard
+          Go to dashboard
         </Button>
       </Col>
     </Row>

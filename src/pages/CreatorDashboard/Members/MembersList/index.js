@@ -34,7 +34,7 @@ const MembersList = () => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
@@ -66,7 +66,7 @@ const MembersList = () => {
   const fetchCreatorPrivateCommunityFlag = useCallback(async () => {
     setIsLoading(false);
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setIsPrivateCommunity(data.member_requires_invite);

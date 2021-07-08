@@ -60,10 +60,11 @@ const Profile = () => {
         form.setFieldsValue(data);
         setCoverImage(data.cover_image_url);
         setProfileImage(data.profile_image_url);
-        setTestimonials(data.profile.testimonials);
+        setTestimonials(data.profile?.testimonials || []);
         setIsLoading(false);
       }
     } catch (error) {
+      console.error(error);
       message.error(error.response?.data?.message || 'Something went wrong.');
       setIsLoading(false);
     }
@@ -81,7 +82,9 @@ const Profile = () => {
     try {
       const localUserDetails = getLocalUserDetails();
 
-      await apis.user.convertUserToCreator();
+      if (!localUserDetails.is_creator) {
+        await apis.user.convertUserToCreator();
+      }
 
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
@@ -103,9 +106,9 @@ const Profile = () => {
           creator_last_name: values.last_name,
           creator_username: values.username || customNullValue,
           creator_profile_complete: localUserDetails.profile_complete,
-          creator_payment_account_status: localUserDetails.payment_account_status,
-          creator_payment_currency: localUserDetails.currency || customNullValue,
-          creator_zoom_connected: localUserDetails.zoom_connected,
+          creator_payment_account_status: localUserDetails.profile?.payment_account_status || customNullValue,
+          creator_payment_currency: localUserDetails.profile?.currency || customNullValue,
+          creator_zoom_connected: localUserDetails.profile?.zoom_connected || customNullValue,
         });
 
         setUserDetails(localUserDetails);

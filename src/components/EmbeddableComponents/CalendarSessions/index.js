@@ -174,7 +174,7 @@ const CalendarSessions = () => {
           name: selectedInventory.name,
           description: desc,
           currency: selectedInventory.currency,
-          price: selectedInventory.price,
+          price: selectedInventory.total_price,
           pay_what_you_want: selectedInventory.pay_what_you_want,
         },
       ],

@@ -203,7 +203,7 @@ const ClassPassList = () => {
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
@@ -417,7 +417,7 @@ const ClassPassList = () => {
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
-      title: 'Net Price',
+      title: 'Earnings',
       dataIndex: 'price_paid',
       key: 'price_paid',
       render: (text, record) => `${record.price_paid} ${record.currency?.toUpperCase()}`,

@@ -34,7 +34,7 @@ const SubscriptionProfileComponent = ({
       const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
 
       if (isAPISuccess(status) && data) {
-        setSubscriptions(data.sort((a, b) => a.price - b.price));
+        setSubscriptions(data.sort((a, b) => a.total_price - b.total_price));
       }
     } catch (error) {
       console.error('Failed to load subscription details');
@@ -50,7 +50,7 @@ const SubscriptionProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
   return subscriptions.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center">
+    <Row className={styles.p10} align="middle" justify="center" id="memberships">
       {isEditing && (
         <Col xs={1}>
           <DragAndDropHandle {...dragHandleProps} />{' '}

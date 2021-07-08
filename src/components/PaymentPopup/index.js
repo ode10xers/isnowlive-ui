@@ -20,6 +20,7 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { getLocalUserDetails } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import {
   orderType,
@@ -28,14 +29,14 @@ import {
   isAPISuccess,
   isUnapprovedUserError,
   getUsernameFromUrl,
+  reservedDomainName,
+  isInCreatorDashboard,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 import validationRules from 'utils/validation';
-
-const stripePromise = loadStripe(config.stripe.secretKey);
 
 const { Text, Title } = Typography;
 const {
@@ -89,6 +90,8 @@ const PaymentPopup = () => {
   // TODO: Defaults to SG, confirm with Rahul what should be the default here
   const [creatorCountry, setCreatorCountry] = useState('SG');
   const [creatorCurrency, setCreatorCurrency] = useState('SGD');
+  const [creatorStripeAccountID, setCreatorStripeAccountID] = useState(null);
+  const [stripePromise, setStripePromise] = useState(null);
 
   const {
     itemList = [],
@@ -99,23 +102,60 @@ const PaymentPopup = () => {
   } = paymentPopupData || {};
   const totalPrice = itemList?.reduce((acc, product) => acc + product.price, 0) || 0;
 
-  const fetchCreatorCountry = useCallback(async () => {
+  const fetchCreatorDetailsForPayment = useCallback(async () => {
+    let creatorUsername = 'app';
+
+    if (isInCreatorDashboard()) {
+      const localUserDetails = getLocalUserDetails();
+
+      if (localUserDetails.is_creator) {
+        creatorUsername = localUserDetails.username;
+      }
+    } else {
+      creatorUsername = getUsernameFromUrl();
+    }
+
+    if (reservedDomainName.includes(creatorUsername)) {
+      return;
+    }
+
     try {
-      const { status, data } = await apis.user.getProfileByUsername(getUsernameFromUrl());
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
 
       if (isAPISuccess(status) && data) {
-        setCreatorCountry(data.country);
-        setCreatorCurrency(data.currency);
+        if (data.profile?.country) {
+          setCreatorCountry(data.profile?.country);
+        }
+
+        if (data.profile?.currency) {
+          setCreatorCurrency(data.profile?.currency);
+        }
+
+        if (data.profile?.connect_account_id) {
+          setCreatorStripeAccountID(data.profile?.connect_account_id);
+        }
       }
     } catch (error) {
-      console.error('Failed fetching creator profile for country', error?.response);
+      console.error('Failed fetching creator details for payment', error?.response);
     }
   }, []);
 
   useEffect(() => {
-    fetchCreatorCountry();
+    fetchCreatorDetailsForPayment();
     //eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (creatorStripeAccountID) {
+      setStripePromise(
+        loadStripe(config.stripe.secretKey, {
+          stripeAccount: creatorStripeAccountID,
+        })
+      );
+    } else {
+      setStripePromise(loadStripe(config.stripe.secretKey));
+    }
+  }, [creatorStripeAccountID]);
 
   useEffect(() => {
     if (!paymentPopupVisible) {
@@ -153,8 +193,6 @@ const PaymentPopup = () => {
     setIsApplyingCoupon(true);
 
     try {
-      //TODO: Use productType here to adjust the payload
-      // e.g. if productType === PASS it should be pass_id (match the BE implementation)
       let couponStatus = null;
       let couponData = null;
       switch (productType) {
@@ -445,9 +483,7 @@ const PaymentPopup = () => {
                     <Text>{creatorCurrency.toUpperCase()} 0</Text>
                   </>
                 ) : (
-                  <Text>
-                    {creatorCurrency.toUpperCase()} {totalPrice}
-                  </Text>
+                  <Text>{totalPrice > 0 ? `${creatorCurrency.toUpperCase()} ${totalPrice}` : 'Free'}</Text>
                 ))}
             </Col>
             {!flexiblePaymentDetails?.enabled && !paymentInstrumentDetails && totalPrice > 0 && (

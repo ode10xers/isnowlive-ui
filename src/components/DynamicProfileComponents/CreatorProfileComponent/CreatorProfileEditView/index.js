@@ -49,8 +49,8 @@ const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = ()
       };
       if (creatorProfile.profile) {
         profile = {
-          bio: creatorProfile.profile.bio,
-          social_media_links: creatorProfile.profile.social_media_links,
+          bio: creatorProfile.profile?.bio || '',
+          social_media_links: creatorProfile.profile?.social_media_links || [],
         };
       }
 

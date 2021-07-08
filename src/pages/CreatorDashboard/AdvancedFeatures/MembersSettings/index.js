@@ -25,7 +25,7 @@ const MembersSettings = () => {
   const getCreatorUserSettings = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setAccountSettings(data);

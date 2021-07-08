@@ -37,7 +37,7 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
   const renderSavedCardsItem = (userCard) => {
     return (
       <Card
-        bodyStyle={{ padding: '4px 2px' }}
+        bodyStyle={{ padding: 0 }}
         key={userCard.external_id}
         className={classNames(
           styles.savedCardElement,
@@ -62,12 +62,6 @@ const SavedCards = ({ disabled, userCards, selectedCard, setSelectedCard }) => {
               : 'Check to pay with this card'}
           </Col>
           <Col xs={3} className={styles.cardBrandWrapper}>
-            {/* <Image
-              className={styles.cardBrandImage}
-              preview={false}
-              src={cardBrandImages[userCard.brand.toUpperCase()]}
-              alt=""
-            /> */}
             {cardBrandImages[userCard.brand.toUpperCase()]}
           </Col>
           <Col xs={4}>{userCard.last_digits}</Col>

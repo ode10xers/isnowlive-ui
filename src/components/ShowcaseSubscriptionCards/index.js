@@ -5,7 +5,7 @@ import { Row, Col, Card, Typography, Button, Drawer, Divider } from 'antd';
 import SessionCards from 'components/SessionCards';
 import VideoCard from 'components/VideoCard';
 
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 
 import styles from './styles.module.scss';
 import { isMobileDevice } from 'utils/device';
@@ -101,9 +101,9 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
           <Col xs={24}>
             <div className={styles.subscriptionPriceWrapper} style={{ color: subscription?.color_code || '#000000' }}>
               <span className={styles.subscriptionPriceText}>
-                {subscription?.currency?.toUpperCase()} {subscription?.price}{' '}
+                {subscription?.currency?.toUpperCase()} {subscription?.total_price}{' '}
               </span>
-              / month
+              / {generateSubscriptionDuration(subscription)}
             </div>
           </Col>
           <Col xs={24} className={styles.buyButtonWrapper}>

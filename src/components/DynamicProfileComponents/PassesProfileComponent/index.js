@@ -50,7 +50,7 @@ const PassesProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
   return passes.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center">
+    <Row className={styles.p10} align="middle" justify="center" id="passes">
       {isEditing && (
         <Col xs={1}>
           {' '}
