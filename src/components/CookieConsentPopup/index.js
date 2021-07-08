@@ -24,7 +24,7 @@ const DOMAIN = {
 // TODO: This component is currently hidden since some customers
 // are frightened by it. Once we add this back, don't forget to also adjust
 // App.js and services/globalContext.js
-// TODO: CHange NODE_ENV here later to REACT_APP_ENV
+
 const CookieConsentPopup = () => {
   const { setCookieConsent } = useGlobalContext();
 
@@ -69,7 +69,7 @@ const CookieConsentPopup = () => {
         const cookieOptions = {
           expires: 365,
           path: '/',
-          domain: DOMAIN[process.env.NODE_ENV],
+          domain: DOMAIN[process.env.REACT_APP_ENV],
           secure: window.location.protocol === 'https' || true,
           sameSite: 'lax',
         };
@@ -94,7 +94,7 @@ const CookieConsentPopup = () => {
       onAccept={() => setCookieConsent(true)}
       onDecline={handleDecline}
       extraCookieOptions={{
-        domain: DOMAIN[process.env.NODE_ENV],
+        domain: DOMAIN[process.env.REACT_APP_ENV],
       }}
       buttonText="Yes, I understand"
       declineButtonText="No, I decline"

@@ -123,8 +123,8 @@ const VideoCard = ({
                       Price :{' '}
                       {video.pay_what_you_want
                         ? 'Flexible'
-                        : video.price > 0
-                        ? `${video.currency?.toUpperCase()} ${video.price}`
+                        : video.total_price > 0
+                        ? `${video.currency?.toUpperCase()} ${video.total_price}`
                         : 'Free'}
                     </Text>
                   </Col>
@@ -167,7 +167,7 @@ const VideoCard = ({
                           showAuthModal(video);
                         }}
                       >
-                        {video?.price === 0 ? 'Get' : 'Buy'}
+                        {video?.total_price === 0 ? 'Get' : 'Buy'}
                       </Button>
                     </Col>
                   )}

@@ -335,8 +335,10 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             </Item>
             <span className="ant-form-text"> {record.currency.toUpperCase()} </span>
           </Item>
+        ) : record.total_price > 0 ? (
+          `${record.total_price} ${record.currency.toUpperCase()}`
         ) : (
-          `${record.price} ${record.currency.toUpperCase()}`
+          'Free'
         ),
     },
   ];
@@ -376,7 +378,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
       key: 'price',
       align: 'left',
       width: '15%',
-      render: (text, record) => (parseInt(text) > 0 ? `${text} ${record.currency.toUpperCase()}` : 'Free'),
+      render: (text, record) =>
+        record.total_price > 0 ? `${record.total_price} ${record.currency.toUpperCase()}` : 'Free',
     },
     {
       title: 'Credit Count',
@@ -531,7 +534,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         >
           {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
           {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout('Price', <Text>{`${pass.total_price} ${pass.currency.toUpperCase()}`}</Text>)}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
@@ -882,7 +885,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
             name: classDetails.name,
             description: toLongDateWithTime(selectedInventory.start_time),
             currency: classDetails.currency,
-            price: classDetails.price,
+            price: classDetails.total_price,
           },
         ],
         paymentInstrumentDetails: {
@@ -904,7 +907,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               name: classDetails.name,
               description: toLongDateWithTime(selectedInventory.start_time),
               currency: classDetails.currency,
-              price: classDetails.price,
+              price: classDetails.total_price,
             },
           ],
           paymentInstrumentDetails: {
@@ -932,7 +935,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               name: selectedPass.name,
               description: `${selectedPass.class_count} Credits, Valid for ${selectedPass.validity} days`,
               currency: selectedPass.currency,
-              price: selectedPass.price,
+              price: selectedPass.total_price,
             },
             {
               name: classDetails.name,
@@ -945,7 +948,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
         const payload = {
           pass_id: selectedPass.external_id,
-          price: selectedPass.price,
+          price: selectedPass.total_price,
           currency: selectedPass.currency.toLowerCase(),
         };
 
@@ -977,7 +980,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               name: classDetails.name,
               description: toLongDateWithTime(selectedInventory.start_time),
               currency: classDetails.currency,
-              price: classDetails.price,
+              price: classDetails.total_price,
               pay_what_you_want: classDetails.pay_what_you_want,
             },
           ],
@@ -994,7 +997,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               name: classDetails.name,
               description: toLongDateWithTime(selectedInventory.start_time),
               currency: classDetails.currency,
-              price: inputPrice || classDetails.price,
+              price: inputPrice || classDetails.total_price,
             },
           ],
         };
@@ -1011,7 +1014,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
       showPaymentPopup(
         paymentPopupData,
-        async (couponCode = '') => await buySingleClass(payload, couponCode, inputPrice || classDetails.price)
+        async (couponCode = '', priceAmount = undefined) =>
+          await buySingleClass(payload, couponCode, priceAmount ?? inputPrice ?? classDetails.price)
       );
     }
   };
@@ -1152,7 +1156,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                             Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                             class for{' '}
                             <Text delete>
-                              {classDetails?.price} {classDetails?.currency.toUpperCase()}
+                              {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
                             </Text>
                             <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased
                             subscription
@@ -1181,7 +1185,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                                 Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                                 class for{' '}
                                 <Text delete>
-                                  {classDetails?.price} {classDetails?.currency.toUpperCase()}
+                                  {classDetails?.total_price} {classDetails?.currency.toUpperCase()}
                                 </Text>
                                 <Text strong> {`0 ${classDetails?.currency.toUpperCase()}`} </Text> using your purchased
                                 pass
@@ -1254,7 +1258,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                             <Col xs={8} md={8} xl={6}>
                               <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                                 {user &&
-                                classDetails?.price > 0 &&
+                                classDetails?.total_price > 0 &&
                                 !(selectedPass && userPasses.length > 0) &&
                                 !usableUserSubscription
                                   ? 'Buy'

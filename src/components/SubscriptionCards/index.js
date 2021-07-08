@@ -8,6 +8,7 @@ import { CloseCircleTwoTone, CheckCircleTwoTone, BookTwoTone, EditOutlined } fro
 import TagListPopup from 'components/TagListPopup';
 
 import styles from './styles.module.scss';
+import { generateSubscriptionDuration } from 'utils/subscriptions';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -52,7 +53,7 @@ const SubscriptionCards = ({
 
   const cardData = [
     {
-      label: `${subscription.currency?.toUpperCase()} ${subscription.price}`,
+      label: subscription.price > 0 ? `${subscription.currency?.toUpperCase()} ${subscription.price}` : 'Free',
       className: undefined,
     },
     {
@@ -60,7 +61,11 @@ const SubscriptionCards = ({
       className: undefined,
     },
     {
-      label: `${getBaseCreditsCount()} Credits/Month`,
+      label: `${getBaseCreditsCount()} credits/period`,
+      className: undefined,
+    },
+    {
+      label: generateSubscriptionDuration(subscription, true),
       className: undefined,
     },
     {
@@ -93,7 +98,7 @@ const SubscriptionCards = ({
     //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
     // },
     // {
-    //   label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/Month` : 'None',
+    //   label: subscription.products['COURSE'] ? `${subscription.products['COURSE'].credits} Credits/period` : 'None',
     //   className: subscription.products['COURSE'] ? undefined : styles.disabled,
     // },
     // {

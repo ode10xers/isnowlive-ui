@@ -87,10 +87,10 @@ const SessionListCard = ({ session }) => {
   const renderSessionPrice = () => {
     if (adjustedSession?.pay_what_you_want) {
       return 'Flexible';
-    } else if (adjustedSession?.price === 0 || adjustedSession?.currency === '') {
+    } else if (adjustedSession?.total_price === 0 || adjustedSession?.currency === '') {
       return 'Free';
     } else {
-      return `${adjustedSession?.currency.toUpperCase()} ${adjustedSession?.price}`;
+      return `${adjustedSession?.currency.toUpperCase()} ${adjustedSession?.total_price}`;
     }
   };
 

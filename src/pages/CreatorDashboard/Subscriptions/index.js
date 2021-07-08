@@ -26,7 +26,7 @@ const Subscriptions = () => {
   const fetchCreatorMemberTags = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.user.getCreatorUserPreferences();
+      const { status, data } = await apis.user.getCreatorSettings();
 
       if (isAPISuccess(status) && data) {
         setCreatorMemberTags(data.tags);
@@ -185,7 +185,7 @@ const Subscriptions = () => {
       className: styles.subscriptionNameField,
     },
     {
-      label: 'Monthly Membership Price',
+      label: 'Membership Price',
       className: undefined,
     },
     {
@@ -194,6 +194,10 @@ const Subscriptions = () => {
     },
     {
       label: 'Session/Video Credit',
+      className: undefined,
+    },
+    {
+      label: 'Membership Period',
       className: undefined,
     },
     {
@@ -213,7 +217,7 @@ const Subscriptions = () => {
     //   className: undefined,
     // },
     // {
-    //   label: 'Course Credits/Month',
+    //   label: 'Course Credits/period',
     //   className: undefined,
     // },
     // {
@@ -283,7 +287,7 @@ const Subscriptions = () => {
     <div className={styles.box}>
       <Row gutter={[8, 10]}>
         <Col xs={24}>
-          <Title level={4}> Monthly Memberships </Title>
+          <Title level={4}> Memberships </Title>
         </Col>
         <Col xs={24}>
           <Loader size="large" loading={isLoading} text="Fetching memberships...">

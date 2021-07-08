@@ -236,7 +236,7 @@ const LiveCourses = ({
       render: (text, record) => toDateAndTime(record.date_of_purchase),
     },
     {
-      title: 'Net Price',
+      title: 'Earnings',
       dataIndex: 'price_paid',
       key: 'price_paid',
       width: '100px',

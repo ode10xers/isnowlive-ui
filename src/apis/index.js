@@ -23,11 +23,12 @@ export default {
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
     setCreatorUserPreferences: (payload) => http.put('/secure/creator/settings', payload),
     upsertCreatorUserTags: (payload) => http.put('/secure/creator/settings/tags', payload),
-    getCreatorUserPreferences: () => http.get('/secure/creator/settings'),
+    getCreatorSettings: () => http.get('/secure/creator/settings'),
     sendProductEmailToCustomers: (payload) => http.post('/secure/creator/products/email', payload),
     confirmCreatorPaymentStatusUpdated: (payload) => http.put('/secure/creator/settings/ga', payload),
     getCreatorDetailsByCustomDomain: (customDomain) => http.get(`/domain/${customDomain}/creator-profile`),
     updateCustomDomainForCreator: (payload) => http.post('/secure/creator/profile/custom-domain', payload),
+    updateCreatorFeeSettings: (payload) => http.post('/secure/creator/settings/platform-fee', payload),
   },
   payment: {
     stripe: {

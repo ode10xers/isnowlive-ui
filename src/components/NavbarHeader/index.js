@@ -128,11 +128,6 @@ const NavbarHeader = () => {
   const inDashboard = () =>
     location.pathname.includes('/attendee/dashboard') || location.pathname.includes('/creator/dashboard');
 
-  const redirectToCreatorProfile = (section) => {
-    setShowMobileMenu(false);
-    history.push(`${Routes.root}`, { section: section || 'home' });
-  };
-
   const redirectToDashboard = (subPage = null) => {
     setShowMobileMenu(false);
     if (subPage) {
@@ -190,7 +185,7 @@ const NavbarHeader = () => {
                   styles.creatorSiteName,
                   username.length >= 15 ? styles.textLength15 : username.length >= 8 ? styles.textLength8 : undefined
                 )}
-                onClick={() => redirectToCreatorProfile()}
+                onClick={() => history.push(Routes.root)}
               >
                 {username.toUpperCase()}
               </span>
@@ -211,14 +206,14 @@ const NavbarHeader = () => {
                 }
                 className={styles.menuContainer}
               >
-                <Menu.Item key="Home" onClick={() => redirectToCreatorProfile('home')}>
+                <Menu.Item key="Home" onClick={() => history.push(Routes.root)}>
                   Site Home
                 </Menu.Item>
                 {shouldShowSessionLink && (
                   <Menu.Item
                     key="Session"
                     className={siteLinkActive('session') ? 'ant-menu-item-active' : undefined}
-                    onClick={() => redirectToCreatorProfile('session')}
+                    onClick={() => history.push(Routes.sessions)}
                   >
                     Sessions
                   </Menu.Item>
@@ -227,7 +222,10 @@ const NavbarHeader = () => {
                   <Menu.Item
                     key="Pass"
                     className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
-                    onClick={() => redirectToCreatorProfile('pass')}
+                    onClick={() => {
+                      history.push(Routes.root);
+                      window.location.hash = 'passes';
+                    }}
                   >
                     Passes
                   </Menu.Item>
@@ -236,7 +234,7 @@ const NavbarHeader = () => {
                   <Menu.Item
                     key="Video"
                     className={siteLinkActive('video') ? 'ant-menu-item-active' : undefined}
-                    onClick={() => redirectToCreatorProfile('video')}
+                    onClick={() => history.push(Routes.videos)}
                   >
                     Videos
                   </Menu.Item>
@@ -245,7 +243,7 @@ const NavbarHeader = () => {
                   <Menu.Item
                     key="Course"
                     className={siteLinkActive('course') ? 'ant-menu-item-active' : undefined}
-                    onClick={() => redirectToCreatorProfile('course')}
+                    onClick={() => history.push(Routes.courses)}
                   >
                     Courses
                   </Menu.Item>
@@ -254,7 +252,10 @@ const NavbarHeader = () => {
                   <Menu.Item
                     key="Membership"
                     className={siteLinkActive('membership') ? 'ant-menu-item-active' : undefined}
-                    onClick={() => redirectToCreatorProfile('membership')}
+                    onClick={() => {
+                      history.push(Routes.root);
+                      window.location.hash = 'memberships';
+                    }}
                   >
                     Memberships
                   </Menu.Item>
@@ -299,7 +300,7 @@ const NavbarHeader = () => {
                   <span className={styles.externalButtonWrapper}>
                     {localUserDetails ? (
                       inDashboard() ? (
-                        <Button className={styles.orangeBtn} onClick={() => redirectToCreatorProfile('home')}>
+                        <Button className={styles.orangeBtn} onClick={() => history.push(Routes.root)}>
                           Site Home
                         </Button>
                       ) : (
@@ -356,7 +357,10 @@ const NavbarHeader = () => {
                             ? styles.textLength8
                             : undefined
                         )}
-                        onClick={() => redirectToCreatorProfile('home')}
+                        onClick={() => {
+                          history.push(Routes.root);
+                          setShowMobileMenu(false);
+                        }}
                       >
                         {username.toUpperCase()}
                       </span>
@@ -375,7 +379,10 @@ const NavbarHeader = () => {
                       <li
                         key="Creator Home"
                         className={siteLinkActive('home') ? styles.active : undefined}
-                        onClick={() => redirectToCreatorProfile('home')}
+                        onClick={() => {
+                          history.push(Routes.root);
+                          setShowMobileMenu(false);
+                        }}
                       >
                         <span className={styles.menuLink}>Site Home</span>
                       </li>
@@ -383,7 +390,10 @@ const NavbarHeader = () => {
                         <li
                           key="Creator Sessions"
                           className={siteLinkActive('session') ? styles.active : undefined}
-                          onClick={() => redirectToCreatorProfile('session')}
+                          onClick={() => {
+                            history.push(Routes.sessions);
+                            setShowMobileMenu(false);
+                          }}
                         >
                           <span className={styles.menuLink}>Sessions</span>
                         </li>
@@ -392,7 +402,11 @@ const NavbarHeader = () => {
                         <li
                           key="Creator Passes"
                           className={siteLinkActive('pass') ? styles.active : undefined}
-                          onClick={() => redirectToCreatorProfile('pass')}
+                          onClick={() => {
+                            history.push(Routes.root);
+                            window.location.hash = 'passes';
+                            setShowMobileMenu(false);
+                          }}
                         >
                           <span className={styles.menuLink}>Passes</span>
                         </li>
@@ -401,7 +415,10 @@ const NavbarHeader = () => {
                         <li
                           key="Creator Videos"
                           className={siteLinkActive('video') ? styles.active : undefined}
-                          onClick={() => redirectToCreatorProfile('video')}
+                          onClick={() => {
+                            history.push(Routes.videos);
+                            setShowMobileMenu(false);
+                          }}
                         >
                           <span className={styles.menuLink}>Videos</span>
                         </li>
@@ -410,7 +427,10 @@ const NavbarHeader = () => {
                         <li
                           key="Creator Courses"
                           className={siteLinkActive('course') ? styles.active : undefined}
-                          onClick={() => redirectToCreatorProfile('course')}
+                          onClick={() => {
+                            history.push(Routes.courses);
+                            setShowMobileMenu(false);
+                          }}
                         >
                           <span className={styles.menuLink}>Courses</span>
                         </li>
@@ -419,7 +439,11 @@ const NavbarHeader = () => {
                         <li
                           key="Creator Memberships"
                           className={siteLinkActive('membership') ? styles.active : undefined}
-                          onClick={() => redirectToCreatorProfile('membership')}
+                          onClick={() => {
+                            history.push(Routes.root);
+                            window.location.hash = 'memberships';
+                            setShowMobileMenu(false);
+                          }}
                         >
                           <span className={styles.menuLink}>Memberships</span>
                         </li>

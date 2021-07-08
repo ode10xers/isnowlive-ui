@@ -5,7 +5,7 @@ import { Row, Col } from 'antd';
 import { ArrowRightOutlined } from '@ant-design/icons';
 
 import { getShadeForHexColor, preventDefaults } from 'utils/helper';
-import { generateBaseCreditsText } from 'utils/subscriptions';
+import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 
 import styles from './style.module.scss';
 import { redirectToMembershipPage } from 'utils/redirect';
@@ -52,14 +52,14 @@ const SubscriptionListItem = ({ subscription }) => {
           <Row gutter={8}>
             <Col xs={14}>
               <div className={styles.membershipDetails}>
-                {generateBaseCreditsText(subscription, false).replace(' credits/month', '')}
-                <br />
-                per month
+                {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
+                <br />/ {generateSubscriptionDuration(subscription)}
               </div>
             </Col>
             <Col xs={10}>
               <div className={styles.membershipPrice}>
-                {subscription?.currency?.toUpperCase()} {subscription?.price} / month
+                {subscription?.currency?.toUpperCase()} {subscription?.total_price} /{' '}
+                {generateSubscriptionDuration(subscription)}
               </div>
             </Col>
           </Row>
