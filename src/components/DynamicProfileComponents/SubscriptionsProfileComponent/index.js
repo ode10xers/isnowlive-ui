@@ -50,7 +50,7 @@ const SubscriptionProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
   return subscriptions.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center">
+    <Row className={styles.p10} align="middle" justify="center" id="memberships">
       {isEditing && (
         <Col xs={1}>
           <DragAndDropHandle {...dragHandleProps} />{' '}
