@@ -464,6 +464,7 @@ const UploadVideoModal = ({
         thumbnail_url: imageUrl,
         watch_limit: editedVideo.watch_limit,
         is_course: isCourseVideo,
+        tag_ids: editedVideo.tags?.map((tag) => tag.external_id) ?? [],
         pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
       })
       .then(() => {
