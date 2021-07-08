@@ -50,10 +50,8 @@ const sampleCourseData = {
   course_currency: 'SGD',
   course_description:
     '<p>What should we do in case this description is super long? Because the image should not stretch vertically.</p>\n',
-  students_learn:
-    '<p>What the students will learn will show up here</p>\n<p> This is just a sample text to show how it will be populated </p>',
-  who_is_this_for:
-    '<p>What the students will learn will show up here</p>\n<p> This is just a sample text to show how it will be populated </p>',
+  students_learn: `<p><strong>Lorem Ipsum</strong> <span style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;">is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span></p>`,
+  who_is_this_for: `<p><strong>Lorem Ipsum</strong> <span style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;">is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span></p>`,
   modules: [
     {
       module_id: 'module_1',
@@ -497,7 +495,7 @@ const CourseDetails = ({ match }) => {
   };
 
   const renderCourseInfoItem = ({ icon, title, content }) => (
-    <Col xs={8} className={styles.textAlignCenter}>
+    <Col className={styles.textAlignCenter}>
       <Space direction="vertical" size="small" className={styles.courseInfoItem}>
         <Text className={styles.courseInfoContent}> {content} </Text>
         <Space size="small" align="center" className={styles.courseTitleContainer}>
