@@ -416,6 +416,7 @@ const CourseDetails = ({ match }) => {
     console.log(paymentPopupData);
     return;
 
+    // eslint-disable-next-line
     showPaymentPopup(paymentPopupData, buySingleCourse);
   };
 
