@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import moment from 'moment';
+import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
 import { MinusCircleOutlined, PlusOutlined, PlayCircleOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
-import { Row, Col, Button, Form, Typography, Modal, Collapse } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Form, Typography, Modal, Collapse, Input } from 'antd';
+import { PlusCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import apis from 'apis';
 import Routes from 'routes';
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
@@ -38,18 +38,27 @@ const formInitialValues = {
   colorCode: initialColor,
 };
 
+const { Title } = Typography;
 const { Text, Paragraph } = Typography;
 
 const {
   formatDate: { toLocaleDate },
 } = dateUtil;
 
-const CreateCourseModule = ({ visible, closeModal, editedCourse = null, isVideoModal = false }) => {
+const CreateCourseModule = ({
+  visible,
+  closeModal,
+  editedCourse = null,
+  isVideoModal = false,
+  creatorMemberTags = [],
+}) => {
   const [form] = Form.useForm();
   const history = useHistory();
 
   const [courseClasses, setCourseClasses] = useState([]);
   const [videos, setVideos] = useState([]);
+  const [videoPopup, setVideosPopup] = useState(false);
+  const [addMethod, setAddMethod] = useState(null);
   const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -92,6 +101,17 @@ const CreateCourseModule = ({ visible, closeModal, editedCourse = null, isVideoM
     }
     setIsLoading(false);
   }, []);
+
+  const openVideoPopup = (addMethodRow) => {
+    setAddMethod(() => addMethodRow);
+    setVideosPopup(true);
+  };
+
+  const addVidoestoContent = (data) => {
+    if (addMethod !== null) {
+      addMethod(data);
+    }
+  };
 
   const getCreatorCurrencyDetails = useCallback(async () => {
     setIsLoading(true);
@@ -370,6 +390,8 @@ const CreateCourseModule = ({ visible, closeModal, editedCourse = null, isVideoM
   };
 
   const handleFinish = async (values) => {
+    console.log(values);
+    return;
     setSubmitting(true);
     let payload = {};
 
@@ -483,97 +505,141 @@ const CreateCourseModule = ({ visible, closeModal, editedCourse = null, isVideoM
   };
 
   return (
-    <Loader size="large" loading={isLoading}>
-      <Form
-        layout="horizontal"
-        name="CourseForm"
-        form={form}
-        onFinish={handleFinish}
-        initialValues={formInitialValues}
-        scrollToFirstError={true}
+    <>
+      <Modal
+        title={<Title level={5}> Add Videos</Title>}
+        visible={videoPopup}
+        centered={true}
+        onCancel={() => setVideosPopup(false)}
+        footer={null}
+        width={1080}
+        afterClose={resetBodyStyle}
       >
-        <Row className={styles.courseRow} gutter={[8, 16]}>
+        <Row gutter={[8, 16]}>
           <Col xs={24}>
-            <Form.Item required={true}>
-              <Form.List name="module" rules={validationRules.otherLinksValidation}>
-                {(fields, { add, remove }, { errors }) => (
-                  <Row className={styles.ml10} gutter={[8, 12]}>
-                    <Col xs={24}>
-                      <Collapse expandIconPosition="left">
-                        {fields.map(({ key, name, fieldKey, ...restField }) => (
-                          <Panel
-                            header="This is panel header 1"
-                            key="1"
-                            extra={<MinusCircleOutlined onClick={() => remove(name)} />}
-                          >
-                            <Form.Item key={key} {...restField} name={[name, 'module']} fieldKey={[fieldKey, 'module']}>
-                              <Row>
-                                <Col xs={24}>
-                                  <Form.Item required={true}>
-                                    <Form.List name={[name, 'content']} rules={validationRules.otherLinksValidation}>
-                                      {(fieldss, { add, remove }, { errors1 }) => (
-                                        <>
-                                          {fieldss.map(({ key1, name1, fieldKey1, ...restField }) => (
-                                            <Form.Item
-                                              {...restField}
-                                              name={[name, 'first']}
-                                              fieldKey={[fieldKey, 'first']}
-                                              rules={[{ required: true, message: 'Missing first name' }]}
-                                            >
-                                              <Row>
-                                                <Col span={20}>
-                                                  <p>Hello World</p>
-                                                </Col>
-                                                <Col span={2}>
-                                                  <PlayCircleOutlined onClick={() => remove(name)} />
-                                                </Col>
-                                                <Col span={2}>
-                                                  <VideoCameraAddOutlined onClick={() => remove(name)} />
-                                                </Col>
-                                              </Row>
-                                            </Form.Item>
-                                          ))}
-                                          <Form.Item>
-                                            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                              Add field
-                                            </Button>
-                                          </Form.Item>
-                                        </>
-                                      )}
-                                    </Form.List>
-                                  </Form.Item>
-                                </Col>
-                              </Row>
-                            </Form.Item>
-                          </Panel>
-                        ))}
-                      </Collapse>
-                    </Col>
-                    <Col xs={24}>
-                      <Button block type="dashed" onClick={() => add()} icon={<PlusCircleOutlined />}>
-                        Add more Modules
-                      </Button>
-                    </Col>
-                    {errors && (
+            <Loader loading={isLoading} size="large">
+              <div>
+                {videos.map((video) => (
+                  <>
+                    <Text>{video.title}</Text>
+                    <Text>{video.validity}</Text>
+                    <Button
+                      size="small"
+                      type="link"
+                      onClick={() =>
+                        addVidoestoContent({ content_name: video.title, content_id: video.external_id, type: 'VIDEO' })
+                      }
+                      icon={<InfoCircleOutlined />}
+                    >
+                      Add Video
+                    </Button>
+                  </>
+                ))}
+              </div>
+            </Loader>
+          </Col>
+        </Row>
+      </Modal>
+      <Loader size="large" loading={isLoading}>
+        <Form
+          layout="horizontal"
+          name="CourseForm"
+          form={form}
+          onFinish={handleFinish}
+          initialValues={formInitialValues}
+          scrollToFirstError={true}
+        >
+          <Row className={styles.courseRow} gutter={[8, 16]}>
+            <Col xs={24}>
+              <Form.Item required={true}>
+                <Form.List name="module">
+                  {(fields, { add, remove }, { errors }) => (
+                    <Row className={styles.ml10} gutter={[8, 12]}>
                       <Col xs={24}>
-                        <Text type="danger"> {errors} </Text>
+                        <Collapse expandIconPosition="left">
+                          {fields.map(({ key, name, fieldKey, ...restField }) => (
+                            <Panel
+                              header={<Text>Module</Text>}
+                              key="1"
+                              extra={<MinusCircleOutlined onClick={() => remove(name)} />}
+                            >
+                              <Form.Item
+                                key={key}
+                                {...restField}
+                                name={[name, 'module']}
+                                fieldKey={[fieldKey, 'module']}
+                              >
+                                <Row>
+                                  <Col xs={24}>
+                                    <Form.Item required={true}>
+                                      <Form.List name={[name, 'content']}>
+                                        {(fieldss, { add, remove }, { errors1 }) => (
+                                          <>
+                                            {fieldss.map(
+                                              ({ key: key1, name: name1, fieldKey: fieldKey1, ...restField }) => (
+                                                <Row>
+                                                  <Col span={20}>
+                                                    <Form.Item
+                                                      {...restField}
+                                                      name={[name1, 'content_name']}
+                                                      fieldKey={[fieldKey1, 'content_name']}
+                                                      id="content_name"
+                                                      initialValue="Content"
+                                                    >
+                                                      <Input maxLength={50} />
+                                                    </Form.Item>
+                                                  </Col>
+                                                  <Col span={2}>
+                                                    <PlayCircleOutlined onClick={() => openVideoPopup(add)} />
+                                                  </Col>
+                                                  <Col span={2}>
+                                                    <VideoCameraAddOutlined onClick={() => remove(name)} />
+                                                  </Col>
+                                                </Row>
+                                              )
+                                            )}
+                                            <Form.Item>
+                                              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                                                Add field
+                                              </Button>
+                                            </Form.Item>
+                                          </>
+                                        )}
+                                      </Form.List>
+                                    </Form.Item>
+                                  </Col>
+                                </Row>
+                              </Form.Item>
+                            </Panel>
+                          ))}
+                        </Collapse>
                       </Col>
-                    )}
-                  </Row>
-                )}
-              </Form.List>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
-          <Col xs={12} md={8}>
-            <Button block type="primary" htmlType="submit" loading={submitting}>
-              Update Course
-            </Button>
-          </Col>
-        </Row>
-      </Form>
-    </Loader>
+                      <Col xs={24}>
+                        <Button block type="dashed" onClick={() => add()} icon={<PlusCircleOutlined />}>
+                          Add more Modules
+                        </Button>
+                      </Col>
+                      {errors && (
+                        <Col xs={24}>
+                          <Text type="danger"> {errors} </Text>
+                        </Col>
+                      )}
+                    </Row>
+                  )}
+                </Form.List>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
+            <Col xs={12} md={8}>
+              <Button block type="primary" htmlType="submit" loading={submitting}>
+                Update Course
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </Loader>
+    </>
   );
 };
 
