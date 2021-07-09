@@ -3,28 +3,12 @@ import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import {
-  Row,
-  Col,
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Typography,
-  DatePicker,
-  Modal,
-  Tag,
-  Checkbox,
-  Radio,
-} from 'antd';
+import { Row, Col, Button, Form, Input, InputNumber, Select, Typography, Modal, Radio } from 'antd';
 
-import { BookTwoTone, TagOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { TagOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
-
-import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ImageUpload from 'components/ImageUpload';
 import { showErrorModal, showSuccessModal, showTagOptionsHelperModal } from 'components/Modals/modals';
@@ -48,6 +32,7 @@ const courseTypes = {
   },
 };
 
+const { TextArea } = Input;
 const initialColor = generateRandomColor();
 
 const whiteColor = '#ffffff';
@@ -61,11 +46,10 @@ const formInitialValues = {
   colorCode: initialColor,
 };
 
-const { Text, Title, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 const {
-  timeCalculation: { dateIsBeforeDate },
-  formatDate: { toLocaleTime, toLocaleDate, toLongDateWithDay, toLongDateWithLongDay },
+  formatDate: { toLocaleDate },
 } = dateUtil;
 
 const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false, creatorMemberTags = [] }) => {
@@ -73,7 +57,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
   const history = useHistory();
 
   const [courseClasses, setCourseClasses] = useState([]);
-  const [videos, setVideos] = useState([]);
   const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -98,21 +81,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
       }
     } catch (error) {
       showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
-    }
-    setIsLoading(false);
-  }, []);
-
-  const fetchAllVideosForCreator = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.videos.getCreatorVideos();
-
-      if (isAPISuccess(status) && data) {
-        let filteredVideos = data;
-        setVideos(filteredVideos);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
   }, []);
@@ -259,10 +227,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
     [generatedSessionInventoryArray]
   );
 
-  const selectAllInventory = () => setSelectedInventories(getAllInventoryIdInTable());
-
-  const unselectAllInventory = () => setSelectedInventories([]);
-
   useEffect(() => {
     if (true) {
       if (!isVideoModal) {
@@ -330,18 +294,9 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
         // setIsSequentialVideos(false);
       }
 
-      fetchAllVideosForCreator();
       getCreatorCurrencyDetails();
     }
-  }, [
-    visible,
-    editedCourse,
-    isVideoModal,
-    fetchAllCourseClassForCreator,
-    fetchAllVideosForCreator,
-    getCreatorCurrencyDetails,
-    form,
-  ]);
+  }, [visible, editedCourse, isVideoModal, fetchAllCourseClassForCreator, getCreatorCurrencyDetails, form]);
 
   useEffect(() => {
     if (!editedCourse || editedCourse?.max_participants === 0) {
@@ -371,44 +326,9 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
     }
   }, [selectedCourseClass, getSelectedCourseClasses, editedCourse, form]);
 
-  const handleStartDateChange = (date) => {
-    setCourseStartDate(date);
-
-    if (!date || (courseEndDate && dateIsBeforeDate(courseEndDate, date))) {
-      setCourseEndDate(null);
-      form.setFieldsValue({ ...form.getFieldsValue(), courseEndDate: undefined });
-    }
-  };
-
-  const disabledStartDates = (currentDate) => {
-    return dateIsBeforeDate(currentDate, moment().startOf('day'));
-  };
-
-  const handleEndDateChange = (date) => {
-    if (dateIsBeforeDate(courseStartDate, date)) {
-      setCourseEndDate(date);
-    }
-  };
-
-  const disabledEndDates = (currentDate) => {
-    return dateIsBeforeDate(currentDate, moment().startOf('day')) || dateIsBeforeDate(currentDate, courseStartDate);
-  };
-
-  const handleCourseClassChange = (val) => {
-    setSelectedCourseClass(val);
-  };
-
   const handleCourseImageUpload = (imageUrl) => {
     setCourseImageUrl(imageUrl);
     form.setFieldsValue({ ...form.getFieldValue(), courseImageUrl: imageUrl });
-  };
-
-  const handleSelectAllCheckboxChanged = (e) => {
-    if (e.target.checked) {
-      selectAllInventory();
-    } else {
-      unselectAllInventory();
-    }
   };
 
   const handleCourseTagTypeChange = (e) => {
@@ -569,324 +489,9 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
     setSubmitting(false);
   };
 
-  const renderSessionDates = () => {
-    const noInventoryComponent = (
-      <Col xs={24}>
-        <Text type="secondary">No sessions found for the date range</Text>
-      </Col>
-    );
-
-    let tableData = generatedSessionInventoryArray;
-
-    if (tableData.length <= 0) {
-      return noInventoryComponent;
-    }
-
-    const tableColumns = [
-      {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        render: (text, record) => {
-          if (record.is_date) {
-            return {
-              props: {
-                colSpan: 2,
-              },
-              children: (
-                <Title level={5} className={styles.dateText}>
-                  {toLongDateWithLongDay(text)}
-                </Title>
-              ),
-            };
-          } else {
-            return {
-              children: (
-                <Tag className={styles.courseScheduleName} color={record.color || 'blue'}>
-                  {record.name}
-                </Tag>
-              ),
-            };
-          }
-        },
-      },
-      {
-        title: 'Date & Time',
-        dataIndex: 'start_date',
-        key: 'start_date',
-        align: 'right',
-        width: '300px',
-        render: (text, record) =>
-          record.is_date
-            ? { props: { colSpan: 0, rowSpan: 0 } }
-            : `${toLongDateWithDay(record?.start_time)}, ${toLocaleTime(record?.start_time)} - ${toLocaleTime(
-                record?.end_time
-              )}`,
-      },
-    ];
-
-    return (
-      <Col xs={24}>
-        <Table
-          columns={tableColumns}
-          data={tableData}
-          rowKey={(record) => (record.is_date ? record.date : record.inventory_id)}
-          rowSelection={{
-            columnWidth: '120px',
-            columnTitle: (
-              <Checkbox checked={selectedInventories.length > 0} onChange={handleSelectAllCheckboxChanged}>
-                <Text strong className={styles.checkboxText}>
-                  {' '}
-                  Select All{' '}
-                </Text>
-              </Checkbox>
-            ),
-            selectedRowKeys: selectedInventories,
-            onChange: setSelectedInventories,
-            getCheckboxProps: (record) => ({
-              style: {
-                display: record.is_date ? 'none' : 'inline-block',
-              },
-            }),
-          }}
-          expandable={{
-            defaultExpandAllRows: true,
-            expandedRowKeys: tableData.map((data) => data.date),
-            rowExpandable: (record) => false,
-            expandIconColumnIndex: -1,
-          }}
-        />
-      </Col>
-    );
-  };
-
-  const renderLiveCourseInputs = () => (
-    <>
-      <Col xs={isVideoModal ? 0 : 16}>
-        <Form.Item
-          {...courseModalFormLayout}
-          id="selectedCourseClass"
-          name="selectedCourseClass"
-          label="Course Session"
-          hidden={isVideoModal}
-          rules={isVideoModal ? [] : validationRules.arrayValidation}
-        >
-          <Select
-            showArrow
-            showSearch={false}
-            mode="multiple"
-            maxTagCount={2}
-            placeholder="Select Class"
-            value={selectedCourseClass}
-            onChange={handleCourseClassChange}
-            optionLabelProp="label"
-          >
-            <Select.OptGroup
-              label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
-              key="Published Session"
-            >
-              {courseClasses
-                ?.filter((courseClass) => courseClass.is_active)
-                .map((courseClass) => (
-                  <Select.Option
-                    value={courseClass.session_id}
-                    key={courseClass.session_id}
-                    label={
-                      <>
-                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
-                      </>
-                    }
-                  >
-                    <Row gutter={[8, 8]}>
-                      <Col xs={17} className={styles.productName}>
-                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
-                      </Col>
-                      <Col xs={7} className={styles.textAlignRight}>
-                        <Text strong>
-                          {courseClass.pay_what_you_want
-                            ? `min. ${courseClass.price}`
-                            : courseClass.price > 0
-                            ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
-                            : 'Free'}
-                        </Text>
-                      </Col>
-                    </Row>
-                  </Select.Option>
-                ))}
-              {courseClasses?.filter((courseClass) => courseClass.is_active).length <= 0 && (
-                <Select.Option disabled value="no_published_session">
-                  <Text disabled> No published sessions </Text>
-                </Select.Option>
-              )}
-            </Select.OptGroup>
-            <Select.OptGroup
-              label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
-              key="Unpublished Sessions"
-            >
-              {courseClasses
-                ?.filter((courseClass) => !courseClass.is_active)
-                .map((courseClass) => (
-                  <Select.Option
-                    value={courseClass.session_id}
-                    key={courseClass.session_id}
-                    label={
-                      <>
-                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
-                      </>
-                    }
-                  >
-                    <Row gutter={[8, 8]}>
-                      <Col xs={17} className={styles.productName}>
-                        {courseClass.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null} {courseClass.name}
-                      </Col>
-                      <Col xs={7} className={styles.textAlignRight}>
-                        <Text strong>
-                          {courseClass.pay_what_you_want
-                            ? `min. ${courseClass.price}`
-                            : courseClass.price > 0
-                            ? `${courseClass.currency?.toUpperCase()} ${courseClass.price}`
-                            : 'Free'}
-                        </Text>
-                      </Col>
-                    </Row>
-                  </Select.Option>
-                ))}
-              {courseClasses?.filter((courseClass) => !courseClass.is_active).length <= 0 && (
-                <Select.Option disabled value="no_unpublished_session">
-                  <Text disabled> No unpublished sessions </Text>
-                </Select.Option>
-              )}
-            </Select.OptGroup>
-          </Select>
-        </Form.Item>
-      </Col>
-      <Col xs={isVideoModal ? 0 : 16}>
-        <Form.Item {...courseModalFormLayout} label="Course Duration" required={true} hidden={isVideoModal}>
-          <Row gutter={8}>
-            <Col xs={12}>
-              <Form.Item
-                id="courseStartDate"
-                name="courseStartDate"
-                rules={isVideoModal ? [] : validationRules.requiredValidation}
-                noStyle
-              >
-                <DatePicker
-                  placeholder="Select Start Date"
-                  onChange={handleStartDateChange}
-                  disabledDate={disabledStartDates}
-                  className={styles.datePicker}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={12}>
-              <Form.Item
-                id="courseEndDate"
-                name="courseEndDate"
-                rules={isVideoModal ? [] : validationRules.requiredValidation}
-                noStyle
-              >
-                <DatePicker
-                  placeholder="Select End Date"
-                  disabled={!Boolean(courseStartDate)}
-                  onChange={handleEndDateChange}
-                  disabledDate={disabledEndDates}
-                  className={styles.datePicker}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form.Item>
-      </Col>
-      <Col xs={isVideoModal ? 0 : 16}>
-        <Form.Item
-          {...courseModalFormLayout}
-          id="maxParticipants"
-          name="maxParticipants"
-          label="Max Course Participants"
-          extra={
-            <Text className={styles.helpText}>
-              This is the max attendee count of the{' '}
-              <Text type="danger"> {highestMaxParticipantCourseSession?.name} </Text>
-              session you selected. You can update the max count here and we'll update it in the sessions too.
-            </Text>
-          }
-          hidden={isVideoModal}
-          rules={
-            isVideoModal
-              ? []
-              : validationRules.numberValidation('Please Input Max Participants Value (min. 2)', 2, true, 100)
-          }
-        >
-          <InputNumber min={0} placeholder="Max Participants" className={styles.numericInput} />
-        </Form.Item>
-      </Col>
-      <Col xs={isVideoModal ? 0 : 16}>
-        <Row gutter={[8, 4]}>
-          <Col xs={24} className={styles.courseDatesText}>
-            Course Classes Date & Time :{' '}
-            <Text type="danger"> Please select the session checkbox you want to add to this course </Text>
-          </Col>
-          <Col xs={24}>
-            <Row gutter={[8, 8]}>{renderSessionDates()}</Row>
-          </Col>
-        </Row>
-      </Col>
-    </>
-  );
-
   const gotoModulePage = () => {
     history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourseModule);
   };
-
-  const renderVideoCourseInputs = () => (
-    <>
-      {/*<Col xs={!isVideoModal ? 0 : 24}> 
-        <Form.Item 
-          {...courseModalFormLayout} 
-          id="video_type" 
-          name="video_type" 
-          label="Video Course Type" 
-          hidden={!isVideoModal} 
-          rules={!isVideoModal ? [] : validationRules.requiredValidation}
-          onChange={handleVideoCourseTypeChange}
-        >
-          <Radio.Group>
-            <Radio value="non_sequential">Non-Sequential</Radio>
-            <Radio value="sequential">Sequential</Radio>
-          </Radio.Group>
-        </Form.Item> 
-      </Col> */}
-      <Col xs={!isVideoModal ? 0 : 24}>
-        <Form.Item
-          {...courseModalFormLayout}
-          label="Course Duration"
-          required={true}
-          hidden={!isVideoModal}
-          scrollToFirstError={true}
-        >
-          <Row gutter={8}>
-            <Col xs={20}>
-              <Form.Item
-                id="validity"
-                name="validity"
-                rules={
-                  !isVideoModal
-                    ? []
-                    : validationRules.numberValidation('Please Input Course Duration in days', 1, false)
-                }
-                noStyle
-              >
-                <InputNumber min={1} placeholder="Course Duration" className={styles.numericInput} />
-              </Form.Item>
-            </Col>
-            <Col xs={4} className={styles.textAlignCenter}>
-              <Text className={styles.currencyWrapper}>days</Text>
-            </Col>
-          </Row>
-        </Form.Item>
-      </Col>
-    </>
-  );
 
   return (
     <Loader size="large" loading={isLoading}>
@@ -930,9 +535,49 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               <Input placeholder="Enter Course Name" maxLength={50} />
             </Form.Item>
           </Col>
-          {renderVideoCourseInputs()}
-          {renderLiveCourseInputs()}
+
           <Col xs={16}>
+            <Form.Item
+              className={classNames(styles.bgWhite, styles.textEditorLayout)}
+              label={<Text> Course Description </Text>}
+              name="description"
+              id="description"
+              rules={validationRules.requiredValidation}
+            >
+              <div>
+                <TextArea rows={5} />
+              </div>
+            </Form.Item>
+          </Col>
+          <Col xs={16}>
+            <Form.Item
+              className={classNames(styles.bgWhite, styles.textEditorLayout)}
+              label={<Text> What will Students Learn </Text>}
+              name="description"
+              id="description"
+              rules={validationRules.requiredValidation}
+            >
+              <div>
+                <TextArea rows={5} />
+              </div>
+            </Form.Item>
+          </Col>
+          <Col xs={16}>
+            <Form.Item
+              className={classNames(styles.bgWhite, styles.textEditorLayout)}
+              label={<Text> Who is this course for </Text>}
+              name="description"
+              id="description"
+              rules={validationRules.requiredValidation}
+            >
+              <div>
+                <TextArea rows={5} />
+              </div>
+            </Form.Item>
+          </Col>
+          {/* {renderVideoCourseInputs()}
+          {renderLiveCourseInputs()} */}
+          {/* <Col xs={16}>
             <Form.Item
               {...courseModalFormLayout}
               id="videoList"
@@ -1029,7 +674,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
                 </Select.OptGroup>
               </Select>
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col xs={16}>
             <Form.Item {...courseModalFormLayout} label="Course Price" required={true}>
               <Row gutter={8}>
