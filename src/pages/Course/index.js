@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
-import { MinusCircleOutlined, PlusOutlined, PlayCircleOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
+import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Row,
   Col,
@@ -17,10 +17,9 @@ import {
   Tag,
   Checkbox,
   Radio,
-  Collapse,
 } from 'antd';
 
-import { BookTwoTone, TagOutlined, InfoCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { BookTwoTone, TagOutlined, InfoCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -38,7 +37,6 @@ import { fetchCreatorCurrency } from 'utils/payment';
 import { courseModalFormLayout, courseModalTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
-const { Panel } = Collapse;
 const courseTypes = {
   MIXED: {
     name: 'MIXED',
@@ -266,8 +264,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
   const unselectAllInventory = () => setSelectedInventories([]);
 
   useEffect(() => {
-    visible = true;
-    if (visible) {
+    if (true) {
       if (!isVideoModal) {
         fetchAllCourseClassForCreator();
       }

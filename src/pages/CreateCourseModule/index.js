@@ -9,7 +9,6 @@ import apis from 'apis';
 import Routes from 'routes';
 import Loader from 'components/Loader';
 import dateUtil from 'utils/date';
-import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
 import styles from './styles.module.scss';
@@ -390,8 +389,6 @@ const CreateCourseModule = ({
   };
 
   const handleFinish = async (values) => {
-    console.log(values);
-    return;
     setSubmitting(true);
     let payload = {};
 
@@ -578,7 +575,7 @@ const CreateCourseModule = ({
                                             {fieldss.map(
                                               ({ key: key1, name: name1, fieldKey: fieldKey1, ...restField }) => (
                                                 <Row>
-                                                  <Col span={20}>
+                                                  <Col span={12} offset={1}>
                                                     <Form.Item
                                                       {...restField}
                                                       name={[name1, 'content_name']}
@@ -593,7 +590,13 @@ const CreateCourseModule = ({
                                                     <PlayCircleOutlined onClick={() => openVideoPopup(add)} />
                                                   </Col>
                                                   <Col span={2}>
-                                                    <VideoCameraAddOutlined onClick={() => remove(name)} />
+                                                    <VideoCameraAddOutlined onClick={() => openVideoPopup(add)} />
+                                                  </Col>
+                                                  <Col span={2}>
+                                                    <MinusCircleOutlined
+                                                      twoToneColor="#FF0000"
+                                                      onClick={() => remove(name)}
+                                                    />
                                                   </Col>
                                                 </Row>
                                               )
