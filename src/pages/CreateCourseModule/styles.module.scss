@@ -1,0 +1,62 @@
+@import '../../styles/variables.scss';
+
+.productName {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inlineFormItem {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+}
+
+.dateText {
+  margin-left: -100px;
+  text-align: left;
+}
+
+.numericInput {
+  width: 100% !important;
+}
+
+.datePicker {
+  width: 100%;
+}
+
+.currencyWrapper {
+  font-size: 16px;
+}
+
+.modalActionRow {
+  margin-top: 10px;
+}
+
+.imageWrapper {
+  position: relative;
+  // height: 200px;
+}
+
+.colorPickerPreview {
+  border-width: 10px;
+  border-style: solid;
+  width: fit-content;
+}
+
+.helpText {
+  @extend .blueText;
+  font-size: 12px;
+}
+
+.coverImage {
+  & > div {
+    width: 100% !important;
+    min-height: 330px;
+    // height: 200px !important;
+  }
+}
+
+.courseScheduleName {
+  font-size: 13px !important;
+}

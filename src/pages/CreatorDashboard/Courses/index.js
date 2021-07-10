@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
+import Routes from 'routes';
 import { Row, Col, Tabs, Typography, Button } from 'antd';
 
 import Loader from 'components/Loader';
-import CreateCourseModal from 'components/CreateCourseModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import LiveCourses from 'pages/CreatorDashboard/Courses/LiveCourses';
 import VideoCourses from 'pages/CreatorDashboard/Courses/VideoCourses';
@@ -18,15 +17,14 @@ import apis from 'apis';
 const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
-const Courses = () => {
+const Courses = ({ history }) => {
   const { showSendEmailPopup } = useGlobalContext();
 
   const [isLoading, setIsLoading] = useState([]);
   const [courses, setCourses] = useState([]);
   const [selectedListTab, setSelectedListTab] = useState('liveClassCourse');
-  const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [targetCourse, setTargetCourse] = useState(null);
-  const [isVideoModal, setIsVideoModal] = useState(false);
+  // const [targetCourse, setTargetCourse] = useState(null);
+  // const [isVideoModal, setIsVideoModal] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
 
   const fetchCreatorMemberTags = useCallback(async () => {
@@ -121,34 +119,17 @@ const Courses = () => {
   };
 
   const openCreateCourseModal = (type = 'mixed') => {
-    setIsVideoModal(type === 'video');
-    setCreateModalVisible(true);
-  };
-
-  const hideCreateCourseModal = (shouldRefresh = false) => {
-    setCreateModalVisible(false);
-    setTargetCourse(null);
-    setIsVideoModal(false);
-
-    if (shouldRefresh) {
-      fetchAllCoursesForCreator();
-    }
+    //setIsVideoModal(type === 'video');
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourse);
   };
 
   const openEditCourseModal = (course) => {
-    setTargetCourse(course);
-    openCreateCourseModal(course.type === courseType.MIXED ? 'mixed' : 'video');
+    //setTargetCourse(course);
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.updateCourse);
   };
 
   return (
     <div className={styles.box}>
-      <CreateCourseModal
-        visible={createModalVisible}
-        closeModal={hideCreateCourseModal}
-        editedCourse={targetCourse}
-        isVideoModal={isVideoModal}
-        creatorMemberTags={creatorMemberTags}
-      />
       <Row gutter={[8, 8]}>
         <Col xs={24}>
           <Title level={3}> Courses </Title>
