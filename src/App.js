@@ -45,9 +45,10 @@ import PaymentRetry from 'pages/PaymentRetry';
 import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
 // import VideoDetails from 'pages/VideoDetails';
-import CourseDetails from 'pages/CourseDetails';
+// import CourseDetails from 'pages/CourseDetails';
 import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
 import VideoDetails from 'pages/ProductDetails/VideoDetails';
+import CourseDetails from 'pages/ProductDetails/CourseDetails';
 import NewHome from 'pages/NewHome';
 import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
@@ -60,6 +61,7 @@ import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 
 import './styles/globals.scss';
+import NavbarFullWidthLayout from 'layouts/NavbarFullWidthLayout';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -246,12 +248,19 @@ function App() {
               path={Routes.membershipDetails}
               component={MembershipDetails}
             />
+
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.courseDetails}
+              component={CourseDetails}
+            />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} />
+            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
             <RouteWithLayout
               layout={NavbarLayout}
               exact

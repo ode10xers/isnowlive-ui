@@ -11,11 +11,11 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Table from 'components/Table';
-import CreatorProfile from 'components/CreatorProfile';
 import Loader from 'components/Loader';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+import CreatorProfile from 'components/CreatorProfile';
 import SessionCards from 'components/SessionCards';
 import VideoCard from 'components/VideoCard';
-import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
@@ -89,7 +89,7 @@ const CourseDetails = ({ match, history }) => {
         message.error('Failed to load course details');
       }
     },
-    [getProfileDetails, location]
+    [location, getProfileDetails]
   );
 
   useEffect(() => {
@@ -237,6 +237,7 @@ const CourseDetails = ({ match, history }) => {
           <Col xs={24} className={styles.creatorProfileWrapper}>
             {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
           </Col>
+
           <Col xs={24}>
             {course && (
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
