@@ -18,6 +18,8 @@ import AuthModal from 'components/AuthModal';
 import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
+import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import {
   isAPISuccess,
   orderType,
@@ -30,7 +32,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { isMobileDevice } from 'utils/device';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
@@ -38,7 +39,6 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-// Session data here should be
 const sampleCourseData = {
   course_id: 'albuquerque-sera-sera',
   course_image_url:
@@ -292,17 +292,6 @@ const sampleCourseData = {
     },
   ],
 };
-// TODO: Can move these into generic helper
-const getCourseSessionContentCount = (courseModules = []) =>
-  courseModules.reduce(
-    (acc, module) => (acc += module.contents.filter((content) => content.content_type === 'SESSION').length ?? 0),
-    0
-  );
-const getCourseVideoContentCount = (courseModules = []) =>
-  courseModules.reduce(
-    (acc, module) => (acc += module.contents.filter((content) => content.content_type === 'VIDEO').length ?? 0),
-    0
-  );
 
 // TODO: Adjust keys here once API is implemented
 const CourseDetails = ({ match }) => {
