@@ -1,15 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 
-import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Space, Progress, Tag } from 'antd';
+import {
+  Row,
+  Col,
+  Image,
+  Collapse,
+  Button,
+  Divider,
+  List,
+  Typography,
+  Spin,
+  Popover,
+  Space,
+  Progress,
+  Tag,
+} from 'antd';
 import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 
 import { showErrorModal } from 'components/Modals/modals';
+import AddToCalendarButton from 'components/AddToCalendarButton';
 
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, isUnapprovedUserError, preventDefaults } from 'utils/helper';
+import { isAPISuccess, isUnapprovedUserError, preventDefaults, generateUrlFromUsername } from 'utils/helper';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 
 import styles from './style.module.scss';
@@ -246,6 +262,10 @@ const sampleOrderData = {
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
+const {
+  formatDate: { toLocaleTime, toLongDateWithDay },
+} = dateUtil;
+
 const CourseOrderDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrderDetails, setCourseOrderDetails] = useState(null);
@@ -288,6 +308,10 @@ const CourseOrderDetails = ({ match, history }) => {
     preventDefaults(e);
 
     history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses);
+  };
+
+  const redirectToVideoOrderDetails = (e) => {
+    preventDefaults(e);
   };
 
   const renderCourseOrderContent = (courseOrder) => {
@@ -345,8 +369,53 @@ const CourseOrderDetails = ({ match, history }) => {
     );
 
   // TODO: Reimplement this to be interactive
-  const renderExtraContent = (content) =>
-    content.content_type === 'SESSION' ? 'Live session' : `${Math.floor(content.content_data.duration / 60)} mins`;
+  const renderExtraContent = (content, contentType) =>
+    contentType === 'SESSION' ? (
+      <Space align="center" size="large">
+        <Text> {toLongDateWithDay(content?.start_time)} </Text>
+        <Text>
+          {' '}
+          {toLocaleTime(content?.start_time)} - {toLocaleTime(content?.end_time)}{' '}
+        </Text>
+        <AddToCalendarButton
+          iconOnly={true}
+          eventData={{
+            ...content,
+            page_url: `${generateUrlFromUsername(content?.username)}/e/${content?.inventory_id}`,
+          }}
+        />
+        {content.is_offline ? (
+          <Popover
+            arrowPointAtCenter
+            placement="topRight"
+            trigger="click"
+            title="Event Address"
+            content={content.offline_event_address}
+          >
+            <Button block size="small" type="text" className={styles.success}>
+              In person
+            </Button>
+          </Popover>
+        ) : (
+          <Button
+            type="primary"
+            size="small"
+            className={!content.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+            disabled={!content.join_url}
+            onClick={() => window.open(content.join_url)}
+          >
+            Join
+          </Button>
+        )}
+      </Space>
+    ) : (
+      <Space align="center" size="large">
+        <Text> {Math.floor(content.duration / 60)} mins </Text>
+        <Button type="primary" onClick={redirectToVideoOrderDetails}>
+          Watch Now
+        </Button>
+      </Space>
+    );
 
   const renderModuleContents = (content) => (
     <List.Item key={content.content_id}>
@@ -358,7 +427,7 @@ const CourseOrderDetails = ({ match, history }) => {
           </Space>
         </Col>
         <Col xs={24} md={12} className={styles.textAlignRight}>
-          <Text type="secondary"> {renderExtraContent(content)} </Text>
+          <Text type="secondary"> {renderExtraContent(content.content_data, content.content_type)} </Text>
         </Col>
       </Row>
     </List.Item>
