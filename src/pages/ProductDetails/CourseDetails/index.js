@@ -51,7 +51,20 @@ const sampleCourseData = {
   course_description:
     '<p>What should we do in case this description is super long? Because the image should not stretch vertically.</p>\n',
   students_learn: `<p><strong>Lorem Ipsum</strong> <span style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;">is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span></p>`,
-  who_is_this_for: `<p><strong>Lorem Ipsum</strong> <span style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;">is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span></p>`,
+  who_is_this_for: [
+    {
+      heading: 'Not you',
+      description: '<p>This is not for you!</p>',
+    },
+    {
+      heading: 'Not you as well',
+      description: '<p>Keep looking, this aint for you too!</p>',
+    },
+    {
+      heading: 'Especially you',
+      description: '<p>This course is made especially for you and your eyes only!</p>',
+    },
+  ],
   modules: [
     {
       module_id: 'module_1',
@@ -689,7 +702,33 @@ const CourseDetails = ({ match }) => {
               </Col>
               <Col xs={24}>
                 {/* Who is this course for */}
-                {generateLongDescriptionTemplate('Who is this course for?', course?.who_is_this_for)}
+                {/* {generateLongDescriptionTemplate('Who is this course for?', course?.who_is_this_for)} */}
+                <Row gutter={[8, 20]} justify="center">
+                  <Col xs={24}>
+                    <Title level={3} className={styles.longDescriptionTitle}>
+                      {' '}
+                      Who is this course for?{' '}
+                    </Title>
+                  </Col>
+                  <Col xs={24}>
+                    <Row gutter={[12, 12]} justify="center" className={styles.personaContainer}>
+                      {course?.who_is_this_for?.length > 0 &&
+                        course?.who_is_this_for.map((persona) => (
+                          <Col xs={24} md={8} key={persona.heading}>
+                            <div className={styles.personaItemWrapper}>
+                              <Space direction="vertical" size="large" className={styles.personaItem}>
+                                <Title level={5} className={styles.personaItemTitle}>
+                                  {' '}
+                                  {persona.heading}{' '}
+                                </Title>
+                                <div className={styles.personaItemContent}>{ReactHtmlParser(persona.description)}</div>
+                              </Space>
+                            </div>
+                          </Col>
+                        ))}
+                    </Row>
+                  </Col>
+                </Row>
               </Col>
             </Row>
           </Col>
