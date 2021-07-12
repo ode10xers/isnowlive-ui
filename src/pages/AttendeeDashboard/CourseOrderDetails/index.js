@@ -13,7 +13,7 @@ import {
   Spin,
   Popover,
   Space,
-  Progress,
+  // Progress,
   Tag,
 } from 'antd';
 import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
@@ -330,10 +330,10 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderCourseOrderDetails = (orderDetails) => (
     <div className={styles.courseOrderDetailsContainer}>
       <Row gutter={[12, 12]}>
-        <Col xs={6}>
+        <Col xs={24} md={12} lg={8}>
           <Image className={styles.courseImage} src={orderDetails?.course_image_url} />
         </Col>
-        <Col xs={14}>
+        <Col xs={24} md={12} lg={16}>
           <Space direction="vertical">
             <Title level={5} className={styles.courseTitle}>
               {' '}
@@ -345,7 +345,7 @@ const CourseOrderDetails = ({ match, history }) => {
             </Tag>
           </Space>
         </Col>
-        <Col xs={4}>
+        {/* <Col xs={4}>
           <Progress
             type="circle"
             success={{ percent: 40 }}
@@ -356,7 +356,7 @@ const CourseOrderDetails = ({ match, history }) => {
               </Text>
             )}
           />
-        </Col>
+        </Col> */}
       </Row>
     </div>
   );
@@ -454,7 +454,7 @@ const CourseOrderDetails = ({ match, history }) => {
       <Spin spinning={isLoading} tip="Fetching course order details" size="large">
         {courseOrderDetails && (
           <Row gutter={[4, 4]} className={styles.courseOrderContainer}>
-            <Col xs={24}>
+            <Col xs={24} className={styles.mb20}>
               <Button ghost type="primary" size="large" icon={<ArrowLeftOutlined />} onClick={handleBackClicked}>
                 Back to my courses
               </Button>
