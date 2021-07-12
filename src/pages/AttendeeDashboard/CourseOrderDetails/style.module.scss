@@ -4,6 +4,10 @@
   padding: 20px;
   background-color: map-get($map: $colors, $key: 'White') !important;
 
+  @media screen and (max-width: 768px) {
+    padding: 12px 4px;
+  }
+
   .courseOrderDetailsContainer {
     .courseImage {
       width: 100%;
@@ -50,6 +54,10 @@
       .courseModules {
         width: 100%;
         padding: 4px 12px 12px;
+
+        @media screen and (max-width: 768px) {
+          padding: 4px 0;
+        }
     
         .curriculumExpandIcon {
           color: map-get($colors, 'Denim') !important;
@@ -68,6 +76,25 @@
             margin-top: 12px;
             background-color: map-get($map: $colors, $key: 'Lavender');
             border-radius: 8px !important;
+          }
+
+          .ant-collapse-content-box {
+            padding: 4px !important;
+          }
+        }
+
+        .mobileCourseModuleContainer {
+          padding: 0 !important;
+
+          .addToCalendarContainer {
+            width: fit-content;
+            margin: 0 auto;
+          }
+
+          :global{
+            .ant-card-actions > li > span a:not(.ant-btn) {
+              color: map-get($map: $colors, $key: 'DodgerBlue');
+            }
           }
         }
       }

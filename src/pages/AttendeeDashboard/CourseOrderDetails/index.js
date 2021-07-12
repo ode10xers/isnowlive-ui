@@ -13,6 +13,7 @@ import {
   Spin,
   Popover,
   Space,
+  Card,
   // Progress,
   Tag,
 } from 'antd';
@@ -361,8 +362,8 @@ const CourseOrderDetails = ({ match, history }) => {
     </div>
   );
 
-  const renderContentIcon = (content) =>
-    content.content_type === 'SESSION' ? (
+  const renderContentIcon = (contentType) =>
+    contentType === 'SESSION' ? (
       <VideoCameraOutlined className={styles.blueText} />
     ) : (
       <PlayCircleOutlined className={styles.blueText} />
@@ -417,12 +418,85 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     );
 
+  const renderMobileModuleContent = (content) => (
+    <Col xs={24} key={content.content_id}>
+      <Card
+        title={content.content_name}
+        extra={renderContentIcon(content.content_type)}
+        actions={
+          content?.content_type === 'SESSION'
+            ? [
+                <div className={styles.addToCalendarContainer}>
+                  <AddToCalendarButton
+                    buttonText="Add to Cal"
+                    eventData={{
+                      ...content?.content_data,
+                      page_url: `${generateUrlFromUsername(content?.content_data?.username)}/e/${
+                        content?.content_data?.inventory_id
+                      }`,
+                    }}
+                  />
+                </div>,
+                content?.content_data?.is_offline ? (
+                  <Popover
+                    arrowPointAtCenter
+                    placement="topRight"
+                    trigger="click"
+                    title="Event Address"
+                    content={content?.content_data?.offline_event_address}
+                  >
+                    <Button block size="small" type="text" className={styles.success}>
+                      In person
+                    </Button>
+                  </Popover>
+                ) : (
+                  <Button
+                    type="primary"
+                    block
+                    size="small"
+                    className={!content?.content_data?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+                    disabled={!content?.content_data?.join_url}
+                    onClick={() => window.open(content?.content_data?.join_url)}
+                  >
+                    Join
+                  </Button>
+                ),
+              ]
+            : [
+                <Button type="primary" onClick={redirectToVideoOrderDetails}>
+                  Watch Now
+                </Button>,
+              ]
+        }
+      >
+        <Row gutter={[4, 10]} align="middle">
+          {content?.content_type === 'SESSION' ? (
+            <>
+              <Col xs={6}> Date </Col>
+              <Col xs={18}> : {toLongDateWithDay(content?.content_data?.start_time)} </Col>
+              <Col xs={6}> Time </Col>
+              <Col xs={18}>
+                {' '}
+                : {toLocaleTime(content?.content_data?.start_time)} - {toLocaleTime(content?.content_data?.end_time)}{' '}
+              </Col>
+            </>
+          ) : (
+            <>
+              <Col xs={10}> Duration </Col>
+              <Col xs={14}> : {Math.floor(content?.content_data?.duration / 60)} mins </Col>
+            </>
+          )}
+        </Row>
+      </Card>
+    </Col>
+  );
+
   const renderModuleContents = (content) => (
     <List.Item key={content.content_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
         <Col xs={24} md={12}>
           <Space className={styles.w100}>
-            {renderContentIcon(content)}
+            {renderContentIcon(content.content_type)}
             <Text strong> {content.content_name} </Text>
           </Space>
         </Col>
@@ -439,12 +513,18 @@ const CourseOrderDetails = ({ match, history }) => {
         key={courseModule.module_id}
         header={<Text className={styles.moduleHeader}> {courseModule.module_name} </Text>}
       >
-        <List
-          size={isMobileDevice ? 'small' : 'large'}
-          rowKey={(record) => record.content_id}
-          dataSource={courseModule?.contents}
-          renderItem={renderModuleContents}
-        />
+        {isMobileDevice ? (
+          <Row gutter={[8, 8]} justify="center" className={styles.mobileCourseModuleContainer}>
+            {courseModule?.contents?.map(renderMobileModuleContent)}
+          </Row>
+        ) : (
+          <List
+            size="small"
+            rowKey={(record) => record.content_id}
+            dataSource={courseModule?.contents}
+            renderItem={renderModuleContents}
+          />
+        )}
       </Panel>
     ));
   };
