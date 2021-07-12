@@ -18,7 +18,7 @@ import validationRules from 'utils/validation';
 import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
 
-import { courseModalFormLayout, courseModalTailLayout } from 'layouts/FormLayouts';
+import { courseCreatePageLayout, courseModalTailLayout } from 'layouts/FormLayouts';
 
 import styles from './styles.module.scss';
 const courseTypes = {
@@ -29,6 +29,17 @@ const courseTypes = {
   VIDEO_NON_SEQ: {
     name: 'VIDEO_NON_SEQUENCE',
     label: 'Non-Sequential Video Course',
+  },
+};
+
+const coursePriceTypes = {
+  FREE: {
+    name: 'FREE',
+    label: 'Free',
+  },
+  PAID: {
+    name: 'PAID',
+    label: 'Paid',
   },
 };
 
@@ -44,9 +55,15 @@ const formInitialValues = {
   videoList: [],
   selectedMemberTags: [],
   colorCode: initialColor,
+  FAQS: [
+    {
+      FAQ_QUESTION: '',
+      FAQ_ANSWER: '',
+    },
+  ],
 };
 
-const { Text, Paragraph } = Typography;
+const { Text, Paragraph, Title } = Typography;
 
 const {
   formatDate: { toLocaleDate },
@@ -56,6 +73,7 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
   const [form] = Form.useForm();
   const history = useHistory();
 
+  const [priceType, setPriceType] = useState(coursePriceTypes.FREE.name);
   const [courseClasses, setCourseClasses] = useState([]);
   const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -376,6 +394,48 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
     setSubmitting(false);
   };
 
+  const setFreeVideo = () => {
+    form.setFieldsValue({
+      ...form.getFieldsValue(),
+      priceType: coursePriceTypes.FREE.name,
+      price: 0,
+    });
+    setPriceType(coursePriceTypes.FREE.name);
+  };
+
+  const handleChangeLimitType = (e) => {
+    const priceType = e.target.value;
+
+    if (priceType === coursePriceTypes.FREE.name) {
+      setFreeVideo();
+    } else {
+      if (currency) {
+        const values = form.getFieldsValue();
+        form.setFieldsValue({
+          ...values,
+          priceType: priceType,
+          price: priceType === coursePriceTypes.FREE.name ? 0 : values.price || 10,
+        });
+        setPriceType(priceType);
+      } else {
+        Modal.confirm({
+          title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
+          okText: 'Setup payment account',
+          cancelText: 'Keep it free',
+          onCancel: () => setFreeVideo(),
+          onOk: () => {
+            setFreeVideo();
+            const newWindow = window.open(
+              `${Routes.creatorDashboard.rootPath}${Routes.creatorDashboard.paymentAccount}`
+            );
+            newWindow.blur();
+            window.focus();
+          },
+        });
+      }
+    }
+  };
+
   const handleFinish = async (values) => {
     setSubmitting(true);
     let payload = {};
@@ -503,83 +563,91 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
         initialValues={formInitialValues}
         scrollToFirstError={true}
       >
-        <Row className={styles.courseRow} gutter={[8, 16]}>
-          <Col xs={16}>
-            <Form.Item
-              id="courseImageUrl"
-              name="courseImageUrl"
-              rules={validationRules.requiredValidation}
-              wrapperCol={{ span: 24 }}
-            >
-              <div className={styles.imageWrapper}>
-                <ImageUpload
-                  className={classNames('avatar-uploader', styles.coverImage)}
-                  name="courseImageUrl"
-                  action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                  onChange={handleCourseImageUpload}
-                  value={courseImageUrl}
-                  label="Course Image (size of Facebook Cover Image)"
-                  overlayHelpText="Click to change image (size of Facebook Cover Image)"
-                />
-              </div>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item
-              {...courseModalFormLayout}
-              id="courseName"
-              name="courseName"
-              label="Course Name"
-              rules={validationRules.nameValidation}
-            >
-              <Input placeholder="Enter Course Name" maxLength={50} />
-            </Form.Item>
-          </Col>
-
-          <Col xs={16}>
-            <Form.Item
-              className={classNames(styles.bgWhite, styles.textEditorLayout)}
-              label={<Text> Course Description </Text>}
-              name="description"
-              id="description"
-              rules={validationRules.requiredValidation}
-            >
-              <div>
-                <TextArea rows={5} />
-              </div>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item
-              className={classNames(styles.bgWhite, styles.textEditorLayout)}
-              label={<Text> What will Students Learn </Text>}
-              name="description"
-              id="description"
-              rules={validationRules.requiredValidation}
-            >
-              <div>
-                <TextArea rows={5} />
-              </div>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item
-              className={classNames(styles.bgWhite, styles.textEditorLayout)}
-              label={<Text> Who is this course for </Text>}
-              name="description"
-              id="description"
-              rules={validationRules.requiredValidation}
-            >
-              <div>
-                <TextArea rows={5} />
-              </div>
-            </Form.Item>
-          </Col>
-          {/* {renderVideoCourseInputs()}
+        <div className={styles.box}>
+          <Row className={styles.courseRow} gutter={[8, 16]}>
+            <Col xs={24}>
+              <Title level={4}>1. Course Information</Title>
+            </Col>
+            <Col xs={16}>
+              <Form.Item
+                id="courseImageUrl"
+                name="courseImageUrl"
+                rules={validationRules.requiredValidation}
+                wrapperCol={{ span: 24 }}
+              >
+                <div className={styles.imageWrapper}>
+                  <ImageUpload
+                    className={classNames('avatar-uploader', styles.coverImage)}
+                    name="courseImageUrl"
+                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                    onChange={handleCourseImageUpload}
+                    value={courseImageUrl}
+                    label="Course Image (size of Facebook Cover Image)"
+                    overlayHelpText="Click to change image (size of Facebook Cover Image)"
+                  />
+                </div>
+              </Form.Item>
+            </Col>
+            <Col xs={16}>
+              <Form.Item
+                {...courseCreatePageLayout}
+                id="courseName"
+                name="courseName"
+                label="Course Name"
+                rules={validationRules.nameValidation}
+              >
+                <Input placeholder="Enter Course Name" maxLength={50} />
+              </Form.Item>
+            </Col>
+            <Col xs={16}>
+              <Form.Item
+                {...courseCreatePageLayout}
+                className={classNames(styles.bgWhite, styles.textEditorLayout)}
+                label={<Text> Course Description </Text>}
+                name="description"
+                id="description"
+                rules={validationRules.requiredValidation}
+              >
+                <div>
+                  <TextArea rows={5} />
+                </div>
+              </Form.Item>
+            </Col>
+            <Col xs={16}>
+              <Form.Item
+                {...courseCreatePageLayout}
+                className={classNames(styles.bgWhite, styles.textEditorLayout)}
+                label={<Text> What will Students Learn </Text>}
+                name="description"
+                id="description"
+                rules={validationRules.requiredValidation}
+              >
+                <div>
+                  <TextArea rows={5} />
+                </div>
+              </Form.Item>
+            </Col>
+            <Col xs={16}>
+              <Form.Item
+                {...courseCreatePageLayout}
+                className={classNames(styles.bgWhite, styles.textEditorLayout)}
+                label={<Text> Who is this course for </Text>}
+                name="description"
+                id="description"
+                rules={validationRules.requiredValidation}
+              >
+                <div>
+                  <TextArea rows={5} />
+                </div>
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
+        {/* {renderVideoCourseInputs()}
           {renderLiveCourseInputs()} */}
-          {/* <Col xs={16}>
+        {/* <Col xs={16}>
             <Form.Item
-              {...courseModalFormLayout}
+              {...courseCreatePageLayout}
               id="videoList"
               name="videoList"
               label="Course Video(s)"
@@ -675,20 +743,87 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
               </Select>
             </Form.Item>
           </Col> */}
-          <Col xs={16}>
-            <Form.Item {...courseModalFormLayout} label="Course Price" required={true}>
+
+        <div className={styles.box}>
+          <Row className={styles.courseRow} gutter={[8, 16]}>
+            <Col xs={24}>
+              <Title level={3}>2. Frequently Asked Questions</Title>
+            </Col>
+            <Col xs={16}>
+              <Form.List name="FAQS">
+                {(fields, { add, remove }) => (
+                  <>
+                    {fields.map(({ key, name, fieldKey, ...restField }) => (
+                      <Row key={key}>
+                        <Col xs={24}>
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'FAQ_QUESTION']}
+                            {...courseCreatePageLayout}
+                            fieldKey={[fieldKey, 'first']}
+                            rules={[{ required: true, message: 'Missing Question' }]}
+                            id="FAQ_QUESTION"
+                            label="FAQ QUESTION"
+                          >
+                            <Input placeholder="Enter Question" maxLength={50} />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24}>
+                          <Form.Item
+                            {...restField}
+                            name={[name, 'FAQ_ANSWER']}
+                            {...courseCreatePageLayout}
+                            fieldKey={[fieldKey, 'first']}
+                            rules={[{ required: true, message: 'Missing Answer' }]}
+                            id="FAQ_ANSWER"
+                            label="FAQ ANSWER"
+                          >
+                            <Input placeholder="Enter Answer" maxLength={50} />
+                          </Form.Item>
+                        </Col>
+                        <MinusCircleOutlined onClick={() => remove(name)} />
+                      </Row>
+                    ))}
+                    <Form.Item>
+                      <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                        Add New FAQ
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+            </Col>
+          </Row>
+        </div>
+        <div className={styles.box}>
+          <Row className={styles.courseRow} gutter={[8, 16]}>
+            <Col xs={24}>
+              <Title level={4}>3. Pricing and details</Title>
+            </Col>
+            <Col xs={16}>
               <Row gutter={8}>
-                <Col xs={20}>
+                <Col xs={24}>
                   <Form.Item
-                    id="price"
-                    name="price"
-                    rules={validationRules.numberValidation('Please Input Course Price', 0, false)}
-                    noStyle
+                    id="priceType"
+                    name="priceType"
+                    label="Price Type"
+                    rules={validationRules.requiredValidation}
+                    onChange={handleChangeLimitType}
                   >
+                    <Radio.Group
+                      options={Object.values(coursePriceTypes).map((pType) => ({
+                        label: pType.label,
+                        value: pType.name,
+                      }))}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={20}>
+                  <Form.Item id="price" name="price" label={`Price (${currency.toUpperCase()})`}>
                     <InputNumber
                       min={0}
                       disabled={currency === ''}
-                      placeholder="Course Price"
+                      placeholder="Price"
                       className={styles.numericInput}
                     />
                   </Form.Item>
@@ -699,107 +834,59 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
                   </Text>
                 </Col>
               </Row>
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.Item
-              label="Bookable by member with Tag"
-              required
-              {...courseModalFormLayout}
-              hidden={creatorMemberTags.length === 0}
-            >
-              <Form.Item
-                name="courseTagType"
-                rules={validationRules.requiredValidation}
-                onChange={handleCourseTagTypeChange}
-                className={styles.inlineFormItem}
-              >
-                <Radio.Group>
-                  <Radio value="anyone"> Anyone </Radio>
-                  <Radio value="selected"> Selected Member Tags </Radio>
-                </Radio.Group>
-              </Form.Item>
-              <Form.Item className={styles.inlineFormItem}>
-                <Button
-                  size="small"
-                  type="link"
-                  onClick={() => showTagOptionsHelperModal('course')}
-                  icon={<InfoCircleOutlined />}
+            </Col>
+            <Col xs={16}>
+              <Form.Item label="Bookable by member with Tag" required {...courseCreatePageLayout}>
+                <Form.Item
+                  name="courseTagType"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleCourseTagTypeChange}
+                  className={styles.inlineFormItem}
                 >
-                  Understanding the options
-                </Button>
+                  <Radio.Group>
+                    <Radio value="anyone"> Anyone </Radio>
+                    <Radio value="selected"> Selected Member Tags </Radio>
+                  </Radio.Group>
+                </Form.Item>
+                <Form.Item className={styles.inlineFormItem}>
+                  <Button
+                    size="small"
+                    type="link"
+                    onClick={() => showTagOptionsHelperModal('course')}
+                    icon={<InfoCircleOutlined />}
+                  >
+                    Understanding the options
+                  </Button>
+                </Form.Item>
               </Form.Item>
-            </Form.Item>
 
-            <Form.Item
-              name="selectedMemberTags"
-              id="selectedMemberTags"
-              {...courseModalTailLayout}
-              hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
-            >
-              <Select
-                showArrow
-                mode="multiple"
-                maxTagCount={2}
-                placeholder="Select a member tag"
-                disabled={selectedTagType === 'anyone'}
-                options={creatorMemberTags.map((tag) => ({
-                  label: (
-                    <>
-                      {' '}
-                      {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
-                    </>
-                  ),
-                  value: tag.external_id,
-                }))}
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={16}>
-            <Form.List name="FAQS">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, fieldKey, ...restField }) => (
-                    <Row key={key}>
-                      <Col xs={24}>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'FAQ_QUESTION']}
-                          {...courseModalFormLayout}
-                          fieldKey={[fieldKey, 'first']}
-                          rules={[{ required: true, message: 'Missing Question' }]}
-                          id="FAQ_QUESTION"
-                          label="FAQ QUESTION"
-                        >
-                          <Input placeholder="Enter Question" maxLength={50} />
-                        </Form.Item>
-                      </Col>
-                      <Col xs={24}>
-                        <Form.Item
-                          {...restField}
-                          name={[name, 'FAQ_ANSWER']}
-                          {...courseModalFormLayout}
-                          fieldKey={[fieldKey, 'first']}
-                          rules={[{ required: true, message: 'Missing Answer' }]}
-                          id="FAQ_ANSWER"
-                          label="FAQ ANSWER"
-                        >
-                          <Input placeholder="Enter Answer" maxLength={50} />
-                        </Form.Item>
-                      </Col>
-                      <MinusCircleOutlined onClick={() => remove(name)} />
-                    </Row>
-                  ))}
-                  <Form.Item>
-                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                      Add New FAQ
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
-          </Col>
-        </Row>
+              <Form.Item
+                name="selectedMemberTags"
+                id="selectedMemberTags"
+                {...courseModalTailLayout}
+                hidden={selectedTagType === 'anyone' || creatorMemberTags.length === 0}
+              >
+                <Select
+                  showArrow
+                  mode="multiple"
+                  maxTagCount={2}
+                  placeholder="Select a member tag"
+                  disabled={selectedTagType === 'anyone'}
+                  options={creatorMemberTags.map((tag) => ({
+                    label: (
+                      <>
+                        {' '}
+                        {tag.name} {tag.is_default ? <TagOutlined /> : null}{' '}
+                      </>
+                    ),
+                    value: tag.external_id,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </div>
+
         <Row justify="end" align="center" gutter={8} className={styles.modalActionRow}>
           <Col xs={12} md={6}>
             <Button block type="default" onClick={() => gotoModulePage()} loading={submitting}>
