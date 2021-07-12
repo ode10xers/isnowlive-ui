@@ -3,9 +3,11 @@ import { useHistory } from 'react-router-dom';
 import moment from 'moment';
 import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
 import { MinusCircleOutlined, PlusOutlined, PlayCircleOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
-import { Row, Col, Button, Form, Typography, Modal, Collapse, Input } from 'antd';
-import { PlusCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Form, Typography, Modal, Collapse, Input, Image } from 'antd';
+import { PlusCircleOutlined, MinusCircleTwoTone } from '@ant-design/icons';
 import apis from 'apis';
+
+import DefaultImage from 'components/Icons/DefaultImage';
 import Routes from 'routes';
 import Loader from 'components/Loader';
 import dateUtil from 'utils/date';
@@ -35,6 +37,15 @@ const formInitialValues = {
   videoList: [],
   selectedMemberTags: [],
   colorCode: initialColor,
+  module: [
+    {
+      content: [
+        {
+          content_name: 'content',
+        },
+      ],
+    },
+  ],
 };
 
 const { Title } = Typography;
@@ -57,7 +68,9 @@ const CreateCourseModule = ({
   const [courseClasses, setCourseClasses] = useState([]);
   const [videos, setVideos] = useState([]);
   const [videoPopup, setVideosPopup] = useState(false);
+  const [sessionPopup, setSessionPopup] = useState(false);
   const [addMethod, setAddMethod] = useState(null);
+  const [sessionMethod, setSessionMethod] = useState(null);
   const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -106,9 +119,20 @@ const CreateCourseModule = ({
     setVideosPopup(true);
   };
 
+  const openSessionPopup = (sessionMethodRow) => {
+    setSessionMethod(() => sessionMethodRow);
+    setSessionPopup(true);
+  };
+
   const addVidoestoContent = (data) => {
     if (addMethod !== null) {
       addMethod(data);
+    }
+  };
+
+  const addSessiontoContent = (data) => {
+    if (sessionMethod !== null) {
+      sessionMethod(data);
     }
   };
 
@@ -504,6 +528,53 @@ const CreateCourseModule = ({
   return (
     <>
       <Modal
+        title={<Title level={5}> Add Sessions</Title>}
+        visible={sessionPopup}
+        centered={true}
+        onCancel={() => setSessionPopup(false)}
+        footer={null}
+        width={1080}
+        afterClose={resetBodyStyle}
+      >
+        <Row gutter={[8, 16]}>
+          <Col xs={24}>
+            <Loader loading={isLoading} size="large">
+              <div>
+                {courseClasses.map((session) => (
+                  <>
+                    <Row className={styles.videoPopupRow}>
+                      <Col span={6} offset={2}>
+                        <Image
+                          src={session.session_image_url || 'error'}
+                          alt={session.name}
+                          height={100}
+                          fallback={DefaultImage()}
+                          className={styles.thumbnailImage}
+                        />
+                      </Col>
+                      <Col xs={12} offset={2}>
+                        <Title level={4}>{session.name}</Title>
+                        <Button
+                          onClick={() =>
+                            addSessiontoContent({
+                              content_name: session.name,
+                              content_id: session.session_external_id,
+                              type: 'SESSION',
+                            })
+                          }
+                        >
+                          Add to Course
+                        </Button>
+                      </Col>
+                    </Row>
+                  </>
+                ))}
+              </div>
+            </Loader>
+          </Col>
+        </Row>
+      </Modal>
+      <Modal
         title={<Title level={5}> Add Videos</Title>}
         visible={videoPopup}
         centered={true}
@@ -518,18 +589,31 @@ const CreateCourseModule = ({
               <div>
                 {videos.map((video) => (
                   <>
-                    <Text>{video.title}</Text>
-                    <Text>{video.validity}</Text>
-                    <Button
-                      size="small"
-                      type="link"
-                      onClick={() =>
-                        addVidoestoContent({ content_name: video.title, content_id: video.external_id, type: 'VIDEO' })
-                      }
-                      icon={<InfoCircleOutlined />}
-                    >
-                      Add Video
-                    </Button>
+                    <Row className={styles.videoPopupRow}>
+                      <Col span={6} offset={2}>
+                        <Image
+                          src={video.thumbnail_url || 'error'}
+                          alt={video.title}
+                          height={100}
+                          fallback={DefaultImage()}
+                          className={styles.thumbnailImage}
+                        />
+                      </Col>
+                      <Col xs={12} offset={2}>
+                        <Title level={4}>{video.title}</Title>
+                        <Button
+                          onClick={() =>
+                            addVidoestoContent({
+                              content_name: video.title,
+                              content_id: video.external_id,
+                              type: 'VIDEO',
+                            })
+                          }
+                        >
+                          Add to Course
+                        </Button>
+                      </Col>
+                    </Row>
                   </>
                 ))}
               </div>
@@ -575,7 +659,7 @@ const CreateCourseModule = ({
                                             {fieldss.map(
                                               ({ key: key1, name: name1, fieldKey: fieldKey1, ...restField }) => (
                                                 <Row>
-                                                  <Col span={12} offset={1}>
+                                                  <Col span={6} offset={1}>
                                                     <Form.Item
                                                       {...restField}
                                                       name={[name1, 'content_name']}
@@ -586,14 +670,14 @@ const CreateCourseModule = ({
                                                       <Input maxLength={50} />
                                                     </Form.Item>
                                                   </Col>
-                                                  <Col span={2}>
+                                                  <Col span={2} offset={8}>
                                                     <PlayCircleOutlined onClick={() => openVideoPopup(add)} />
                                                   </Col>
                                                   <Col span={2}>
-                                                    <VideoCameraAddOutlined onClick={() => openVideoPopup(add)} />
+                                                    <VideoCameraAddOutlined onClick={() => openSessionPopup(add)} />
                                                   </Col>
                                                   <Col span={2}>
-                                                    <MinusCircleOutlined
+                                                    <MinusCircleTwoTone
                                                       twoToneColor="#FF0000"
                                                       onClick={() => remove(name)}
                                                     />
@@ -603,7 +687,7 @@ const CreateCourseModule = ({
                                             )}
                                             <Form.Item>
                                               <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                                Add field
+                                                Add Content
                                               </Button>
                                             </Form.Item>
                                           </>

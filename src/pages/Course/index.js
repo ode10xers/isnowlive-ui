@@ -73,7 +73,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
   const [form] = Form.useForm();
   const history = useHistory();
 
-  const [priceType, setPriceType] = useState(coursePriceTypes.FREE.name);
   const [courseClasses, setCourseClasses] = useState([]);
   const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -400,7 +399,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
       priceType: coursePriceTypes.FREE.name,
       price: 0,
     });
-    setPriceType(coursePriceTypes.FREE.name);
   };
 
   const handleChangeLimitType = (e) => {
@@ -416,7 +414,6 @@ const Course = ({ visible, closeModal, editedCourse = null, isVideoModal = false
           priceType: priceType,
           price: priceType === coursePriceTypes.FREE.name ? 0 : values.price || 10,
         });
-        setPriceType(priceType);
       } else {
         Modal.confirm({
           title: `We need your bank account details to send you the earnings. Please add your bank account details and proceed with creating a paid session`,
