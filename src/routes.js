@@ -79,11 +79,11 @@ const Routes = {
     rootPath: '/attendee/dashboard',
     defaultPath: '/sessions/upcoming',
     sessions: '/sessions/:session_type',
-    sessionsDetails: '/sessions/e/:inventory_id/details',
     passes: '/passes',
     videos: '/videos',
     videoDetails: '/videos/:video_id/:video_order_id',
     courses: '/courses',
+    // TODO: Might want to change this into course order details
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
     referrals: '/referrals',
