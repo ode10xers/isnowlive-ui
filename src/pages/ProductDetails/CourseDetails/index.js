@@ -27,6 +27,7 @@ import {
   paymentSource,
   isUnapprovedUserError,
   preventDefaults,
+  deepCloneObject,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -38,273 +39,6 @@ const { Panel } = Collapse;
 const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
-
-const sampleCourseData = {
-  course_id: 'albuquerque-sera-sera',
-  course_image_url:
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-  course_name: 'Why hello there its a course',
-  creator_username: 'ellianto',
-  course_duration: 10,
-  course_price: 75,
-  course_currency: 'SGD',
-  course_description:
-    '<p>What should we do in case this description is super long? Because the image should not stretch vertically.</p>\n',
-  students_learn: `<p><strong>Lorem Ipsum</strong> <span style="color: rgb(0,0,0);background-color: rgb(255,255,255);font-size: 14px;font-family: Open Sans", Arial, sans-serif;">is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</span></p>`,
-  who_is_this_for: [
-    {
-      heading: 'Not you',
-      description: '<p>This is not for you!</p>',
-    },
-    {
-      heading: 'Not you as well',
-      description: '<p>Keep looking, this aint for you too!</p>',
-    },
-    {
-      heading: 'Especially you',
-      description: '<p>This course is made especially for you and your eyes only!</p>',
-    },
-  ],
-  modules: [
-    {
-      module_id: 'module_1',
-      module_name: 'First Mixed module',
-      contents: [
-        {
-          content_id: 'scooby-dooby-doo',
-          content_name: 'First modules first content',
-          content_type: 'SESSION',
-          content_data: {
-            inventory_id: 3535,
-            start_time: '2021-07-08T07:00:00Z',
-            end_time: '2021-07-08T07:30:00Z',
-            session_date: '2021-07-08',
-            price: 16,
-            currency: 'sgd',
-            max_participants: 10,
-            name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-            description: '<p>Desc</p>\n',
-            session_image_url:
-              'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-            document_urls: [],
-            beginning: '2021-06-18T17:00:00Z',
-            expiry: '2021-07-31T16:59:59Z',
-            prerequisites: '',
-            pay_what_you_want: false,
-            recurring: true,
-            is_refundable: false,
-            refund_before_hours: 0,
-            user_timezone_offset: 420,
-            user_timezone: 'Indochina Time',
-            color_code: '#ff9800',
-            is_course: false,
-            is_offline: true,
-            session_id: 382,
-            group: true,
-            is_active: true,
-            session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-            creator_username: 'ellianto',
-            tags: [],
-            offline_event_address: 'Gobi Dessert is better maybe',
-            total_bookings: 0,
-            total_price: 19.2,
-          },
-        },
-        {
-          content_id: 'yabba-dabba-doo',
-          content_name: 'First modules next content',
-          content_type: 'VIDEO',
-          content_data: {
-            title: 'Create, Upload, Cancel after Fix',
-            description: '<p>Test</p>\n',
-            validity: 1,
-            price: 8,
-            pay_what_you_want: false,
-            currency: 'sgd',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-            external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-            is_published: true,
-            video_url: '',
-            video_uid: '11458eea7ad9e069add75a2fb569df50',
-            duration: 489,
-            status: 'UPLOAD_SUCCESS',
-            watch_limit: 1,
-            creator_username: 'ellianto',
-            is_course: false,
-            tags: [],
-            total_price: 9.6,
-            sessions: [],
-          },
-        },
-      ],
-    },
-    {
-      module_id: 'module_2',
-      module_name: 'Video only module',
-      contents: [
-        {
-          content_id: 'yabba-dabba-doo-bi',
-          content_name: 'First Video Content',
-          content_type: 'VIDEO',
-          content_data: {
-            title: 'Create, Upload, Cancel after Fix',
-            description: '<p>Test</p>\n',
-            validity: 1,
-            price: 8,
-            pay_what_you_want: false,
-            currency: 'sgd',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-            external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-            is_published: true,
-            video_url: '',
-            video_uid: '11458eea7ad9e069add75a2fb569df50',
-            duration: 489,
-            status: 'UPLOAD_SUCCESS',
-            watch_limit: 1,
-            creator_username: 'ellianto',
-            is_course: false,
-            tags: [],
-            total_price: 9.6,
-            sessions: [],
-          },
-        },
-        {
-          content_id: 'yabba-dabba-doo-ba',
-          content_name: 'Next Video Content',
-          content_type: 'VIDEO',
-          content_data: {
-            title: 'Create, Upload, Cancel after Fix',
-            description: '<p>Test</p>\n',
-            validity: 1,
-            price: 8,
-            pay_what_you_want: false,
-            currency: 'sgd',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-            external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-            is_published: true,
-            video_url: '',
-            video_uid: '11458eea7ad9e069add75a2fb569df50',
-            duration: 489,
-            status: 'UPLOAD_SUCCESS',
-            watch_limit: 1,
-            creator_username: 'ellianto',
-            is_course: false,
-            tags: [],
-            total_price: 9.6,
-            sessions: [],
-          },
-        },
-      ],
-    },
-    {
-      module_id: 'module_3',
-      module_name: 'Session only module',
-      contents: [
-        {
-          content_id: 'scooby-dooby-doo-bi',
-          content_name: 'Session modules first content',
-          content_type: 'SESSION',
-          content_data: {
-            inventory_id: 3535,
-            start_time: '2021-07-08T07:00:00Z',
-            end_time: '2021-07-08T07:30:00Z',
-            session_date: '2021-07-08',
-            price: 16,
-            currency: 'sgd',
-            max_participants: 10,
-            name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-            description: '<p>Desc</p>\n',
-            session_image_url:
-              'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-            document_urls: [],
-            beginning: '2021-06-18T17:00:00Z',
-            expiry: '2021-07-31T16:59:59Z',
-            prerequisites: '',
-            pay_what_you_want: false,
-            recurring: true,
-            is_refundable: false,
-            refund_before_hours: 0,
-            user_timezone_offset: 420,
-            user_timezone: 'Indochina Time',
-            color_code: '#ff9800',
-            is_course: false,
-            is_offline: true,
-            session_id: 382,
-            group: true,
-            is_active: true,
-            session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-            creator_username: 'ellianto',
-            tags: [],
-            offline_event_address: 'Gobi Dessert is better maybe',
-            total_bookings: 0,
-            total_price: 19.2,
-          },
-        },
-        {
-          content_id: 'scooby-dooby-doo-ba',
-          content_name: 'Session modules first content',
-          content_type: 'SESSION',
-          content_data: {
-            inventory_id: 3535,
-            start_time: '2021-07-08T07:00:00Z',
-            end_time: '2021-07-08T07:30:00Z',
-            session_date: '2021-07-08',
-            price: 16,
-            currency: 'sgd',
-            max_participants: 10,
-            name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-            description: '<p>Desc</p>\n',
-            session_image_url:
-              'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-            document_urls: [],
-            beginning: '2021-06-18T17:00:00Z',
-            expiry: '2021-07-31T16:59:59Z',
-            prerequisites: '',
-            pay_what_you_want: false,
-            recurring: true,
-            is_refundable: false,
-            refund_before_hours: 0,
-            user_timezone_offset: 420,
-            user_timezone: 'Indochina Time',
-            color_code: '#ff9800',
-            is_course: false,
-            is_offline: true,
-            session_id: 382,
-            group: true,
-            is_active: true,
-            session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-            creator_username: 'ellianto',
-            tags: [],
-            offline_event_address: 'Gobi Dessert is better maybe',
-            total_bookings: 0,
-            total_price: 19.2,
-          },
-        },
-      ],
-    },
-  ],
-  preview_images: [
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-  ],
-  faqs: [
-    {
-      question: 'What does the fox say?',
-      answer: '<p>The quick brown fox</p>\n',
-    },
-    {
-      question: 'Wake me up?',
-      answer: '<p>Wake me up inside</p>\n',
-    },
-    {
-      question: 'Never gonna?',
-      answer: '<p>Give you up</p>\n',
-    },
-  ],
-};
 
 // TODO: Adjust keys here once API is implemented
 const CourseDetails = ({ match }) => {
@@ -338,24 +72,77 @@ const CourseDetails = ({ match }) => {
     }
   }, []);
 
+  const fetchCourseContentDetails = useCallback(async (courseData) => {
+    let tempCourseData = deepCloneObject(courseData);
+
+    if (courseData.modules?.length > 0) {
+      try {
+        tempCourseData.modules = await Promise.all(
+          courseData.modules.map(async (courseModule) => {
+            let tempModuleData = deepCloneObject(courseModule);
+
+            if (courseModule.module_content?.length > 0) {
+              try {
+                tempModuleData.module_content = await Promise.all(
+                  courseModule.module_content.map(async (moduleContent) => {
+                    let productData = null;
+                    let targetAPI = null;
+
+                    if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
+                      targetAPI = apis.videos.getVideoById;
+                    }
+
+                    if (targetAPI) {
+                      try {
+                        const { status, data } = await targetAPI(moduleContent.product_id);
+
+                        if (isAPISuccess(status) && data) {
+                          productData = data;
+                        }
+                      } catch (error) {
+                        console.error('Failed fetching product details for content');
+                        console.error(error);
+                      }
+                    }
+
+                    return {
+                      ...moduleContent,
+                      product_data: productData,
+                    };
+                  })
+                );
+              } catch (error) {
+                console.error('Failed fetching course content details');
+                console.error(error);
+              }
+            }
+
+            return tempModuleData;
+          })
+        );
+      } catch (error) {
+        console.error('Failed fetching course module details');
+        console.error(error);
+      }
+    }
+
+    setCourse(tempCourseData);
+  }, []);
+
   const getCourseDetails = useCallback(
     async (courseId) => {
       setIsLoading(true);
 
       try {
-        // TODO: Implement API Here when ready
-        // const { status, data } = await apis.courses.getDetails(courseId);
-        const { status, data } = {
-          status: 200,
-          data: sampleCourseData,
-        };
+        const { status, data } = await apis.courses.getDetails(courseId);
 
         if (isAPISuccess(status) && data) {
-          setCourse(data);
-          setExpandedCourseModules(data.modules.map((courseModule) => courseModule.module_id));
+          setExpandedCourseModules(data.modules.map((courseModule) => courseModule.name));
           if (data.creator_username) {
             getCreatorProfileDetails(data.creator_username);
           }
+
+          await fetchCourseContentDetails(data);
         }
       } catch (error) {
         console.error(error);
@@ -364,7 +151,7 @@ const CourseDetails = ({ match }) => {
 
       setIsLoading(false);
     },
-    [getCreatorProfileDetails]
+    [fetchCourseContentDetails, getCreatorProfileDetails]
   );
 
   useEffect(() => {
@@ -383,14 +170,6 @@ const CourseDetails = ({ match }) => {
 
     let desc = [];
 
-    // if (selectedCourse.inventory_ids?.length > 0) {
-    //   desc.push(`${selectedCourse.inventory_ids.length} Sessions`);
-    // }
-
-    // if (selectedCourse.videos?.length > 0) {
-    //   desc.push(`${selectedCourse.videos.length} Videos`);
-    // }
-
     const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
     const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
 
@@ -403,22 +182,18 @@ const CourseDetails = ({ match }) => {
     }
 
     let paymentPopupData = {
-      productId: course.course_id,
+      productId: course.id,
       productType: productType.COURSE,
       itemList: [
         {
-          name: course.course_name,
+          name: course.name,
           description: desc.join(', '),
-          currency: course.course_currency,
-          price: course.course_price,
+          currency: course.currency,
+          price: course.price,
         },
       ],
     };
 
-    console.log(paymentPopupData);
-    return;
-
-    // eslint-disable-next-line
     showPaymentPopup(paymentPopupData, buySingleCourse);
   };
 
@@ -432,9 +207,9 @@ const CourseDetails = ({ match }) => {
 
     try {
       const { status, data } = await apis.courses.createOrderForUser({
-        course_id: course.course_id,
-        price: course.course_price,
-        currency: course.course_currency?.toLowerCase(),
+        course_id: course.id,
+        price: course.price,
+        currency: course.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
         payment_source: paymentSource.GATEWAY,
@@ -536,7 +311,7 @@ const CourseDetails = ({ match }) => {
         {renderCourseInfoItem({
           icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
           title: 'Course duration',
-          content: `${course?.course_duration} days`,
+          content: `${course?.validity} days`,
         })}
       </Row>
     );
@@ -556,27 +331,29 @@ const CourseDetails = ({ match }) => {
     </Row>
   );
 
-  const renderExtraContent = (content) =>
-    content.content_type === 'SESSION' ? 'Live session' : `${Math.floor(content.content_data.duration / 60)} mins`;
-
-  const renderContentIcon = (content) =>
-    content.content_type === 'SESSION' ? (
+  const renderContentIcon = (productType) =>
+    productType.toUpperCase() === 'SESSION' ? (
       <VideoCameraOutlined className={styles.blueText} />
     ) : (
       <PlayCircleOutlined className={styles.blueText} />
     );
 
   const renderModuleContents = (content) => (
-    <List.Item key={content.content_id}>
+    <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
         <Col xs={14} md={18}>
           <Space className={styles.w100}>
-            {renderContentIcon(content)}
-            <Text strong> {content.content_name} </Text>
+            {renderContentIcon(content.product_type)}
+            <Text strong> {content.name} </Text>
           </Space>
         </Col>
         <Col xs={10} md={6} className={styles.textAlignRight}>
-          <Text type="secondary"> {renderExtraContent(content)} </Text>
+          <Text type="secondary">
+            {' '}
+            {content.product_type?.toUpperCase() === 'SESSION'
+              ? 'Live session'
+              : `${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
+          </Text>
         </Col>
       </Row>
     </List.Item>
@@ -584,14 +361,11 @@ const CourseDetails = ({ match }) => {
 
   const renderCourseCurriculums = (courseModules = []) => {
     return courseModules.map((courseModule) => (
-      <Panel
-        key={courseModule.module_id}
-        header={<Text className={styles.moduleHeader}> {courseModule.module_name} </Text>}
-      >
+      <Panel key={courseModule.name} header={<Text className={styles.moduleHeader}> {courseModule.name} </Text>}>
         <List
           size={isMobileDevice ? 'small' : 'large'}
           rowKey={(record) => record.content_id}
-          dataSource={courseModule?.contents}
+          dataSource={courseModule?.module_content}
           renderItem={renderModuleContents}
         />
       </Panel>
@@ -658,19 +432,17 @@ const CourseDetails = ({ match }) => {
                   <div className={styles.courseBuyContainer}>
                     <Space direction="vertical" className={styles.courseBuyDetails}>
                       <Title level={3} className={styles.courseName}>
-                        {course?.course_name}
+                        {course?.name}
                       </Title>
-                      <div className={styles.courseDesc}>{ReactHtmlParser(course?.course_description)}</div>
+                      <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
                       <Button
                         size="large"
                         type="primary"
                         className={styles.courseBuyBtn}
                         onClick={handleCourseBuyClicked}
                       >
-                        {course?.course_price > 0 ? 'Buy' : 'Get'} course for{' '}
-                        {course?.course_price > 0
-                          ? `${course?.course_currency?.toUpperCase()} ${course?.course_price}`
-                          : 'Free'}
+                        {course?.price > 0 ? 'Buy' : 'Get'} course for{' '}
+                        {course?.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}
                       </Button>
                     </Space>
                   </div>
@@ -687,11 +459,10 @@ const CourseDetails = ({ match }) => {
             <Row gutter={[8, 30]}>
               <Col xs={24}>
                 {/* What you'll learn */}
-                {generateLongDescriptionTemplate(`What you'll learn`, course?.students_learn)}
+                {generateLongDescriptionTemplate(`What you'll learn`, course?.summary)}
               </Col>
               <Col xs={24}>
                 {/* Who is this course for */}
-                {/* {generateLongDescriptionTemplate('Who is this course for?', course?.who_is_this_for)} */}
                 <Row gutter={[8, 20]} justify="center">
                   <Col xs={24}>
                     <Title level={3} className={styles.longDescriptionTitle}>
@@ -701,8 +472,8 @@ const CourseDetails = ({ match }) => {
                   </Col>
                   <Col xs={24}>
                     <Row gutter={[12, 12]} justify="center" className={styles.personaContainer}>
-                      {course?.who_is_this_for?.length > 0 &&
-                        course?.who_is_this_for.map((persona) => (
+                      {course?.topic?.length > 0 &&
+                        course?.topic.map((persona) => (
                           <Col xs={24} md={8} key={persona.heading}>
                             <div className={styles.personaItemWrapper}>
                               <Space direction="vertical" size="large" className={styles.personaItem}>
@@ -762,7 +533,7 @@ const CourseDetails = ({ match }) => {
             </Title>
             {/* Preview Images */}
             <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
-              {renderImagePreviews(course?.preview_images)}
+              {renderImagePreviews(course?.preview_image_url)}
             </Carousel>
           </Col>
           <Col xs={24} className={styles.courseFAQSection}>
