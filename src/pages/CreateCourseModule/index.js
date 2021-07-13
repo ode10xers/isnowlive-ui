@@ -149,7 +149,6 @@ const CreateCourseModule = ({ match, history }) => {
         if (isAPISuccess(status) && data) {
           setCourseDetails(data);
 
-          // TODO: Also set other fields here
           form.setFieldsValue({
             modules: data.modules ?? [],
             curriculumType: data?.type ?? courseCurriculumTypes.MIXED.name,
@@ -213,24 +212,7 @@ const CreateCourseModule = ({ match, history }) => {
 
   const handleCourseCurriculumTypeChange = (e) => {
     const curriculumType = e.target.value;
-
     setCourseCurriculumType(curriculumType);
-
-    // TODO: Adjust form logics here if required
-    // switch (curriculumType) {
-    //   case courseCurriculumTypes.LIVE.name:
-
-    //     break;
-    //   case courseCurriculumTypes.VIDEO.name:
-
-    //     break;
-    //   case courseCurriculumTypes.MIXED.name:
-
-    //     break;
-
-    //   default:
-    //     break;
-    // }
   };
 
   const handleStartDateChange = (date) => {
@@ -264,13 +246,12 @@ const CreateCourseModule = ({ match, history }) => {
       setTimeout(() => redirectToCourseSectionDashboard(), 2000);
     }
 
-    // TODO: Match these with the actual form names and value/states
     const modifiedFields = {
       modules: values.modules,
-      type: 'MIXED',
-      max_participants: values.max_participants ?? 0,
-      start_date: moment().startOf('day').utc().format(),
-      end_date: moment().endOf('day').utc().format(),
+      type: courseCurriculumType ?? values.curriculumType ?? courseCurriculumTypes.MIXED.name,
+      max_participants: values.maxParticipants ?? 1,
+      start_date: moment(courseStartDate).startOf('day').utc().format(),
+      end_date: moment(courseEndDate).endOf('day').utc().format(),
       validity: values.validity ?? 1,
     };
 
