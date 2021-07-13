@@ -14,8 +14,9 @@ import {
   Modal,
   Radio,
   PageHeader,
+  Image,
 } from 'antd';
-import { TagOutlined, InfoCircleOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { TagOutlined, InfoCircleOutlined, PlusOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -43,7 +44,6 @@ const coursePriceTypes = {
   },
 };
 
-// TODO: Match these keys with the form item names
 const formInitialValues = {
   courseImageUrl: '',
   courseName: '',
@@ -75,10 +75,11 @@ const Course = ({ match, history }) => {
 
   const courseId = match.params.course_id;
 
-  const [currency, setCurrency] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [currency, setCurrency] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState(null);
+  const [previewImageUrls, setPreviewImageUrls] = useState([]);
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [coursePriceType, setCoursePriceType] = useState(coursePriceTypes.FREE.name);
 
@@ -129,12 +130,65 @@ const Course = ({ match, history }) => {
     setIsLoading(false);
   }, []);
 
+  const fetchCourseDetails = useCallback(
+    async (courseExternalId) => {
+      setIsLoading(true);
+
+      try {
+        const { status, data } = await apis.courses.getCreatorCourseDetailsById(courseExternalId);
+
+        if (isAPISuccess(status) && data) {
+          setCourseDetails(data);
+          form.setFieldsValue({
+            courseImageUrl: data.course_image_url,
+            courseName: data.name,
+            courseDescription: data.description,
+            summary: data.summary,
+            topic: data.topic,
+            faqs: data.faqs,
+            priceType: data.price === 0 ? coursePriceTypes.FREE.name : coursePriceTypes.PAID.name,
+            price: data.price,
+            courseTagType: data.tag?.length > 0 ? 'selected' : 'anyone',
+            selectedMemberTags: data.tag?.map((tagData) => tagData.external_id),
+          });
+
+          if (data.currency) {
+            setCurrency(data.currency);
+          }
+
+          setCourseImageUrl(data.course_image_url);
+          setPreviewImageUrls(data.preview_image_url);
+          setSelectedTagType(data.tag?.length > 0 ? 'selected' : 'anyone');
+          setCoursePriceType(data.price === 0 ? coursePriceTypes.FREE.name : coursePriceTypes.PAID.name);
+        } else {
+          form.resetFields();
+        }
+      } catch (error) {
+        console.error(error);
+        showErrorModal('Failed fetching course details', error?.response?.data?.message || 'Something went wrong.');
+      }
+
+      setIsLoading(false);
+    },
+    [form]
+  );
+
   useEffect(() => {
     fetchCreatorMemberTags();
     getCreatorCurrencyDetails();
-  }, [fetchCreatorMemberTags, getCreatorCurrencyDetails]);
 
-  // TODO: Implement State initialization and Edit Flow here
+    if (courseId) {
+      fetchCourseDetails();
+    }
+  }, [fetchCreatorMemberTags, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
+
+  const handleAddPreviewImageUrl = (newPreviewImageUrl) => {
+    setPreviewImageUrls((imageUrls) => [...imageUrls, newPreviewImageUrl]);
+  };
+
+  const removePreviewImageUrl = (targetImageUrl) => {
+    setPreviewImageUrls(previewImageUrls.filter((imageUrl) => imageUrl !== targetImageUrl));
+  };
 
   const handleCourseImageUpload = (imageUrl) => {
     setCourseImageUrl(imageUrl);
@@ -205,6 +259,37 @@ const Course = ({ match, history }) => {
   const handleFinish = async (values) => {
     setSubmitting(true);
 
+    // NOTE : The values below are hard coded for now because they should be changed in the next page
+
+    const dummyModuleData = [
+      {
+        name: 'Enter your course module name example - Introduction to Hatha Yoga',
+        module_content: [
+          {
+            name: 'Select your first live session or video by clicking on the buttons on the right',
+            product_type: '',
+            product_id: '',
+          },
+        ],
+      },
+    ];
+
+    const modulesData = courseDetails
+      ? {
+          modules: courseDetails?.modules ?? dummyModuleData,
+          type: courseDetails?.type ?? 'MIXED',
+          max_participants: courseDetails?.max_participants ?? 0,
+          start_date: courseDetails?.start_date ?? moment().startOf('day').utc().format(),
+          end_date: courseDetails?.end_date ?? moment().endOf('day').utc().format(),
+        }
+      : {
+          modules: dummyModuleData,
+          type: 'MIXED',
+          max_participants: 20,
+          start_date: moment().startOf('day').utc().format(),
+          end_date: moment().endOf('day').utc().format(),
+        };
+
     const payload = {
       name: values.courseName,
       course_image_url: courseImageUrl || values.courseImageUrl,
@@ -215,14 +300,8 @@ const Course = ({ match, history }) => {
       price: currency ? values.price ?? 1 : 0,
       currency: currency?.toLowerCase() || '',
       tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
-      // TODO: Implement Multiple Image Upload later
-      preview_image_url: [],
-      // NOTE : The values below are hard coded for now because they should be changed in the next page
-      modules: [],
-      type: 'MIXED',
-      max_participants: 20,
-      start_date: moment().startOf('day').utc().format(),
-      end_date: moment().endOf('day').utc().format(),
+      preview_image_url: previewImageUrls ?? [],
+      ...modulesData,
     };
 
     try {
@@ -308,7 +387,6 @@ const Course = ({ match, history }) => {
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
-                  className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   label="Course Description"
                   name="description"
                   id="description"
@@ -320,17 +398,49 @@ const Course = ({ match, history }) => {
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
-                  className={classNames(styles.bgWhite, styles.textEditorLayout)}
                   id="summary"
                   name="summary"
                   label="What will students learn"
                   rules={validationRules.requiredValidation}
                 >
-                  {/* <TextEditor name="summary" form={form} placeholder="  Describe what will the students learn from this course" /> */}
                   <TextArea
                     placeholder="Describe what will the students learn from this course"
                     className={styles.textAreaInput}
                   />
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item {...courseCreatePageLayout} label="Preview Images">
+                  <Row gutter={[10, 10]}>
+                    <Col xs={12} md={8} lg={6}>
+                      <div className={styles.previewImageUploaderContainer}>
+                        <ImageUpload
+                          className={styles.previewImageUploader}
+                          aspect={1}
+                          label="Click to upload"
+                          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                          onChange={handleAddPreviewImageUrl}
+                        />
+                      </div>
+                    </Col>
+                    {previewImageUrls?.length > 0 &&
+                      previewImageUrls.map((previewUrl) => (
+                        <Col xs={12} md={8} lg={6}>
+                          <div className={styles.previewImageContainer}>
+                            <div className={styles.previewImageButtonContainer}>
+                              <Button
+                                danger
+                                ghost
+                                type="primary"
+                                icon={<CloseOutlined />}
+                                onClick={() => removePreviewImageUrl(previewUrl)}
+                              />
+                            </div>
+                            <Image preview={false} src={previewUrl} className={styles.previewImage} />
+                          </div>
+                        </Col>
+                      ))}
+                  </Row>
                 </Form.Item>
               </Col>
             </Row>
@@ -361,14 +471,18 @@ const Course = ({ match, history }) => {
                               <Input
                                 placeholder="Enter heading (max. 50 characters)"
                                 maxLength={50}
-                                suffix={
-                                  fields.length > 0 ? (
-                                    <Tooltip title="Remove this item">
-                                      <MinusCircleOutlined className={styles.redText} onClick={() => remove(name)} />
-                                    </Tooltip>
-                                  ) : null
-                                }
+                                className={styles.inputWithButton}
                               />
+                              {fields.length > 0 ? (
+                                <span className="ant-form-text">
+                                  <Tooltip title="Remove this item">
+                                    <DeleteOutlined
+                                      className={styles.deleteItemIconButton}
+                                      onClick={() => remove(name)}
+                                    />
+                                  </Tooltip>
+                                </span>
+                              ) : null}
                             </Form.Item>
                           </Col>
                           <Col xs={24}>
@@ -380,9 +494,7 @@ const Course = ({ match, history }) => {
                               name={[name, 'description']}
                               fieldKey={[fieldKey, 'description']}
                               rules={validationRules.requiredValidation}
-                              className={classNames(styles.bgWhite, styles.textEditorLayout)}
                             >
-                              {/* <TextEditor name={[name, 'description']} form={form} placeholder="  Describe who is this course for" /> */}
                               <TextArea
                                 className={styles.textAreaInput}
                                 placeholder="Describe who is this course for"
@@ -393,7 +505,7 @@ const Course = ({ match, history }) => {
                       ))}
                       {fields.length < 3 && (
                         <Row>
-                          <Col xs={24} md={{ span: 8, offset: 8 }}>
+                          <Col xs={24} md={{ span: 6, offset: 8 }}>
                             <Button block size="large" type="primary" onClick={() => add()} icon={<PlusOutlined />}>
                               Add More Item
                             </Button>
@@ -429,7 +541,21 @@ const Course = ({ match, history }) => {
                               fieldKey={[fieldKey, 'question']}
                               rules={validationRules.requiredValidation}
                             >
-                              <Input placeholder="Enter Question" maxLength={50} />
+                              <Input
+                                placeholder="Enter the question (max. 50 characters)"
+                                maxLength={50}
+                                className={styles.inputWithButton}
+                              />
+                              {fields.length > 0 ? (
+                                <span className="ant-form-text">
+                                  <Tooltip title="Remove this item">
+                                    <DeleteOutlined
+                                      className={styles.deleteItemIconButton}
+                                      onClick={() => remove(name)}
+                                    />
+                                  </Tooltip>
+                                </span>
+                              ) : null}
                             </Form.Item>
                           </Col>
                           <Col xs={24}>
@@ -441,29 +567,24 @@ const Course = ({ match, history }) => {
                               name={[name, 'answer']}
                               fieldKey={[fieldKey, 'answer']}
                               rules={validationRules.requiredValidation}
-                              className={classNames(styles.bgWhite, styles.textEditorLayout)}
                             >
-                              {/* <TextEditor name={[name, 'answer']} form={form} placeholder="  Describe answer to the question" /> */}
                               <TextArea
                                 className={styles.textAreaInput}
                                 placeholder="Describe the answer to the question above"
                               />
                             </Form.Item>
                           </Col>
-                          <Col span={16} offset={8}>
-                            <Form.Item>
-                              <Button type="danger" onClick={() => remove(name)}>
-                                Remove
-                              </Button>
-                            </Form.Item>
-                          </Col>
                         </Row>
                       ))}
-                      <Form.Item>
-                        <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                          Add New FAQ
-                        </Button>
-                      </Form.Item>
+                      {fields.length < 3 && (
+                        <Row>
+                          <Col xs={24} md={{ span: 6, offset: 8 }}>
+                            <Button block size="large" type="primary" onClick={() => add()} icon={<PlusOutlined />}>
+                              Add FAQs
+                            </Button>
+                          </Col>
+                        </Row>
+                      )}
                     </>
                   )}
                 </Form.List>
@@ -572,12 +693,12 @@ const Course = ({ match, history }) => {
           {/* CTA Buttons */}
           <Col xs={24}>
             <Row justify="end" align="center" gutter={[8, 8]}>
-              <Col xs={12} md={8}>
+              <Col xs={12} md={8} lg={6}>
                 <Button block type="default" htmlType="submit" loading={submitting}>
                   Create Course
                 </Button>
               </Col>
-              <Col xs={12} md={6}>
+              <Col xs={12} md={6} lg={6}>
                 <Button block type="primary" onClick={() => gotoModulePage()} loading={submitting}>
                   Add Modules
                 </Button>

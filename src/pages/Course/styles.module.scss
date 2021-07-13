@@ -13,6 +13,50 @@
   }
 }
 
+.inputWithButton {
+  width: 95% !important;
+  margin-right: 10px !important;
+  display: inline-block;
+}
+
+.deleteItemIconButton {
+  @extend .redText;
+  font-size: 20px;
+  margin: 0 auto;
+}
+
+.previewImageUploaderContainer {
+  width: 100%;
+
+  // adjust this
+  .previewImageUploader {
+    width: 100%;
+    :global {
+      div.ant-upload {
+        width: 100% !important;
+        min-height: 200px !important;
+        
+      }  
+    }
+  }
+}
+
+.previewImageContainer {
+  position: relative;
+
+  .previewImageButtonContainer {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 10;
+  }
+
+  .previewImage {
+    width: 100%;
+    object-fit: scale-down;
+  }
+}
+
 .textAreaInput {
   min-height: 200px !important;
 }
