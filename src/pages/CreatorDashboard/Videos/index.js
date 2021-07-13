@@ -25,9 +25,9 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import UploadVideoModal from 'components/UploadVideoModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import dateUtil from 'utils/date';
 import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';

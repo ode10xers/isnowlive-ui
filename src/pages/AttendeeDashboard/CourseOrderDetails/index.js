@@ -1,22 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 
-import {
-  Row,
-  Col,
-  Image,
-  Collapse,
-  Button,
-  Divider,
-  List,
-  Typography,
-  Spin,
-  Popover,
-  Space,
-  Card,
-  // Progress,
-  Tag,
-} from 'antd';
+import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Popover, Space, Card, Tag } from 'antd';
 import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -31,7 +16,6 @@ import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/
 
 import styles from './style.module.scss';
 
-// TODO: Confirm what to do with the Progress
 const sampleOrderData = {
   course_id: 'albuquerque-sera-sera',
   course_order_id: 'ad-astra-abyssosque',
@@ -320,7 +304,7 @@ const CourseOrderDetails = ({ match, history }) => {
     const videoCount = getCourseVideoContentCount(courseOrder.modules);
 
     return (
-      <Space size="small" split={<Divider type="vertical" />}>
+      <Space split={<Divider type="vertical" />}>
         {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
         {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
       </Space>
