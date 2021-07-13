@@ -1,7 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 
-import { Row, Col, Button, Form, Typography, Modal, Collapse, Tooltip, Input, Image, PageHeader, Space } from 'antd';
+import {
+  Row,
+  Col,
+  Button,
+  Form,
+  Typography,
+  Modal,
+  Collapse,
+  Tooltip,
+  Input,
+  InputNumber,
+  Image,
+  PageHeader,
+  Space,
+  Radio,
+  DatePicker,
+} from 'antd';
 import {
   PlusOutlined,
   PlayCircleOutlined,
@@ -18,12 +34,15 @@ import Loader from 'components/Loader';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 
+import { courseCreatePageLayout } from 'layouts/FormLayouts';
+
 import styles from './styles.module.scss';
 
-const courseTypes = {
+const courseCurriculumTypes = {
   LIVE: {
     name: 'LIVE',
     label: 'Live sessions only',
@@ -51,15 +70,19 @@ const formInitialValues = {
       ],
     },
   ],
-  type: 'MIXED',
-  max_participants: 2,
-  start_date: moment().startOf('day').utc().format(),
-  end_date: moment().endOf('day').utc().format(),
+  curriculumType: courseCurriculumTypes.MIXED.name,
+  max_participants: 1,
   validity: 1,
+  start_date: moment(),
+  end_date: moment().add(1, 'day'),
 };
 
 const { Panel } = Collapse;
 const { Text, Title } = Typography;
+
+const {
+  timeCalculation: { dateIsBeforeDate },
+} = dateUtil;
 
 const CreateCourseModule = ({ match, history }) => {
   const [form] = Form.useForm();
@@ -76,8 +99,12 @@ const CreateCourseModule = ({ match, history }) => {
   const [addVideoContentMethod, setAddVideoContentMethod] = useState(null);
   const [addSessionContentMethod, setAddSessionContentMethod] = useState(null);
 
+  // TODO: Implement auto expand on form errors like in Other Links
   const [courseDetails, setCourseDetails] = useState(null);
   const [expandedModulesKeys, setExpandedModulesKeys] = useState([]);
+  const [courseCurriculumType, setCourseCurriculumType] = useState(courseCurriculumTypes.MIXED.name);
+  const [courseStartDate, setCourseStartDate] = useState(moment());
+  const [courseEndDate, setCourseEndDate] = useState(moment().add(1, 'day'));
 
   const redirectToCourseSectionDashboard = useCallback(
     () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses),
@@ -124,7 +151,12 @@ const CreateCourseModule = ({ match, history }) => {
 
           // TODO: Also set other fields here
           form.setFieldsValue({
-            modules: data.modules,
+            modules: data.modules ?? [],
+            curriculumType: data?.type ?? courseCurriculumTypes.MIXED.name,
+            courseStartDate: data?.start_date ? moment(data?.start_date) : moment(),
+            courseEndDate: data?.end_date ? moment(data?.end_date) : moment().add(1, 'day'),
+            maxParticipants: data?.max_participants ?? 1,
+            validity: data?.validity ?? 1,
           });
         } else {
           form.resetFields();
@@ -177,6 +209,51 @@ const CreateCourseModule = ({ match, history }) => {
     if (addVideoContentMethod) {
       addVideoContentMethod(data);
     }
+  };
+
+  const handleCourseCurriculumTypeChange = (e) => {
+    const curriculumType = e.target.value;
+
+    setCourseCurriculumType(curriculumType);
+
+    // TODO: Adjust form logics here if required
+    // switch (curriculumType) {
+    //   case courseCurriculumTypes.LIVE.name:
+
+    //     break;
+    //   case courseCurriculumTypes.VIDEO.name:
+
+    //     break;
+    //   case courseCurriculumTypes.MIXED.name:
+
+    //     break;
+
+    //   default:
+    //     break;
+    // }
+  };
+
+  const handleStartDateChange = (date) => {
+    setCourseStartDate(date);
+
+    if (!date || (courseEndDate && dateIsBeforeDate(courseEndDate, date))) {
+      setCourseEndDate(null);
+      form.setFieldsValue({ ...form.getFieldsValue(), courseEndDate: undefined });
+    }
+  };
+
+  const disabledStartDates = (currentDate) => {
+    return dateIsBeforeDate(currentDate, moment().startOf('day'));
+  };
+
+  const handleEndDateChange = (date) => {
+    if (dateIsBeforeDate(courseStartDate, date)) {
+      setCourseEndDate(date);
+    }
+  };
+
+  const disabledEndDates = (currentDate) => {
+    return dateIsBeforeDate(currentDate, moment().startOf('day')) || dateIsBeforeDate(currentDate, courseStartDate);
   };
 
   const handleFinish = async (values) => {
@@ -319,6 +396,9 @@ const CreateCourseModule = ({ match, history }) => {
     </Modal>
   );
 
+  const isSessionsOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.LIVE.name;
+  const isVideosOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.VIDEO.name;
+
   return (
     <>
       {sessionPopup}
@@ -340,6 +420,105 @@ const CreateCourseModule = ({ match, history }) => {
                   onBack={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses)}
                 />
               </Col>
+              {/* Course Module Informations */}
+              <Col xs={24}>
+                <Row>
+                  <Col xs={24}>
+                    <Form.Item
+                      {...courseCreatePageLayout}
+                      id="curriculumType"
+                      name="curriculumType"
+                      label="What would you like to offer in this course?"
+                      rules={validationRules.requiredValidation}
+                      onChange={handleCourseCurriculumTypeChange}
+                    >
+                      <Radio.Group>
+                        {Object.entries(courseCurriculumTypes).map(([key, val]) => (
+                          <Radio value={val.name}> {val.label} </Radio>
+                        ))}
+                      </Radio.Group>
+                    </Form.Item>
+                  </Col>
+                  {/* Start and end date fields */}
+                  <Col xs={isVideosOnlyCourse() ? 0 : 24}>
+                    <Form.Item
+                      {...courseCreatePageLayout}
+                      label="Course Duration"
+                      required={true}
+                      hidden={isVideosOnlyCourse()}
+                    >
+                      <Row gutter={8}>
+                        <Col xs={12}>
+                          <Form.Item
+                            id="courseStartDate"
+                            name="courseStartDate"
+                            rules={isVideosOnlyCourse() ? [] : validationRules.requiredValidation}
+                            noStyle
+                          >
+                            <DatePicker
+                              placeholder="Select Start Date"
+                              onChange={handleStartDateChange}
+                              disabledDate={disabledStartDates}
+                              className={styles.datePicker}
+                            />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={12}>
+                          <Form.Item
+                            id="courseEndDate"
+                            name="courseEndDate"
+                            rules={isVideosOnlyCourse() ? [] : validationRules.requiredValidation}
+                            noStyle
+                          >
+                            <DatePicker
+                              placeholder="Select End Date"
+                              disabled={!Boolean(courseStartDate)}
+                              onChange={handleEndDateChange}
+                              disabledDate={disabledEndDates}
+                              className={styles.datePicker}
+                            />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Form.Item>
+                  </Col>
+                  {/* Max Participants */}
+                  <Col xs={isVideosOnlyCourse() ? 0 : 24}>
+                    <Form.Item
+                      {...courseCreatePageLayout}
+                      hidden={isVideosOnlyCourse()}
+                      id="maxParticipants"
+                      name="maxParticipants"
+                      label="Max Participants"
+                      rules={
+                        isVideosOnlyCourse()
+                          ? []
+                          : validationRules.numberValidation('Please input course max participants', 1)
+                      }
+                    >
+                      <InputNumber placeholder="Course Max Participants" min={1} className={styles.numericInput} />
+                    </Form.Item>
+                  </Col>
+                  {/* Validity Field */}
+                  <Col xs={isSessionsOnlyCourse() ? 0 : 24}>
+                    <Form.Item
+                      {...courseCreatePageLayout}
+                      hidden={isSessionsOnlyCourse()}
+                      id="videoValidity"
+                      name="validity"
+                      label="Validity"
+                      rules={
+                        isSessionsOnlyCourse()
+                          ? []
+                          : validationRules.numberValidation('Please input course videos validity', 1)
+                      }
+                    >
+                      <InputNumber placeholder="Course Videos Validity" min={1} className={styles.numericInput} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Col>
+              {/* Course Modules */}
               <Col xs={24}>
                 <div className={styles.courseFormListContainer}>
                   <Form.List name="modules" rules={validationRules.courseModulesValidation}>
