@@ -47,7 +47,7 @@ const coursePriceTypes = {
 const formInitialValues = {
   courseImageUrl: '',
   courseName: '',
-  courseDescription: '',
+  description: '',
   summary: '',
   topic: [
     {
@@ -142,7 +142,7 @@ const Course = ({ match, history }) => {
           form.setFieldsValue({
             courseImageUrl: data.course_image_url,
             courseName: data.name,
-            courseDescription: data.description,
+            description: data.description,
             summary: data.summary,
             topic: data.topic,
             faqs: data.faqs,
@@ -178,7 +178,7 @@ const Course = ({ match, history }) => {
     getCreatorCurrencyDetails();
 
     if (courseId) {
-      fetchCourseDetails();
+      fetchCourseDetails(courseId);
     }
   }, [fetchCreatorMemberTags, getCreatorCurrencyDetails, fetchCourseDetails, courseId]);
 
@@ -260,7 +260,6 @@ const Course = ({ match, history }) => {
     setSubmitting(true);
 
     // NOTE : The values below are hard coded for now because they should be changed in the next page
-
     const dummyModuleData = [
       {
         name: 'Enter your course module name example - Introduction to Hatha Yoga',
@@ -281,6 +280,7 @@ const Course = ({ match, history }) => {
           max_participants: courseDetails?.max_participants ?? 0,
           start_date: courseDetails?.start_date ?? moment().startOf('day').utc().format(),
           end_date: courseDetails?.end_date ?? moment().endOf('day').utc().format(),
+          validity: courseDetails?.validity ?? 1,
         }
       : {
           modules: dummyModuleData,
@@ -288,6 +288,7 @@ const Course = ({ match, history }) => {
           max_participants: 20,
           start_date: moment().startOf('day').utc().format(),
           end_date: moment().endOf('day').utc().format(),
+          validity: 1,
         };
 
     const payload = {
@@ -305,27 +306,34 @@ const Course = ({ match, history }) => {
     };
 
     try {
-      const { status } = courseId
+      const { status, data } = courseId
         ? await apis.courses.updateCourse(courseId, payload)
         : await apis.courses.createCourse(payload);
 
       if (isAPISuccess(status)) {
+        setSubmitting(false);
         showSuccessModal(`${payload.name} successfully ${courseId ? 'updated' : 'created'}`);
+        if (courseId) {
+          return courseId;
+        } else if (data?.id) {
+          return data?.id;
+        }
       }
     } catch (error) {
+      setSubmitting(false);
       console.error(error);
       showErrorModal(
         `Failed to ${courseId ? 'update' : 'create'} course`,
         error?.response?.data?.message || 'Something went wrong.'
       );
     }
-
-    setSubmitting(false);
   };
 
   const gotoModulePage = async () => {
-    await handleFinish(form.getFieldsValue());
-    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourseModule);
+    const courseExternalId = await handleFinish(form.getFieldsValue());
+    if (courseExternalId) {
+      history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
+    }
   };
 
   return (
@@ -425,7 +433,7 @@ const Course = ({ match, history }) => {
                     </Col>
                     {previewImageUrls?.length > 0 &&
                       previewImageUrls.map((previewUrl) => (
-                        <Col xs={12} md={8} lg={6}>
+                        <Col xs={12} md={8} lg={6} key={previewUrl}>
                           <div className={styles.previewImageContainer}>
                             <div className={styles.previewImageButtonContainer}>
                               <Button
@@ -459,21 +467,22 @@ const Course = ({ match, history }) => {
                       {fields.map(({ key, name, fieldKey, ...restField }) => (
                         <Row key={key}>
                           <Col xs={24}>
-                            <Form.Item
-                              {...restField}
-                              {...courseCreatePageLayout}
-                              id="heading"
-                              label="Heading"
-                              name={[name, 'heading']}
-                              fieldKey={[fieldKey, 'heading']}
-                              rules={validationRules.requiredValidation}
-                            >
-                              <Input
-                                placeholder="Enter heading (max. 50 characters)"
-                                maxLength={50}
-                                className={styles.inputWithButton}
-                              />
-                              {fields.length > 0 ? (
+                            <Form.Item {...courseCreatePageLayout} label="Heading" required={true}>
+                              <Form.Item
+                                {...restField}
+                                id="heading"
+                                name={[name, 'heading']}
+                                fieldKey={[fieldKey, 'heading']}
+                                rules={validationRules.requiredValidation}
+                                noStyle
+                              >
+                                <Input
+                                  placeholder="Enter heading (max. 50 characters)"
+                                  maxLength={50}
+                                  className={styles.inputWithButton}
+                                />
+                              </Form.Item>
+                              {fields.length > 1 ? (
                                 <span className="ant-form-text">
                                   <Tooltip title="Remove this item">
                                     <DeleteOutlined
@@ -532,21 +541,22 @@ const Course = ({ match, history }) => {
                       {fields.map(({ key, name, fieldKey, ...restField }) => (
                         <Row key={key}>
                           <Col xs={24}>
-                            <Form.Item
-                              {...restField}
-                              {...courseCreatePageLayout}
-                              id="question"
-                              label="Question"
-                              name={[name, 'question']}
-                              fieldKey={[fieldKey, 'question']}
-                              rules={validationRules.requiredValidation}
-                            >
-                              <Input
-                                placeholder="Enter the question (max. 50 characters)"
-                                maxLength={50}
-                                className={styles.inputWithButton}
-                              />
-                              {fields.length > 0 ? (
+                            <Form.Item {...courseCreatePageLayout} label="Question" required={true}>
+                              <Form.Item
+                                {...restField}
+                                id="question"
+                                name={[name, 'question']}
+                                fieldKey={[fieldKey, 'question']}
+                                rules={validationRules.requiredValidation}
+                                noStyle
+                              >
+                                <Input
+                                  placeholder="Enter the question (max. 50 characters)"
+                                  maxLength={50}
+                                  className={styles.inputWithButton}
+                                />
+                              </Form.Item>
+                              {fields.length > 1 ? (
                                 <span className="ant-form-text">
                                   <Tooltip title="Remove this item">
                                     <DeleteOutlined
@@ -619,19 +629,20 @@ const Course = ({ match, history }) => {
                   </Col>
                   {coursePriceType === coursePriceTypes.PAID.name && (
                     <Col xs={24}>
-                      <Form.Item
-                        {...courseCreatePageLayout}
-                        id="price"
-                        name="price"
-                        label="Price"
-                        rules={validationRules.numberValidation('Please input course price', 0)}
-                      >
-                        <InputNumber
-                          min={0}
-                          disabled={currency === ''}
-                          placeholder="Course Price"
-                          className={styles.numericInput}
-                        />
+                      <Form.Item label="Price" required={true} {...courseCreatePageLayout}>
+                        <Form.Item
+                          id="price"
+                          name="price"
+                          rules={validationRules.numberValidation('Please input course price', 0)}
+                          noStyle
+                        >
+                          <InputNumber
+                            min={0}
+                            disabled={currency === ''}
+                            placeholder="Course Price"
+                            className={styles.numericInput}
+                          />
+                        </Form.Item>
                         <span className="ant-form-text"> {currency?.toUpperCase() || ''} </span>
                       </Form.Item>
                     </Col>
@@ -695,12 +706,12 @@ const Course = ({ match, history }) => {
             <Row justify="end" align="center" gutter={[8, 8]}>
               <Col xs={12} md={8} lg={6}>
                 <Button block type="default" htmlType="submit" loading={submitting}>
-                  Create Course
+                  {courseId ? 'Update' : 'Create'} Course
                 </Button>
               </Col>
               <Col xs={12} md={6} lg={6}>
                 <Button block type="primary" onClick={() => gotoModulePage()} loading={submitting}>
-                  Add Modules
+                  Continue to {courseId ? 'Edit' : 'Add'} Modules
                 </Button>
               </Col>
             </Row>

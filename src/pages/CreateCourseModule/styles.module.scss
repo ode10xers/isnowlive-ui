@@ -1,15 +1,50 @@
 @import '../../styles/variables.scss';
 
-.productName {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .inlineFormItem {
   display: inline-block !important;
   margin-bottom: 0 !important;
+  min-width: clamp(200px, 500px, 800px);
+}
+
+.coursePageContainer {
+  .courseFormListContainer {
+    @extend .box;
+    padding: 20px 80px;
+
+    :global {
+      .ant-collapse-header {
+        padding: 8px;
+
+        .ant-collapse-arrow {
+          top: 10px !important;
+        }
+      }
+    }
+
+    .deleteModuleIconButton {
+      @extend .redText;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+
+    .panelHeaderFormItem {
+      @extend .inlineFormItem;
+    }
+
+    .contentListItem {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+      box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
+    }
+  }
+}
+
+.contentPopupContainer {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+  box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
 }
 
 .dateText {
@@ -25,47 +60,6 @@
   width: 100%;
 }
 
-.currencyWrapper {
-  font-size: 16px;
-}
-
-.modalActionRow {
-  margin-top: 10px;
-}
-
-.imageWrapper {
-  position: relative;
-  // height: 200px;
-}
-
-.colorPickerPreview {
-  border-width: 10px;
-  border-style: solid;
-  width: fit-content;
-}
-
-.helpText {
-  @extend .blueText;
-  font-size: 12px;
-}
-
-.coverImage {
-  & > div {
-    width: 100% !important;
-    min-height: 330px;
-    // height: 200px !important;
-  }
-}
-
-.courseScheduleName {
-  font-size: 13px !important;
-}
-
-.videoPopupRow{
+.contentPopupContainer{
   padding-top: 10px;
-}
-
-.thumbnailImage {
-  border-radius: 5px;
-  object-fit: cover;
 }

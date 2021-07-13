@@ -9,7 +9,6 @@ import SessionsDetails from 'pages/CreatorDashboard/SessionsDetails';
 import ManageSessions from 'pages/CreatorDashboard/ManageSessions';
 import Session from 'pages/Session';
 import Profile from 'pages/Profile';
-// import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
 import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
 import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
