@@ -12,7 +12,7 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, isUnapprovedUserError, preventDefaults, generateUrlFromUsername } from 'utils/helper';
-import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { getCourseSessionDetailsContentCount, getCourseVideoDetailsContentCount } from 'utils/course';
 
 import styles from './style.module.scss';
 
@@ -162,8 +162,8 @@ const CourseOrderDetails = ({ match, history }) => {
   };
 
   const renderCourseOrderContent = (courseOrder) => {
-    const sessionCount = getCourseSessionContentCount(courseOrder.modules);
-    const videoCount = getCourseVideoContentCount(courseOrder.modules);
+    const sessionCount = getCourseSessionDetailsContentCount(courseOrder.modules);
+    const videoCount = getCourseVideoDetailsContentCount(courseOrder.modules);
 
     return (
       <Space split={<Divider type="vertical" />}>
