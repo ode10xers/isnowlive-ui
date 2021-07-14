@@ -287,19 +287,27 @@ const EmailList = () => {
       title: 'First Name',
       dataIndex: 'first_name',
       key: 'first_name',
-      width: '32%',
+      width: '150px',
     },
     {
       title: 'Last Name',
       dataIndex: 'last_name',
       key: 'last_name',
-      width: '32%',
+      width: '150px',
       render: (text, record) => record.last_name || '-',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      width: '170px',
+      ellipsis: true,
     },
     {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
+      width: '100px',
       render: (text, record) => `${record.type[0]}${record.type.slice(1).toLowerCase()}`,
       filterIcon: (filtered) => (
         <Tooltip defaultVisible={true} title="Click here to filter">
@@ -320,10 +328,10 @@ const EmailList = () => {
     },
     {
       title: 'Actions',
-      width: '15%',
+      width: '80px',
       render: (record) => (
         <Row gutter={[8, 8]}>
-          <Col xs={4}>
+          <Col xs={12}>
             <Popconfirm
               arrowPointAtCenter
               icon={<DeleteOutlined className={styles.redText} />}
@@ -340,7 +348,7 @@ const EmailList = () => {
               <Button block type="text" danger icon={<DeleteOutlined />} />
             </Popconfirm>
           </Col>
-          <Col xs={4}>
+          <Col xs={12}>
             <Tooltip title="Send email to this audience" arrowPointAtCenter>
               <Button
                 block
