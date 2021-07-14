@@ -5,7 +5,6 @@ import { ArrowLeftOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 
 import apis from 'apis';
-import Routes from 'routes';
 
 import CreatorProfile from 'components/CreatorProfile';
 import Loader from 'components/Loader';
@@ -125,11 +124,7 @@ const VideoDetails = ({ match }) => {
     <Loader loading={isLoading} size="large" text="Loading video details">
       <Row justify="start" className={styles.mb50}>
         <Col xs={24} md={4}>
-          <Button
-            className={styles.headButton}
-            onClick={() => history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos)}
-            icon={<ArrowLeftOutlined />}
-          >
+          <Button className={styles.headButton} onClick={() => history.goBack()} icon={<ArrowLeftOutlined />}>
             Back to Video List
           </Button>
         </Col>
