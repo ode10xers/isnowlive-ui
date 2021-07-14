@@ -17,6 +17,7 @@ import {
   Space,
   Radio,
   DatePicker,
+  Divider,
 } from 'antd';
 import {
   PlusOutlined,
@@ -81,6 +82,7 @@ const { Panel } = Collapse;
 const { Text, Title } = Typography;
 
 const {
+  formatDate: { toLongDateWithLongDay, toLocaleTime },
   timeCalculation: { dateIsBeforeDate },
 } = dateUtil;
 
@@ -99,7 +101,6 @@ const CreateCourseModule = ({ match, history }) => {
   const [addVideoContentMethod, setAddVideoContentMethod] = useState(null);
   const [addSessionContentMethod, setAddSessionContentMethod] = useState(null);
 
-  // TODO: Implement auto expand on form errors like in Other Links
   const [courseDetails, setCourseDetails] = useState(null);
   const [expandedModulesKeys, setExpandedModulesKeys] = useState([]);
   const [courseCurriculumType, setCourseCurriculumType] = useState(courseCurriculumTypes.MIXED.name);
@@ -270,9 +271,6 @@ const CreateCourseModule = ({ match, history }) => {
       ...modifiedFields,
     };
 
-    console.log(payload);
-    return;
-
     try {
       const { status } = await apis.courses.updateCourse(courseId, payload);
 
@@ -301,7 +299,7 @@ const CreateCourseModule = ({ match, history }) => {
         {inventories.map((inventory) => (
           <Col xs={24} key={inventory.inventory_external_id}>
             <Row gutter={[12, 12]} className={styles.contentPopupItem}>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={10}>
                 <Image
                   src={inventory.session_image_url || 'error'}
                   alt={inventory.name}
@@ -309,9 +307,12 @@ const CreateCourseModule = ({ match, history }) => {
                   className={styles.sessionContentPopupImage}
                 />
               </Col>
-              <Col xs={24} md={16}>
-                <Space size="large" direction="vertical">
-                  <Title level={5}>{inventory.name}</Title>
+              <Col xs={24} md={14}>
+                <Space size="small" direction="vertical">
+                  <Text strong>{inventory.name}</Text>
+                  <Text type="secondary">
+                    {toLongDateWithLongDay(inventory?.start_time)}, {toLocaleTime(inventory?.start_time)}
+                  </Text>
                   <Button
                     onClick={() =>
                       addSessionsToContent({
@@ -346,7 +347,7 @@ const CreateCourseModule = ({ match, history }) => {
         {videos.map((video) => (
           <Col xs={24} key={video.external_id}>
             <Row gutter={[12, 12]} className={styles.contentPopupItem}>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={10}>
                 <Image
                   src={video.thumbnail_url || 'error'}
                   alt={video.title}
@@ -354,9 +355,19 @@ const CreateCourseModule = ({ match, history }) => {
                   className={styles.videoContentPopupImage}
                 />
               </Col>
-              <Col xs={24} md={16}>
-                <Space size="large" direction="vertical">
-                  <Title level={5}>{video.title}</Title>
+              <Col xs={24} md={14}>
+                <Space size="small" direction="vertical">
+                  <Text strong>{video.title}</Text>
+                  <Space split={<Divider type="vertical" />}>
+                    <Text type="secondary">
+                      {video?.pay_what_you_want
+                        ? 'Flexible'
+                        : video?.price > 0
+                        ? `${video?.currency?.toUpperCase()} ${video?.price}`
+                        : 'Free'}
+                    </Text>
+                    <Text type="secondary">{Math.floor((video?.duration ?? 0) / 60)} mins</Text>
+                  </Space>
                   <Button
                     onClick={() =>
                       addVideosToContent({
@@ -572,7 +583,7 @@ const CreateCourseModule = ({ match, history }) => {
                                                     align="middle"
                                                     className={styles.contentListItem}
                                                   >
-                                                    <Col xs={18}>
+                                                    <Col xs={16}>
                                                       <Form.Item
                                                         {...contentFormItemRestFields}
                                                         id="content_name"
@@ -599,39 +610,29 @@ const CreateCourseModule = ({ match, history }) => {
                                                         <Input placeholder="Content Type" maxLength={50} />
                                                       </Form.Item>
                                                     </Col>
-                                                    <Col xs={6}>
+                                                    <Col xs={8}>
                                                       <Row gutter={[10, 10]} justify="end" align="middle">
                                                         {getContentProductType(moduleFieldName, contentFieldName) ? (
-                                                          <>
-                                                            <Col xs={12}>
-                                                              <Text type="secondary">
-                                                                {getContentProductType(
-                                                                  moduleFieldName,
-                                                                  contentFieldName
-                                                                )[0].toUpperCase()}
-                                                                {getContentProductType(
-                                                                  moduleFieldName,
-                                                                  contentFieldName
-                                                                )
-                                                                  .slice(1)
-                                                                  .toLowerCase()}{' '}
-                                                                content
-                                                              </Text>
-                                                            </Col>
-                                                            <Col xs={6}>
-                                                              <Tooltip title="Remove content">
-                                                                <Button
-                                                                  size="large"
-                                                                  type="link"
-                                                                  icon={<MinusCircleTwoTone twoToneColor="#FF0000" />}
-                                                                  onClick={() => removeContent(contentFieldName)}
-                                                                />
-                                                              </Tooltip>
-                                                            </Col>
-                                                          </>
+                                                          <Col xs={12}>
+                                                            <Text type="secondary" className={styles.textAlignCenter}>
+                                                              {getContentProductType(
+                                                                moduleFieldName,
+                                                                contentFieldName
+                                                              )[0].toUpperCase()}
+                                                              {getContentProductType(moduleFieldName, contentFieldName)
+                                                                .slice(1)
+                                                                .toLowerCase()}{' '}
+                                                              content
+                                                            </Text>
+                                                          </Col>
                                                         ) : (
                                                           <>
-                                                            <Col xs={6}>
+                                                            <Col xs={14}>
+                                                              <Text type="secondary" className={styles.textAlignCenter}>
+                                                                Select content to add
+                                                              </Text>
+                                                            </Col>
+                                                            <Col xs={3}>
                                                               <Tooltip title="Add Video Content">
                                                                 <Button
                                                                   disabled={
@@ -645,7 +646,7 @@ const CreateCourseModule = ({ match, history }) => {
                                                                 />
                                                               </Tooltip>
                                                             </Col>
-                                                            <Col xs={6}>
+                                                            <Col xs={3}>
                                                               <Tooltip title="Add Session Content">
                                                                 <Button
                                                                   disabled={
@@ -661,6 +662,16 @@ const CreateCourseModule = ({ match, history }) => {
                                                             </Col>
                                                           </>
                                                         )}
+                                                        <Col xs={3}>
+                                                          <Tooltip title="Remove content">
+                                                            <Button
+                                                              size="large"
+                                                              type="link"
+                                                              icon={<MinusCircleTwoTone twoToneColor="#FF0000" />}
+                                                              onClick={() => removeContent(contentFieldName)}
+                                                            />
+                                                          </Tooltip>
+                                                        </Col>
                                                       </Row>
                                                     </Col>
                                                   </Row>

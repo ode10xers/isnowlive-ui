@@ -482,7 +482,7 @@ const Course = ({ match, history }) => {
                                   className={styles.inputWithButton}
                                 />
                               </Form.Item>
-                              {fields.length > 1 ? (
+                              {fields.length > 0 ? (
                                 <span className="ant-form-text">
                                   <Tooltip title="Remove this item">
                                     <DeleteOutlined
@@ -556,7 +556,7 @@ const Course = ({ match, history }) => {
                                   className={styles.inputWithButton}
                                 />
                               </Form.Item>
-                              {fields.length > 1 ? (
+                              {fields.length > 0 ? (
                                 <span className="ant-form-text">
                                   <Tooltip title="Remove this item">
                                     <DeleteOutlined
