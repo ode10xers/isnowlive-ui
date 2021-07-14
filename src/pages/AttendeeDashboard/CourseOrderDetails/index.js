@@ -6,6 +6,8 @@ import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutline
 
 import Routes from 'routes';
 
+import apis from 'apis';
+
 import { showErrorModal } from 'components/Modals/modals';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
@@ -108,24 +110,26 @@ const {
 } = dateUtil;
 
 const CourseOrderDetails = ({ match, history }) => {
+  const courseId = match.params.course_id;
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrderDetails, setCourseOrderDetails] = useState(null);
-
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);
 
-  const fetchCourseOrderDetails = useCallback(async () => {
+  const fetchCourseOrderDetails = useCallback(async (courseId) => {
     setIsLoading(true);
-
     try {
-      // TODO: Implement API here (confirm with BE)
-      const { status, data } = {
-        status: 200,
-        data: sampleOrderData,
-      };
+      const { status, data } = await apis.courses.getAttendeeCourses();
 
       if (isAPISuccess(status) && data) {
-        setCourseOrderDetails(data);
-        setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.module_id) ?? []);
+        const activeData = data.active;
+        activeData.map((course) => {
+          if (course.course_order_id === courseId) {
+            setCourseOrderDetails(course);
+            //setExpandedCourseModules(course.course.modules?.map((courseModule) => courseModule.module_id) ?? []);
+          }
+        });
+
+        //setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.module_id) ?? []);
       }
     } catch (error) {
       console.error(error);
@@ -142,8 +146,10 @@ const CourseOrderDetails = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
-    fetchCourseOrderDetails();
-  }, [fetchCourseOrderDetails]);
+    if (courseId) {
+      fetchCourseOrderDetails(courseId);
+    }
+  }, [fetchCourseOrderDetails, courseId]);
 
   const handleBackClicked = (e) => {
     preventDefaults(e);
@@ -152,11 +158,10 @@ const CourseOrderDetails = ({ match, history }) => {
   };
 
   const redirectToVideoOrderDetails = (content, isExpired = false) => {
-    console.log(content);
     history.push(
       Routes.attendeeDashboard.rootPath +
         Routes.attendeeDashboard.videos +
-        `/${content.product_id}/${content.order_data.order_id}`,
+        `/${content.product_id}/${content.order_id}`,
       { video_order: { ...content, isExpired } }
     );
   };
@@ -178,17 +183,17 @@ const CourseOrderDetails = ({ match, history }) => {
     <div className={styles.courseOrderDetailsContainer}>
       <Row gutter={[12, 12]}>
         <Col xs={24} md={12} lg={8}>
-          <Image className={styles.courseImage} src={orderDetails?.course_image_url} />
+          <Image className={styles.courseImage} src={orderDetails?.course.course_image_url} />
         </Col>
         <Col xs={24} md={12} lg={16}>
           <Space direction="vertical">
             <Title level={5} className={styles.courseTitle}>
               {' '}
-              {orderDetails.course_name}{' '}
+              {orderDetails.course.name}{' '}
             </Title>
-            <div className={styles.courseDescription}>{ReactHtmlParser(orderDetails.course_description)}</div>
+            <div className={styles.courseDescription}>{ReactHtmlParser(orderDetails.course.description)}</div>
             <Tag color="blue" className={styles.contentTag}>
-              {renderCourseOrderContent(orderDetails)}
+              {renderCourseOrderContent(orderDetails.course)}
             </Tag>
           </Space>
         </Col>
@@ -219,10 +224,10 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderExtraContent = (content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
-        <Text> {toLongDateWithDay(content?.order_data?.start_time)} </Text>
+        <Text>{/* {toLongDateWithDay(content?.order_data?.start_time)} */}</Text>
         <Text>
           {' '}
-          {toLocaleTime(content?.order_data?.start_time)} - {toLocaleTime(content?.order_data?.end_time)}{' '}
+          {/* {toLocaleTime(content?.order_data?.start_time)} - {toLocaleTime(content?.order_data?.end_time)}{' '} */}
         </Text>
         <AddToCalendarButton
           iconOnly={true}
@@ -233,7 +238,7 @@ const CourseOrderDetails = ({ match, history }) => {
             }`,
           }}
         />
-        {content.order_data.is_offline ? (
+        {false ? (
           <Popover
             arrowPointAtCenter
             placement="topRight"
@@ -249,9 +254,9 @@ const CourseOrderDetails = ({ match, history }) => {
           <Button
             type="primary"
             size="small"
-            className={!content.order_data.join_url ? styles.disabledBuyBtn : styles.buyBtn}
-            disabled={!content.order_data.join_url}
-            onClick={() => window.open(content.order_data.join_url)}
+            className={!content?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+            disabled={!content?.join_url}
+            onClick={() => window.open(content.join_url)}
           >
             Join
           </Button>
@@ -259,7 +264,7 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text> {Math.floor(content.order_data.duration / 60)} mins </Text>
+        <Text>{/* {Math.floor(content.order_data.duration / 60)} mins  */}</Text>
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
@@ -357,19 +362,16 @@ const CourseOrderDetails = ({ match, history }) => {
 
   const renderCourseCurriculums = (courseModules = []) => {
     return courseModules.map((courseModule) => (
-      <Panel
-        key={courseModule.module_id}
-        header={<Text className={styles.moduleHeader}> {courseModule.module_name} </Text>}
-      >
+      <Panel key={courseModule.name} header={<Text className={styles.moduleHeader}> {courseModule.name} </Text>}>
         {isMobileDevice ? (
           <Row gutter={[8, 8]} justify="center" className={styles.mobileCourseModuleContainer}>
-            {courseModule?.contents?.map(renderMobileModuleContent)}
+            {courseModule?.module_content?.map(renderMobileModuleContent)}
           </Row>
         ) : (
           <List
             size="small"
             rowKey={(record) => record.product_id}
-            dataSource={courseModule?.contents}
+            dataSource={courseModule?.module_content}
             renderItem={renderModuleContents}
           />
         )}
@@ -409,7 +411,7 @@ const CourseOrderDetails = ({ match, history }) => {
                       <DownOutlined className={styles.curriculumExpandIcon} rotate={isActive ? 180 : 0} />
                     )}
                   >
-                    {renderCourseCurriculums(courseOrderDetails?.modules)}
+                    {renderCourseCurriculums(courseOrderDetails?.course?.modules)}
                   </Collapse>
                 </Col>
               </Row>
