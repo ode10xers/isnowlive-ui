@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Modal, Collapse, Typography } from 'antd';
+import { Button, Modal, Collapse, Typography, Spin, message } from 'antd';
 import { DownOutlined, CheckCircleFilled } from '@ant-design/icons';
 
 import Table from 'components/Table';
@@ -19,14 +19,19 @@ const {
 } = dateUtil;
 
 const SessionContentPopup = ({ visible, closeModal, inventories = [], addContentMethod = null }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedSessionPopupContent, setSelectedSessionPopupContent] = useState([]);
 
   const handleMarkInventoryAsSelected = (inventoryExternalId) => {
+    setIsLoading(true);
     setSelectedSessionPopupContent([...new Set([...selectedSessionPopupContent, inventoryExternalId])]);
+    setIsLoading(false);
   };
 
   const handleUnmarkInventoryAsSelected = (inventoryExternalId) => {
+    setIsLoading(true);
     setSelectedSessionPopupContent(selectedSessionPopupContent.filter((val) => val !== inventoryExternalId));
+    setIsLoading(false);
   };
 
   const sessionPopupColumns = [
@@ -97,6 +102,8 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
     preventDefaults(e);
 
     if (addContentMethod) {
+      setIsLoading(true);
+
       inventories
         .filter((inventory) => selectedSessionPopupContent.includes(inventory.inventory_external_id))
         .forEach((inventory) => {
@@ -107,6 +114,8 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
           });
         });
 
+      message.success('Sessions added to module successfully!');
+      setIsLoading(false);
       setSelectedSessionPopupContent([]);
       closeModal();
     }
@@ -119,28 +128,30 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
       centered={true}
       onCancel={closeModal}
       footer={
-        <Button type="primary" size="large" onClick={addSessionsToContent}>
+        <Button type="primary" size="large" onClick={addSessionsToContent} loading={isLoading}>
           Add Selected Session to Module
         </Button>
       }
       width={820}
       afterClose={resetBodyStyle}
     >
-      <Collapse
-        expandIconPosition="right"
-        ghost
-        expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
-      >
-        {groupInventoryBySession(inventories).map((session) => (
-          <Panel key={session.session_id} className={styles.sessionPopupAccordionItem} header={session.session_name}>
-            <Table
-              columns={sessionPopupColumns}
-              data={session.inventories}
-              rowKey={(record) => record.inventory_external_id}
-            />
-          </Panel>
-        ))}
-      </Collapse>
+      <Spin spinning={isLoading} tip="Processing..." size="large">
+        <Collapse
+          expandIconPosition="right"
+          ghost
+          expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
+        >
+          {groupInventoryBySession(inventories).map((session) => (
+            <Panel key={session.session_id} className={styles.sessionPopupAccordionItem} header={session.session_name}>
+              <Table
+                columns={sessionPopupColumns}
+                data={session.inventories}
+                rowKey={(record) => record.inventory_external_id}
+              />
+            </Panel>
+          ))}
+        </Collapse>
+      </Spin>
     </Modal>
   );
 };

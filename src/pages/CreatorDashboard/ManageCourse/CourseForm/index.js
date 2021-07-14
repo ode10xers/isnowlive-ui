@@ -288,7 +288,7 @@ const CourseForm = ({ match, history }) => {
       description: values.description,
       topic: values.topic,
       faqs: values.faqs,
-      price: currency ? values.price ?? 1 : 0,
+      price: coursePriceType === coursePriceTypes.FREE.name ? 0 : currency ? values.price ?? 1 : 0,
       currency: currency?.toLowerCase() || '',
       tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
       preview_image_url: previewImageUrls ?? [],

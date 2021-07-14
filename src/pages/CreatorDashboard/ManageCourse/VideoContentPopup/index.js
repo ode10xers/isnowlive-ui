@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Button, Space, Divider, Image, Typography, Modal } from 'antd';
+import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Spin, message } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
@@ -13,20 +13,27 @@ import styles from './styles.module.scss';
 const { Title, Text } = Typography;
 
 const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod = null }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedVideoPopupContent, setSelectedVideoPopupContent] = useState([]);
 
   const handleMarkVideoAsSelected = (videoId) => {
+    setIsLoading(true);
     setSelectedVideoPopupContent([...new Set([...selectedVideoPopupContent, videoId])]);
+    setIsLoading(false);
   };
 
   const handleUnmarkVideoAsSelected = (videoId) => {
+    setIsLoading(true);
     setSelectedVideoPopupContent(selectedVideoPopupContent.filter((val) => val !== videoId));
+    setIsLoading(false);
   };
 
   const addVideosToContent = (e) => {
     preventDefaults(e);
 
     if (addContentMethod) {
+      setIsLoading(true);
+
       videos
         .filter((video) => selectedVideoPopupContent.includes(video.external_id))
         .forEach((video) => {
@@ -37,6 +44,8 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
           });
         });
 
+      message.success('Videos added to module successfully!');
+      setIsLoading(false);
       setSelectedVideoPopupContent([]);
       closeModal();
     }
@@ -95,14 +104,16 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
       afterClose={resetBodyStyle}
       title={<Title level={5}> Add Videos to Module </Title>}
       footer={
-        <Button type="primary" size="large" onClick={addVideosToContent}>
+        <Button type="primary" size="large" onClick={addVideosToContent} loading={isLoading}>
           Add Selected Videos to Module
         </Button>
       }
     >
-      <Row gutter={[12, 12]} justify="center" align="middle">
-        {videos.map(renderVideoContentItems)}
-      </Row>
+      <Spin spinning={isLoading} tip="Processing">
+        <Row gutter={[12, 12]} justify="center" align="middle">
+          {videos.map(renderVideoContentItems)}
+        </Row>
+      </Spin>
     </Modal>
   );
 };

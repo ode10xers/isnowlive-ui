@@ -35,7 +35,7 @@ import VideoContentPopup from '../VideoContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, deepCloneObject } from 'utils/helper';
 
 import { courseCreatePageLayout } from 'layouts/FormLayouts';
 
@@ -265,8 +265,46 @@ const CourseModulesForm = ({ match, history }) => {
     console.log(errorFields);
   };
 
-  const openSessionPopup = (addSessionMethod) => {
-    setAddSessionContentMethod(() => addSessionMethod);
+  const initializeAddContentFunction = (moduleIndex) => {
+    // We return a function that will be set as a state
+    // This function will accept the content data that will be added
+    return (contentData) => {
+      const previousFormValues = deepCloneObject(form.getFieldsValue());
+      const targetModuleContents = previousFormValues.modules[moduleIndex].module_content;
+
+      // Check if the same product is already there, if so then skip
+      // currently the duplicate check is only in the content scope
+      const duplicateContentInstance = targetModuleContents.find(
+        (moduleContent) =>
+          moduleContent.product_type === contentData.product_type && moduleContent.product_id === contentData.product_id
+      );
+
+      if (duplicateContentInstance) {
+        return;
+      }
+
+      // Check if there's an empty content to replace with
+      const targetContentIndex = targetModuleContents.findIndex(
+        (moduleContent) => moduleContent.product_type !== 'SESSION' && moduleContent.product_type !== 'VIDEO'
+      );
+
+      if (targetContentIndex >= 0) {
+        targetModuleContents.splice(targetContentIndex, 1, contentData);
+      } else {
+        targetModuleContents.push(contentData);
+      }
+
+      previousFormValues.modules[moduleIndex].module_content = targetModuleContents;
+      form.setFieldsValue({
+        ...form.getFieldsValue(),
+        modules: previousFormValues.modules,
+      });
+    };
+  };
+
+  const openSessionPopup = (moduleIndex) => {
+    const addContentFunction = initializeAddContentFunction(moduleIndex);
+    setAddSessionContentMethod(() => addContentFunction);
     setSessionPopupVisible(true);
   };
 
@@ -274,8 +312,9 @@ const CourseModulesForm = ({ match, history }) => {
     setSessionPopupVisible(false);
   };
 
-  const openVideoPopup = (addVideoMethod) => {
-    setAddVideoContentMethod(() => addVideoMethod);
+  const openVideoPopup = (moduleIndex) => {
+    const addContentFunction = initializeAddContentFunction(moduleIndex);
+    setAddVideoContentMethod(() => addContentFunction);
     setVideoPopupVisible(true);
   };
 
@@ -471,11 +510,7 @@ const CourseModulesForm = ({ match, history }) => {
                                         name={[moduleFieldName, 'module_content']}
                                         rules={validationRules.courseModuleContentValidation}
                                       >
-                                        {(
-                                          contentFields,
-                                          { add: addMoreContent, remove: removeContent },
-                                          { errors: contentErrors }
-                                        ) => (
+                                        {(contentFields, { add: addMoreContent, remove: removeContent }) => (
                                           <Row gutter={[8, 8]}>
                                             <Col xs={24}>
                                               {contentFields.map(
@@ -550,7 +585,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                   size="large"
                                                                   type="link"
                                                                   icon={<PlayCircleOutlined />}
-                                                                  onClick={() => openVideoPopup(addMoreContent)}
+                                                                  onClick={() => openVideoPopup(moduleFieldName)}
                                                                 />
                                                               </Tooltip>
                                                             </Col>
@@ -564,7 +599,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                   size="large"
                                                                   type="link"
                                                                   icon={<VideoCameraAddOutlined />}
-                                                                  onClick={() => openSessionPopup(addMoreContent)}
+                                                                  onClick={() => openSessionPopup(moduleFieldName)}
                                                                 />
                                                               </Tooltip>
                                                             </Col>
@@ -586,11 +621,6 @@ const CourseModulesForm = ({ match, history }) => {
                                                 )
                                               )}
                                             </Col>
-                                            {contentErrors && (
-                                              <Col xs={24}>
-                                                <Text type="danger"> {contentErrors} </Text>
-                                              </Col>
-                                            )}
                                             <Col xs={24}>
                                               <Row justify="center">
                                                 <Col>
