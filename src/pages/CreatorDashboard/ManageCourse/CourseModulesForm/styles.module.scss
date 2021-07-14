@@ -42,22 +42,6 @@
   }
 }
 
-.sessionPopupAccordionItem {
-  margin-top: 10px;
-}
-
-.contentPopupItem {
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
-  box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
-
-  .videoContentPopupImage {
-    height: 120px;
-    object-fit: scale-down;
-  }
-}
-
 .dateText {
   margin-left: -100px;
   text-align: left;
@@ -69,8 +53,4 @@
 
 .datePicker {
   width: 100%;
-}
-
-.contentPopupContainer{
-  padding-top: 10px;
 }

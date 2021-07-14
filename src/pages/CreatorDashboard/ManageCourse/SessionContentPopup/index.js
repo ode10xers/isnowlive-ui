@@ -26,7 +26,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
   };
 
   const handleUnmarkInventoryAsSelected = (inventoryExternalId) => {
-    setSelectedSessionPopupContent(selectedSessionPopupContent.filter((val) => val === inventoryExternalId));
+    setSelectedSessionPopupContent(selectedSessionPopupContent.filter((val) => val !== inventoryExternalId));
   };
 
   const sessionPopupColumns = [
@@ -52,7 +52,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
     },
     {
       title: 'Action',
-      width: '160px',
+      width: '180px',
       render: (record) =>
         selectedSessionPopupContent.includes(record.inventory_external_id) ? (
           <Button
@@ -65,7 +65,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
           </Button>
         ) : (
           <Button ghost type="primary" onClick={() => handleMarkInventoryAsSelected(record.inventory_external_id)}>
-            Select this
+            Select this session
           </Button>
         ),
     },
@@ -107,6 +107,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
           });
         });
 
+      setSelectedSessionPopupContent([]);
       closeModal();
     }
   };
@@ -116,7 +117,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
       title={<Title level={5}> Add Sessions To Module </Title>}
       visible={visible}
       centered={true}
-      onCancel={() => closeModal()}
+      onCancel={closeModal}
       footer={
         <Button type="primary" size="large" onClick={addSessionsToContent}>
           Add Selected Session to Module

@@ -7,17 +7,13 @@ import {
   Button,
   Form,
   Typography,
-  Modal,
   Collapse,
   Tooltip,
   Input,
   InputNumber,
-  Image,
   PageHeader,
-  Space,
   Radio,
   DatePicker,
-  Divider,
 } from 'antd';
 import {
   PlusOutlined,
@@ -32,10 +28,10 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import DefaultImage from 'components/Icons/DefaultImage';
-import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import SessionContentPopup from '../SessionContentPopup';
+import VideoContentPopup from '../VideoContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
@@ -81,7 +77,7 @@ const formInitialValues = {
 };
 
 const { Panel } = Collapse;
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const {
   timeCalculation: { dateIsBeforeDate },
@@ -190,17 +186,6 @@ const CourseModulesForm = ({ match, history }) => {
     redirectToCourseSectionDashboard,
   ]);
 
-  const openVideoPopup = (addVideoMethod) => {
-    setAddVideoContentMethod(() => addVideoMethod);
-    setVideoPopupVisible(true);
-  };
-
-  const addVideosToContent = (data) => {
-    if (addVideoContentMethod) {
-      addVideoContentMethod(data);
-    }
-  };
-
   const handleCourseCurriculumTypeChange = (e) => {
     const curriculumType = e.target.value;
     setCourseCurriculumType(curriculumType);
@@ -289,60 +274,14 @@ const CourseModulesForm = ({ match, history }) => {
     setSessionPopupVisible(false);
   };
 
-  const videoPopup = (
-    <Modal
-      title={<Title level={5}> Add Videos To Module </Title>}
-      visible={videoPopupVisible}
-      centered={true}
-      onCancel={() => setVideoPopupVisible(false)}
-      footer={null}
-      width={640}
-      afterClose={resetBodyStyle}
-    >
-      <Row gutter={[8, 12]} className={styles.contentPopupItemContainer}>
-        {videos.map((video) => (
-          <Col xs={24} key={video.external_id}>
-            <Row gutter={[12, 12]} className={styles.contentPopupItem}>
-              <Col xs={24} md={10}>
-                <Image
-                  src={video.thumbnail_url || 'error'}
-                  alt={video.title}
-                  fallback={DefaultImage()}
-                  className={styles.videoContentPopupImage}
-                />
-              </Col>
-              <Col xs={24} md={14}>
-                <Space size="small" direction="vertical">
-                  <Text strong>{video.title}</Text>
-                  <Space split={<Divider type="vertical" />}>
-                    <Text type="secondary">
-                      {video?.pay_what_you_want
-                        ? 'Flexible'
-                        : video?.price > 0
-                        ? `${video?.currency?.toUpperCase()} ${video?.price}`
-                        : 'Free'}
-                    </Text>
-                    <Text type="secondary">{Math.floor((video?.duration ?? 0) / 60)} mins</Text>
-                  </Space>
-                  <Button
-                    onClick={() =>
-                      addVideosToContent({
-                        name: video.title,
-                        product_id: video.external_id,
-                        product_type: 'VIDEO',
-                      })
-                    }
-                  >
-                    Add to Course
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Col>
-        ))}
-      </Row>
-    </Modal>
-  );
+  const openVideoPopup = (addVideoMethod) => {
+    setAddVideoContentMethod(() => addVideoMethod);
+    setVideoPopupVisible(true);
+  };
+
+  const closeVideoPopup = () => {
+    setVideoPopupVisible(false);
+  };
 
   const isVideosOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.VIDEO.name;
 
@@ -357,7 +296,12 @@ const CourseModulesForm = ({ match, history }) => {
         inventories={inventories}
         addContentMethod={addSessionContentMethod}
       />
-      {videoPopup}
+      <VideoContentPopup
+        visible={videoPopupVisible}
+        closeModal={closeVideoPopup}
+        videos={videos}
+        addContentMethod={addVideoContentMethod}
+      />
       <div className={styles.box}>
         <Loader size="large" loading={isLoading}>
           <Form
