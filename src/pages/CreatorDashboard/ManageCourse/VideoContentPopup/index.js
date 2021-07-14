@@ -60,6 +60,7 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
             alt={video.title}
             fallback={DefaultImage()}
             className={styles.videoContentPopupImage}
+            preview={false}
           />
         </Col>
         <Col xs={24} md={14}>
@@ -108,6 +109,10 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
           Add Selected Videos to Module
         </Button>
       }
+      bodyStyle={{
+        maxHeight: 'calc(100vh - 200px)',
+        overflow: 'scroll',
+      }}
     >
       <Spin spinning={isLoading} tip="Processing">
         <Row gutter={[12, 12]} justify="center" align="middle">

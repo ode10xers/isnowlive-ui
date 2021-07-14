@@ -14,6 +14,7 @@ import {
   PageHeader,
   Radio,
   DatePicker,
+  Space,
 } from 'antd';
 import {
   PlusOutlined,
@@ -80,6 +81,7 @@ const { Panel } = Collapse;
 const { Text } = Typography;
 
 const {
+  formatDate: { toLocaleTime, toLongDateWithDay },
   timeCalculation: { dateIsBeforeDate },
 } = dateUtil;
 
@@ -327,6 +329,35 @@ const CourseModulesForm = ({ match, history }) => {
   const getContentProductType = (moduleName, contentName) =>
     form.getFieldValue(['modules', moduleName, 'module_content', contentName, 'product_type']);
 
+  const renderContentDetails = (moduleName, contentName) => {
+    const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
+    let productData = null;
+
+    switch (contentData.product_type) {
+      case 'SESSION':
+        productData = inventories.find((inventory) => inventory.inventory_external_id === contentData.product_id);
+
+        return productData ? (
+          <Space direction="horizontal" align="middle">
+            <Text> {toLongDateWithDay(productData.start_time)} </Text>
+            <Text>
+              {toLocaleTime(productData.start_time)} - {toLocaleTime(productData.end_time)}
+            </Text>
+          </Space>
+        ) : null;
+      case 'VIDEO':
+        productData = videos.find((video) => video.external_id === contentData.product_id);
+
+        return productData ? (
+          <Space direction="horizontal" align="middle">
+            <Text> Video : {Math.floor((productData?.duration ?? 0) / 60)} mins </Text>
+          </Space>
+        ) : null;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <SessionContentPopup
@@ -389,8 +420,8 @@ const CourseModulesForm = ({ match, history }) => {
                       required={true}
                       hidden={isVideosOnlyCourse()}
                     >
-                      <Row gutter={8}>
-                        <Col xs={12}>
+                      <Row gutter={8} align="middle">
+                        <Col>
                           <Form.Item
                             id="courseStartDate"
                             name="courseStartDate"
@@ -405,7 +436,8 @@ const CourseModulesForm = ({ match, history }) => {
                             />
                           </Form.Item>
                         </Col>
-                        <Col xs={12}>
+                        <Col>-</Col>
+                        <Col>
                           <Form.Item
                             id="courseEndDate"
                             name="courseEndDate"
@@ -526,7 +558,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                     align="middle"
                                                     className={styles.contentListItem}
                                                   >
-                                                    <Col xs={16}>
+                                                    <Col xs={10}>
                                                       <Form.Item
                                                         {...contentFormItemRestFields}
                                                         id="content_name"
@@ -553,31 +585,30 @@ const CourseModulesForm = ({ match, history }) => {
                                                         <Input placeholder="Content Type" maxLength={50} />
                                                       </Form.Item>
                                                     </Col>
-                                                    <Col xs={8}>
+                                                    <Col xs={14}>
                                                       <Row gutter={[10, 10]} justify="end" align="middle">
                                                         {getContentProductType(moduleFieldName, contentFieldName) ? (
-                                                          <Col xs={12}>
-                                                            <Text type="secondary" className={styles.textAlignRight}>
-                                                              {getContentProductType(
-                                                                moduleFieldName,
-                                                                contentFieldName
-                                                              )[0].toUpperCase()}
-                                                              {getContentProductType(moduleFieldName, contentFieldName)
-                                                                .slice(1)
-                                                                .toLowerCase()}{' '}
-                                                              content
-                                                            </Text>
+                                                          <Col xs={12} className={styles.textAlignRight}>
+                                                            {renderContentDetails(moduleFieldName, contentFieldName)}
                                                           </Col>
                                                         ) : (
                                                           <>
-                                                            <Col xs={14}>
+                                                            <Col xs={14} className={styles.textAlignRight}>
                                                               <Text type="secondary" className={styles.textAlignCenter}>
                                                                 Select content to add
                                                               </Text>
                                                             </Col>
-                                                            <Col xs={3}>
-                                                              <Tooltip title="Add Video Content">
+                                                            <Col xs={3} className={styles.textAlignCenter}>
+                                                              <Tooltip
+                                                                title={
+                                                                  courseCurriculumType ===
+                                                                  courseCurriculumTypes.LIVE.name
+                                                                    ? `You can't add a video to a live session course`
+                                                                    : 'Add Video Content'
+                                                                }
+                                                              >
                                                                 <Button
+                                                                  block
                                                                   disabled={
                                                                     courseCurriculumType ===
                                                                     courseCurriculumTypes.LIVE.name
@@ -589,9 +620,17 @@ const CourseModulesForm = ({ match, history }) => {
                                                                 />
                                                               </Tooltip>
                                                             </Col>
-                                                            <Col xs={3}>
-                                                              <Tooltip title="Add Session Content">
+                                                            <Col xs={3} className={styles.textAlignCenter}>
+                                                              <Tooltip
+                                                                title={
+                                                                  courseCurriculumType ===
+                                                                  courseCurriculumTypes.VIDEO.name
+                                                                    ? `You can't add a session to a video course`
+                                                                    : 'Add Session Content'
+                                                                }
+                                                              >
                                                                 <Button
+                                                                  block
                                                                   disabled={
                                                                     courseCurriculumType ===
                                                                     courseCurriculumTypes.VIDEO.name
@@ -605,7 +644,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                             </Col>
                                                           </>
                                                         )}
-                                                        <Col xs={3}>
+                                                        <Col xs={3} className={styles.textAlignCenter}>
                                                           <Tooltip title="Remove content">
                                                             <Button
                                                               size="large"

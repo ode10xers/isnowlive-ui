@@ -134,6 +134,10 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
       }
       width={820}
       afterClose={resetBodyStyle}
+      bodyStyle={{
+        maxHeight: 'calc(100vh - 200px)',
+        overflow: 'scroll',
+      }}
     >
       <Spin spinning={isLoading} tip="Processing..." size="large">
         <Collapse
