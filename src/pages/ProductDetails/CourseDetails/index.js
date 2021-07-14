@@ -10,6 +10,7 @@ import {
   DownOutlined,
   MinusOutlined,
   PlusOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -38,6 +39,7 @@ import styles from './style.module.scss';
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
 const {
+  formatDate: { toLongDateWithDay },
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
@@ -317,6 +319,12 @@ const CourseDetails = ({ match }) => {
               ? `${course?.duration ?? 0} days`
               : `${moment(course?.end_date).diff(moment(course.start_date), 'days')} days`,
         })}
+        {course?.type !== 'VIDEO' &&
+          renderCourseInfoItem({
+            icon: <NotificationOutlined className={styles.courseInfoIcon} />,
+            title: 'Starts at',
+            content: toLongDateWithDay(course?.start_date),
+          })}
       </Row>
     );
   };
@@ -353,10 +361,9 @@ const CourseDetails = ({ match }) => {
         </Col>
         <Col xs={10} md={6} className={styles.textAlignRight}>
           <Text type="secondary">
-            {' '}
             {content.product_type?.toUpperCase() === 'SESSION'
               ? 'Live session'
-              : `${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
+              : `Video : ${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
           </Text>
         </Col>
       </Row>
@@ -394,7 +401,7 @@ const CourseDetails = ({ match }) => {
     return carouselItems.map((carouselItem, idx) => (
       <div className={styles.carouselItem} key={idx}>
         <Image.PreviewGroup>
-          <Row gutter={[10, 10]}>
+          <Row gutter={[10, 10]} justify="center" align="middle">
             {carouselItem.map((imageUrl, imageIndex) => (
               <Col xs={12} md={6} key={`${imageIndex}_${imageUrl}`}>
                 <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
