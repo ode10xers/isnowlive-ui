@@ -35,6 +35,8 @@ import Loader from 'components/Loader';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, resetBodyStyle, showSuccessModal } from 'components/Modals/modals';
 
+import SessionContentPopup from '../SessionContentPopup';
+
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
@@ -82,11 +84,10 @@ const { Panel } = Collapse;
 const { Text, Title } = Typography;
 
 const {
-  formatDate: { toLongDateWithLongDay, toLocaleTime },
   timeCalculation: { dateIsBeforeDate },
 } = dateUtil;
 
-const CreateCourseModule = ({ match, history }) => {
+const CourseModulesForm = ({ match, history }) => {
   const [form] = Form.useForm();
 
   const courseId = match.params.course_id;
@@ -189,20 +190,9 @@ const CreateCourseModule = ({ match, history }) => {
     redirectToCourseSectionDashboard,
   ]);
 
-  const openSessionPopup = (addSessionMethod) => {
-    setAddSessionContentMethod(() => addSessionMethod);
-    setSessionPopupVisible(true);
-  };
-
   const openVideoPopup = (addVideoMethod) => {
     setAddVideoContentMethod(() => addVideoMethod);
     setVideoPopupVisible(true);
-  };
-
-  const addSessionsToContent = (data) => {
-    if (addSessionContentMethod) {
-      addSessionContentMethod(data);
-    }
   };
 
   const addVideosToContent = (data) => {
@@ -285,53 +275,19 @@ const CreateCourseModule = ({ match, history }) => {
     setSubmitting(false);
   };
 
-  const sessionPopup = (
-    <Modal
-      title={<Title level={5}> Add Sessions To Module </Title>}
-      visible={sessionPopupVisible}
-      centered={true}
-      onCancel={() => setSessionPopupVisible(false)}
-      footer={null}
-      width={640}
-      afterClose={resetBodyStyle}
-    >
-      <Row gutter={[8, 12]} className={styles.contentPopupItemContainer}>
-        {inventories.map((inventory) => (
-          <Col xs={24} key={inventory.inventory_external_id}>
-            <Row gutter={[12, 12]} className={styles.contentPopupItem}>
-              <Col xs={24} md={10}>
-                <Image
-                  src={inventory.session_image_url || 'error'}
-                  alt={inventory.name}
-                  fallback={DefaultImage()}
-                  className={styles.sessionContentPopupImage}
-                />
-              </Col>
-              <Col xs={24} md={14}>
-                <Space size="small" direction="vertical">
-                  <Text strong>{inventory.name}</Text>
-                  <Text type="secondary">
-                    {toLongDateWithLongDay(inventory?.start_time)}, {toLocaleTime(inventory?.start_time)}
-                  </Text>
-                  <Button
-                    onClick={() =>
-                      addSessionsToContent({
-                        name: inventory.name,
-                        product_id: inventory.inventory_external_id,
-                        product_type: 'SESSION',
-                      })
-                    }
-                  >
-                    Add to Course
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          </Col>
-        ))}
-      </Row>
-    </Modal>
-  );
+  // TODO: Improve Error UX here
+  const handleFinishFailed = ({ errorFields }) => {
+    console.log(errorFields);
+  };
+
+  const openSessionPopup = (addSessionMethod) => {
+    setAddSessionContentMethod(() => addSessionMethod);
+    setSessionPopupVisible(true);
+  };
+
+  const closeSessionPopup = () => {
+    setSessionPopupVisible(false);
+  };
 
   const videoPopup = (
     <Modal
@@ -395,7 +351,12 @@ const CreateCourseModule = ({ match, history }) => {
 
   return (
     <>
-      {sessionPopup}
+      <SessionContentPopup
+        visible={sessionPopupVisible}
+        closeModal={closeSessionPopup}
+        inventories={inventories}
+        addContentMethod={addSessionContentMethod}
+      />
       {videoPopup}
       <div className={styles.box}>
         <Loader size="large" loading={isLoading}>
@@ -404,6 +365,7 @@ const CreateCourseModule = ({ match, history }) => {
             name="courseModuleForm"
             form={form}
             onFinish={handleFinish}
+            onFinishFailed={handleFinishFailed}
             initialValues={formInitialValues}
             scrollToFirstError={true}
           >
@@ -563,6 +525,7 @@ const CreateCourseModule = ({ match, history }) => {
                                       <Form.List
                                         {...moduleFormItemRestFields}
                                         name={[moduleFieldName, 'module_content']}
+                                        rules={validationRules.courseModuleContentValidation}
                                       >
                                         {(
                                           contentFields,
@@ -579,6 +542,7 @@ const CreateCourseModule = ({ match, history }) => {
                                                   ...contentFormItemRestFields
                                                 }) => (
                                                   <Row
+                                                    key={contentKey}
                                                     gutter={[10, 10]}
                                                     align="middle"
                                                     className={styles.contentListItem}
@@ -614,7 +578,7 @@ const CreateCourseModule = ({ match, history }) => {
                                                       <Row gutter={[10, 10]} justify="end" align="middle">
                                                         {getContentProductType(moduleFieldName, contentFieldName) ? (
                                                           <Col xs={12}>
-                                                            <Text type="secondary" className={styles.textAlignCenter}>
+                                                            <Text type="secondary" className={styles.textAlignRight}>
                                                               {getContentProductType(
                                                                 moduleFieldName,
                                                                 contentFieldName
@@ -708,25 +672,16 @@ const CreateCourseModule = ({ match, history }) => {
                             )}
                           </Collapse>
                         </Col>
-                        <Col xs={24}>
-                          <Row justify="center">
-                            <Col xs={24} md={8} lg={6} xl={4}>
-                              <Button
-                                ghost
-                                size="large"
-                                type="primary"
-                                onClick={() => addMoreModule()}
-                                icon={<PlusCircleOutlined />}
-                              >
-                                Add more module
-                              </Button>
-                            </Col>
-                            <Col xs={24} md={8} lg={6} xl={4}>
-                              <Button size="large" type="primary" htmlType="submit" loading={submitting}>
-                                Update Course Curriculum
-                              </Button>
-                            </Col>
-                          </Row>
+                        <Col xs={24} md={8} lg={6}>
+                          <Button
+                            ghost
+                            size="large"
+                            type="primary"
+                            onClick={() => addMoreModule()}
+                            icon={<PlusCircleOutlined />}
+                          >
+                            Add more module
+                          </Button>
                         </Col>
                         {moduleErrors && (
                           <Col xs={24}>
@@ -738,6 +693,16 @@ const CreateCourseModule = ({ match, history }) => {
                   </Form.List>
                 </div>
               </Col>
+              {/* CTA Button */}
+              <Col xs={24}>
+                <Row justify="center">
+                  <Col>
+                    <Button size="large" type="primary" htmlType="submit" loading={submitting}>
+                      Update Course Curriculum
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
             </Row>
           </Form>
         </Loader>
@@ -746,4 +711,4 @@ const CreateCourseModule = ({ match, history }) => {
   );
 };
 
-export default CreateCourseModule;
+export default CourseModulesForm;

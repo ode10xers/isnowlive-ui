@@ -1,8 +1,9 @@
-@import '../../styles/variables.scss';
+@import '../../../../styles/variables.scss';
 
+// NOTE: For some reason, this will make it look weird on local but proper on stage
 .inlineFormItem {
   display: inline-block !important;
-  margin-bottom: 0 !important;
+  margin : 4px 0 0 0 !important;
   min-width: clamp(200px, 400px, 800px);
 }
 
@@ -29,6 +30,7 @@
 
     .panelHeaderFormItem {
       @extend .inlineFormItem;
+      margin-left: 40px !important;
     }
 
     .contentListItem {
@@ -40,13 +42,17 @@
   }
 }
 
+.sessionPopupAccordionItem {
+  margin-top: 10px;
+}
+
 .contentPopupItem {
   padding: 8px;
   border-radius: 8px;
   border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
   box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
 
-  .videoContentPopupImage, .sessionContentPopupImage {
+  .videoContentPopupImage {
     height: 120px;
     object-fit: scale-down;
   }

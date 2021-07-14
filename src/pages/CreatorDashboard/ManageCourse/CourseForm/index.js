@@ -60,7 +60,7 @@ const formInitialValues = {
 const { Title } = Typography;
 const { TextArea } = Input;
 
-const Course = ({ match, history }) => {
+const CourseForm = ({ match, history }) => {
   const [form] = Form.useForm();
 
   const courseId = match.params.course_id;
@@ -246,7 +246,7 @@ const Course = ({ match, history }) => {
     }
   };
 
-  const handleFinish = async (values) => {
+  const handleFinish = async (values, shouldRedirect = true) => {
     setSubmitting(true);
 
     // NOTE : The values below are hard coded for now because they should be changed in the next page
@@ -303,6 +303,11 @@ const Course = ({ match, history }) => {
       if (isAPISuccess(status)) {
         setSubmitting(false);
         showSuccessModal(`${payload.name} successfully ${courseId ? 'updated' : 'created'}`);
+
+        if (shouldRedirect) {
+          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses);
+        }
+
         if (courseId) {
           return courseId;
         } else if (data?.id) {
@@ -320,7 +325,7 @@ const Course = ({ match, history }) => {
   };
 
   const gotoModulePage = async () => {
-    const courseExternalId = await handleFinish(form.getFieldsValue());
+    const courseExternalId = await handleFinish(form.getFieldsValue(), false);
     if (courseExternalId) {
       history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
     }
@@ -723,4 +728,4 @@ const Course = ({ match, history }) => {
   );
 };
 
-export default Course;
+export default CourseForm;
