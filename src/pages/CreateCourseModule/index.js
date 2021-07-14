@@ -43,13 +43,13 @@ import { courseCreatePageLayout } from 'layouts/FormLayouts';
 import styles from './styles.module.scss';
 
 const courseCurriculumTypes = {
-  LIVE: {
-    name: 'LIVE',
-    label: 'Live sessions only',
-  },
   MIXED: {
     name: 'MIXED',
     label: 'Both live sessions & videos',
+  },
+  LIVE: {
+    name: 'LIVE',
+    label: 'Live sessions only',
   },
   VIDEO: {
     name: 'VIDEO',
@@ -150,8 +150,8 @@ const CreateCourseModule = ({ match, history }) => {
           setCourseDetails(data);
 
           form.setFieldsValue({
-            modules: data.modules ?? [],
-            curriculumType: data?.type ?? courseCurriculumTypes.MIXED.name,
+            modules: data?.modules ?? [],
+            curriculumType: data?.type || courseCurriculumTypes.MIXED.name,
             courseStartDate: data?.start_date ? moment(data?.start_date) : moment(),
             courseEndDate: data?.end_date ? moment(data?.end_date) : moment().add(1, 'day'),
             maxParticipants: data?.max_participants ?? 1,
@@ -301,17 +301,17 @@ const CreateCourseModule = ({ match, history }) => {
         {inventories.map((inventory) => (
           <Col xs={24} key={inventory.inventory_external_id}>
             <Row gutter={[12, 12]} className={styles.contentPopupItem}>
-              <Col xs={24} md={6}>
+              <Col xs={24} md={8}>
                 <Image
                   src={inventory.session_image_url || 'error'}
                   alt={inventory.name}
                   fallback={DefaultImage()}
-                  className={styles.thumbnailImage}
+                  className={styles.sessionContentPopupImage}
                 />
               </Col>
-              <Col xs={24} md={18}>
+              <Col xs={24} md={16}>
                 <Space size="large" direction="vertical">
-                  <Title level={4}>{inventory.name}</Title>
+                  <Title level={5}>{inventory.name}</Title>
                   <Button
                     onClick={() =>
                       addSessionsToContent({
@@ -346,17 +346,17 @@ const CreateCourseModule = ({ match, history }) => {
         {videos.map((video) => (
           <Col xs={24} key={video.external_id}>
             <Row gutter={[12, 12]} className={styles.contentPopupItem}>
-              <Col xs={24} md={6}>
+              <Col xs={24} md={8}>
                 <Image
                   src={video.thumbnail_url || 'error'}
                   alt={video.title}
                   fallback={DefaultImage()}
-                  className={styles.thumbnailImage}
+                  className={styles.videoContentPopupImage}
                 />
               </Col>
-              <Col xs={24} md={18}>
+              <Col xs={24} md={16}>
                 <Space size="large" direction="vertical">
-                  <Title level={4}>{video.title}</Title>
+                  <Title level={5}>{video.title}</Title>
                   <Button
                     onClick={() =>
                       addVideosToContent({
@@ -377,8 +377,10 @@ const CreateCourseModule = ({ match, history }) => {
     </Modal>
   );
 
-  const isSessionsOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.LIVE.name;
   const isVideosOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.VIDEO.name;
+
+  const getContentProductType = (moduleName, contentName) =>
+    form.getFieldValue(['modules', moduleName, 'module_content', contentName, 'product_type']);
 
   return (
     <>
@@ -415,7 +417,10 @@ const CreateCourseModule = ({ match, history }) => {
                     >
                       <Radio.Group>
                         {Object.entries(courseCurriculumTypes).map(([key, val]) => (
-                          <Radio value={val.name}> {val.label} </Radio>
+                          <Radio key={key} value={val.name}>
+                            {' '}
+                            {val.label}{' '}
+                          </Radio>
                         ))}
                       </Radio.Group>
                     </Form.Item>
@@ -481,17 +486,17 @@ const CreateCourseModule = ({ match, history }) => {
                     </Form.Item>
                   </Col>
                   {/* Validity Field */}
-                  <Col xs={isSessionsOnlyCourse() ? 0 : 24}>
+                  <Col xs={isVideosOnlyCourse() ? 24 : 0}>
                     <Form.Item
                       {...courseCreatePageLayout}
-                      hidden={isSessionsOnlyCourse()}
+                      hidden={!isVideosOnlyCourse()}
                       id="videoValidity"
                       name="validity"
-                      label="Validity"
+                      label="Validity (days)"
                       rules={
-                        isSessionsOnlyCourse()
-                          ? []
-                          : validationRules.numberValidation('Please input course videos validity', 1)
+                        isVideosOnlyCourse()
+                          ? validationRules.numberValidation('Please input course videos validity', 1)
+                          : []
                       }
                     >
                       <InputNumber placeholder="Course Videos Validity" min={1} className={styles.numericInput} />
@@ -558,7 +563,7 @@ const CreateCourseModule = ({ match, history }) => {
                                               {contentFields.map(
                                                 ({
                                                   key: contentKey,
-                                                  name: contentName,
+                                                  name: contentFieldName,
                                                   fieldKey: contentFieldKey,
                                                   ...contentFormItemRestFields
                                                 }) => (
@@ -571,7 +576,7 @@ const CreateCourseModule = ({ match, history }) => {
                                                       <Form.Item
                                                         {...contentFormItemRestFields}
                                                         id="content_name"
-                                                        name={[contentName, 'name']}
+                                                        name={[contentFieldName, 'name']}
                                                         fieldKey={[contentFieldKey, 'name']}
                                                         className={styles.inlineFormItem}
                                                       >
@@ -580,7 +585,7 @@ const CreateCourseModule = ({ match, history }) => {
                                                       <Form.Item
                                                         hidden={true}
                                                         id="content_id"
-                                                        name={[contentName, 'product_id']}
+                                                        name={[contentFieldName, 'product_id']}
                                                         fieldKey={[contentFieldKey, 'product_id']}
                                                       >
                                                         <Input placeholder="Content ID" maxLength={50} />
@@ -588,36 +593,74 @@ const CreateCourseModule = ({ match, history }) => {
                                                       <Form.Item
                                                         hidden={true}
                                                         id="content_type"
-                                                        name={[contentName, 'product_type']}
+                                                        name={[contentFieldName, 'product_type']}
                                                         fieldKey={[contentFieldKey, 'product_type']}
                                                       >
                                                         <Input placeholder="Content Type" maxLength={50} />
                                                       </Form.Item>
                                                     </Col>
                                                     <Col xs={6}>
-                                                      <Row gutter={[10, 10]} justify="end">
-                                                        <Col xs={6}>
-                                                          <Tooltip title="Add Video Content">
-                                                            <PlayCircleOutlined
-                                                              onClick={() => openVideoPopup(addMoreContent)}
-                                                            />
-                                                          </Tooltip>
-                                                        </Col>
-                                                        <Col xs={6}>
-                                                          <Tooltip title="Add Session Content">
-                                                            <VideoCameraAddOutlined
-                                                              onClick={() => openSessionPopup(addMoreContent)}
-                                                            />
-                                                          </Tooltip>
-                                                        </Col>
-                                                        <Col xs={6}>
-                                                          <Tooltip title="Remove content">
-                                                            <MinusCircleTwoTone
-                                                              twoToneColor="#FF0000"
-                                                              onClick={() => removeContent(contentName)}
-                                                            />
-                                                          </Tooltip>
-                                                        </Col>
+                                                      <Row gutter={[10, 10]} justify="end" align="middle">
+                                                        {getContentProductType(moduleFieldName, contentFieldName) ? (
+                                                          <>
+                                                            <Col xs={12}>
+                                                              <Text type="secondary">
+                                                                {getContentProductType(
+                                                                  moduleFieldName,
+                                                                  contentFieldName
+                                                                )[0].toUpperCase()}
+                                                                {getContentProductType(
+                                                                  moduleFieldName,
+                                                                  contentFieldName
+                                                                )
+                                                                  .slice(1)
+                                                                  .toLowerCase()}{' '}
+                                                                content
+                                                              </Text>
+                                                            </Col>
+                                                            <Col xs={6}>
+                                                              <Tooltip title="Remove content">
+                                                                <Button
+                                                                  size="large"
+                                                                  type="link"
+                                                                  icon={<MinusCircleTwoTone twoToneColor="#FF0000" />}
+                                                                  onClick={() => removeContent(contentFieldName)}
+                                                                />
+                                                              </Tooltip>
+                                                            </Col>
+                                                          </>
+                                                        ) : (
+                                                          <>
+                                                            <Col xs={6}>
+                                                              <Tooltip title="Add Video Content">
+                                                                <Button
+                                                                  disabled={
+                                                                    courseCurriculumType ===
+                                                                    courseCurriculumTypes.LIVE.name
+                                                                  }
+                                                                  size="large"
+                                                                  type="link"
+                                                                  icon={<PlayCircleOutlined />}
+                                                                  onClick={() => openVideoPopup(addMoreContent)}
+                                                                />
+                                                              </Tooltip>
+                                                            </Col>
+                                                            <Col xs={6}>
+                                                              <Tooltip title="Add Session Content">
+                                                                <Button
+                                                                  disabled={
+                                                                    courseCurriculumType ===
+                                                                    courseCurriculumTypes.VIDEO.name
+                                                                  }
+                                                                  size="large"
+                                                                  type="link"
+                                                                  icon={<VideoCameraAddOutlined />}
+                                                                  onClick={() => openSessionPopup(addMoreContent)}
+                                                                />
+                                                              </Tooltip>
+                                                            </Col>
+                                                          </>
+                                                        )}
                                                       </Row>
                                                     </Col>
                                                   </Row>
