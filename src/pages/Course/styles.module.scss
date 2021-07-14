@@ -14,7 +14,7 @@
 }
 
 .inputWithButton {
-  width: 95% !important;
+  width: 80% !important;
   margin-right: 10px !important;
   display: inline-block;
 }
@@ -34,8 +34,9 @@
     :global {
       div.ant-upload {
         width: 100% !important;
-        min-height: 200px !important;
-        
+        // min-height: 200px !important;
+        aspect-ratio: 1;
+        height: 100%;
       }  
     }
   }
@@ -58,7 +59,9 @@
 }
 
 .textAreaInput {
-  min-height: 200px !important;
+  > textarea {
+    min-height: 120px !important;
+  }
 }
 
 .inlineFormItem {

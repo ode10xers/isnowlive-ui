@@ -49,18 +49,8 @@ const formInitialValues = {
   courseName: '',
   description: '',
   summary: '',
-  topic: [
-    {
-      heading: '',
-      description: '',
-    },
-  ],
-  faqs: [
-    {
-      question: '',
-      answer: '',
-    },
-  ],
+  topic: [],
+  faqs: [],
   priceType: coursePriceTypes.FREE.name,
   price: 10,
   courseTagType: 'anyone',
@@ -359,7 +349,7 @@ const Course = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={4}>1. Course Information</Title>
+                <Title level={4}>1. Basic Course Information</Title>
               </Col>
               <Col xs={24}>
                 <Form.Item
@@ -395,12 +385,17 @@ const Course = ({ match, history }) => {
               <Col xs={24}>
                 <Form.Item
                   {...courseCreatePageLayout}
-                  label="Course Description"
+                  label="Short summary of the course"
                   name="description"
                   id="description"
                   rules={validationRules.requiredValidation}
                 >
-                  <TextArea placeholder="Describe this course briefly" className={styles.textAreaInput} />
+                  <TextArea
+                    showCount={true}
+                    placeholder="Describe this course briefly (max 280 characters)"
+                    maxLength={280}
+                    className={styles.textAreaInput}
+                  />
                 </Form.Item>
               </Col>
               <Col xs={24}>
@@ -408,17 +403,19 @@ const Course = ({ match, history }) => {
                   {...courseCreatePageLayout}
                   id="summary"
                   name="summary"
-                  label="What will students learn"
+                  label="Details of what students will learn"
                   rules={validationRules.requiredValidation}
                 >
                   <TextArea
-                    placeholder="Describe what will the students learn from this course"
+                    placeholder="Describe what will the students learn from this course (max 800 characters)"
+                    maxLength={800}
+                    showCount={true}
                     className={styles.textAreaInput}
                   />
                 </Form.Item>
               </Col>
               <Col xs={24}>
-                <Form.Item {...courseCreatePageLayout} label="Preview Images">
+                <Form.Item {...courseCreatePageLayout} label="Any images you want to add (Course Preview/Testimonial)">
                   <Row gutter={[10, 10]}>
                     <Col xs={12} md={8} lg={6}>
                       <div className={styles.previewImageUploaderContainer}>
@@ -458,7 +455,7 @@ const Course = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={3}>2. Who is this course for</Title>
+                <Title level={3}>2. Who should attend this course (Optional)</Title>
               </Col>
               <Col xs={24}>
                 <Form.List name="topic">
@@ -467,7 +464,7 @@ const Course = ({ match, history }) => {
                       {fields.map(({ key, name, fieldKey, ...restField }) => (
                         <Row key={key}>
                           <Col xs={24}>
-                            <Form.Item {...courseCreatePageLayout} label="Heading" required={true}>
+                            <Form.Item {...courseCreatePageLayout} label="Student type heading" required={true}>
                               <Form.Item
                                 {...restField}
                                 id="heading"
@@ -499,14 +496,16 @@ const Course = ({ match, history }) => {
                               {...restField}
                               {...courseCreatePageLayout}
                               id="topic_description"
-                              label="Description"
+                              label="Student Type Description"
                               name={[name, 'description']}
                               fieldKey={[fieldKey, 'description']}
                               rules={validationRules.requiredValidation}
                             >
                               <TextArea
                                 className={styles.textAreaInput}
-                                placeholder="Describe who is this course for"
+                                showCount={true}
+                                maxLength={280}
+                                placeholder="Describe who is this course for (max 280 characters)"
                               />
                             </Form.Item>
                           </Col>
@@ -516,7 +515,7 @@ const Course = ({ match, history }) => {
                         <Row>
                           <Col xs={24} md={{ span: 6, offset: 8 }}>
                             <Button block size="large" type="primary" onClick={() => add()} icon={<PlusOutlined />}>
-                              Add More Item
+                              Add Attendee Types
                             </Button>
                           </Col>
                         </Row>
@@ -532,7 +531,7 @@ const Course = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={3}>3. Frequently Asked Questions</Title>
+                <Title level={3}>3. Frequently Asked Questions (Optional)</Title>
               </Col>
               <Col xs={24}>
                 <Form.List name="faqs">
@@ -580,7 +579,9 @@ const Course = ({ match, history }) => {
                             >
                               <TextArea
                                 className={styles.textAreaInput}
-                                placeholder="Describe the answer to the question above"
+                                showCount={true}
+                                maxLength={280}
+                                placeholder="Describe the answer to the question above (max 280 characters)"
                               />
                             </Form.Item>
                           </Col>
@@ -606,7 +607,7 @@ const Course = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={4}>4. Pricing and details</Title>
+                <Title level={4}>4. Course Pricing</Title>
               </Col>
               <Col xs={24}>
                 <Row gutter={8}>
