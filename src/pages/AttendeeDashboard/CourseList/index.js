@@ -1,25 +1,23 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Row, Col, Button, Typography, Card, Collapse, Tag } from 'antd';
+import { Row, Col, Button, Typography, Card, Collapse, Tag, Space, Divider, Image } from 'antd';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import Table from 'components/Table';
+import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal } from 'components/Modals/modals';
 
-import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, isUnapprovedUserError } from 'utils/helper';
+import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 
 import styles from './styles.module.scss';
 
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
-const {
-  formatDate: { toShortDateWithYear },
-} = dateUtil;
 
 const CourseList = () => {
   const history = useHistory();
@@ -49,46 +47,92 @@ const CourseList = () => {
   }, [fetchUserCourseOrders]);
 
   const redirectToCourseOrderDetails = (courseOrder) => {
-    if (courseOrder.creator_username && courseOrder.course_id) {
-      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_id}`, {
-        username: courseOrder.creator_username || 'app',
+    if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
+      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`, {
+        username: courseOrder?.course?.creator_username || 'app',
       });
     }
   };
 
+  const renderCourseContents = (courseOrder) => {
+    const sessionCount = getCourseSessionContentCount(courseOrder.course?.modules ?? []);
+    const videoCount = getCourseVideoContentCount(courseOrder.course?.modules ?? []);
+
+    return (
+      <Tag color="blue">
+        <Space split={<Divider type="vertical" />}>
+          {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
+          {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
+        </Space>
+      </Tag>
+    );
+  };
+
+  const renderCourseItem = (item) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={7}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={17} className={styles.mobileDetailsText}>
+          : {value}
+        </Col>
+      </Row>
+    );
+
+    return (
+      <Card
+        key={item.course_order_id}
+        bodyStyle={{ padding: '10px' }}
+        title={
+          <div onClick={() => redirectToCourseOrderDetails(item)}>
+            <Text>{item?.course?.name}</Text>
+          </div>
+        }
+        actions={[
+          <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(item)}>
+            Details
+          </Button>,
+        ]}
+      >
+        <div onClick={() => redirectToCourseOrderDetails(item)}>
+          {layout('Contents', renderCourseContents(item))}
+          {layout('Duration', <Text>{item?.duration} days</Text>)}
+          {layout('Price', <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>)}
+        </div>
+      </Card>
+    );
+  };
+
   const courseColumns = [
     {
-      title: 'Course Name',
-      key: 'name',
-      dataIndex: 'name',
-      render: (text, record) => {
-        return {
-          props: {
-            style: {
-              borderLeft: `6px solid ${record.color_code || '#FFF'}`,
-            },
-          },
-          children: <Text> {record?.course_name} </Text>,
-        };
-      },
-    },
-    {
-      title: 'Course Content',
-      key: 'videos',
-      dataIndex: 'videos',
+      title: '',
+      dataIndex: ['course', 'course_image_url'],
+      align: 'center',
+      width: '180px',
       render: (text, record) => (
-        <>
-          {record?.videos?.length > 0 && <Tag color="blue"> {record?.videos?.length} Videos </Tag>}
-          {record?.inventory_ids?.length > 0 && <Tag color="volcano"> {record?.inventory_ids?.length} Sessions </Tag>}
-        </>
+        <Image
+          src={text || 'error'}
+          alt={record.course?.name}
+          fallback={DefaultImage()}
+          className={styles.thumbnailImage}
+        />
       ),
     },
     {
+      title: 'Course Name',
+      dataIndex: ['course', 'name'],
+    },
+    {
+      title: 'Course Content',
+      width: '150px',
+      render: renderCourseContents,
+    },
+    {
       title: 'Duration',
-      key: 'start_date',
-      dataIndex: 'start_date',
-      width: '210px',
-      render: (text, record) => `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
+      dataIndex: ['course', 'duration'],
+      width: '90px',
+      render: (text) => `${text} days`,
     },
     {
       title: 'Price',
@@ -112,51 +156,6 @@ const CourseList = () => {
       ),
     },
   ];
-
-  const renderCourseItem = (item) => {
-    const layout = (label, value) => (
-      <Row>
-        <Col span={7}>
-          <Text strong>{label}</Text>
-        </Col>
-        <Col span={17} className={styles.mobileDetailsText}>
-          : {value}
-        </Col>
-      </Row>
-    );
-
-    return (
-      <Card
-        key={item.course_id}
-        bodyStyle={{ padding: '10px' }}
-        title={
-          <div onClick={() => redirectToCourseOrderDetails(item)}>
-            <Text>{item?.course_name}</Text>
-          </div>
-        }
-        actions={[
-          <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(item)}>
-            Details
-          </Button>,
-        ]}
-      >
-        <div onClick={() => redirectToCourseOrderDetails(item)}>
-          {layout(
-            'Contents',
-            <Text>
-              {item?.videos?.length > 0 && <Tag color="blue"> {item?.videos?.length} Videos </Tag>}
-              {item?.inventory_ids?.length > 0 && <Tag color="volcano"> {item?.inventory_ids?.length} Sessions </Tag>}
-            </Text>
-          )}
-          {layout(
-            'Duration',
-            <Text>{`${toShortDateWithYear(item?.start_date)} - ${toShortDateWithYear(item?.end_date)}`}</Text>
-          )}
-          {layout('Price', <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>)}
-        </div>
-      </Card>
-    );
-  };
 
   return (
     <div className={styles.box}>
