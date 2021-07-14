@@ -1,22 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 
-import {
-  Row,
-  Col,
-  Image,
-  Collapse,
-  Button,
-  Divider,
-  List,
-  Typography,
-  Spin,
-  Popover,
-  Space,
-  Card,
-  // Progress,
-  Tag,
-} from 'antd';
+import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Popover, Space, Card, Tag } from 'antd';
 import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
@@ -27,11 +12,10 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { isAPISuccess, isUnapprovedUserError, preventDefaults, generateUrlFromUsername } from 'utils/helper';
-import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { getCourseSessionDetailsContentCount, getCourseVideoDetailsContentCount } from 'utils/course';
 
 import styles from './style.module.scss';
 
-// TODO: Confirm what to do with the Progress
 const sampleOrderData = {
   course_id: 'albuquerque-sera-sera',
   course_order_id: 'ad-astra-abyssosque',
@@ -46,69 +30,21 @@ const sampleOrderData = {
       module_name: 'First Mixed module',
       contents: [
         {
-          content_id: 'scooby-dooby-doo',
-          content_name: 'First modules first content',
-          content_type: 'SESSION',
-          content_data: {
-            inventory_id: 3535,
-            start_time: '2021-07-08T07:00:00Z',
-            end_time: '2021-07-08T07:30:00Z',
-            session_date: '2021-07-08',
-            price: 16,
-            currency: 'sgd',
-            max_participants: 10,
-            name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-            description: '<p>Desc</p>\n',
-            session_image_url:
-              'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-            document_urls: [],
-            beginning: '2021-06-18T17:00:00Z',
-            expiry: '2021-07-31T16:59:59Z',
-            prerequisites: '',
-            pay_what_you_want: false,
-            recurring: true,
-            is_refundable: false,
-            refund_before_hours: 0,
-            user_timezone_offset: 420,
-            user_timezone: 'Indochina Time',
-            color_code: '#ff9800',
-            is_course: false,
-            is_offline: true,
-            session_id: 382,
-            group: true,
-            is_active: true,
-            session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-            creator_username: 'ellianto',
-            tags: [],
-            offline_event_address: 'Gobi Dessert is better maybe',
-            total_bookings: 0,
-            total_price: 19.2,
+          product_id: 'scooby-dooby-doo',
+          name: 'First modules first content',
+          product_type: 'SESSION',
+          order_data: {
+            join_url: null,
+            order_id: 'scooby-dooby-doo',
           },
         },
         {
-          content_id: 'yabba-dabba-doo',
-          content_name: 'First modules next content',
-          content_type: 'VIDEO',
-          content_data: {
-            title: 'Create, Upload, Cancel after Fix',
-            description: '<p>Test</p>\n',
-            validity: 1,
-            price: 8,
-            pay_what_you_want: false,
-            currency: 'sgd',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-            external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-            is_published: true,
-            video_url: '',
-            video_uid: '11458eea7ad9e069add75a2fb569df50',
-            duration: 489,
-            status: 'UPLOAD_SUCCESS',
-            watch_limit: 1,
-            creator_username: 'ellianto',
-            is_course: false,
-            tags: [],
-            total_price: 9.6,
-            sessions: [],
+          product_id: '1fcf5295-9ff0-4199-98f6-17ca92dd9e4d',
+          name: 'First modules next content',
+          product_type: 'VIDEO',
+          order_data: {
+            join_url: null,
+            order_id: 'p9nyqFygbpR5Tae5',
           },
         },
       ],
@@ -118,55 +54,21 @@ const sampleOrderData = {
       module_name: 'Video only module',
       contents: [
         {
-          content_id: 'yabba-dabba-doo-bi',
-          content_name: 'First Video Content',
-          content_type: 'VIDEO',
-          content_data: {
-            title: 'Create, Upload, Cancel after Fix',
-            description: '<p>Test</p>\n',
-            validity: 1,
-            price: 8,
-            pay_what_you_want: false,
-            currency: 'sgd',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-            external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-            is_published: true,
-            video_url: '',
-            video_uid: '11458eea7ad9e069add75a2fb569df50',
-            duration: 489,
-            status: 'UPLOAD_SUCCESS',
-            watch_limit: 1,
-            creator_username: 'ellianto',
-            is_course: false,
-            tags: [],
-            total_price: 9.6,
-            sessions: [],
+          product_id: '7ced2ff4-6b51-4e07-9a24-1622d6473a88',
+          name: 'First Video Content',
+          product_type: 'VIDEO',
+          order_data: {
+            join_url: null,
+            order_id: '5rzFq50ejB1nvoGZ',
           },
         },
         {
-          content_id: 'yabba-dabba-doo-ba',
-          content_name: 'Next Video Content',
-          content_type: 'VIDEO',
-          content_data: {
-            title: 'Create, Upload, Cancel after Fix',
-            description: '<p>Test</p>\n',
-            validity: 1,
-            price: 8,
-            pay_what_you_want: false,
-            currency: 'sgd',
-            thumbnail_url: 'https://dkfqbuenrrvge.cloudfront.net/image/icpyj903a88nfzHZ_thumbnail.gif',
-            external_id: 'cb4a9cd4-8dc7-4526-9fed-72fb43257a44',
-            is_published: true,
-            video_url: '',
-            video_uid: '11458eea7ad9e069add75a2fb569df50',
-            duration: 489,
-            status: 'UPLOAD_SUCCESS',
-            watch_limit: 1,
-            creator_username: 'ellianto',
-            is_course: false,
-            tags: [],
-            total_price: 9.6,
-            sessions: [],
+          product_id: '7ced2ff4-6b51-4e07-9a24-1622d6473a88',
+          name: 'Next Video Content',
+          product_type: 'VIDEO',
+          order_data: {
+            join_url: null,
+            order_id: '5rzFq50ejB1nvoGZ',
           },
         },
       ],
@@ -176,83 +78,21 @@ const sampleOrderData = {
       module_name: 'Session only module',
       contents: [
         {
-          content_id: 'scooby-dooby-doo-bi',
-          content_name: 'Session modules first content',
-          content_type: 'SESSION',
-          content_data: {
-            inventory_id: 3535,
-            start_time: '2021-07-08T07:00:00Z',
-            end_time: '2021-07-08T07:30:00Z',
-            session_date: '2021-07-08',
-            price: 16,
-            currency: 'sgd',
-            max_participants: 10,
-            name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-            description: '<p>Desc</p>\n',
-            session_image_url:
-              'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-            document_urls: [],
-            beginning: '2021-06-18T17:00:00Z',
-            expiry: '2021-07-31T16:59:59Z',
-            prerequisites: '',
-            pay_what_you_want: false,
-            recurring: true,
-            is_refundable: false,
-            refund_before_hours: 0,
-            user_timezone_offset: 420,
-            user_timezone: 'Indochina Time',
-            color_code: '#ff9800',
-            is_course: false,
-            is_offline: true,
-            session_id: 382,
-            group: true,
-            is_active: true,
-            session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-            creator_username: 'ellianto',
-            tags: [],
-            offline_event_address: 'Gobi Dessert is better maybe',
-            total_bookings: 0,
-            total_price: 19.2,
+          product_id: 'scooby-dooby-doo-bi',
+          name: 'Session modules first content',
+          product_type: 'SESSION',
+          order_data: {
+            join_url: null,
+            order_id: 'scooby-dooby-doo',
           },
         },
         {
-          content_id: 'scooby-dooby-doo-ba',
-          content_name: 'Session modules first content',
-          content_type: 'SESSION',
-          content_data: {
-            inventory_id: 3535,
-            start_time: '2021-07-08T07:00:00Z',
-            end_time: '2021-07-08T07:30:00Z',
-            session_date: '2021-07-08',
-            price: 16,
-            currency: 'sgd',
-            max_participants: 10,
-            name: 'Yoga at the Park (Guided by: Irini Lembessis) LAVAL',
-            description: '<p>Desc</p>\n',
-            session_image_url:
-              'https://dkfqbuenrrvge.cloudfront.net/image/6xC6Fn7yFOsqrEo0_desert safari facebook cover.png',
-            document_urls: [],
-            beginning: '2021-06-18T17:00:00Z',
-            expiry: '2021-07-31T16:59:59Z',
-            prerequisites: '',
-            pay_what_you_want: false,
-            recurring: true,
-            is_refundable: false,
-            refund_before_hours: 0,
-            user_timezone_offset: 420,
-            user_timezone: 'Indochina Time',
-            color_code: '#ff9800',
-            is_course: false,
-            is_offline: true,
-            session_id: 382,
-            group: true,
-            is_active: true,
-            session_external_id: '29ce0e74-113d-4756-a723-eec687f623a9',
-            creator_username: 'ellianto',
-            tags: [],
-            offline_event_address: 'Gobi Dessert is better maybe',
-            total_bookings: 0,
-            total_price: 19.2,
+          product_id: 'scooby-dooby-doo-ba',
+          name: 'Session modules first content',
+          product_type: 'SESSION',
+          order_data: {
+            join_url: 'https://zoom.us/j/97026118970?pwd=ZVUvMldxZ2ZrZ1NBakN2c3dUVDNmUT09',
+            order_id: 'scooby-dooby-doo',
           },
         },
       ],
@@ -311,16 +151,22 @@ const CourseOrderDetails = ({ match, history }) => {
     history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses);
   };
 
-  const redirectToVideoOrderDetails = (e) => {
-    preventDefaults(e);
+  const redirectToVideoOrderDetails = (content, isExpired = false) => {
+    console.log(content);
+    history.push(
+      Routes.attendeeDashboard.rootPath +
+        Routes.attendeeDashboard.videos +
+        `/${content.product_id}/${content.order_data.order_id}`,
+      { video_order: { ...content, isExpired } }
+    );
   };
 
   const renderCourseOrderContent = (courseOrder) => {
-    const sessionCount = getCourseSessionContentCount(courseOrder.modules);
-    const videoCount = getCourseVideoContentCount(courseOrder.modules);
+    const sessionCount = getCourseSessionDetailsContentCount(courseOrder.modules);
+    const videoCount = getCourseVideoDetailsContentCount(courseOrder.modules);
 
     return (
-      <Space size="small" split={<Divider type="vertical" />}>
+      <Space split={<Divider type="vertical" />}>
         {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
         {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
       </Space>
@@ -373,25 +219,27 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderExtraContent = (content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
-        <Text> {toLongDateWithDay(content?.start_time)} </Text>
+        <Text> {toLongDateWithDay(content?.order_data?.start_time)} </Text>
         <Text>
           {' '}
-          {toLocaleTime(content?.start_time)} - {toLocaleTime(content?.end_time)}{' '}
+          {toLocaleTime(content?.order_data?.start_time)} - {toLocaleTime(content?.order_data?.end_time)}{' '}
         </Text>
         <AddToCalendarButton
           iconOnly={true}
           eventData={{
             ...content,
-            page_url: `${generateUrlFromUsername(content?.username)}/e/${content?.inventory_id}`,
+            page_url: `${generateUrlFromUsername(content?.order_data?.username)}/e/${
+              content?.order_data?.inventory_id
+            }`,
           }}
         />
-        {content.is_offline ? (
+        {content.order_data.is_offline ? (
           <Popover
             arrowPointAtCenter
             placement="topRight"
             trigger="click"
             title="Event Address"
-            content={content.offline_event_address}
+            content={content.order_data.offline_event_address}
           >
             <Button block size="small" type="text" className={styles.success}>
               In person
@@ -401,9 +249,9 @@ const CourseOrderDetails = ({ match, history }) => {
           <Button
             type="primary"
             size="small"
-            className={!content.join_url ? styles.disabledBuyBtn : styles.buyBtn}
-            disabled={!content.join_url}
-            onClick={() => window.open(content.join_url)}
+            className={!content.order_data.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+            disabled={!content.order_data.join_url}
+            onClick={() => window.open(content.order_data.join_url)}
           >
             Join
           </Button>
@@ -411,39 +259,39 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text> {Math.floor(content.duration / 60)} mins </Text>
-        <Button type="primary" onClick={redirectToVideoOrderDetails}>
+        <Text> {Math.floor(content.order_data.duration / 60)} mins </Text>
+        <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
       </Space>
     );
 
   const renderMobileModuleContent = (content) => (
-    <Col xs={24} key={content.content_id}>
+    <Col xs={24} key={content.product_id}>
       <Card
-        title={content.content_name}
-        extra={renderContentIcon(content.content_type)}
+        title={content.name}
+        extra={renderContentIcon(content.product_type)}
         actions={
-          content?.content_type === 'SESSION'
+          content?.product_type === 'SESSION'
             ? [
                 <div className={styles.addToCalendarContainer}>
                   <AddToCalendarButton
                     buttonText="Add to Cal"
                     eventData={{
-                      ...content?.content_data,
-                      page_url: `${generateUrlFromUsername(content?.content_data?.username)}/e/${
-                        content?.content_data?.inventory_id
+                      ...content?.order_data,
+                      page_url: `${generateUrlFromUsername(content?.order_data?.username)}/e/${
+                        content?.order_data?.inventory_id
                       }`,
                     }}
                   />
                 </div>,
-                content?.content_data?.is_offline ? (
+                content?.order_data?.is_offline ? (
                   <Popover
                     arrowPointAtCenter
                     placement="topRight"
                     trigger="click"
                     title="Event Address"
-                    content={content?.content_data?.offline_event_address}
+                    content={content?.order_data?.offline_event_address}
                   >
                     <Button block size="small" type="text" className={styles.success}>
                       In person
@@ -454,36 +302,36 @@ const CourseOrderDetails = ({ match, history }) => {
                     type="primary"
                     block
                     size="small"
-                    className={!content?.content_data?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
-                    disabled={!content?.content_data?.join_url}
-                    onClick={() => window.open(content?.content_data?.join_url)}
+                    className={!content?.order_data?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+                    disabled={!content?.order_data?.join_url}
+                    onClick={() => window.open(content?.order_data?.join_url)}
                   >
                     Join
                   </Button>
                 ),
               ]
             : [
-                <Button type="primary" onClick={redirectToVideoOrderDetails}>
+                <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
                   Watch Now
                 </Button>,
               ]
         }
       >
         <Row gutter={[4, 10]} align="middle">
-          {content?.content_type === 'SESSION' ? (
+          {content?.product_type === 'SESSION' ? (
             <>
               <Col xs={6}> Date </Col>
-              <Col xs={18}> : {toLongDateWithDay(content?.content_data?.start_time)} </Col>
+              <Col xs={18}> : {toLongDateWithDay(content?.order_data?.start_time)} </Col>
               <Col xs={6}> Time </Col>
               <Col xs={18}>
                 {' '}
-                : {toLocaleTime(content?.content_data?.start_time)} - {toLocaleTime(content?.content_data?.end_time)}{' '}
+                : {toLocaleTime(content?.order_data?.start_time)} - {toLocaleTime(content?.order_data?.end_time)}{' '}
               </Col>
             </>
           ) : (
             <>
               <Col xs={10}> Duration </Col>
-              <Col xs={14}> : {Math.floor(content?.content_data?.duration / 60)} mins </Col>
+              <Col xs={14}> : {Math.floor(content?.order_data?.duration / 60)} mins </Col>
             </>
           )}
         </Row>
@@ -492,16 +340,16 @@ const CourseOrderDetails = ({ match, history }) => {
   );
 
   const renderModuleContents = (content) => (
-    <List.Item key={content.content_id}>
+    <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
         <Col xs={24} md={12}>
           <Space className={styles.w100}>
-            {renderContentIcon(content.content_type)}
-            <Text strong> {content.content_name} </Text>
+            {renderContentIcon(content.product_type)}
+            <Text strong> {content.name} </Text>
           </Space>
         </Col>
         <Col xs={24} md={12} className={styles.textAlignRight}>
-          <Text type="secondary"> {renderExtraContent(content.content_data, content.content_type)} </Text>
+          <Text type="secondary"> {renderExtraContent(content, content.product_type)} </Text>
         </Col>
       </Row>
     </List.Item>
@@ -520,7 +368,7 @@ const CourseOrderDetails = ({ match, history }) => {
         ) : (
           <List
             size="small"
-            rowKey={(record) => record.content_id}
+            rowKey={(record) => record.product_id}
             dataSource={courseModule?.contents}
             renderItem={renderModuleContents}
           />
