@@ -64,11 +64,12 @@ export const redirectToCoursesPage = (course) => {
   const baseUrl = generateUrlFromUsername(course.creator_username || urlUsername);
   const targetUrl = `${baseUrl}/c/${course.id}`;
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    window.open(targetUrl, '_self');
-  } else {
-    window.open(targetUrl);
-  }
+  window.open(targetUrl);
+  // if (isInIframeWidget() || isWidgetUrl()) {
+  //   window.open(targetUrl, '_self');
+  // } else {
+  //   window.open(targetUrl);
+  // }
 };
 
 export const redirectToPassesPage = (pass) => {
