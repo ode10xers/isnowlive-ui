@@ -12,7 +12,13 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, isUnapprovedUserError, preventDefaults, generateUrlFromUsername } from 'utils/helper';
+import {
+  isAPISuccess,
+  isUnapprovedUserError,
+  preventDefaults,
+  generateUrlFromUsername,
+  deepCloneObject,
+} from 'utils/helper';
 import { getCourseSessionDetailsContentCount, getCourseVideoDetailsContentCount } from 'utils/course';
 
 import styles from './style.module.scss';
@@ -30,35 +36,96 @@ const CourseOrderDetails = ({ match, history }) => {
   const [courseOrderDetails, setCourseOrderDetails] = useState(null);
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);
 
-  const fetchCourseOrderDetails = useCallback(async (courseOrderID) => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.courses.getAttendeeCourses();
+  const fetchCourseContentDetails = useCallback(async (courseData) => {
+    let tempCourseData = deepCloneObject(courseData);
+    if (courseData.course.modules?.length > 0) {
+      try {
+        tempCourseData.course.modules = await Promise.all(
+          courseData.course.modules.map(async (courseModule) => {
+            let tempModuleData = deepCloneObject(courseModule);
 
-      if (isAPISuccess(status) && data) {
-        const activeData = data.active;
-        activeData.forEach((course) => {
-          if (course.course_order_id === courseOrderID) {
-            setCourseOrderDetails(course);
-            //setExpandedCourseModules(course.course.modules?.map((courseModule) => courseModule.module_id) ?? []);
-          }
-        });
+            if (courseModule.module_content?.length > 0) {
+              try {
+                tempModuleData.module_content = await Promise.all(
+                  courseModule.module_content.map(async (moduleContent) => {
+                    let productData = null;
+                    let targetAPI = null;
 
-        //setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.module_id) ?? []);
-      }
-    } catch (error) {
-      console.error(error);
+                    console.log(moduleContent.product_type);
+                    if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
+                      targetAPI = apis.videos.getVideoById;
+                    }
 
-      if (!isUnapprovedUserError(error?.response)) {
-        showErrorModal(
-          'Failed to fetch attendee course order details',
-          error?.response?.data?.message || 'Something went wrong.'
+                    if (targetAPI) {
+                      try {
+                        const { status, data } = await targetAPI(moduleContent.product_id);
+
+                        if (isAPISuccess(status) && data) {
+                          productData = data;
+                        }
+                      } catch (error) {
+                        console.error('Failed fetching product details for content');
+                        console.error(error);
+                      }
+                    }
+
+                    return {
+                      ...moduleContent,
+                      product_data: productData,
+                    };
+                  })
+                );
+              } catch (error) {
+                console.error('Failed fetching course content details');
+                console.error(error);
+              }
+            }
+
+            return tempModuleData;
+          })
         );
+      } catch (error) {
+        console.error('Failed fetching course module details');
+        console.error(error);
       }
     }
 
-    setIsLoading(false);
+    setCourseOrderDetails(tempCourseData);
   }, []);
+
+  const fetchCourseOrderDetails = useCallback(
+    async (courseOrderID) => {
+      setIsLoading(true);
+      try {
+        const { status, data } = await apis.courses.getAttendeeCourses();
+
+        if (isAPISuccess(status) && data) {
+          const activeData = data.active;
+          activeData.forEach((course) => {
+            if (course.course_order_id === courseOrderID) {
+              setCourseOrderDetails(course);
+              fetchCourseContentDetails(course);
+              //setExpandedCourseModules(course.course.modules?.map((courseModule) => courseModule.module_id) ?? []);
+            }
+          });
+
+          //setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.module_id) ?? []);
+        }
+      } catch (error) {
+        console.error(error);
+
+        if (!isUnapprovedUserError(error?.response)) {
+          showErrorModal(
+            'Failed to fetch attendee course order details',
+            error?.response?.data?.message || 'Something went wrong.'
+          );
+        }
+      }
+
+      setIsLoading(false);
+    },
+    [fetchCourseContentDetails]
+  );
 
   useEffect(() => {
     if (courseOrderID) {
@@ -139,17 +206,17 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderExtraContent = (content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
-        <Text>{/* {toLongDateWithDay(content?.order_data?.start_time)} */}</Text>
+        <Text>{/* {toLongDateWithDay(content?.product_data?.start_time)} */}</Text>
         <Text>
           {' '}
-          {/* {toLocaleTime(content?.order_data?.start_time)} - {toLocaleTime(content?.order_data?.end_time)}{' '} */}
+          {/* {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '} */}
         </Text>
         <AddToCalendarButton
           iconOnly={true}
           eventData={{
             ...content,
-            page_url: `${generateUrlFromUsername(content?.order_data?.username)}/e/${
-              content?.order_data?.inventory_id
+            page_url: `${generateUrlFromUsername(content?.product_data?.username)}/e/${
+              content?.product_data?.inventory_id
             }`,
           }}
         />
@@ -159,7 +226,7 @@ const CourseOrderDetails = ({ match, history }) => {
             placement="topRight"
             trigger="click"
             title="Event Address"
-            content={content.order_data.offline_event_address}
+            content={content.product_data.offline_event_address}
           >
             <Button block size="small" type="text" className={styles.success}>
               In person
@@ -179,7 +246,9 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text>{/* {Math.floor(content.order_data.duration / 60)} mins  */}</Text>
+        {console.log('kajbdkjsa')}
+        {console.log(content)}
+        <Text>{Math.floor(content.product_data.duration / 60)} mins </Text>
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
@@ -198,20 +267,20 @@ const CourseOrderDetails = ({ match, history }) => {
                   <AddToCalendarButton
                     buttonText="Add to Cal"
                     eventData={{
-                      ...content?.order_data,
-                      page_url: `${generateUrlFromUsername(content?.order_data?.username)}/e/${
-                        content?.order_data?.inventory_id
+                      ...content?.product_data,
+                      page_url: `${generateUrlFromUsername(content?.product_data?.username)}/e/${
+                        content?.product_data?.inventory_id
                       }`,
                     }}
                   />
                 </div>,
-                content?.order_data?.is_offline ? (
+                content?.product_data?.is_offline ? (
                   <Popover
                     arrowPointAtCenter
                     placement="topRight"
                     trigger="click"
                     title="Event Address"
-                    content={content?.order_data?.offline_event_address}
+                    content={content?.product_data?.offline_event_address}
                   >
                     <Button block size="small" type="text" className={styles.success}>
                       In person
@@ -222,9 +291,9 @@ const CourseOrderDetails = ({ match, history }) => {
                     type="primary"
                     block
                     size="small"
-                    className={!content?.order_data?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
-                    disabled={!content?.order_data?.join_url}
-                    onClick={() => window.open(content?.order_data?.join_url)}
+                    className={!content?.product_data?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+                    disabled={!content?.product_data?.join_url}
+                    onClick={() => window.open(content?.product_data?.join_url)}
                   >
                     Join
                   </Button>
@@ -241,17 +310,17 @@ const CourseOrderDetails = ({ match, history }) => {
           {content?.product_type === 'SESSION' ? (
             <>
               <Col xs={6}> Date </Col>
-              <Col xs={18}> : {toLongDateWithDay(content?.order_data?.start_time)} </Col>
+              <Col xs={18}> : {toLongDateWithDay(content?.product_data?.start_time)} </Col>
               <Col xs={6}> Time </Col>
               <Col xs={18}>
                 {' '}
-                : {toLocaleTime(content?.order_data?.start_time)} - {toLocaleTime(content?.order_data?.end_time)}{' '}
+                : {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '}
               </Col>
             </>
           ) : (
             <>
               <Col xs={10}> Duration </Col>
-              <Col xs={14}> : {Math.floor(content?.order_data?.duration / 60)} mins </Col>
+              <Col xs={14}> : {Math.floor(content?.product_data?.duration / 60)} mins </Col>
             </>
           )}
         </Row>
