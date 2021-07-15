@@ -51,9 +51,10 @@ const CourseOrderDetails = ({ match, history }) => {
                     let productData = null;
                     let targetAPI = null;
 
-                    console.log(moduleContent.product_type);
                     if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
                       targetAPI = apis.videos.getVideoById;
+                    } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
+                      targetAPI = apis.session.getPublicInventoryById;
                     }
 
                     if (targetAPI) {
@@ -206,15 +207,15 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderExtraContent = (content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
-        <Text>{/* {toLongDateWithDay(content?.product_data?.start_time)} */}</Text>
+        <Text>{toLongDateWithDay(content?.product_data?.start_time)}</Text>
         <Text>
           {' '}
-          {/* {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '} */}
+          {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '}
         </Text>
         <AddToCalendarButton
           iconOnly={true}
           eventData={{
-            ...content,
+            ...content.product_data,
             page_url: `${generateUrlFromUsername(content?.product_data?.username)}/e/${
               content?.product_data?.inventory_id
             }`,
@@ -246,8 +247,6 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        {console.log('kajbdkjsa')}
-        {console.log(content)}
         <Text>{Math.floor(content.product_data.duration / 60)} mins </Text>
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
