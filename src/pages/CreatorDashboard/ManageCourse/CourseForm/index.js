@@ -322,6 +322,8 @@ const CourseForm = ({ match, history }) => {
         error?.response?.data?.message || 'Something went wrong.'
       );
     }
+
+    return null;
   };
 
   const gotoModulePage = async () => {
