@@ -152,7 +152,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
           expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
         >
           {groupInventoryBySession(inventories).map((session) => (
-            <Panel key={session.session_id} className={styles.sessionPopupAccordionItem} header={session.session_name}>
+            <Panel key={session.session_id} header={session.session_name}>
               <Table
                 columns={sessionPopupColumns}
                 data={session.inventories}

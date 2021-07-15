@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import moment from 'moment';
 
@@ -231,7 +231,6 @@ const CourseModulesForm = ({ match, history }) => {
 
     if (!courseId || !courseDetails) {
       showErrorModal('Invalid course selected!');
-      setTimeout(() => redirectToCourseSectionDashboard(), 2000);
     }
 
     const modifiedFields = {
@@ -403,20 +402,26 @@ const CourseModulesForm = ({ match, history }) => {
     }
   };
 
+  const inventoryListFilteredByCourseDate = useMemo(() => {
+    if (!courseStartDate || !courseEndDate) {
+      return inventories ?? [];
+    }
+
+    return (
+      inventories?.filter(
+        (inventory) =>
+          moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
+          moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
+      ) ?? []
+    );
+  }, [inventories, courseStartDate, courseEndDate]);
+
   return (
     <>
       <SessionContentPopup
         visible={sessionPopupVisible}
         closeModal={closeSessionPopup}
-        inventories={
-          courseStartDate && courseEndDate
-            ? inventories.filter(
-                (inventory) =>
-                  moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
-                  moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
-              )
-            : inventories
-        }
+        inventories={inventoryListFilteredByCourseDate}
         addContentMethod={addSessionContentMethod}
       />
       <VideoContentPopup
@@ -724,6 +729,8 @@ const CourseModulesForm = ({ match, history }) => {
                                                                                   courseCurriculumType ===
                                                                                   courseCurriculumTypes.LIVE.name
                                                                                     ? `You can't add a video to a live session course`
+                                                                                    : videos?.length <= 0
+                                                                                    ? `You currently don't have a video`
                                                                                     : 'Add Video Content'
                                                                                 }
                                                                               >
@@ -753,6 +760,9 @@ const CourseModulesForm = ({ match, history }) => {
                                                                                     ? `You can't add a session to a video course`
                                                                                     : !courseStartDate || !courseEndDate
                                                                                     ? 'Please pick the course dates first'
+                                                                                    : inventoryListFilteredByCourseDate.length <=
+                                                                                      0
+                                                                                    ? 'No session available for the selected date range'
                                                                                     : 'Add Session Content'
                                                                                 }
                                                                               >
