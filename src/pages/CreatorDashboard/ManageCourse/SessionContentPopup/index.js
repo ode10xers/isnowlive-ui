@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, Modal, Collapse, Typography, Spin, message } from 'antd';
+import { Button, Modal, Collapse, Typography, Spin } from 'antd';
 import { DownOutlined, CheckCircleFilled } from '@ant-design/icons';
 
 import Table from 'components/Table';
@@ -20,7 +20,13 @@ const {
 
 const SessionContentPopup = ({ visible, closeModal, inventories = [], addContentMethod = null }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([]);
   const [selectedSessionPopupContent, setSelectedSessionPopupContent] = useState([]);
+
+  const handleCloseModal = () => {
+    setExpandedAccordionKeys([]);
+    closeModal();
+  };
 
   const handleMarkInventoryAsSelected = (inventoryExternalId) => {
     setIsLoading(true);
@@ -114,10 +120,9 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
           });
         });
 
-      message.success('Sessions added to module successfully!');
       setIsLoading(false);
       setSelectedSessionPopupContent([]);
-      closeModal();
+      handleCloseModal();
     }
   };
 
@@ -126,7 +131,7 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
       title={<Title level={5}> Add Sessions To Module </Title>}
       visible={visible}
       centered={true}
-      onCancel={closeModal}
+      onCancel={handleCloseModal}
       footer={
         <Button type="primary" size="large" onClick={addSessionsToContent} loading={isLoading}>
           Add Selected Session to Module
@@ -141,8 +146,9 @@ const SessionContentPopup = ({ visible, closeModal, inventories = [], addContent
     >
       <Spin spinning={isLoading} tip="Processing..." size="large">
         <Collapse
+          activeKey={expandedAccordionKeys}
+          onChange={setExpandedAccordionKeys}
           expandIconPosition="right"
-          ghost
           expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
         >
           {groupInventoryBySession(inventories).map((session) => (

@@ -15,6 +15,7 @@ import {
   Radio,
   DatePicker,
   Space,
+  message,
 } from 'antd';
 import {
   PlusOutlined,
@@ -71,10 +72,10 @@ const formInitialValues = {
     },
   ],
   curriculumType: courseCurriculumTypes.MIXED.name,
-  max_participants: 1,
+  maxParticipants: 1,
   validity: 1,
-  start_date: moment(),
-  end_date: moment().add(1, 'day'),
+  start_date: null,
+  end_date: null,
 };
 
 const { Panel } = Collapse;
@@ -103,8 +104,8 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseDetails, setCourseDetails] = useState(null);
   const [expandedModulesKeys, setExpandedModulesKeys] = useState([]);
   const [courseCurriculumType, setCourseCurriculumType] = useState(courseCurriculumTypes.MIXED.name);
-  const [courseStartDate, setCourseStartDate] = useState(moment());
-  const [courseEndDate, setCourseEndDate] = useState(moment().add(1, 'day'));
+  const [courseStartDate, setCourseStartDate] = useState(null);
+  const [courseEndDate, setCourseEndDate] = useState(null);
 
   const redirectToCourseSectionDashboard = useCallback(
     () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses),
@@ -152,13 +153,21 @@ const CourseModulesForm = ({ match, history }) => {
           form.setFieldsValue({
             modules: data?.modules ?? [],
             curriculumType: data?.type || courseCurriculumTypes.MIXED.name,
-            courseStartDate: data?.start_date ? moment(data?.start_date) : moment(),
-            courseEndDate: data?.end_date ? moment(data?.end_date) : moment().add(1, 'day'),
+            courseStartDate: data?.start_date ? moment(data?.start_date) : moment().startOf('day'),
+            courseEndDate: data?.end_date ? moment(data?.end_date) : moment().startOf('day').add(1, 'day'),
             maxParticipants: data?.max_participants ?? 1,
             validity: data?.validity ?? 1,
           });
+          setCourseCurriculumType(data?.type || courseCurriculumTypes.MIXED.name);
+          setCourseStartDate(data?.start_date ? moment(data?.start_date) : moment().startOf('day'));
+          setCourseEndDate(data?.end_date ? moment(data?.end_date) : moment().startOf('day').add(1, 'day'));
+          setExpandedModulesKeys(data?.modules?.length > 0 ? [0] : []);
         } else {
           form.resetFields();
+          setCourseCurriculumType(courseCurriculumTypes.MIXED.name);
+          setCourseStartDate(null);
+          setCourseEndDate(null);
+          setExpandedModulesKeys([]);
         }
       } catch (error) {
         console.error(error);
@@ -203,7 +212,7 @@ const CourseModulesForm = ({ match, history }) => {
   };
 
   const disabledStartDates = (currentDate) => {
-    return dateIsBeforeDate(currentDate, moment().startOf('day'));
+    return dateIsBeforeDate(currentDate, moment().startOf('day').subtract(1, 'second'));
   };
 
   const handleEndDateChange = (date) => {
@@ -282,6 +291,10 @@ const CourseModulesForm = ({ match, history }) => {
       );
 
       if (duplicateContentInstance) {
+        message.warning({
+          content: 'Duplicate content will be skipped',
+          key: 'duplicate_content_message',
+        });
         return;
       }
 
@@ -300,6 +313,13 @@ const CourseModulesForm = ({ match, history }) => {
       form.setFieldsValue({
         ...form.getFieldsValue(),
         modules: previousFormValues.modules,
+      });
+
+      message.success({
+        content: `${contentData.product_type[0]}${contentData.product_type
+          .slice(1)
+          .toLowerCase()} successfully added to module!`,
+        key: 'success_add_content_message',
       });
     };
   };
@@ -363,7 +383,15 @@ const CourseModulesForm = ({ match, history }) => {
       <SessionContentPopup
         visible={sessionPopupVisible}
         closeModal={closeSessionPopup}
-        inventories={inventories}
+        inventories={
+          courseStartDate && courseEndDate
+            ? inventories.filter(
+                (inventory) =>
+                  moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
+                  moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
+              )
+            : inventories
+        }
         addContentMethod={addSessionContentMethod}
       />
       <VideoContentPopup
@@ -512,12 +540,19 @@ const CourseModulesForm = ({ match, history }) => {
                                 ...moduleFormItemRestFields
                               }) => (
                                 <Panel
-                                  key={moduleKey}
+                                  key={moduleFieldName}
                                   extra={
-                                    <DeleteOutlined
-                                      className={styles.deleteModuleIconButton}
-                                      onClick={() => removeModule(moduleFieldName)}
-                                    />
+                                    <Tooltip title="Remove this module">
+                                      <DeleteOutlined
+                                        className={styles.deleteModuleIconButton}
+                                        onClick={() => {
+                                          setExpandedModulesKeys((prevKeys) =>
+                                            prevKeys.filter((val) => val !== moduleFieldName)
+                                          );
+                                          removeModule(moduleFieldName);
+                                        }}
+                                      />
+                                    </Tooltip>
                                   }
                                   header={
                                     <Form.Item
@@ -626,6 +661,8 @@ const CourseModulesForm = ({ match, history }) => {
                                                                   courseCurriculumType ===
                                                                   courseCurriculumTypes.VIDEO.name
                                                                     ? `You can't add a session to a video course`
+                                                                    : !courseStartDate || !courseEndDate
+                                                                    ? 'Please pick the course dates first'
                                                                     : 'Add Session Content'
                                                                 }
                                                               >
@@ -633,7 +670,9 @@ const CourseModulesForm = ({ match, history }) => {
                                                                   block
                                                                   disabled={
                                                                     courseCurriculumType ===
-                                                                    courseCurriculumTypes.VIDEO.name
+                                                                      courseCurriculumTypes.VIDEO.name ||
+                                                                    !courseStartDate ||
+                                                                    !courseEndDate
                                                                   }
                                                                   size="large"
                                                                   type="link"
@@ -690,7 +729,12 @@ const CourseModulesForm = ({ match, history }) => {
                             ghost
                             size="large"
                             type="primary"
-                            onClick={() => addMoreModule()}
+                            onClick={() => {
+                              // NOTE : Since the new one will be added at the last place
+                              // We ad the length of current array to the expanded keys
+                              setExpandedModulesKeys((prevKeys) => [...new Set([...prevKeys, moduleFields.length])]);
+                              addMoreModule();
+                            }}
                             icon={<PlusCircleOutlined />}
                           >
                             Add more module
