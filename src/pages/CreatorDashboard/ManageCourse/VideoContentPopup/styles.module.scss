@@ -1,0 +1,13 @@
+@import '../../../../styles/variables.scss';
+
+.contentPopupItem {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+  box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
+
+  .videoContentPopupImage {
+    height: 120px;
+    object-fit: scale-down;
+  }
+}

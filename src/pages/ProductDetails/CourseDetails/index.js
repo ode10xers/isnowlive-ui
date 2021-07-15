@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
+import moment from 'moment';
 
 import { Row, Col, Typography, Button, message, Image, Collapse, List, Space, Carousel } from 'antd';
 import {
@@ -9,6 +10,7 @@ import {
   DownOutlined,
   MinusOutlined,
   PlusOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -37,6 +39,7 @@ import styles from './style.module.scss';
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
 const {
+  formatDate: { toLongDateWithDay },
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
@@ -311,8 +314,17 @@ const CourseDetails = ({ match }) => {
         {renderCourseInfoItem({
           icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
           title: 'Course duration',
-          content: `${course?.validity} days`,
+          content:
+            course?.type === 'VIDEO'
+              ? `${course?.duration ?? 0} days`
+              : `${moment(course?.end_date).diff(moment(course.start_date), 'days')} days`,
         })}
+        {course?.type !== 'VIDEO' &&
+          renderCourseInfoItem({
+            icon: <NotificationOutlined className={styles.courseInfoIcon} />,
+            title: 'Starts at',
+            content: toLongDateWithDay(course?.start_date),
+          })}
       </Row>
     );
   };
@@ -349,10 +361,9 @@ const CourseDetails = ({ match }) => {
         </Col>
         <Col xs={10} md={6} className={styles.textAlignRight}>
           <Text type="secondary">
-            {' '}
             {content.product_type?.toUpperCase() === 'SESSION'
               ? 'Live session'
-              : `${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
+              : `Video : ${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
           </Text>
         </Col>
       </Row>
@@ -390,7 +401,7 @@ const CourseDetails = ({ match }) => {
     return carouselItems.map((carouselItem, idx) => (
       <div className={styles.carouselItem} key={idx}>
         <Image.PreviewGroup>
-          <Row gutter={[10, 10]}>
+          <Row gutter={[10, 10]} justify="center" align="middle">
             {carouselItem.map((imageUrl, imageIndex) => (
               <Col xs={12} md={6} key={`${imageIndex}_${imageUrl}`}>
                 <Image width="100%" className={styles.coursePreviewImage} src={imageUrl} />
@@ -457,67 +468,71 @@ const CourseDetails = ({ match }) => {
           </Col>
           <Col xs={24} className={styles.paddedContent}>
             <Row gutter={[8, 30]}>
-              <Col xs={24}>
-                {/* What you'll learn */}
-                {generateLongDescriptionTemplate(`What you'll learn`, course?.summary)}
-              </Col>
-              <Col xs={24}>
-                {/* Who is this course for */}
-                <Row gutter={[8, 20]} justify="center">
-                  <Col xs={24}>
-                    <Title level={3} className={styles.longDescriptionTitle}>
-                      {' '}
-                      Who is this course for?{' '}
-                    </Title>
-                  </Col>
-                  <Col xs={24}>
-                    <Row gutter={[12, 12]} justify="center" className={styles.personaContainer}>
-                      {course?.topic?.length > 0 &&
-                        course?.topic.map((persona) => (
-                          <Col xs={24} md={8} key={persona.heading}>
-                            <div className={styles.personaItemWrapper}>
-                              <Space direction="vertical" size="large" className={styles.personaItem}>
-                                <Title level={5} className={styles.personaItemTitle}>
-                                  {' '}
-                                  {persona.heading}{' '}
-                                </Title>
-                                <div className={styles.personaItemContent}>{ReactHtmlParser(persona.description)}</div>
-                              </Space>
-                            </div>
-                          </Col>
-                        ))}
-                    </Row>
-                  </Col>
-                </Row>
-              </Col>
+              {/* What you'll learn */}
+              {course?.summary && course.summary.length > 0 && (
+                <Col xs={24}>{generateLongDescriptionTemplate(`What you'll learn`, course?.summary)}</Col>
+              )}
+              {/* Who is this course for */}
+              {course?.topic && course?.topic?.length > 0 && (
+                <Col xs={24}>
+                  <Row gutter={[8, 20]} justify="center">
+                    <Col xs={24}>
+                      <Title level={3} className={styles.longDescriptionTitle}>
+                        Who is this course for?
+                      </Title>
+                    </Col>
+                    <Col xs={24}>
+                      <Row gutter={[12, 12]} justify="center" className={styles.personaContainer}>
+                        {course?.topic?.length > 0 &&
+                          course?.topic.map((persona) => (
+                            <Col xs={24} md={8} key={persona.heading}>
+                              <div className={styles.personaItemWrapper}>
+                                <Space direction="vertical" size="large" className={styles.personaItem}>
+                                  <Title level={5} className={styles.personaItemTitle}>
+                                    {persona.heading}
+                                  </Title>
+                                  <div className={styles.personaItemContent}>
+                                    {ReactHtmlParser(persona.description)}
+                                  </div>
+                                </Space>
+                              </div>
+                            </Col>
+                          ))}
+                      </Row>
+                    </Col>
+                  </Row>
+                </Col>
+              )}
             </Row>
           </Col>
-          <Col xs={24} className={styles.courseCurriculumSection}>
-            {/* Course Contents */}
-            <Row gutter={[8, 20]} justify="center" className={styles.courseCurriculumContainer}>
-              <Col>
-                <Title level={3} className={styles.courseCurriculumText}>
-                  Course curriculum
-                </Title>
-              </Col>
-              <Col xs={24}>
-                <Collapse
-                  ghost
-                  expandIconPosition="right"
-                  className={styles.courseModules}
-                  activeKey={expandedCourseModules}
-                  onChange={setExpandedCourseModules}
-                  expandIcon={({ isActive }) => (
-                    <DownOutlined className={styles.curriculumExpandIcon} rotate={isActive ? 180 : 0} />
-                  )}
-                >
-                  {renderCourseCurriculums(course?.modules)}
-                </Collapse>
-              </Col>
-            </Row>
-          </Col>
+          {/* Course Contents */}
+          {course?.modules && course?.modules?.length > 0 && (
+            <Col xs={24} className={styles.courseCurriculumSection}>
+              <Row gutter={[8, 20]} justify="center" className={styles.courseCurriculumContainer}>
+                <Col>
+                  <Title level={3} className={styles.courseCurriculumText}>
+                    Course curriculum
+                  </Title>
+                </Col>
+                <Col xs={24}>
+                  <Collapse
+                    ghost
+                    expandIconPosition="right"
+                    className={styles.courseModules}
+                    activeKey={expandedCourseModules}
+                    onChange={setExpandedCourseModules}
+                    expandIcon={({ isActive }) => (
+                      <DownOutlined className={styles.curriculumExpandIcon} rotate={isActive ? 180 : 0} />
+                    )}
+                  >
+                    {renderCourseCurriculums(course?.modules)}
+                  </Collapse>
+                </Col>
+              </Row>
+            </Col>
+          )}
+          {/* Know Your Mentor */}
           <Col xs={24} className={styles.paddedContent}>
-            {/* Know Your Mentor */}
             <Row gutter={[30, 12]} className={styles.mb30}>
               <Col xs={24} md={18}>
                 {generateLongDescriptionTemplate('Know your mentor', creatorProfile?.profile?.bio)}
@@ -527,42 +542,47 @@ const CourseDetails = ({ match }) => {
               </Col>
             </Row>
           </Col>
-          <Col xs={24} className={styles.coursePreviewImagesSection}>
-            <Title level={5} className={styles.coursePreviewTitle}>
-              See what happens inside the course
-            </Title>
-            {/* Preview Images */}
-            <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
-              {renderImagePreviews(course?.preview_image_url)}
-            </Carousel>
-          </Col>
-          <Col xs={24} className={styles.courseFAQSection}>
-            {/* FAQs */}
-            <Row gutter={[8, 20]} className={styles.courseFAQContainer}>
-              <Col xs={24}>
-                <Title level={3} className={styles.longDescriptionTitle}>
-                  Let us answer all your doubts
-                </Title>
-              </Col>
-              <Col xs={24}>
-                <Collapse
-                  ghost
-                  expandIconPosition="right"
-                  className={styles.courseFAQs}
-                  defaultActiveKey={course?.faqs.map((faq) => faq.faq_question)}
-                  expandIcon={({ isActive }) =>
-                    isActive ? (
-                      <MinusOutlined className={styles.faqExpandIcon} />
-                    ) : (
-                      <PlusOutlined className={styles.faqExpandIcon} />
-                    )
-                  }
-                >
-                  {renderCourseFAQs(course?.faqs)}
-                </Collapse>
-              </Col>
-            </Row>
-          </Col>
+          {/* Preview Images */}
+          {course?.preview_image_url && course?.preview_image_url?.length > 0 && (
+            <Col xs={24} className={styles.coursePreviewImagesSection}>
+              <Title level={5} className={styles.coursePreviewTitle}>
+                See what happens inside the course
+              </Title>
+              <Carousel dots={{ className: styles.carouselDots }} className={styles.coursePreviewImagesContainer}>
+                {renderImagePreviews(course?.preview_image_url)}
+              </Carousel>
+            </Col>
+          )}
+
+          {/* FAQs */}
+          {course?.faqs && course.faqs.length > 0 && (
+            <Col xs={24} className={styles.courseFAQSection}>
+              <Row gutter={[8, 20]} className={styles.courseFAQContainer}>
+                <Col xs={24}>
+                  <Title level={3} className={styles.longDescriptionTitle}>
+                    Let us answer all your doubts
+                  </Title>
+                </Col>
+                <Col xs={24}>
+                  <Collapse
+                    ghost
+                    expandIconPosition="right"
+                    className={styles.courseFAQs}
+                    defaultActiveKey={course?.faqs.map((faq) => faq.faq_question)}
+                    expandIcon={({ isActive }) =>
+                      isActive ? (
+                        <MinusOutlined className={styles.faqExpandIcon} />
+                      ) : (
+                        <PlusOutlined className={styles.faqExpandIcon} />
+                      )
+                    }
+                  >
+                    {renderCourseFAQs(course?.faqs)}
+                  </Collapse>
+                </Col>
+              </Row>
+            </Col>
+          )}
         </Row>
       </Loader>
     </div>
