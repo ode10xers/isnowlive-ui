@@ -125,6 +125,7 @@ export default {
     getVideoCoursesByVideoId: (videoId) => http.get(`/courses?video_id=${videoId}&mixed=false`),
     getDetails: (courseId) => http.get(`/courses/${courseId}`),
     getCreatorCourses: () => http.get('/secure/creator/courses'),
+    getCreatorCourseDetailsById: (courseId) => http.get(`/secure/creator/courses/${courseId}`),
     createCourse: (payload) => http.post('/secure/creator/courses', payload),
     updateCourse: (courseId, payload) => http.put(`/secure/creator/courses/${courseId}`, payload),
     createOrderForUser: (payload) => http.post('/secure/customer/courses/orders', payload),

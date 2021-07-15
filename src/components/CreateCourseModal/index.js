@@ -32,8 +32,8 @@ import { resetBodyStyle, showErrorModal, showSuccessModal, showTagOptionsHelperM
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { isAPISuccess, generateRandomColor, getRandomTagColor, tagColors } from 'utils/helper';
 
 import { courseModalFormLayout, courseModalTailLayout } from 'layouts/FormLayouts';
 
@@ -90,6 +90,7 @@ const {
   formatDate: { toLocaleTime, toLocaleDate, toLongDateWithDay, toLongDateWithLongDay },
 } = dateUtil;
 
+// TODO: Soon to be deprecated
 const CreateCourseModal = ({
   visible,
   closeModal,
@@ -401,7 +402,7 @@ const CreateCourseModal = ({
 
   const handleColorChange = (color) => {
     setColorCode(color.hex || whiteColor);
-    form.setFieldsValue({ ...form.getFieldsValue(), color_code: color.hex || whiteColor });
+    form.setFieldsValue({ ...form.getFieldsValue(), colorCode: color.hex || whiteColor });
   };
 
   const handleStartDateChange = (date) => {
