@@ -5,7 +5,6 @@ import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Pop
 import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
-
 import apis from 'apis';
 
 import { showErrorModal } from 'components/Modals/modals';
@@ -18,90 +17,6 @@ import { getCourseSessionDetailsContentCount, getCourseVideoDetailsContentCount 
 
 import styles from './style.module.scss';
 
-const sampleOrderData = {
-  course_id: 'albuquerque-sera-sera',
-  course_order_id: 'ad-astra-abyssosque',
-  course_image_url:
-    'https://dkfqbuenrrvge.cloudfront.net/image/1fWsqzwHDwQSwP3l_screenshot from 2021-06-05 20-54-40.png',
-  course_name: 'Why hello there its a course',
-  course_description:
-    '<p>What should we do in case this description is super long? Because the image should not stretch vertically.</p>\n',
-  modules: [
-    {
-      module_id: 'module_1',
-      module_name: 'First Mixed module',
-      contents: [
-        {
-          product_id: 'scooby-dooby-doo',
-          name: 'First modules first content',
-          product_type: 'SESSION',
-          order_data: {
-            join_url: null,
-            order_id: 'scooby-dooby-doo',
-          },
-        },
-        {
-          product_id: '1fcf5295-9ff0-4199-98f6-17ca92dd9e4d',
-          name: 'First modules next content',
-          product_type: 'VIDEO',
-          order_data: {
-            join_url: null,
-            order_id: 'p9nyqFygbpR5Tae5',
-          },
-        },
-      ],
-    },
-    {
-      module_id: 'module_2',
-      module_name: 'Video only module',
-      contents: [
-        {
-          product_id: '7ced2ff4-6b51-4e07-9a24-1622d6473a88',
-          name: 'First Video Content',
-          product_type: 'VIDEO',
-          order_data: {
-            join_url: null,
-            order_id: '5rzFq50ejB1nvoGZ',
-          },
-        },
-        {
-          product_id: '7ced2ff4-6b51-4e07-9a24-1622d6473a88',
-          name: 'Next Video Content',
-          product_type: 'VIDEO',
-          order_data: {
-            join_url: null,
-            order_id: '5rzFq50ejB1nvoGZ',
-          },
-        },
-      ],
-    },
-    {
-      module_id: 'module_3',
-      module_name: 'Session only module',
-      contents: [
-        {
-          product_id: 'scooby-dooby-doo-bi',
-          name: 'Session modules first content',
-          product_type: 'SESSION',
-          order_data: {
-            join_url: null,
-            order_id: 'scooby-dooby-doo',
-          },
-        },
-        {
-          product_id: 'scooby-dooby-doo-ba',
-          name: 'Session modules first content',
-          product_type: 'SESSION',
-          order_data: {
-            join_url: 'https://zoom.us/j/97026118970?pwd=ZVUvMldxZ2ZrZ1NBakN2c3dUVDNmUT09',
-            order_id: 'scooby-dooby-doo',
-          },
-        },
-      ],
-    },
-  ],
-};
-
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
@@ -110,20 +25,20 @@ const {
 } = dateUtil;
 
 const CourseOrderDetails = ({ match, history }) => {
-  const courseId = match.params.course_id;
+  const courseOrderID = match.params.course_id;
   const [isLoading, setIsLoading] = useState(false);
   const [courseOrderDetails, setCourseOrderDetails] = useState(null);
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);
 
-  const fetchCourseOrderDetails = useCallback(async (courseId) => {
+  const fetchCourseOrderDetails = useCallback(async (courseOrderID) => {
     setIsLoading(true);
     try {
       const { status, data } = await apis.courses.getAttendeeCourses();
 
       if (isAPISuccess(status) && data) {
         const activeData = data.active;
-        activeData.map((course) => {
-          if (course.course_order_id === courseId) {
+        activeData.forEach((course) => {
+          if (course.course_order_id === courseOrderID) {
             setCourseOrderDetails(course);
             //setExpandedCourseModules(course.course.modules?.map((courseModule) => courseModule.module_id) ?? []);
           }
@@ -146,10 +61,10 @@ const CourseOrderDetails = ({ match, history }) => {
   }, []);
 
   useEffect(() => {
-    if (courseId) {
-      fetchCourseOrderDetails(courseId);
+    if (courseOrderID) {
+      fetchCourseOrderDetails(courseOrderID);
     }
-  }, [fetchCourseOrderDetails, courseId]);
+  }, [fetchCourseOrderDetails, courseOrderID]);
 
   const handleBackClicked = (e) => {
     preventDefaults(e);
