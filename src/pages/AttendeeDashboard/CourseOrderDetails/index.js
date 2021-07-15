@@ -106,11 +106,8 @@ const CourseOrderDetails = ({ match, history }) => {
             if (course.course_order_id === courseOrderID) {
               setCourseOrderDetails(course);
               fetchCourseContentDetails(course);
-              //setExpandedCourseModules(course.course.modules?.map((courseModule) => courseModule.module_id) ?? []);
             }
           });
-
-          //setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.module_id) ?? []);
         }
       } catch (error) {
         console.error(error);
@@ -247,7 +244,7 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text>{Math.floor(content.product_data.duration / 60)} mins </Text>
+        <Text>{Math.floor(content?.product_data?.duration ?? 0) / 60} mins </Text>
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
@@ -319,7 +316,7 @@ const CourseOrderDetails = ({ match, history }) => {
           ) : (
             <>
               <Col xs={10}> Duration </Col>
-              <Col xs={14}> : {Math.floor(content?.product_data?.duration / 60)} mins </Col>
+              <Col xs={14}> : {Math.floor(content?.product_data?.duration ?? 0) / 60} mins </Col>
             </>
           )}
         </Row>
