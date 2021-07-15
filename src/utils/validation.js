@@ -59,17 +59,6 @@ const validationRules = {
     ];
   },
   otherLinksValidation: [
-    // {
-    //   validator: async (_, values) => {
-    //     if (!values || values.length < 1) {
-    //       return Promise.reject('Need at least 1 value');
-    //     }
-
-    //     if (values.some(val => !val)) {
-    //       return Promise.reject('Please fill in all the fields');
-    //     }
-    //   },
-    // },
     // Reference for below rule :
     // https://github.com/ant-design/ant-design/issues/14275#issuecomment-678800190
     // https://github.com/yiminghe/async-validator#deep-rules
@@ -110,6 +99,64 @@ const validationRules = {
                 validator: (_, value) =>
                   !value ? Promise.resolve() : regexTester.test(value) ? Promise.resolve() : Promise.reject(message),
               };
+            },
+          ],
+        },
+      },
+    },
+  ],
+  courseModulesValidation: [
+    {
+      type: 'array',
+      min: 1,
+      message: 'Please add at least one module!',
+      defaultField: {
+        message: 'Some fields are missing! Please fill them before publishing',
+        type: 'object',
+        fields: {
+          name: [{ required: true, message: 'This field is required.' }],
+          // module_content: [
+          // {
+          // type: 'array',
+          // min: 1,
+          // message: 'Please add at least one module content!',
+          // defaultField: {
+          //   message: 'Some content fields are missing! Please fill them before publishing',
+          //   type: 'object',
+          //   fields: {
+          //     name: [{ required: true, message: 'This field is required.' }],
+          //     product_id: [{ required: true, message: 'This field is required.' }],
+          //     product_type: [
+          //       {
+          //         required: true,
+          //         type: 'enum',
+          //         enum: ['SESSION', 'VIDEO'],
+          //       },
+          //     ],
+          //   },
+          // },
+          // },
+          // ],
+        },
+      },
+    },
+  ],
+  courseModuleContentValidation: [
+    {
+      type: 'array',
+      min: 1,
+      message: 'Please add at least one module content!',
+      defaultField: {
+        message: 'Some content fields are missing! Please fill them before publishing',
+        type: 'object',
+        fields: {
+          name: [{ required: true, message: 'This field is required.' }],
+          product_id: [{ required: true, message: 'This field is required.' }],
+          product_type: [
+            {
+              required: true,
+              type: 'enum',
+              enum: ['SESSION', 'VIDEO'],
             },
           ],
         },
