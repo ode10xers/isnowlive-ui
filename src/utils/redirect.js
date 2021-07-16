@@ -10,7 +10,7 @@ export const redirectToInventoryPage = (inventory) => {
   }
 
   const baseUrl = generateUrlFromUsername(inventory.creator_username || inventory.username || urlUsername);
-  const targetUrl = `${baseUrl}/e/${inventory.inventory_id}`;
+  const targetUrl = `${baseUrl}/e/${inventory.inventory_external_id}`;
 
   if (isInIframeWidget() || isWidgetUrl()) {
     window.open(targetUrl, '_self');
