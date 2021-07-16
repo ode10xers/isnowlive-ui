@@ -527,10 +527,10 @@ const Courses = ({ history }) => {
       <Row gutter={[8, 8]}>
         <Col xs={24}>
           <Row gutter={[10, 10]} align="middle">
-            <Col xs={24} md={14} lg={18}>
+            <Col xs={24} sm={12} md={14} lg={18}>
               <Title level={3}> Courses </Title>
             </Col>
-            <Col xs={24} md={10} lg={6} className={styles.textAlignRight}>
+            <Col xs={24} sm={12} md={10} lg={6} className={styles.textAlignRight}>
               <Button size="large" type="primary" onClick={redirectToCreateCourse}>
                 Create Live Course
               </Button>
