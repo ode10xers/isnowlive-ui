@@ -381,13 +381,13 @@ const CourseDetails = ({ match }) => {
   const renderModuleContents = (content) => (
     <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
-        <Col xs={14} md={18}>
+        <Col xs={24} md={12} lg={14}>
           <Space className={styles.w100}>
             {renderContentIcon(content.product_type)}
             <Text strong> {content.name} </Text>
           </Space>
         </Col>
-        <Col xs={10} md={6} className={styles.textAlignRight}>
+        <Col xs={24} md={12} lg={10} className={styles.textAlignRight}>
           {renderContentDetails(content)}
         </Col>
       </Row>
