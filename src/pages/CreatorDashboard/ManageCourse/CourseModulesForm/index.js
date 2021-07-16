@@ -245,8 +245,12 @@ const CourseModulesForm = ({ match, history }) => {
     }
   };
 
+  // TODO: Fix this
   const disabledEndDates = (currentDate) => {
-    return dateIsBeforeDate(currentDate, moment().startOf('day')) || dateIsBeforeDate(currentDate, courseStartDate);
+    return (
+      dateIsBeforeDate(currentDate, moment().startOf('day')) ||
+      dateIsBeforeDate(currentDate, moment(courseStartDate).add(1, 'day'))
+    );
   };
 
   const getVideoContentIDsFromModules = (modules = []) => [
