@@ -139,10 +139,7 @@ const CourseOrderDetails = ({ match, history }) => {
 
   const redirectToVideoOrderDetails = (content, isExpired = false) => {
     history.push(
-      Routes.attendeeDashboard.rootPath +
-        Routes.attendeeDashboard.videos +
-        `/${content.product_id}/${content.order_id}`,
-      { video_order: { ...content, isExpired } }
+      Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos + `/${content.product_id}/${content.order_id}`
     );
   };
 

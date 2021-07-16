@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { Row, Col, Typography, Image, message, Button } from 'antd';
 import { ArrowLeftOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
@@ -14,24 +14,27 @@ import SessionCards from 'components/SessionCards';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, showWarningModal } from 'components/Modals/modals';
 
+import dateUtil from 'utils/date';
 import { isAPISuccess, reservedDomainName, isUnapprovedUserError } from 'utils/helper';
 
 import styles from './style.module.scss';
 
 const { Text } = Typography;
 
+const {
+  timeCalculation: { isBeforeDate },
+} = dateUtil;
+
 const VideoDetails = ({ match }) => {
-  const location = useLocation();
   const history = useHistory();
 
   const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [profileImage, setProfileImage] = useState(null);
   const [video, setVideo] = useState([]);
+  const [videoOrderDetails, setVideoOrderDetails] = useState({ isExpired: true });
   const [videoToken, setVideoToken] = useState(null);
   const [startVideo, setStartVideo] = useState(false);
-
-  const videoOrderDetails = location.state ? location.state.video_order : null;
 
   const getProfileDetails = useCallback(async (username) => {
     setIsLoading(true);
@@ -77,6 +80,25 @@ const VideoDetails = ({ match }) => {
     [getProfileDetails, videoOrderDetails]
   );
 
+  const fetchVideoOrderDetails = useCallback(async (videoOrderId) => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.videos.getAttendeeVideoOrderDetails(videoOrderId);
+
+      if (isAPISuccess(status) && data) {
+        const orderExpired = !isBeforeDate(data.expiry);
+        setVideoOrderDetails({ ...data, isExpired: orderExpired });
+      }
+    } catch (error) {
+      console.error(error);
+      if (error?.response?.status !== 404) {
+        message.error(error?.response?.data?.message || 'Failed fetching attendee order details');
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
   const getVideoToken = async (videoOrderId) => {
     try {
       setIsLoading(true);
@@ -107,9 +129,15 @@ const VideoDetails = ({ match }) => {
       setIsLoading(false);
       message.error('Video details not found.');
     }
+  }, [match.params.video_id, getVideoDetails]);
 
-    //eslint-disable-next-line
-  }, [match.params.video_id]);
+  useEffect(() => {
+    if (match.params.video_order_id) {
+      fetchVideoOrderDetails(match.params.video_order_id);
+    } else {
+      setVideoOrderDetails({ isExpired: true });
+    }
+  }, [match.params.video_order_id, fetchVideoOrderDetails]);
 
   const playVideo = () => {
     setStartVideo(true);
@@ -131,43 +159,45 @@ const VideoDetails = ({ match }) => {
       </Row>
       <Row gutter={[8, 24]} className={classNames(styles.p50, styles.box)}>
         <Col xs={24} className={styles.showcaseCardContainer}>
-          <VideoCard
-            cover={
-              startVideo && videoToken && !videoOrderDetails.isExpired ? (
-                <VideoPlayer token={videoToken} />
-              ) : videoOrderDetails.isExpired ? (
-                <div className={classNames(styles.videoWrapper, styles.expired)}>
-                  <Image
-                    preview={false}
-                    className={styles.videoThumbnail}
-                    src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
-                    alt={video?.title || videoOrderDetails?.title}
-                    fallback={DefaultImage()}
-                  />
-                </div>
-              ) : (
-                <div className={styles.videoWrapper} onClick={() => playVideo()}>
-                  <PlayCircleOutlined className={styles.playIcon} />
-                  <div className={styles.imageOverlay}>
-                    <Image
-                      preview={false}
-                      className={styles.videoThumbnail}
-                      src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
-                      alt={video?.title || videoOrderDetails?.title}
-                      fallback={DefaultImage()}
-                    />
+          {videoOrderDetails?.isExpired ? (
+            <div className={classNames(styles.videoWrapper, styles.expired)}>
+              <Image
+                preview={false}
+                className={styles.videoThumbnail}
+                src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                alt={video?.title || videoOrderDetails?.title}
+                fallback={DefaultImage()}
+              />
+            </div>
+          ) : (
+            <VideoCard
+              cover={
+                startVideo && videoToken ? (
+                  <VideoPlayer token={videoToken} />
+                ) : (
+                  <div className={styles.videoWrapper} onClick={() => playVideo()}>
+                    <PlayCircleOutlined className={styles.playIcon} />
+                    <div className={styles.imageOverlay}>
+                      <Image
+                        preview={false}
+                        className={styles.videoThumbnail}
+                        src={video?.thumbnail_url || videoOrderDetails?.thumbnail_url || 'error'}
+                        alt={video?.title || videoOrderDetails?.title}
+                        fallback={DefaultImage()}
+                      />
+                    </div>
                   </div>
-                </div>
-              )
-            }
-            video={video}
-            buyable={false}
-            hoverable={false}
-            showOrderDetails={true}
-            onCardClick={() => {}}
-            orderDetails={videoOrderDetails}
-            showDesc={true}
-          />
+                )
+              }
+              video={video}
+              buyable={false}
+              hoverable={false}
+              showOrderDetails={true}
+              onCardClick={() => {}}
+              orderDetails={videoOrderDetails}
+              showDesc={true}
+            />
+          )}
         </Col>
         <Col xs={24} className={styles.mt50}>
           {profile && <CreatorProfile profile={profile} profileImage={profileImage} />}
