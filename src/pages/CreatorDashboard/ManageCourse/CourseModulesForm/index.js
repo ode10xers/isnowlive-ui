@@ -371,10 +371,34 @@ const CourseModulesForm = ({ match, history }) => {
 
   const handleFinishFailed = ({ errorFields }) => {
     let errorModules = [];
-    // TODO: Improve how to show errors here
+
+    console.log(errorFields);
+
+    form.scrollToField(errorFields[0].name);
     errorFields.forEach((error) => {
+      // We want to expand any module container which have errors
       if (error.name.includes('modules') && error.name.length >= 2) {
         errorModules.push(error.name[1]);
+      }
+
+      if (error.name.includes('module_content') && error.name.length === 3) {
+        // Error for the module_content fields (probably empty)
+        message.error({
+          content: `Module ${error.name[1] + 1} : ${error.errors[0]}`,
+          key: error.name.join('-') + '-error',
+        });
+      } else if (error.name.includes('module_content') && error.name.length > 3) {
+        // Error for inside of module_content (at the content level)
+        if (error.name.includes('product_id') || error.name.includes('product_type')) {
+          const errorFieldKey = deepCloneObject(error.name)
+            .slice(0, error.name.length - 1)
+            .join('-');
+          console.log(errorFieldKey);
+          message.error({
+            content: `Module ${error.name[1]} Content ${error.name[3]} : Please select a proper content type!`,
+            key: `${errorFieldKey}-error`,
+          });
+        }
       }
     });
 

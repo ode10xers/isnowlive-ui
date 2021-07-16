@@ -110,13 +110,29 @@ const validationRules = {
       type: 'array',
       min: 1,
       message: 'Please add at least one module!',
+      required: true,
+      // defaultField: {
+      //   // message: 'Make sure to add at least 1 content to each module!',
+      //   type: 'object',
+      //   fields: {
+      //     module_content : [
+      //       {
+      //         type: 'array',
+      //         required : true,
+      //         min: 1,
+      //         message: 'Make sure to add at least 1 content to each module!',
+      //       }
+      //     ]
+      //   }
+      // }
     },
   ],
   courseModuleContentValidation: [
     {
       type: 'array',
+      required: true,
       min: 1,
-      message: 'Please add at least one module content!',
+      message: 'Please add at least one content!',
     },
   ],
 };
