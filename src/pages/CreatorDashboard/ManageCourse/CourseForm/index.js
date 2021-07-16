@@ -15,6 +15,7 @@ import {
   Radio,
   PageHeader,
   Image,
+  message,
 } from 'antd';
 import { TagOutlined, InfoCircleOutlined, PlusOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -57,7 +58,7 @@ const formInitialValues = {
   selectedMemberTags: [],
 };
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const CourseForm = ({ match, history }) => {
@@ -284,10 +285,10 @@ const CourseForm = ({ match, history }) => {
     const payload = {
       name: values.courseName,
       course_image_url: courseImageUrl || values.courseImageUrl,
-      summary: values.summary,
-      description: values.description,
-      topic: values.topic,
-      faqs: values.faqs,
+      summary: values.summary ?? '',
+      description: values.description ?? '',
+      topic: values.topic ?? [],
+      faqs: values.faqs ?? [],
       price: coursePriceType === coursePriceTypes.FREE.name ? 0 : currency ? values.price ?? 1 : 0,
       currency: currency?.toLowerCase() || '',
       tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
@@ -322,12 +323,22 @@ const CourseForm = ({ match, history }) => {
         error?.response?.data?.message || 'Something went wrong.'
       );
     }
+
+    return null;
   };
 
   const gotoModulePage = async () => {
-    const courseExternalId = await handleFinish(form.getFieldsValue(), false);
-    if (courseExternalId) {
-      history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
+    try {
+      await form.validateFields();
+
+      const courseExternalId = await handleFinish(form.getFieldsValue(), false);
+      if (courseExternalId) {
+        history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
+      }
+    } catch (error) {
+      form.scrollToField(error.errorFields[0].name);
+      message.error('Please fill all the required fields!');
+      console.error(error);
     }
   };
 
@@ -370,7 +381,12 @@ const CourseForm = ({ match, history }) => {
                       action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                       onChange={handleCourseImageUpload}
                       value={courseImageUrl}
-                      label="Course Image (size of Facebook Cover Image)"
+                      label={
+                        <>
+                          {' '}
+                          <Text type="danger">*</Text>Course Image (size of Facebook Cover Image)
+                        </>
+                      }
                       overlayHelpText="Click to change image (size of Facebook Cover Image)"
                     />
                   </div>
@@ -382,7 +398,7 @@ const CourseForm = ({ match, history }) => {
                   id="courseName"
                   name="courseName"
                   label="Course Name"
-                  rules={validationRules.nameValidation}
+                  rules={validationRules.requiredValidation}
                 >
                   <Input placeholder="Enter Course Name" maxLength={50} />
                 </Form.Item>
@@ -393,7 +409,6 @@ const CourseForm = ({ match, history }) => {
                   label="Short summary of the course"
                   name="description"
                   id="description"
-                  rules={validationRules.requiredValidation}
                 >
                   <TextArea
                     showCount={true}
@@ -409,7 +424,6 @@ const CourseForm = ({ match, history }) => {
                   id="summary"
                   name="summary"
                   label="Details of what students will learn"
-                  rules={validationRules.requiredValidation}
                 >
                   <TextArea
                     placeholder="Describe what will the students learn from this course (max 800 characters)"
@@ -460,7 +474,7 @@ const CourseForm = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={3}>2. Who should attend this course (Optional)</Title>
+                <Title level={4}>2. Who should attend this course (Optional)</Title>
               </Col>
               <Col xs={24}>
                 <Form.List name="topic">
@@ -536,7 +550,7 @@ const CourseForm = ({ match, history }) => {
           <Col xs={24} className={styles.courseSection}>
             <Row gutter={[8, 16]}>
               <Col xs={24}>
-                <Title level={3}>3. Frequently Asked Questions (Optional)</Title>
+                <Title level={4}>3. Frequently Asked Questions (Optional)</Title>
               </Col>
               <Col xs={24}>
                 <Form.List name="faqs">

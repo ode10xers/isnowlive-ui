@@ -7,6 +7,26 @@
   min-width: clamp(200px, 400px, 800px);
 }
 
+.contentDragHandle {
+  content: '....';
+  width: 24px;
+  height: 100%;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 5px;
+  margin: auto;
+  font-size: 14px;
+  font-family: sans-serif;
+  letter-spacing: 2px;
+  color: #cccccc;
+  text-shadow: 1px 0 1px black;
+  text-align: center;
+
+  &::after {
+    content: '.. .. .. ..';
+  }
+}
+
 .coursePageContainer {
   .courseFormListContainer {
     @extend .box;

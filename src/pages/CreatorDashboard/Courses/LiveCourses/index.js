@@ -27,6 +27,7 @@ const {
   formatDate: { toShortDateWithYear, toDateAndTime },
 } = dateUtil;
 
+// NOTE: Currently unused
 const LiveCourses = ({
   liveCourses,
   showEditModal,

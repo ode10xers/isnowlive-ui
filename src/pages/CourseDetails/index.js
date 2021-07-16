@@ -37,6 +37,7 @@ const {
 
 const { Title, Text } = Typography;
 
+// NOTE: Currently unused, changed into ProdutDetails/CourseDetails
 const CourseDetails = ({ match, history }) => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);

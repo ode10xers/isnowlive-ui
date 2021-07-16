@@ -127,13 +127,35 @@
       margin: -10px auto 20px;
     }
 
+    @media screen and (max-width: 769px) {
+      padding: 8px;
+    }
+
     .courseInfoItem {
-      min-width: 200px;
+      min-width: 240px;
       padding: 0 30px;
 
+      @media screen and (max-width: 1140px) {
+        min-width: 200px;
+        padding: 0 12px;
+      }
+      
+      @media screen and (max-width: 1025px) {
+        min-width: 180px;
+        padding: 0 12px;
+      }
+
       @media screen and (max-width: 769px) {
+        min-width: 120px;
+        padding: 8px;
+      }
+      
+      @media screen and (max-width: 605px) {
+        min-width: 200px;
+      }
+      
+      @media screen and (max-width: 432px) {
         min-width: 0px;
-        padding: 0 8px;
       }
 
       .courseInfoContent {
@@ -142,17 +164,17 @@
         display: block;
         font-weight: 700;
 
-        @media screen and (max-width: 1025px) {
+        @media screen and (max-width: 1140px) {
           font-size: 24px;
         }
 
-        @media screen and (max-width: 769px) {
-          font-size: 20px;
-        }
+        // @media screen and (max-width: 769px) {
+        //   font-size: 20px;
+        // }
         
-        @media screen and (max-width: 526px) {
-          font-size: 16px;
-        }
+        // @media screen and (max-width: 526px) {
+        //   font-size: 16px;
+        // }
       }
   
       .courseTitleContainer {
@@ -170,25 +192,25 @@
             line-height: 20px;
           }
 
-          @media screen and (max-width: 526px) {
-            font-size: 12px;
-            line-height: 18px;
-            margin-right: 4px;
-          }
+          // @media screen and (max-width: 526px) {
+          //   font-size: 12px;
+          //   line-height: 18px;
+          //   margin-right: 4px;
+          // }
         }
     
         .courseInfoTitle {
           font-size: 14px;
           vertical-align: super;
 
-          @media screen and (max-width: 769px) {
-            font-size: 12px;
-          }
+          // @media screen and (max-width: 769px) {
+          //   font-size: 12px;
+          // }
 
-          @media screen and (max-width: 526px) {
-            font-size: 10px;
-            vertical-align: unset;
-          }
+          // @media screen and (max-width: 526px) {
+          //   font-size: 10px;
+          //   vertical-align: unset;
+          // }
         }
       }
     }
