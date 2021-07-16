@@ -54,7 +54,7 @@ const CourseOrderDetails = ({ match, history }) => {
                     if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
                       targetAPI = apis.videos.getVideoById;
                     } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
-                      targetAPI = apis.session.getPublicInventoryById;
+                      targetAPI = apis.session.getInventoryDetailsByExternalId;
                     }
 
                     if (targetAPI) {
