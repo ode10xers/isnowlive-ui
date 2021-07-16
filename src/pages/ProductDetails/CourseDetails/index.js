@@ -39,7 +39,7 @@ import styles from './style.module.scss';
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
 const {
-  formatDate: { toLongDateWithDay },
+  formatDate: { toLongDateWithDay, toLocaleTime },
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
@@ -93,6 +93,8 @@ const CourseDetails = ({ match }) => {
 
                     if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
                       targetAPI = apis.videos.getVideoById;
+                    } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
+                      targetAPI = apis.session.getInventoryDetailsByExternalId;
                     }
 
                     if (targetAPI) {
@@ -350,6 +352,25 @@ const CourseDetails = ({ match }) => {
       <PlayCircleOutlined className={styles.blueText} />
     );
 
+  const renderContentDetails = (contentData) => {
+    switch (contentData.product_type?.toUpperCase()) {
+      case 'VIDEO':
+        return <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>;
+      case 'SESSION':
+        return (
+          <Space align="center">
+            <Text type="secondary">{toLongDateWithDay(contentData?.product_data?.start_time)}</Text>
+            <Text type="secondary">
+              {toLocaleTime(contentData?.product_data?.start_time)} -{' '}
+              {toLocaleTime(contentData?.product_data?.end_time)}
+            </Text>
+          </Space>
+        );
+      default:
+        break;
+    }
+  };
+
   const renderModuleContents = (content) => (
     <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
@@ -360,11 +381,7 @@ const CourseDetails = ({ match }) => {
           </Space>
         </Col>
         <Col xs={10} md={6} className={styles.textAlignRight}>
-          <Text type="secondary">
-            {content.product_type?.toUpperCase() === 'SESSION'
-              ? 'Live session'
-              : `Video : ${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
-          </Text>
+          {renderContentDetails(content)}
         </Col>
       </Row>
     </List.Item>
