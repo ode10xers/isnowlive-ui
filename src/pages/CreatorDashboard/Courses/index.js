@@ -46,12 +46,116 @@ const Courses = ({ history }) => {
   const [expandedPublishedRowKeys, setExpandedPublishedRowKeys] = useState([]);
   const [expandedUnpublishedRowKeys, setExpandedUnpublishedRowKeys] = useState([]);
 
+  //#region Start of API Functions
+
+  const fetchCreatorMemberTags = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.user.getCreatorSettings();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberTags(data.tags);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
+    }
+    setIsLoading(false);
+  }, []);
+
+  const fetchAllCoursesForCreator = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.courses.getCreatorCourses();
+
+      if (isAPISuccess(status) && data) {
+        setCourses(data);
+      }
+    } catch (error) {
+      showErrorModal('Failed fetching courses', error?.response?.data?.message || 'Something went wrong');
+    }
+    setIsLoading(false);
+  }, []);
+
+  const publishCourse = async (course) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.courses.publishCourse(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Course Published');
+        fetchAllCoursesForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
+    }
+    setIsLoading(false);
+  };
+
+  const unpublishCourse = async (course) => {
+    setIsLoading(true);
+    try {
+      const { status } = await apis.courses.unpublishCourse(course.id);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Course Unpublished');
+        fetchAllCoursesForCreator();
+      }
+    } catch (error) {
+      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
+    }
+    setIsLoading(false);
+  };
+
+  //#endregion End of API Functions
+
+  useEffect(() => {
+    fetchCreatorMemberTags();
+    fetchAllCoursesForCreator();
+  }, [fetchCreatorMemberTags, fetchAllCoursesForCreator]);
+
+  //#region Start Of Business Logics
+
+  const showSendEmailModal = (course) => {
+    let userIdMap = new Map();
+
+    // This mapping is used to make sure the recipients sent to modal is unique
+    if (course?.buyers && course?.buyers?.length > 0) {
+      course.buyers.forEach((buyer) => {
+        if (!userIdMap.has(buyer.external_id)) {
+          userIdMap.set(buyer.external_id, buyer);
+        }
+      });
+    }
+
+    showSendEmailPopup({
+      recipients: {
+        active: Array.from(userIdMap, ([key, val]) => val),
+        expired: [],
+      },
+      productId: course?.id || null,
+      productType: productType.COURSE,
+    });
+  };
+
   const copyCourseLink = (courseId) => {
     const username = getLocalUserDetails().username;
     const pageLink = `${generateUrlFromUsername(username)}/c/${courseId}`;
 
     copyToClipboard(pageLink);
   };
+
+  const redirectToCreateCourse = (e) => {
+    preventDefaults(e);
+    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourse);
+  };
+
+  const redirectToEditCourse = (courseExternalId) => {
+    history.push(Routes.creatorDashboard.rootPath + `courses/${courseExternalId}/edit`);
+  };
+
+  //#endregion End Of Business Logics
+
+  //#region Start Of Expandable Logics
 
   const toggleExpandAllPublished = () => {
     if (expandedPublishedRowKeys.length > 0) {
@@ -91,14 +195,9 @@ const Courses = ({ history }) => {
   const collapseRowUnpublished = (rowKey) =>
     setExpandedUnpublishedRowKeys(expandedUnpublishedRowKeys.filter((key) => key !== rowKey));
 
-  const redirectToCreateCourse = (e) => {
-    preventDefaults(e);
-    history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createCourse);
-  };
+  //#endregion End Of Expandable Logics
 
-  const redirectToEditCourse = (courseExternalId) => {
-    history.push(Routes.creatorDashboard.rootPath + `courses/${courseExternalId}/edit`);
-  };
+  //#region Start Of Table Columns
 
   const generateLiveCourseColumns = (published) => {
     const initialColumns = [
@@ -127,7 +226,7 @@ const Courses = ({ history }) => {
         dataIndex: 'start_time',
         key: 'start_time',
         render: (text, record) =>
-          record.type === 'VIDEO'
+          record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`
             : `${toShortDateWithYear(record.start_date)} - ${toShortDateWithYear(record.end_date)}`,
       },
@@ -281,6 +380,10 @@ const Courses = ({ history }) => {
     },
   ];
 
+  //#endregion End Of Table Columns
+
+  //#region Start Of Render Functions
+
   const renderBuyersList = (record) => {
     return (
       <div className={classNames(styles.mb20, styles.mt20)}>
@@ -323,6 +426,9 @@ const Courses = ({ history }) => {
         <Col span={17}>: {value}</Col>
       </Row>
     );
+
+    const sessionCount = getCourseSessionContentCount(course?.modules ?? []);
+    const videoCount = getCourseVideoContentCount(course?.modules ?? []);
 
     return (
       <Col xs={24} key={course.id}>
@@ -382,14 +488,20 @@ const Courses = ({ history }) => {
         >
           {layout(
             'Duration',
-            <Text> {`${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`} </Text>
+            <Text>
+              {course?.type === 'VIDEO'
+                ? `${course?.validity ?? 0} days`
+                : `${toShortDateWithYear(course.start_date)} - ${toShortDateWithYear(course.end_date)}`}
+            </Text>
           )}
           {layout(
             'Content',
-            <>
-              {course.inventory_ids?.length > 0 && <Tag color="volcano"> {course.inventory_ids?.length} sessions</Tag>}
-              {course.videos?.length > 0 && <Tag color="blue"> {course.videos?.length} videos </Tag>}
-            </>
+            <Tag color="blue">
+              <Space split={<Divider type="vertical" />}>
+                {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
+                {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
+              </Space>
+            </Tag>
           )}
           {layout(
             'Price',
@@ -408,90 +520,7 @@ const Courses = ({ history }) => {
     );
   };
 
-  const fetchCreatorMemberTags = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.user.getCreatorSettings();
-
-      if (isAPISuccess(status) && data) {
-        setCreatorMemberTags(data.tags);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch creator tags', error?.response?.data?.message || 'Something went wrong.');
-    }
-    setIsLoading(false);
-  }, []);
-
-  const fetchAllCoursesForCreator = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.courses.getCreatorCourses();
-
-      if (isAPISuccess(status) && data) {
-        setCourses(data);
-      }
-    } catch (error) {
-      showErrorModal('Failed fetching courses', error?.response?.data?.message || 'Something went wrong');
-    }
-    setIsLoading(false);
-  }, []);
-
-  const publishCourse = async (course) => {
-    setIsLoading(true);
-    try {
-      const { status } = await apis.courses.publishCourse(course.id);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Course Published');
-        fetchAllCoursesForCreator();
-      }
-    } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to publish course');
-    }
-    setIsLoading(false);
-  };
-
-  const unpublishCourse = async (course) => {
-    setIsLoading(true);
-    try {
-      const { status } = await apis.courses.unpublishCourse(course.id);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal('Course Unpublished');
-        fetchAllCoursesForCreator();
-      }
-    } catch (error) {
-      showErrorModal('Something wrong happened', error.response?.data?.message || 'Failed to unpublish course');
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchCreatorMemberTags();
-    fetchAllCoursesForCreator();
-  }, [fetchCreatorMemberTags, fetchAllCoursesForCreator]);
-
-  const showSendEmailModal = (course) => {
-    let userIdMap = new Map();
-
-    // This mapping is used to make sure the recipients sent to modal is unique
-    if (course?.buyers && course?.buyers?.length > 0) {
-      course.buyers.forEach((buyer) => {
-        if (!userIdMap.has(buyer.external_id)) {
-          userIdMap.set(buyer.external_id, buyer);
-        }
-      });
-    }
-
-    showSendEmailPopup({
-      recipients: {
-        active: Array.from(userIdMap, ([key, val]) => val),
-        expired: [],
-      },
-      productId: course?.id || null,
-      productType: productType.COURSE,
-    });
-  };
+  //#endregion End Of Render Functions
 
   return (
     <div className={styles.box}>
