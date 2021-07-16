@@ -150,7 +150,7 @@ const Courses = ({ history }) => {
   };
 
   const redirectToEditCourse = (courseExternalId) => {
-    history.push(Routes.creatorDashboard.rootPath + `courses/${courseExternalId}/edit`);
+    history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/edit`);
   };
 
   //#endregion End Of Business Logics
