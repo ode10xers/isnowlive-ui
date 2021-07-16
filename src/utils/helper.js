@@ -338,9 +338,11 @@ export const orderType = {
 };
 
 export const courseType = {
+  LIVE: 'LIVE', // Live sessions only
+  VIDEO: 'VIDEO', // Videos only
   MIXED: 'MIXED',
-  VIDEO_SEQ: 'VIDEO_SEQUENCE',
-  VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE',
+  VIDEO_SEQ: 'VIDEO_SEQUENCE', // Deprecated
+  VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE', // Deprecated
 };
 
 export const productType = {

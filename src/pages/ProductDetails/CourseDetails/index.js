@@ -39,7 +39,7 @@ import styles from './style.module.scss';
 const { Text, Title } = Typography;
 const { Panel } = Collapse;
 const {
-  formatDate: { toLongDateWithDay },
+  formatDate: { toLongDateWithDay, toLocaleTime },
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
@@ -93,6 +93,8 @@ const CourseDetails = ({ match }) => {
 
                     if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
                       targetAPI = apis.videos.getVideoById;
+                    } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
+                      targetAPI = apis.session.getInventoryDetailsByExternalId;
                     }
 
                     if (targetAPI) {
@@ -276,15 +278,13 @@ const CourseDetails = ({ match }) => {
   };
 
   const renderCourseInfoItem = ({ icon, title, content }) => (
-    <Col className={styles.textAlignCenter}>
-      <Space direction="vertical" size="small" className={styles.courseInfoItem}>
-        <Text className={styles.courseInfoContent}> {content} </Text>
-        <Space size="small" align="center" className={styles.courseTitleContainer}>
-          {icon}
-          <Text className={styles.courseInfoTitle}> {title} </Text>
-        </Space>
+    <Space direction="vertical" size="small" className={styles.courseInfoItem}>
+      <Text className={styles.courseInfoContent}> {content} </Text>
+      <Space size="small" align="center" className={styles.courseTitleContainer}>
+        {icon}
+        <Text className={styles.courseInfoTitle}> {title} </Text>
       </Space>
-    </Col>
+    </Space>
   );
 
   const renderCourseInfos = (course = null) => {
@@ -297,34 +297,43 @@ const CourseDetails = ({ match }) => {
 
     return (
       <Row justify="center" align="middle">
-        {sessionContentCount > 0
-          ? renderCourseInfoItem({
+        {sessionContentCount > 0 ? (
+          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
               icon: <VideoCameraOutlined className={styles.courseInfoIcon} />,
               title: 'Live sessions',
               content: sessionContentCount,
-            })
-          : null}
-        {videoContentCount > 0
-          ? renderCourseInfoItem({
+            })}
+          </Col>
+        ) : null}
+        {videoContentCount > 0 ? (
+          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
               icon: <PlayCircleOutlined className={styles.courseInfoIcon} />,
               title: 'Recorded videos',
               content: videoContentCount,
-            })
-          : null}
-        {renderCourseInfoItem({
-          icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
-          title: 'Course duration',
-          content:
-            course?.type === 'VIDEO'
-              ? `${course?.duration ?? 0} days`
-              : `${moment(course?.end_date).diff(moment(course.start_date), 'days')} days`,
-        })}
-        {course?.type !== 'VIDEO' &&
-          renderCourseInfoItem({
-            icon: <NotificationOutlined className={styles.courseInfoIcon} />,
-            title: 'Starts at',
-            content: toLongDateWithDay(course?.start_date),
+            })}
+          </Col>
+        ) : null}
+        <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+          {renderCourseInfoItem({
+            icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
+            title: 'Course duration',
+            content:
+              course?.type === 'VIDEO'
+                ? `${course?.duration ?? 0} days`
+                : `${moment(course?.end_date).diff(moment(course.start_date), 'days')} days`,
           })}
+        </Col>
+        {course?.type !== 'VIDEO' && (
+          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
+              icon: <NotificationOutlined className={styles.courseInfoIcon} />,
+              title: 'Starts at',
+              content: toLongDateWithDay(course?.start_date),
+            })}
+          </Col>
+        )}
       </Row>
     );
   };
@@ -350,21 +359,36 @@ const CourseDetails = ({ match }) => {
       <PlayCircleOutlined className={styles.blueText} />
     );
 
+  const renderContentDetails = (contentData) => {
+    switch (contentData.product_type?.toUpperCase()) {
+      case 'VIDEO':
+        return <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>;
+      case 'SESSION':
+        return (
+          <Space align="center">
+            <Text type="secondary">{toLongDateWithDay(contentData?.product_data?.start_time)}</Text>
+            <Text type="secondary">
+              {toLocaleTime(contentData?.product_data?.start_time)} -{' '}
+              {toLocaleTime(contentData?.product_data?.end_time)}
+            </Text>
+          </Space>
+        );
+      default:
+        break;
+    }
+  };
+
   const renderModuleContents = (content) => (
     <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
-        <Col xs={14} md={18}>
+        <Col xs={24} md={12} lg={14}>
           <Space className={styles.w100}>
             {renderContentIcon(content.product_type)}
             <Text strong> {content.name} </Text>
           </Space>
         </Col>
-        <Col xs={10} md={6} className={styles.textAlignRight}>
-          <Text type="secondary">
-            {content.product_type?.toUpperCase() === 'SESSION'
-              ? 'Live session'
-              : `Video : ${Math.floor((content.product_data?.duration ?? 0) / 60)} mins`}{' '}
-          </Text>
+        <Col xs={24} md={12} lg={10} className={styles.textAlignRight}>
+          {renderContentDetails(content)}
         </Col>
       </Row>
     </List.Item>
@@ -445,7 +469,9 @@ const CourseDetails = ({ match }) => {
                       <Title level={3} className={styles.courseName}>
                         {course?.name}
                       </Title>
-                      <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
+                      {course?.description && (
+                        <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
+                      )}
                       <Button
                         size="large"
                         type="primary"

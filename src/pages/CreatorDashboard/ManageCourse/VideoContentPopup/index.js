@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Spin, message } from 'antd';
+import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Spin } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 
 import DefaultImage from 'components/Icons/DefaultImage';
@@ -44,7 +44,6 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
           });
         });
 
-      message.success('Videos added to module successfully!');
       setIsLoading(false);
       setSelectedVideoPopupContent([]);
       closeModal();

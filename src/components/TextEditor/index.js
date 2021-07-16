@@ -13,12 +13,23 @@ const TextEditor = ({ name, form, placeholder }) => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   useEffect(() => {
-    if (form.getFieldValue(name)) {
-      const contentBlock = htmlToDraft(form.getFieldValue(name));
-      if (contentBlock) {
-        const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-        const editorState = EditorState.createWithContent(contentState);
-        setEditorState(editorState);
+    if (typeof name === 'string') {
+      if (form.getFieldsValue()[name]) {
+        const contentBlock = htmlToDraft(form.getFieldsValue()[name]);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          const editorState = EditorState.createWithContent(contentState);
+          setEditorState(editorState);
+        }
+      }
+    } else if (Array.isArray(name)) {
+      if (form.getFieldsValue()[name[0]][name[1]]) {
+        const contentBlock = htmlToDraft(form.getFieldsValue()[name[0]][name[1]]);
+        if (contentBlock) {
+          const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+          const editorState = EditorState.createWithContent(contentState);
+          setEditorState(editorState);
+        }
       }
     }
   }, [form, name]);
@@ -33,7 +44,7 @@ const TextEditor = ({ name, form, placeholder }) => {
       form.setFieldsValue({ ...form.getFieldsValue(), [name]: text });
     } else if (Array.isArray(name)) {
       let newFormData = JSON.parse(JSON.stringify(form.getFieldsValue()));
-      if (newFormData[name[0]] && name.length === 2) {
+      if (newFormData[name[0]]) {
         newFormData[name[0]][name[1]] = text;
       }
       form.setFieldsValue(newFormData);
