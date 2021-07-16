@@ -658,7 +658,7 @@ const CourseModulesForm = ({ match, history }) => {
               {/* Course Modules */}
               <Col xs={24}>
                 <div className={styles.courseFormListContainer}>
-                  <Form.List name="modules">
+                  <Form.List name="modules" rules={validationRules.courseModulesValidation}>
                     {(moduleFields, { add: addMoreModule, remove: removeModule }, { errors: moduleErrors }) => (
                       <Row gutter={[8, 12]}>
                         <Col xs={24}>
@@ -712,7 +712,7 @@ const CourseModulesForm = ({ match, history }) => {
                                         <Form.List
                                           {...moduleFormItemRestFields}
                                           name={[moduleFieldName, 'module_content']}
-                                          // rules={validationRules.courseModuleContentValidation}
+                                          rules={validationRules.courseModuleContentValidation}
                                         >
                                           {(contentFields, { add: addMoreContent, remove: removeContent }) => (
                                             <Row gutter={[8, 8]}>

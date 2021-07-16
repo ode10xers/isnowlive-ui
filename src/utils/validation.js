@@ -110,35 +110,6 @@ const validationRules = {
       type: 'array',
       min: 1,
       message: 'Please add at least one module!',
-      defaultField: {
-        message: 'Some fields are missing! Please fill them before publishing',
-        type: 'object',
-        fields: {
-          name: [{ required: true, message: 'This field is required.' }],
-          // module_content: [
-          // {
-          // type: 'array',
-          // min: 1,
-          // message: 'Please add at least one module content!',
-          // defaultField: {
-          //   message: 'Some content fields are missing! Please fill them before publishing',
-          //   type: 'object',
-          //   fields: {
-          //     name: [{ required: true, message: 'This field is required.' }],
-          //     product_id: [{ required: true, message: 'This field is required.' }],
-          //     product_type: [
-          //       {
-          //         required: true,
-          //         type: 'enum',
-          //         enum: ['SESSION', 'VIDEO'],
-          //       },
-          //     ],
-          //   },
-          // },
-          // },
-          // ],
-        },
-      },
     },
   ],
   courseModuleContentValidation: [
@@ -146,21 +117,6 @@ const validationRules = {
       type: 'array',
       min: 1,
       message: 'Please add at least one module content!',
-      defaultField: {
-        message: 'Some content fields are missing! Please fill them before publishing',
-        type: 'object',
-        fields: {
-          name: [{ required: true, message: 'This field is required.' }],
-          product_id: [{ required: true, message: 'This field is required.' }],
-          product_type: [
-            {
-              required: true,
-              type: 'enum',
-              enum: ['SESSION', 'VIDEO'],
-            },
-          ],
-        },
-      },
     },
   ],
 };

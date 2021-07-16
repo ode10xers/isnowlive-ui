@@ -139,10 +139,23 @@
         min-width: 200px;
         padding: 0 12px;
       }
+      
+      @media screen and (max-width: 1025px) {
+        min-width: 180px;
+        padding: 0 12px;
+      }
 
       @media screen and (max-width: 769px) {
-        min-width: 0px;
+        min-width: 120px;
         padding: 8px;
+      }
+      
+      @media screen and (max-width: 605px) {
+        min-width: 200px;
+      }
+      
+      @media screen and (max-width: 432px) {
+        min-width: 0px;
       }
 
       .courseInfoContent {
