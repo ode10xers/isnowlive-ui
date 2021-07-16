@@ -298,7 +298,7 @@ const CourseDetails = ({ match }) => {
     return (
       <Row justify="center" align="middle">
         {sessionContentCount > 0 ? (
-          <Col xs={12} md={course?.type !== 'VIDEO' ? 6 : 8} className={styles.textAlignCenter}>
+          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
             {renderCourseInfoItem({
               icon: <VideoCameraOutlined className={styles.courseInfoIcon} />,
               title: 'Live sessions',
@@ -307,7 +307,7 @@ const CourseDetails = ({ match }) => {
           </Col>
         ) : null}
         {videoContentCount > 0 ? (
-          <Col xs={12} md={course?.type !== 'VIDEO' ? 6 : 8} className={styles.textAlignCenter}>
+          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
             {renderCourseInfoItem({
               icon: <PlayCircleOutlined className={styles.courseInfoIcon} />,
               title: 'Recorded videos',
@@ -315,7 +315,7 @@ const CourseDetails = ({ match }) => {
             })}
           </Col>
         ) : null}
-        <Col xs={12} md={course?.type !== 'VIDEO' ? 6 : 8} className={styles.textAlignCenter}>
+        <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
           {renderCourseInfoItem({
             icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
             title: 'Course duration',
@@ -326,7 +326,7 @@ const CourseDetails = ({ match }) => {
           })}
         </Col>
         {course?.type !== 'VIDEO' && (
-          <Col xs={12} md={6} className={styles.textAlignCenter}>
+          <Col xs={{ flex: '1 1 50%' }} md={{ flex: 1 }} className={styles.textAlignCenter}>
             {renderCourseInfoItem({
               icon: <NotificationOutlined className={styles.courseInfoIcon} />,
               title: 'Starts at',

@@ -110,57 +110,29 @@ const validationRules = {
       type: 'array',
       min: 1,
       message: 'Please add at least one module!',
-      defaultField: {
-        message: 'Some fields are missing! Please fill them before publishing',
-        type: 'object',
-        fields: {
-          name: [{ required: true, message: 'This field is required.' }],
-          // module_content: [
-          // {
-          // type: 'array',
-          // min: 1,
-          // message: 'Please add at least one module content!',
-          // defaultField: {
-          //   message: 'Some content fields are missing! Please fill them before publishing',
-          //   type: 'object',
-          //   fields: {
-          //     name: [{ required: true, message: 'This field is required.' }],
-          //     product_id: [{ required: true, message: 'This field is required.' }],
-          //     product_type: [
-          //       {
-          //         required: true,
-          //         type: 'enum',
-          //         enum: ['SESSION', 'VIDEO'],
-          //       },
-          //     ],
-          //   },
-          // },
-          // },
-          // ],
-        },
-      },
+      required: true,
+      // defaultField: {
+      //   // message: 'Make sure to add at least 1 content to each module!',
+      //   type: 'object',
+      //   fields: {
+      //     module_content : [
+      //       {
+      //         type: 'array',
+      //         required : true,
+      //         min: 1,
+      //         message: 'Make sure to add at least 1 content to each module!',
+      //       }
+      //     ]
+      //   }
+      // }
     },
   ],
   courseModuleContentValidation: [
     {
       type: 'array',
+      required: true,
       min: 1,
-      message: 'Please add at least one module content!',
-      defaultField: {
-        message: 'Some content fields are missing! Please fill them before publishing',
-        type: 'object',
-        fields: {
-          name: [{ required: true, message: 'This field is required.' }],
-          product_id: [{ required: true, message: 'This field is required.' }],
-          product_type: [
-            {
-              required: true,
-              type: 'enum',
-              enum: ['SESSION', 'VIDEO'],
-            },
-          ],
-        },
-      },
+      message: 'Please add at least one content!',
     },
   ],
 };
