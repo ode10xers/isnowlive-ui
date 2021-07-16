@@ -284,10 +284,10 @@ const CourseForm = ({ match, history }) => {
     const payload = {
       name: values.courseName,
       course_image_url: courseImageUrl || values.courseImageUrl,
-      summary: values.summary,
-      description: values.description,
-      topic: values.topic,
-      faqs: values.faqs,
+      summary: values.summary ?? '',
+      description: values.description ?? '',
+      topic: values.topic ?? [],
+      faqs: values.faqs ?? [],
       price: coursePriceType === coursePriceTypes.FREE.name ? 0 : currency ? values.price ?? 1 : 0,
       currency: currency?.toLowerCase() || '',
       tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
@@ -395,7 +395,7 @@ const CourseForm = ({ match, history }) => {
                   label="Short summary of the course"
                   name="description"
                   id="description"
-                  rules={validationRules.requiredValidation}
+                  // rules={validationRules.requiredValidation}
                 >
                   <TextArea
                     showCount={true}
@@ -411,7 +411,7 @@ const CourseForm = ({ match, history }) => {
                   id="summary"
                   name="summary"
                   label="Details of what students will learn"
-                  rules={validationRules.requiredValidation}
+                  // rules={validationRules.requiredValidation}
                 >
                   <TextArea
                     placeholder="Describe what will the students learn from this course (max 800 characters)"
