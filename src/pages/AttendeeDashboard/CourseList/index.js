@@ -138,7 +138,7 @@ const CourseList = () => {
       title: 'Price',
       key: 'price',
       dataIndex: 'price',
-      width: '85px',
+      width: '100px',
       render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
     },
     {

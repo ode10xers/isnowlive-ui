@@ -116,6 +116,7 @@ export default {
     unlinkVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unlink`),
     createOrderForUser: (payload) => http.post('/secure/customer/videos/orders', payload),
     getAttendeeVideos: () => http.get('/secure/customer/videos/orders'),
+    getAttendeeVideoOrderDetails: (orderId) => http.get(`/secure/customer/videos/orders/${orderId}`),
     getAttendeeVideoToken: (orderId) => http.post(`/secure/customer/videos/orders/${orderId}/token`),
     publishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/publish`),
     unpublishVideo: (videoId) => http.post(`/secure/creator/videos/${videoId}/unpublish`),

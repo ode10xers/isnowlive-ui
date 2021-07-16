@@ -47,7 +47,7 @@ const Videos = () => {
     //eslint-disable-next-line
   }, []);
 
-  const renderVideoItem = (video, isExpired) => {
+  const renderVideoItem = (video) => {
     return (
       <Col
         key={video.video_order_id}
@@ -55,12 +55,10 @@ const Videos = () => {
         lg={12}
         className={styles.videoItem}
         onClick={() =>
-          // Sending the video order data, since it's needed in the UI
           history.push(
             Routes.attendeeDashboard.rootPath +
               Routes.attendeeDashboard.videos +
-              `/${video.video_id}/${video.video_order_id}`,
-            { video_order: { ...video, isExpired } }
+              `/${video.video_id}/${video.video_order_id}`
           )
         }
       >
@@ -112,7 +110,7 @@ const Videos = () => {
             <Panel header={<Title level={5}> Active </Title>} key="Active">
               {activeVideos.length ? (
                 <Loader loading={isLoading} size="large" text="Loading Active Videos">
-                  <Row gutter={[8, 16]}>{activeVideos.map((video) => renderVideoItem(video, false))}</Row>
+                  <Row gutter={[8, 16]}>{activeVideos.map(renderVideoItem)}</Row>
                 </Loader>
               ) : (
                 <Empty description={'No Active Videos'} />
@@ -121,7 +119,7 @@ const Videos = () => {
             <Panel header={<Title level={5}> Expired </Title>} key="Expired">
               {expiredVideos.length ? (
                 <Loader loading={isLoading} size="large" text="Loading Expired Videos">
-                  <Row gutter={[8, 16]}>{expiredVideos.map((video) => renderVideoItem(video, true))}</Row>
+                  <Row gutter={[8, 16]}>{expiredVideos.map(renderVideoItem)}</Row>
                 </Loader>
               ) : (
                 <Empty description={'No Expired Videos'} />

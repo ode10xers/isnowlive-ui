@@ -139,10 +139,7 @@ const CourseOrderDetails = ({ match, history }) => {
 
   const redirectToVideoOrderDetails = (content, isExpired = false) => {
     history.push(
-      Routes.attendeeDashboard.rootPath +
-        Routes.attendeeDashboard.videos +
-        `/${content.product_id}/${content.order_id}`,
-      { video_order: { ...content, isExpired } }
+      Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos + `/${content.product_id}/${content.order_id}`
     );
   };
 
@@ -244,7 +241,7 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text>{Math.floor(content?.product_data?.duration ?? 0) / 60} mins </Text>
+        <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
