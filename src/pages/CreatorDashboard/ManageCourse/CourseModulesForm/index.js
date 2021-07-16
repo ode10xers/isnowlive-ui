@@ -249,9 +249,49 @@ const CourseModulesForm = ({ match, history }) => {
     return dateIsBeforeDate(currentDate, moment().startOf('day')) || dateIsBeforeDate(currentDate, courseStartDate);
   };
 
-  const handleFinish = async (values) => {
+  const getVideoContentIDsFromModules = (modules = []) => [
+    ...new Set(
+      modules.reduce(
+        (acc, module) =>
+          (acc = acc.concat(
+            module.module_content
+              .filter((content) => content.product_type.toUpperCase() === 'VIDEO')
+              .map((content) => content.product_id)
+          )),
+        []
+      )
+    ),
+  ];
+
+  const isVideoContentModified = (newModules) => {
+    const prevVideoContents = getVideoContentIDsFromModules(courseDetails?.modules).sort();
+    const newVideoContents = getVideoContentIDsFromModules(newModules).sort();
+
+    return JSON.stringify(prevVideoContents) !== JSON.stringify(newVideoContents);
+  };
+
+  const saveCourseCurriculum = async (payload, modalRef = null) => {
     setSubmitting(true);
 
+    if (modalRef) {
+      modalRef.destroy();
+    }
+
+    try {
+      const { status } = await apis.courses.updateCourse(courseId, payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal(`${courseDetails.name ?? 'Course'} updated successfully`);
+        setTimeout(() => redirectToCourseSectionDashboard(), 2000);
+      }
+    } catch (error) {
+      showErrorModal(`Failed to update course`, error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setSubmitting(false);
+  };
+
+  const handleFinish = async (values) => {
     if (!courseId || !courseDetails) {
       showErrorModal('Invalid course selected!');
     }
@@ -280,23 +320,65 @@ const CourseModulesForm = ({ match, history }) => {
       ...modifiedFields,
     };
 
-    try {
-      const { status } = await apis.courses.updateCourse(courseId, payload);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal(`${courseDetails.name ?? 'Course'} updated successfully`);
-        setTimeout(() => redirectToCourseSectionDashboard(), 2000);
-      }
-    } catch (error) {
-      showErrorModal(`Failed to update course`, error?.response?.data?.message || 'Something went wrong.');
+    if (isVideoContentModified(values.modules)) {
+      const modalRef = Modal.confirm({
+        centered: true,
+        closable: true,
+        maskClosable: false,
+        title: 'Some items in this course have changed',
+        width: 640,
+        content: (
+          <Row gutter={[8, 4]}>
+            <Col xs={24}>
+              <Paragraph>It seems you have added or removed some items in this course.</Paragraph>
+            </Col>
+            <Col xs={24}>
+              <Paragraph>
+                Would you like these changes to also reflect in the course orders already purchased by some attendees?
+              </Paragraph>
+            </Col>
+            <Col xs={24}>
+              <Row gutter={8} justify="end">
+                <Col>
+                  <Button
+                    block
+                    type="default"
+                    onClick={() => saveCourseCurriculum({ ...payload, new_videos_to_orders: false }, modalRef)}
+                  >
+                    Don't change existing orders
+                  </Button>
+                </Col>
+                <Col>
+                  <Button
+                    block
+                    type="primary"
+                    onClick={() => saveCourseCurriculum({ ...payload, new_videos_to_orders: true }, modalRef)}
+                  >
+                    Change existing orders
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        ),
+        okButtonProps: { style: { display: 'none' } },
+        cancelButtonProps: { style: { display: 'none' } },
+      });
+    } else {
+      saveCourseCurriculum({ ...payload, new_videos_to_orders: false });
     }
-
-    setSubmitting(false);
   };
 
-  // TODO: Improve Error UX here
   const handleFinishFailed = ({ errorFields }) => {
-    console.log(errorFields);
+    let errorModules = [];
+    // TODO: Improve how to show errors here
+    errorFields.forEach((error) => {
+      if (error.name.includes('modules') && error.name.length >= 2) {
+        errorModules.push(error.name[1]);
+      }
+    });
+
+    setExpandedModulesKeys([...new Set([...expandedModulesKeys, ...errorModules])]);
   };
 
   const handleDragEnd = (result) => {
@@ -576,7 +658,7 @@ const CourseModulesForm = ({ match, history }) => {
               {/* Course Modules */}
               <Col xs={24}>
                 <div className={styles.courseFormListContainer}>
-                  <Form.List name="modules" rules={validationRules.courseModulesValidation}>
+                  <Form.List name="modules">
                     {(moduleFields, { add: addMoreModule, remove: removeModule }, { errors: moduleErrors }) => (
                       <Row gutter={[8, 12]}>
                         <Col xs={24}>
@@ -615,6 +697,7 @@ const CourseModulesForm = ({ match, history }) => {
                                         name={[moduleFieldName, 'name']}
                                         fieldKey={[moduleFieldKey, 'name']}
                                         className={styles.panelHeaderFormItem}
+                                        rules={validationRules.requiredValidation}
                                       >
                                         <Input
                                           placeholder="Module name"
@@ -629,7 +712,7 @@ const CourseModulesForm = ({ match, history }) => {
                                         <Form.List
                                           {...moduleFormItemRestFields}
                                           name={[moduleFieldName, 'module_content']}
-                                          rules={validationRules.courseModuleContentValidation}
+                                          // rules={validationRules.courseModuleContentValidation}
                                         >
                                           {(contentFields, { add: addMoreContent, remove: removeContent }) => (
                                             <Row gutter={[8, 8]}>
@@ -682,6 +765,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         name={[contentFieldName, 'name']}
                                                                         fieldKey={[contentFieldKey, 'name']}
                                                                         className={styles.inlineFormItem}
+                                                                        rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content name"
@@ -693,6 +777,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         id="content_id"
                                                                         name={[contentFieldName, 'product_id']}
                                                                         fieldKey={[contentFieldKey, 'product_id']}
+                                                                        rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content ID"
@@ -704,6 +789,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         id="content_type"
                                                                         name={[contentFieldName, 'product_type']}
                                                                         fieldKey={[contentFieldKey, 'product_type']}
+                                                                        rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content Type"
