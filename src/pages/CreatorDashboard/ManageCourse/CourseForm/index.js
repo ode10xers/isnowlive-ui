@@ -329,13 +329,14 @@ const CourseForm = ({ match, history }) => {
 
   const gotoModulePage = async () => {
     try {
-      form.validateFields();
+      await form.validateFields();
 
       const courseExternalId = await handleFinish(form.getFieldsValue(), false);
       if (courseExternalId) {
         history.push(Routes.creatorDashboard.rootPath + `/courses/${courseExternalId}/modules`);
       }
     } catch (error) {
+      form.scrollToField(error.errorFields[0].name);
       message.error('Please fill all the required fields!');
       console.error(error);
     }
