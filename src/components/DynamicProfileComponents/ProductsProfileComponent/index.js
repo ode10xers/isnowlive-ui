@@ -158,11 +158,6 @@ const ProductsProfileComponent = ({
 
   const handleMenuClick = (key) => {
     history.push(menuKeyRouteMap[key]);
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
   };
 
   const getSelectedKeysForMenu = () => {

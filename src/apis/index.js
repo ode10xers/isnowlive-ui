@@ -58,6 +58,7 @@ export default {
     getSessionDetails: (sessionId) => http.get(`/session/${sessionId}`),
     getRescheduleableSessionsByPrice: (price) => http.get(`/sessions/reschedulable?price=${price}`),
     getPublicInventoryById: (inventoryId) => http.get(`/inventories/${inventoryId}`),
+    getInventoryDetailsByExternalId: (inventoryExternalId) => http.get(`/inventories/external/${inventoryExternalId}`),
     getPrivateInventoryById: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}`),
     createOrderForUser: (payload) => http.post('/secure/customer/orders', payload),
     getCreatorInventoryEarnings: (pageNo, perPage) =>

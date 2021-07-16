@@ -43,7 +43,6 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
 
     sessions
       .filter((session) => moment(session.start_time).isSameOrAfter(selectedStartDate.startOf('day')))
-      .slice(0, limit)
       .forEach((session) => {
         const formattedStartTime = toLongDateWithDay(session.start_time);
         const foundIndex = filteredByDate.findIndex((val) => val.key === formattedStartTime);
@@ -59,7 +58,7 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
         }
       });
 
-    return filteredByDate;
+    return filteredByDate.slice(0, limit);
   }, [selectedStartDate, sessions, limit]);
 
   const renderSessionDateList = (sessionDateData) => (
