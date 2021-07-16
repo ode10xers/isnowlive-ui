@@ -241,7 +241,7 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text>{Math.floor(content?.product_data?.duration ?? 0) / 60} mins </Text>
+        <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
