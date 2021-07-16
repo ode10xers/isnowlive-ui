@@ -27,6 +27,8 @@ const {
   formatDate: { toDateAndTime },
 } = dateUtil;
 
+// NOTE: Currently unused
+
 const VideoCourses = ({
   videoCourses,
   showEditModal,
