@@ -393,7 +393,7 @@ const CourseModulesForm = ({ match, history }) => {
             .join('-');
           console.log(errorFieldKey);
           message.error({
-            content: `Module ${error.name[1]} Content ${error.name[3]} : Please select a proper content type!`,
+            content: `Module ${error.name[1] + 1} Content ${error.name[3] + 1} : Please select a proper content type!`,
             key: `${errorFieldKey}-error`,
           });
         }
