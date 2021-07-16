@@ -278,15 +278,13 @@ const CourseDetails = ({ match }) => {
   };
 
   const renderCourseInfoItem = ({ icon, title, content }) => (
-    <Col className={styles.textAlignCenter}>
-      <Space direction="vertical" size="small" className={styles.courseInfoItem}>
-        <Text className={styles.courseInfoContent}> {content} </Text>
-        <Space size="small" align="center" className={styles.courseTitleContainer}>
-          {icon}
-          <Text className={styles.courseInfoTitle}> {title} </Text>
-        </Space>
+    <Space direction="vertical" size="small" className={styles.courseInfoItem}>
+      <Text className={styles.courseInfoContent}> {content} </Text>
+      <Space size="small" align="center" className={styles.courseTitleContainer}>
+        {icon}
+        <Text className={styles.courseInfoTitle}> {title} </Text>
       </Space>
-    </Col>
+    </Space>
   );
 
   const renderCourseInfos = (course = null) => {
@@ -299,34 +297,43 @@ const CourseDetails = ({ match }) => {
 
     return (
       <Row justify="center" align="middle">
-        {sessionContentCount > 0
-          ? renderCourseInfoItem({
+        {sessionContentCount > 0 ? (
+          <Col xs={12} md={course?.type !== 'VIDEO' ? 6 : 8} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
               icon: <VideoCameraOutlined className={styles.courseInfoIcon} />,
               title: 'Live sessions',
               content: sessionContentCount,
-            })
-          : null}
-        {videoContentCount > 0
-          ? renderCourseInfoItem({
+            })}
+          </Col>
+        ) : null}
+        {videoContentCount > 0 ? (
+          <Col xs={12} md={course?.type !== 'VIDEO' ? 6 : 8} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
               icon: <PlayCircleOutlined className={styles.courseInfoIcon} />,
               title: 'Recorded videos',
               content: videoContentCount,
-            })
-          : null}
-        {renderCourseInfoItem({
-          icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
-          title: 'Course duration',
-          content:
-            course?.type === 'VIDEO'
-              ? `${course?.duration ?? 0} days`
-              : `${moment(course?.end_date).diff(moment(course.start_date), 'days')} days`,
-        })}
-        {course?.type !== 'VIDEO' &&
-          renderCourseInfoItem({
-            icon: <NotificationOutlined className={styles.courseInfoIcon} />,
-            title: 'Starts at',
-            content: toLongDateWithDay(course?.start_date),
+            })}
+          </Col>
+        ) : null}
+        <Col xs={12} md={course?.type !== 'VIDEO' ? 6 : 8} className={styles.textAlignCenter}>
+          {renderCourseInfoItem({
+            icon: <ScheduleOutlined className={styles.courseInfoIcon} />,
+            title: 'Course duration',
+            content:
+              course?.type === 'VIDEO'
+                ? `${course?.duration ?? 0} days`
+                : `${moment(course?.end_date).diff(moment(course.start_date), 'days')} days`,
           })}
+        </Col>
+        {course?.type !== 'VIDEO' && (
+          <Col xs={12} md={6} className={styles.textAlignCenter}>
+            {renderCourseInfoItem({
+              icon: <NotificationOutlined className={styles.courseInfoIcon} />,
+              title: 'Starts at',
+              content: toLongDateWithDay(course?.start_date),
+            })}
+          </Col>
+        )}
       </Row>
     );
   };
@@ -462,7 +469,9 @@ const CourseDetails = ({ match }) => {
                       <Title level={3} className={styles.courseName}>
                         {course?.name}
                       </Title>
-                      <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
+                      {course?.description && (
+                        <div className={styles.courseDesc}>{ReactHtmlParser(course?.description)}</div>
+                      )}
                       <Button
                         size="large"
                         type="primary"
