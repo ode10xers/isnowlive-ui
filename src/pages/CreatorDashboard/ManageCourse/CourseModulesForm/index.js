@@ -372,8 +372,6 @@ const CourseModulesForm = ({ match, history }) => {
   const handleFinishFailed = ({ errorFields }) => {
     let errorModules = [];
 
-    console.log(errorFields);
-
     form.scrollToField(errorFields[0].name);
     errorFields.forEach((error) => {
       // We want to expand any module container which have errors
@@ -743,7 +741,7 @@ const CourseModulesForm = ({ match, history }) => {
                                               <Col xs={24}>
                                                 <Droppable
                                                   droppableId={`module-${moduleFieldName}-content`}
-                                                  type="CONTENT"
+                                                  type={`module-${moduleFieldName}-content`}
                                                 >
                                                   {(contentDroppableProvided) => (
                                                     <div
