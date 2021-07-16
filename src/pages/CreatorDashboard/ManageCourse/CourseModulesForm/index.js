@@ -8,6 +8,7 @@ import {
   Button,
   Form,
   Typography,
+  Modal,
   Collapse,
   Tooltip,
   Input,
@@ -31,7 +32,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import { showErrorModal, showSuccessModal, resetBodyStyle } from 'components/Modals/modals';
 
 import SessionContentPopup from '../SessionContentPopup';
 import VideoContentPopup from '../VideoContentPopup';
@@ -80,7 +81,7 @@ const formInitialValues = {
 };
 
 const { Panel } = Collapse;
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
@@ -198,8 +199,28 @@ const CourseModulesForm = ({ match, history }) => {
     redirectToCourseSectionDashboard,
   ]);
 
+  const showCourseDetailsChangedModal = () => {
+    Modal.warning({
+      title: 'Course Date Changed',
+      afterClose: resetBodyStyle,
+      content: (
+        <>
+          <Paragraph>Note : Changing these details can affect the videos & sessions selected below.</Paragraph>
+          <Paragraph>
+            Please review the curriculum below to remove or add sessions or videos after this change.
+          </Paragraph>
+        </>
+      ),
+      okText: 'Review Curriculum',
+      onOk: () => {
+        window.scrollTo(0, 320);
+      },
+    });
+  };
+
   const handleCourseCurriculumTypeChange = (e) => {
     const curriculumType = e.target.value;
+    showCourseDetailsChangedModal();
     setCourseCurriculumType(curriculumType);
   };
 
@@ -208,6 +229,7 @@ const CourseModulesForm = ({ match, history }) => {
 
     if (!date || (courseEndDate && dateIsBeforeDate(courseEndDate, date))) {
       setCourseEndDate(null);
+      showCourseDetailsChangedModal();
       form.setFieldsValue({ ...form.getFieldsValue(), courseEndDate: undefined });
     }
   };
@@ -218,6 +240,7 @@ const CourseModulesForm = ({ match, history }) => {
 
   const handleEndDateChange = (date) => {
     if (dateIsBeforeDate(courseStartDate, date)) {
+      showCourseDetailsChangedModal();
       setCourseEndDate(date);
     }
   };
