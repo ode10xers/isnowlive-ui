@@ -59,10 +59,10 @@ const CourseListItem = ({ course }) => {
       align="center"
       className={styles.courseContentContainer}
     >
-      {course?.sessions?.length > 0 && (
+      {course?.inventory_ids?.length > 0 && (
         <Text className={styles.courseContents}>
           {' '}
-          {course?.sessions?.length} Session{course?.sessions?.length > 1 ? 's' : ''}{' '}
+          {course?.inventory_ids?.length} Session{course?.inventory_ids?.length > 1 ? 's' : ''}{' '}
         </Text>
       )}
       {course?.videos?.length > 0 && (

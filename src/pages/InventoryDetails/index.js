@@ -14,6 +14,7 @@ import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import SessionRegistration from 'components/SessionRegistration';
+import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import { isMobileDevice } from 'utils/device';
 import {
@@ -38,6 +39,7 @@ const InventoryDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [creator, setCreator] = useState(null);
+  const [courses, setCourses] = useState([]);
   const [showDescription, setShowDescription] = useState(false);
   const [showPrerequisite, setShowPrerequisite] = useState(false);
   const [availablePasses, setAvailablePasses] = useState([]);
@@ -60,6 +62,16 @@ const InventoryDetails = ({ match, history }) => {
             setCreator(creatorDetailsResponse.data);
           } else {
             console.error('Failed to fetch creator of inventory', creatorDetailsResponse);
+          }
+
+          if (inventoryDetails.is_course) {
+            const courseDetailsResponse = await apis.courses.getCoursesBySessionId(inventoryDetails.session_id);
+
+            if (isAPISuccess(courseDetailsResponse.status) && courseDetailsResponse.data) {
+              setCourses(courseDetailsResponse.data || []);
+            } else {
+              console.error('Failed to fetch courses for session', courseDetailsResponse);
+            }
           }
 
           const passesResponse = await apis.passes.getPassesBySessionId(inventoryDetails?.session_id);
@@ -176,13 +188,34 @@ const InventoryDetails = ({ match, history }) => {
         <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : undefined}>
           <HostDetails host={creator} />
         </Col>
-        <Col xs={24}>
-          {session?.end_time &&
-            !(session?.total_bookings >= session?.max_participants) &&
-            getTimeDiff(session?.end_time, moment(), 'minutes') > 0 && (
-              <SessionRegistration availablePasses={availablePasses} classDetails={session} isInventoryDetails={true} />
-            )}
-        </Col>
+        {session?.is_course && courses ? (
+          courses?.length > 0 && (
+            <Col xs={24}>
+              <div className={classNames(styles.mb50, styles.mt20)}>
+                <Row gutter={[8, 16]}>
+                  <Col xs={24}>
+                    <Title level={5}> This session can only be attended by doing this course </Title>
+                  </Col>
+                  <Col xs={24}>
+                    <ShowcaseCourseCard courses={courses} />
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+          )
+        ) : (
+          <Col xs={24}>
+            {session?.end_time &&
+              !(session?.total_bookings >= session?.max_participants) &&
+              getTimeDiff(session?.end_time, moment(), 'minutes') > 0 && (
+                <SessionRegistration
+                  availablePasses={availablePasses}
+                  classDetails={session}
+                  isInventoryDetails={true}
+                />
+              )}
+          </Col>
+        )}
       </Row>
     </Loader>
   );
