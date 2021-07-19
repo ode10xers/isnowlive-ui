@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import moment from 'moment';
 import { Row, Col, Button, Typography, Card, Collapse, Tag, Space, Divider, Image } from 'antd';
 
 import apis from 'apis';
@@ -68,6 +69,14 @@ const CourseList = () => {
     );
   };
 
+  const renderCourseDuration = (course) =>
+    course?.type === 'VIDEO'
+      ? `${course?.validity ?? 0} days`
+      : `${moment(course?.end_date)
+          .endOf('day')
+          .add(1, 'second')
+          .diff(moment(course.start_date).startOf('day'), 'days')} days`;
+
   const renderCourseItem = (item) => {
     const layout = (label, value) => (
       <Row>
@@ -97,7 +106,7 @@ const CourseList = () => {
       >
         <div onClick={() => redirectToCourseOrderDetails(item)}>
           {layout('Contents', renderCourseContents(item))}
-          {layout('Duration', <Text>{item?.duration} days</Text>)}
+          {layout('Duration', <Text>{renderCourseDuration(item.course)}</Text>)}
           {layout('Price', <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>)}
         </div>
       </Card>
@@ -132,7 +141,7 @@ const CourseList = () => {
       title: 'Duration',
       dataIndex: ['course', 'duration'],
       width: '90px',
-      render: (text) => `${text} days`,
+      render: (text, record) => renderCourseDuration(record.course),
     },
     {
       title: 'Price',
