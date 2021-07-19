@@ -395,7 +395,6 @@ const CourseModulesForm = ({ match, history }) => {
           const errorFieldKey = deepCloneObject(error.name)
             .slice(0, error.name.length - 1)
             .join('-');
-          console.log(errorFieldKey);
           message.error({
             content: `Module ${error.name[1] + 1} Content ${error.name[3] + 1} : Please select a proper content type!`,
             key: `${errorFieldKey}-error`,

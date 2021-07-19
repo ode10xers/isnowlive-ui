@@ -194,7 +194,7 @@ const CourseDetails = ({ match }) => {
           name: course.name,
           description: desc.join(', '),
           currency: course.currency,
-          price: course.price,
+          price: course.total_price,
         },
       ],
     };
@@ -213,7 +213,7 @@ const CourseDetails = ({ match }) => {
     try {
       const { status, data } = await apis.courses.createOrderForUser({
         course_id: course.id,
-        price: course.price,
+        price: course.total_price,
         currency: course.currency?.toLowerCase(),
         timezone_location: getTimezoneLocation(),
         coupon_code: couponCode,
@@ -480,8 +480,8 @@ const CourseDetails = ({ match }) => {
                         className={styles.courseBuyBtn}
                         onClick={handleCourseBuyClicked}
                       >
-                        {course?.price > 0 ? 'Buy' : 'Get'} course for{' '}
-                        {course?.price > 0 ? `${course?.currency?.toUpperCase()} ${course?.price}` : 'Free'}
+                        {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
+                        {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
                       </Button>
                     </Space>
                   </div>
