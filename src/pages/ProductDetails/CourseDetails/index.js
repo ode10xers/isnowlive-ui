@@ -321,7 +321,7 @@ const CourseDetails = ({ match }) => {
             title: 'Course duration',
             content:
               course?.type === 'VIDEO'
-                ? `${course?.duration ?? 0} days`
+                ? `${course?.validity ?? 0} days`
                 : `${moment(course?.end_date)
                     .endOf('day')
                     .add(1, 'second')
