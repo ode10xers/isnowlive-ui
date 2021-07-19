@@ -515,6 +515,7 @@ const SessionsInventories = ({ match }) => {
     setCalendarView(e);
   };
 
+  // TODO: FIx this mobile UI
   return (
     <div className={styles.box}>
       <Row gutter={[8, 8]}>
