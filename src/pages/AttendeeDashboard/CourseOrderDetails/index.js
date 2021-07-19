@@ -215,7 +215,7 @@ const CourseOrderDetails = ({ match, history }) => {
             }`,
           }}
         />
-        {false ? (
+        {!content?.join_url ? (
           <Popover
             arrowPointAtCenter
             placement="topRight"
@@ -231,7 +231,7 @@ const CourseOrderDetails = ({ match, history }) => {
           <Button
             type="primary"
             size="small"
-            className={!content?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+            className={styles.buyBtn}
             disabled={!content?.join_url}
             onClick={() => window.open(content.join_url)}
           >
