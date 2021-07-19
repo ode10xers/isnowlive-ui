@@ -19,7 +19,7 @@ const AddToCalendarButton = ({ type = 'link', eventData, iconOnly = false, butto
       return `You can see the event details in this <a href="${
         eventData.page_url
       }">page</a>.\n\nYou can also join from your <a href="${generateUrlFromUsername(
-        eventData.username
+        eventData?.username || eventData?.creator_username
       )}/attendee/dashboard">dashboard</a> `;
     }
   };

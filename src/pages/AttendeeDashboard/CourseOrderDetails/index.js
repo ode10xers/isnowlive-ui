@@ -209,7 +209,7 @@ const CourseOrderDetails = ({ match, history }) => {
           iconOnly={true}
           eventData={{
             ...content.product_data,
-            page_url: `${generateUrlFromUsername(content?.product_data?.username)}/e/${
+            page_url: `${generateUrlFromUsername(content?.product_data?.creator_username)}/e/${
               content?.product_data?.inventory_id
             }`,
           }}
