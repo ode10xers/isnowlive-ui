@@ -245,7 +245,6 @@ const CourseModulesForm = ({ match, history }) => {
     }
   };
 
-  // TODO: Fix this
   const disabledEndDates = (currentDate) => {
     return (
       dateIsBeforeDate(currentDate, moment().startOf('day')) ||
@@ -295,9 +294,37 @@ const CourseModulesForm = ({ match, history }) => {
     setSubmitting(false);
   };
 
+  const isCourseContentMatchesCourseType = () => {
+    const formValues = form.getFieldsValue();
+    const moduleContents = formValues.modules.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []);
+
+    console.log(moduleContents);
+
+    if (
+      courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
+      moduleContents.some((content) => content.product_type === 'SESSION')
+    ) {
+      showErrorModal('You have a session content in a Video Only session! Please review the curriculum');
+      return false;
+    } else if (
+      courseCurriculumType === courseCurriculumTypes.LIVE.name &&
+      moduleContents.some((content) => content.product_type === 'VIDEO')
+    ) {
+      showErrorModal('You have a video content in a Session Only session! Please review the curriculum');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleFinish = async (values) => {
     if (!courseId || !courseDetails) {
       showErrorModal('Invalid course selected!');
+      return;
+    }
+
+    if (!isCourseContentMatchesCourseType()) {
+      return;
     }
 
     const modifiedFields = {
