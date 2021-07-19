@@ -161,7 +161,6 @@ const CourseOrderDetails = ({ match, history }) => {
     );
   };
 
-  // TODO: Rework Progress based on API Data
   const renderCourseOrderDetails = (orderDetails) => (
     <div className={styles.courseOrderDetailsContainer}>
       <Row gutter={[12, 12]}>
@@ -203,7 +202,6 @@ const CourseOrderDetails = ({ match, history }) => {
       <PlayCircleOutlined className={styles.blueText} />
     );
 
-  // TODO: Reimplement this to be interactive
   const renderExtraContent = (content, contentType) =>
     contentType === 'SESSION' ? (
       <Space align="center" size="large">
@@ -265,7 +263,7 @@ const CourseOrderDetails = ({ match, history }) => {
                     buttonText="Add to Cal"
                     eventData={{
                       ...content?.product_data,
-                      page_url: `${generateUrlFromUsername(content?.product_data?.username)}/e/${
+                      page_url: `${generateUrlFromUsername(content?.product_data?.creator_username)}/e/${
                         content?.product_data?.inventory_id
                       }`,
                     }}
@@ -288,9 +286,9 @@ const CourseOrderDetails = ({ match, history }) => {
                     type="primary"
                     block
                     size="small"
-                    className={!content?.product_data?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
-                    disabled={!content?.product_data?.join_url}
-                    onClick={() => window.open(content?.product_data?.join_url)}
+                    className={styles.buyBtn}
+                    disabled={!content?.join_url}
+                    onClick={() => window.open(content?.join_url)}
                   >
                     Join
                   </Button>
@@ -317,7 +315,7 @@ const CourseOrderDetails = ({ match, history }) => {
           ) : (
             <>
               <Col xs={10}> Duration </Col>
-              <Col xs={14}> : {Math.floor(content?.product_data?.duration ?? 0) / 60} mins </Col>
+              <Col xs={14}> : {Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Col>
             </>
           )}
         </Row>
