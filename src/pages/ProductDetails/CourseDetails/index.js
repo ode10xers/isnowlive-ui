@@ -321,9 +321,10 @@ const CourseDetails = ({ match }) => {
             title: 'Course duration',
             content:
               course?.type === 'VIDEO'
-                ? `${course?.duration ?? 0} days`
+                ? `${course?.validity ?? 0} days`
                 : `${moment(course?.end_date)
-                    .startOf('day')
+                    .endOf('day')
+                    .add(1, 'second')
                     .diff(moment(course.start_date).startOf('day'), 'days')} days`,
           })}
         </Col>
