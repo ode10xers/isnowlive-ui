@@ -203,8 +203,7 @@ const CourseOrderDetails = ({ match, history }) => {
       <Space align="center" size="large">
         <Text>{toLongDateWithDay(content?.product_data?.start_time)}</Text>
         <Text>
-          {' '}
-          {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '}
+          {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}
         </Text>
         <AddToCalendarButton
           iconOnly={true}
@@ -215,11 +214,10 @@ const CourseOrderDetails = ({ match, history }) => {
             }`,
           }}
         />
-        {false ? (
+        {!content?.join_url ? (
           <Popover
             arrowPointAtCenter
             placement="topRight"
-            trigger="click"
             title="Event Address"
             content={content.product_data.offline_event_address}
           >
@@ -231,7 +229,7 @@ const CourseOrderDetails = ({ match, history }) => {
           <Button
             type="primary"
             size="small"
-            className={!content?.join_url ? styles.disabledBuyBtn : styles.buyBtn}
+            className={styles.buyBtn}
             disabled={!content?.join_url}
             onClick={() => window.open(content.join_url)}
           >
