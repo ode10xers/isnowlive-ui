@@ -47,34 +47,36 @@ const CourseOrderDetails = ({ match, history }) => {
             if (courseModule.module_content?.length > 0) {
               try {
                 tempModuleData.module_content = await Promise.all(
-                  courseModule.module_content.map(async (moduleContent) => {
-                    let productData = null;
-                    let targetAPI = null;
+                  courseModule.module_content
+                    .filter((content) => content.order_id)
+                    .map(async (moduleContent) => {
+                      let productData = null;
+                      let targetAPI = null;
 
-                    if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
-                      targetAPI = apis.videos.getVideoById;
-                    } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
-                      targetAPI = apis.session.getInventoryDetailsByExternalId;
-                    }
-
-                    if (targetAPI) {
-                      try {
-                        const { status, data } = await targetAPI(moduleContent.product_id);
-
-                        if (isAPISuccess(status) && data) {
-                          productData = data;
-                        }
-                      } catch (error) {
-                        console.error('Failed fetching product details for content');
-                        console.error(error);
+                      if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
+                        targetAPI = apis.videos.getVideoById;
+                      } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
+                        targetAPI = apis.session.getInventoryDetailsByExternalId;
                       }
-                    }
 
-                    return {
-                      ...moduleContent,
-                      product_data: productData,
-                    };
-                  })
+                      if (targetAPI) {
+                        try {
+                          const { status, data } = await targetAPI(moduleContent.product_id);
+
+                          if (isAPISuccess(status) && data) {
+                            productData = data;
+                          }
+                        } catch (error) {
+                          console.error('Failed fetching product details for content');
+                          console.error(error);
+                        }
+                      }
+
+                      return {
+                        ...moduleContent,
+                        product_data: productData,
+                      };
+                    })
                 );
               } catch (error) {
                 console.error('Failed fetching course content details');
@@ -84,6 +86,10 @@ const CourseOrderDetails = ({ match, history }) => {
 
             return tempModuleData;
           })
+        );
+
+        tempCourseData.course.modules = tempCourseData.course.modules.filter(
+          (module) => module.module_content.length > 0
         );
       } catch (error) {
         console.error('Failed fetching course module details');
