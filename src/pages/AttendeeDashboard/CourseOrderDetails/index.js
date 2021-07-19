@@ -19,7 +19,7 @@ import {
   generateUrlFromUsername,
   deepCloneObject,
 } from 'utils/helper';
-import { getCourseSessionDetailsContentCount, getCourseVideoDetailsContentCount } from 'utils/course';
+import { getCourseOrderSessionContentCount, getCourseOrderVideoContentCount } from 'utils/course';
 
 import styles from './style.module.scss';
 
@@ -150,8 +150,8 @@ const CourseOrderDetails = ({ match, history }) => {
   };
 
   const renderCourseOrderContent = (courseOrder) => {
-    const sessionCount = getCourseSessionDetailsContentCount(courseOrder.modules);
-    const videoCount = getCourseVideoDetailsContentCount(courseOrder.modules);
+    const sessionCount = getCourseOrderSessionContentCount(courseOrder.modules);
+    const videoCount = getCourseOrderVideoContentCount(courseOrder.modules);
 
     return (
       <Space split={<Divider type="vertical" />}>

@@ -312,6 +312,13 @@ const CourseModulesForm = ({ match, history }) => {
     ) {
       showErrorModal('You have a video content in a Session Only session! Please review the curriculum');
       return false;
+    } else if (
+      courseCurriculumType === courseCurriculumTypes.MIXED.name &&
+      !moduleContents.some((content) => content.product_type === 'SESSION')
+    ) {
+      // MIXED course needs at least 1 session
+      showErrorModal('Mixed course requires at least 1 session added as content');
+      return false;
     }
 
     return true;
