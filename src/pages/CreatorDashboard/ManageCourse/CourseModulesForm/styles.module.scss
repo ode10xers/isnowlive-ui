@@ -1,0 +1,78 @@
+@import '../../../../styles/variables.scss';
+
+// NOTE: For some reason, this will make it look weird on local but proper on stage
+.inlineFormItem {
+  display: inline-block !important;
+  margin: 4px 0 0 0 !important;
+  min-width: clamp(200px, 400px, 800px);
+}
+
+.contentDragHandle {
+  content: '....';
+  width: 24px;
+  height: 100%;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 5px;
+  margin: auto;
+  font-size: 14px;
+  font-family: sans-serif;
+  letter-spacing: 2px;
+  color: #cccccc;
+  text-shadow: 1px 0 1px black;
+  text-align: center;
+
+  &::after {
+    content: '.. .. .. ..';
+  }
+}
+
+.coursePageContainer {
+  .courseFormListContainer {
+    @extend .box;
+    padding: 20px 80px;
+
+    :global {
+      .ant-collapse-header {
+        padding: 8px;
+
+        .ant-collapse-arrow {
+          top: 10px !important;
+        }
+      }
+    }
+
+    .deleteModuleIconButton {
+      @extend .redText;
+      font-size: 18px;
+      margin-top: 5px;
+    }
+
+    .panelHeaderFormItem {
+      @extend .inlineFormItem;
+      margin-left: 40px !important;
+    }
+
+    .contentListItem {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+      box-shadow: inset 0px -1px 0px map-get($map: $colors, $key: 'WhiteSmoke1');
+    }
+  }
+}
+
+.dateText {
+  margin-left: -100px;
+  text-align: left;
+}
+
+.numericInput {
+  min-width: 100px !important;
+  max-width: 200px;
+}
+
+.datePicker {
+  width: 100%;
+  max-width: 300px;
+}

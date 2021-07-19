@@ -3,7 +3,7 @@
 .videoListCard {
   border-radius: 8px !important;
   cursor: pointer;
-  background-color : transparent !important;
+  background-color: transparent !important;
   // background-color: var(--new-video-card-background-color) !important;
 
   .videoCoverContainer {
@@ -18,8 +18,8 @@
       left: 8px;
       z-index: 5;
       color: map-get($map: $colors, $key: 'White');
-      background-color: rgba(0,0,0, 0.7);
-      
+      background-color: rgba(0, 0, 0, 0.7);
+
       .videoDuration {
         color: map-get($map: $colors, $key: 'White');
       }

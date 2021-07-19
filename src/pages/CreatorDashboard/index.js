@@ -9,13 +9,14 @@ import SessionsDetails from 'pages/CreatorDashboard/SessionsDetails';
 import ManageSessions from 'pages/CreatorDashboard/ManageSessions';
 import Session from 'pages/Session';
 import Profile from 'pages/Profile';
-// import ProfilePreview from 'pages/ProfilePreview';
 import LiveStream from 'pages/LiveStream';
 import ClassPassList from 'pages/CreatorDashboard/ClassPassList';
 import PaymentAccount from 'pages/CreatorDashboard/PaymentAccount';
 import EarningDetails from 'pages/CreatorDashboard/EarningDetails';
 import Videos from 'pages/CreatorDashboard/Videos';
 import Courses from 'pages/CreatorDashboard/Courses';
+import CourseForm from 'pages/CreatorDashboard/ManageCourse/CourseForm';
+import CourseModulesForm from 'pages/CreatorDashboard/ManageCourse/CourseModulesForm';
 import Subscriptions from 'pages/CreatorDashboard/Subscriptions';
 import Coupons from 'pages/CreatorDashboard/Coupons';
 import Audiences from 'pages/CreatorDashboard/Newsletter/Audiences';
@@ -61,6 +62,9 @@ const CreatorDashboard = ({ match }) => {
       <Route exact path={match.url + Routes.creatorDashboard.passes} component={ClassPassList} />
       <Route exact path={match.url + Routes.creatorDashboard.videos} component={Videos} />
       <Route exact path={match.url + Routes.creatorDashboard.courses} component={Courses} />
+      <Route exact path={match.url + Routes.creatorDashboard.updateCourse} component={CourseForm} />
+      <Route exact path={match.url + Routes.creatorDashboard.createCourse} component={CourseForm} />
+      <Route exact path={match.url + Routes.creatorDashboard.createCourseModule} component={CourseModulesForm} />
       <Route exact path={match.url + Routes.creatorDashboard.subscriptions} component={Subscriptions} />
       <Route exact path={match.url + Routes.creatorDashboard.coupons} component={Coupons} />
       <Route exact path={match.url + Routes.creatorDashboard.accountSettings} component={AccountSettings} />

@@ -59,17 +59,6 @@ const validationRules = {
     ];
   },
   otherLinksValidation: [
-    // {
-    //   validator: async (_, values) => {
-    //     if (!values || values.length < 1) {
-    //       return Promise.reject('Need at least 1 value');
-    //     }
-
-    //     if (values.some(val => !val)) {
-    //       return Promise.reject('Please fill in all the fields');
-    //     }
-    //   },
-    // },
     // Reference for below rule :
     // https://github.com/ant-design/ant-design/issues/14275#issuecomment-678800190
     // https://github.com/yiminghe/async-validator#deep-rules
@@ -114,6 +103,36 @@ const validationRules = {
           ],
         },
       },
+    },
+  ],
+  courseModulesValidation: [
+    {
+      type: 'array',
+      min: 1,
+      message: 'Please add at least one module!',
+      required: true,
+      // defaultField: {
+      //   // message: 'Make sure to add at least 1 content to each module!',
+      //   type: 'object',
+      //   fields: {
+      //     module_content : [
+      //       {
+      //         type: 'array',
+      //         required : true,
+      //         min: 1,
+      //         message: 'Make sure to add at least 1 content to each module!',
+      //       }
+      //     ]
+      //   }
+      // }
+    },
+  ],
+  courseModuleContentValidation: [
+    {
+      type: 'array',
+      required: true,
+      min: 1,
+      message: 'Please add at least one content!',
     },
   ],
 };

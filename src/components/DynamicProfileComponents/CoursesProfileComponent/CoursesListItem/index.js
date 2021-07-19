@@ -17,16 +17,8 @@ const {
 const { Text, Title } = Typography;
 
 const CourseListItem = ({ course }) => {
-  // const extraTags = (
-  //   <Space>
-  //     {course.type === courseType.MIXED && <Tag color="green"> Live Course </Tag>}
-  //     {course.type !== courseType.MIXED && <Tag color="cyan"> Video Course </Tag>}
-  //   </Space>
-  // );
-
   const courseImage = (
     <div className={styles.courseCoverContainer}>
-      {/* <div className={styles.extraTagsContainer}> {extraTags} </div> */}
       <div className={styles.courseImageContainer}>
         <Image
           preview={false}
@@ -89,9 +81,9 @@ const CourseListItem = ({ course }) => {
   const bottomCardBar = (
     <Row className={styles.cardFooter}>
       <Col xs={14} className={styles.timeText}>
-        {course.type === courseType.MIXED
-          ? `${renderCourseDate(course?.start_date)} - ${renderCourseDate(course?.end_date)}`
-          : `VALIDITY : ${course?.validity} DAY${course?.validity > 1 ? 'S' : ''}`}
+        {course.type === courseType.VIDEO
+          ? `VALIDITY : ${course?.validity} DAY${course?.validity > 1 ? 'S' : ''}`
+          : `${renderCourseDate(course?.start_date)} - ${renderCourseDate(course?.end_date)}`}
       </Col>
       <Col xs={10} className={styles.priceText}>
         {renderCoursePrice()}
