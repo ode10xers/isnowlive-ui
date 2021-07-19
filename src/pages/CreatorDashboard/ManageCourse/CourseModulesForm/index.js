@@ -76,8 +76,8 @@ const formInitialValues = {
   curriculumType: courseCurriculumTypes.MIXED.name,
   maxParticipants: 1,
   validity: 1,
-  start_date: null,
-  end_date: null,
+  start_date: moment().startOf('day'),
+  end_date: moment().startOf('day').add(1, 'day'),
 };
 
 const { Panel } = Collapse;
@@ -395,7 +395,6 @@ const CourseModulesForm = ({ match, history }) => {
           const errorFieldKey = deepCloneObject(error.name)
             .slice(0, error.name.length - 1)
             .join('-');
-          console.log(errorFieldKey);
           message.error({
             content: `Module ${error.name[1] + 1} Content ${error.name[3] + 1} : Please select a proper content type!`,
             key: `${errorFieldKey}-error`,
@@ -519,7 +518,11 @@ const CourseModulesForm = ({ match, history }) => {
               {toLocaleTime(productData.start_time)} - {toLocaleTime(productData.end_time)}
             </Text>
           </Space>
-        ) : null;
+        ) : (
+          <Tooltip title="This session's date has already past">
+            <Text type="secondary">Past session</Text>
+          </Tooltip>
+        );
       case 'VIDEO':
         productData = videos.find((video) => video.external_id === contentData.product_id);
 

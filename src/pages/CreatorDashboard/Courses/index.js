@@ -532,7 +532,7 @@ const Courses = ({ history }) => {
             </Col>
             <Col xs={24} sm={12} md={10} lg={6} className={styles.textAlignRight}>
               <Button size="large" type="primary" onClick={redirectToCreateCourse}>
-                Create Live Course
+                Create New Course
               </Button>
             </Col>
           </Row>
