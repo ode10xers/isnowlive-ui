@@ -146,15 +146,24 @@ const PaymentPopup = () => {
   }, []);
 
   useEffect(() => {
+    let stripeKey = config.stripe.secretKey;
+
+    if (creatorCountry && creatorCountry === 'IN') {
+      stripeKey = config.stripe.indianSecretKey;
+      console.log('Using indian stripe key for this creator');
+    }
+
     if (creatorStripeAccountID) {
       setStripePromise(
-        loadStripe(config.stripe.secretKey, {
+        loadStripe(stripeKey, {
           stripeAccount: creatorStripeAccountID,
         })
       );
     } else {
-      setStripePromise(loadStripe(config.stripe.secretKey));
+      setStripePromise(loadStripe(stripeKey));
     }
+
+    //eslint-disable-next-line
   }, [creatorStripeAccountID]);
 
   useEffect(() => {

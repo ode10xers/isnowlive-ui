@@ -17,6 +17,7 @@ export default {
   stripe: {
     secretKey:
       'pk_live_51HVgJAHZtrrEElwYpsua3HdxQREeNtDhwhDSO0SDnnaoVLLniZu26mWdSdNFwztw0323UZvWJv7Ruxom7mjPsnfW00INDUZFLe',
+    // TODO: Also add LIVE indian secret key here
   },
   zoom: {
     oAuthURL: `https://zoom.us/oauth/authorize?response_type=code&client_id=brQnuitATty_4L23JGrIYg&redirect_uri=https://app.passion.do/creator/dashboard/livestream`,

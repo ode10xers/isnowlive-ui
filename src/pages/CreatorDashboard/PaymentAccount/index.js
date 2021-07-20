@@ -142,6 +142,7 @@ const PaymentAccount = () => {
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'user already registered for account, trigger relink'
       ) {
+        // TODO: Add special handler here if selected country === IN (for India)
         relinkStripe();
       } else {
         pushToDataLayer(gtmTriggerEvents.STRIPE_CONNECT_FAILED, {

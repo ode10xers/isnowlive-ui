@@ -181,10 +181,13 @@ const Earnings = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
+      console.error(error);
       if (
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'error while generating dashboard URL from stripe'
       ) {
+        // TODO: Add special handler here if selected country === IN (for India)
+
         relinkStripe();
       } else {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -229,6 +232,11 @@ const Earnings = () => {
   }, [getCreatorBalance, getCreatorEarnings, checkAndSendCreatorConversionEvent, userDetails]);
 
   const confirmPayout = async () => {
+    if (balance?.currency === 'inr') {
+      message.error('Unable to request payout for indian account');
+      return;
+    }
+
     const eventTag = creator.click.payment.requestPayout;
     try {
       setIsLoadingPayout(true);
