@@ -127,7 +127,7 @@ const WrappedPaymentRetry = () => {
           }
 
           setStripeObj(
-            await loadStripe(config.stripe.secretKey, {
+            await loadStripe(stripeKey, {
               stripeAccount: data.profile?.connect_account_id,
             })
           );
