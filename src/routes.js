@@ -77,7 +77,7 @@ const Routes = {
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
-    defaultPath: '/sessions/upcoming',
+    defaultPath: '/products',
     sessions: '/sessions/:session_type',
     passes: '/passes',
     videos: '/videos',
