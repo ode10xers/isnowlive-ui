@@ -48,7 +48,8 @@ const PaymentAccount = () => {
       });
       window.open(url, '_self');
     },
-    [payment_account_status]
+    // eslint-disable-next-line
+    []
   );
 
   const relinkStripe = useCallback(async () => {
@@ -86,8 +87,7 @@ const PaymentAccount = () => {
   }, [relinkStripe]);
 
   useEffect(() => {
-    console.log(payment_account_status);
-    if (validateAccount && payment_account_status === StripeAccountStatus.VERIFICATION_PENDING) {
+    if (validateAccount && paymentConnected === StripeAccountStatus.VERIFICATION_PENDING) {
       const validateStripeAccount = async () => {
         try {
           const { status, data } = await apis.payment.stripe.validate();
@@ -113,7 +113,7 @@ const PaymentAccount = () => {
             setPaymentConnected(paymentStatus);
           }
         } catch (error) {
-          if (error.response?.data?.message !== 'unable to find payment credentials') {
+          if (error.response?.data?.message && error.response?.data?.message !== 'unable to find payment credentials') {
             openStripeDashboard();
           }
         }
