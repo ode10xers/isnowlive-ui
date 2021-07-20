@@ -86,11 +86,12 @@ const PaymentAccount = () => {
   }, [relinkStripe]);
 
   useEffect(() => {
-    if (validateAccount) {
+    console.log(payment_account_status);
+    if (validateAccount && payment_account_status === StripeAccountStatus.VERIFICATION_PENDING) {
       const validateStripeAccount = async () => {
         try {
           const { status, data } = await apis.payment.stripe.validate();
-          if (isAPISuccess(status)) {
+          if (isAPISuccess(status) && data) {
             const paymentStatus = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
 
             const localUserDetails = getLocalUserDetails();
@@ -117,6 +118,7 @@ const PaymentAccount = () => {
           }
         }
       };
+
       validateStripeAccount();
     }
     //eslint-disable-next-line
