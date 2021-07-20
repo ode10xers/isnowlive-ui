@@ -86,6 +86,8 @@ const Profile = () => {
         await apis.user.convertUserToCreator();
       }
 
+      // TODO: Check if it's possible to return the updated profile in this API
+      // CASE: If not returned here, we are missing some info on the next step due to "profile" object missing
       const { status } = await apis.user.updateProfile(values);
       if (isAPISuccess(status)) {
         setIsLoading(false);

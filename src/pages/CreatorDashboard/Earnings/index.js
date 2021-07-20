@@ -543,7 +543,7 @@ const Earnings = () => {
             {stripePaymentDashboard}
           </Col>
           <Col xs={24} lg={8}>
-            {availableForPayout}
+            {balance?.currency && balance?.currency !== 'inr' && availableForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>
