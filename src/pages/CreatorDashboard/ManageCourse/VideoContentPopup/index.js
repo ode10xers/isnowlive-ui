@@ -74,7 +74,7 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
                   : 'Free'}
               </Text>
               {video.source === videoSourceType.YOUTUBE ? (
-                <Text type="secondary"> Youtube Video </Text>
+                <Text type="secondary"> Video </Text>
               ) : (
                 <Text type="secondary">{Math.floor((video?.duration ?? 0) / 60)} mins</Text>
               )}

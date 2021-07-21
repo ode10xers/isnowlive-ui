@@ -366,7 +366,7 @@ const CourseDetails = ({ match }) => {
     switch (contentData.product_type?.toUpperCase()) {
       case 'VIDEO':
         if (contentData.product_data?.source === videoSourceType.YOUTUBE) {
-          return <Text type="secondary"> Youtube Video </Text>;
+          return <Text type="secondary"> Video </Text>;
         } else {
           return (
             <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>

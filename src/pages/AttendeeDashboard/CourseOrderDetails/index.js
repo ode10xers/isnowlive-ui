@@ -243,7 +243,7 @@ const CourseOrderDetails = ({ match, history }) => {
     ) : (
       <Space align="center" size="large">
         {content.product_data?.source === videoSourceType.YOUTUBE ? (
-          <Text> Youtube video </Text>
+          <Text> Video </Text>
         ) : (
           <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
         )}
@@ -316,7 +316,7 @@ const CourseOrderDetails = ({ match, history }) => {
               </Col>
             </>
           ) : content.product_data?.source === videoSourceType.YOUTUBE ? (
-            <Text> Youtube video </Text>
+            <Text> Video </Text>
           ) : (
             <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
           )}

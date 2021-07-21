@@ -561,7 +561,7 @@ const CourseModulesForm = ({ match, history }) => {
         return productData ? (
           productData.source === videoSourceType.YOUTUBE ? (
             <Space direction="horizontal" align="middle">
-              <Text> Youtube Video </Text>
+              <Text> Video </Text>
             </Space>
           ) : (
             <Space direction="horizontal" align="middle">
