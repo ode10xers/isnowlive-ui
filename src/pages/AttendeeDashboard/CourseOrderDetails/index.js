@@ -18,6 +18,7 @@ import {
   preventDefaults,
   generateUrlFromUsername,
   deepCloneObject,
+  videoSourceType,
 } from 'utils/helper';
 import { getCourseOrderSessionContentCount, getCourseOrderVideoContentCount } from 'utils/course';
 
@@ -98,6 +99,7 @@ const CourseOrderDetails = ({ match, history }) => {
     }
 
     setCourseOrderDetails(tempCourseData);
+    setExpandedCourseModules([tempCourseData.course.modules[0].name]);
   }, []);
 
   const fetchCourseOrderDetails = useCallback(
@@ -108,12 +110,9 @@ const CourseOrderDetails = ({ match, history }) => {
 
         if (isAPISuccess(status) && data) {
           const activeData = data.active;
-          activeData.forEach((course) => {
-            if (course.course_order_id === courseOrderID) {
-              setCourseOrderDetails(course);
-              fetchCourseContentDetails(course);
-            }
-          });
+          const targetCourse = activeData.find((course) => course.course_order_id === courseOrderID);
+
+          fetchCourseContentDetails(targetCourse);
         }
       } catch (error) {
         console.error(error);
@@ -243,7 +242,11 @@ const CourseOrderDetails = ({ match, history }) => {
       </Space>
     ) : (
       <Space align="center" size="large">
-        <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
+        {content.product_data?.source === videoSourceType.YOUTUBE ? (
+          <Text> Video </Text>
+        ) : (
+          <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
+        )}
         <Button type="primary" onClick={() => redirectToVideoOrderDetails(content)}>
           Watch Now
         </Button>
@@ -312,11 +315,10 @@ const CourseOrderDetails = ({ match, history }) => {
                 : {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}{' '}
               </Col>
             </>
+          ) : content.product_data?.source === videoSourceType.YOUTUBE ? (
+            <Text> Video </Text>
           ) : (
-            <>
-              <Col xs={10}> Duration </Col>
-              <Col xs={14}> : {Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Col>
-            </>
+            <Text>{Math.floor((content?.product_data?.duration ?? 0) / 60)} mins </Text>
           )}
         </Row>
       </Card>

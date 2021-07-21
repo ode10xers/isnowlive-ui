@@ -10,6 +10,7 @@ import {
   showErrorModal,
   showAlreadyBookedModal,
   showGetVideoWithPassSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
   showGetVideoWithSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
@@ -25,6 +26,7 @@ import {
   paymentSource,
   orderType,
   productType,
+  videoSourceType,
   isUnapprovedUserError,
 } from 'utils/helper';
 
@@ -255,6 +257,8 @@ const VideoDetails = ({ match, history }) => {
             payment_order_type: orderType.VIDEO,
           };
         } else {
+          showPurchaseSingleVideoSuccessModal(data.payment_order_id);
+
           return {
             ...data,
             is_successful_order: true,
@@ -552,11 +556,13 @@ const VideoDetails = ({ match, history }) => {
                       value={`${videoData?.validity} day${videoData?.validity > 1 ? 's' : ''}`}
                       formatter={renderVideoDetailItem}
                     />
-                    <Statistic
-                      title="Duration"
-                      value={getVideoMinutesDuration(videoData?.duration ?? 0)}
-                      formatter={renderVideoDetailItem}
-                    />
+                    {videoData.source === videoSourceType.CLOUDFLARE ? (
+                      <Statistic
+                        title="Duration"
+                        value={getVideoMinutesDuration(videoData?.duration ?? 0)}
+                        formatter={renderVideoDetailItem}
+                      />
+                    ) : null}
                   </Space>
                 </Col>
 
