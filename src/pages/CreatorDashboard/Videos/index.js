@@ -397,6 +397,7 @@ const Videos = () => {
                       />
                     </Tooltip>
                   ) : (
+                    // Here we also use the UID to determine whether the video has been completely processed or not
                     <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
                       <Button
                         className={styles.detailsButton}

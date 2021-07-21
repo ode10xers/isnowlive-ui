@@ -426,6 +426,10 @@ const UploadVideoModal = ({
 
         updateEditedVideo(response.data);
 
+        // NOTE : Video UID is required here in order to
+        // know whether the video has been uploaded or not
+        // If it's uploaded, we proceed to step 3 (change thumbnail)
+        // Else we proceed to step 2 (upload the video)
         if (response.data.video_uid.length) {
           apis.videos
             .getVideoToken(response.data.external_id)
