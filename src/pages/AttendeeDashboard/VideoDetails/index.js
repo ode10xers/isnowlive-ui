@@ -15,6 +15,7 @@ import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal, showWarningModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { getYoutubeVideoIDFromURL } from 'utils/video';
 import { isAPISuccess, reservedDomainName, isUnapprovedUserError, videoSourceType } from 'utils/helper';
 
 import styles from './style.module.scss';
@@ -172,10 +173,10 @@ const VideoDetails = ({ match }) => {
           ) : (
             <VideoCard
               cover={
-                video?.source === videoSourceType.YOUTUBE ? (
+                video?.source === videoSourceType.YOUTUBE && videoOrderDetails ? (
                   <iframe
                     className={styles.youtubeVideoPlayer}
-                    src="https://www.youtube.com/embed/JSURzPQnkl0"
+                    src={`https://www.youtube.com/embed/${getYoutubeVideoIDFromURL(videoOrderDetails?.video_url)}`}
                     title="YouTube video player"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

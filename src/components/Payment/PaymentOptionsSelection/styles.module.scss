@@ -5,7 +5,8 @@
   border-radius: 8px;
   width: 100%;
 
-  &.active, &.active:hover {
+  &.active,
+  &.active:hover {
     border: 2px solid map-get($map: $colors, $key: 'DodgerBlue') !important;
     font-weight: 500;
   }
@@ -36,7 +37,7 @@
 @media screen and (max-width: 425px) {
   .paymentOptionCard {
     .paymentOptionName {
-      font-size: 10px;  
+      font-size: 10px;
     }
   }
 }
