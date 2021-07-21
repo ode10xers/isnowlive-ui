@@ -41,9 +41,10 @@ import {
 } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
-import { isMobileDevice } from 'utils/device';
 import { isAPISuccess } from 'utils/helper';
+import { isMobileDevice } from 'utils/device';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { generateYoutubeThumbnailURL } from 'utils/video';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
@@ -69,13 +70,13 @@ const videoPriceTypes = {
   },
 };
 
-const videoUrlTypes = {
-  UPLOAD: {
-    value: 'upload',
+const videoSourceTypes = {
+  CLOUDFLARE: {
+    value: 'CLOUDFLARE',
     label: 'Upload a video',
   },
   YOUTUBE: {
-    value: 'youtube',
+    value: 'YOUTUBE',
     label: 'Youtube video',
   },
 };
@@ -93,7 +94,7 @@ const formInitialValues = {
 };
 
 const uploadVideoFormInitialValues = {
-  video_url_type: videoUrlTypes.UPLOAD.value,
+  video_url_type: videoSourceTypes.CLOUDFLARE.value,
   youtube_url: '',
 };
 
@@ -108,6 +109,7 @@ const UploadVideoModal = ({
   creatorMemberTags = [],
 }) => {
   const [form] = Form.useForm();
+  const [uploadForm] = Form.useForm();
 
   const [classes, setClasses] = useState([]);
   const [currency, setCurrency] = useState('');
@@ -122,7 +124,7 @@ const UploadVideoModal = ({
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
   const [videoPreviewTime, setVideoPreviewTime] = useState('');
-  const [videoUrlType, setVideoUrlType] = useState(videoUrlTypes.UPLOAD.value);
+  const [videoUrlType, setVideoUrlType] = useState(videoSourceTypes.CLOUDFLARE.value);
   const [, setVideoLength] = useState(0);
   const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState('preview');
@@ -264,9 +266,8 @@ const UploadVideoModal = ({
 
   useEffect(() => {
     if (visible) {
-      // document.body.style.overflow = 'hidden';
-
       if (editedVideo) {
+        console.log(editedVideo);
         form.setFieldsValue({
           ...editedVideo,
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
@@ -301,8 +302,22 @@ const UploadVideoModal = ({
         );
 
         updateUppyListeners(editedVideo.external_id);
+
+        uploadForm.setFieldsValue({
+          video_url_type: editedVideo.source ?? videoSourceTypes.CLOUDFLARE.value,
+          youtube_url: editedVideo.video_url ?? '',
+        });
+
+        if (editedVideo.source === videoSourceTypes.YOUTUBE.value) {
+          if (formPart === 3) {
+            setActiveTabKey('static');
+          } else if (formPart === 2) {
+            setVideoUrlType(editedVideo.source ?? videoSourceTypes.CLOUDFLARE.value);
+          }
+        }
       } else {
         form.resetFields();
+        uploadForm.resetFields();
       }
 
       if (formPart === 1) {
@@ -404,13 +419,12 @@ const UploadVideoModal = ({
     setIsCourseVideo(e.target.value === 'course');
   };
 
-  // TODO: Adjust API Implementation here
   // NOTE : This handles the form submit logic on the first part of the modal
   const handleFinish = async (values) => {
     setIsSubmitting(true);
 
     try {
-      let data = {
+      let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
         description: values.description,
@@ -425,43 +439,49 @@ const UploadVideoModal = ({
         is_course: isCourseVideo,
         tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
         pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
+        source: editedVideo ? editedVideo.source : videoSourceTypes.CLOUDFLARE.value,
       };
 
-      const response = editedVideo
-        ? await apis.videos.updateVideo(editedVideo.external_id, data)
-        : await apis.videos.createVideo(data);
+      const { status, data } = editedVideo
+        ? await apis.videos.updateVideo(editedVideo.external_id, payload)
+        : await apis.videos.createVideo(payload);
 
-      if (isAPISuccess(response.status)) {
+      if (isAPISuccess(status)) {
         if (!editedVideo) {
           pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_VIDEO, {
-            video_name: response.data.title,
-            video_price: response.data.price,
-            video_id: response.data.external_id,
+            video_name: data.title,
+            video_price: data.price,
+            video_id: data.external_id,
             video_creator_username: getLocalUserDetails().username,
-            video_currency: response.data.currency || customNullValue,
+            video_currency: data.currency || customNullValue,
           });
         }
 
-        updateEditedVideo(response.data);
+        updateEditedVideo(data);
 
-        // NOTE : Video UID is required here in order to
-        // know whether the video has been uploaded or not
-        // If it's uploaded, we proceed to step 3 (change thumbnail)
-        // Else we proceed to step 2 (upload the video)
-        if (response.data.video_uid.length) {
-          apis.videos
-            .getVideoToken(response.data.external_id)
-            .then((res) => {
-              setVideoPreviewToken(res.data.token);
-              setFormPart(3);
-            })
-            .catch((error) => {
-              console.log(error);
-              showErrorModal(`Failed to get video token`);
-            });
+        if (data.source === videoSourceTypes.CLOUDFLARE.value) {
+          // NOTE : Video UID is required here in order to
+          // know whether the video has been uploaded or not
+          // If it's uploaded, we proceed to step 3 (change thumbnail)
+          // Else we proceed to step 2 (upload the video)
+          if (data.video_uid?.length) {
+            apis.videos
+              .getVideoToken(data.external_id)
+              .then((res) => {
+                setVideoPreviewToken(res.data.token);
+                setFormPart(3);
+              })
+              .catch((error) => {
+                console.log(error);
+                showErrorModal(`Failed to get video token`);
+              });
+          } else {
+            updateUppyListeners(data.external_id);
+            setFormPart(2);
+          }
         } else {
-          updateUppyListeners(response.data.external_id);
-          setFormPart(2);
+          setVideoPreviewToken(null);
+          setFormPart(3);
         }
       }
     } catch (error) {
@@ -503,9 +523,43 @@ const UploadVideoModal = ({
   // NOTE : this logic handles the form submit on 2nd part of the modal
   // only when the video type is Youtube Video URL
   const handleUploadVideoFormFinish = async (values) => {
-    // TODO: Integrate with API here
-    // TODO: Also immediately populate the thumbnail URL
     console.log(values);
+
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        currency: currency.toLowerCase(),
+        title: editedVideo.title,
+        description: editedVideo.description,
+        price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
+        validity: editedVideo.validity,
+        session_ids: selectedSessionIds || editedVideo.session_ids || [],
+        watch_limit: editedVideo.watch_limit,
+        is_course: isCourseVideo,
+        tag_ids: editedVideo.tags?.map((tag) => tag.external_id) ?? [],
+        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
+        source: values.video_url_type ?? videoUrlType,
+        video_url: values.youtube_url,
+        thumbnail_url: generateYoutubeThumbnailURL(values.youtube_url),
+      };
+
+      const { status, data } = await apis.videos.updateVideo(editedVideo.external_id, payload);
+
+      if (isAPISuccess(status) && data) {
+        message.success('Youtube Video Linked');
+        updateEditedVideo(data);
+        setFormPart(3);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed setting Youtube Link for video',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setIsLoading(false);
   };
 
   //#endregion End of Form Part 2 Logics
@@ -552,7 +606,16 @@ const UploadVideoModal = ({
     setIsLoading(true);
 
     try {
-      // TODO: Might also want to adjust this keys
+      const videoSourceData =
+        editedVideo?.source === videoSourceTypes.YOUTUBE.value
+          ? {
+              source: videoSourceTypes.YOUTUBE.value,
+              video_url: editedVideo.video_url,
+            }
+          : {
+              source: videoSourceTypes.CLOUDFLARE.value,
+            };
+
       const payload = {
         currency: currency.toLowerCase(),
         title: editedVideo.title,
@@ -565,6 +628,7 @@ const UploadVideoModal = ({
         is_course: isCourseVideo,
         tag_ids: editedVideo.tags?.map((tag) => tag.external_id) ?? [],
         pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
+        ...videoSourceData,
       };
 
       const { status } = await apis.videos.updateVideo(editedVideo.external_id, payload);
@@ -578,16 +642,20 @@ const UploadVideoModal = ({
         } else if (updateVideoDetails) {
           showSuccessModal('Video details updated successfully');
         } else {
-          showSuccessModal(
-            'Video Successfully Uploaded',
-            <>
-              <Paragraph>
-                We have received your video. It takes us about 10 minutes to process your video. Until then your video
-                is hidden.
-              </Paragraph>
-              <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
-            </>
-          );
+          if (editedVideo.source === videoSourceTypes.CLOUDFLARE.value) {
+            showSuccessModal(
+              'Video Successfully Uploaded',
+              <>
+                <Paragraph>
+                  We have received your video. It takes us about 10 minutes to process your video. Until then your video
+                  is hidden.
+                </Paragraph>
+                <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+              </>
+            );
+          } else {
+            showSuccessModal('Video Successfully Uploaded');
+          }
           if (editedVideo && uploadingFile) {
             pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
               video_id: editedVideo?.external_id || customNullValue,
@@ -620,7 +688,7 @@ const UploadVideoModal = ({
     <div className={styles.mb20}>
       <Radio.Group size="large" value={activeTabKey} onChange={handleRadioTabChange}>
         {Array.isArray(props.panes) ? (
-          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+          props.panes.map((pane) => (pane ? <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button> : null))
         ) : (
           <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
         )}
@@ -983,6 +1051,7 @@ const UploadVideoModal = ({
         {formPart === 2 && (
           <Form
             name="uploadVideoForm"
+            form={uploadForm}
             initialValue={uploadVideoFormInitialValues}
             onFinish={handleUploadVideoFormFinish}
             scrollToFirstError={true}
@@ -994,18 +1063,20 @@ const UploadVideoModal = ({
               rules={validationRules.requiredValidation}
               onChange={handleVideoUrlTypeChange}
             >
-              <Radio.Group options={Object.entries(videoUrlTypes).map(([key, urlTypeData]) => ({ ...urlTypeData }))} />
+              <Radio.Group
+                options={Object.entries(videoSourceTypes).map(([key, urlTypeData]) => ({ ...urlTypeData }))}
+              />
             </Form.Item>
             <Form.Item
               id="youtube_url"
               name="youtube_url"
               label="Youtube Video URL"
-              hidden={videoUrlType === videoUrlTypes.UPLOAD.value}
-              rules={videoUrlType === videoUrlTypes.UPLOAD.value ? [] : validationRules.requiredValidation}
+              hidden={videoUrlType === videoSourceTypes.CLOUDFLARE.value}
+              rules={videoUrlType === videoSourceTypes.CLOUDFLARE.value ? [] : validationRules.requiredValidation}
             >
               <Input placeholder="Paste your youtube video url here" maxLength={100} />
             </Form.Item>
-            {videoUrlType === videoUrlTypes.UPLOAD.value ? (
+            {videoUrlType === videoSourceTypes.CLOUDFLARE.value ? (
               <div className={styles.videoUpload}>
                 <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFile ? 'none' : 'auto' }}>
                   <DragDrop
@@ -1062,82 +1133,88 @@ const UploadVideoModal = ({
 
         {formPart === 3 && (
           <Tabs renderTabBar={handleCustomTabBarRender} activeKey={activeTabKey}>
-            <Tabs.TabPane key="preview" tab="Video Preview">
-              <Row justify="center" gutter={[12, 20]} className={styles.textAlignCenter}>
-                {editedVideo?.thumbnail_url ? (
-                  <>
-                    <Col xs={24} md={12}>
-                      <Row justify="center" align="middle" gutter={[8, 16]}>
-                        <Col xs={24}>
-                          <Text strong> Previous Thumbnail </Text>
-                        </Col>
-                        <Col xs={24}>
-                          <Image preview={false} src={editedVideo?.thumbnail_url} className={styles.centeredPreview} />
-                        </Col>
-                      </Row>
+            {editedVideo?.source === videoSourceTypes.CLOUDFLARE.value ? (
+              <Tabs.TabPane key="preview" tab="Video Preview">
+                <Row justify="center" gutter={[12, 20]} className={styles.textAlignCenter}>
+                  {editedVideo?.thumbnail_url ? (
+                    <>
+                      <Col xs={24} md={12}>
+                        <Row justify="center" align="middle" gutter={[8, 16]}>
+                          <Col xs={24}>
+                            <Text strong> Previous Thumbnail </Text>
+                          </Col>
+                          <Col xs={24}>
+                            <Image
+                              preview={false}
+                              src={editedVideo?.thumbnail_url}
+                              className={styles.centeredPreview}
+                            />
+                          </Col>
+                        </Row>
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <Row justify="center" align="middle" gutter={[8, 16]}>
+                          <Col xs={24}>
+                            <Text strong> New Thumbnail </Text>
+                          </Col>
+                          <Col xs={24} className={styles.relativeContainer}>
+                            {videoPreviewLoading && videoPreviewTime && (
+                              <div className={styles.videoPreviewLoaderContainer}>
+                                <Spin
+                                  className={styles.videoPreviewLoader}
+                                  size="large"
+                                  spinning={true}
+                                  tip="Loading preview"
+                                />
+                              </div>
+                            )}
+                            {videoThumbnailPreview}
+                          </Col>
+                        </Row>
+                      </Col>
+                    </>
+                  ) : (
+                    <Col xs={24} className={styles.relativeContainer}>
+                      {videoPreviewLoading && videoPreviewTime && (
+                        <div className={styles.videoPreviewLoaderContainer}>
+                          <Spin
+                            className={styles.videoPreviewLoader}
+                            size="large"
+                            spinning={true}
+                            tip="Loading preview"
+                          />
+                        </div>
+                      )}
+                      {videoThumbnailPreview}
                     </Col>
-                    <Col xs={24} md={12}>
-                      <Row justify="center" align="middle" gutter={[8, 16]}>
-                        <Col xs={24}>
-                          <Text strong> New Thumbnail </Text>
-                        </Col>
-                        <Col xs={24} className={styles.relativeContainer}>
-                          {videoPreviewLoading && videoPreviewTime && (
-                            <div className={styles.videoPreviewLoaderContainer}>
-                              <Spin
-                                className={styles.videoPreviewLoader}
-                                size="large"
-                                spinning={true}
-                                tip="Loading preview"
-                              />
-                            </div>
-                          )}
-                          {videoThumbnailPreview}
-                        </Col>
-                      </Row>
-                    </Col>
-                  </>
-                ) : (
-                  <Col xs={24} className={styles.relativeContainer}>
-                    {videoPreviewLoading && videoPreviewTime && (
-                      <div className={styles.videoPreviewLoaderContainer}>
-                        <Spin
-                          className={styles.videoPreviewLoader}
-                          size="large"
-                          spinning={true}
-                          tip="Loading preview"
-                        />
-                      </div>
-                    )}
-                    {videoThumbnailPreview}
+                  )}
+                  <Col xs={editedVideo?.thumbnail_url ? { span: 12, offset: 12 } : 24}>
+                    Select Time:{' '}
+                    <TimePicker
+                      showNow={false}
+                      value={videoPreviewTime ? moment(videoPreviewTime, 'hh:mm:ss') : null}
+                      onChange={handleVideoPreviewTimeChange}
+                    />
                   </Col>
-                )}
-                <Col xs={editedVideo?.thumbnail_url ? { span: 12, offset: 12 } : 24}>
-                  Select Time:{' '}
-                  <TimePicker
-                    showNow={false}
-                    value={videoPreviewTime ? moment(videoPreviewTime, 'hh:mm:ss') : null}
-                    onChange={handleVideoPreviewTimeChange}
-                  />
-                </Col>
-                <Col xs={24} md={12}>
-                  <Button block type="default" onClick={() => closeModal(false)}>
-                    Finish changes
-                  </Button>
-                </Col>
-                <Col xs={24} md={12}>
-                  <Button
-                    block
-                    type="primary"
-                    className="submit-video-thumbnail-btn"
-                    onClick={() => onCoverImageUpload()}
-                    disabled={!videoPreviewTime}
-                  >
-                    Submit
-                  </Button>
-                </Col>
-              </Row>
-            </Tabs.TabPane>
+                  <Col xs={24} md={12}>
+                    <Button block type="default" onClick={() => closeModal(false)}>
+                      Finish changes
+                    </Button>
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <Button
+                      block
+                      type="primary"
+                      className="submit-video-thumbnail-btn"
+                      onClick={() => onCoverImageUpload()}
+                      disabled={!videoPreviewTime}
+                    >
+                      Submit
+                    </Button>
+                  </Col>
+                </Row>
+              </Tabs.TabPane>
+            ) : null}
             <Tabs.TabPane key="static" tab="Static Image">
               <Row justify="center" gutter={[8, 8]}>
                 {coverImageUrl && !coverImageUrl?.endsWith('.gif') && (
