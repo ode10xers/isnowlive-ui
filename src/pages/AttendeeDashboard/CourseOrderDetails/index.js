@@ -98,6 +98,7 @@ const CourseOrderDetails = ({ match, history }) => {
     }
 
     setCourseOrderDetails(tempCourseData);
+    setExpandedCourseModules([tempCourseData.course.modules[0].name]);
   }, []);
 
   const fetchCourseOrderDetails = useCallback(
@@ -108,12 +109,9 @@ const CourseOrderDetails = ({ match, history }) => {
 
         if (isAPISuccess(status) && data) {
           const activeData = data.active;
-          activeData.forEach((course) => {
-            if (course.course_order_id === courseOrderID) {
-              setCourseOrderDetails(course);
-              fetchCourseContentDetails(course);
-            }
-          });
+          const targetCourse = activeData.find((course) => course.course_order_id === courseOrderID);
+
+          fetchCourseContentDetails(targetCourse);
         }
       } catch (error) {
         console.error(error);

@@ -43,7 +43,6 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-// TODO: Adjust keys here once API is implemented
 const CourseDetails = ({ match }) => {
   const courseId = match.params.course_id;
 
@@ -424,7 +423,6 @@ const CourseDetails = ({ match }) => {
       return resultArray;
     }, []);
 
-    // TODO: Currently using index as keys, rethink based on API Implementation
     return carouselItems.map((carouselItem, idx) => (
       <div className={styles.carouselItem} key={idx}>
         <Image.PreviewGroup>
