@@ -107,6 +107,7 @@ const UploadVideoModal = ({
   updateEditedVideo,
   shouldClone,
   creatorMemberTags = [],
+  refetchVideos,
 }) => {
   const [form] = Form.useForm();
   const [uploadForm] = Form.useForm();
@@ -267,7 +268,6 @@ const UploadVideoModal = ({
   useEffect(() => {
     if (visible) {
       if (editedVideo) {
-        console.log(editedVideo);
         form.setFieldsValue({
           ...editedVideo,
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
@@ -523,8 +523,6 @@ const UploadVideoModal = ({
   // NOTE : this logic handles the form submit on 2nd part of the modal
   // only when the video type is Youtube Video URL
   const handleUploadVideoFormFinish = async (values) => {
-    console.log(values);
-
     setIsLoading(true);
 
     try {
@@ -549,6 +547,7 @@ const UploadVideoModal = ({
       if (isAPISuccess(status) && data) {
         message.success('Youtube Video Linked');
         updateEditedVideo(data);
+        refetchVideos();
         setFormPart(3);
       }
     } catch (error) {

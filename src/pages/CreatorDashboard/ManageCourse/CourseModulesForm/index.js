@@ -298,8 +298,6 @@ const CourseModulesForm = ({ match, history }) => {
     const formValues = form.getFieldsValue();
     const moduleContents = formValues.modules.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []);
 
-    console.log(moduleContents);
-
     if (
       courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
       moduleContents.some((content) => content.product_type === 'SESSION')

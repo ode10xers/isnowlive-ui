@@ -801,6 +801,7 @@ const Videos = () => {
         updateEditedVideo={setSelectedVideo}
         shouldClone={shouldCloneVideo}
         creatorMemberTags={creatorMemberTags}
+        refetchVideos={getVideosForCreator}
       />
       <Row gutter={[8, 24]}>
         <Col xs={24} md={14} lg={18}>
