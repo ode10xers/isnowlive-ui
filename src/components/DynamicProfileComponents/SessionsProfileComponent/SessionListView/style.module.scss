@@ -7,7 +7,7 @@
 }
 
 .sessionDateSeparator {
-  color : var(--session-list-date-font-color) !important;
+  color: var(--session-list-date-font-color) !important;
   font-size: 16px !important;
 }
 
@@ -22,11 +22,13 @@
     width: 100%;
     border-radius: 8px !important;
     cursor: pointer !important;
-  
-    input, span, div {
+
+    input,
+    span,
+    div {
       cursor: pointer !important;
       text-align: center;
-      font-size : 18px !important;
+      font-size: 18px !important;
       color: map-get($map: $colors, $key: 'Smalt') !important;
     }
   }

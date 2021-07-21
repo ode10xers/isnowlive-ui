@@ -15,8 +15,8 @@
 .longContentWrapper {
   p,
   span {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-      sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
     background-color: map-get($map: $colors, $key: 'White') !important;
   }
 }
@@ -27,7 +27,7 @@
   @media screen and (max-width: 1025px) {
     padding: 0 100px !important;
   }
-  
+
   @media screen and (max-width: 769px) {
     padding: 0 20px !important;
   }
@@ -70,7 +70,7 @@
         @media screen and (max-width: 526px) {
           margin: 20px auto 0;
         }
-        
+
         .courseName {
           font-size: 48px;
           line-height: 52px;
@@ -139,7 +139,7 @@
         min-width: 200px;
         padding: 0 12px;
       }
-      
+
       @media screen and (max-width: 1025px) {
         min-width: 180px;
         padding: 0 12px;
@@ -149,11 +149,11 @@
         min-width: 120px;
         padding: 8px;
       }
-      
+
       @media screen and (max-width: 605px) {
         min-width: 200px;
       }
-      
+
       @media screen and (max-width: 432px) {
         min-width: 0px;
       }
@@ -171,12 +171,12 @@
         // @media screen and (max-width: 769px) {
         //   font-size: 20px;
         // }
-        
+
         // @media screen and (max-width: 526px) {
         //   font-size: 16px;
         // }
       }
-  
+
       .courseTitleContainer {
         justify-content: center;
         width: 100%;
@@ -185,7 +185,7 @@
           font-size: 20px;
           line-height: 28px;
           margin-right: 8px;
-          color:  map-get($map: $colors, $key: 'DodgerBlue');
+          color: map-get($map: $colors, $key: 'DodgerBlue');
 
           @media screen and (max-width: 769px) {
             font-size: 16px;
@@ -198,7 +198,7 @@
           //   margin-right: 4px;
           // }
         }
-    
+
         .courseInfoTitle {
           font-size: 14px;
           vertical-align: super;
@@ -255,22 +255,22 @@
 
       .courseCurriculumText {
         font-size: 32px;
-        color:  map-get($map: $colors, $key: 'Denim');
+        color: map-get($map: $colors, $key: 'Denim');
         text-align: center;
       }
-    
+
       .courseModules {
         width: 100%;
         padding: 4px 12px 12px;
         border-radius: 12px;
         background-color: map-get($map: $colors, $key: 'White');
         box-shadow: 0px 4px 44px rgba(0, 0, 0, 0.08);
-    
+
         .curriculumExpandIcon {
           color: map-get($colors, 'Denim') !important;
           font-size: 16px !important;
         }
-    
+
         .moduleHeader {
           font-size: 18px;
           font-weight: 600;
@@ -304,7 +304,7 @@
   .coursePreviewImagesSection {
     margin: -50px 0;
     padding: 30px 80px !important;
-    background : linear-gradient(41.18deg, #E6F7FF 16.22%, #FFF5F6 82.56%), #F8FAFF;
+    background: linear-gradient(41.18deg, #e6f7ff 16.22%, #fff5f6 82.56%), #f8faff;
 
     @media screen and (max-width: 769px) {
       padding: 20px !important;
@@ -329,7 +329,7 @@
       :global {
         .slick-active {
           > button {
-            background: #006CD0 !important;
+            background: #006cd0 !important;
           }
         }
       }
@@ -356,7 +356,7 @@
 
     .courseFAQContainer {
       margin: 50px 0;
-      
+
       .courseFAQs {
         width: 100%;
 

@@ -76,8 +76,8 @@ const formInitialValues = {
   curriculumType: courseCurriculumTypes.MIXED.name,
   maxParticipants: 1,
   validity: 1,
-  start_date: moment().startOf('day'),
-  end_date: moment().startOf('day').add(1, 'day'),
+  courseStartDate: moment().startOf('day'),
+  courseEndDate: moment().startOf('day').add(1, 'day'),
 };
 
 const { Panel } = Collapse;
