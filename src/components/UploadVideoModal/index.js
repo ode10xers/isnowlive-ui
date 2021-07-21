@@ -464,6 +464,7 @@ const UploadVideoModal = ({
           });
         }
 
+        refetchVideos();
         updateEditedVideo(data);
 
         if (data.source === videoSourceTypes.CLOUDFLARE.value) {
