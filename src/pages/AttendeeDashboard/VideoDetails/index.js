@@ -173,10 +173,10 @@ const VideoDetails = ({ match }) => {
           ) : (
             <VideoCard
               cover={
-                video?.source === videoSourceType.YOUTUBE ? (
+                video?.source === videoSourceType.YOUTUBE && videoOrderDetails ? (
                   <iframe
                     className={styles.youtubeVideoPlayer}
-                    src={`https://www.youtube.com/embed/${getYoutubeVideoIDFromURL(video?.video_url)}`}
+                    src={`https://www.youtube.com/embed/${getYoutubeVideoIDFromURL(videoOrderDetails?.video_url)}`}
                     title="YouTube video player"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
