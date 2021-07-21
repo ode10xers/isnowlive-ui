@@ -345,6 +345,11 @@ export const courseType = {
   VIDEO_NON_SEQ: 'VIDEO_NON_SEQUENCE', // Deprecated
 };
 
+export const videoSourceType = {
+  CLOUDFLARE: 'CLOUDFLARE',
+  YOUTUBE: 'YOUTUBE',
+};
+
 export const productType = {
   CLASS: 'Session',
   PASS: 'Pass',

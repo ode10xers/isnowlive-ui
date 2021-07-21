@@ -28,7 +28,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername, copyToClipboard, productType, videoSourceType } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -387,28 +387,31 @@ const Videos = () => {
                     />
                   </Tooltip>
                 </Col>
-                <Col xs={24} sm={12} md={8}>
-                  {record.status === 'UPLOAD_SUCCESS' ? (
-                    <Tooltip title="Video uploaded">
-                      <Button
-                        className={classNames(styles.detailsButton, styles.checkIcon)}
-                        type="text"
-                        icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
-                      />
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={record.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
-                      <Button
-                        className={styles.detailsButton}
-                        type="text"
-                        disabled={record.video_uid.length > 0 ? true : false}
-                        onClick={() => showUploadVideoModal(record, 2)}
-                        icon={<CloudUploadOutlined />}
-                      />
-                    </Tooltip>
-                  )}
-                </Col>
-                {record.status === 'UPLOAD_SUCCESS' && (
+                {record.source === videoSourceType.CLOUDFLARE && (
+                  <Col xs={24} sm={12} md={8}>
+                    {record.status === 'UPLOAD_SUCCESS' ? (
+                      <Tooltip title="Video uploaded">
+                        <Button
+                          className={classNames(styles.detailsButton, styles.checkIcon)}
+                          type="text"
+                          icon={<CheckCircleTwoTone twoToneColor="#52c41a" />}
+                        />
+                      </Tooltip>
+                    ) : (
+                      // Here we also use the UID to determine whether the video has been completely processed or not
+                      <Tooltip title={record.video_uid?.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+                        <Button
+                          className={styles.detailsButton}
+                          type="text"
+                          disabled={record.video_uid?.length > 0 ? true : false}
+                          onClick={() => showUploadVideoModal(record, 2)}
+                          icon={<CloudUploadOutlined />}
+                        />
+                      </Tooltip>
+                    )}
+                  </Col>
+                )}
+                {(record.status === 'UPLOAD_SUCCESS' || record.source === videoSourceType.YOUTUBE) && (
                   <Col xs={24} sm={12} md={8}>
                     <Tooltip title="Clone Video">
                       <Button
@@ -456,7 +459,7 @@ const Videos = () => {
                 <Tooltip title="Unhide Video">
                   <Button
                     type="link"
-                    disabled={record.status === 'UPLOAD_SUCCESS' ? false : true}
+                    disabled={!(record.status === 'UPLOAD_SUCCESS' || record.source === videoSourceType.YOUTUBE)}
                     className={styles.successBtn}
                     onClick={() => publishVideo(record.external_id)}
                   >
@@ -570,7 +573,7 @@ const Videos = () => {
     );
 
     const actionButtons =
-      video?.status === 'UPLOAD_SUCCESS'
+      video?.status === 'UPLOAD_SUCCESS' || video?.source === videoSourceType.YOUTUBE
         ? [
             <Tooltip title="Send Customer Email">
               <Button type="text" onClick={() => showEmailModal(video)} icon={<MailOutlined />} />
@@ -672,11 +675,11 @@ const Videos = () => {
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
             </Tooltip>,
-            <Tooltip title={video?.video_uid.length > 0 ? 'Video is being processed' : 'Upload Video'}>
+            <Tooltip title={video?.video_uid?.length > 0 ? 'Video is being processed' : 'Upload Video'}>
               <Button
                 className={styles.detailsButton}
                 type="text"
-                disabled={video?.video_uid.length ? true : false}
+                disabled={video?.video_uid?.length ? true : false}
                 onClick={() => showUploadVideoModal(video, 2)}
                 icon={<CloudUploadOutlined />}
               />
@@ -798,6 +801,7 @@ const Videos = () => {
         updateEditedVideo={setSelectedVideo}
         shouldClone={shouldCloneVideo}
         creatorMemberTags={creatorMemberTags}
+        refetchVideos={getVideosForCreator}
       />
       <Row gutter={[8, 24]}>
         <Col xs={24} md={14} lg={18}>

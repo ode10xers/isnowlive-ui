@@ -5,13 +5,14 @@ import ReactHtmlParser from 'react-html-parser';
 import { Row, Col, Card, Button, Typography, Image, Space, Divider } from 'antd';
 import { PlayCircleOutlined, BookTwoTone } from '@ant-design/icons';
 
+import DefaultImage from 'components/Icons/DefaultImage';
+
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { videoSourceType } from 'utils/helper';
 import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './styles.module.scss';
-
-import DefaultImage from 'components/Icons/DefaultImage';
 
 const { Title, Text } = Typography;
 
@@ -39,7 +40,7 @@ const VideoCard = ({
 }) => {
   const renderVideoOrderDetails = () => {
     if (isMobileDevice) {
-      return (
+      return video.source === videoSourceType.CLOUDFLARE ? (
         <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
           <Text strong className={styles.blueText}>
             Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
@@ -54,10 +55,17 @@ const VideoCard = ({
             You've watched {orderDetails.num_views} times
           </Text>
         </Space>
+      ) : (
+        <Space size={1} align="center" direction="vertical" className={styles.orderDetailsWrapper}>
+          <Text strong className={styles.blueText}>
+            Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
+            {toLongDateWithDayTime(orderDetails.expiry)}
+          </Text>
+        </Space>
       );
     }
 
-    return (
+    return video.source === videoSourceType.CLOUDFLARE ? (
       <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
         <Title level={5} className={styles.blueText}>
           Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
@@ -68,6 +76,13 @@ const VideoCard = ({
         </Title>
         <Title level={5} className={styles.blueText}>
           You've watched {orderDetails.num_views} times
+        </Title>
+      </Space>
+    ) : (
+      <Space size="middle" align="center" split={<Divider className={styles.divider} type="vertical" />}>
+        <Title level={5} className={styles.blueText}>
+          Available From : {toLongDateWithDayTime(orderDetails.beginning)} -{' '}
+          {toLongDateWithDayTime(orderDetails.expiry)}
         </Title>
       </Space>
     );

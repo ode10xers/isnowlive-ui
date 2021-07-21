@@ -26,6 +26,7 @@ import {
   isAPISuccess,
   orderType,
   productType,
+  videoSourceType,
   paymentSource,
   isUnapprovedUserError,
   preventDefaults,
@@ -43,7 +44,6 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-// TODO: Adjust keys here once API is implemented
 const CourseDetails = ({ match }) => {
   const courseId = match.params.course_id;
 
@@ -365,7 +365,13 @@ const CourseDetails = ({ match }) => {
   const renderContentDetails = (contentData) => {
     switch (contentData.product_type?.toUpperCase()) {
       case 'VIDEO':
-        return <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>;
+        if (contentData.product_data?.source === videoSourceType.YOUTUBE) {
+          return <Text type="secondary"> Video </Text>;
+        } else {
+          return (
+            <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>
+          );
+        }
       case 'SESSION':
         return (
           <Space align="center">
@@ -424,7 +430,6 @@ const CourseDetails = ({ match }) => {
       return resultArray;
     }, []);
 
-    // TODO: Currently using index as keys, rethink based on API Implementation
     return carouselItems.map((carouselItem, idx) => (
       <div className={styles.carouselItem} key={idx}>
         <Image.PreviewGroup>
