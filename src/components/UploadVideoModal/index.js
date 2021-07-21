@@ -1080,8 +1080,8 @@ const UploadVideoModal = ({
               id="youtube_url"
               name="youtube_url"
               label="Youtube Video URL"
-              hidden={videoUrlType === videoSourceTypes.CLOUDFLARE.value}
-              rules={videoUrlType === videoSourceTypes.CLOUDFLARE.value ? [] : validationRules.requiredValidation}
+              hidden={videoUrlType !== videoSourceTypes.YOUTUBE.value}
+              rules={videoUrlType !== videoSourceTypes.YOUTUBE.value ? [] : validationRules.requiredValidation}
             >
               <Input placeholder="Paste your youtube video url here" maxLength={100} />
             </Form.Item>
