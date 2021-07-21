@@ -10,6 +10,7 @@ import {
   showErrorModal,
   showAlreadyBookedModal,
   showGetVideoWithPassSuccessModal,
+  showPurchaseSingleVideoSuccessModal,
   showGetVideoWithSubscriptionSuccessModal,
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
@@ -256,6 +257,8 @@ const VideoDetails = ({ match, history }) => {
             payment_order_type: orderType.VIDEO,
           };
         } else {
+          showPurchaseSingleVideoSuccessModal(data.payment_order_id);
+
           return {
             ...data,
             is_successful_order: true,
