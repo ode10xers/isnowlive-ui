@@ -424,6 +424,16 @@ const UploadVideoModal = ({
     setIsSubmitting(true);
 
     try {
+      const videoSourceData =
+        editedVideo?.source === videoSourceTypes.YOUTUBE.value
+          ? {
+              source: videoSourceTypes.YOUTUBE.value,
+              video_url: editedVideo.video_url,
+            }
+          : {
+              source: videoSourceTypes.CLOUDFLARE.value,
+            };
+
       let payload = {
         currency: currency.toLowerCase(),
         title: values.title,
@@ -439,7 +449,7 @@ const UploadVideoModal = ({
         is_course: isCourseVideo,
         tag_ids: selectedTagType === 'anyone' ? [] : values.selectedMemberTags || [],
         pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
-        source: editedVideo ? editedVideo.source : videoSourceTypes.CLOUDFLARE.value,
+        ...videoSourceData,
       };
 
       const { status, data } = editedVideo
