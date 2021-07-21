@@ -69,6 +69,17 @@ const videoPriceTypes = {
   },
 };
 
+const videoUrlTypes = {
+  UPLOAD: {
+    value: 'upload',
+    label: 'Upload a video',
+  },
+  YOUTUBE: {
+    value: 'youtube',
+    label: 'Youtube video',
+  },
+};
+
 const formInitialValues = {
   title: '',
   description: '',
@@ -79,6 +90,11 @@ const formInitialValues = {
   video_course_type: 'normal',
   videoTagType: 'anyone',
   selectedMemberTags: [],
+};
+
+const uploadVideoFormInitialValues = {
+  video_url_type: videoUrlTypes.UPLOAD.value,
+  youtube_url: '',
 };
 
 const UploadVideoModal = ({
@@ -106,10 +122,13 @@ const UploadVideoModal = ({
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [videoPreviewToken, setVideoPreviewToken] = useState(null);
   const [videoPreviewTime, setVideoPreviewTime] = useState('');
+  const [videoUrlType, setVideoUrlType] = useState(videoUrlTypes.UPLOAD.value);
   const [, setVideoLength] = useState(0);
   const [updateVideoDetails, setUpdateVideoDetails] = useState(false);
   const [activeTabKey, setActiveTabKey] = useState('preview');
   const [videoPreviewLoading, setVideoPreviewLoading] = useState(true);
+
+  //#region Start of Uppy Related Methods
 
   const uppy = useRef(null);
   uppy.current = useUppy(() => {
@@ -145,6 +164,11 @@ const UploadVideoModal = ({
   uppy.current.on('progress', (result) => {
     setIsLoading(false);
     setVideoUploadPercent(result);
+  });
+
+  uppy.current.on('cancel-all', () => {
+    setVideoUploadPercent(0);
+    setUploadingFile(null);
   });
 
   const updateUppyListeners = (external_id) => {
@@ -184,17 +208,16 @@ const UploadVideoModal = ({
     }
   };
 
-  uppy.current.on('cancel-all', () => {
-    setVideoUploadPercent(0);
-    setUploadingFile(null);
-  });
-
   const removeUppyListeners = () => {
     if (uppy.current) {
       const eventNames = ['complete', 'cancel-all', 'progress', 'file-added'];
       eventNames.forEach((eventName) => uppy.current.off(eventName));
     }
   };
+
+  //#endregion End of Uppy Related Methods
+
+  //#region Start of API Calls
 
   const fetchAllClassesForCreator = useCallback(async () => {
     setIsLoading(true);
@@ -234,6 +257,10 @@ const UploadVideoModal = ({
     setIsLoading(false);
     //eslint-disable-next-line
   }, []);
+
+  //#endregion End of API Calls
+
+  //#region Start of Use Effects
 
   useEffect(() => {
     if (visible) {
@@ -307,6 +334,11 @@ const UploadVideoModal = ({
     // eslint-disable-next-line
   }, []);
 
+  //#endregion End of Use Effects
+
+  //#region Start of Form Logics
+
+  //#region Start of Form Part 1 Logics
   const setFreeVideo = () => {
     form.setFieldsValue({
       ...form.getFieldsValue(),
@@ -372,22 +404,8 @@ const UploadVideoModal = ({
     setIsCourseVideo(e.target.value === 'course');
   };
 
-  const cancelUpload = async () => {
-    setIsLoading(true);
-    uppy.current.cancelAll();
-
-    try {
-      const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
-
-      if (isAPISuccess(status)) {
-        message.success('Video upload aborted');
-      }
-    } catch (error) {
-      message.error(error.response?.data?.message || 'Failed to remove uploaded video');
-    }
-    setIsLoading(false);
-  };
-
+  // TODO: Adjust API Implementation here
+  // NOTE : This handles the form submit logic on the first part of the modal
   const handleFinish = async (values) => {
     setIsSubmitting(true);
 
@@ -456,54 +474,46 @@ const UploadVideoModal = ({
     setIsSubmitting(false);
   };
 
-  const updateVideoWithImageUrl = (imageUrl) => {
-    apis.videos
-      .updateVideo(editedVideo.external_id, {
-        currency: currency.toLowerCase(),
-        title: editedVideo.title,
-        description: editedVideo.description,
-        price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
-        validity: editedVideo.validity,
-        session_ids: selectedSessionIds || editedVideo.session_ids || [],
-        thumbnail_url: imageUrl,
-        watch_limit: editedVideo.watch_limit,
-        is_course: isCourseVideo,
-        tag_ids: editedVideo.tags?.map((tag) => tag.external_id) ?? [],
-        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
-      })
-      .then(() => {
-        setIsLoading(false);
-        closeModal(true);
+  //#endregion End of Form Part 1 Logics
 
-        if (shouldClone) {
-          showSuccessModal('Video cloned successfully');
-        } else if (updateVideoDetails) {
-          showSuccessModal('Video details updated successfully');
-        } else {
-          showSuccessModal(
-            'Video Successfully Uploaded',
-            <>
-              <Paragraph>
-                We have received your video. It takes us about 10 minutes to process your video. Until then your video
-                is hidden.
-              </Paragraph>
-              <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
-            </>
-          );
-          if (editedVideo && uploadingFile) {
-            pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
-              video_id: editedVideo?.external_id || customNullValue,
-            });
-          }
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        setIsLoading(false);
-        showErrorModal('Something went wrong!');
-      });
+  //#region Start of Form Part 2 Logics
+
+  // NOTE : This is the logic used when the user
+  // wants to cancel an video upload halfway through the process
+  const cancelUpload = async () => {
+    setIsLoading(true);
+    uppy.current.cancelAll();
+
+    try {
+      const { status } = await apis.videos.unlinkVideo(editedVideo.external_id);
+
+      if (isAPISuccess(status)) {
+        message.success('Video upload aborted');
+      }
+    } catch (error) {
+      message.error(error.response?.data?.message || 'Failed to remove uploaded video');
+    }
+    setIsLoading(false);
   };
 
+  const handleVideoUrlTypeChange = (e) => {
+    setVideoUrlType(e.target.value);
+  };
+
+  // NOTE : this logic handles the form submit on 2nd part of the modal
+  // only when the video type is Youtube Video URL
+  const handleUploadVideoFormFinish = async (values) => {
+    // TODO: Integrate with API here
+    // TODO: Also immediately populate the thumbnail URL
+    console.log(values);
+  };
+
+  //#endregion End of Form Part 2 Logics
+
+  //#region Start of Form Part 3 Logics
+
+  // NOTE : This logic is used for getting the thumbnail URL
+  // in a GIF format (for live thumbnail)
   const onCoverImageUpload = async () => {
     try {
       setIsLoading(true);
@@ -528,6 +538,70 @@ const UploadVideoModal = ({
     }
   };
 
+  // NOTE : This is the handler when the button is clicked
+  // For Static Thumbnail URL
+  const handleUploadStaticImage = () => {
+    if (!coverImageUrl?.endsWith('.gif')) {
+      updateVideoWithImageUrl(coverImageUrl);
+    }
+  };
+
+  // NOTE : This is the actual logic that this the API and updates
+  // ONLY THE THUMBNAIL_URL of the video
+  const updateVideoWithImageUrl = async (imageUrl) => {
+    setIsLoading(true);
+
+    try {
+      // TODO: Might also want to adjust this keys
+      const payload = {
+        currency: currency.toLowerCase(),
+        title: editedVideo.title,
+        description: editedVideo.description,
+        price: videoType === videoPriceTypes.FREE.name ? 0 : editedVideo.price,
+        validity: editedVideo.validity,
+        session_ids: selectedSessionIds || editedVideo.session_ids || [],
+        thumbnail_url: imageUrl,
+        watch_limit: editedVideo.watch_limit,
+        is_course: isCourseVideo,
+        tag_ids: editedVideo.tags?.map((tag) => tag.external_id) ?? [],
+        pay_what_you_want: videoType === videoPriceTypes.FLEXIBLE.name,
+      };
+
+      const { status } = await apis.videos.updateVideo(editedVideo.external_id, payload);
+
+      if (isAPISuccess(status)) {
+        setIsLoading(false);
+        closeModal(true);
+
+        if (shouldClone) {
+          showSuccessModal('Video cloned successfully');
+        } else if (updateVideoDetails) {
+          showSuccessModal('Video details updated successfully');
+        } else {
+          showSuccessModal(
+            'Video Successfully Uploaded',
+            <>
+              <Paragraph>
+                We have received your video. It takes us about 10 minutes to process your video. Until then your video
+                is hidden.
+              </Paragraph>
+              <Paragraph>Come back after 10 minutes to unhide the video and start selling.</Paragraph>
+            </>
+          );
+          if (editedVideo && uploadingFile) {
+            pushToDataLayer(gtmTriggerEvents.CREATOR_UPLOAD_VIDEO, {
+              video_id: editedVideo?.external_id || customNullValue,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      showErrorModal('Something went wrong!');
+    }
+  };
+
   const handleVideoPreviewTimeChange = (time, timeString) => {
     setVideoPreviewTime(timeString.length > 0 ? timeString : '');
     setVideoPreviewLoading(true);
@@ -542,6 +616,28 @@ const UploadVideoModal = ({
     return `${time[0] || 0}h${time[1] || 0}m${time[2] || 0}s`;
   };
 
+  const handleCustomTabBarRender = (props, DefaultTabBar) => (
+    <div className={styles.mb20}>
+      <Radio.Group size="large" value={activeTabKey} onChange={handleRadioTabChange}>
+        {Array.isArray(props.panes) ? (
+          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+        ) : (
+          <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
+        )}
+      </Radio.Group>
+    </div>
+  );
+
+  const handleRadioTabChange = (e) => {
+    setActiveTabKey(e.target.value);
+  };
+
+  //#endregion End of Form Part 3 Logics
+
+  //#endregion End of Form Logics
+
+  //#region Start of UI Components/Methods
+
   const modalTitle = () => {
     if (formPart === 1) {
       return 'Create Video Product';
@@ -549,12 +645,6 @@ const UploadVideoModal = ({
       return 'Upload Video';
     } else if (formPart === 3) {
       return 'Set a preview thumbnail';
-    }
-  };
-
-  const handleUploadStaticImage = () => {
-    if (!coverImageUrl?.endsWith('.gif')) {
-      updateVideoWithImageUrl(coverImageUrl);
     }
   };
 
@@ -582,21 +672,7 @@ const UploadVideoModal = ({
     [videoPreviewTime, videoPreviewToken, editedVideo]
   );
 
-  const handleRadioTabChange = (e) => {
-    setActiveTabKey(e.target.value);
-  };
-
-  const handleCustomTabBarRender = (props, DefaultTabBar) => (
-    <div className={styles.mb20}>
-      <Radio.Group size="large" value={activeTabKey} onChange={handleRadioTabChange}>
-        {Array.isArray(props.panes) ? (
-          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
-        ) : (
-          <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
-        )}
-      </Radio.Group>
-    </div>
-  );
+  //#endregion End of UI Components/Methods
 
   return (
     <Modal
@@ -617,6 +693,7 @@ const UploadVideoModal = ({
             name="classVideoForm"
             form={form}
             onFinish={handleFinish}
+            scrollToFirstError={true}
             initialValues={formInitialValues}
           >
             <Row gutter={[8, 16]}>
@@ -747,7 +824,7 @@ const UploadVideoModal = ({
                     rules={validationRules.requiredValidation}
                     onChange={onCourseTypeChange}
                   >
-                    <Radio.Group className="video-type-radio">
+                    <Radio.Group>
                       <Radio value="normal"> Normal Video </Radio>
                       <Radio value="course"> Course Video </Radio>
                     </Radio.Group>
@@ -773,8 +850,6 @@ const UploadVideoModal = ({
                   onChange={handleChangeLimitType}
                 >
                   <Radio.Group
-                    className="video-type-radio"
-                    // value={videoType}
                     options={Object.values(videoPriceTypes).map((pType) => ({
                       label: pType.label,
                       value: pType.name,
@@ -906,48 +981,83 @@ const UploadVideoModal = ({
         )}
 
         {formPart === 2 && (
-          <div className={styles.videoUpload}>
-            <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFile ? 'none' : 'auto' }}>
-              <DragDrop
-                uppy={uppy.current}
-                locale={{
-                  strings: {
-                    dropHereOr: 'Drop your video here or %{browse}',
-                    browse: 'browse',
-                  },
-                }}
-              />
-              {videoUploadPercent !== 0 && (
-                <>
-                  <Text>{uploadingFile?.name}</Text>
-                  <Progress percent={videoUploadPercent} status="active" />
-                </>
-              )}
-            </div>
+          <Form
+            name="uploadVideoForm"
+            initialValue={uploadVideoFormInitialValues}
+            onFinish={handleUploadVideoFormFinish}
+            scrollToFirstError={true}
+          >
+            <Form.Item
+              id="video_url_type"
+              name="video_url_type"
+              label="Video Type"
+              rules={validationRules.requiredValidation}
+              onChange={handleVideoUrlTypeChange}
+            >
+              <Radio.Group options={Object.entries(videoUrlTypes).map(([key, urlTypeData]) => ({ ...urlTypeData }))} />
+            </Form.Item>
+            <Form.Item
+              id="youtube_url"
+              name="youtube_url"
+              label="Youtube Video URL"
+              hidden={videoUrlType === videoUrlTypes.UPLOAD.value}
+              rules={videoUrlType === videoUrlTypes.UPLOAD.value ? [] : validationRules.requiredValidation}
+            >
+              <Input placeholder="Paste your youtube video url here" maxLength={100} />
+            </Form.Item>
+            {videoUrlType === videoUrlTypes.UPLOAD.value ? (
+              <div className={styles.videoUpload}>
+                <div className={styles.uppyDragDrop} style={{ pointerEvents: uploadingFile ? 'none' : 'auto' }}>
+                  <DragDrop
+                    uppy={uppy.current}
+                    locale={{
+                      strings: {
+                        dropHereOr: 'Drop your video here or %{browse}',
+                        browse: 'browse',
+                      },
+                    }}
+                  />
+                  {videoUploadPercent !== 0 && (
+                    <>
+                      <Text>{uploadingFile?.name}</Text>
+                      <Progress percent={videoUploadPercent} status="active" />
+                    </>
+                  )}
+                </div>
 
-            <Row justify="center" className={styles.mt20}>
-              <Col xs={12}>
-                {uploadingFile ? (
-                  <Popconfirm
-                    arrowPointAtCenter
-                    title={<Text> Are you sure you want to cancel the video upload? </Text>}
-                    onConfirm={cancelUpload}
-                    okText="Yes, Cancel the Upload"
-                    okButtonProps={{ danger: true, type: 'primary' }}
-                    cancelText="No"
-                  >
-                    <Button block danger type="primary">
-                      Cancel Upload
-                    </Button>
-                  </Popconfirm>
-                ) : (
-                  <Button block type="default" onClick={() => closeModal(true)}>
-                    Cancel
+                <Row justify="center" className={styles.mt20}>
+                  <Col xs={12}>
+                    {uploadingFile ? (
+                      <Popconfirm
+                        arrowPointAtCenter
+                        title={<Text> Are you sure you want to cancel the video upload? </Text>}
+                        onConfirm={cancelUpload}
+                        okText="Yes, Cancel the Upload"
+                        okButtonProps={{ danger: true, type: 'primary' }}
+                        cancelText="No"
+                      >
+                        <Button block danger type="primary">
+                          Cancel Upload
+                        </Button>
+                      </Popconfirm>
+                    ) : (
+                      <Button block type="default" onClick={() => closeModal(true)}>
+                        Cancel
+                      </Button>
+                    )}
+                  </Col>
+                </Row>
+              </div>
+            ) : (
+              <Row justify="center">
+                <Col>
+                  <Button type="primary" htmlType="submit">
+                    Set Youtube Video
                   </Button>
-                )}
-              </Col>
-            </Row>
-          </div>
+                </Col>
+              </Row>
+            )}
+          </Form>
         )}
 
         {formPart === 3 && (
@@ -1002,9 +1112,6 @@ const UploadVideoModal = ({
                     {videoThumbnailPreview}
                   </Col>
                 )}
-                {/* <Col xs={24}>
-                  We'll generate a 15 seconds preview starting from that time you enter below box in HH:MM:SS format.
-                </Col> */}
                 <Col xs={editedVideo?.thumbnail_url ? { span: 12, offset: 12 } : 24}>
                   Select Time:{' '}
                   <TimePicker
