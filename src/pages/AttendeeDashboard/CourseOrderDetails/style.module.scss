@@ -45,12 +45,11 @@
   }
 
   .courseCurriculumSection {
-
     .courseCurriculumContainer {
       .courseCurriculumText {
         font-size: 24px;
       }
-    
+
       .courseModules {
         width: 100%;
         padding: 4px 12px 12px;
@@ -58,12 +57,12 @@
         @media screen and (max-width: 768px) {
           padding: 4px 0;
         }
-    
+
         .curriculumExpandIcon {
           color: map-get($colors, 'Denim') !important;
           font-size: 16px !important;
         }
-    
+
         .moduleHeader {
           font-size: 18px;
           font-weight: 600;
@@ -91,7 +90,7 @@
             margin: 0 auto;
           }
 
-          :global{
+          :global {
             .ant-card-actions > li > span a:not(.ant-btn) {
               color: map-get($map: $colors, $key: 'DodgerBlue');
             }

@@ -1,28 +1,22 @@
 import React from 'react';
 
-import { Card, Space, Typography, Image, Row, Col } from 'antd';
-import { PlayCircleOutlined } from '@ant-design/icons';
+import { Card, Typography, Image, Row, Col } from 'antd';
 
-import dateUtil from 'utils/date';
 import { isValidFile, preventDefaults } from 'utils/helper';
 import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
 const DefaultImage = require('assets/images/greybg.jpg');
 
-const {
-  formatDate: { getVideoDuration },
-} = dateUtil;
-
-const { Text, Title } = Typography;
+const { Title } = Typography;
 
 const VideoListCard = ({ video }) => {
-  const videoDuration = (
-    <Space size={4} align="middle">
-      <PlayCircleOutlined className={styles.textIcons} />
-      <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
-    </Space>
-  );
+  // const videoDuration = (
+  //   <Space size={4} align="middle">
+  //     <PlayCircleOutlined className={styles.textIcons} />
+  //     <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
+  //   </Space>
+  // );
 
   const videoImage = (
     <div className={styles.videoCoverContainer}>
@@ -33,7 +27,7 @@ const VideoListCard = ({ video }) => {
           src={isValidFile(video?.thumbnail_url) ? video?.thumbnail_url : DefaultImage}
         />
       </div>
-      <div className={styles.videoDurationContainer}>{videoDuration}</div>
+      {/* <div className={styles.videoDurationContainer}>{videoDuration}</div> */}
     </div>
   );
 

@@ -6,7 +6,7 @@ import { CheckCircleFilled } from '@ant-design/icons';
 import DefaultImage from 'components/Icons/DefaultImage';
 import { resetBodyStyle } from 'components/Modals/modals';
 
-import { preventDefaults } from 'utils/helper';
+import { preventDefaults, videoSourceType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -73,7 +73,11 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
                   ? `${video?.currency?.toUpperCase()} ${video?.price}`
                   : 'Free'}
               </Text>
-              <Text type="secondary">{Math.floor((video?.duration ?? 0) / 60)} mins</Text>
+              {video.source === videoSourceType.YOUTUBE ? (
+                <Text type="secondary"> Video </Text>
+              ) : (
+                <Text type="secondary">{Math.floor((video?.duration ?? 0) / 60)} mins</Text>
+              )}
             </Space>
             {selectedVideoPopupContent.includes(video.external_id) ? (
               <Button
