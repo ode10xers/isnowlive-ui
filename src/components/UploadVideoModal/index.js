@@ -296,7 +296,7 @@ const UploadVideoModal = ({
         setSelectedSessionIds(editedVideo.sessions.map((session) => session.session_id));
         setCoverImageUrl(editedVideo.thumbnail_url);
         setIsCourseVideo(editedVideo.is_course || false);
-
+        setVideoUrlType(editedVideo.source ?? videoSourceTypes.CLOUDFLARE.value);
         setActiveTabKey(
           editedVideo.thumbnail_url && editedVideo.thumbnail_url?.endsWith('.gif') ? 'preview' : 'static'
         );
@@ -308,12 +308,8 @@ const UploadVideoModal = ({
           youtube_url: editedVideo.video_url ?? '',
         });
 
-        if (editedVideo.source === videoSourceTypes.YOUTUBE.value) {
-          if (formPart === 3) {
-            setActiveTabKey('static');
-          } else if (formPart === 2) {
-            setVideoUrlType(editedVideo.source ?? videoSourceTypes.CLOUDFLARE.value);
-          }
+        if (editedVideo.source === videoSourceTypes.YOUTUBE.value && formPart === 3) {
+          setActiveTabKey('static');
         }
       } else {
         form.resetFields();
@@ -338,6 +334,7 @@ const UploadVideoModal = ({
       setActiveTabKey('preview');
       removeUppyListeners();
       resetBodyStyle();
+      setVideoUrlType(videoSourceTypes.CLOUDFLARE.name);
     };
     //eslint-disable-next-line
   }, [visible, editedVideo, fetchAllClassesForCreator, getCreatorCurrencyDetails, form, formPart]);
