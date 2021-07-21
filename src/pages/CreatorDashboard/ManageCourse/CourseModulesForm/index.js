@@ -39,7 +39,7 @@ import VideoContentPopup from '../VideoContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { isAPISuccess, deepCloneObject } from 'utils/helper';
+import { isAPISuccess, deepCloneObject, videoSourceType } from 'utils/helper';
 
 import { courseCreatePageLayout } from 'layouts/FormLayouts';
 
@@ -561,9 +561,15 @@ const CourseModulesForm = ({ match, history }) => {
         productData = videos.find((video) => video.external_id === contentData.product_id);
 
         return productData ? (
-          <Space direction="horizontal" align="middle">
-            <Text> Video : {Math.floor((productData?.duration ?? 0) / 60)} mins </Text>
-          </Space>
+          productData.source === videoSourceType.YOUTUBE ? (
+            <Space direction="horizontal" align="middle">
+              <Text> Youtube Video </Text>
+            </Space>
+          ) : (
+            <Space direction="horizontal" align="middle">
+              <Text> Video : {Math.floor((productData?.duration ?? 0) / 60)} mins </Text>
+            </Space>
+          )
         ) : null;
       default:
         return null;

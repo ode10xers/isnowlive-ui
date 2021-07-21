@@ -25,6 +25,7 @@ import {
   paymentSource,
   orderType,
   productType,
+  videoSourceType,
   isUnapprovedUserError,
 } from 'utils/helper';
 
@@ -552,11 +553,13 @@ const VideoDetails = ({ match, history }) => {
                       value={`${videoData?.validity} day${videoData?.validity > 1 ? 's' : ''}`}
                       formatter={renderVideoDetailItem}
                     />
-                    <Statistic
-                      title="Duration"
-                      value={getVideoMinutesDuration(videoData?.duration ?? 0)}
-                      formatter={renderVideoDetailItem}
-                    />
+                    {videoData.source === videoSourceType.CLOUDFLARE ? (
+                      <Statistic
+                        title="Duration"
+                        value={getVideoMinutesDuration(videoData?.duration ?? 0)}
+                        formatter={renderVideoDetailItem}
+                      />
+                    ) : null}
                   </Space>
                 </Col>
 

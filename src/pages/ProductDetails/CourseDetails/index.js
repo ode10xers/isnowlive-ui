@@ -26,6 +26,7 @@ import {
   isAPISuccess,
   orderType,
   productType,
+  videoSourceType,
   paymentSource,
   isUnapprovedUserError,
   preventDefaults,
@@ -364,7 +365,13 @@ const CourseDetails = ({ match }) => {
   const renderContentDetails = (contentData) => {
     switch (contentData.product_type?.toUpperCase()) {
       case 'VIDEO':
-        return <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>;
+        if (contentData.product_data?.source === videoSourceType.YOUTUBE) {
+          return <Text type="secondary"> Youtube Video </Text>;
+        } else {
+          return (
+            <Text type="secondary">Video : {Math.floor((contentData.product_data?.duration ?? 0) / 60)} mins</Text>
+          );
+        }
       case 'SESSION':
         return (
           <Space align="center">
