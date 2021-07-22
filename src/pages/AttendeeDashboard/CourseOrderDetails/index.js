@@ -215,7 +215,6 @@ const CourseOrderDetails = ({ match, history }) => {
           See Details
         </Button>
         <AddToCalendarButton
-          showIcon={true}
           eventData={{
             ...content.product_data,
             page_url: `${generateUrlFromUsername(content?.product_data?.creator_username)}/e/${
