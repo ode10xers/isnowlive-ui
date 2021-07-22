@@ -6,19 +6,19 @@
   .videoDataContainer {
     .videoImageContainer {
       text-align: center;
-    
+
       .videoImage {
         height: 100%;
         object-fit: scale-down;
         border-radius: 12px;
       }
     }
-    
+
     .videoTitle {
       font-size: 24px;
       font-weight: 500;
     }
-    
+
     .videoDetailsContainer {
       width: 100%;
       border-radius: 8px;
@@ -28,29 +28,29 @@
       border: 1px solid map-get($map: $colors, $key: 'ColumbiaBlue');
       justify-content: space-evenly;
       text-align: center;
-    
+
       .videoDetailsDivider {
         min-height: 40px;
         height: 100%;
-        border-left : 1px solid map-get($map: $colors, $key: 'ColumbiaBlue');
+        border-left: 1px solid map-get($map: $colors, $key: 'ColumbiaBlue');
       }
-    
+
       .videoDetailItem {
-        color : map-get($map: $colors, $key: 'DodgerBlue');
+        color: map-get($map: $colors, $key: 'DodgerBlue');
         font-size: 20px;
         font-weight: 600;
       }
     }
-    
+
     .videoDescription {
       margin: 20px 0;
 
       p,
-        span {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-          background: transparent !important;
-        }
+      span {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+        background: transparent !important;
+      }
     }
   }
 
@@ -80,7 +80,7 @@
 
       .buyVideoBtn {
         background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
-        
+
         .buyVideoBtnContent {
           height: 24px;
           margin-left: 10px;
@@ -90,7 +90,7 @@
             height: 20px;
             margin: 0 8px;
           }
-          
+
           .buyVideoBtnText {
             font-size: 16px;
             color: map-get($map: $colors, $key: 'White') !important;
@@ -114,8 +114,7 @@
 .videoBottomSheets {
   :global {
     .ant-drawer-content {
-      border-radius : 12px 12px 0 0;
+      border-radius: 12px 12px 0 0;
     }
   }
 }
-

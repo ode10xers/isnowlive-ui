@@ -4,9 +4,10 @@ import { Row, Col } from 'antd';
 
 import apis from 'apis';
 
-import VideoCard from 'components/VideoCard';
-import AuthModal from 'components/AuthModal';
 import Loader from 'components/Loader';
+import AuthModal from 'components/AuthModal';
+// import VideoCard from 'components/VideoCard';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import { showAlreadyBookedModal, showErrorModal, showPurchaseSingleVideoSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
@@ -27,12 +28,12 @@ const PublicVideoList = ({ videos }) => {
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [showPurchaseVideoModal, setShowPurchaseVideoModal] = useState(false);
 
-  const handleSelectVideo = (video) => {
-    if (video) {
-      setSelectedVideo(video);
-      openAuthModal();
-    }
-  };
+  // const handleSelectVideo = (video) => {
+  //   if (video) {
+  //     setSelectedVideo(video);
+  //     openAuthModal();
+  //   }
+  // };
 
   const showConfirmPaymentPopup = () => {
     if (!selectedVideo) {
@@ -118,9 +119,9 @@ const PublicVideoList = ({ videos }) => {
     };
   };
 
-  const openAuthModal = () => {
-    setShowPurchaseVideoModal(true);
-  };
+  // const openAuthModal = () => {
+  //   setShowPurchaseVideoModal(true);
+  // };
 
   const closeAuthModal = () => {
     setShowPurchaseVideoModal(false);
@@ -139,7 +140,8 @@ const PublicVideoList = ({ videos }) => {
             ?.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : -1))
             .map((video) => (
               <Col xs={24} sm={12} key={video?.external_id}>
-                <VideoCard video={video} buyable={true} showAuthModal={() => handleSelectVideo(video)} />
+                {/* <VideoCard video={video} buyable={true} showAuthModal={() => handleSelectVideo(video)} /> */}
+                <VideoListCard video={video} />
               </Col>
             ))}
         </Row>

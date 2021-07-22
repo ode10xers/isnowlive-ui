@@ -93,6 +93,13 @@
     right: -15px;
   }
 }
+
+@media (max-width: 526px) {
+  .passCard {
+    margin: 0px !important;
+  }
+}
+
 @media (min-width: 768px) and (max-width: 1400px) {
   .imageWrapper {
     margin-bottom: 0px;

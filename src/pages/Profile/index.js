@@ -80,22 +80,18 @@ const Profile = () => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
     try {
-      const localUserDetails = getLocalUserDetails();
+      let localUserDetails = getLocalUserDetails();
 
       if (!localUserDetails.is_creator) {
         await apis.user.convertUserToCreator();
       }
 
-      const { status } = await apis.user.updateProfile(values);
-      if (isAPISuccess(status)) {
+      const { status, data } = await apis.user.updateProfile(values);
+      if (isAPISuccess(status) && data) {
         setIsLoading(false);
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
-        localUserDetails.profile_complete = true;
-        localUserDetails.is_creator = true;
-        localUserDetails.first_name = values.first_name;
-        localUserDetails.last_name = values.last_name;
-        localUserDetails.username = values.username;
+        localUserDetails = data;
 
         pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
           creator_external_id: localUserDetails.external_id,

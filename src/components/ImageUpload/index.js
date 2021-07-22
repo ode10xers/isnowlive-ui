@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Upload, Row, Col, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-// import ImageBlobReduce from 'image-blob-reduce';
+import { PlusOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+
+import Loader from 'components/Loader';
 
 import styles from './styles.module.scss';
 
@@ -21,7 +22,7 @@ const ImageUpload = ({
   className,
   shape = 'rect',
 }) => {
-  const [loading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -36,6 +37,7 @@ const ImageUpload = ({
   };
 
   const handleImageUpload = async (fileData) => {
+    setIsLoading(true);
     try {
       const formData = new FormData();
       // const reducer = ImageBlobReduce();
@@ -51,6 +53,7 @@ const ImageUpload = ({
         message.error(error.response?.data?.message);
       }
     }
+    setIsLoading(false);
   };
 
   return (
@@ -64,27 +67,29 @@ const ImageUpload = ({
         beforeUpload={beforeUpload}
         showUploadList={showUploadList}
       >
-        {value ? (
-          <div className={styles.imageContainer}>
-            <Row
-              className={classNames(styles.imageHoverOverlay, shape === 'round' ? styles.roundImage : undefined)}
-              justify="center"
-              align="middle"
-            >
-              <Col className={styles.helpText}>{overlayHelpText}</Col>
-            </Row>
-            <img
-              src={value}
-              alt={label}
-              className={classNames(styles.w100, styles.image, shape === 'round' ? styles.roundImage : undefined)}
-            />
-          </div>
-        ) : (
-          <div>
-            {loading ? <LoadingOutlined /> : <PlusOutlined />}
-            <div className={styles.mt10}>{label}</div>
-          </div>
-        )}
+        <Loader loading={isLoading} text="Uploading new image...">
+          {value ? (
+            <div className={styles.imageContainer}>
+              <Row
+                className={classNames(styles.imageHoverOverlay, shape === 'round' ? styles.roundImage : undefined)}
+                justify="center"
+                align="middle"
+              >
+                <Col className={styles.helpText}>{overlayHelpText}</Col>
+              </Row>
+              <img
+                src={value}
+                alt={label}
+                className={classNames(styles.w100, styles.image, shape === 'round' ? styles.roundImage : undefined)}
+              />
+            </div>
+          ) : (
+            <div>
+              <PlusOutlined />
+              <div className={styles.mt10}>{label}</div>
+            </div>
+          )}
+        </Loader>
       </Upload>
     </ImgCrop>
   );

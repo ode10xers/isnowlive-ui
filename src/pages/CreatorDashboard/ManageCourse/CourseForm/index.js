@@ -278,7 +278,7 @@ const CourseForm = ({ match, history }) => {
           type: 'MIXED',
           max_participants: 20,
           start_date: moment().startOf('day').utc().format(),
-          end_date: moment().endOf('day').utc().format(),
+          end_date: moment().startOf('day').add(1, 'day').utc().format(),
           validity: 1,
         };
 

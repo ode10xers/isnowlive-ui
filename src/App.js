@@ -4,24 +4,10 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import Routes from 'routes';
 import apis from 'apis';
 
-import { useGlobalContext } from 'services/globalContext';
-import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
-import { initMixPanel } from 'services/integrations/mixpanel';
-import { getAuthCookie, setAuthCookie } from 'services/authCookie';
-import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
-import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
-import { mapUserToPendo } from 'services/integrations/pendo';
-import http from 'services/http';
-
-import { isAPISuccess, isInCustomDomain } from 'utils/helper';
-import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
-import parseQueryString from 'utils/parseQueryString';
-
-import { storeCreatorDetailsToLS } from 'utils/storage';
-
 import DefaultLayout from 'layouts/DefaultLayout';
 import SideNavLayout from 'layouts/SideNavLayout';
 import SideNavWithHeaderLayout from 'layouts/SideNavWithHeaderLayout';
+import NavbarFullWidthLayout from 'layouts/NavbarFullWidthLayout';
 import NavbarLayout from 'layouts/NavbarLayout';
 import MobileLayout from 'layouts/MobileLayout';
 
@@ -44,8 +30,6 @@ import PaymentVerification from 'pages/PaymentVerification';
 import PaymentRetry from 'pages/PaymentRetry';
 import SessionReschedule from 'pages/SessionReschedule';
 import PassDetails from 'pages/PassDetails';
-// import VideoDetails from 'pages/VideoDetails';
-// import CourseDetails from 'pages/CourseDetails';
 import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
 import VideoDetails from 'pages/ProductDetails/VideoDetails';
 import CourseDetails from 'pages/ProductDetails/CourseDetails';
@@ -60,8 +44,21 @@ import Legals from 'pages/Legals';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 
+import parseQueryString from 'utils/parseQueryString';
+import { storeCreatorDetailsToLS } from 'utils/storage';
+import { isAPISuccess, isInCustomDomain } from 'utils/helper';
+import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
+
+import { useGlobalContext } from 'services/globalContext';
+import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
+import { initMixPanel } from 'services/integrations/mixpanel';
+import { getAuthCookie, setAuthCookie } from 'services/authCookie';
+import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
+import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
+import { mapUserToPendo } from 'services/integrations/pendo';
+import http from 'services/http';
+
 import './styles/globals.scss';
-import NavbarFullWidthLayout from 'layouts/NavbarFullWidthLayout';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (

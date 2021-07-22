@@ -1,6 +1,6 @@
 @import '../../../../styles/variables.scss';
 
-$card-border-radius : 8px;
+$card-border-radius: 8px;
 
 .sessionListCard {
   border-radius: $card-border-radius !important;
@@ -20,7 +20,7 @@ $card-border-radius : 8px;
 
     .sessionImageContainer {
       text-align: center;
-      
+
       .sessionImage {
         border-radius: $card-border-radius $card-border-radius 0 0;
         object-fit: scale-down;
@@ -57,7 +57,7 @@ $card-border-radius : 8px;
     justify-content: center;
     font-size: 16px;
     background-color: var(--session-list-card-background-color) !important;
-    box-shadow : inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+    box-shadow: inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
 
     .sessionDayTagsContainer {
@@ -65,7 +65,7 @@ $card-border-radius : 8px;
         text-align: center;
         font-size: 12px;
       }
-    
+
       .sessionTagsDisabled {
         @extend .sessionTags;
         opacity: 0.4;

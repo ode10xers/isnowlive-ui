@@ -119,8 +119,15 @@ const WrappedPaymentRetry = () => {
 
       if (isAPISuccess(status) && data) {
         if (data.profile?.connect_account_id) {
+          let stripeKey = config.stripe.secretKey;
+          const creatorCountry = data.profile?.country;
+
+          if (creatorCountry && creatorCountry === 'IN') {
+            stripeKey = config.stripe.indianSecretKey;
+          }
+
           setStripeObj(
-            await loadStripe(config.stripe.secretKey, {
+            await loadStripe(stripeKey, {
               stripeAccount: data.profile?.connect_account_id,
             })
           );
