@@ -335,13 +335,13 @@ const CourseOrderDetails = ({ match, history }) => {
   const renderModuleContents = (content) => (
     <List.Item key={content.product_id}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
-        <Col xs={24} md={12}>
+        <Col xs={24} md={6} xl={10}>
           <Space className={styles.w100}>
             {renderContentIcon(content.product_type)}
             <Text strong> {content.name} </Text>
           </Space>
         </Col>
-        <Col xs={24} md={12} className={styles.textAlignRight}>
+        <Col xs={24} md={18} xl={14} className={styles.textAlignRight}>
           <Text type="secondary"> {renderExtraContent(content, content.product_type)} </Text>
         </Col>
       </Row>
