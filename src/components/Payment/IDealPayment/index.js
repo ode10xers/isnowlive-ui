@@ -81,8 +81,15 @@ const IDealPayment = ({ disabled = false, onBeforePayment, onAfterPayment, payme
     } else {
       form.resetFields();
       setIsSubmitting(false);
+
+      if (elements) {
+        const idealBankElement = elements.getElement(IdealBankElement);
+        if (idealBankElement) {
+          idealBankElement.clear();
+        }
+      }
     }
-  }, [buyerName, paymentPopupVisible, form]);
+  }, [buyerName, paymentPopupVisible, form, elements]);
 
   const handleIdealBankChange = (event) => {
     setIsButtonDisabled(event.empty || !event.complete);

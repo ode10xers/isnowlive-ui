@@ -181,10 +181,13 @@ const Earnings = () => {
       }
     } catch (error) {
       trackFailedEvent(eventTag, error);
+      console.error(error);
       if (
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'error while generating dashboard URL from stripe'
       ) {
+        // TODO: Add special handler here if selected country === IN (for India)
+
         relinkStripe();
       } else {
         message.error(error.response?.data?.message || 'Something went wrong.');
@@ -229,6 +232,11 @@ const Earnings = () => {
   }, [getCreatorBalance, getCreatorEarnings, checkAndSendCreatorConversionEvent, userDetails]);
 
   const confirmPayout = async () => {
+    if (balance?.currency === 'inr') {
+      message.error('Unable to request payout for indian account');
+      return;
+    }
+
     const eventTag = creator.click.payment.requestPayout;
     try {
       setIsLoadingPayout(true);
@@ -325,6 +333,15 @@ const Earnings = () => {
               : 'Edit Bank Account'}
           </Button>
         </Col>
+        {balance &&
+          balance?.currency === 'inr' &&
+          userDetails.profile?.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING && (
+            <Col xs={24}>
+              <Text type="secondary" className={styles.tipText}>
+                Tip: Check your email and verify your stripe account to access and receive updates from Stripe
+              </Text>
+            </Col>
+          )}
       </Row>
     </div>
   );
@@ -543,7 +560,7 @@ const Earnings = () => {
             {stripePaymentDashboard}
           </Col>
           <Col xs={24} lg={8}>
-            {availableForPayout}
+            {balance?.currency && balance?.currency !== 'inr' && availableForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>

@@ -53,6 +53,7 @@ const Videos = () => {
   const [formPart, setFormPart] = useState(1);
   const [shouldCloneVideo, setShouldCloneVideo] = useState(false);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
+  const [expandedCollapseKeys, setExpandedCollapseKeys] = useState(['Published']);
 
   const isOnboarding = location.state ? location.state.onboarding || false : false;
 
@@ -153,6 +154,8 @@ const Videos = () => {
     document.body.classList.remove(['ant-scrolling-effect']);
     document.body.removeAttribute('style');
     if (shouldRefresh) {
+      setExpandedCollapseKeys((prevKeys) => [...new Set([...prevKeys, 'Unpublished'])]);
+      setTimeout(() => document.getElementById('unpublished-section').scrollIntoView(), 1500);
       getVideosForCreator();
     }
   };
@@ -813,7 +816,7 @@ const Videos = () => {
           </Button>
         </Col>
         <Col xs={24}>
-          <Collapse defaultActiveKey="Published">
+          <Collapse activeKey={expandedCollapseKeys} onChange={setExpandedCollapseKeys}>
             <Panel header={<Title level={5}> Published </Title>} key="Published">
               {videos?.filter((video) => video.is_published).length > 0 ? (
                 <>
@@ -841,7 +844,15 @@ const Videos = () => {
                 <Empty description="No Published Videos" />
               )}
             </Panel>
-            <Panel header={<Title level={5}> Unpublished </Title>} key="Unpublished">
+            <Panel
+              header={
+                <Title level={5} id="unpublished-section">
+                  {' '}
+                  Unpublished{' '}
+                </Title>
+              }
+              key="Unpublished"
+            >
               {videos?.filter((video) => !video.is_published).length > 0 ? (
                 <>
                   {isMobileDevice ? (

@@ -48,7 +48,8 @@ const PaymentAccount = () => {
       });
       window.open(url, '_self');
     },
-    [payment_account_status]
+    // eslint-disable-next-line
+    []
   );
 
   const relinkStripe = useCallback(async () => {
@@ -86,11 +87,11 @@ const PaymentAccount = () => {
   }, [relinkStripe]);
 
   useEffect(() => {
-    if (validateAccount) {
+    if (validateAccount && paymentConnected === StripeAccountStatus.VERIFICATION_PENDING) {
       const validateStripeAccount = async () => {
         try {
           const { status, data } = await apis.payment.stripe.validate();
-          if (isAPISuccess(status)) {
+          if (isAPISuccess(status) && data) {
             const paymentStatus = data?.status || StripeAccountStatus.VERIFICATION_PENDING;
 
             const localUserDetails = getLocalUserDetails();
@@ -112,11 +113,12 @@ const PaymentAccount = () => {
             setPaymentConnected(paymentStatus);
           }
         } catch (error) {
-          if (error.response?.data?.message !== 'unable to find payment credentials') {
+          if (error.response?.data?.message && error.response?.data?.message !== 'unable to find payment credentials') {
             openStripeDashboard();
           }
         }
       };
+
       validateStripeAccount();
     }
     //eslint-disable-next-line
@@ -142,6 +144,7 @@ const PaymentAccount = () => {
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'user already registered for account, trigger relink'
       ) {
+        // TODO: Add special handler here if selected country === IN (for India)
         relinkStripe();
       } else {
         pushToDataLayer(gtmTriggerEvents.STRIPE_CONNECT_FAILED, {

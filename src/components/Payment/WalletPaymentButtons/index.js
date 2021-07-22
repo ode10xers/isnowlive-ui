@@ -18,7 +18,7 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
   const stripe = useStripe();
   const { hidePaymentPopup } = useGlobalContext();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const onConfirmPaymentDetails = useCallback(
     async (ev) => {
@@ -111,7 +111,7 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
   }, [paymentRequest, onConfirmPaymentDetails]);
 
   return paymentRequest ? (
-    <Loader loading={isLoading} text="Processing payment..." size="small">
+    <Loader loading={isLoading} size="small">
       {disabled && (
         <div className={styles.w100}>
           <Text disabled className={styles.textAlignCenter}>
@@ -120,7 +120,7 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
         </div>
       )}
       <div className={disabled ? styles.hidden : undefined}>
-        <PaymentRequestButtonElement options={{ paymentRequest }} />
+        <PaymentRequestButtonElement options={{ paymentRequest }} onReady={() => setIsLoading(false)} />
       </div>
     </Loader>
   ) : null;
