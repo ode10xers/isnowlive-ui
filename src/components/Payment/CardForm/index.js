@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useCallback } from 'react';
 // import classNames from 'classnames';
 
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { Button, Row, Col, message } from 'antd';
+import { Button, Row, Col, Spin, message } from 'antd';
 
 import apis from 'apis';
 
@@ -70,6 +70,8 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
   const stripe = useStripe();
   const elements = useElements();
   const options = useOptions();
+  const [isLoadingStripeComponent, setIsLoadingStripeComponent] = useState(true);
+
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [disableSavedCards, setDisableSavedCards] = useState(false);
@@ -109,8 +111,15 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
       setSavedUserCards([]);
       setSelectedCard(null);
       setDisableSavedCards(false);
+
+      if (elements) {
+        const cardEl = elements.getElement(CardElement);
+        if (cardEl) {
+          cardEl.clear();
+        }
+      }
     }
-  }, [isFree, fetchUserCards, paymentPopupVisible]);
+  }, [isFree, fetchUserCards, paymentPopupVisible, elements]);
 
   const makePayment = async (secret, paymentPayload) => {
     try {
@@ -232,6 +241,10 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
     setSelectedCard(userCard);
   };
 
+  const handleStripeComponentReady = (element) => {
+    setIsLoadingStripeComponent(false);
+  };
+
   return (
     <Row gutter={[8, 12]} justify="center">
       {!isFree && (
@@ -247,18 +260,21 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
             </Col>
           )}
           <Col xs={24} className={styles.inlineCardForm}>
-            <CardElement
-              options={options}
-              onChange={(event) => {
-                setDisableSavedCards(!event.empty);
+            <Spin spinning={isLoadingStripeComponent}>
+              <CardElement
+                options={options}
+                onReady={handleStripeComponentReady}
+                onChange={(event) => {
+                  setDisableSavedCards(!event.empty);
 
-                if (event.complete) {
-                  setIsButtonDisabled(false);
-                } else {
-                  setIsButtonDisabled(true);
-                }
-              }}
-            />
+                  if (event.complete) {
+                    setIsButtonDisabled(false);
+                  } else {
+                    setIsButtonDisabled(true);
+                  }
+                }}
+              />
+            </Spin>
           </Col>
         </>
       )}

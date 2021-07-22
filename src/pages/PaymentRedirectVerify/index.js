@@ -170,6 +170,7 @@ const PaymentRedirectVerify = () => {
 };
 
 const WrappedPaymentRedirectVerify = () => {
+  // NOTE: We don't use indian key here since Indian creators can only receive card payments
   const stripePromise = loadStripe(config.stripe.secretKey);
 
   if (!stripePromise) {

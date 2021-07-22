@@ -313,6 +313,7 @@ const Session = ({ match, history }) => {
         is_offline: 'false',
         offline_event_address: '',
       });
+      setColorCode(initialColor || whiteColor);
       setIsLoading(false);
     }
     getCurrencyList()

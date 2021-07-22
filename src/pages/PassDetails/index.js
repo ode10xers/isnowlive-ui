@@ -190,7 +190,7 @@ const PassDetails = ({ match, history }) => {
             {pass && (
               <Row className={classNames(styles.box, styles.p20)} gutter={[8, 24]}>
                 <Col xs={24} className={styles.p20}>
-                  <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 15 : 24 }}>
+                  <Card className={styles.passCard} bodyStyle={{ padding: isMobileDevice ? 8 : 24 }}>
                     <Row gutter={[8, 16]} align="center">
                       <Col xs={24} md={18}>
                         <Row gutter={8}>
@@ -200,7 +200,7 @@ const PassDetails = ({ match, history }) => {
                             </Title>
                           </Col>
                           <Col xs={24}>
-                            <Space size={isMobileDevice ? 'small' : 'middle'}>
+                            <Space size={isMobileDevice ? 8 : 'middle'}>
                               <Text className={classNames(styles.blueText, styles.textAlignCenter)} strong>
                                 {pass && pass?.limited ? `${pass?.class_count} Credits` : 'Unlimited Credits'}
                               </Text>

@@ -16,6 +16,8 @@ export default {
   stripe: {
     secretKey:
       'pk_test_51HVgJAHZtrrEElwY505DceKWURZlKrV7h16hlPj5zzoqgVUl4ZsokHA2AzCO09vYTqriTBQychnYDo82GVddFMC300oaVzsJVC',
+    indianSecretKey:
+      'pk_test_51JAUu3SAipO1KYDwrdTNBNT3unsc2CJYbVd6RhW5ksXRrHM4s5V2ztVFUZ746GSjUqEv5rMuUO7Nt2GhbJTc2Tyj00XPYyClay',
   },
   zoom: {
     oAuthURL: `https://zoom.us/oauth/authorize?client_id=UZLBPDoXSZi2SSb_4_pBcQ&response_type=code&redirect_uri=https://app.stage.passion.do/creator/dashboard/livestream`,
