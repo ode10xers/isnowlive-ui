@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
+import moment from 'moment';
 
 import { Row, Col, Image, Collapse, Button, Divider, List, Typography, Spin, Popover, Space, Card, Tag } from 'antd';
 import { ArrowLeftOutlined, DownOutlined, VideoCameraOutlined, PlayCircleOutlined } from '@ant-design/icons';
@@ -29,6 +30,7 @@ const { Panel } = Collapse;
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
+  timeCalculation: { isBeforeDate },
 } = dateUtil;
 
 const CourseOrderDetails = ({ match, history }) => {
@@ -209,7 +211,7 @@ const CourseOrderDetails = ({ match, history }) => {
           {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}
         </Text>
         <AddToCalendarButton
-          iconOnly={true}
+          showIcon={true}
           eventData={{
             ...content.product_data,
             page_url: `${generateUrlFromUsername(content?.product_data?.creator_username)}/e/${
@@ -233,7 +235,9 @@ const CourseOrderDetails = ({ match, history }) => {
             type="primary"
             size="small"
             className={styles.buyBtn}
-            disabled={!content?.join_url}
+            disabled={
+              !content?.join_url || isBeforeDate(moment(content.product_data.start_time).subtract(15, 'minutes'))
+            }
             onClick={() => window.open(content.join_url)}
           >
             Join
