@@ -1071,6 +1071,7 @@ const UploadVideoModal = ({
               onChange={handleVideoUrlTypeChange}
             >
               <Radio.Group
+                disabled={videoUploadPercent > 0}
                 options={Object.entries(videoSourceTypes).map(([key, urlTypeData]) => ({ ...urlTypeData }))}
               />
             </Form.Item>
