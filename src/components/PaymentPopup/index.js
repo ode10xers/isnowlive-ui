@@ -265,6 +265,8 @@ const PaymentPopup = () => {
     setCouponErrorText(null);
     setDiscountedPrice(null);
     setIsApplyingCoupon(false);
+    setShowCouponField(false);
+    setPriceAmount(0);
     resetBodyStyle();
 
     hidePaymentPopup();
