@@ -14,6 +14,8 @@ import { PaymentOptionsSelection, paymentMethodOptions } from 'components/Paymen
 
 import { isAPISuccess } from 'utils/helper';
 
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 import BankRedirectPayments from '../BankRedirectPayments';
 
@@ -44,6 +46,11 @@ const PaymentOptionsWrapper = ({
   amount,
 }) => {
   const stripe = useStripe();
+
+  const {
+    state: { paymentPopupVisible },
+  } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(false);
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [availablePaymentOptions, setAvailablePaymentOptions] = useState(defaultAvailablePaymentOptions);
@@ -102,6 +109,13 @@ const PaymentOptionsWrapper = ({
 
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (paymentPopupVisible === false) {
+      console.log('HMMM');
+      setSelectedPaymentOption(paymentMethodOptions.CARD.key);
+    }
+  }, [paymentPopupVisible]);
 
   useEffect(() => {
     if (shouldFetchAvailablePaymentMethods) {

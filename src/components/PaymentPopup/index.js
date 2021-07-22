@@ -536,6 +536,7 @@ const PaymentPopup = () => {
                   handleAfterPayment={handleAfterPayment}
                   handleBeforePayment={handleBeforePayment}
                   isFreeProduct={isFree()}
+                  paymentPopupVisible={paymentPopupVisible}
                   // Currently, only subscriptions need payment details to be saved
                   // so we can use the saved details to charge them offline for recurring payment
                   shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
