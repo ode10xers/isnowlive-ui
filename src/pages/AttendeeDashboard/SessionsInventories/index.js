@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import moment from 'moment';
+
 import { Row, Col, Typography, Button, Card, Popconfirm, message, Modal, Popover, Radio, Empty } from 'antd';
 import { BookTwoTone, UpCircleOutlined, DownCircleOutlined } from '@ant-design/icons';
 
@@ -8,10 +10,14 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
 import AddToCalendarButton from 'components/AddToCalendarButton';
+import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { isInIframeWidget } from 'utils/widgets';
+import { redirectToInventoryPage } from 'utils/redirect';
 import { getDuration, generateUrlFromUsername, generateQueryString, isUnapprovedUserError } from 'utils/helper';
+
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -20,13 +26,10 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
-import { showErrorModal } from 'components/Modals/modals';
-import { redirectToInventoryPage } from 'utils/redirect';
-import { isInIframeWidget } from 'utils/widgets';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLocaleDate, toLongDateWithLongDay },
-  timeCalculation: { isBeforeLimitHours },
+  timeCalculation: { isBeforeLimitHours, isBeforeDate },
 } = dateUtil;
 const { Text, Title } = Typography;
 const { attendee } = mixPanelEventTags;
@@ -393,8 +396,12 @@ const SessionsInventories = ({ match }) => {
                       type="text"
                       size="small"
                       block
-                      className={!record.join_url ? styles.disabledSuccess : styles.success}
-                      disabled={!record.join_url}
+                      className={
+                        !record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))
+                          ? styles.disabledSuccess
+                          : styles.success
+                      }
+                      disabled={!record.join_url || isBeforeDate(moment(record.start_time).subtract(15, 'minutes'))}
                       onClick={() => trackAndJoinSession(record)}
                     >
                       Join

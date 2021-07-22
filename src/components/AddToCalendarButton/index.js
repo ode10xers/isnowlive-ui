@@ -11,7 +11,7 @@ const {
   timeCalculation: { generateCalendarTimeInfo },
 } = dateUtil;
 
-const AddToCalendarButton = ({ type = 'link', eventData, iconOnly = false, buttonText = 'Add To Cal' }) => {
+const AddToCalendarButton = ({ type = 'link', eventData, showIcon = false, buttonText = 'Add To Cal' }) => {
   const generateEventDescription = () => {
     if (eventData.is_offline) {
       return `You can see the event details in this <a href="${eventData.page_url}">page</a>.\n\nThe event itself is an offline event that will be held in <b>${eventData.offline_event_address}</b>`;
@@ -31,9 +31,9 @@ const AddToCalendarButton = ({ type = 'link', eventData, iconOnly = false, butto
     ...generateCalendarTimeInfo(eventData.start_time, eventData.end_time),
   };
 
-  const icon = { 'calendar-o': 'left' };
+  const icon = { 'calendar-plus-o': 'left' };
 
-  const buttonIconProps = iconOnly ? { buttonLabel: '', buttonTemplate: icon } : { buttonLabel: buttonText };
+  const buttonIconProps = showIcon ? { buttonLabel: buttonText, buttonTemplate: icon } : { buttonLabel: buttonText };
 
   return (
     <AddToCalendar
