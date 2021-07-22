@@ -222,28 +222,34 @@ const CourseOrderDetails = ({ match, history }) => {
             }`,
           }}
         />
-        {!content?.join_url ? (
-          <Popover
-            arrowPointAtCenter
-            placement="topRight"
-            title="Event Address"
-            content={content.product_data.offline_event_address}
-          >
-            <Button block size="small" type="text" className={styles.success}>
-              In person
+        {isBeforeDate(content.product_data?.end_time) ? (
+          !content?.join_url ? (
+            <Popover
+              arrowPointAtCenter
+              placement="topRight"
+              title="Event Address"
+              content={content.product_data.offline_event_address}
+            >
+              <Button block size="small" type="text" className={styles.success}>
+                In person
+              </Button>
+            </Popover>
+          ) : (
+            <Button
+              type="primary"
+              size="small"
+              className={styles.buyBtn}
+              disabled={
+                !content?.join_url || isBeforeDate(moment(content.product_data?.start_time).subtract(15, 'minutes'))
+              }
+              onClick={() => window.open(content.join_url)}
+            >
+              Join
             </Button>
-          </Popover>
+          )
         ) : (
-          <Button
-            type="primary"
-            size="small"
-            className={styles.buyBtn}
-            disabled={
-              !content?.join_url || isBeforeDate(moment(content.product_data.start_time).subtract(15, 'minutes'))
-            }
-            onClick={() => window.open(content.join_url)}
-          >
-            Join
+          <Button block type="primary" size="small" disabled={true} className={styles.disabledBuyBtn}>
+            Attended
           </Button>
         )}
       </Space>
@@ -268,6 +274,14 @@ const CourseOrderDetails = ({ match, history }) => {
         actions={
           content?.product_type === 'SESSION'
             ? [
+                <Button
+                  ghost
+                  type="primary"
+                  size="small"
+                  onClick={() => redirectToInventoryPage(content?.product_data)}
+                >
+                  Details
+                </Button>,
                 <div className={styles.addToCalendarContainer}>
                   <AddToCalendarButton
                     buttonText="Add to Cal"
@@ -279,28 +293,36 @@ const CourseOrderDetails = ({ match, history }) => {
                     }}
                   />
                 </div>,
-                content?.product_data?.is_offline ? (
-                  <Popover
-                    arrowPointAtCenter
-                    placement="topRight"
-                    trigger="click"
-                    title="Event Address"
-                    content={content?.product_data?.offline_event_address}
-                  >
-                    <Button block size="small" type="text" className={styles.success}>
-                      In person
+                isBeforeDate(content.product_data?.end_time) ? (
+                  content?.product_data?.is_offline ? (
+                    <Popover
+                      arrowPointAtCenter
+                      placement="topRight"
+                      trigger="click"
+                      title="Event Address"
+                      content={content?.product_data?.offline_event_address}
+                    >
+                      <Button size="small" type="text" className={styles.success}>
+                        In person
+                      </Button>
+                    </Popover>
+                  ) : (
+                    <Button
+                      type="primary"
+                      size="small"
+                      className={styles.buyBtn}
+                      disabled={
+                        !content?.join_url ||
+                        isBeforeDate(moment(content.product_data?.start_time).subtract(15, 'minutes'))
+                      }
+                      onClick={() => window.open(content?.join_url)}
+                    >
+                      Join
                     </Button>
-                  </Popover>
+                  )
                 ) : (
-                  <Button
-                    type="primary"
-                    block
-                    size="small"
-                    className={styles.buyBtn}
-                    disabled={!content?.join_url}
-                    onClick={() => window.open(content?.join_url)}
-                  >
-                    Join
+                  <Button disabled={true} size="small" type="primary" className={styles.disabledBuyBtn}>
+                    Attended
                   </Button>
                 ),
               ]
