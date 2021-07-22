@@ -36,7 +36,6 @@ const defaultAvailablePaymentOptions = paymentMethodOptions.CARD.options;
 
 // NOTE: Payment Request won't work on local
 const PaymentOptionsWrapper = ({
-  shouldFetchAvailablePaymentMethods,
   handleAfterPayment,
   handleBeforePayment,
   isFreeProduct = false,
@@ -111,20 +110,15 @@ const PaymentOptionsWrapper = ({
   }, []);
 
   useEffect(() => {
-    if (paymentPopupVisible === false) {
-      setSelectedPaymentOption(paymentMethodOptions.CARD.key);
-    }
-  }, [paymentPopupVisible]);
-
-  useEffect(() => {
-    if (shouldFetchAvailablePaymentMethods) {
+    if (paymentPopupVisible) {
       fetchAvailablePaymentMethods(creatorDetails.currency);
       setupStripePaymentRequest();
     } else {
       setAvailablePaymentOptions(defaultAvailablePaymentOptions);
       setPaymentRequest(null);
+      setSelectedPaymentOption(paymentMethodOptions.CARD.key);
     }
-  }, [shouldFetchAvailablePaymentMethods, fetchAvailablePaymentMethods, creatorDetails, setupStripePaymentRequest]);
+  }, [paymentPopupVisible, fetchAvailablePaymentMethods, creatorDetails, setupStripePaymentRequest]);
 
   // This use effect logic is to update the amount in the payment request
   // for dynamic amounts (Pay What You Want)

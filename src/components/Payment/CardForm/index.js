@@ -111,8 +111,15 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
       setSavedUserCards([]);
       setSelectedCard(null);
       setDisableSavedCards(false);
+
+      if (elements) {
+        const cardEl = elements.getElement(CardElement);
+        if (cardEl) {
+          cardEl.clear();
+        }
+      }
     }
-  }, [isFree, fetchUserCards, paymentPopupVisible]);
+  }, [isFree, fetchUserCards, paymentPopupVisible, elements]);
 
   const makePayment = async (secret, paymentPayload) => {
     try {
