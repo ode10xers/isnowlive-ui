@@ -757,7 +757,7 @@ const UploadVideoModal = ({
       footer={null}
       maskClosable={false}
       closable={[1, 3].includes(formPart)}
-      onCancel={() => closeModal(true)}
+      onCancel={() => closeModal(false)}
       width={850}
       afterClose={resetBodyStyle}
     >
@@ -1041,7 +1041,7 @@ const UploadVideoModal = ({
             <Form.Item {...(!isMobileDevice && formTailLayout)}>
               <Row>
                 <Col xs={12}>
-                  <Button block type="default" onClick={() => closeModal(true)}>
+                  <Button block type="default" onClick={() => closeModal(false)}>
                     Cancel
                   </Button>
                 </Col>
@@ -1120,7 +1120,7 @@ const UploadVideoModal = ({
                         </Button>
                       </Popconfirm>
                     ) : (
-                      <Button block type="default" onClick={() => closeModal(true)}>
+                      <Button block type="default" onClick={() => closeModal(false)}>
                         Cancel
                       </Button>
                     )}
