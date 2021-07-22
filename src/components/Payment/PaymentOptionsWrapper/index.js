@@ -112,7 +112,6 @@ const PaymentOptionsWrapper = ({
 
   useEffect(() => {
     if (paymentPopupVisible === false) {
-      console.log('HMMM');
       setSelectedPaymentOption(paymentMethodOptions.CARD.key);
     }
   }, [paymentPopupVisible]);
