@@ -86,12 +86,9 @@ const Profile = () => {
         await apis.user.convertUserToCreator();
       }
 
-      // TODO: Check if it's possible to return the updated profile in this API
-      // CASE: If not returned here, we are missing some info on the next step due to "profile" object missing
       const { status, data } = await apis.user.updateProfile(values);
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
-        console.log(data);
         trackSuccessEvent(eventTag, { form_values: values });
         message.success('Profile successfully updated.');
         localUserDetails = data;

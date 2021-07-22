@@ -3,11 +3,10 @@ import classNames from 'classnames';
 import { Upload, Row, Col, message } from 'antd';
 import ImgCrop from 'antd-img-crop';
 import { PlusOutlined } from '@ant-design/icons';
-// import ImageBlobReduce from 'image-blob-reduce';
-
-import Loader from 'components/Loader';
 
 import apis from 'apis';
+
+import Loader from 'components/Loader';
 
 import styles from './styles.module.scss';
 

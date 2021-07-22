@@ -333,6 +333,15 @@ const Earnings = () => {
               : 'Edit Bank Account'}
           </Button>
         </Col>
+        {balance &&
+          balance?.currency === 'inr' &&
+          userDetails.profile?.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING && (
+            <Col xs={24}>
+              <Text type="secondary" className={styles.tipText}>
+                Tip: Check your email and verify your stripe account to access and receive updates from Stripe
+              </Text>
+            </Col>
+          )}
       </Row>
     </div>
   );
