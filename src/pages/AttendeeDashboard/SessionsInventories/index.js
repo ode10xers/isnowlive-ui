@@ -10,10 +10,14 @@ import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
 import AddToCalendarButton from 'components/AddToCalendarButton';
+import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { isInIframeWidget } from 'utils/widgets';
+import { redirectToInventoryPage } from 'utils/redirect';
 import { getDuration, generateUrlFromUsername, generateQueryString, isUnapprovedUserError } from 'utils/helper';
+
 import {
   mixPanelEventTags,
   trackSimpleEvent,
@@ -22,9 +26,6 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
-import { showErrorModal } from 'components/Modals/modals';
-import { redirectToInventoryPage } from 'utils/redirect';
-import { isInIframeWidget } from 'utils/widgets';
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay, toLocaleDate, toLongDateWithLongDay },

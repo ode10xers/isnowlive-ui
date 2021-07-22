@@ -13,6 +13,7 @@ import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { redirectToInventoryPage } from 'utils/redirect';
 import {
   isAPISuccess,
   isUnapprovedUserError,
@@ -210,6 +211,9 @@ const CourseOrderDetails = ({ match, history }) => {
         <Text>
           {toLocaleTime(content?.product_data?.start_time)} - {toLocaleTime(content?.product_data?.end_time)}
         </Text>
+        <Button ghost type="primary" size="small" onClick={() => redirectToInventoryPage(content?.product_data)}>
+          See Details
+        </Button>
         <AddToCalendarButton
           showIcon={true}
           eventData={{
