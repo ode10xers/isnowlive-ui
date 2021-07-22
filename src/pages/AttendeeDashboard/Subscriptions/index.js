@@ -6,8 +6,6 @@ import { UpOutlined, DownOutlined } from '@ant-design/icons';
 import apis from 'apis';
 
 import Table from 'components/Table';
-// import VideoCard from 'components/VideoCard';
-// import SessionCards from 'components/SessionCards';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';

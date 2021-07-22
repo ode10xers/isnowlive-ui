@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Row, Col, Card, Typography, Button, Drawer, Divider } from 'antd';
 
 import SessionCards from 'components/SessionCards';
-import VideoCard from 'components/VideoCard';
+// import VideoCard from 'components/VideoCard';
+import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 
@@ -33,7 +34,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
       <Row gutter={[8, 8]} justify="center">
         {subscription?.product_details['VIDEO'].map((video) => (
           <Col xs={24} key={video.external_id}>
-            <VideoCard video={video} />
+            <VideoListCard video={video} />
           </Col>
         ))}
       </Row>
@@ -84,7 +85,7 @@ const ShowcaseSubscriptionCards = ({ subscription, openPurchaseModal = () => {} 
                 <Col xs={24} key={`${subscription?.external_id}_${key}`}>
                   <Button onClick={() => showProductsDetails(key)}>
                     {' '}
-                    {val.product_ids.length} {key.toLowerCase()}s{' '}
+                    {val.product_ids?.length ?? 0} {key.toLowerCase()}s{' '}
                   </Button>
                 </Col>
               ))}
