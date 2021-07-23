@@ -10,6 +10,16 @@
 
 .sessionsContainer {
   width: 100%;
+
+  .disabledSuccess {
+    color: map-get($colors, $key: 'KellyGreenPale') !important;
+  }
+  .success {
+    color: map-get($colors, $key: 'KellyGreen') !important;
+  }
+  .warning {
+    color: map-get($colors, $key: 'Pumpkin') !important;
+  }  
 }
 
 .videosContainer {
