@@ -1,22 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Spin } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 
+import apis from 'apis';
 import Routes from 'routes';
 
 import DefaultImage from 'components/Icons/DefaultImage';
-import { resetBodyStyle } from 'components/Modals/modals';
+import { showErrorModal, resetBodyStyle } from 'components/Modals/modals';
 
-import { preventDefaults, videoSourceType } from 'utils/helper';
+import { isAPISuccess, preventDefaults, videoSourceType } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod = null }) => {
+const VideoContentPopup = ({ visible, closeModal, addContentMethod = null }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [videos, setVideos] = useState([]);
   const [selectedVideoPopupContent, setSelectedVideoPopupContent] = useState([]);
+
+  const fetchVideosForCreator = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.videos.getCreatorVideos();
+
+      if (isAPISuccess(status) && data) {
+        setVideos(data);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (visible) {
+      fetchVideosForCreator();
+    }
+  }, [visible, fetchVideosForCreator]);
 
   //#region Start of Button Handlers
 
@@ -34,6 +56,8 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
 
   const handleCreateNewVideoClicked = (e) => {
     preventDefaults(e);
+
+    closeModal();
 
     window.open(
       `${window.location.origin}${Routes.creatorDashboard.rootPath}${Routes.creatorDashboard.videos}`,

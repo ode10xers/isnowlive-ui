@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import moment from 'moment';
 
 import { Row, Col, Button, Modal, Collapse, Typography, Spin, Space, DatePicker } from 'antd';
 import { DownOutlined, CheckCircleFilled } from '@ant-design/icons';
 
+import apis from 'apis';
 import Routes from 'routes';
 
 import Table from 'components/Table';
-import { resetBodyStyle } from 'components/Modals/modals';
+import { showErrorModal, resetBodyStyle } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { preventDefaults, getDuration } from 'utils/helper';
+import { isAPISuccess, preventDefaults, getDuration } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -25,18 +26,38 @@ const {
 const SessionContentPopup = ({
   visible,
   closeModal,
-  inventories = [],
   addContentMethod = null,
   courseStartDate = null,
   courseEndDate = null,
   changeCourseDates,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [inventories, setInventories] = useState([]);
   const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([]);
   const [selectedSessionPopupContent, setSelectedSessionPopupContent] = useState([]);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  const fetchCreatorUpcomingSessionInventories = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { status, data } = await apis.session.getUpcomingSession();
+
+      if (isAPISuccess(status) && data) {
+        setInventories(data);
+      }
+    } catch (error) {
+      showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (visible) {
+      fetchCreatorUpcomingSessionInventories();
+    }
+  }, [visible, fetchCreatorUpcomingSessionInventories]);
 
   useEffect(() => {
     if (courseStartDate) {
@@ -69,6 +90,8 @@ const SessionContentPopup = ({
 
   const handleCreateNewSessionClicked = (e) => {
     preventDefaults(e);
+
+    handleCloseModal();
 
     window.open(
       `${window.location.origin}${Routes.creatorDashboard.rootPath}${Routes.creatorDashboard.createSessions}`,
