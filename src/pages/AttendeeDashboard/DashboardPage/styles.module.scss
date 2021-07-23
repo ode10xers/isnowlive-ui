@@ -6,6 +6,10 @@
 
 .dashboardContainer {
   padding: 10px;
+
+  .sectionDivider {
+    border-top: 1px solid map-get($map: $colors, $key: 'Silver');
+  }
 }
 
 .sessionsContainer {

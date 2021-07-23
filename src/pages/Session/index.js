@@ -879,7 +879,7 @@ const Session = ({ match, history }) => {
           {(isOfflineSession || zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
             <>
               <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Session Name" />
+                <Input placeholder="Enter Session Name" maxLength={60} />
               </Form.Item>
 
               <Form.Item
