@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Spin } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 
+import Routes from 'routes';
+
 import DefaultImage from 'components/Icons/DefaultImage';
 import { resetBodyStyle } from 'components/Modals/modals';
 
@@ -16,6 +18,8 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVideoPopupContent, setSelectedVideoPopupContent] = useState([]);
 
+  //#region Start of Button Handlers
+
   const handleMarkVideoAsSelected = (videoId) => {
     setIsLoading(true);
     setSelectedVideoPopupContent([...new Set([...selectedVideoPopupContent, videoId])]);
@@ -27,6 +31,19 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
     setSelectedVideoPopupContent(selectedVideoPopupContent.filter((val) => val !== videoId));
     setIsLoading(false);
   };
+
+  const handleCreateNewVideoClicked = (e) => {
+    preventDefaults(e);
+
+    window.open(
+      `${window.location.origin}${Routes.creatorDashboard.rootPath}${Routes.creatorDashboard.videos}`,
+      '_blank'
+    );
+  };
+
+  //#endregion End of Button Handlers
+
+  //#region Start of Business Logic
 
   const addVideosToContent = (e) => {
     preventDefaults(e);
@@ -49,6 +66,10 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
       closeModal();
     }
   };
+
+  //#endregion End of Business Logic
+
+  //#region Start of Render Methods
 
   const renderVideoContentItems = (video) => (
     <Col xs={24} key={video.external_id}>
@@ -99,6 +120,8 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
     </Col>
   );
 
+  //#endregion End of Render Methods
+
   return (
     <Modal
       visible={visible}
@@ -108,7 +131,13 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
       afterClose={resetBodyStyle}
       title={<Title level={5}> Add Videos to Module </Title>}
       footer={
-        <Button type="primary" size="large" onClick={addVideosToContent} loading={isLoading}>
+        <Button
+          type="primary"
+          size="large"
+          onClick={addVideosToContent}
+          loading={isLoading}
+          disabled={selectedVideoPopupContent.length <= 0}
+        >
           Add Selected Videos to Module
         </Button>
       }
@@ -119,7 +148,19 @@ const VideoContentPopup = ({ visible, closeModal, videos = [], addContentMethod 
     >
       <Spin spinning={isLoading} tip="Processing">
         <Row gutter={[12, 12]} justify="center" align="middle">
-          {videos.map(renderVideoContentItems)}
+          {videos.length > 0 ? (
+            videos.map(renderVideoContentItems)
+          ) : (
+            <Col xs={24}>
+              <Row justify="center">
+                <Col>
+                  <Button type="primary" size="large" onClick={handleCreateNewVideoClicked}>
+                    Create New Video
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          )}
         </Row>
       </Spin>
     </Modal>

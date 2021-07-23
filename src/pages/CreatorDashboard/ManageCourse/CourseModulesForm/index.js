@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import moment from 'moment';
 
@@ -77,7 +77,7 @@ const formInitialValues = {
   maxParticipants: 1,
   validity: 1,
   courseStartDate: moment().startOf('day'),
-  courseEndDate: moment().startOf('day').add(1, 'day'),
+  courseEndDate: moment().startOf('day').add(10, 'day'),
 };
 
 const { Panel } = Collapse;
@@ -226,6 +226,7 @@ const CourseModulesForm = ({ match, history }) => {
 
   const handleStartDateChange = (date) => {
     setCourseStartDate(date);
+    form.setFieldsValue({ ...form.getFieldsValue(), courseStartDate: date });
 
     if (!date || (courseEndDate && dateIsBeforeDate(courseEndDate, date))) {
       setCourseEndDate(null);
@@ -242,6 +243,8 @@ const CourseModulesForm = ({ match, history }) => {
     if (dateIsBeforeDate(courseStartDate, date)) {
       showCourseDetailsChangedModal();
       setCourseEndDate(date);
+
+      form.setFieldsValue({ ...form.getFieldsValue(), courseEndDate: date });
     }
   };
 
@@ -250,6 +253,12 @@ const CourseModulesForm = ({ match, history }) => {
       dateIsBeforeDate(currentDate, moment().startOf('day')) ||
       dateIsBeforeDate(currentDate, moment(courseStartDate).add(1, 'day'))
     );
+  };
+
+  const handleChangeCourseDates = (startDate, endDate) => {
+    setCourseStartDate(startDate);
+    setCourseEndDate(endDate);
+    form.setFieldsValue({ ...form.getFieldsValue(), courseStartDate: startDate, courseEndDate: endDate });
   };
 
   const getVideoContentIDsFromModules = (modules = []) => [
@@ -574,27 +583,30 @@ const CourseModulesForm = ({ match, history }) => {
     }
   };
 
-  const inventoryListFilteredByCourseDate = useMemo(() => {
-    if (!courseStartDate || !courseEndDate) {
-      return inventories ?? [];
-    }
+  // const inventoryListFilteredByCourseDate = useMemo(() => {
+  //   if (!courseStartDate || !courseEndDate) {
+  //     return inventories ?? [];
+  //   }
 
-    return (
-      inventories?.filter(
-        (inventory) =>
-          moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
-          moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
-      ) ?? []
-    );
-  }, [inventories, courseStartDate, courseEndDate]);
+  //   return (
+  //     inventories?.filter(
+  //       (inventory) =>
+  //         moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
+  //         moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
+  //     ) ?? []
+  //   );
+  // }, [inventories, courseStartDate, courseEndDate]);
 
   return (
     <>
       <SessionContentPopup
         visible={sessionPopupVisible}
         closeModal={closeSessionPopup}
-        inventories={inventoryListFilteredByCourseDate}
+        inventories={inventories ?? []}
         addContentMethod={addSessionContentMethod}
+        courseStartDate={courseStartDate}
+        courseEndDate={courseEndDate}
+        changeCourseDates={handleChangeCourseDates}
       />
       <VideoContentPopup
         visible={videoPopupVisible}
@@ -936,9 +948,6 @@ const CourseModulesForm = ({ match, history }) => {
                                                                                     ? `You can't add a session to a video course`
                                                                                     : !courseStartDate || !courseEndDate
                                                                                     ? 'Please pick the course dates first'
-                                                                                    : inventoryListFilteredByCourseDate.length <=
-                                                                                      0
-                                                                                    ? 'No session available for the selected date range'
                                                                                     : 'Add Session Content'
                                                                                 }
                                                                               >
