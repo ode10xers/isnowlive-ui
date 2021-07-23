@@ -5,6 +5,7 @@ import moment from 'moment';
 import {
   Row,
   Col,
+  Spin,
   Button,
   Form,
   Typography,
@@ -85,8 +86,98 @@ const { Text, Paragraph } = Typography;
 
 const {
   formatDate: { toLocaleTime, toLongDateWithDay },
-  timeCalculation: { dateIsBeforeDate },
+  timeCalculation: { dateIsBeforeDate, isBeforeDate },
 } = dateUtil;
+
+const CourseContentDetails = ({ productId, productType }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [productData, setProductData] = useState(null);
+
+  const fetchInventoryDetails = useCallback(async (inventoryExternalId) => {
+    try {
+      const { status, data } = await apis.session.getInventoryDetailsByExternalId(inventoryExternalId);
+
+      if (isAPISuccess(status) && data) {
+        setProductData(data);
+      }
+    } catch (error) {
+      setProductData(null);
+      console.error(`Failed fetching inventory details for ${inventoryExternalId}`);
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchVideoDetails = useCallback(async (videoId) => {
+    try {
+      const { status, data } = await apis.videos.getVideoById(videoId);
+
+      if (isAPISuccess(status) && data) {
+        setProductData(data);
+      }
+    } catch (error) {
+      setProductData(null);
+      console.error(`Failed fetching inventory details for ${videoId}`);
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (productId && productType) {
+      switch (productType) {
+        case 'SESSION':
+          fetchInventoryDetails(productId);
+          break;
+        case 'VIDEO':
+          fetchVideoDetails(productId);
+          break;
+        default:
+          setIsLoading(false);
+          break;
+      }
+    }
+  }, [fetchInventoryDetails, fetchVideoDetails, productId, productType]);
+
+  const renderSessionDetails = (session) =>
+    isBeforeDate(session.end_time) ? (
+      <Space direction="horizontal" align="middle">
+        <Text> {toLongDateWithDay(session.start_time)} </Text>
+        <Text>
+          {toLocaleTime(session.start_time)} - {toLocaleTime(session.end_time)}
+        </Text>
+      </Space>
+    ) : (
+      <Tooltip title="This session's date has already past">
+        <Text type="secondary">Past session</Text>
+      </Tooltip>
+    );
+
+  const renderVideoDetails = (video) =>
+    video.source === videoSourceType.YOUTUBE ? (
+      <Space direction="horizontal" align="middle">
+        <Text> Video </Text>
+      </Space>
+    ) : (
+      <Space direction="horizontal" align="middle">
+        <Text> Video : {Math.floor((video?.duration ?? 0) / 60)} mins </Text>
+      </Space>
+    );
+
+  return (
+    <Spin spinning={isLoading}>
+      {productData && productType
+        ? productType === 'SESSION'
+          ? renderSessionDetails(productData)
+          : productType === 'VIDEO'
+          ? renderVideoDetails(productData)
+          : null
+        : null}
+    </Spin>
+  );
+};
 
 const CourseModulesForm = ({ match, history }) => {
   const [form] = Form.useForm();
@@ -95,8 +186,8 @@ const CourseModulesForm = ({ match, history }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [videos, setVideos] = useState([]);
-  const [inventories, setInventories] = useState([]);
+  // const [videos, setVideos] = useState([]);
+  // const [inventories, setInventories] = useState([]);
 
   const [videoPopupVisible, setVideoPopupVisible] = useState(false);
   const [sessionPopupVisible, setSessionPopupVisible] = useState(false);
@@ -109,38 +200,51 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
 
+  //#region Start of Helper functions
+
   const redirectToCourseSectionDashboard = useCallback(
     () => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses),
     [history]
   );
 
-  const fetchCreatorUpcomingSessionInventories = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.session.getUpcomingSession();
+  const isVideosOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.VIDEO.name;
 
-      if (isAPISuccess(status) && data) {
-        setInventories(data);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
-    }
-    setIsLoading(false);
-  }, []);
+  const getContentProductType = (moduleName, contentName) =>
+    form.getFieldValue(['modules', moduleName, 'module_content', contentName, 'product_type']);
 
-  const fetchVideosForCreator = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.videos.getCreatorVideos();
+  //#endregion End of Helper functions
 
-      if (isAPISuccess(status) && data) {
-        setVideos(data);
-      }
-    } catch (error) {
-      showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
-    }
-    setIsLoading(false);
-  }, []);
+  //#region Start of API Calls
+
+  // TODO: Rework this
+  // const fetchCreatorUpcomingSessionInventories = useCallback(async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const { status, data } = await apis.session.getUpcomingSession();
+
+  //     if (isAPISuccess(status) && data) {
+  //       setInventories(data);
+  //     }
+  //   } catch (error) {
+  //     showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
+  //   }
+  //   setIsLoading(false);
+  // }, []);
+
+  // TODO: Rework this
+  // const fetchVideosForCreator = useCallback(async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const { status, data } = await apis.videos.getCreatorVideos();
+
+  //     if (isAPISuccess(status) && data) {
+  //       setVideos(data);
+  //     }
+  //   } catch (error) {
+  //     showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
+  //   }
+  //   setIsLoading(false);
+  // }, []);
 
   const fetchCourseDetails = useCallback(
     async (courseExternalId) => {
@@ -181,10 +285,12 @@ const CourseModulesForm = ({ match, history }) => {
     [form]
   );
 
+  //#endregion End of API Calls
+
   useEffect(() => {
     if (courseId) {
-      fetchCreatorUpcomingSessionInventories();
-      fetchVideosForCreator();
+      // fetchCreatorUpcomingSessionInventories();
+      // fetchVideosForCreator();
       fetchCourseDetails(courseId);
     } else {
       showErrorModal('No Course Id Detected');
@@ -194,35 +300,14 @@ const CourseModulesForm = ({ match, history }) => {
     courseId,
     history,
     fetchCourseDetails,
-    fetchVideosForCreator,
-    fetchCreatorUpcomingSessionInventories,
+    // fetchVideosForCreator,
+    // fetchCreatorUpcomingSessionInventories,
     redirectToCourseSectionDashboard,
   ]);
 
-  const showCourseDetailsChangedModal = () => {
-    Modal.warning({
-      title: 'Course Date Changed',
-      afterClose: resetBodyStyle,
-      content: (
-        <>
-          <Paragraph>Note : Changing these details can affect the videos & sessions selected below.</Paragraph>
-          <Paragraph>
-            Please review the curriculum below to remove or add sessions or videos after this change.
-          </Paragraph>
-        </>
-      ),
-      okText: 'Review Curriculum',
-      onOk: () => {
-        window.scrollTo(0, 320);
-      },
-    });
-  };
+  //#region Start of Form Logics
 
-  const handleCourseCurriculumTypeChange = (e) => {
-    const curriculumType = e.target.value;
-    showCourseDetailsChangedModal();
-    setCourseCurriculumType(curriculumType);
-  };
+  //#region Start of Date Form Logics
 
   const handleStartDateChange = (date) => {
     setCourseStartDate(date);
@@ -261,13 +346,17 @@ const CourseModulesForm = ({ match, history }) => {
     form.setFieldsValue({ ...form.getFieldsValue(), courseStartDate: startDate, courseEndDate: endDate });
   };
 
+  //#endregion End of Date Form Logics
+
+  //#region Start of Validation Logics
+
   const getVideoContentIDsFromModules = (modules = []) => [
     ...new Set(
       modules.reduce(
         (acc, module) =>
           (acc = acc.concat(
             module.module_content
-              .filter((content) => content.product_type.toUpperCase() === 'VIDEO')
+              .filter((content) => content.product_type?.toUpperCase() === 'VIDEO')
               .map((content) => content.product_id)
           )),
         []
@@ -282,27 +371,7 @@ const CourseModulesForm = ({ match, history }) => {
     return JSON.stringify(prevVideoContents) !== JSON.stringify(newVideoContents);
   };
 
-  const saveCourseCurriculum = async (payload, modalRef = null) => {
-    setSubmitting(true);
-
-    if (modalRef) {
-      modalRef.destroy();
-    }
-
-    try {
-      const { status } = await apis.courses.updateCourse(courseId, payload);
-
-      if (isAPISuccess(status)) {
-        showSuccessModal(`${courseDetails.name ?? 'Course'} updated successfully`);
-        setTimeout(() => redirectToCourseSectionDashboard(), 2000);
-      }
-    } catch (error) {
-      showErrorModal(`Failed to update course`, error?.response?.data?.message || 'Something went wrong.');
-    }
-
-    setSubmitting(false);
-  };
-
+  // TODO: Need more clarity
   const isCourseContentMatchesCourseType = () => {
     const formValues = form.getFieldsValue();
     const moduleContents = formValues.modules.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []);
@@ -329,6 +398,68 @@ const CourseModulesForm = ({ match, history }) => {
     }
 
     return true;
+  };
+
+  const handleFinishFailed = ({ errorFields }) => {
+    let errorModules = [];
+
+    form.scrollToField(errorFields[0].name);
+    errorFields.forEach((error) => {
+      // We want to expand any module container which have errors
+      if (error.name.includes('modules') && error.name.length >= 2) {
+        errorModules.push(error.name[1]);
+      }
+
+      if (error.name.includes('module_content') && error.name.length === 3) {
+        // Error for the module_content fields (probably empty)
+        message.error({
+          content: `Module ${error.name[1] + 1} : ${error.errors[0]}`,
+          key: error.name.join('-') + '-error',
+        });
+      } else if (error.name.includes('module_content') && error.name.length > 3) {
+        // Error for inside of module_content (at the content level)
+        if (error.name.includes('product_id') || error.name.includes('product_type')) {
+          const errorFieldKey = deepCloneObject(error.name)
+            .slice(0, error.name.length - 1)
+            .join('-');
+          message.error({
+            content: `Module ${error.name[1] + 1} Content ${error.name[3] + 1} : Please select a proper content type!`,
+            key: `${errorFieldKey}-error`,
+          });
+        }
+      }
+    });
+
+    setExpandedModulesKeys([...new Set([...expandedModulesKeys, ...errorModules])]);
+  };
+
+  //#endregion End of Validation Logics
+
+  const handleCourseCurriculumTypeChange = (e) => {
+    const curriculumType = e.target.value;
+    showCourseDetailsChangedModal();
+    setCourseCurriculumType(curriculumType);
+  };
+
+  const saveCourseCurriculum = async (payload, modalRef = null) => {
+    setSubmitting(true);
+
+    if (modalRef) {
+      modalRef.destroy();
+    }
+
+    try {
+      const { status } = await apis.courses.updateCourse(courseId, payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal(`${courseDetails.name ?? 'Course'} updated successfully`);
+        setTimeout(() => redirectToCourseSectionDashboard(), 2000);
+      }
+    } catch (error) {
+      showErrorModal(`Failed to update course`, error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setSubmitting(false);
   };
 
   const handleFinish = async (values) => {
@@ -414,63 +545,6 @@ const CourseModulesForm = ({ match, history }) => {
     }
   };
 
-  const handleFinishFailed = ({ errorFields }) => {
-    let errorModules = [];
-
-    form.scrollToField(errorFields[0].name);
-    errorFields.forEach((error) => {
-      // We want to expand any module container which have errors
-      if (error.name.includes('modules') && error.name.length >= 2) {
-        errorModules.push(error.name[1]);
-      }
-
-      if (error.name.includes('module_content') && error.name.length === 3) {
-        // Error for the module_content fields (probably empty)
-        message.error({
-          content: `Module ${error.name[1] + 1} : ${error.errors[0]}`,
-          key: error.name.join('-') + '-error',
-        });
-      } else if (error.name.includes('module_content') && error.name.length > 3) {
-        // Error for inside of module_content (at the content level)
-        if (error.name.includes('product_id') || error.name.includes('product_type')) {
-          const errorFieldKey = deepCloneObject(error.name)
-            .slice(0, error.name.length - 1)
-            .join('-');
-          message.error({
-            content: `Module ${error.name[1] + 1} Content ${error.name[3] + 1} : Please select a proper content type!`,
-            key: `${errorFieldKey}-error`,
-          });
-        }
-      }
-    });
-
-    setExpandedModulesKeys([...new Set([...expandedModulesKeys, ...errorModules])]);
-  };
-
-  const handleDragEnd = (result) => {
-    const { destination, source, draggableId } = result;
-
-    const formModules = deepCloneObject(form.getFieldsValue()).modules;
-    const moduleIndex = draggableId.split('-')[1];
-    const contentIndex = draggableId.split('-')[3];
-
-    // NOTE: For modules, we use form names which are actually array indexes
-    const targetModule = formModules[moduleIndex];
-    const targetContent = targetModule.module_content[contentIndex];
-
-    if (targetModule && targetContent && destination && destination.index !== source.index) {
-      targetModule.module_content.splice(source.index, 1);
-      targetModule.module_content.splice(destination.index, 0, targetContent);
-
-      formModules[moduleIndex] = targetModule;
-
-      form.setFieldsValue({
-        ...form.getFieldsValue(),
-        modules: formModules,
-      });
-    }
-  };
-
   const initializeAddContentFunction = (moduleIndex) => {
     // We return a function that will be set as a state
     // This function will accept the content data that will be added
@@ -519,6 +593,53 @@ const CourseModulesForm = ({ match, history }) => {
     };
   };
 
+  //#endregion End of Form Logics
+
+  //#region Start of UI Handlers
+
+  const showCourseDetailsChangedModal = () => {
+    Modal.warning({
+      title: 'Course Date Changed',
+      afterClose: resetBodyStyle,
+      content: (
+        <>
+          <Paragraph>Note : Changing these details can affect the videos & sessions selected below.</Paragraph>
+          <Paragraph>
+            Please review the curriculum below to remove or add sessions or videos after this change.
+          </Paragraph>
+        </>
+      ),
+      okText: 'Review Curriculum',
+      onOk: () => {
+        window.scrollTo(0, 320);
+      },
+    });
+  };
+
+  const handleDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
+
+    const formModules = deepCloneObject(form.getFieldsValue()).modules;
+    const moduleIndex = draggableId.split('-')[1];
+    const contentIndex = draggableId.split('-')[3];
+
+    // NOTE: For modules, we use form names which are actually array indexes
+    const targetModule = formModules[moduleIndex];
+    const targetContent = targetModule.module_content[contentIndex];
+
+    if (targetModule && targetContent && destination && destination.index !== source.index) {
+      targetModule.module_content.splice(source.index, 1);
+      targetModule.module_content.splice(destination.index, 0, targetContent);
+
+      formModules[moduleIndex] = targetModule;
+
+      form.setFieldsValue({
+        ...form.getFieldsValue(),
+        modules: formModules,
+      });
+    }
+  };
+
   const openSessionPopup = (moduleIndex) => {
     const addContentFunction = initializeAddContentFunction(moduleIndex);
     setAddSessionContentMethod(() => addContentFunction);
@@ -539,48 +660,48 @@ const CourseModulesForm = ({ match, history }) => {
     setVideoPopupVisible(false);
   };
 
-  const isVideosOnlyCourse = () => courseCurriculumType && courseCurriculumType === courseCurriculumTypes.VIDEO.name;
-
-  const getContentProductType = (moduleName, contentName) =>
-    form.getFieldValue(['modules', moduleName, 'module_content', contentName, 'product_type']);
+  //#endregion End of UI Handlers
 
   const renderContentDetails = (moduleName, contentName) => {
     const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
-    let productData = null;
 
-    switch (contentData.product_type) {
-      case 'SESSION':
-        productData = inventories.find((inventory) => inventory.inventory_external_id === contentData.product_id);
+    return <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />;
 
-        return productData ? (
-          <Space direction="horizontal" align="middle">
-            <Text> {toLongDateWithDay(productData.start_time)} </Text>
-            <Text>
-              {toLocaleTime(productData.start_time)} - {toLocaleTime(productData.end_time)}
-            </Text>
-          </Space>
-        ) : (
-          <Tooltip title="This session's date has already past">
-            <Text type="secondary">Past session</Text>
-          </Tooltip>
-        );
-      case 'VIDEO':
-        productData = videos.find((video) => video.external_id === contentData.product_id);
+    // let productData = null;
 
-        return productData ? (
-          productData.source === videoSourceType.YOUTUBE ? (
-            <Space direction="horizontal" align="middle">
-              <Text> Video </Text>
-            </Space>
-          ) : (
-            <Space direction="horizontal" align="middle">
-              <Text> Video : {Math.floor((productData?.duration ?? 0) / 60)} mins </Text>
-            </Space>
-          )
-        ) : null;
-      default:
-        return null;
-    }
+    // switch (contentData.product_type) {
+    //   case 'SESSION':
+    //     productData = inventories.find((inventory) => inventory.inventory_external_id === contentData.product_id);
+
+    //     return productData ? (
+    //       <Space direction="horizontal" align="middle">
+    //         <Text> {toLongDateWithDay(productData.start_time)} </Text>
+    //         <Text>
+    //           {toLocaleTime(productData.start_time)} - {toLocaleTime(productData.end_time)}
+    //         </Text>
+    //       </Space>
+    //     ) : (
+    //       <Tooltip title="This session's date has already past">
+    //         <Text type="secondary">Past session</Text>
+    //       </Tooltip>
+    //     );
+    //   case 'VIDEO':
+    //     productData = videos.find((video) => video.external_id === contentData.product_id);
+
+    //     return productData ? (
+    //       productData.source === videoSourceType.YOUTUBE ? (
+    //         <Space direction="horizontal" align="middle">
+    //           <Text> Video </Text>
+    //         </Space>
+    //       ) : (
+    //         <Space direction="horizontal" align="middle">
+    //           <Text> Video : {Math.floor((productData?.duration ?? 0) / 60)} mins </Text>
+    //         </Space>
+    //       )
+    //     ) : null;
+    //   default:
+    //     return null;
+    // }
   };
 
   // const inventoryListFilteredByCourseDate = useMemo(() => {
@@ -602,7 +723,7 @@ const CourseModulesForm = ({ match, history }) => {
       <SessionContentPopup
         visible={sessionPopupVisible}
         closeModal={closeSessionPopup}
-        inventories={inventories ?? []}
+        // inventories={inventories ?? []}
         addContentMethod={addSessionContentMethod}
         courseStartDate={courseStartDate}
         courseEndDate={courseEndDate}
@@ -611,7 +732,7 @@ const CourseModulesForm = ({ match, history }) => {
       <VideoContentPopup
         visible={videoPopupVisible}
         closeModal={closeVideoPopup}
-        videos={videos}
+        // videos={videos}
         addContentMethod={addVideoContentMethod}
       />
       <div className={styles.box}>
@@ -856,7 +977,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         id="content_id"
                                                                         name={[contentFieldName, 'product_id']}
                                                                         fieldKey={[contentFieldKey, 'product_id']}
-                                                                        rules={validationRules.requiredValidation}
+                                                                        // rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content ID"
@@ -868,7 +989,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         id="content_type"
                                                                         name={[contentFieldName, 'product_type']}
                                                                         fieldKey={[contentFieldKey, 'product_type']}
-                                                                        rules={validationRules.requiredValidation}
+                                                                        // rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content Type"
@@ -917,8 +1038,6 @@ const CourseModulesForm = ({ match, history }) => {
                                                                                   courseCurriculumType ===
                                                                                   courseCurriculumTypes.LIVE.name
                                                                                     ? `You can't add a video to a live session course`
-                                                                                    : videos?.length <= 0
-                                                                                    ? `You currently don't have a video`
                                                                                     : 'Add Video Content'
                                                                                 }
                                                                               >
