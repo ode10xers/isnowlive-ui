@@ -150,7 +150,7 @@ const CourseContentDetails = ({ productId, productType }) => {
         </Text>
       </Space>
     ) : (
-      <Tooltip title="This session's date has already past">
+      <Tooltip title="This session's date has already passed">
         <Text type="secondary">Past session</Text>
       </Tooltip>
     );
@@ -186,8 +186,6 @@ const CourseModulesForm = ({ match, history }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  // const [videos, setVideos] = useState([]);
-  // const [inventories, setInventories] = useState([]);
 
   const [videoPopupVisible, setVideoPopupVisible] = useState(false);
   const [sessionPopupVisible, setSessionPopupVisible] = useState(false);
@@ -215,36 +213,6 @@ const CourseModulesForm = ({ match, history }) => {
   //#endregion End of Helper functions
 
   //#region Start of API Calls
-
-  // TODO: Rework this
-  // const fetchCreatorUpcomingSessionInventories = useCallback(async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const { status, data } = await apis.session.getUpcomingSession();
-
-  //     if (isAPISuccess(status) && data) {
-  //       setInventories(data);
-  //     }
-  //   } catch (error) {
-  //     showErrorModal('Failed to fetch course classes', error?.response?.data?.message || 'Something went wrong');
-  //   }
-  //   setIsLoading(false);
-  // }, []);
-
-  // TODO: Rework this
-  // const fetchVideosForCreator = useCallback(async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const { status, data } = await apis.videos.getCreatorVideos();
-
-  //     if (isAPISuccess(status) && data) {
-  //       setVideos(data);
-  //     }
-  //   } catch (error) {
-  //     showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
-  //   }
-  //   setIsLoading(false);
-  // }, []);
 
   const fetchCourseDetails = useCallback(
     async (courseExternalId) => {
@@ -289,21 +257,12 @@ const CourseModulesForm = ({ match, history }) => {
 
   useEffect(() => {
     if (courseId) {
-      // fetchCreatorUpcomingSessionInventories();
-      // fetchVideosForCreator();
       fetchCourseDetails(courseId);
     } else {
       showErrorModal('No Course Id Detected');
       redirectToCourseSectionDashboard();
     }
-  }, [
-    courseId,
-    history,
-    fetchCourseDetails,
-    // fetchVideosForCreator,
-    // fetchCreatorUpcomingSessionInventories,
-    redirectToCourseSectionDashboard,
-  ]);
+  }, [courseId, history, fetchCourseDetails, redirectToCourseSectionDashboard]);
 
   //#region Start of Form Logics
 
@@ -674,64 +633,13 @@ const CourseModulesForm = ({ match, history }) => {
     const contentData = form.getFieldValue(['modules', moduleName, 'module_content', contentName]);
 
     return <CourseContentDetails productType={contentData.product_type} productId={contentData.product_id} />;
-
-    // let productData = null;
-
-    // switch (contentData.product_type) {
-    //   case 'SESSION':
-    //     productData = inventories.find((inventory) => inventory.inventory_external_id === contentData.product_id);
-
-    //     return productData ? (
-    //       <Space direction="horizontal" align="middle">
-    //         <Text> {toLongDateWithDay(productData.start_time)} </Text>
-    //         <Text>
-    //           {toLocaleTime(productData.start_time)} - {toLocaleTime(productData.end_time)}
-    //         </Text>
-    //       </Space>
-    //     ) : (
-    //       <Tooltip title="This session's date has already past">
-    //         <Text type="secondary">Past session</Text>
-    //       </Tooltip>
-    //     );
-    //   case 'VIDEO':
-    //     productData = videos.find((video) => video.external_id === contentData.product_id);
-
-    //     return productData ? (
-    //       productData.source === videoSourceType.YOUTUBE ? (
-    //         <Space direction="horizontal" align="middle">
-    //           <Text> Video </Text>
-    //         </Space>
-    //       ) : (
-    //         <Space direction="horizontal" align="middle">
-    //           <Text> Video : {Math.floor((productData?.duration ?? 0) / 60)} mins </Text>
-    //         </Space>
-    //       )
-    //     ) : null;
-    //   default:
-    //     return null;
-    // }
   };
-
-  // const inventoryListFilteredByCourseDate = useMemo(() => {
-  //   if (!courseStartDate || !courseEndDate) {
-  //     return inventories ?? [];
-  //   }
-
-  //   return (
-  //     inventories?.filter(
-  //       (inventory) =>
-  //         moment(inventory.start_time).isSameOrAfter(moment(courseStartDate).startOf('day')) &&
-  //         moment(inventory.end_time).isSameOrBefore(moment(courseEndDate).endOf('day'))
-  //     ) ?? []
-  //   );
-  // }, [inventories, courseStartDate, courseEndDate]);
 
   return (
     <>
       <SessionContentPopup
         visible={sessionPopupVisible}
         closeModal={closeSessionPopup}
-        // inventories={inventories ?? []}
         addContentMethod={addSessionContentMethod}
         courseStartDate={courseStartDate}
         courseEndDate={courseEndDate}
@@ -740,7 +648,6 @@ const CourseModulesForm = ({ match, history }) => {
       <VideoContentPopup
         visible={videoPopupVisible}
         closeModal={closeVideoPopup}
-        // videos={videos}
         addContentMethod={addVideoContentMethod}
       />
       <div className={styles.box}>
@@ -985,7 +892,6 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         id="content_id"
                                                                         name={[contentFieldName, 'product_id']}
                                                                         fieldKey={[contentFieldKey, 'product_id']}
-                                                                        // rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content ID"
@@ -997,7 +903,6 @@ const CourseModulesForm = ({ match, history }) => {
                                                                         id="content_type"
                                                                         name={[contentFieldName, 'product_type']}
                                                                         fieldKey={[contentFieldKey, 'product_type']}
-                                                                        // rules={validationRules.requiredValidation}
                                                                       >
                                                                         <Input
                                                                           placeholder="Content Type"

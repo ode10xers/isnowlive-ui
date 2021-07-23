@@ -56,18 +56,10 @@ const SessionContentPopup = ({
   useEffect(() => {
     if (visible) {
       fetchCreatorUpcomingSessionInventories();
-    }
-  }, [visible, fetchCreatorUpcomingSessionInventories]);
-
-  useEffect(() => {
-    if (courseStartDate) {
       setStartDate(courseStartDate);
-    }
-
-    if (courseEndDate) {
       setEndDate(courseEndDate);
     }
-  }, [courseStartDate, courseEndDate]);
+  }, [visible, fetchCreatorUpcomingSessionInventories, courseStartDate, courseEndDate]);
 
   //#region Start of Button Handlers
 
