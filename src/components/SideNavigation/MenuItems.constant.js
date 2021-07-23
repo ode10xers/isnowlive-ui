@@ -15,6 +15,7 @@ import {
   ControlOutlined,
   PartitionOutlined,
   GlobalOutlined,
+  AppstoreOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -300,6 +301,14 @@ export const creatorMenuItems = [
 
 export const attendeeMenuItems = [
   {
+    order: 0,
+    key: 'dashboard',
+    title: 'Dashboard',
+    icon: <AppstoreOutlined />,
+    mixPanelTag: attendee.click.dashboard.dashboardNav,
+    path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.dashboardPage,
+  },
+  {
     order: 1,
     key: 'sessions',
     title: 'Sessions',
@@ -346,7 +355,7 @@ export const attendeeMenuItems = [
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses,
   },
   {
-    order: 5,
+    order: 6,
     key: 'subscription',
     title: 'Membership Subscriptions',
     icon: <ScheduleOutlined />,
@@ -354,7 +363,7 @@ export const attendeeMenuItems = [
     path: Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.subscriptions,
   },
   {
-    order: 6,
+    order: 7,
     key: 'referrals',
     title: 'Referrals',
     icon: <PartitionOutlined />,

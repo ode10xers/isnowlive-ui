@@ -77,16 +77,17 @@ const Routes = {
   },
   attendeeDashboard: {
     rootPath: '/attendee/dashboard',
-    defaultPath: '/sessions/upcoming',
+    defaultPath: '/products',
     sessions: '/sessions/:session_type',
     passes: '/passes',
     videos: '/videos',
     videoDetails: '/videos/:video_id/:video_order_id',
     courses: '/courses',
-    // TODO: Might want to change this into course order details
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
     referrals: '/referrals',
+    // TODO: Reconsider the path
+    dashboardPage: '/products',
   },
 };
 
