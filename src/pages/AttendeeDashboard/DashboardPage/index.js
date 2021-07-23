@@ -641,92 +641,90 @@ const DashboardPage = ({ history }) => {
 
   return (
     <div className={styles.dashboardContainer}>
-      <Row gutter={[12, 32]} justify="center" align="middle">
+      <Space
+        direction="vertical"
+        split={<Divider orientation="center" type="horizontal" className={styles.sectionDivider} />}
+        className={styles.w100}
+      >
         {/* Sessions Section */}
-        <Col xs={24}>
-          <Space direction="vertical" align="middle" className={styles.w100}>
-            <Title level={4}> Your Purchased Sessions </Title>
-            <div className={styles.sessionsContainer}>
-              {isMobileDevice ? (
-                <Spin spinning={isSessionLoading}>
-                  {upcomingSessions.length > 0 ? (
-                    <Row gutter={[10, 10]}>{upcomingSessions.map(renderMobileSessionItem)}</Row>
-                  ) : (
-                    <Empty description="No upcoming purchased sessions" />
-                  )}
-                </Spin>
-              ) : (
-                <Table
-                  columns={sessionTableColumns}
-                  data={upcomingSessions}
-                  loading={isSessionLoading}
-                  rowKey={(record) => record.order_id}
-                />
-              )}
-            </div>
-            <div className={styles.moreButtonContainer}>
-              <Button type="primary" onClick={redirectToSessionsPage}>
-                See More Sessions Purchased By You
-              </Button>
-            </div>
-          </Space>
-        </Col>
-        {/* Videos Section */}
-        <Col xs={24}>
-          <Space direction="vertical">
-            <Title level={4}> Your Purchased Videos </Title>
-            <div className={styles.videosContainer}>
-              <Spin spinning={isVideoLoading} tip="Fetching video orders">
-                {videos.length > 0 ? (
-                  <Row gutter={[12, 12]} align="middle">
-                    {videos.map(renderVideoItems)}
-                    <Col xs={24}>
-                      <Row justify="center">
-                        <Col>
-                          <Button type="primary" onClick={redirectToVideosPage}>
-                            See More Videos Purchased By You
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Col>
-                  </Row>
+        <Space direction="vertical" align="middle" className={styles.w100}>
+          <Title level={4}> Your Purchased Sessions </Title>
+          <div className={styles.sessionsContainer}>
+            {isMobileDevice ? (
+              <Spin spinning={isSessionLoading}>
+                {upcomingSessions.length > 0 ? (
+                  <Row gutter={[10, 10]}>{upcomingSessions.map(renderMobileSessionItem)}</Row>
                 ) : (
-                  <Empty description="No video purchased" />
+                  <Empty description="No upcoming purchased sessions" />
                 )}
               </Spin>
-            </div>
-          </Space>
-        </Col>
-        {/* Courses Section */}
-        <Col xs={24}>
-          <Space direction="vertical" className={styles.w100}>
-            <Title level={4}> Your Purchased Courses </Title>
-            <div className={styles.coursesContainer}>
-              {isMobileDevice ? (
-                <Spin spinning={isCourseLoading}>
-                  {courses.length > 0 ? (
-                    <Row gutter={[8, 8]}>{courses.map(renderMobileCourseItem)}</Row>
-                  ) : (
-                    <Empty description="No active course orders" />
-                  )}
-                </Spin>
+            ) : (
+              <Table
+                columns={sessionTableColumns}
+                data={upcomingSessions}
+                loading={isSessionLoading}
+                rowKey={(record) => record.order_id}
+              />
+            )}
+          </div>
+          <div className={styles.moreButtonContainer}>
+            <Button type="primary" onClick={redirectToSessionsPage}>
+              See More Sessions Purchased By You
+            </Button>
+          </div>
+        </Space>
+        {/* Videos Section */}
+        <Space direction="vertical" className={styles.w100}>
+          <Title level={4}> Your Purchased Videos </Title>
+          <div className={styles.videosContainer}>
+            <Spin spinning={isVideoLoading} tip="Fetching video orders">
+              {videos.length > 0 ? (
+                <Row gutter={[12, 12]} align="middle">
+                  {videos.map(renderVideoItems)}
+                  <Col xs={24}>
+                    <Row justify="center">
+                      <Col>
+                        <Button type="primary" onClick={redirectToVideosPage}>
+                          See More Videos Purchased By You
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
+                </Row>
               ) : (
-                <Table
-                  columns={courseTableColumns}
-                  data={courses}
-                  loading={isCourseLoading}
-                  rowKey={(record) => record.course_order_id}
-                />
+                <Empty description="No video purchased" />
               )}
-            </div>
-            <div className={styles.moreButtonContainer}>
-              <Button type="primary" onClick={redirectToCoursesPage}>
-                See More Courses Purchased By You
-              </Button>
-            </div>
-          </Space>
-        </Col>
-      </Row>
+            </Spin>
+          </div>
+        </Space>
+        {/* Courses Section */}
+        <Space direction="vertical" className={styles.w100}>
+          <Title level={4}> Your Purchased Courses </Title>
+          <div className={styles.coursesContainer}>
+            {isMobileDevice ? (
+              <Spin spinning={isCourseLoading}>
+                {courses.length > 0 ? (
+                  <Row gutter={[8, 8]}>{courses.map(renderMobileCourseItem)}</Row>
+                ) : (
+                  <Empty description="No active course orders" />
+                )}
+              </Spin>
+            ) : (
+              <Table
+                columns={courseTableColumns}
+                data={courses}
+                loading={isCourseLoading}
+                rowKey={(record) => record.course_order_id}
+              />
+            )}
+          </div>
+          <div className={styles.moreButtonContainer}>
+            <Button type="primary" onClick={redirectToCoursesPage}>
+              See More Courses Purchased By You
+            </Button>
+          </div>
+        </Space>
+      </Space>
     </div>
   );
 };
