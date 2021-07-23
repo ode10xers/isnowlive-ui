@@ -23,7 +23,7 @@ import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
 import { getLocalUserDetails } from 'utils/storage';
-import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { getCourseSessionContentCount, getCourseVideoContentCount, getCourseEmptyContentCount } from 'utils/course';
 import { isAPISuccess, productType, copyToClipboard, generateUrlFromUsername, preventDefaults } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -77,6 +77,16 @@ const Courses = ({ history }) => {
   }, []);
 
   const publishCourse = async (course) => {
+    const emptyContentCount = getCourseEmptyContentCount(course?.modules);
+
+    if (emptyContentCount > 0) {
+      showErrorModal(
+        'Course Outline detected',
+        'This course has an outline but does not have content. Please add content before publishing it to avoid customers buying an empty course.'
+      );
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { status } = await apis.courses.publishCourse(course.id);
@@ -238,9 +248,10 @@ const Courses = ({ history }) => {
         render: (text, record) => {
           const sessionCount = getCourseSessionContentCount(record?.modules ?? []);
           const videoCount = getCourseVideoContentCount(record?.modules ?? []);
+          const emptyCount = getCourseEmptyContentCount(record?.modules ?? []);
 
           if (!sessionCount && !videoCount) {
-            return '-';
+            return <Text type="secondary"> {`${emptyCount} outlines`} </Text>;
           }
 
           return (
@@ -248,6 +259,7 @@ const Courses = ({ history }) => {
               <Space split={<Divider type="vertical" />}>
                 {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
                 {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
+                {emptyCount > 0 ? <Text type="secondary"> {`${emptyCount} outlines`} </Text> : null}
               </Space>
             </Tag>
           );
