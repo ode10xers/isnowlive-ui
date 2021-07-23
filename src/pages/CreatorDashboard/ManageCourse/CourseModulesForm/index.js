@@ -371,10 +371,18 @@ const CourseModulesForm = ({ match, history }) => {
     return JSON.stringify(prevVideoContents) !== JSON.stringify(newVideoContents);
   };
 
-  // TODO: Need more clarity
   const isCourseContentMatchesCourseType = () => {
     const formValues = form.getFieldsValue();
     const moduleContents = formValues.modules.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []);
+
+    // NOTE : Special check, if all contents are empty then it's an outline
+    // In this case, allow them to pass through without any checks
+    if (moduleContents.every((content) => !content.product_type)) {
+      return true;
+    } else if (moduleContents.some((content) => !content.product_type)) {
+      showErrorModal('You have some empty contents! Please review the curriculum');
+      return false;
+    }
 
     if (
       courseCurriculumType === courseCurriculumTypes.VIDEO.name &&
@@ -1023,7 +1031,7 @@ const CourseModulesForm = ({ match, history }) => {
                                                                               className={styles.textAlignRight}
                                                                             >
                                                                               <Text
-                                                                                type="secondary"
+                                                                                type="danger"
                                                                                 className={styles.textAlignCenter}
                                                                               >
                                                                                 Select content to add

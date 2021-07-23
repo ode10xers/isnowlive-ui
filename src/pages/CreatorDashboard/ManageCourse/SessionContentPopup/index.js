@@ -271,31 +271,37 @@ const SessionContentPopup = ({
         <Row gutter={[10, 10]}>
           <Col xs={24}>
             <Space direction="vertical">
-              <Text strong>
-                The sessions shown below is limited to the Start Date{' '}
-                <DatePicker
-                  placeholder="Select Start Date"
-                  onChange={startDateChanged}
-                  disabledDate={disabledStartDate}
-                  className={styles.inlineDatePicker}
-                  defaultValue={courseStartDate}
-                  value={startDate}
-                />{' '}
-                and End Date{' '}
-                <DatePicker
-                  placeholder="Select End Date"
-                  onChange={endDateChanged}
-                  disabledDate={disabledEndDate}
-                  className={styles.inlineDatePicker}
-                  defaultValue={courseEndDate}
-                  value={endDate}
-                />{' '}
-                by you.
-              </Text>
+              <div>
+                <Text strong>
+                  Sessions shown below is limited to Start Date{' '}
+                  <DatePicker
+                    placeholder="Select Start Date"
+                    onChange={startDateChanged}
+                    disabledDate={disabledStartDate}
+                    className={styles.inlineDatePicker}
+                    defaultValue={courseStartDate}
+                    value={startDate}
+                  />{' '}
+                  End Date{' '}
+                  <DatePicker
+                    placeholder="Select End Date"
+                    onChange={endDateChanged}
+                    disabledDate={disabledEndDate}
+                    className={styles.inlineDatePicker}
+                    defaultValue={courseEndDate}
+                    value={endDate}
+                  />{' '}
+                  <Button
+                    type="primary"
+                    disabled={!startDate || !endDate}
+                    onClick={applyDateChanges}
+                    className={styles.inlineButton}
+                  >
+                    Apply
+                  </Button>
+                </Text>
+              </div>
               <Text strong>To see more sessions, change the start/end date and click on Apply</Text>
-              <Button type="primary" disabled={!startDate || !endDate} onClick={applyDateChanges}>
-                Apply
-              </Button>
             </Space>
           </Col>
           <Col xs={24}>
