@@ -91,9 +91,9 @@ const DashboardPage = ({ history }) => {
     const videosItemCount = 2;
 
     try {
-      const { data } = await apis.videos.getAttendeeVideos();
+      const { status, data } = await apis.videos.getAttendeeVideos();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setVideos(data.active.sort((a, b) => new Date(a.expiry) - new Date(b.expiry)).slice(0, videosItemCount));
       }
     } catch (error) {
@@ -141,10 +141,6 @@ const DashboardPage = ({ history }) => {
   const redirectToSessionsPage = (e) => {
     preventDefaults(e);
     history.push(Routes.attendeeDashboard.rootPath + '/sessions/upcoming');
-  };
-
-  const openSessionInventoryDetails = (item) => {
-    redirectToInventoryPage(item);
   };
 
   const cancelOrderForSession = async (orderId) => {
@@ -238,7 +234,7 @@ const DashboardPage = ({ history }) => {
     };
 
     window.open(
-      `${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`,
+      `${generateUrlFromUsername(data.creator_username)}/reschedule?${generateQueryString(passedData)}`,
       isInIframeWidget() ? '_self' : '_blank'
     );
   };
@@ -255,9 +251,7 @@ const DashboardPage = ({ history }) => {
 
   const redirectToCourseOrderDetails = (courseOrder) => {
     if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
-      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`, {
-        username: courseOrder?.course?.creator_username || 'app',
-      });
+      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`);
     }
   };
 
@@ -403,7 +397,7 @@ const DashboardPage = ({ history }) => {
                 buttonText="Add to Cal"
                 eventData={{
                   ...record,
-                  page_url: `${generateUrlFromUsername(record?.username)}/e/${record.inventory_id}`,
+                  page_url: `${generateUrlFromUsername(record?.creator_username)}/e/${record.inventory_id}`,
                 }}
               />
             </Col>
@@ -441,7 +435,7 @@ const DashboardPage = ({ history }) => {
               {renderRefundPopup(record)}
             </Col>
             <Col md={24} lg={4} xl={4}>
-              <Button block size="small" type="link" onClick={() => openSessionInventoryDetails(record)}>
+              <Button block size="small" type="link" onClick={() => redirectToInventoryPage(record)}>
                 Details
               </Button>
             </Col>
@@ -488,7 +482,6 @@ const DashboardPage = ({ history }) => {
     },
     {
       title: 'Duration',
-      dataIndex: ['course', 'duration'],
       width: '90px',
       render: (text, record) => renderCourseDuration(record.course),
     },
@@ -532,9 +525,9 @@ const DashboardPage = ({ history }) => {
     return (
       <Col xs={24}>
         <Card
-          key={item.inventory_id}
+          key={item.order_id}
           title={
-            <div onClick={() => openSessionInventoryDetails(item)}>
+            <div onClick={() => redirectToInventoryPage(item)}>
               <Text>{item.name}</Text>
               {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
             </div>
@@ -572,7 +565,7 @@ const DashboardPage = ({ history }) => {
             </Button>,
           ]}
         >
-          <div onClick={() => openSessionInventoryDetails(item)}>
+          <div onClick={() => redirectToInventoryPage(item)}>
             {layout('Type', <Text>{item?.max_participants > 1 ? 'Group' : '1-on-1'}</Text>)}
             {layout('Day', <Text>{item?.start_time ? toLongDateWithDay(item?.start_time) : '-'}</Text>)}
             {layout(
@@ -594,7 +587,7 @@ const DashboardPage = ({ history }) => {
               buttonText="Add to My Calendar"
               eventData={{
                 ...item,
-                page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
+                page_url: `${generateUrlFromUsername(item?.creator_username)}/e/${item.inventory_id}`,
               }}
             />
           </div>
@@ -667,7 +660,7 @@ const DashboardPage = ({ history }) => {
                   columns={sessionTableColumns}
                   data={upcomingSessions}
                   loading={isSessionLoading}
-                  rowKey={(record) => record.inventory_external_id}
+                  rowKey={(record) => record.order_id}
                 />
               )}
             </div>

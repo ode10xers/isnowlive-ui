@@ -59,4 +59,9 @@
 
 .coursesContainer {
   width: 100%;
+
+  .thumbnailImage {
+    width: 100%;
+    object-fit: scale-down;
+  }
 }

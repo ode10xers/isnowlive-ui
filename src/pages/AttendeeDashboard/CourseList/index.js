@@ -49,9 +49,7 @@ const CourseList = () => {
 
   const redirectToCourseOrderDetails = (courseOrder) => {
     if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
-      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`, {
-        username: courseOrder?.course?.creator_username || 'app',
-      });
+      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`);
     }
   };
 
@@ -139,7 +137,6 @@ const CourseList = () => {
     },
     {
       title: 'Duration',
-      dataIndex: ['course', 'duration'],
       width: '90px',
       render: (text, record) => renderCourseDuration(record.course),
     },

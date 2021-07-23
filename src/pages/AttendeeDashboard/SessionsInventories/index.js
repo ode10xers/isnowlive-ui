@@ -69,7 +69,7 @@ const SessionsInventories = ({ match }) => {
           session_id: i?.session_id,
           order_id: i?.order_id,
           max_participants: i?.max_participants,
-          username: i?.creator_username,
+          creator_username: i?.creator_username,
           price: i?.price,
           currency: i?.currency.toUpperCase() || 'SGD',
           refund_amount: i?.refund_amount || 0,
@@ -145,7 +145,7 @@ const SessionsInventories = ({ match }) => {
       : attendee.click.sessions.upcomingSessionDetails;
 
     trackSimpleEvent(eventTag, {
-      creator: item.username,
+      creator: item.creator_username,
       session_data: item,
     });
 
@@ -248,7 +248,7 @@ const SessionsInventories = ({ match }) => {
     };
 
     window.open(
-      `${generateUrlFromUsername(data.username)}/reschedule?${generateQueryString(passedData)}`,
+      `${generateUrlFromUsername(data.creator_username)}/reschedule?${generateQueryString(passedData)}`,
       isInIframeWidget() ? '_self' : '_blank'
     );
   };
@@ -370,7 +370,7 @@ const SessionsInventories = ({ match }) => {
                   buttonText="Add to Cal"
                   eventData={{
                     ...record,
-                    page_url: `${generateUrlFromUsername(record?.username)}/e/${record.inventory_id}`,
+                    page_url: `${generateUrlFromUsername(record?.creator_username)}/e/${record.inventory_id}`,
                   }}
                 />
               </Col>
@@ -526,7 +526,7 @@ const SessionsInventories = ({ match }) => {
             buttonText="Add to My Calendar"
             eventData={{
               ...item,
-              page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
+              page_url: `${generateUrlFromUsername(item?.creator_username)}/e/${item.inventory_id}`,
             }}
           />
         </div>
