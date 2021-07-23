@@ -1,19 +1,38 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
 
-import { Row, Col, Typography, Spin, Image, Empty, Space, Button, Modal, Popover, Popconfirm, message } from 'antd';
+import {
+  Row,
+  Col,
+  Typography,
+  Spin,
+  Image,
+  Empty,
+  Space,
+  Tag,
+  Divider,
+  Card,
+  Button,
+  Modal,
+  Popover,
+  Popconfirm,
+  message,
+} from 'antd';
 import { BookTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Table from 'components/Table';
+import DefaultImage from 'components/Icons/DefaultImage';
 import { showErrorModal } from 'components/Modals/modals';
 import AddToCalendarButton from 'components/AddToCalendarButton';
 
 import dateUtil from 'utils/date';
+import { isMobileDevice } from 'utils/device';
 import { isInIframeWidget } from 'utils/widgets';
 import { redirectToInventoryPage } from 'utils/redirect';
+import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import {
   getDuration,
   isAPISuccess,
@@ -34,12 +53,15 @@ const { Text, Title } = Typography;
 
 const whiteColor = '#ffffff';
 
-const DashboardPage = ({ match, history }) => {
+const DashboardPage = ({ history }) => {
   const [isSessionLoading, setIsSessionLoading] = useState(false);
   const [upcomingSessions, setUpcomingSessions] = useState([]);
 
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [videos, setVideos] = useState([]);
+
+  const [isCourseLoading, setIsCourseLoading] = useState(false);
+  const [courses, setCourses] = useState([]);
 
   //#region Start of API Calls
 
@@ -63,13 +85,16 @@ const DashboardPage = ({ match, history }) => {
     setIsSessionLoading(false);
   }, []);
 
-  const getVideosForCreator = useCallback(async () => {
+  const fetchAttendeeVideoOrders = useCallback(async () => {
     setIsVideoLoading(true);
+
+    const videosItemCount = 2;
+
     try {
       const { data } = await apis.videos.getAttendeeVideos();
 
       if (data) {
-        setVideos(data.active.sort((a, b) => new Date(a.expiry) - new Date(b.expiry)).slice(0, 2));
+        setVideos(data.active.sort((a, b) => new Date(a.expiry) - new Date(b.expiry)).slice(0, videosItemCount));
       }
     } catch (error) {
       if (!isUnapprovedUserError(error.response)) {
@@ -79,14 +104,35 @@ const DashboardPage = ({ match, history }) => {
     setIsVideoLoading(false);
   }, []);
 
+  const fetchAttendeeCourseOrders = useCallback(async () => {
+    setIsCourseLoading(true);
+
+    const courseItemCount = 1;
+
+    try {
+      const { status, data } = await apis.courses.getAttendeeCourses();
+
+      if (isAPISuccess(status) && data) {
+        setCourses(data.active.length > 0 ? data.active.slice(0, courseItemCount) : []);
+      }
+    } catch (error) {
+      if (!isUnapprovedUserError(error.response)) {
+        showErrorModal('Something wrong happened', error?.response?.data?.message || 'Failed to fetch course orders');
+      }
+    }
+
+    setIsCourseLoading(false);
+  }, []);
+
   //#endregion End of API Calls
 
   //#region Start of Use Effects
 
   useEffect(() => {
     fetchAttendeeUpcomingSessions();
-    getVideosForCreator();
-  }, [fetchAttendeeUpcomingSessions, getVideosForCreator]);
+    fetchAttendeeVideoOrders();
+    fetchAttendeeCourseOrders();
+  }, [fetchAttendeeUpcomingSessions, fetchAttendeeVideoOrders, fetchAttendeeCourseOrders]);
 
   //#endregion End of Use Effects
 
@@ -95,11 +141,6 @@ const DashboardPage = ({ match, history }) => {
   const redirectToSessionsPage = (e) => {
     preventDefaults(e);
     history.push(Routes.attendeeDashboard.rootPath + '/sessions/upcoming');
-  };
-
-  const redirectToVideosPage = (e) => {
-    preventDefaults(e);
-    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
   };
 
   const openSessionInventoryDetails = (item) => {
@@ -128,7 +169,6 @@ const DashboardPage = ({ match, history }) => {
         return (
           <Popconfirm
             arrowPointAtCenter
-            placement="topRight"
             title={
               <Text>
                 Do you want to refund this session? <br />
@@ -149,17 +189,16 @@ const DashboardPage = ({ match, history }) => {
         return (
           <Popover
             arrowPointAtCenter
-            placement="topRight"
             trigger="click"
             title="Refund Time Limit Reached"
             content={
               <Text>
                 Sorry, as per the cancellation policy of <br />
-                this session,
+                this session,{' '}
                 <strong>
                   it can only be cancelled <br />
                   {data.refund_before_hours} hours
-                </strong>
+                </strong>{' '}
                 before the session starts.
               </Text>
             }
@@ -174,7 +213,6 @@ const DashboardPage = ({ match, history }) => {
       return (
         <Popover
           arrowPointAtCenter
-          placement="topRight"
           trigger="click"
           title="Session Cannot be Refunded"
           content={
@@ -205,7 +243,101 @@ const DashboardPage = ({ match, history }) => {
     );
   };
 
+  const redirectToVideosPage = (e) => {
+    preventDefaults(e);
+    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.videos);
+  };
+
+  const redirectToCoursesPage = (e) => {
+    preventDefaults(e);
+    history.push(Routes.attendeeDashboard.rootPath + Routes.attendeeDashboard.courses);
+  };
+
+  const redirectToCourseOrderDetails = (courseOrder) => {
+    if (courseOrder?.course?.creator_username && courseOrder?.course_order_id) {
+      history.push(`${Routes.attendeeDashboard.rootPath}/course/${courseOrder.course_order_id}`, {
+        username: courseOrder?.course?.creator_username || 'app',
+      });
+    }
+  };
+
   //#endregion End of Business Logics
+
+  //#region Start of Render Methods
+
+  const renderVideoItems = (video) => (
+    <Col
+      key={video.video_order_id}
+      xs={24}
+      lg={12}
+      className={styles.videoItem}
+      onClick={() =>
+        history.push(
+          Routes.attendeeDashboard.rootPath +
+            Routes.attendeeDashboard.videos +
+            `/${video.video_id}/${video.video_order_id}`
+        )
+      }
+    >
+      <Row gutter={[12, 12]}>
+        <Col xs={24} md={10} lg={14} xl={12}>
+          <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+        </Col>
+        <Col xs={24} md={14} lg={10} xl={12}>
+          <Row>
+            <Col xs={24}>
+              <Title level={5} className={styles.videoTitle}>
+                {video.title}
+              </Title>
+            </Col>
+            <Col xs={24}>
+              {video.price === 0 ? (
+                <Text type="secondary">Free video</Text>
+              ) : (
+                <Text type="secondary">
+                  {video.currency.toUpperCase()} {video.price}
+                </Text>
+              )}
+            </Col>
+            <Col xs={24}>
+              <Text type="secondary" className={styles.expiryText}>
+                Available from :
+              </Text>
+            </Col>
+            <Col xs={24}>
+              <Text type="secondary" className={styles.expiryText}>
+                {toLongDateWithDayTime(video.beginning)} - {toLongDateWithDayTime(video.expiry)}
+              </Text>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </Col>
+  );
+
+  const renderCourseContents = (courseOrder) => {
+    const sessionCount = getCourseSessionContentCount(courseOrder.course?.modules ?? []);
+    const videoCount = getCourseVideoContentCount(courseOrder.course?.modules ?? []);
+
+    return (
+      <Tag color="blue">
+        <Space split={<Divider type="vertical" />}>
+          {sessionCount > 0 ? <Text className={styles.blueText}> {`${sessionCount} sessions`} </Text> : null}
+          {videoCount > 0 ? <Text className={styles.blueText}> {`${videoCount} videos`} </Text> : null}
+        </Space>
+      </Tag>
+    );
+  };
+
+  const renderCourseDuration = (course) =>
+    course?.type === 'VIDEO'
+      ? `${course?.validity ?? 0} days`
+      : `${moment(course?.end_date)
+          .endOf('day')
+          .add(1, 'second')
+          .diff(moment(course.start_date).startOf('day'), 'days')} days`;
+
+  //#endregion End of Render Methods
 
   //#region Start of Table Columns
 
@@ -266,7 +398,7 @@ const DashboardPage = ({ match, history }) => {
       render: (text, record) => {
         return (
           <Row justify="space-around">
-            <Col md={24} xl={6}>
+            <Col md={24} lg={5} xl={6}>
               <AddToCalendarButton
                 buttonText="Add to Cal"
                 eventData={{
@@ -275,8 +407,7 @@ const DashboardPage = ({ match, history }) => {
                 }}
               />
             </Col>
-
-            <Col md={24} lg={24} xl={4}>
+            <Col md={24} lg={5} xl={4}>
               {record.is_offline ? (
                 <Popover
                   arrowPointAtCenter
@@ -306,16 +437,15 @@ const DashboardPage = ({ match, history }) => {
                 </Button>
               )}
             </Col>
-            <Col md={24} lg={24} xl={4}>
+            <Col md={24} lg={5} xl={4}>
               {renderRefundPopup(record)}
             </Col>
-            <Col md={24} lg={24} xl={4}>
+            <Col md={24} lg={4} xl={4}>
               <Button block size="small" type="link" onClick={() => openSessionInventoryDetails(record)}>
                 Details
               </Button>
             </Col>
-
-            <Col md={24} lg={24} xl={6}>
+            <Col md={24} lg={5} xl={6}>
               <Button
                 block
                 size="small"
@@ -331,80 +461,215 @@ const DashboardPage = ({ match, history }) => {
       },
     },
   ];
+
+  const courseTableColumns = [
+    {
+      title: '',
+      dataIndex: ['course', 'course_image_url'],
+      align: 'center',
+      width: '180px',
+      render: (text, record) => (
+        <Image
+          src={text || 'error'}
+          alt={record.course?.name}
+          fallback={DefaultImage()}
+          className={styles.thumbnailImage}
+        />
+      ),
+    },
+    {
+      title: 'Course Name',
+      dataIndex: ['course', 'name'],
+    },
+    {
+      title: 'Course Content',
+      width: '150px',
+      render: renderCourseContents,
+    },
+    {
+      title: 'Duration',
+      dataIndex: ['course', 'duration'],
+      width: '90px',
+      render: (text, record) => renderCourseDuration(record.course),
+    },
+    {
+      title: 'Price',
+      key: 'price',
+      dataIndex: 'price',
+      width: '100px',
+      render: (text, record) => (record.price > 0 ? `${record.currency?.toUpperCase()} ${record.price}` : 'Free'),
+    },
+    {
+      title: '',
+      align: 'right',
+      width: '100px',
+      render: (text, record) => (
+        <Row gutter={[8, 8]} justify="end">
+          <Col>
+            <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(record)}>
+              Details
+            </Button>
+          </Col>
+        </Row>
+      ),
+    },
+  ];
+
   //#endregion End of Table Columns
 
-  //#region Start of Render Methods
+  //#region Start of Mobile UI Handlers
 
-  const renderVideoItems = (video) => (
-    <Col
-      key={video.video_order_id}
-      xs={24}
-      lg={12}
-      className={styles.videoItem}
-      onClick={() =>
-        history.push(
-          Routes.attendeeDashboard.rootPath +
-            Routes.attendeeDashboard.videos +
-            `/${video.video_id}/${video.video_order_id}`
-        )
-      }
-    >
-      <Row gutter={[12, 12]}>
-        <Col xs={24} md={10} lg={14} xl={12}>
-          <Image className={styles.coverImage} src={video.thumbnail_url} preview={false} />
+  const renderMobileSessionItem = (item) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={9}>
+          <Text strong>{label}</Text>
         </Col>
-        <Col xs={24} md={14} lg={10} xl={12}>
-          <Row>
-            <Col xs={24}>
-              <Title level={5} className={styles.videoTitle}>
-                {video.title}
-              </Title>
-            </Col>
-            <Col xs={24}>
-              {video.price === 0 ? (
-                <Text type="secondary">Free video</Text>
-              ) : (
-                <Text type="secondary">
-                  {video.currency.toUpperCase()} {video.price}
-                </Text>
-              )}
-            </Col>
-            <Col xs={24}>
-              <Text type="secondary" className={styles.expiryText}>
-                Available from :
+        <Col span={15}>: {value}</Col>
+      </Row>
+    );
+
+    return (
+      <Col xs={24}>
+        <Card
+          key={item.inventory_id}
+          title={
+            <div onClick={() => openSessionInventoryDetails(item)}>
+              <Text>{item.name}</Text>
+              {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            </div>
+          }
+          actions={[
+            item.is_offline ? (
+              <Popover
+                arrowPointAtCenter
+                placement="topRight"
+                trigger="click"
+                title="Event Address"
+                content={item.offline_event_address}
+              >
+                <Button block size="small" type="text" className={styles.success}>
+                  In person
+                </Button>
+              </Popover>
+            ) : (
+              <Button
+                type="text"
+                disabled={!item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))}
+                onClick={() => window.open(item.join_url)}
+                className={
+                  !item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))
+                    ? styles.disabledSuccess
+                    : styles.success
+                }
+              >
+                Join
+              </Button>
+            ),
+            renderRefundPopup(item),
+            <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
+              Reschedule
+            </Button>,
+          ]}
+        >
+          <div onClick={() => openSessionInventoryDetails(item)}>
+            {layout('Type', <Text>{item?.max_participants > 1 ? 'Group' : '1-on-1'}</Text>)}
+            {layout('Day', <Text>{item?.start_time ? toLongDateWithDay(item?.start_time) : '-'}</Text>)}
+            {layout(
+              'Duration',
+              <Text>{item?.start_time && item?.end_time ? getDuration(item?.start_time, item?.end_time) : '-'}</Text>
+            )}
+            {layout(
+              'Time',
+              <Text>
+                {item?.start_time && item?.end_time
+                  ? `${toLocaleTime(item?.start_time)} - ${toLocaleTime(item?.end_time)}`
+                  : '-'}
               </Text>
-            </Col>
-            <Col xs={24}>
-              <Text type="secondary" className={styles.expiryText}>
-                {toLongDateWithDayTime(video.beginning)} - {toLongDateWithDayTime(video.expiry)}
-              </Text>
-            </Col>
-          </Row>
+            )}
+          </div>
+          <div className={styles.mt20}>
+            <AddToCalendarButton
+              type="button"
+              buttonText="Add to My Calendar"
+              eventData={{
+                ...item,
+                page_url: `${generateUrlFromUsername(item?.username)}/e/${item.inventory_id}`,
+              }}
+            />
+          </div>
+        </Card>
+      </Col>
+    );
+  };
+
+  const renderMobileCourseItem = (item) => {
+    const layout = (label, value) => (
+      <Row>
+        <Col span={7}>
+          <Text strong>{label}</Text>
+        </Col>
+        <Col span={17} className={styles.mobileDetailsText}>
+          : {value}
         </Col>
       </Row>
-    </Col>
-  );
+    );
 
-  //#endregion End of Render Methods
-
-  //#region Start of Mobile UI Handlers
+    return (
+      <Col xs={24}>
+        <Card
+          key={item.course_order_id}
+          bodyStyle={{ padding: '10px' }}
+          title={
+            <div onClick={() => redirectToCourseOrderDetails(item)}>
+              <Text>{item?.course?.name}</Text>
+            </div>
+          }
+          actions={[
+            <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(item)}>
+              Details
+            </Button>,
+          ]}
+        >
+          <div onClick={() => redirectToCourseOrderDetails(item)}>
+            {layout('Contents', renderCourseContents(item))}
+            {layout('Duration', <Text>{renderCourseDuration(item.course)}</Text>)}
+            {layout(
+              'Price',
+              <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>
+            )}
+          </div>
+        </Card>
+      </Col>
+    );
+  };
 
   //#endregion End of Mobile UI Handlers
 
   return (
     <div className={styles.dashboardContainer}>
-      <Row gutter={[12, 12]} justify="center" align="middle">
+      <Row gutter={[12, 32]} justify="center" align="middle">
         {/* Sessions Section */}
         <Col xs={24}>
           <Space direction="vertical" align="middle" className={styles.w100}>
             <Title level={4}> Your Purchased Sessions </Title>
             <div className={styles.sessionsContainer}>
-              <Table
-                columns={sessionTableColumns}
-                data={upcomingSessions}
-                loading={isSessionLoading}
-                rowKey={(record) => record.inventory_external_id}
-              />
+              {isMobileDevice ? (
+                <Spin spinning={isSessionLoading}>
+                  {upcomingSessions.length > 0 ? (
+                    <Row gutter={[10, 10]}>{upcomingSessions.map(renderMobileSessionItem)}</Row>
+                  ) : (
+                    <Empty description="No upcoming purchased sessions" />
+                  )}
+                </Spin>
+              ) : (
+                <Table
+                  columns={sessionTableColumns}
+                  data={upcomingSessions}
+                  loading={isSessionLoading}
+                  rowKey={(record) => record.inventory_external_id}
+                />
+              )}
             </div>
             <div className={styles.moreButtonContainer}>
               <Button type="primary" onClick={redirectToSessionsPage}>
@@ -440,7 +705,34 @@ const DashboardPage = ({ match, history }) => {
           </Space>
         </Col>
         {/* Courses Section */}
-        <Col xs={24}></Col>
+        <Col xs={24}>
+          <Space direction="vertical" className={styles.w100}>
+            <Title level={4}> Your Purchased Courses </Title>
+            <div className={styles.coursesContainer}>
+              {isMobileDevice ? (
+                <Spin spinning={isCourseLoading}>
+                  {courses.length > 0 ? (
+                    <Row gutter={[8, 8]}>{courses.map(renderMobileCourseItem)}</Row>
+                  ) : (
+                    <Empty description="No active course orders" />
+                  )}
+                </Spin>
+              ) : (
+                <Table
+                  columns={courseTableColumns}
+                  data={courses}
+                  loading={isCourseLoading}
+                  rowKey={(record) => record.course_order_id}
+                />
+              )}
+            </div>
+            <div className={styles.moreButtonContainer}>
+              <Button type="primary" onClick={redirectToCoursesPage}>
+                See More Courses Purchased By You
+              </Button>
+            </div>
+          </Space>
+        </Col>
       </Row>
     </div>
   );

@@ -479,14 +479,34 @@ const SessionsInventories = ({ match }) => {
                 </Button>,
               ]
             : [
-                <Button
-                  type="text"
-                  disabled={!item.join_url}
-                  onClick={() => trackAndJoinSession(item)}
-                  className={styles.success}
-                >
-                  Join
-                </Button>,
+                item.is_offline ? (
+                  <Popover
+                    arrowPointAtCenter
+                    placement="topRight"
+                    trigger="click"
+                    title="Event Address"
+                    content={item.offline_event_address}
+                  >
+                    <Button block size="small" type="text" className={styles.success}>
+                      In person
+                    </Button>
+                  </Popover>
+                ) : (
+                  <Button
+                    type="text"
+                    size="small"
+                    block
+                    className={
+                      !item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))
+                        ? styles.disabledSuccess
+                        : styles.success
+                    }
+                    disabled={!item.join_url || isBeforeDate(moment(item.start_time).subtract(15, 'minutes'))}
+                    onClick={() => trackAndJoinSession(item)}
+                  >
+                    Join
+                  </Button>
+                ),
                 renderRefundPopup(item),
                 <Button className={styles.warning} type="text" onClick={() => rescheduleSession(item)}>
                   Reschedule
