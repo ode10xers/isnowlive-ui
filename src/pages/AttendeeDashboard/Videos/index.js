@@ -8,7 +8,7 @@ import Loader from 'components/Loader';
 import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { isUnapprovedUserError } from 'utils/helper';
+import { isUnapprovedUserError, isAPISuccess } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
@@ -28,9 +28,9 @@ const Videos = () => {
   const getVideosForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await apis.videos.getAttendeeVideos();
+      const { status, data } = await apis.videos.getAttendeeVideos();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setActiveVideos(data.active);
         setExpiredVideos(data.expired);
       }

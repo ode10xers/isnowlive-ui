@@ -1,0 +1,71 @@
+@import '../../../styles/variables.scss';
+
+.moreButtonContainer {
+  text-align: center;
+}
+
+.dashboardContainer {
+  padding: 10px;
+
+  .sectionDivider {
+    border-top: 1px solid map-get($map: $colors, $key: 'Silver');
+  }
+}
+
+.sessionsContainer {
+  width: 100%;
+
+  .disabledSuccess {
+    color: map-get($colors, $key: 'KellyGreenPale') !important;
+  }
+  .success {
+    color: map-get($colors, $key: 'KellyGreen') !important;
+  }
+  .warning {
+    color: map-get($colors, $key: 'Pumpkin') !important;
+  }  
+}
+
+.videosContainer {
+  width: 100%;
+
+  .videoTitle {
+    min-height: 48px;
+  }
+  
+  .coverImage {
+    object-fit: cover;
+    border-radius: 8px;
+    height: 140px !important;
+  
+    @media screen and (max-width: 993px) {
+      height: 140px !important;
+    }
+  
+    @media screen and (max-width: 768px) {
+      height: 200px !important;
+    }
+  
+    @media screen and (max-width: 569px) {
+      height: 150px !important;
+    }
+  }
+  
+  .videoItem {
+    cursor: pointer;
+  }
+  
+  .expiryText {
+    font-size: 12px;
+  }
+  
+}
+
+.coursesContainer {
+  width: 100%;
+
+  .thumbnailImage {
+    width: 100%;
+    object-fit: scale-down;
+  }
+}

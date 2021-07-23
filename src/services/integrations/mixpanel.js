@@ -98,6 +98,7 @@ export const mixPanelEventTags = {
   attendee: {
     click: {
       dashboard: {
+        dashboardNav: '(Attendee) Dashboard Nav Clicked',
         upcomingSession: '(Attendee) Upcoming Sessions Clicked',
         pastSessions: '(Attendee) Past Sessions Clicked',
         passesNav: '(Attendee) Passes Nav Clicked',

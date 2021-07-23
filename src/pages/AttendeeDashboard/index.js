@@ -10,10 +10,12 @@ import CourseList from 'pages/AttendeeDashboard/CourseList';
 import Subscriptions from 'pages/AttendeeDashboard/Subscriptions';
 import Referrals from 'pages/AttendeeDashboard/Referrals';
 import CourseOrderDetails from 'pages/AttendeeDashboard/CourseOrderDetails';
+import DashboardPage from 'pages/AttendeeDashboard/DashboardPage';
 
 const AttendeeDashboard = ({ match }) => {
   return (
     <Switch>
+      <Route exact path={match.url + Routes.attendeeDashboard.dashboardPage} component={DashboardPage} />
       <Route exact path={match.url + Routes.attendeeDashboard.sessions} component={SessionsInventories} />
       <Route exact path={match.url + Routes.attendeeDashboard.passes} component={ClassPassList} />
       <Route exact path={match.url + Routes.attendeeDashboard.videoDetails} component={VideoDetails} />
