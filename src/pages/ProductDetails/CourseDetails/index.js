@@ -460,7 +460,7 @@ const CourseDetails = ({ match }) => {
   return (
     <div className={styles.newCourseDetails}>
       <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
-      <Loader loading={isLoading} text="Processing payment" size="large">
+      <Loader loading={isLoading} size="large">
         <Row gutter={[8, 50]}>
           <Col xs={24}>
             <Row>
@@ -485,9 +485,18 @@ const CourseDetails = ({ match }) => {
                         type="primary"
                         className={styles.courseBuyBtn}
                         onClick={handleCourseBuyClicked}
+                        disabled={!course || !course.current_capacity}
                       >
-                        {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
-                        {course?.total_price > 0 ? `${course?.currency?.toUpperCase()} ${course?.total_price}` : 'Free'}
+                        {course?.current_capacity <= 0 ? (
+                          `Course has reached max capacity`
+                        ) : (
+                          <>
+                            {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
+                            {course?.total_price > 0
+                              ? `${course?.currency?.toUpperCase()} ${course?.total_price}`
+                              : 'Free'}
+                          </>
+                        )}
                       </Button>
                     </Space>
                   </div>
