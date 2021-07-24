@@ -32,6 +32,7 @@ const Videos = () => {
       }
     };
     getVideosDetails();
+    document.body.style.backgroundColor = 'transparent';
   }, []);
 
   const renderVideoCards = (video) => (
