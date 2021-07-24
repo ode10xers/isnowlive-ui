@@ -53,7 +53,7 @@ const Plugins = () => {
       iframeOnloadHandler = `onload="(function(){document.getElementById('${widgetId}').contentWindow.postMessage({ command : 'add-custom-styling', data : '${widgetStyling}' }, '*')})() "`;
     }
 
-    return `<iframe ${iframeOnloadHandler}id="${widgetId}" title="Passion.do Plugin Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; payment;" allowpaymentrequest="true" allowfullscreen="true" style="border-width: 0;"> </iframe>`;
+    return `<iframe ${iframeOnloadHandler}id="${widgetId}" title="Passion.do Plugin Container" src="${widgetLink}" width="100%" height="700px" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; payment;" allowpaymentrequest="true" allowfullscreen="true" allowtransparency="true" style="border-width: 0;"> </iframe>`;
   }, [widgetLink, selectedWidget, widgetStyling]);
 
   useEffect(() => {
