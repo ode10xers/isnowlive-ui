@@ -485,7 +485,7 @@ const CourseDetails = ({ match }) => {
                         type="primary"
                         className={styles.courseBuyBtn}
                         onClick={handleCourseBuyClicked}
-                        disabled={!course || !course.current_capacity || !course.modules}
+                        disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
                       >
                         {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
                           `Course has reached max capacity`

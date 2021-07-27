@@ -40,7 +40,7 @@ import VideoContentPopup from '../VideoContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { isAPISuccess, deepCloneObject, videoSourceType } from 'utils/helper';
+import { isAPISuccess, deepCloneObject, videoSourceType, preventDefaults } from 'utils/helper';
 
 import { courseCreatePageLayout } from 'layouts/FormLayouts';
 
@@ -888,6 +888,7 @@ const CourseModulesForm = ({ match, history }) => {
                                           placeholder="Module name"
                                           maxLength={50}
                                           className={styles.panelHeaderFormInput}
+                                          onClick={preventDefaults}
                                         />
                                       </Form.Item>
                                     }
