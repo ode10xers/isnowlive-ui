@@ -75,10 +75,10 @@ const CourseDetails = ({ match }) => {
     }
   }, []);
 
-  const fetchCourseContentDetails = useCallback(async (courseData) => {
+  const fetchCourseContentDetails = useCallback(async (courseData = {}) => {
     let tempCourseData = deepCloneObject(courseData);
 
-    if (courseData.modules?.length > 0) {
+    if (courseData.modules && courseData.modules?.length > 0) {
       try {
         tempCourseData.modules = await Promise.all(
           courseData.modules.map(async (courseModule) => {
@@ -142,7 +142,7 @@ const CourseDetails = ({ match }) => {
         const { status, data } = await apis.courses.getDetails(courseId);
 
         if (isAPISuccess(status) && data) {
-          setExpandedCourseModules(data.modules.map((courseModule) => courseModule.name));
+          setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);
           if (data.creator_username) {
             getCreatorProfileDetails(data.creator_username);
           }
