@@ -263,9 +263,6 @@ const CourseForm = ({ match, history }) => {
           type: 'VIDEO',
           max_participants: 20,
           validity: 1,
-          // TODO: Remove this once BE has this fixed
-          start_date: moment().startOf('day').utc().format(),
-          end_date: moment().endOf('day').add(10, 'day').utc().format(),
         };
 
     const payload = {
