@@ -40,7 +40,7 @@ import VideoContentPopup from '../VideoContentPopup';
 
 import dateUtil from 'utils/date';
 import validationRules from 'utils/validation';
-import { isAPISuccess, deepCloneObject, videoSourceType } from 'utils/helper';
+import { isAPISuccess, deepCloneObject, videoSourceType, preventDefaults } from 'utils/helper';
 
 import { courseCreatePageLayout } from 'layouts/FormLayouts';
 
@@ -61,24 +61,24 @@ const courseCurriculumTypes = {
   },
 };
 
-const formInitialValues = {
-  modules: [
+const defaultModuleValue = {
+  name: 'Enter your course module name example - Introduction to Hatha Yoga',
+  module_content: [
     {
-      name: 'Module 1',
-      module_content: [
-        {
-          name: 'Content 1',
-          product_type: '',
-          product_id: '',
-        },
-      ],
+      name: 'Select your first live session or video by clicking on the buttons on the right',
+      product_type: '',
+      product_id: '',
     },
   ],
-  curriculumType: courseCurriculumTypes.MIXED.name,
+};
+
+const formInitialValues = {
+  modules: [defaultModuleValue],
+  curriculumType: courseCurriculumTypes.VIDEO.name,
   maxParticipants: 1,
   validity: 1,
-  courseStartDate: moment().startOf('day'),
-  courseEndDate: moment().startOf('day').add(10, 'day'),
+  courseStartDate: null,
+  courseEndDate: null,
 };
 
 const { Panel } = Collapse;
@@ -118,7 +118,7 @@ const CourseContentDetails = ({ productId, productType }) => {
       }
     } catch (error) {
       setProductData(null);
-      console.error(`Failed fetching inventory details for ${videoId}`);
+      console.error(`Failed fetching video details for ${videoId}`);
       console.error(error);
     }
 
@@ -168,13 +168,15 @@ const CourseContentDetails = ({ productId, productType }) => {
 
   return (
     <Spin spinning={isLoading}>
-      {productData && productType
-        ? productType === 'SESSION'
-          ? renderSessionDetails(productData)
-          : productType === 'VIDEO'
-          ? renderVideoDetails(productData)
-          : null
-        : null}
+      {productData && productType ? (
+        productType === 'SESSION' ? (
+          renderSessionDetails(productData)
+        ) : productType === 'VIDEO' ? (
+          renderVideoDetails(productData)
+        ) : null
+      ) : (
+        <Text type="danger"> Invalid product! </Text>
+      )}
     </Spin>
   );
 };
@@ -214,6 +216,33 @@ const CourseModulesForm = ({ match, history }) => {
 
   //#region Start of API Calls
 
+  // TODO : Very inefficient, should find a better way later
+  const fetchContentDetails = useCallback(async (productId, productType) => {
+    let productCallSuccessful = false;
+    let targetAPI = null;
+
+    if (productType.toUpperCase() === 'SESSION') {
+      targetAPI = apis.session.getInventoryDetailsByExternalId;
+    } else if (productType.toUpperCase() === 'VIDEO') {
+      targetAPI = apis.videos.getVideoById;
+    }
+
+    if (targetAPI) {
+      try {
+        const { status } = await targetAPI(productId);
+
+        if (isAPISuccess(status)) {
+          productCallSuccessful = true;
+        }
+      } catch (error) {
+        console.error(`Failed fetching product details for ${productType} with id ${productId}`);
+        console.error(error);
+      }
+    }
+
+    return productCallSuccessful;
+  }, []);
+
   const fetchCourseDetails = useCallback(
     async (courseExternalId) => {
       setIsLoading(true);
@@ -225,16 +254,16 @@ const CourseModulesForm = ({ match, history }) => {
           setCourseDetails(data);
 
           form.setFieldsValue({
-            modules: data?.modules ?? [],
+            modules: data?.modules ?? [defaultModuleValue],
             curriculumType: data?.type || courseCurriculumTypes.MIXED.name,
-            courseStartDate: data?.start_date ? moment(data?.start_date) : moment().startOf('day'),
-            courseEndDate: data?.end_date ? moment(data?.end_date) : moment().startOf('day').add(1, 'day'),
-            maxParticipants: data?.max_participants ?? 1,
+            courseStartDate: data?.start_date ? moment(data?.start_date) : null,
+            courseEndDate: data?.end_date ? moment(data?.end_date) : null,
+            maxParticipants: data?.max_participants || 1,
             validity: data?.validity ?? 1,
           });
           setCourseCurriculumType(data?.type || courseCurriculumTypes.MIXED.name);
-          setCourseStartDate(data?.start_date ? moment(data?.start_date) : moment().startOf('day'));
-          setCourseEndDate(data?.end_date ? moment(data?.end_date) : moment().startOf('day').add(1, 'day'));
+          setCourseStartDate(data?.start_date ? moment(data?.start_date) : null);
+          setCourseEndDate(data?.end_date ? moment(data?.end_date) : null);
           setExpandedModulesKeys(data?.modules?.length > 0 ? [0] : []);
         } else {
           form.resetFields();
@@ -324,22 +353,36 @@ const CourseModulesForm = ({ match, history }) => {
   ];
 
   const isVideoContentModified = (newModules) => {
-    const prevVideoContents = getVideoContentIDsFromModules(courseDetails?.modules).sort();
+    if (!courseDetails?.modules) {
+      return false;
+    }
+
+    const prevVideoContents = getVideoContentIDsFromModules(courseDetails?.modules ?? []).sort();
     const newVideoContents = getVideoContentIDsFromModules(newModules).sort();
 
     return JSON.stringify(prevVideoContents) !== JSON.stringify(newVideoContents);
   };
 
+  const showIssueDetectedModal = () =>
+    showErrorModal(
+      'Issue detected',
+      <>
+        <Paragraph>You have some empty curriculum item ( outlines ).</Paragraph>
+        <Paragraph>Please either add content in them or remove them to update this course</Paragraph>
+      </>
+    );
+
   const isCourseContentMatchesCourseType = () => {
     const formValues = form.getFieldsValue();
-    const moduleContents = formValues.modules.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []);
+    const moduleContents =
+      formValues.modules?.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []) ?? [];
 
     // NOTE : Special check, if all contents are empty then it's an outline
     // In this case, allow them to pass through without any checks
     if (moduleContents.every((content) => !content.product_type)) {
       return true;
     } else if (moduleContents.some((content) => !content.product_type)) {
-      showErrorModal('You have some empty contents! Please review the curriculum');
+      showIssueDetectedModal();
       return false;
     }
 
@@ -365,6 +408,20 @@ const CourseModulesForm = ({ match, history }) => {
     }
 
     return true;
+  };
+
+  const invalidProductDetected = async () => {
+    const formValues = form.getFieldsValue();
+    const moduleContents =
+      formValues.modules?.reduce((acc, val) => (acc = [...acc, ...(val.module_content ?? [])]), []) ?? [];
+
+    const validModuleContents = await Promise.all(
+      moduleContents
+        .filter((content) => content.product_id && content.product_type)
+        .map(async (content) => await fetchContentDetails(content.product_id, content.product_type))
+    );
+
+    return validModuleContents.some((isValid) => !isValid);
   };
 
   const handleFinishFailed = ({ errorFields }) => {
@@ -439,10 +496,17 @@ const CourseModulesForm = ({ match, history }) => {
       return;
     }
 
+    const isAnyInvalidProducts = await invalidProductDetected();
+
+    if (isAnyInvalidProducts) {
+      showIssueDetectedModal();
+      return;
+    }
+
     const modifiedFields = {
       modules: values.modules,
       type: courseCurriculumType ?? values.curriculumType ?? courseCurriculumTypes.MIXED.name,
-      max_participants: values.maxParticipants ?? 1,
+      max_participants: values.maxParticipants || 1,
       start_date: moment(courseStartDate).startOf('day').utc().format(),
       end_date: moment(courseEndDate).endOf('day').utc().format(),
       validity: values.validity ?? 1,
@@ -665,7 +729,13 @@ const CourseModulesForm = ({ match, history }) => {
               <Col xs={24}>
                 <PageHeader
                   title="Manage Course Curriculum"
-                  onBack={() => history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses)}
+                  onBack={() =>
+                    history.push(
+                      Routes.creatorDashboard.rootPath +
+                        Routes.creatorDashboard.courses +
+                        (courseId ? `/${courseId}/edit` : '')
+                    )
+                  }
                 />
               </Col>
               {/* Course Module Informations */}
@@ -818,6 +888,7 @@ const CourseModulesForm = ({ match, history }) => {
                                           placeholder="Module name"
                                           maxLength={50}
                                           className={styles.panelHeaderFormInput}
+                                          onClick={preventDefaults}
                                         />
                                       </Form.Item>
                                     }

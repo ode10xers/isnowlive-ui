@@ -551,7 +551,7 @@ const Courses = ({ history }) => {
         </Col>
         <Col xs={24}>
           <Loader loading={isLoading} size="large" text="Fetching Courses">
-            <Collapse defaultActiveKey="published">
+            <Collapse defaultActiveKey={['published', 'unpublished']}>
               <Panel header={<Title level={5}> Published </Title>} key="published">
                 {isMobileDevice ? (
                   <Row gutter={[8, 16]}>
