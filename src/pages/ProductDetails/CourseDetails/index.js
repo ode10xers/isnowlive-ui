@@ -75,10 +75,10 @@ const CourseDetails = ({ match }) => {
     }
   }, []);
 
-  const fetchCourseContentDetails = useCallback(async (courseData) => {
+  const fetchCourseContentDetails = useCallback(async (courseData = {}) => {
     let tempCourseData = deepCloneObject(courseData);
 
-    if (courseData.modules?.length > 0) {
+    if (courseData.modules && courseData.modules?.length > 0) {
       try {
         tempCourseData.modules = await Promise.all(
           courseData.modules.map(async (courseModule) => {
@@ -142,7 +142,7 @@ const CourseDetails = ({ match }) => {
         const { status, data } = await apis.courses.getDetails(courseId);
 
         if (isAPISuccess(status) && data) {
-          setExpandedCourseModules(data.modules.map((courseModule) => courseModule.name));
+          setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);
           if (data.creator_username) {
             getCreatorProfileDetails(data.creator_username);
           }
@@ -485,10 +485,14 @@ const CourseDetails = ({ match }) => {
                         type="primary"
                         className={styles.courseBuyBtn}
                         onClick={handleCourseBuyClicked}
-                        disabled={!course || !course.current_capacity}
+                        disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
                       >
-                        {course?.current_capacity <= 0 ? (
+                        {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
                           `Course has reached max capacity`
+                        ) : !course?.modules ? (
+                          // NOTE : Empty here means that there is no modules at all
+                          // There can be a case where the modules are all outlines
+                          `Cannot purchase an empty course`
                         ) : (
                           <>
                             {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}

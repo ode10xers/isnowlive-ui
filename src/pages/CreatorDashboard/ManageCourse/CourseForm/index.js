@@ -250,35 +250,18 @@ const CourseForm = ({ match, history }) => {
   const handleFinish = async (values, shouldRedirect = true) => {
     setSubmitting(true);
 
-    // NOTE : The values below are hard coded for now because they should be changed in the next page
-    const dummyModuleData = [
-      {
-        name: 'Enter your course module name example - Introduction to Hatha Yoga',
-        module_content: [
-          {
-            name: 'Select your first live session or video by clicking on the buttons on the right',
-            product_type: '',
-            product_id: '',
-          },
-        ],
-      },
-    ];
-
     const modulesData = courseDetails
       ? {
-          modules: courseDetails?.modules ?? dummyModuleData,
-          type: courseDetails?.type ?? 'MIXED',
-          max_participants: courseDetails?.max_participants ?? 0,
+          // modules: courseDetails?.modules ?? dummyModuleData,
+          type: courseDetails?.type ?? 'VIDEO',
+          max_participants: courseDetails?.max_participants || 1,
           start_date: courseDetails?.start_date ?? moment().startOf('day').utc().format(),
           end_date: courseDetails?.end_date ?? moment().endOf('day').add(10, 'day').utc().format(),
           validity: courseDetails?.validity ?? 1,
         }
       : {
-          modules: dummyModuleData,
-          type: 'MIXED',
+          type: 'VIDEO',
           max_participants: 20,
-          start_date: moment().startOf('day').utc().format(),
-          end_date: moment().startOf('day').add(10, 'day').utc().format(),
           validity: 1,
         };
 
