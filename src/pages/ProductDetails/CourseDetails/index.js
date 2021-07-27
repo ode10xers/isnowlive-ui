@@ -485,10 +485,14 @@ const CourseDetails = ({ match }) => {
                         type="primary"
                         className={styles.courseBuyBtn}
                         onClick={handleCourseBuyClicked}
-                        disabled={!course || !course.current_capacity}
+                        disabled={!course || !course.current_capacity || !course.modules}
                       >
                         {course?.current_capacity <= 0 ? (
                           `Course has reached max capacity`
+                        ) : !course?.modules ? (
+                          // NOTE : Empty here means that there is no modules at all
+                          // There can be a case where the modules are all outlines
+                          `Cannot purchase an empty course`
                         ) : (
                           <>
                             {course?.total_price > 0 ? 'Buy' : 'Get'} course for{' '}
