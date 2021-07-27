@@ -487,7 +487,7 @@ const CourseDetails = ({ match }) => {
                         onClick={handleCourseBuyClicked}
                         disabled={!course || !course.current_capacity || !course.modules}
                       >
-                        {course?.current_capacity <= 0 ? (
+                        {course?.type !== 'VIDEO' && course?.current_capacity <= 0 ? (
                           `Course has reached max capacity`
                         ) : !course?.modules ? (
                           // NOTE : Empty here means that there is no modules at all
