@@ -106,6 +106,16 @@ const componentsMap = {
   },
 };
 
+// TODO: Remove this once integrated with API
+const sampleColorData = {
+  '--passion-profile-background-color': '#EEE8EC',
+  // '--passion-profile-background-color' : '#EED3DE',
+  '--passion-profile-card-color': '#EED3DE',
+  '--passion-profile-cta-main-color': '#C77F9D',
+  '--passion-profile-cta-text-color': '#FCEEF4',
+  '--passion-profile-heading-color': '#A56982',
+};
+
 const DynamicProfile = ({ creatorUsername = null }) => {
   const history = useHistory();
 
@@ -117,6 +127,8 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [creatorUIConfig, setCreatorUIConfig] = useState([]);
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState([]);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
+
+  const [creatorColorData, setCreatorColorData] = useState(sampleColorData);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     if (!username) {
@@ -150,6 +162,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   useEffect(() => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
   }, [creatorProfileData]);
+
+  useEffect(() => {
+    if (creatorColorData) {
+      Object.entries(creatorColorData).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+  }, [creatorColorData]);
 
   //#endregion End of Use Effects
 
@@ -430,6 +450,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
     const RenderedComponent = componentsMap[component.key].component;
 
+    // NOTE : We are passing the color here to use in Two Tone Icons
     return (
       <Draggable
         isDragDisabled={!editingMode || previewMode}
@@ -447,6 +468,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               dragHandleProps={provided.dragHandleProps}
               title={component.title}
               values={component.values}
+              headerColor={creatorColorData['--passion-profile-heading-color'] ?? null}
             />
           </Col>
         )}

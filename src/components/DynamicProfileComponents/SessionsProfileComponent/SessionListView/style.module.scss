@@ -1,18 +1,12 @@
 @import '../../../../styles/variables.scss';
 
-.moreButton {
-  height: 100% !important;
-  min-width: 144px;
-  font-size: 16px !important;
-}
-
 .sessionDateSeparator {
-  color: var(--session-list-date-font-color) !important;
+  color: var(--passion-profile-card-color, --session-list-date-font-color, #{map-get($map: $colors, $key: 'SunsetOrange')}) !important;
   font-size: 16px !important;
 }
 
 .sessionDatePickerContainer {
-  background-color: var(--session-list-bar-color);
+  background-color: var(--passion-profile-background-color, --session-list-bar-color, #{map-get($map: $colors, $key: 'ColumbiaBlue')});
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
   padding: 16px 12px;
@@ -29,7 +23,7 @@
       cursor: pointer !important;
       text-align: center;
       font-size: 18px !important;
-      color: map-get($map: $colors, $key: 'Smalt') !important;
+      color: var(--passion-profile-heading-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
     }
   }
 }

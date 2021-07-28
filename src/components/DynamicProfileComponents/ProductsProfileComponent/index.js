@@ -199,7 +199,9 @@ const ProductsProfileComponent = ({
       productName="sessions"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions}
       title={getComponentTitle('SESSIONS')}
-      icon={<VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
+      icon={
+        <VideoCameraTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />
+      }
     >
       <SessionListView sessions={sessions} />
     </ProductCardTemplate>
@@ -211,7 +213,7 @@ const ProductsProfileComponent = ({
       productName="videos"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos}
       title={getComponentTitle('VIDEOS')}
-      icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
+      icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
     >
       <VideoListView videos={videos} />
     </ProductCardTemplate>
@@ -223,7 +225,7 @@ const ProductsProfileComponent = ({
       productName="courses"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses}
       title={getComponentTitle('COURSES')}
-      icon={<BookTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
+      icon={<BookTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
     >
       <CoursesListView courses={courses} />
     </ProductCardTemplate>

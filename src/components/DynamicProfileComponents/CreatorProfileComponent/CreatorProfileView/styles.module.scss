@@ -13,7 +13,8 @@
   }
 
   .creatorDetailsWrapper {
-    background: linear-gradient(204.83deg, #ffffff 0.14%, #fdfeff 57.56%, #e5f2ff 102.54%);
+    margin-top: -6px;
+    background: linear-gradient(204.83deg, #ffffff 0.14%, var(--passion-profile-card-color, #b3d9ff) 122.54%);
 
     .profileImageWrapper {
       $profile-image-size: 100px;

@@ -60,7 +60,7 @@ const PassesProfileComponent = ({
       <Col xs={isEditing ? 22 : 24}>
         <ContainerCard
           title={customComponentProps?.title ?? 'CREDIT PASSES'}
-          icon={<LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
+          icon={<LikeTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
         >
           {isEditing ? (
             <Row gutter={[8, 8]} justify="center" align="center">
