@@ -172,8 +172,8 @@ $spacing: (
   height: 100% !important;
   min-width: 144px;
   font-size: 16px !important;
-  background-color: var(--passion-profile-primary-color, map-get($colors, 'DodgerBlue')) !important;
-  border-color: var(--passion-profile-primary-color, map-get($colors, 'DodgerBlue')) !important;
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   color: map-get($colors, 'White') !important;
   
   &.lightBg {

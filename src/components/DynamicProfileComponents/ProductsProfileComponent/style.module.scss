@@ -24,7 +24,7 @@
       padding: 12px;
       border-radius: 12px;
       text-align: center;
-      color: var(--passion-profile-primary-color, map-get($map: $colors, $key: 'DodgerBlue')) !important;
+      color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
       cursor: pointer;
 
       @media screen and (max-width: 425px) {
@@ -33,7 +33,7 @@
       }
 
       &.selectedMenu {
-        background-color: var(--passion-profile-primary-color, map-get($map: $colors, $key: 'DodgerBlue')) !important;
+        background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
         color: map-get($map: $colors, $key: 'White') !important;
         
         &.lightBg {

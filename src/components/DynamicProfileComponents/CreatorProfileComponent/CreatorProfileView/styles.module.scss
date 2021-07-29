@@ -34,7 +34,7 @@
       text-align: center;
       font-weight: 600;
       font-size: 24px;
-      color: var(--passion-profile-darker-color, map-get($colors, 'Smalt')) !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
 
     .creatorProfileDivider {
@@ -56,7 +56,7 @@
           // background-color: map-get($map: $colors, $key: 'White1') !important;
           text-align: center !important;
           background: transparent !important;
-          color: var(--passion-profile-darker-color, map-get($colors, 'Smalt')) !important;
+          color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
         }
       }
 
@@ -68,7 +68,7 @@
           // background-color: map-get($map: $colors, $key: 'White1') !important;
           text-align: center !important;
           background: transparent !important;
-          color: var(--passion-profile-darker-color, map-get($colors, 'Smalt')) !important;
+          color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
 
         }
 
@@ -78,7 +78,7 @@
 
       .readMoreBio {
         @extend .readMoreText;
-        color: var(--passion-profile-primary-color, map-get($colors, 'Smalt')) !important;
+        color: var(--passion-profile-primary-color, #{map-get($colors, 'Smalt')}) !important;
         margin: 8px 0;
         letter-spacing: 0.08em;
         cursor: pointer;
@@ -97,7 +97,7 @@
       .socialIcon {
         margin: 0 auto;
         font-size: 24px;
-        color: var(--passion-profile-primary-color, map-get($map: $colors, $key: 'DodgerBlue'));
+        color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
       }
     }
   }

@@ -483,7 +483,9 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
     const RenderedComponent = componentsMap[component.key].component;
 
-    // NOTE : We are passing the color here to use in Two Tone Icons
+    // NOTE : We are passing the color here to programatically add styling
+    // to more buttons and nav bars, so we know if we need a light text (for dark BG)
+    // or dark text (for light BG)
     return (
       <Draggable
         isDragDisabled={!editingMode || previewMode}
@@ -578,7 +580,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
                 </div>
               ))}
-              {/* Integrate API save here */}
               <Button
                 size="small"
                 shape="round"
