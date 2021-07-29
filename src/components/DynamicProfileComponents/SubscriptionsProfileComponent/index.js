@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { Typography, Spin, Row, Col, Button, Space } from 'antd';
-import { ScheduleTwoTone } from '@ant-design/icons';
+import { ScheduleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -59,9 +59,7 @@ const SubscriptionProfileComponent = ({
       <Col xs={isEditing ? 22 : 24}>
         <ContainerCard
           title={customComponentProps?.title ?? 'MEMBERSHIPS'}
-          icon={
-            <ScheduleTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />
-          }
+          icon={<ScheduleOutlined className={styles.mr10} />}
         >
           {isEditing ? (
             <Row gutter={[8, 8]} justify="center" align="center">

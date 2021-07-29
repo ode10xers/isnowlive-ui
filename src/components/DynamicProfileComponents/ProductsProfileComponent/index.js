@@ -4,9 +4,9 @@ import { Route, Switch, Redirect, useHistory, useRouteMatch } from 'react-router
 
 import { Spin, Typography, Row, Col, Button, Space } from 'antd';
 import {
-  VideoCameraTwoTone,
-  PlayCircleTwoTone,
-  BookTwoTone,
+  VideoCameraOutlined,
+  PlayCircleOutlined,
+  BookOutlined,
   VideoCameraFilled,
   PlayCircleFilled,
   BookFilled,
@@ -201,9 +201,7 @@ const ProductsProfileComponent = ({
       productName="sessions"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions}
       title={getComponentTitle('SESSIONS')}
-      icon={
-        <VideoCameraTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />
-      }
+      icon={<VideoCameraOutlined className={styles.mr10} />}
     >
       <SessionListView sessions={sessions} profileColor={customComponentProps?.headerColor ?? null} />
     </ProductCardTemplate>
@@ -215,7 +213,7 @@ const ProductsProfileComponent = ({
       productName="videos"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos}
       title={getComponentTitle('VIDEOS')}
-      icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
+      icon={<PlayCircleOutlined className={styles.mr10} />}
     >
       <VideoListView videos={videos} profileColor={customComponentProps?.headerColor ?? null} />
     </ProductCardTemplate>
@@ -227,7 +225,7 @@ const ProductsProfileComponent = ({
       productName="courses"
       route={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses}
       title={getComponentTitle('COURSES')}
-      icon={<BookTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
+      icon={<BookOutlined className={styles.mr10} />}
     >
       <CoursesListView courses={courses} profileColor={customComponentProps?.headerColor ?? null} />
     </ProductCardTemplate>
