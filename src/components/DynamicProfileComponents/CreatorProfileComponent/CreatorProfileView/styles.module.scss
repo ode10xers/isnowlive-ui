@@ -38,7 +38,7 @@
     }
 
     .creatorProfileDivider {
-      border-top: 1.5px solid map-get($map: $colors, $key: 'ColumbiaBlue');
+      border-top: 1.5px solid var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'ColumbiaBlue')});
       margin: 4px auto;
       width: 80px;
       min-width: 0 !important;
