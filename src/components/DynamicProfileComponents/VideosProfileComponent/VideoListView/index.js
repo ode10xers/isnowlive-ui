@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Button } from 'antd';
@@ -8,11 +9,17 @@ import Routes from 'routes';
 import VideoListCard from '../VideoListCard';
 
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isInCreatorDashboard,
+  preventDefaults,
+  isBrightColorShade,
+  convertHexToRGB,
+} from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const VideoListView = ({ limit = 2, videos = [] }) => {
+const VideoListView = ({ limit = 2, videos = [], profileColor }) => {
   const history = useHistory();
 
   const renderVideoCards = (video) => (
@@ -42,7 +49,18 @@ const VideoListView = ({ limit = 2, videos = [] }) => {
             <Col xs={24}>
               <Row justify="center">
                 <Col>
-                  <Button className={styles.moreButton} type="primary" onClick={handleMoreClicked}>
+                  <Button
+                    className={classNames(
+                      styles.moreButton,
+                      profileColor
+                        ? isBrightColorShade(convertHexToRGB(profileColor))
+                          ? styles.lightBg
+                          : undefined
+                        : undefined
+                    )}
+                    type="primary"
+                    onClick={handleMoreClicked}
+                  >
                     MORE
                   </Button>
                 </Col>

@@ -5,7 +5,8 @@ $navbar-height: 66px;
 
 .mainContainer {
   height: 100%;
-  background-color: map-get($colors, 'WhiteSmoke1') !important;
+  // background-color: map-get($colors, 'WhiteSmoke1') !important;
+  background-color: map-get($map: $colors, $key: 'White') !important;
 
   .mainContent {
     max-width: 767px;

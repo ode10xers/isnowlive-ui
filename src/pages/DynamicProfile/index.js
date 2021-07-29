@@ -109,15 +109,6 @@ const componentsMap = {
   },
 };
 
-// TODO: Remove this once integrated with API
-// const sampleColorData = {
-//   '--passion-profile-background-color': '#EEE8EC',
-//   '--passion-profile-card-color': '#EED3DE',
-//   '--passion-profile-cta-main-color': '#C77F9D',
-//   '--passion-profile-cta-text-color': '#FCEEF4',
-//   '--passion-profile-heading-color': '#A56982',
-// };
-
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
 const DynamicProfile = ({ creatorUsername = null }) => {
@@ -145,6 +136,12 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
+
+        if (data.profile?.color) {
+          setCreatorColorChoice(data.profile?.color);
+        } else {
+          setCreatorColorChoice(null);
+        }
       }
     } catch (error) {
       message.error('Failed to load creator profile details');
@@ -178,6 +175,38 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   //#endregion End of Use Effects
 
   //#region Start Of Page Edit Button Handlers
+
+  const saveCreatorColorPalletteChoice = async (e) => {
+    preventDefaults(e);
+
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        cover_image_url: creatorProfileData?.cover_image_url,
+        profile_image_url: creatorProfileData?.profile_image_url,
+        first_name: creatorProfileData?.first_name,
+        last_name: creatorProfileData?.last_name,
+        username: creatorProfileData?.username,
+        profile: {
+          color: creatorColorChoice,
+        },
+      };
+
+      const { status } = await apis.user.updateProfile(payload);
+
+      if (isAPISuccess(status)) {
+        message.success('Creator profile color successfully updated');
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed updating Creator Profile UI Colors',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setIsLoading(false);
+  };
 
   const getExistingComponentInstance = (identifier) =>
     tempCreatorUIConfig.find((component) => component.key === identifier);
@@ -550,7 +579,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                 </div>
               ))}
               {/* Integrate API save here */}
-              <Button size="small" shape="round" icon={<CheckOutlined />} className={styles.confirmColorBtn} />
+              <Button
+                size="small"
+                shape="round"
+                icon={<CheckOutlined />}
+                className={styles.confirmColorBtn}
+                onClick={saveCreatorColorPalletteChoice}
+              />
             </Space>
           </Col>
         </Row>

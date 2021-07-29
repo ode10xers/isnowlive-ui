@@ -21,7 +21,7 @@ import CoursesListView from '../CoursesProfileComponent/CoursesListView';
 import ProductsEditView from './ProductsEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
 
-import { isAPISuccess, isInCreatorDashboard } from 'utils/helper';
+import { convertHexToRGB, isAPISuccess, isBrightColorShade, isInCreatorDashboard } from 'utils/helper';
 
 import styles from './style.module.scss';
 import ContainerCard from 'components/ContainerCard';
@@ -205,7 +205,7 @@ const ProductsProfileComponent = ({
         <VideoCameraTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />
       }
     >
-      <SessionListView sessions={sessions} />
+      <SessionListView sessions={sessions} profileColor={customComponentProps?.headerColor ?? null} />
     </ProductCardTemplate>
   );
 
@@ -217,7 +217,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('VIDEOS')}
       icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
     >
-      <VideoListView videos={videos} />
+      <VideoListView videos={videos} profileColor={customComponentProps?.headerColor ?? null} />
     </ProductCardTemplate>
   );
 
@@ -229,7 +229,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('COURSES')}
       icon={<BookTwoTone className={styles.mr10} twoToneColor={customComponentProps?.headerColor ?? '#0050B3'} />}
     >
-      <CoursesListView courses={courses} />
+      <CoursesListView courses={courses} profileColor={customComponentProps?.headerColor ?? null} />
     </ProductCardTemplate>
   );
 
@@ -243,7 +243,12 @@ const ProductsProfileComponent = ({
                 <div
                   className={classNames(
                     styles.menuItem,
-                    getSelectedKeysForMenu().includes('SESSIONS') ? styles.selectedMenu : undefined
+                    getSelectedKeysForMenu().includes('SESSIONS') ? styles.selectedMenu : undefined,
+                    customComponentProps?.headerColor
+                      ? isBrightColorShade(convertHexToRGB(customComponentProps?.headerColor))
+                        ? styles.lightBg
+                        : undefined
+                      : undefined
                   )}
                 >
                   <VideoCameraFilled className={styles.mr10} />
@@ -256,7 +261,12 @@ const ProductsProfileComponent = ({
                 <div
                   className={classNames(
                     styles.menuItem,
-                    getSelectedKeysForMenu().includes('VIDEOS') ? styles.selectedMenu : undefined
+                    getSelectedKeysForMenu().includes('VIDEOS') ? styles.selectedMenu : undefined,
+                    customComponentProps?.headerColor
+                      ? isBrightColorShade(convertHexToRGB(customComponentProps?.headerColor))
+                        ? styles.lightBg
+                        : undefined
+                      : undefined
                   )}
                 >
                   <PlayCircleFilled className={styles.mr10} />
@@ -269,7 +279,12 @@ const ProductsProfileComponent = ({
                 <div
                   className={classNames(
                     styles.menuItem,
-                    getSelectedKeysForMenu().includes('COURSES') ? styles.selectedMenu : undefined
+                    getSelectedKeysForMenu().includes('COURSES') ? styles.selectedMenu : undefined,
+                    customComponentProps?.headerColor
+                      ? isBrightColorShade(convertHexToRGB(customComponentProps?.headerColor))
+                        ? styles.lightBg
+                        : undefined
+                      : undefined
                   )}
                 >
                   <BookFilled className={styles.mr10} />

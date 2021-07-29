@@ -17,7 +17,7 @@ const ContainerCard = ({ title = '', icon = null, textColor = '#0050B3', backgro
   return (
     <Card
       className={styles.profileComponentContainer}
-      bodyStyle={{ padding: 12 }}
+      bodyStyle={{ padding: 12, backgroundColor: 'var(--passion-profile-lightest-color, white)' }}
       headStyle={generateCardHeadingStyle(textColor, backgroundColor)}
       title={
         <Text

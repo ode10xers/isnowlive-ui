@@ -175,4 +175,8 @@ $spacing: (
   background-color: var(--passion-profile-primary-color, map-get($colors, 'DodgerBlue')) !important;
   border-color: var(--passion-profile-primary-color, map-get($colors, 'DodgerBlue')) !important;
   color: map-get($colors, 'White') !important;
+  
+  &.lightBg {
+    color: map-get($colors, 'Zeus') !important;
+  }
 }

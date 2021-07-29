@@ -76,6 +76,7 @@ export const generateColorPalletteForProfile = (primaryColor) => {
 
   // NOTE: We're using HSL here for easier programmatic control
   return {
+    '--passion-profile-lightest-color': formatHSLStyleString(h, s, l + 44),
     '--passion-profile-lighter-color': formatHSLStyleString(h, s, l + 36),
     '--passion-profile-light-color': formatHSLStyleString(h, s, l + 32),
     '--passion-profile-primary-color': formatHSLStyleString(h, s, l),
