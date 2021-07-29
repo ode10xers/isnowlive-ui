@@ -193,6 +193,8 @@ const ProductsProfileComponent = ({
     return targetComponent?.title ?? '';
   };
 
+  console.log(customComponentProps?.headerColor);
+
   const sessionsComponent = (
     <ProductCardTemplate
       isEditing={isEditing}

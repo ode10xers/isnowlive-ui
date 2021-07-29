@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
@@ -11,6 +12,7 @@ import {
   PlusCircleOutlined,
   ArrowLeftOutlined,
   GlobalOutlined,
+  CheckOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -31,6 +33,7 @@ import {
   generateUrlFromUsername,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import { convertHSLToHex, generateColorPalletteForProfile } from 'utils/colors';
 
 import styles from './style.module.scss';
 
@@ -107,14 +110,15 @@ const componentsMap = {
 };
 
 // TODO: Remove this once integrated with API
-const sampleColorData = {
-  '--passion-profile-background-color': '#EEE8EC',
-  // '--passion-profile-background-color' : '#EED3DE',
-  '--passion-profile-card-color': '#EED3DE',
-  '--passion-profile-cta-main-color': '#C77F9D',
-  '--passion-profile-cta-text-color': '#FCEEF4',
-  '--passion-profile-heading-color': '#A56982',
-};
+// const sampleColorData = {
+//   '--passion-profile-background-color': '#EEE8EC',
+//   '--passion-profile-card-color': '#EED3DE',
+//   '--passion-profile-cta-main-color': '#C77F9D',
+//   '--passion-profile-cta-text-color': '#FCEEF4',
+//   '--passion-profile-heading-color': '#A56982',
+// };
+
+const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
 const DynamicProfile = ({ creatorUsername = null }) => {
   const history = useHistory();
@@ -128,7 +132,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState([]);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
-  const [creatorColorData, setCreatorColorData] = useState(sampleColorData);
+  const [creatorColorChoice, setCreatorColorChoice] = useState(null);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     if (!username) {
@@ -164,12 +168,12 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   }, [creatorProfileData]);
 
   useEffect(() => {
-    if (creatorColorData) {
-      Object.entries(creatorColorData).forEach(([key, val]) => {
+    if (creatorColorChoice) {
+      Object.entries(generateColorPalletteForProfile(creatorColorChoice)).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
       });
     }
-  }, [creatorColorData]);
+  }, [creatorColorChoice]);
 
   //#endregion End of Use Effects
 
@@ -468,7 +472,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               dragHandleProps={provided.dragHandleProps}
               title={component.title}
               values={component.values}
-              headerColor={creatorColorData['--passion-profile-heading-color'] ?? null}
+              headerColor={
+                creatorColorChoice
+                  ? convertHSLToHex(
+                      generateColorPalletteForProfile(creatorColorChoice)['--passion-profile-primary-color']
+                    )
+                  : null
+              }
             />
           </Col>
         )}
@@ -524,6 +534,23 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   </Button>
                 </>
               )}
+            </Space>
+          </Col>
+          <Col xs={24}>
+            <Space className={styles.colorChoicesContainer}>
+              {colorPalletteChoices.map((color) => (
+                <div
+                  className={classNames(
+                    styles.colorContainer,
+                    creatorColorChoice === color ? styles.selected : undefined
+                  )}
+                  onClick={() => setCreatorColorChoice(color)}
+                >
+                  <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
+                </div>
+              ))}
+              {/* Integrate API save here */}
+              <Button size="small" shape="round" icon={<CheckOutlined />} className={styles.confirmColorBtn} />
             </Space>
           </Col>
         </Row>

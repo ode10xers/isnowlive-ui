@@ -4,6 +4,7 @@
   box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.08), 0px 0px 16px 2px rgba(0, 0, 0, 0.05);
   border-radius: 12px;
   position: relative;
+  background: linear-gradient(204.83deg, hsl(0, 0%, 100%) 0.14%, var(--passion-profile-light-color, hsl(210, 100%, 85%)) 122.54%) !important;
 
   .coverImageWrapper {
     .coverImage {
@@ -14,7 +15,6 @@
 
   .creatorDetailsWrapper {
     margin-top: -6px;
-    background: linear-gradient(204.83deg, #ffffff 0.14%, var(--passion-profile-card-color, #b3d9ff) 122.54%);
 
     .profileImageWrapper {
       $profile-image-size: 100px;
@@ -34,7 +34,7 @@
       text-align: center;
       font-weight: 600;
       font-size: 24px;
-      color: map-get($colors, 'Smalt');
+      color: var(--passion-profile-darker-color, map-get($colors, 'Smalt')) !important;
     }
 
     .creatorProfileDivider {
@@ -56,7 +56,7 @@
           // background-color: map-get($map: $colors, $key: 'White1') !important;
           text-align: center !important;
           background: transparent !important;
-          color: map-get($colors, 'Smalt') !important;
+          color: var(--passion-profile-darker-color, map-get($colors, 'Smalt')) !important;
         }
       }
 
@@ -68,7 +68,8 @@
           // background-color: map-get($map: $colors, $key: 'White1') !important;
           text-align: center !important;
           background: transparent !important;
-          color: map-get($colors, 'Smalt') !important;
+          color: var(--passion-profile-darker-color, map-get($colors, 'Smalt')) !important;
+
         }
 
         max-height: 72px;
@@ -77,6 +78,7 @@
 
       .readMoreBio {
         @extend .readMoreText;
+        color: var(--passion-profile-primary-color, map-get($colors, 'Smalt')) !important;
         margin: 8px 0;
         letter-spacing: 0.08em;
         cursor: pointer;
@@ -86,7 +88,6 @@
 
   .socialIconWrapper {
     @extend .bottomBorderRadius;
-    background-color: map-get($map: $colors, $key: 'White');
     padding: 12px;
     text-align: center;
 
@@ -96,7 +97,7 @@
       .socialIcon {
         margin: 0 auto;
         font-size: 24px;
-        color: map-get($map: $colors, $key: 'DodgerBlue');
+        color: var(--passion-profile-primary-color, map-get($map: $colors, $key: 'DodgerBlue'));
       }
     }
   }

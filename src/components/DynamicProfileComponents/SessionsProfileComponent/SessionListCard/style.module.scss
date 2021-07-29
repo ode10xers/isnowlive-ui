@@ -56,7 +56,7 @@ $card-border-radius: 8px;
     width: 100%;
     justify-content: center;
     font-size: 16px;
-    background-color: var(--session-list-card-background-color) !important;
+    background-color: var(--session-list-card-background-color, map-get($colors, 'White')) !important;
     box-shadow: inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
 
@@ -73,7 +73,7 @@ $card-border-radius: 8px;
     }
 
     .footerText {
-      color: var(--session-list-card-font-color) !important;
+      color: var(--session-list-card-font-color, map-get($map: $colors, $key: 'PrussianBlue')) !important;
     }
 
     .footerDivider {
