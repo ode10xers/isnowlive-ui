@@ -581,12 +581,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                 </div>
               ))}
               <Button
-                size="small"
-                shape="round"
+                type="primary"
                 icon={<CheckOutlined />}
-                className={styles.confirmColorBtn}
                 onClick={saveCreatorColorPalletteChoice}
-              />
+                loading={isLoading}
+              >
+                Apply Color
+              </Button>
             </Space>
           </Col>
         </Row>
