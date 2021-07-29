@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react';
+import classNames from 'classnames';
+
 import { useHistory } from 'react-router-dom';
 import moment from 'moment';
 
@@ -10,7 +12,13 @@ import SessionListCard from '../SessionListCard';
 
 import dateUtil from 'utils/date';
 import { getLocalUserDetails } from 'utils/storage';
-import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from 'utils/helper';
+import {
+  generateUrlFromUsername,
+  isInCreatorDashboard,
+  preventDefaults,
+  isBrightColorShade,
+  convertHexToRGB,
+} from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -21,7 +29,7 @@ const {
 const { Title } = Typography;
 
 // NOTE: The actual data that is shown here is inventories
-const SessionListView = ({ limit = 2, sessions = [] }) => {
+const SessionListView = ({ limit = 2, sessions = [], profileColor }) => {
   const history = useHistory();
 
   const selectedStartDate = moment();
@@ -116,7 +124,18 @@ const SessionListView = ({ limit = 2, sessions = [] }) => {
           <Col xs={24}>
             <Row justify="center">
               <Col>
-                <Button className={styles.moreButton} type="primary" onClick={handleMoreClicked}>
+                <Button
+                  className={classNames(
+                    styles.moreButton,
+                    profileColor
+                      ? isBrightColorShade(convertHexToRGB(profileColor))
+                        ? styles.lightBg
+                        : undefined
+                      : undefined
+                  )}
+                  type="primary"
+                  onClick={handleMoreClicked}
+                >
                   MORE
                 </Button>
               </Col>

@@ -4,8 +4,9 @@ import { Layout, Row, Col } from 'antd';
 
 import NavbarHeader from 'components/NavbarHeader';
 
-import styles from './style.module.scss';
 import { isInCreatorDashboard } from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const { Content, Header } = Layout;
 

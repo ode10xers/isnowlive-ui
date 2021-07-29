@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Spin, Row, Col, Space, Button, Typography } from 'antd';
-import { LikeTwoTone } from '@ant-design/icons';
+import { LikeOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -60,7 +60,7 @@ const PassesProfileComponent = ({
       <Col xs={isEditing ? 22 : 24}>
         <ContainerCard
           title={customComponentProps?.title ?? 'CREDIT PASSES'}
-          icon={<LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
+          icon={<LikeOutlined className={styles.mr10} />}
         >
           {isEditing ? (
             <Row gutter={[8, 8]} justify="center" align="center">

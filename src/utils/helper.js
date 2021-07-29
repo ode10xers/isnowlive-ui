@@ -196,6 +196,7 @@ export const generateWidgetCSSVarsFromJSON = (objData) => {
   return '* { ' + stylesData.map(([key, val]) => `${key} : #${val}`).join('; ') + '}';
 };
 
+// TODO: Move color related helpers to colors.js
 export const generateRandomColor = () => `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 
 export const convertHexToRGB = (hexColor) => {
@@ -224,7 +225,8 @@ export const isBrightColorShade = ([r, g, b]) => {
   const hsp = Math.sqrt(0.299 * (r * r) + 0.587 * (g * g) + 0.114 * (b * b));
 
   // Using the HSP value, determine whether the color is light or dark
-  return hsp > 127.5;
+  // return hsp > 127.5;
+  return hsp > 180.5;
 };
 
 export const getRandomTagColor = () => tagColors[Math.floor(Math.random() * tagColors.length)];
