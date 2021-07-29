@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import classNames from 'classnames';
 import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
@@ -11,6 +12,7 @@ import {
   PlusCircleOutlined,
   ArrowLeftOutlined,
   GlobalOutlined,
+  CheckOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -31,6 +33,7 @@ import {
   generateUrlFromUsername,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import { convertHSLToHex, generateColorPalletteForProfile } from 'utils/colors';
 
 import styles from './style.module.scss';
 
@@ -106,6 +109,8 @@ const componentsMap = {
   },
 };
 
+const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
+
 const DynamicProfile = ({ creatorUsername = null }) => {
   const history = useHistory();
 
@@ -118,6 +123,8 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [tempCreatorUIConfig, setTempCreatorUIConfig] = useState([]);
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
+  const [creatorColorChoice, setCreatorColorChoice] = useState(null);
+
   const fetchCreatorProfileData = useCallback(async (username) => {
     if (!username) {
       return;
@@ -129,6 +136,12 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
+
+        if (data.profile?.color) {
+          setCreatorColorChoice(data.profile?.color);
+        } else {
+          setCreatorColorChoice(null);
+        }
       }
     } catch (error) {
       message.error('Failed to load creator profile details');
@@ -151,9 +164,49 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
   }, [creatorProfileData]);
 
+  useEffect(() => {
+    if (creatorColorChoice) {
+      Object.entries(generateColorPalletteForProfile(creatorColorChoice)).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+  }, [creatorColorChoice]);
+
   //#endregion End of Use Effects
 
   //#region Start Of Page Edit Button Handlers
+
+  const saveCreatorColorPalletteChoice = async (e) => {
+    preventDefaults(e);
+
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        cover_image_url: creatorProfileData?.cover_image_url,
+        profile_image_url: creatorProfileData?.profile_image_url,
+        first_name: creatorProfileData?.first_name,
+        last_name: creatorProfileData?.last_name,
+        username: creatorProfileData?.username,
+        profile: {
+          color: creatorColorChoice,
+        },
+      };
+
+      const { status } = await apis.user.updateProfile(payload);
+
+      if (isAPISuccess(status)) {
+        message.success('Creator profile color successfully updated');
+      }
+    } catch (error) {
+      showErrorModal(
+        'Failed updating Creator Profile UI Colors',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setIsLoading(false);
+  };
 
   const getExistingComponentInstance = (identifier) =>
     tempCreatorUIConfig.find((component) => component.key === identifier);
@@ -430,6 +483,9 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
     const RenderedComponent = componentsMap[component.key].component;
 
+    // NOTE : We are passing the color here to programatically add styling
+    // to more buttons and nav bars, so we know if we need a light text (for dark BG)
+    // or dark text (for light BG)
     return (
       <Draggable
         isDragDisabled={!editingMode || previewMode}
@@ -447,6 +503,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               dragHandleProps={provided.dragHandleProps}
               title={component.title}
               values={component.values}
+              headerColor={
+                creatorColorChoice
+                  ? convertHSLToHex(
+                      generateColorPalletteForProfile(creatorColorChoice)['--passion-profile-primary-color']
+                    )
+                  : null
+              }
             />
           </Col>
         )}
@@ -502,6 +565,28 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   </Button>
                 </>
               )}
+            </Space>
+          </Col>
+          <Col xs={24}>
+            <Space className={styles.colorChoicesContainer}>
+              {colorPalletteChoices.map((color) => (
+                <div
+                  className={classNames(
+                    styles.colorContainer,
+                    creatorColorChoice === color ? styles.selected : undefined
+                  )}
+                  onClick={() => setCreatorColorChoice(color)}
+                >
+                  <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
+                </div>
+              ))}
+              <Button
+                size="small"
+                shape="round"
+                icon={<CheckOutlined />}
+                className={styles.confirmColorBtn}
+                onClick={saveCreatorColorPalletteChoice}
+              />
             </Space>
           </Col>
         </Row>

@@ -13,7 +13,7 @@
     align-items: center;
     width: 100%;
     border: none !important;
-    background-color: map-get($map: $colors, $key: 'White') !important;
+    background-color: var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')}) !important;
     padding: 8px 8px 12px 8px !important;
     border-radius: 8px;
     margin: 0 auto !important;
@@ -24,7 +24,7 @@
       padding: 12px;
       border-radius: 12px;
       text-align: center;
-      color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+      color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
       cursor: pointer;
 
       @media screen and (max-width: 425px) {
@@ -33,8 +33,12 @@
       }
 
       &.selectedMenu {
-        background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+        background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
         color: map-get($map: $colors, $key: 'White') !important;
+        
+        &.lightBg {
+          color: map-get($map: $colors, $key: 'Zeus') !important;
+        }
       }
       &:hover {
         transition: 0.2s linear;

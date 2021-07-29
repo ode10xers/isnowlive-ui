@@ -1,11 +1,12 @@
 @import '../../styles/variables.scss';
 
 // We'll be basing the max-width on Ant Design's md breakpoint (768px)
-$navbar-height: 64px;
+$navbar-height: 66px;
 
 .mainContainer {
   height: 100%;
-  background-color: map-get($colors, 'WhiteSmoke1') !important;
+  // background-color: map-get($colors, 'WhiteSmoke1') !important;
+  background-color: map-get($map: $colors, $key: 'White') !important;
 
   .mainContent {
     max-width: 767px;
