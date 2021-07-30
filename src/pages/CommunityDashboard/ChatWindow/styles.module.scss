@@ -1,0 +1,28 @@
+@import '../../../styles/variables.scss';
+
+// TODO: Override some Stream Variables here as required
+
+:global {
+  .str-chat__main-panel {
+    padding: 0px !important;
+  }
+  .str-chat__header-livestream {
+    border-radius: 0px !important;
+  }
+}
+
+.channelHeaderContainer {
+  background-color: map-get($map: $colors, $key: 'White') !important;
+}
+
+.channelWindowContainer {
+  padding: 20px;
+  background-color: map-get($map: $colors, $key: 'Quartz') !important;
+  
+  .channelMemberListContainer {
+    flex: 0 0 auto !important;
+    max-width: 300px !important;
+    width: 100% !important;
+    background-color: map-get($map: $colors, $key: 'ClearDay') !important;
+  }
+}

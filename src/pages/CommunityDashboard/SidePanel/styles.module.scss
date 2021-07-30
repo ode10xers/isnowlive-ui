@@ -1,0 +1,46 @@
+@import '../../../styles/variables.scss';
+
+// TODO: Override some Stream Variables here as required
+
+:global {
+  .str-chat {
+    --main-font :  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    --second-font :  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    width: 100%;
+    height: 100% !important;
+    background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  }
+}
+
+.sidePanelContainer {
+  width: 100%;
+  height: 100vh;
+  padding: 20px 0;
+  background-color: map-get($map: $colors, $key: 'DodgerBlue');
+
+  h1, h2, h3, h4, h5, h6 {
+    color: map-get($map: $colors, $key: 'White') !important;
+  }
+
+  .navItem {
+    padding: 4px 10px;
+    width: 100%;
+  }
+
+  .channelListContainer {
+    @extend .navItem;
+    padding: 4px 0;
+
+    .channelListItem {
+      padding: 4px 0 4px 20px;
+      color: map-get($map: $colors, $key: 'White') !important;
+
+      &.activeChannel {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-right: 2px solid map-get($map: $colors, $key: 'White');
+      }
+    }
+  }
+}

@@ -88,7 +88,7 @@ const CommunityDashboard = ({ match, history }) => {
         </Sider>
         <Content>
           <Switch>
-            <Route path={Routes.community.root + Routes.community.chatChannels} component={ChatWindow} />
+            <Route exact path={match.url + Routes.community.chatChannels} component={ChatWindow} />
           </Switch>
         </Content>
       </Layout>
