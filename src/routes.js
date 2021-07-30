@@ -27,6 +27,12 @@ const Routes = {
   stripePaymentSuccess: '/stripe/payment/success',
   paymentRetry: '/payment/retry/:retry_token',
   paymentConfirm: '/payment/redirect/verify',
+  // TODO: Might want to attach course ID or some identifier in the path
+  community: {
+    root: '/community',
+    curriculum: '/curriculum',
+    chatChannels: '/channels',
+  },
   list: {
     sessions: '/list/sessions',
     videos: '/list/videos',
@@ -86,7 +92,6 @@ const Routes = {
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
     referrals: '/referrals',
-    // TODO: Reconsider the path
     dashboardPage: '/products',
   },
 };

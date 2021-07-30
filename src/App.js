@@ -10,6 +10,7 @@ import SideNavWithHeaderLayout from 'layouts/SideNavWithHeaderLayout';
 import NavbarFullWidthLayout from 'layouts/NavbarFullWidthLayout';
 import NavbarLayout from 'layouts/NavbarLayout';
 import MobileLayout from 'layouts/MobileLayout';
+import SimpleLayout from 'layouts/SimpleLayout';
 
 import Home from 'pages/Home';
 import Profile from 'pages/Profile';
@@ -39,6 +40,7 @@ import SessionDetailedListView from 'pages/DetailedListView/Sessions';
 import CourseDetailedListView from 'pages/DetailedListView/Courses';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
+import CommunityDashboard from 'pages/CommunityDashboard';
 
 // import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
@@ -219,6 +221,7 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
+            <PrivateRoute layout={SimpleLayout} path={Routes.community.root} component={CommunityDashboard} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}

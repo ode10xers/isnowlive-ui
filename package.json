@@ -43,7 +43,9 @@
     "react-select-country-list": "^2.2.1",
     "react-share": "^4.3.1",
     "react-switch-selector": "^1.2.1",
-    "react-syntax-highlighter": "^15.4.3"
+    "react-syntax-highlighter": "^15.4.3",
+    "stream-chat": "^3.13.1",
+    "stream-chat-react": "^6.4.7"
   },
   "scripts": {
     "start": "react-scripts start",
