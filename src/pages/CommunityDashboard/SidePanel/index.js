@@ -1,12 +1,10 @@
 import React from 'react';
-import classNames from 'classnames';
-import { useHistory, useLocation } from 'react-router-dom';
 
-import { ChannelList, useChatContext } from 'stream-chat-react';
+import { ChannelList } from 'stream-chat-react';
 
 import { Space, Typography } from 'antd';
 
-import Routes from 'routes';
+import ChannelListItem from '../ChannelListItem';
 
 import styles from './styles.module.scss';
 
@@ -22,33 +20,10 @@ const ChannelListTemplate = ({ listTitle = 'Channels', listElement = null }) => 
   </div>
 );
 
-const ChannelListItem = ({ channel, setActiveChannel }) => {
-  const history = useHistory();
-  const location = useLocation();
-
-  const { channel: activeChannel } = useChatContext();
-
-  return (
-    <div
-      className={classNames(
-        styles.channelListItem,
-        location.pathname.match(Routes.community.root + Routes.community.chatChannels) &&
-          activeChannel &&
-          channel.data?.id === activeChannel?.data?.id
-          ? styles.activeChannel
-          : undefined
-      )}
-      onClick={() => {
-        history.push(Routes.community.root + Routes.community.chatChannels);
-        setActiveChannel(channel);
-      }}
-    >
-      {`# ${channel?.data?.name ?? 'DMs'}`}
-    </div>
-  );
-};
-
 const SidePanel = () => {
+  const teamChannelFilter = (channels) => channels.filter((channel) => channel.type === 'team');
+  const messagingChannelFilter = (channels) => channels.filter((channel) => channel.type === 'messaging');
+
   return (
     <Space direction="vertical" className={styles.sidePanelContainer}>
       <div className={styles.navItem}>
@@ -56,6 +31,7 @@ const SidePanel = () => {
       </div>
       <div className={styles.channelListContainer}>
         <ChannelList
+          channelRenderFilterFn={teamChannelFilter}
           EmptyStateIndicator={(emptyStateProps) => {
             return (
               <Text disabled className={styles.pl20}>
@@ -66,6 +42,22 @@ const SidePanel = () => {
           }}
           List={(listProps) => {
             return <ChannelListTemplate listElement={listProps.children} listTitle="Channels" />;
+          }}
+          Preview={ChannelListItem}
+        />
+      </div>
+      <div className={styles.channelListContainer}>
+        <ChannelList
+          channelRenderFilterFn={messagingChannelFilter}
+          EmptyStateIndicator={(emptyStateProps) => {
+            return (
+              <Text disabled className={styles.pl20}>
+                You currently have no messages
+              </Text>
+            );
+          }}
+          List={(listProps) => {
+            return <ChannelListTemplate listElement={listProps.children} listTitle="Messages" />;
           }}
           Preview={ChannelListItem}
         />

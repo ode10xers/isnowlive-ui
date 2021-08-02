@@ -80,6 +80,8 @@ const CommunityDashboard = ({ match, history }) => {
     );
   }
 
+  // TODO: Might want to move these later to creator dashboard index.js
+  // This is so that they can see whenever there are new messages
   return (
     <Chat client={chatClient}>
       <Layout>

@@ -20,9 +20,15 @@
   background-color: map-get($map: $colors, $key: 'Quartz') !important;
   
   .channelMemberListContainer {
+    padding: 0 10px;
     flex: 0 0 auto !important;
     max-width: 300px !important;
     width: 100% !important;
     background-color: map-get($map: $colors, $key: 'ClearDay') !important;
   }
+}
+
+.userHeaders {
+  display: flex;
+  align-items: center;
 }
