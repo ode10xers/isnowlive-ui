@@ -9,11 +9,12 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import ChannelListItem from '../ChannelListItem';
+import NewChannelModal from '../NewChannelModal';
+import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess, preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
-import { showErrorModal } from 'components/Modals/modals';
 
 const { Title } = Typography;
 
@@ -54,10 +55,14 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [creatorDetails, setCreatorDetails] = useState(null);
 
+  const [channelModalVisible, setChannelModalVisible] = useState(false);
+  const [targetChannelType, setTargetChannelType] = useState('team');
+
   const teamChannelFilter = (channels) =>
     channels.filter(
       (channel) => channel.type === 'team' && Object.keys(channel.state?.members).includes(client.userID)
     );
+
   const messagingChannelFilter = (channels) =>
     channels.filter(
       (channel) => channel.type === 'messaging' && Object.keys(channel.state?.members).includes(client.userID)
@@ -91,15 +96,25 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
     history.push(isCourseOwner ? Routes.creatorDashboard.rootPath : Routes.attendeeDashboard.rootPath);
   };
 
+  const openChannelModal = () => {
+    setChannelModalVisible(true);
+  };
+
+  const handleCloseChannelModal = () => {
+    setChannelModalVisible(false);
+    setTargetChannelType('team');
+  };
+
   const handleCreateNewChannel = (e) => {
     preventDefaults(e);
-
-    // TODO: Need to show list of buyers/team members here
+    setTargetChannelType('team');
+    openChannelModal();
   };
 
   const handleInitiateChatWithAttendee = (e) => {
     preventDefaults(e);
-    // TODO: Need to show list of buyers/team members here
+    setTargetChannelType('messaging');
+    openChannelModal();
   };
 
   const handleInitiateChatWithCreator = async (e) => {
@@ -132,8 +147,13 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
     }
   };
 
+  // TODO: Consider moving this outside so we can also use this for edit channel flow
+  // OR adjust ChannelListItem to have edit button
   return (
     <Spin spinning={isLoading} size="large">
+      {isCourseOwner && (
+        <NewChannelModal visible={channelModalVisible} closeModal={handleCloseChannelModal} type={targetChannelType} />
+      )}
       <Space direction="vertical" className={styles.sidePanelContainer}>
         <div className={styles.navItem}>
           <Button

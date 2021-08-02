@@ -21,8 +21,6 @@ import 'stream-chat-react/dist/css/index.css';
 
 const { Content, Sider } = Layout;
 
-// TODO: Remove this hardcoded data later
-
 // ellianto+1001@10xers.co
 const attendeeUser1 = {
   data: {
