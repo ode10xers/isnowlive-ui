@@ -1,12 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 
 import { Typography } from 'antd';
 
 import { useChatContext, Avatar } from 'stream-chat-react';
-
-import Routes from 'routes';
 
 import styles from './styles.module.scss';
 
@@ -15,6 +13,7 @@ const { Text, Paragraph } = Typography;
 const ChannelListItem = ({ channel, setActiveChannel }) => {
   const history = useHistory();
   const location = useLocation();
+  const match = useRouteMatch();
 
   const { channel: activeChannel, client } = useChatContext();
 
@@ -64,14 +63,12 @@ const ChannelListItem = ({ channel, setActiveChannel }) => {
     <div
       className={classNames(
         styles.channelListItem,
-        location.pathname.match(Routes.community.root + Routes.community.chatChannels) &&
-          activeChannel &&
-          channel.data?.id === activeChannel?.data?.id
+        location.pathname.includes('/channels') && activeChannel && channel.data?.id === activeChannel?.data?.id
           ? styles.activeChannel
           : undefined
       )}
       onClick={() => {
-        history.push(Routes.community.root + Routes.community.chatChannels);
+        history.push(`/community/${match.params.course_id}/channels`);
         setActiveChannel(channel);
       }}
     >

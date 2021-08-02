@@ -29,8 +29,7 @@ const Routes = {
   paymentConfirm: '/payment/redirect/verify',
   // TODO: Might want to attach course ID or some identifier in the path
   community: {
-    root: '/community',
-    curriculum: '/curriculum',
+    root: '/community/:course_id',
     chatChannels: '/channels',
   },
   list: {

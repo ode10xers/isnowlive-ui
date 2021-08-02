@@ -33,4 +33,21 @@
     @extend .navItem;
     padding: 4px 0;
   }
+
+  .emptyChannelText {
+    padding-left: 20px;
+    font-size: 12px !important;
+    font-weight: normal;
+    color: map-get($map: $colors, $key: 'Silver') !important;
+  }
+
+  .whiteOutlineButton {
+    color: map-get($map: $colors, $key: 'White') !important;
+    border-color: map-get($map: $colors, $key: 'White') !important;
+    
+    &:hover {
+      color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+      background-color: map-get($map: $colors, $key: 'White') !important;
+    }
+  }
 }
