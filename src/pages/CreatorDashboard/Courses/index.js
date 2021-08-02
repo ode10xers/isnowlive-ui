@@ -9,6 +9,7 @@ import {
   DownOutlined,
   UpOutlined,
   EyeInvisibleOutlined,
+  CommentOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -306,6 +307,16 @@ const Courses = ({ history }) => {
                 <Button block type="text" onClick={() => copyCourseLink(record.id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
+            <Col xs={3}>
+              <Tooltip title="Community Chat">
+                <Button
+                  block
+                  type="text"
+                  onClick={() => history.push(`/community/${record.id}`)}
+                  icon={<CommentOutlined className={styles.chatIcon} />}
+                />
+              </Tooltip>
+            </Col>
             <Col xs={5}>
               {record.is_published ? (
                 <Tooltip title="Hide Course">
@@ -321,7 +332,7 @@ const Courses = ({ history }) => {
                 </Tooltip>
               )}
             </Col>
-            <Col xs={10}>
+            <Col xs={7}>
               {record.is_published ? (
                 expandedPublishedRowKeys.includes(record.id) ? (
                   <Button block type="link" onClick={() => collapseRowPublished(record.id)}>
@@ -458,8 +469,8 @@ const Courses = ({ history }) => {
             </Tooltip>,
             <Tooltip title="Edit">
               <Button
-                className={styles.detailsButton}
                 type="text"
+                className={styles.detailsButton}
                 onClick={() => redirectToEditCourse(course.id)}
                 icon={<EditTwoTone twoToneColor="#08979c" />}
               />
@@ -470,6 +481,13 @@ const Courses = ({ history }) => {
                 className={styles.detailsButton}
                 onClick={() => copyCourseLink(course.id)}
                 icon={<CopyOutlined />}
+              />
+            </Tooltip>,
+            <Tooltip title="Community Chat">
+              <Button
+                type="text"
+                onClick={() => history.push(`/community/${course.id}`)}
+                icon={<CommentOutlined className={styles.chatIcon} />}
               />
             </Tooltip>,
             course.is_published ? (

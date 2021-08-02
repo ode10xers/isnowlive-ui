@@ -75,7 +75,7 @@ const CourseList = () => {
           .add(1, 'second')
           .diff(moment(course.start_date).startOf('day'), 'days')} days`;
 
-  const renderCourseItem = (item) => {
+  const renderCourseItem = (item, isExpired = true) => {
     const layout = (label, value) => (
       <Row>
         <Col span={7}>
@@ -88,30 +88,58 @@ const CourseList = () => {
     );
 
     return (
-      <Card
-        key={item.course_order_id}
-        bodyStyle={{ padding: '10px' }}
-        title={
-          <div onClick={() => redirectToCourseOrderDetails(item)}>
-            <Text>{item?.course?.name}</Text>
+      <Col xs={24} key={item.course_order_id}>
+        <Card
+          bodyStyle={{ padding: '10px' }}
+          title={
+            <div
+              onClick={() => {
+                if (!isExpired) redirectToCourseOrderDetails(item);
+              }}
+            >
+              <Text>{item?.course?.name}</Text>
+            </div>
+          }
+          actions={
+            isExpired
+              ? []
+              : [
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      if (!isExpired) redirectToCourseOrderDetails(item);
+                    }}
+                  >
+                    Details
+                  </Button>,
+                  <Button
+                    type="link"
+                    className={styles.greenText}
+                    onClick={() => history.push(`/community/${item?.course.id}`)}
+                  >
+                    Community
+                  </Button>,
+                ]
+          }
+        >
+          <div
+            onClick={() => {
+              if (!isExpired) redirectToCourseOrderDetails(item);
+            }}
+          >
+            {layout('Contents', renderCourseContents(item))}
+            {layout('Duration', <Text>{renderCourseDuration(item.course)}</Text>)}
+            {layout(
+              'Price',
+              <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>
+            )}
           </div>
-        }
-        actions={[
-          <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(item)}>
-            Details
-          </Button>,
-        ]}
-      >
-        <div onClick={() => redirectToCourseOrderDetails(item)}>
-          {layout('Contents', renderCourseContents(item))}
-          {layout('Duration', <Text>{renderCourseDuration(item.course)}</Text>)}
-          {layout('Price', <Text>{item?.price > 0 ? `${item?.currency?.toUpperCase()} ${item?.price}` : 'Free'}</Text>)}
-        </div>
-      </Card>
+        </Card>
+      </Col>
     );
   };
 
-  const courseColumns = [
+  const generateCourseColumns = (isExpired = true) => [
     {
       title: '',
       dataIndex: ['course', 'course_image_url'],
@@ -150,16 +178,28 @@ const CourseList = () => {
     {
       title: '',
       align: 'right',
-      width: '100px',
-      render: (text, record) => (
-        <Row gutter={[8, 8]} justify="end">
-          <Col>
-            <Button type="link" size="large" onClick={() => redirectToCourseOrderDetails(record)}>
-              Details
-            </Button>
-          </Col>
-        </Row>
-      ),
+      width: isExpired ? 0 : '240px',
+      render: (text, record) =>
+        isExpired ? null : (
+          <Row gutter={[8, 8]} justify="end">
+            <Col xs={12}>
+              <Button type="link" onClick={() => redirectToCourseOrderDetails(record)}>
+                Curriculum
+              </Button>
+            </Col>
+            <Col xs={12}>
+              <Button
+                type="link"
+                className={styles.greenText}
+                onClick={() => {
+                  if (record?.course?.id) history.push(`/community/${record.course.id}`);
+                }}
+              >
+                Community
+              </Button>
+            </Col>
+          </Row>
+        ),
     },
   ];
 
@@ -175,19 +215,21 @@ const CourseList = () => {
               {isMobileDevice ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.active?.length > 0 ? (
-                    <>
-                      <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                        Click on the card to show course details
-                      </Text>
-                      {courseOrders?.active?.map(renderCourseItem)}
-                    </>
+                    <Row gutter={[12, 12]}>
+                      <Col xs={24}>
+                        <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
+                          Click on the card to show course details
+                        </Text>
+                      </Col>
+                      {courseOrders?.active?.map((courseOrders) => renderCourseItem(courseOrders, false))}
+                    </Row>
                   ) : (
                     <div className="text-empty"> No course found </div>
                   )}
                 </Loader>
               ) : (
                 <Table
-                  columns={courseColumns}
+                  columns={generateCourseColumns(false)}
                   data={courseOrders?.active}
                   loading={isLoading}
                   rowKey={(record) => record.course_order_id}
@@ -198,19 +240,16 @@ const CourseList = () => {
               {isMobileDevice ? (
                 <Loader loading={isLoading} size="large" text="Loading courses">
                   {courseOrders?.expired?.length > 0 ? (
-                    <>
-                      <Text className={`${styles.helperText} ${styles.mt10} ${styles.mb10}`}>
-                        Click on the card to show course details
-                      </Text>
-                      {courseOrders?.expired?.map(renderCourseItem)}
-                    </>
+                    <Row gutter={[12, 12]}>
+                      {courseOrders?.active?.map((courseOrders) => renderCourseItem(courseOrders, true))}
+                    </Row>
                   ) : (
                     <div className="text-empty"> No course found </div>
                   )}
                 </Loader>
               ) : (
                 <Table
-                  columns={courseColumns}
+                  columns={generateCourseColumns(true)}
                   data={courseOrders?.expired}
                   loading={isLoading}
                   rowKey={(record) => record.course_order_id}

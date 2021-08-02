@@ -413,6 +413,7 @@ const SessionsInventories = ({ match }) => {
       title: '',
       dataIndex: 'name',
       key: 'name',
+      width: '180px',
       render: (text, record) => (
         <Text strong className={styles.textAlignLeft}>
           {toLongDateWithLongDay(text)}
@@ -510,30 +511,31 @@ const SessionsInventories = ({ match }) => {
     }
 
     return (
-      <Card
-        key={`${item.session_id}_${item.start_time}`}
-        className={item.is_published ? styles.card : styles.unpublished}
-        actions={actionButtons}
-        title={
-          <div
-            style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
-            onClick={() => openSessionInventoryDetails(item)}
-          >
-            {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>{' '}
-            {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
-          </div>
-        }
-      >
-        {layout('Type', <Text>{item.type}</Text>)}
-        {layout('Duration', <Text>{item.duration}</Text>)}
-        {layout('Time', <Text>{item.time}</Text>)}
-        {layout(
-          'Attendees',
-          <Text>
-            {item.num_participants || 0} {'/'} {item.max_participants}
-          </Text>
-        )}
-      </Card>
+      <Col xs={24} key={`${item.session_id}_${item.start_time}`}>
+        <Card
+          className={item.is_published ? styles.card : styles.unpublished}
+          actions={actionButtons}
+          title={
+            <div
+              style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || whiteColor}` }}
+              onClick={() => openSessionInventoryDetails(item)}
+            >
+              {item.is_published ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />} <Text>{item.name}</Text>{' '}
+              {item.is_course ? <BookTwoTone twoToneColor="#1890ff" /> : null}
+            </div>
+          }
+        >
+          {layout('Type', <Text>{item.type}</Text>)}
+          {layout('Duration', <Text>{item.duration}</Text>)}
+          {layout('Time', <Text>{item.time}</Text>)}
+          {layout(
+            'Attendees',
+            <Text>
+              {item.num_participants || 0} {'/'} {item.max_participants}
+            </Text>
+          )}
+        </Card>
+      </Col>
     );
   };
 
@@ -615,8 +617,14 @@ const SessionsInventories = ({ match }) => {
               <>
                 {isMobileDevice ? (
                   <Loader loading={isLoading} size="large" text="Loading sessions">
+                    <div className={styles.mb10}>
+                      <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
+                        {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+                      </Button>
+                    </div>
                     {sessions.length > 0 ? (
                       <Table
+                        showHeader={false}
                         columns={mobileTableColumns}
                         data={filteredByDateSession.map((session) => ({
                           session_id: session.session_id,
@@ -630,8 +638,13 @@ const SessionsInventories = ({ match }) => {
                           record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
                         }
                         expandable={{
-                          expandedRowRender: (record) => <> {record.sessions.map(renderSessionItem)} </>,
+                          expandedRowRender: (record) => (
+                            <div className={styles.mobileExpandedRowContainer}>
+                              <Row gutter={[8, 10]}> {record.sessions.map(renderSessionItem)} </Row>{' '}
+                            </div>
+                          ),
                           expandRowByClick: true,
+                          indentSize: 0,
                           onExpand: (expanded, record) => {
                             if (expanded) {
                               expandRow(record.start_time);
@@ -655,6 +668,7 @@ const SessionsInventories = ({ match }) => {
                 ) : filteredByDateSession.length > 0 ? (
                   <Table
                     sticky={true}
+                    showHeader={false}
                     columns={dateColumns}
                     data={filteredByDateSession}
                     loading={isLoading}
