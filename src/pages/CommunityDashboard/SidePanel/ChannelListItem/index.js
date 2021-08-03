@@ -6,6 +6,8 @@ import { Typography } from 'antd';
 
 import { useChatContext, Avatar } from 'stream-chat-react';
 
+import Routes from 'routes';
+
 import styles from './styles.module.scss';
 
 const { Text, Paragraph } = Typography;
@@ -63,12 +65,19 @@ const ChannelListItem = ({ channel, setActiveChannel }) => {
     <div
       className={classNames(
         styles.channelListItem,
-        location.pathname.includes('/channels') && activeChannel && channel.data?.id === activeChannel?.data?.id
+        (location.pathname.includes(Routes.community.chatChannels) ||
+          location.pathname.includes(Routes.community.feeds)) &&
+          activeChannel &&
+          channel.data?.id === activeChannel?.data?.id
           ? styles.activeChannel
           : undefined
       )}
       onClick={() => {
-        history.push(`/community/${match.params.course_id}/channels`);
+        history.push(
+          `/community/${match.params.course_id}${
+            channel.type === 'team' ? Routes.community.feeds : Routes.community.chatChannels
+          }`
+        );
         setActiveChannel(channel);
       }}
     >

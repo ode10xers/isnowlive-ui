@@ -1,0 +1,62 @@
+@import '../../../../styles/variables.scss';
+
+:global {
+  .str-chat__reaction-selector {
+    position: relative !important;
+    width: fit-content !important;
+    height: 30px !important;
+
+    > ul {
+      margin: 0 !important;
+    }
+  }
+}
+
+.reactionPopover {
+  padding: 0px;
+
+  :global {
+    .ant-popover-arrow {
+      border-color: map-get($map: $colors, $key: 'Black');
+    }
+
+    .ant-popover-inner {
+      border-radius: 40px;
+    }
+  }
+}
+
+.feedContainer {
+  border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke');
+  border-radius: 8px;
+  margin: 8px;
+  padding: 10px;
+
+  .messageAuthor {
+    margin-bottom: 0px;
+  }
+
+  .simpleDivider { 
+    margin: 0;
+  }
+
+  .commentButton, .likeButton {
+    border: none;
+  }
+
+  .replyCountContainer {
+    text-align: right;
+    align-self: center;
+  }
+
+  .messageTextWrapper {
+    width: 100%;
+    padding: 20px;
+  
+    .messageText {
+      background-color: transparent;
+      border: none;
+    }
+  }
+}
+

@@ -11,6 +11,7 @@ import Routes from 'routes';
 
 import SidePanel from './SidePanel';
 import ChatWindow from './ChatWindow';
+import MessageFeeds from './MessageFeeds';
 import { showErrorModal } from 'components/Modals/modals';
 
 import { isAPISuccess } from 'utils/helper';
@@ -109,6 +110,10 @@ const CommunityDashboard = ({ match, history }) => {
     } else {
       setClientReady(false);
     }
+
+    return () => {
+      chatClient.disconnectUser();
+    };
   }, [userDetails]);
 
   useEffect(() => {
@@ -138,6 +143,7 @@ const CommunityDashboard = ({ match, history }) => {
         </Sider>
         <Content>
           <Switch>
+            <Route exact path={match.url + Routes.community.feeds} component={MessageFeeds} />
             <Route exact path={match.url + Routes.community.chatChannels} component={ChatWindow} />
           </Switch>
         </Content>

@@ -8,7 +8,7 @@ import { ArrowLeftOutlined, LoadingOutlined } from '@ant-design/icons';
 import apis from 'apis';
 import Routes from 'routes';
 
-import ChannelListItem from '../ChannelListItem';
+import ChannelListItem from './ChannelListItem';
 import NewChannelModal from '../NewChannelModal';
 import { showErrorModal } from 'components/Modals/modals';
 
@@ -155,6 +155,12 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
         <NewChannelModal visible={channelModalVisible} closeModal={handleCloseChannelModal} type={targetChannelType} />
       )}
       <Space direction="vertical" className={styles.sidePanelContainer}>
+        <div className={styles.navItem}>
+          <Title level={5} className={styles.textAlignCenter}>
+            {' '}
+            Hi, {client.user.name}{' '}
+          </Title>
+        </div>
         <div className={styles.navItem}>
           <Button
             block

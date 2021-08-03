@@ -27,10 +27,10 @@ const Routes = {
   stripePaymentSuccess: '/stripe/payment/success',
   paymentRetry: '/payment/retry/:retry_token',
   paymentConfirm: '/payment/redirect/verify',
-  // TODO: Might want to attach course ID or some identifier in the path
   community: {
     root: '/community/:course_id',
     chatChannels: '/channels',
+    feeds: '/feeds',
   },
   list: {
     sessions: '/list/sessions',

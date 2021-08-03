@@ -2,27 +2,28 @@ import React from 'react';
 
 import { Layout } from 'antd';
 
-import { Channel, MessageList, MessageInput, Thread, Window } from 'stream-chat-react';
+import { Channel, MessageList, Thread, Window } from 'stream-chat-react';
 
-import CustomChannelHeader from './CustomChannelHeader';
 import ChannelMemberList from '../ChannelMemberList';
+import CustomFeedsHeader from './CustomFeedsHeader';
 
 import styles from './styles.module.scss';
+import CustomMessageItem from './CustomMessageItem';
 
 const { Header, Content, Sider } = Layout;
 
-const ChatWindow = () => {
+// NOTE: This UI will specifically be used for team typed channels
+const MessageFeeds = ({ match, history }) => {
   return (
     <Channel TypingIndicator={() => null}>
       <Layout>
         <Header className={styles.channelHeaderContainer}>
-          <CustomChannelHeader />
+          <CustomFeedsHeader />
         </Header>
         <Layout className={styles.channelWindowContainer}>
           <Content>
             <Window hideOnThread={true}>
-              <MessageList />
-              <MessageInput />
+              <MessageList Message={CustomMessageItem} />
             </Window>
             <Thread fullWidth={true} />
           </Content>
@@ -35,4 +36,4 @@ const ChatWindow = () => {
   );
 };
 
-export default ChatWindow;
+export default MessageFeeds;

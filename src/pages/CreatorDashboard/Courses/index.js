@@ -236,6 +236,7 @@ const Courses = ({ history }) => {
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
+        width: '180px',
         render: (text, record) =>
           record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`
@@ -283,7 +284,6 @@ const Courses = ({ history }) => {
             {expandedUnpublishedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         ),
-        width: '250px',
         align: 'right',
         render: (text, record) => (
           <Row gutter={4} justify="end">

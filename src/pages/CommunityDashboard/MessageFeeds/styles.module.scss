@@ -9,10 +9,6 @@
   .str-chat__header-livestream {
     border-radius: 0px !important;
   }
-
-  .str-chat__thread {
-    height: 100%;
-  }
 }
 
 .channelHeaderContainer {
@@ -22,7 +18,7 @@
 .channelWindowContainer {
   padding: 20px;
   background-color: map-get($map: $colors, $key: 'Quartz') !important;
-
+  
   .channelMemberListContainer {
     padding: 0 10px;
     flex: 0 0 auto !important;
