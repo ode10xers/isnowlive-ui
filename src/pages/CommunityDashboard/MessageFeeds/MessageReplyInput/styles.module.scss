@@ -1,0 +1,36 @@
+@import '../../../../styles/variables.scss';
+
+// :global {
+//   .str-chat__input-flat {
+//     padding: 0px !important;
+//   }
+
+//   .str-chat__send-button {
+//     display: block;
+//   }
+// }
+
+.inputReplyContainer {
+  :global {
+    .str-chat__send-button {
+      display: block;
+    }
+  }
+
+  .emojiButton {
+    border: none;
+    margin-left: auto;
+  
+    .emojiIcon {
+      font-size: 20px;
+    }
+  }  
+}
+
+.emojiPopupContainer {
+  :global {
+    .str-chat__input--emojipicker {
+      position: relative;
+    }
+  }
+}

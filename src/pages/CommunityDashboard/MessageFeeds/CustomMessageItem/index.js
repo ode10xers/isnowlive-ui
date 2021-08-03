@@ -9,34 +9,91 @@ import {
   MessageText,
   MessageTimestamp,
   useMessageContext,
-  useChannelActionContext,
   useEditHandler,
   useChatContext,
+  useChannelStateContext,
 } from 'stream-chat-react';
 
-import { Row, Col, Typography, Divider, Button, Popover } from 'antd';
+import { Row, Col, Typography, Divider, Button, Popover, List, Comment } from 'antd';
 import { CommentOutlined, LikeOutlined, EditOutlined } from '@ant-design/icons';
 
+import MessageReplyInput from '../MessageReplyInput';
+
+import dateUtil from 'utils/date';
 import { preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
+const {
+  formatDate: { toDateAndTime },
+} = dateUtil;
+
+const MessageRepliesItem = (message) => {
+  return (
+    <List.Item>
+      <Comment
+        actions={[]}
+        author={message.user?.name}
+        avatar={<Avatar image={message.user?.image} name={message.user?.name} />}
+        content={<MessageText message={message} />}
+        datetime={toDateAndTime(message.updated_at)}
+      />
+    </List.Item>
+  );
+};
+
 const CustomMessageItem = ({ openMessageModal }) => {
   const { message, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
 
   const { client } = useChatContext();
-  const { openThread } = useChannelActionContext();
+  const { channel } = useChannelStateContext();
   const { handleEdit, setEditingState } = useMessageContext();
 
   const { setEdit } = useEditHandler();
 
   const [reactionPopoverVisible, setReactionPopoverVisible] = useState(false);
+  const [repliesVisible, setRepliesVisible] = useState(false);
+  const [messageReplies, setMessageReplies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [repliesPageCount, setRepliesPageCount] = useState(1);
+  const [showLoadMore, setShowLoadMore] = useState(false);
+
+  const repliesPerPage = 20;
 
   const messageWrapperRef = useRef(null);
 
   const hasReactions = messageHasReactions(message);
+
+  const fetchMessageReplies = async () => {
+    setIsLoading(true);
+    try {
+      const replies = await channel.getReplies(message.id, { limit: repliesPerPage * repliesPageCount });
+
+      setMessageReplies((prevReplies) => [...prevReplies, ...replies.messages]);
+
+      if (replies.messages.length >= repliesPerPage) {
+        setShowLoadMore(true);
+        setRepliesPageCount((prevPageCount) => prevPageCount + 1);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    setIsLoading(false);
+  };
+
+  const toggleRepliesForMessage = () => {
+    if (!repliesVisible) {
+      fetchMessageReplies();
+    } else {
+      setMessageReplies([]);
+      setRepliesPageCount(1);
+      setShowLoadMore(false);
+    }
+
+    setRepliesVisible(!repliesVisible);
+  };
 
   const handleLikeButtonClicked = (e) => {
     preventDefaults(e);
@@ -50,7 +107,7 @@ const CustomMessageItem = ({ openMessageModal }) => {
 
   const handleCommentClicked = (e) => {
     preventDefaults(e);
-    openThread(message);
+    toggleRepliesForMessage();
   };
 
   // TODO: Investigate this later
@@ -139,6 +196,29 @@ const CustomMessageItem = ({ openMessageModal }) => {
             </Col>
           </Row>
         </Col>
+        {repliesVisible && (
+          <>
+            <Col xs={24}>
+              <Divider type="horizontal" className={styles.simpleDivider} />
+            </Col>
+            <Col xs={24}>
+              <List
+                loading={isLoading}
+                dataSource={messageReplies}
+                rowKey={(message) => message.id}
+                renderItem={MessageRepliesItem}
+                loadMore={
+                  showLoadMore ? (
+                    <Button type="default" onClick={fetchMessageReplies}>
+                      Load more comments
+                    </Button>
+                  ) : null
+                }
+                footer={<MessageReplyInput parentMessage={message} />}
+              />
+            </Col>
+          </>
+        )}
       </Row>
     </div>
   );
