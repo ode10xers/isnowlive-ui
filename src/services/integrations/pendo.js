@@ -14,7 +14,7 @@ export const mapUserToPendo = (userDetails) => {
   const allowedStageEmail = 'felicia.karissa7';
 
   // These checks below will selectively initializes pendo
-  if (userDetails) {
+  if (userDetails && false) {
     if (isDev) {
       // For Dev environments, only initializes for specific emails
       // And with hardcoded external ID values
@@ -82,5 +82,7 @@ export const mapUserToPendo = (userDetails) => {
         });
       }
     }
+  } else {
+    console.log('Pendo not initialized');
   }
 };
