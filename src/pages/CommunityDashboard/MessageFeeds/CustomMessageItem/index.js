@@ -10,10 +10,12 @@ import {
   MessageTimestamp,
   useMessageContext,
   useChannelActionContext,
+  useEditHandler,
+  useChatContext,
 } from 'stream-chat-react';
 
-import { Row, Col, Space, Typography, Divider, Button, Popover } from 'antd';
-import { CommentOutlined, LikeOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Divider, Button, Popover } from 'antd';
+import { CommentOutlined, LikeOutlined, EditOutlined } from '@ant-design/icons';
 
 import { preventDefaults } from 'utils/helper';
 
@@ -21,16 +23,14 @@ import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const CustomMessageItem = () => {
-  const {
-    isReactionEnabled,
-    message,
-    // reactionSelectorRef,
-    showDetailedReactions,
-    handleReaction,
-  } = useMessageContext();
+const CustomMessageItem = ({ openMessageModal }) => {
+  const { message, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
 
+  const { client } = useChatContext();
   const { openThread } = useChannelActionContext();
+  const { handleEdit, setEditingState } = useMessageContext();
+
+  const { setEdit } = useEditHandler();
 
   const [reactionPopoverVisible, setReactionPopoverVisible] = useState(false);
 
@@ -53,14 +53,24 @@ const CustomMessageItem = () => {
     openThread(message);
   };
 
+  // TODO: Investigate this later
+  const handleEditMessage = async (e) => {
+    await setEdit(e);
+    await handleEdit(e);
+    // await setEditingState(e);
+    openMessageModal();
+  };
+
   return (
     <div className={styles.feedContainer}>
       <Row gutter={[10, 10]}>
         <Col xs={24}>
           {/* Top Section with Avatar, name, timestamp */}
-          <Space className={styles.p10}>
-            <Avatar image={message.user?.image} name={message.user?.name} size={42} shape="circle" />
-            <div>
+          <Row gutter={[8, 8]} align="middle">
+            <Col flex="0 0 40px">
+              <Avatar image={message.user?.image} name={message.user?.name} size={42} shape="circle" />
+            </Col>
+            <Col flex="1 1 auto">
               <Title level={5} className={styles.messageAuthor}>
                 {' '}
                 {message.user?.name}{' '}
@@ -69,8 +79,13 @@ const CustomMessageItem = () => {
                 {' '}
                 <MessageTimestamp />{' '}
               </Text>
-            </div>
-          </Space>
+            </Col>
+            {message.user.id === client.userID && (
+              <Col flex="0 0 40px">
+                <Button size="large" type="link" icon={<EditOutlined />} />
+              </Col>
+            )}
+          </Row>
         </Col>
         <Col xs={24}>
           <Divider type="horizontal" className={styles.simpleDivider} />

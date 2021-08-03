@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Layout } from 'antd';
 
@@ -9,21 +9,37 @@ import CustomFeedsHeader from './CustomFeedsHeader';
 
 import styles from './styles.module.scss';
 import CustomMessageItem from './CustomMessageItem';
+import CustomMessageInputModal from './CustomMessageInputModal';
 
 const { Header, Content, Sider } = Layout;
 
 // NOTE: This UI will specifically be used for team typed channels
 const MessageFeeds = ({ match, history }) => {
+  const [messageModalVisible, setMessageModalVisible] = useState(false);
+
+  const handleOpenMessageModal = () => {
+    setMessageModalVisible(true);
+  };
+  const handleCloseMessageModal = () => {
+    setMessageModalVisible(false);
+  };
+
   return (
     <Channel TypingIndicator={() => null}>
       <Layout>
+        <CustomMessageInputModal visible={messageModalVisible} closeModal={handleCloseMessageModal} />
         <Header className={styles.channelHeaderContainer}>
-          <CustomFeedsHeader />
+          <CustomFeedsHeader openMessageModal={handleOpenMessageModal} />
         </Header>
         <Layout className={styles.channelWindowContainer}>
           <Content>
             <Window hideOnThread={true}>
-              <MessageList Message={CustomMessageItem} />
+              <MessageList
+                onlySenderCanEdit={true}
+                Message={(messageProps) => (
+                  <CustomMessageItem {...messageProps} openMessageModal={handleOpenMessageModal} />
+                )}
+              />
             </Window>
             <Thread fullWidth={true} />
           </Content>
