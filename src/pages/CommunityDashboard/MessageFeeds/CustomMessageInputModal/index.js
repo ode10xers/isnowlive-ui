@@ -1,8 +1,15 @@
 import React from 'react';
 
-import { Modal, Row, Col, Button, Popover } from 'antd';
-import { SmileOutlined } from '@ant-design/icons';
-import { ChatAutoComplete, EmojiPicker, SendButton, MessageInput, useMessageInputContext } from 'stream-chat-react';
+import { Modal, Row, Col, Button, Popover, Upload, message as AntdMessage } from 'antd';
+import { SmileOutlined, CloudUploadOutlined } from '@ant-design/icons';
+import {
+  ChatAutoComplete,
+  EmojiPicker,
+  UploadsPreview,
+  SendButton,
+  MessageInput,
+  useMessageInputContext,
+} from 'stream-chat-react';
 
 import { resetBodyStyle } from 'components/Modals/modals';
 
@@ -15,6 +22,7 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     handleEmojiKeyDown,
     handleSubmit,
     openEmojiPicker,
+    uploadNewFiles,
   } = useMessageInputContext();
 
   const handleMessageSend = (e) => {
@@ -24,6 +32,18 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
   };
 
   // TODO: Add file handling later
+  const handleBeforeImageUpload = (file) => {
+    const isValidFileSize = file.size / 1024 / 1024 < 20; // Stream max file size = 20MB
+    if (!isValidFileSize) {
+      AntdMessage.error('Image must be smaller than 20MB!');
+    }
+
+    return isValidFileSize;
+  };
+
+  const handleImageUpload = (fileData) => {
+    uploadNewFiles([fileData.file]);
+  };
 
   return (
     <div className={styles.inputWrapper}>
@@ -47,11 +67,25 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
                 />
               </Popover>
             </Col>
+            <Col flex="0 0 40px">
+              <Upload
+                defaultFileList={[]}
+                showUploadList={false}
+                multiple={false}
+                beforeUpload={handleBeforeImageUpload}
+                customRequest={handleImageUpload}
+              >
+                <Button type="default" icon={<CloudUploadOutlined />} />
+              </Upload>
+            </Col>
             <Col flex="1 1 auto"></Col>
             <Col flex="0 0 40px" className={styles.sendButtonContainer}>
               <SendButton sendMessage={handleMessageSend} />
             </Col>
           </Row>
+        </Col>
+        <Col xs={24}>
+          <UploadsPreview />
         </Col>
         <Col xs={24}>
           <div className={styles.textAreaWrapper}>

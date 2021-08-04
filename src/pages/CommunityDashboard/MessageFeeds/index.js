@@ -62,6 +62,10 @@ const MessageFeeds = ({ match, history }) => {
     setTargetReply(selectedReply);
   };
 
+  const handleResetTargetReply = () => {
+    setTargetReply(null);
+  };
+
   return channel ? (
     <Channel TypingIndicator={() => null} ThreadStart={() => null} ThreadHeader={CustomThreadHeader}>
       <Layout>
@@ -97,7 +101,7 @@ const MessageFeeds = ({ match, history }) => {
                 <MessageReplyInput
                   {...inputProps}
                   targetReply={targetReply}
-                  resetTargetReply={() => setTargetReply(null)}
+                  resetTargetReply={handleResetTargetReply}
                 />
               )}
             />

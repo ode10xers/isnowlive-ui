@@ -5,6 +5,7 @@ import {
   messageHasReactions,
   SimpleReactionsList,
   Avatar,
+  Attachment,
   MessageText,
   MessageTimestamp,
   useMessageContext,
@@ -106,10 +107,7 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
           {/* <MessageOptions displayLeft={false} messageWrapperRef={messageWrapperRef} /> */}
           <MessageText customWrapperClass={styles.messageTextWrapper} customInnerClass={styles.messageText} />
         </Col>
-        {/* <Col xs={24}>
-          Not sure how this will show up, test sometimes
-          {message.attachments && <Attachment attachments={message.attachments} />}
-        </Col> */}
+        <Col xs={24}>{message.attachments && <Attachment attachments={message.attachments} />}</Col>
         <Col xs={24}>{hasReactions && !showDetailedReactions && isReactionEnabled && <SimpleReactionsList />}</Col>
         <Col xs={24}>
           <Divider type="horizontal" className={styles.simpleDivider} />

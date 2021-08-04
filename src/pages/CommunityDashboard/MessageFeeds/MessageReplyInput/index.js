@@ -10,24 +10,30 @@ import {
   MessageInput,
   useChatContext,
   useMessageInputContext,
-  useChannelStateContext,
 } from 'stream-chat-react';
 
 import { preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
-const ReplyInputComponent = () => {
+const ReplyInputComponent = ({ resetTargetReply = () => {} }) => {
   const {
     closeEmojiPicker,
     emojiPickerIsOpen,
     handleEmojiKeyDown,
     openEmojiPicker,
     handleSubmit,
+    message,
   } = useMessageInputContext();
 
   const handleReplyMessage = async (e) => {
     preventDefaults(e);
+
+    if (message) {
+      // clearEdit();
+      resetTargetReply();
+    }
+
     handleSubmit(e);
   };
 
@@ -62,22 +68,6 @@ const ReplyInputComponent = () => {
 
 const MessageReplyInput = ({ targetReply = null, resetTargetReply = () => {} }) => {
   const { client } = useChatContext();
-
-  const { channel, thread } = useChannelStateContext();
-
-  const overrideSubmitHandler = async (message, channelId) => {
-    if (thread && thread.id) {
-      const messageReplyData = {
-        ...message,
-        parent: thread,
-        parent_id: thread.id,
-      };
-
-      await channel.sendMessage(messageReplyData);
-      resetTargetReply();
-    }
-  };
-
   // TODO: Can also check flag for if reply is enabled
   return (
     <Comment
@@ -90,16 +80,16 @@ const MessageReplyInput = ({ targetReply = null, resetTargetReply = () => {} }) 
             keycodeSubmitKeys={[]}
             grow={true}
             maxRows={5}
-            Input={ReplyInputComponent}
-            overrideSubmitHandler={overrideSubmitHandler}
+            Input={(inputProps) => <ReplyInputComponent {...inputProps} resetTargetReply={resetTargetReply} />}
+            // overrideSubmitHandler={overrideSubmitHandler}
           />
         ) : (
           <MessageInput
             keycodeSubmitKeys={[]}
             grow={true}
             maxRows={5}
-            Input={ReplyInputComponent}
-            overrideSubmitHandler={overrideSubmitHandler}
+            Input={(inputProps) => <ReplyInputComponent {...inputProps} resetTargetReply={resetTargetReply} />}
+            // overrideSubmitHandler={overrideSubmitHandler}
           />
         )
       }
