@@ -1,0 +1,6 @@
+@import '../../../../styles/variables.scss';
+
+.threadHeader  {
+  padding: 20px 10px;
+  border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke');
+}

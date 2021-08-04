@@ -9,10 +9,11 @@ import {
   MessageTimestamp,
   useMessageContext,
   useChatContext,
+  useChannelActionContext,
 } from 'stream-chat-react';
 
-import { Row, Col, Typography, Divider, Button, Popover } from 'antd';
-import { CommentOutlined, LikeOutlined, EditOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Divider, Button, Popover, Popconfirm, message as AntdMessage } from 'antd';
+import { CommentOutlined, LikeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { preventDefaults } from 'utils/helper';
 
@@ -22,6 +23,7 @@ const { Title, Text } = Typography;
 
 const CustomMessageItem = ({ editMessage = () => {} }) => {
   const { client } = useChatContext();
+  const { removeMessage } = useChannelActionContext();
   const { message, handleOpenThread, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
 
   const [reactionPopoverVisible, setReactionPopoverVisible] = useState(false);
@@ -43,14 +45,23 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
     handleOpenThread(e);
   };
 
-  // TODO: Investigate this later
-  const handleEditMessage = async (e) => {
+  const handleEditMessage = (e) => {
     editMessage(message);
-    // await setEdit(e);
-    // await handleEdit(e);
-    // await setEditingState(e);
   };
 
+  const handleDeleteFeedMessage = async (e) => {
+    preventDefaults(e);
+    try {
+      await client.deleteMessage(message.id);
+      removeMessage(message);
+      AntdMessage.success('Post deleted!');
+    } catch (error) {
+      console.error(error);
+      AntdMessage.error('Failed to delete post! Try again later');
+    }
+  };
+
+  // TODO: Get allowed actions, and render the CTAs accordingly
   return (
     <div className={styles.feedContainer}>
       <Row gutter={[10, 10]}>
@@ -67,13 +78,24 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
               </Title>
               <Text type="secondary">
                 {' '}
-                <MessageTimestamp />{' '}
+                <MessageTimestamp format="DD/MM/YYYY, hh:mm A" />{' '}
               </Text>
             </Col>
             {message.user.id === client.userID && (
-              <Col flex="0 0 40px">
-                <Button size="large" type="link" icon={<EditOutlined />} onClick={handleEditMessage} />
-              </Col>
+              <>
+                <Col flex="0 0 40px">
+                  <Button type="link" icon={<EditOutlined />} onClick={handleEditMessage} />
+                </Col>
+                <Col flex="0 0 40px">
+                  <Popconfirm
+                    okType="danger"
+                    title="Are you sure you want delete this post?"
+                    onConfirm={handleDeleteFeedMessage}
+                  >
+                    <Button danger type="link" icon={<DeleteOutlined />} />
+                  </Popconfirm>
+                </Col>
+              </>
             )}
           </Row>
         </Col>

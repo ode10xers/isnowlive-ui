@@ -60,17 +60,40 @@
   }
 }
 
-.messageReplyItem {
+.messageReplyContainer {
   padding-left: 40px;
+  display: block;
 
-  :global {
-    .str-chat__message-text {
-      width: 100%;
-      
-      .str-chat__message-text-inner {
-        max-width: 100%;
-        border: none;
-        background: map-get($map: $colors, $key: 'White');
+  .editingOverlay {
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .messageReplyItem {
+
+  
+    .replyActionButtons {
+      font-size: 12px;
+    }
+  
+    :global {
+      .ant-comment-actions {
+        margin-top: 4px !important;
+      }
+  
+      .str-chat__message-text {
+        width: 100%;
+        
+        .str-chat__message-text-inner {
+          max-width: 100%;
+          border: none;
+          background: map-get($map: $colors, $key: 'White');
+        }
       }
     }
   }

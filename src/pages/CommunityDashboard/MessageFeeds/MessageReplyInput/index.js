@@ -60,7 +60,7 @@ const ReplyInputComponent = () => {
   );
 };
 
-const MessageReplyInput = () => {
+const MessageReplyInput = ({ targetReply = null, resetTargetReply = () => {} }) => {
   const { client } = useChatContext();
 
   const { channel, thread } = useChannelStateContext();
@@ -74,6 +74,7 @@ const MessageReplyInput = () => {
       };
 
       await channel.sendMessage(messageReplyData);
+      resetTargetReply();
     }
   };
 
@@ -83,13 +84,24 @@ const MessageReplyInput = () => {
       className={styles.threadReplyInput}
       avatar={<Avatar image={client.user?.image} name={client.user?.name} />}
       content={
-        <MessageInput
-          keycodeSubmitKeys={[]}
-          grow={true}
-          maxRows={5}
-          Input={ReplyInputComponent}
-          overrideSubmitHandler={overrideSubmitHandler}
-        />
+        targetReply ? (
+          <MessageInput
+            message={targetReply}
+            keycodeSubmitKeys={[]}
+            grow={true}
+            maxRows={5}
+            Input={ReplyInputComponent}
+            overrideSubmitHandler={overrideSubmitHandler}
+          />
+        ) : (
+          <MessageInput
+            keycodeSubmitKeys={[]}
+            grow={true}
+            maxRows={5}
+            Input={ReplyInputComponent}
+            overrideSubmitHandler={overrideSubmitHandler}
+          />
+        )
       }
     />
   );

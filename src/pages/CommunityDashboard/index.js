@@ -60,7 +60,7 @@ const mockUsers = [attendeeUser1, attendeeUser2, creatorUser];
 const chatClient = StreamChat.getInstance('9kapp3pjzvmg');
 
 // NOTE : We manage the layouting here since Chat needs the client to be instantiated
-const CommunityDashboard = ({ match, history }) => {
+const CommunityDashboard = ({ match, history, location }) => {
   const {
     state: { userDetails },
   } = useGlobalContext();

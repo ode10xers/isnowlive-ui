@@ -18,6 +18,12 @@ import styles from './styles.module.scss';
 
 const { Title } = Typography;
 
+const channelSortObject = { created_at: 1 };
+const channelFilterObject = {
+  TEAM: { type: 'team' },
+  MESSAGING: { type: 'messaging' },
+};
+
 const ChannelListTemplate = ({ children, loading, LoadingIndicator, listTitle = 'Channels' }) => {
   // TODO: Can also add LoadingErrorIndicator for failed loadings
 
@@ -208,7 +214,8 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
         <div className={styles.channelListContainer}>
           <ChannelList
             channelRenderFilterFn={teamChannelFilter}
-            filter={userIncludedChannelsFilter}
+            filter={{ ...userIncludedChannelsFilter, ...channelFilterObject.TEAM }}
+            sort={channelSortObject}
             EmptyStateIndicator={(emptyStateProps) => {
               return (
                 <Title level={5} className={styles.emptyChannelText}>
@@ -224,7 +231,8 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
         <div className={styles.channelListContainer}>
           <ChannelList
             channelRenderFilterFn={messagingChannelFilter}
-            filter={userIncludedChannelsFilter}
+            filter={{ ...userIncludedChannelsFilter, ...channelFilterObject.MESSAGING }}
+            sort={channelSortObject}
             LoadingIndicator={ChannelListLoadingIndicator}
             EmptyStateIndicator={(emptyStateProps) => {
               return (

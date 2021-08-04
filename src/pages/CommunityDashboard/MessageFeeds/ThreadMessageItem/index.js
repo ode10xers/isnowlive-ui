@@ -8,9 +8,11 @@ import {
   ReactionSelector,
   messageHasReactions,
   useMessageContext,
+  useChatContext,
+  useChannelActionContext,
 } from 'stream-chat-react';
 
-import { Row, Col, Popover, Button, Divider, Typography, Comment } from 'antd';
+import { Row, Col, Popover, Button, Divider, Typography, Comment, Popconfirm, message as AntdMessage } from 'antd';
 import { LikeOutlined } from '@ant-design/icons';
 
 import dateUtil from 'utils/date';
@@ -23,7 +25,9 @@ const {
 } = dateUtil;
 const { Text, Title } = Typography;
 
-const ThreadMessageItem = () => {
+const ThreadMessageItem = ({ handleEditMessageReply = () => {}, editedMessage = null }) => {
+  const { client } = useChatContext();
+  const { removeMessage } = useChannelActionContext();
   const { message, initialMessage, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
 
   const hasReactions = messageHasReactions(message);
@@ -40,6 +44,19 @@ const ThreadMessageItem = () => {
     handleReaction(reaction, event);
   };
 
+  const handleDeleteMessageReply = async (e) => {
+    preventDefaults(e);
+    try {
+      await client.deleteMessage(message.id);
+      removeMessage(message);
+      AntdMessage.success('Message deleted successfully!');
+    } catch (error) {
+      console.error(error);
+      AntdMessage.error('Failed to delete message! Try again later');
+    }
+  };
+
+  // TODO: Get allowed actions, and render the CTAs accordingly
   return initialMessage ? (
     <div className={styles.feedContainer}>
       <Row gutter={[10, 10]}>
@@ -51,12 +68,10 @@ const ThreadMessageItem = () => {
             </Col>
             <Col flex="1 1 auto">
               <Title level={5} className={styles.messageAuthor}>
-                {' '}
-                {message.user?.name}{' '}
+                {message.user?.name}
               </Title>
               <Text type="secondary">
-                {' '}
-                <MessageTimestamp />{' '}
+                <MessageTimestamp />
               </Text>
             </Col>
           </Row>
@@ -65,13 +80,8 @@ const ThreadMessageItem = () => {
           <Divider type="horizontal" className={styles.simpleDivider} />
         </Col>
         <Col xs={24}>
-          {/* <MessageOptions displayLeft={false} messageWrapperRef={messageWrapperRef} /> */}
           <MessageText customWrapperClass={styles.messageTextWrapper} customInnerClass={styles.messageText} />
         </Col>
-        {/* <Col xs={24}>
-        Not sure how this will show up, test sometimes
-        {message.attachments && <Attachment attachments={message.attachments} />}
-      </Col> */}
         <Col xs={24}>{hasReactions && !showDetailedReactions && isReactionEnabled && <SimpleReactionsList />}</Col>
         <Col xs={24}>
           <Divider type="horizontal" className={styles.simpleDivider} />
@@ -106,14 +116,41 @@ const ThreadMessageItem = () => {
       </Row>
     </div>
   ) : (
-    <Comment
-      className={styles.messageReplyItem}
-      actions={[]}
-      author={message.user?.name}
-      avatar={<Avatar image={message.user?.image} name={message.user?.name} />}
-      content={<MessageText className={styles.replyContent} message={message} />}
-      datetime={toDateAndTime(message.updated_at)}
-    />
+    <div className={styles.messageReplyContainer}>
+      {editedMessage && editedMessage?.id === message.id && <div className={styles.editingOverlay} />}
+      <Comment
+        className={styles.messageReplyItem}
+        actions={
+          message?.user?.id === client.userID
+            ? [
+                <Button
+                  className={styles.replyActionButtons}
+                  size="small"
+                  type="link"
+                  onClick={() => handleEditMessageReply(message)}
+                >
+                  {' '}
+                  Edit{' '}
+                </Button>,
+                <Popconfirm
+                  okType="danger"
+                  title="Are you sure you want to delete this message?"
+                  onConfirm={handleDeleteMessageReply}
+                >
+                  <Button danger className={styles.replyActionButtons} size="small" type="link">
+                    {' '}
+                    Delete{' '}
+                  </Button>
+                </Popconfirm>,
+              ]
+            : []
+        }
+        author={message.user?.name}
+        avatar={<Avatar image={message.user?.image} name={message.user?.name} />}
+        content={<MessageText className={styles.replyContent} message={message} />}
+        datetime={toDateAndTime(message.updated_at)}
+      />
+    </div>
   );
 };
 
