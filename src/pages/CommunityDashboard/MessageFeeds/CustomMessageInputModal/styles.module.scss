@@ -1,20 +1,22 @@
 @import '../../../../styles/variables.scss';
 
-:global {
-  .str-chat__input-flat {
-    padding: 0px !important;
-
-    .str-chat__textarea {
-      // min-height: 200px;
-      > textarea {
-        height: 100% !important;
-        min-height: 200px !important;
+.newPostModal {
+  :global {
+    .str-chat__input-flat {
+      padding: 0px !important;
+  
+      .str-chat__textarea {
+        // min-height: 200px;
+        > textarea {
+          height: 100% !important;
+          min-height: 200px !important;
+        }
       }
     }
-  }
-
-  .str-chat__send-button {
-    display: block;
+  
+    .str-chat__send-button {
+      display: block;
+    }
   }
 }
 

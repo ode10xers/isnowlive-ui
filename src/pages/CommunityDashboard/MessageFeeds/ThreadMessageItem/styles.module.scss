@@ -30,7 +30,7 @@
   border: 1px solid map-get($map: $colors, $key: 'WhiteSmoke');
   border-radius: 8px;
   margin: 8px;
-  padding: 10px;
+  padding: 8px;
 
   .messageAuthor {
     margin-bottom: 0px;
@@ -40,7 +40,7 @@
     margin: 0;
   }
 
-  .commentButton, .likeButton {
+  .likeButton {
     border: none;
   }
 
@@ -56,6 +56,22 @@
     .messageText {
       background-color: transparent;
       border: none;
+    }
+  }
+}
+
+.messageReplyItem {
+  padding-left: 40px;
+
+  :global {
+    .str-chat__message-text {
+      width: 100%;
+      
+      .str-chat__message-text-inner {
+        max-width: 100%;
+        border: none;
+        background: map-get($map: $colors, $key: 'White');
+      }
     }
   }
 }

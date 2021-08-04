@@ -76,6 +76,7 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
 const CustomMessageInputModal = ({ visible, closeModal }) => {
   return (
     <Modal
+      className={styles.newPostModal}
       footer={null}
       centered={true}
       closable={true}

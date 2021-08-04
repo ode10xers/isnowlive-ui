@@ -111,9 +111,7 @@ const CommunityDashboard = ({ match, history }) => {
       setClientReady(false);
     }
 
-    return () => {
-      chatClient.disconnectUser();
-    };
+    return () => chatClient.disconnectUser();
   }, [userDetails]);
 
   useEffect(() => {

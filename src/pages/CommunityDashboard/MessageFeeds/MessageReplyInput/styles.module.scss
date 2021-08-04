@@ -1,14 +1,9 @@
 @import '../../../../styles/variables.scss';
 
-// :global {
-//   .str-chat__input-flat {
-//     padding: 0px !important;
-//   }
-
-//   .str-chat__send-button {
-//     display: block;
-//   }
-// }
+.threadReplyInput {
+  padding: 0 20px 0 40px;
+  background-color: map-get($map: $colors, $key: 'WhiteSmoke') !important;
+}
 
 .inputReplyContainer {
   :global {
@@ -20,6 +15,7 @@
   .emojiButton {
     border: none;
     margin-left: auto;
+    background: transparent;
   
     .emojiIcon {
       font-size: 20px;
