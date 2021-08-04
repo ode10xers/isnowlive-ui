@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { Layout } from 'antd';
 
-import { Channel, MessageList, Thread, Window } from 'stream-chat-react';
+import { Channel, MessageList, Thread, useMessageContext, Window } from 'stream-chat-react';
 
 import ChannelMemberList from '../ChannelMemberList';
 import CustomFeedsHeader from './CustomFeedsHeader';
@@ -21,6 +21,11 @@ const { Header, Content, Sider } = Layout;
 // NOTE: This UI will specifically be used for team typed channels
 const MessageFeeds = ({ match, history }) => {
   const [messageModalVisible, setMessageModalVisible] = useState(false);
+  const [targetMessage, setTargetMessage] = useState(null);
+
+  const { customMessageActions } = useMessageContext();
+
+  console.log(customMessageActions);
 
   const handleOpenMessageModal = () => {
     setMessageModalVisible(true);
@@ -28,12 +33,22 @@ const MessageFeeds = ({ match, history }) => {
 
   const handleCloseMessageModal = () => {
     setMessageModalVisible(false);
+    setTargetMessage(null);
+  };
+
+  const handleEditMessage = (selectedMessage) => {
+    setTargetMessage(selectedMessage);
+    handleOpenMessageModal();
   };
 
   return (
     <Channel TypingIndicator={() => null} ThreadStart={() => null} ThreadHeader={CustomThreadHeader}>
       <Layout>
-        <CustomMessageInputModal visible={messageModalVisible} closeModal={handleCloseMessageModal} />
+        <CustomMessageInputModal
+          visible={messageModalVisible}
+          closeModal={handleCloseMessageModal}
+          targetMessage={targetMessage}
+        />
         <Header className={styles.channelHeaderContainer}>
           <CustomFeedsHeader openMessageModal={handleOpenMessageModal} />
         </Header>
@@ -42,9 +57,7 @@ const MessageFeeds = ({ match, history }) => {
             <Window hideOnThread={true}>
               <MessageList
                 onlySenderCanEdit={true}
-                Message={(messageProps) => (
-                  <CustomMessageItem {...messageProps} openMessageModal={handleOpenMessageModal} />
-                )}
+                Message={(messageProps) => <CustomMessageItem {...messageProps} editMessage={handleEditMessage} />}
               />
             </Window>
             <Thread fullWidth={true} Message={ThreadMessageItem} Input={MessageReplyInput} />

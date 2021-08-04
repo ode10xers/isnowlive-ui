@@ -2,19 +2,11 @@ import React from 'react';
 
 import { Modal, Row, Col, Button, Popover } from 'antd';
 import { SmileOutlined } from '@ant-design/icons';
-import {
-  ChatAutoComplete,
-  EmojiPicker,
-  SendButton,
-  MessageInput,
-  useMessageInputContext,
-  useEditHandler,
-} from 'stream-chat-react';
+import { ChatAutoComplete, EmojiPicker, SendButton, MessageInput, useMessageInputContext } from 'stream-chat-react';
+
 import { resetBodyStyle } from 'components/Modals/modals';
 
 import styles from './styles.module.scss';
-
-// TODO: Adjust this for edit message
 
 const CustomInputComponent = ({ closeModal = () => {} }) => {
   const {
@@ -24,8 +16,6 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     handleSubmit,
     openEmojiPicker,
   } = useMessageInputContext();
-
-  const { editing, clearEdit } = useEditHandler();
 
   const handleMessageSend = (e) => {
     handleSubmit(e);
@@ -73,7 +63,7 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
   );
 };
 
-const CustomMessageInputModal = ({ visible, closeModal }) => {
+const CustomMessageInputModal = ({ visible, closeModal, targetMessage = null }) => {
   return (
     <Modal
       className={styles.newPostModal}
@@ -86,12 +76,15 @@ const CustomMessageInputModal = ({ visible, closeModal }) => {
       afterClose={resetBodyStyle}
       title="Post a message"
     >
-      <MessageInput
-        keycodeSubmitKeys={[]}
-        grow={true}
-        maxRows={7}
-        Input={(inputProps) => <CustomInputComponent {...inputProps} closeModal={closeModal} />}
-      />
+      {visible && (
+        <MessageInput
+          message={targetMessage}
+          keycodeSubmitKeys={[]}
+          grow={true}
+          maxRows={7}
+          Input={(inputProps) => <CustomInputComponent {...inputProps} closeModal={closeModal} />}
+        />
+      )}
     </Modal>
   );
 };

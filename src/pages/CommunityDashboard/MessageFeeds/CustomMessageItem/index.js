@@ -8,45 +8,21 @@ import {
   MessageText,
   MessageTimestamp,
   useMessageContext,
-  useEditHandler,
   useChatContext,
 } from 'stream-chat-react';
 
-import { Row, Col, Typography, Divider, Button, Popover, List, Comment } from 'antd';
+import { Row, Col, Typography, Divider, Button, Popover } from 'antd';
 import { CommentOutlined, LikeOutlined, EditOutlined } from '@ant-design/icons';
 
-import dateUtil from 'utils/date';
 import { preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
 
-const {
-  formatDate: { toDateAndTime },
-} = dateUtil;
-
-const MessageRepliesItem = (message) => {
-  return (
-    <List.Item>
-      <Comment
-        actions={[]}
-        author={message.user?.name}
-        avatar={<Avatar image={message.user?.image} name={message.user?.name} />}
-        content={<MessageText message={message} />}
-        datetime={toDateAndTime(message.updated_at)}
-      />
-    </List.Item>
-  );
-};
-
-const CustomMessageItem = ({ openMessageModal }) => {
-  const { message, handleOpenThread, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
-
+const CustomMessageItem = ({ editMessage = () => {} }) => {
   const { client } = useChatContext();
-  const { handleEdit, setEditingState } = useMessageContext();
-
-  const { setEdit } = useEditHandler();
+  const { message, handleOpenThread, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
 
   const [reactionPopoverVisible, setReactionPopoverVisible] = useState(false);
 
@@ -69,10 +45,10 @@ const CustomMessageItem = ({ openMessageModal }) => {
 
   // TODO: Investigate this later
   const handleEditMessage = async (e) => {
-    await setEdit(e);
-    await handleEdit(e);
+    editMessage(message);
+    // await setEdit(e);
+    // await handleEdit(e);
     // await setEditingState(e);
-    openMessageModal();
   };
 
   return (
@@ -96,7 +72,7 @@ const CustomMessageItem = ({ openMessageModal }) => {
             </Col>
             {message.user.id === client.userID && (
               <Col flex="0 0 40px">
-                <Button size="large" type="link" icon={<EditOutlined />} />
+                <Button size="large" type="link" icon={<EditOutlined />} onClick={handleEditMessage} />
               </Col>
             )}
           </Row>
