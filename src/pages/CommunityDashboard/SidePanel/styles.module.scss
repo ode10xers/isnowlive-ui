@@ -1,19 +1,5 @@
 @import '../../../styles/variables.scss';
 
-// TODO: Override some Stream Variables here as required
-
-:global {
-  .str-chat {
-    --main-font :  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    --second-font :  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    width: 100%;
-    height: 100% !important;
-    background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
-  }
-}
-
 .sidePanelContainer {
   width: 100%;
   height: 100vh;
@@ -48,6 +34,15 @@
     &:hover {
       color: map-get($map: $colors, $key: 'DodgerBlue') !important;
       background-color: map-get($map: $colors, $key: 'White') !important;
+    }
+  }
+
+  @media screen and (max-width: 960px) {
+    :global {
+      .str-chat-channel-list.messaging, .str-chat-channel-list.team, .str-chat-channel-list.commerce {
+        position: initial;
+        min-height: 0;
+      }
     }
   }
 }

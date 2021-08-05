@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { StreamChat } from 'stream-chat';
 import { Chat } from 'stream-chat-react';
 
 import { Layout, Spin } from 'antd';
+import { MenuOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -19,6 +20,9 @@ import { isAPISuccess } from 'utils/helper';
 import { useGlobalContext } from 'services/globalContext';
 
 import 'stream-chat-react/dist/css/index.css';
+
+// eslint-disable-next-line
+import styles from './styles.module.scss';
 
 const { Content, Sider } = Layout;
 
@@ -67,6 +71,7 @@ const CommunityDashboard = ({ match, history, location }) => {
 
   const [clientReady, setClientReady] = useState(false);
   const [courseDetails, setCourseDetails] = useState(null);
+  const [mainSidebarCollapsed, setMainSidebarCollapsed] = useState(false);
 
   const fetchCourseDetails = useCallback(async (courseExternalId) => {
     try {
@@ -131,18 +136,35 @@ const CommunityDashboard = ({ match, history, location }) => {
     );
   }
 
+  const handleMainSidebarCollapsed = (collapsed) => {
+    setMainSidebarCollapsed(collapsed);
+  };
+
   // TODO: Might want to move these later to creator dashboard index.js
   // This is so that they can see whenever there are new messages
   return (
     <Chat client={chatClient}>
       <Layout>
-        <Sider>
-          <SidePanel isCourseOwner={isCourseOwner} creatorUsername={courseDetails?.creator_username} />
+        <Sider
+          className={styles.mainSideBar}
+          collapsed={mainSidebarCollapsed}
+          onCollapse={handleMainSidebarCollapsed}
+          collapsedWidth={0}
+          breakpoint="lg"
+          trigger={<MenuOutlined />}
+          zeroWidthTriggerStyle={{ backgroundColor: '#1890ff', top: 12 }}
+        >
+          <SidePanel
+            closeSideBar={() => handleMainSidebarCollapsed(true)}
+            isCourseOwner={isCourseOwner}
+            creatorUsername={courseDetails?.creator_username}
+          />
         </Sider>
         <Content>
           <Switch>
             <Route exact path={match.url + Routes.community.feeds} component={MessageFeeds} />
             <Route exact path={match.url + Routes.community.chatChannels} component={ChatWindow} />
+            <Redirect to={match.url + Routes.community.feeds} />
           </Switch>
         </Content>
       </Layout>

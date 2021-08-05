@@ -50,7 +50,7 @@ const ChannelListLoadingIndicator = ({ loadingText = 'Getting channel info' }) =
   />
 );
 
-const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
+const SidePanel = ({ isCourseOwner = false, creatorUsername = null, closeSideBar = () => {} }) => {
   const history = useHistory();
   const match = useRouteMatch();
 
@@ -97,6 +97,7 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
 
   const redirectToDashboard = (e) => {
     preventDefaults(e);
+    closeSideBar();
     history.push(isCourseOwner ? Routes.creatorDashboard.rootPath : Routes.attendeeDashboard.rootPath);
   };
 
@@ -113,12 +114,14 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
     preventDefaults(e);
     setTargetChannelType('team');
     openChannelModal();
+    closeSideBar();
   };
 
   const handleInitiateChatWithAttendee = (e) => {
     preventDefaults(e);
     setTargetChannelType('messaging');
     openChannelModal();
+    closeSideBar();
   };
 
   const handleInitiateChatWithCreator = async (e) => {
@@ -149,6 +152,8 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
         setIsLoading(false);
       }
     }
+
+    closeSideBar();
   };
 
   return (
@@ -222,7 +227,7 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
             }}
             LoadingIndicator={ChannelListLoadingIndicator}
             List={(listProps) => <ChannelListTemplate {...listProps} listTitle="Channels" />}
-            Preview={ChannelListItem}
+            Preview={(previewProps) => <ChannelListItem {...previewProps} onChannelItemClicked={closeSideBar} />}
           />
         </div>
         <div className={styles.channelListContainer}>
@@ -239,7 +244,7 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
               );
             }}
             List={(listProps) => <ChannelListTemplate {...listProps} listTitle="Messages" />}
-            Preview={ChannelListItem}
+            Preview={(previewProps) => <ChannelListItem {...previewProps} onChannelItemClicked={closeSideBar} />}
           />
         </div>
       </Space>

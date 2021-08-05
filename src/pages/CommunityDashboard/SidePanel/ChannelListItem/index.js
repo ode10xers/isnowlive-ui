@@ -12,7 +12,7 @@ import styles from './styles.module.scss';
 
 const { Text, Paragraph } = Typography;
 
-const ChannelListItem = ({ channel, setActiveChannel }) => {
+const ChannelListItem = ({ channel, setActiveChannel, onChannelItemClicked = () => {} }) => {
   const history = useHistory();
   const location = useLocation();
   const match = useRouteMatch();
@@ -78,6 +78,7 @@ const ChannelListItem = ({ channel, setActiveChannel }) => {
             channel.type === 'team' ? Routes.community.feeds : Routes.community.chatChannels
           }`
         );
+        onChannelItemClicked();
         setActiveChannel(channel);
       }}
     >

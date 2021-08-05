@@ -1,0 +1,28 @@
+@import '../../styles/variables.scss';
+
+:global {
+  .str-chat {
+    --main-font :  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    --second-font :  -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    width: 100%;
+    height: 100% !important;
+    background-color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  }
+}
+
+.mainSideBar {
+  @media screen and (max-width: 993px) {
+    position: absolute !important;
+    z-index: 10000;
+    height: 100vh;
+    box-shadow: 2px 0 4px -3px #333 !important;
+  }
+
+  :global {
+    .ant-layout-sider-zero-width-trigger:hover::after {
+      background-color: transparent;
+    }
+  }
+}
