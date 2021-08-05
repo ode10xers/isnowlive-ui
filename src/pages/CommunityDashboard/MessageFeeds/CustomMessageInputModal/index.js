@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Modal, Row, Col, Button, Popover, Upload, message as AntdMessage } from 'antd';
+import { Modal, Row, Col, Button, Popover, Upload, Typography, message as AntdMessage } from 'antd';
 import { SmileOutlined, CloudUploadOutlined } from '@ant-design/icons';
 import {
   ChatAutoComplete,
@@ -15,6 +15,8 @@ import { resetBodyStyle } from 'components/Modals/modals';
 
 import styles from './styles.module.scss';
 
+const { Text } = Typography;
+
 const CustomInputComponent = ({ closeModal = () => {} }) => {
   const {
     closeEmojiPicker,
@@ -23,10 +25,11 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     handleSubmit,
     openEmojiPicker,
     uploadNewFiles,
-    message,
+    isUploadEnabled,
+    maxFilesLeft,
+    fileUploads,
+    imageUploads,
   } = useMessageInputContext();
-
-  console.log(message);
 
   const handleMessageSend = (e) => {
     handleSubmit(e);
@@ -34,7 +37,6 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     closeModal();
   };
 
-  // TODO: Add file handling later
   const handleBeforeFileUpload = (file) => {
     const isValidFileSize = file.size / 1024 / 1024 < 20; // Stream max file size = 20MB
     if (!isValidFileSize) {
@@ -48,6 +50,8 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     uploadNewFiles([fileData.file]);
   };
 
+  // TODO: Editing a file with attachment doesn't render the images correctly. Investigate
+  // the message pulled from MessageInputContext does have attachments property
   return (
     <div className={styles.inputWrapper}>
       <Row gutter={[10, 12]}>
@@ -70,17 +74,29 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
                 />
               </Popover>
             </Col>
-            <Col flex="0 0 40px">
-              <Upload
-                defaultFileList={[]}
-                showUploadList={false}
-                multiple={false}
-                beforeUpload={handleBeforeFileUpload}
-                customRequest={handleFileUpload}
-              >
-                <Button type="default" icon={<CloudUploadOutlined />} />
-              </Upload>
-            </Col>
+            {isUploadEnabled && (
+              <Col flex="0 0 100px">
+                {maxFilesLeft ? (
+                  <Upload
+                    defaultFileList={[]}
+                    showUploadList={false}
+                    multiple={false}
+                    beforeUpload={handleBeforeFileUpload}
+                    customRequest={handleFileUpload}
+                  >
+                    <Button type="default" icon={<CloudUploadOutlined />} />
+                  </Upload>
+                ) : (
+                  <div className={styles.maxAttachmentText}>
+                    <Text type="danger">
+                      {' '}
+                      You can only attach max {Object.keys(fileUploads).length +
+                        Object.keys(imageUploads).length} files{' '}
+                    </Text>
+                  </div>
+                )}
+              </Col>
+            )}
             <Col flex="1 1 auto"></Col>
             <Col flex="0 0 40px" className={styles.sendButtonContainer}>
               <SendButton sendMessage={handleMessageSend} />
