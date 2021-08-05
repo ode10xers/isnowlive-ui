@@ -8,6 +8,7 @@ import {
   UploadsPreview,
   SendButton,
   MessageInput,
+  DefaultTriggerProvider,
   useMessageInputContext,
 } from 'stream-chat-react';
 
@@ -107,6 +108,9 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
           <UploadsPreview />
         </Col>
         <Col xs={24}>
+          <DefaultTriggerProvider />
+        </Col>
+        <Col xs={24}>
           <div className={styles.textAreaWrapper}>
             <ChatAutoComplete />
           </div>
@@ -131,6 +135,7 @@ const CustomMessageInputModal = ({ visible, closeModal, targetMessage = null }) 
     >
       {visible && (
         <MessageInput
+          additionalTextareaProps={{ minRows: 5 }}
           message={targetMessage}
           keycodeSubmitKeys={[]}
           grow={true}
