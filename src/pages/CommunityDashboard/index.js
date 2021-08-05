@@ -154,11 +154,7 @@ const CommunityDashboard = ({ match, history, location }) => {
           trigger={<MenuOutlined />}
           zeroWidthTriggerStyle={{ backgroundColor: '#1890ff', top: 12 }}
         >
-          <SidePanel
-            closeSideBar={() => handleMainSidebarCollapsed(true)}
-            isCourseOwner={isCourseOwner}
-            creatorUsername={courseDetails?.creator_username}
-          />
+          <SidePanel isCourseOwner={isCourseOwner} creatorUsername={courseDetails?.creator_username} />
         </Sider>
         <Content>
           <Switch>
