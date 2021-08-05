@@ -36,7 +36,10 @@ const ChannelMemberList = () => {
     <List
       itemLayout="vertical"
       split={false}
-      loading={isLoading}
+      loading={{
+        spinning: isLoading,
+        tip: 'Loading members',
+      }}
       rowKey={(member) => member.user_id}
       header={`Members (${channelMembers.length})`}
       dataSource={channelMembers}

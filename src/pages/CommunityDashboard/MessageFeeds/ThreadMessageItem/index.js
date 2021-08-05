@@ -28,7 +28,16 @@ const { Text, Title } = Typography;
 const ThreadMessageItem = ({ handleEditMessageReply = () => {}, editedMessage = null }) => {
   const { client } = useChatContext();
   const { removeMessage } = useChannelActionContext();
-  const { message, initialMessage, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
+  const {
+    message,
+    initialMessage,
+    handleReaction,
+    isReactionEnabled,
+    showDetailedReactions,
+    actionsEnabled,
+    isMyMessage,
+    getMessageActions,
+  } = useMessageContext();
 
   const hasReactions = messageHasReactions(message);
 
@@ -88,26 +97,28 @@ const ThreadMessageItem = ({ handleEditMessageReply = () => {}, editedMessage = 
         </Col>
         <Col xs={24}>
           <Row gutter={8}>
-            <Col flex="0 0 100px">
-              <Popover
-                visible={reactionPopoverVisible}
-                overlayClassName={styles.reactionPopover}
-                overlayInnerStyle={{
-                  background: 'black',
-                }}
-                content={<ReactionSelector handleReaction={handleReactionClicked} />}
-                trigger="click"
-              >
-                <Button
-                  type="default"
-                  icon={<LikeOutlined />}
-                  className={styles.likeButton}
-                  onClick={handleLikeButtonClicked}
+            {getMessageActions().includes('react') && (
+              <Col flex="0 0 100px">
+                <Popover
+                  visible={reactionPopoverVisible}
+                  overlayClassName={styles.reactionPopover}
+                  overlayInnerStyle={{
+                    background: 'black',
+                  }}
+                  content={<ReactionSelector handleReaction={handleReactionClicked} />}
+                  trigger="click"
                 >
-                  Like
-                </Button>
-              </Popover>
-            </Col>
+                  <Button
+                    type="default"
+                    icon={<LikeOutlined />}
+                    className={styles.likeButton}
+                    onClick={handleLikeButtonClicked}
+                  >
+                    Like
+                  </Button>
+                </Popover>
+              </Col>
+            )}
             <Col flex="1 1 auto" className={styles.replyCountContainer}>
               <Text type="secondary"> {message.reply_count} Replies </Text>
             </Col>
@@ -121,7 +132,7 @@ const ThreadMessageItem = ({ handleEditMessageReply = () => {}, editedMessage = 
       <Comment
         className={styles.messageReplyItem}
         actions={
-          message?.user?.id === client.userID
+          actionsEnabled && isMyMessage()
             ? [
                 <Button
                   className={styles.replyActionButtons}

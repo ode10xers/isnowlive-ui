@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import { Layout } from 'antd';
+import { Layout, Spin } from 'antd';
 
-import { Channel, MessageList, Thread, useChatContext, Window } from 'stream-chat-react';
+import { Channel, MessageList, Thread, Window, useChatContext } from 'stream-chat-react';
 
 import ChannelMemberList from '../ChannelMemberList';
 import CustomFeedsHeader from './CustomFeedsHeader';
@@ -81,6 +81,7 @@ const MessageFeeds = ({ match, history }) => {
           <Content>
             <Window hideOnThread={true}>
               <MessageList
+                LoadingIndicator={<Spin spinning={true} tip="Fetching feed posts" />}
                 hideDeletedMessages={true}
                 disableDateSeparator={true}
                 onlySenderCanEdit={true}

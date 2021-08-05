@@ -25,7 +25,16 @@ const { Title, Text } = Typography;
 const CustomMessageItem = ({ editMessage = () => {} }) => {
   const { client } = useChatContext();
   const { removeMessage } = useChannelActionContext();
-  const { message, handleOpenThread, handleReaction, isReactionEnabled, showDetailedReactions } = useMessageContext();
+  const {
+    message,
+    handleOpenThread,
+    handleReaction,
+    isReactionEnabled,
+    showDetailedReactions,
+    actionsEnabled,
+    isMyMessage,
+    getMessageActions,
+  } = useMessageContext();
 
   const [reactionPopoverVisible, setReactionPopoverVisible] = useState(false);
 
@@ -62,7 +71,6 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
     }
   };
 
-  // TODO: Get allowed actions, and render the CTAs accordingly
   return (
     <div className={styles.feedContainer}>
       <Row gutter={[10, 10]}>
@@ -80,20 +88,24 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
                 <MessageTimestamp format="DD/MM/YYYY, hh:mm A" />
               </Text>
             </Col>
-            {message.user.id === client.userID && (
+            {actionsEnabled && isMyMessage() && (
               <>
-                <Col flex="0 0 40px">
-                  <Button type="link" icon={<EditOutlined />} onClick={handleEditMessage} />
-                </Col>
-                <Col flex="0 0 40px">
-                  <Popconfirm
-                    okType="danger"
-                    title="Are you sure you want delete this post?"
-                    onConfirm={handleDeleteFeedMessage}
-                  >
-                    <Button danger type="link" icon={<DeleteOutlined />} />
-                  </Popconfirm>
-                </Col>
+                {getMessageActions().includes('edit') && (
+                  <Col flex="0 0 40px">
+                    <Button type="link" icon={<EditOutlined />} onClick={handleEditMessage} />
+                  </Col>
+                )}
+                {getMessageActions().includes('delete') && (
+                  <Col flex="0 0 40px">
+                    <Popconfirm
+                      okType="danger"
+                      title="Are you sure you want delete this post?"
+                      onConfirm={handleDeleteFeedMessage}
+                    >
+                      <Button danger type="link" icon={<DeleteOutlined />} />
+                    </Popconfirm>
+                  </Col>
+                )}
               </>
             )}
           </Row>
@@ -102,7 +114,6 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
           <Divider type="horizontal" className={styles.simpleDivider} />
         </Col>
         <Col xs={24}>
-          {/* <MessageOptions displayLeft={false} messageWrapperRef={messageWrapperRef} /> */}
           <MessageText customWrapperClass={styles.messageTextWrapper} customInnerClass={styles.messageText} />
         </Col>
         <Col xs={24}>{message.attachments && <Attachment attachments={message.attachments} />}</Col>
@@ -112,40 +123,44 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
         </Col>
         <Col xs={24}>
           <Row gutter={8}>
-            <Col flex="0 0 100px">
-              <Popover
-                visible={reactionPopoverVisible}
-                overlayClassName={styles.reactionPopover}
-                overlayInnerStyle={{
-                  background: 'black',
-                }}
-                content={
-                  <div onMouseLeave={() => setReactionPopoverVisible(false)}>
-                    <ReactionSelector handleReaction={handleReactionClicked} />
-                  </div>
-                }
-                trigger="click"
-              >
+            {getMessageActions().includes('react') && (
+              <Col flex="0 0 100px">
+                <Popover
+                  visible={reactionPopoverVisible}
+                  overlayClassName={styles.reactionPopover}
+                  overlayInnerStyle={{
+                    background: 'black',
+                  }}
+                  content={
+                    <div onMouseLeave={() => setReactionPopoverVisible(false)}>
+                      <ReactionSelector handleReaction={handleReactionClicked} />
+                    </div>
+                  }
+                  trigger="click"
+                >
+                  <Button
+                    type="default"
+                    icon={<LikeOutlined />}
+                    className={styles.likeButton}
+                    onClick={handleLikeButtonClicked}
+                  >
+                    Like
+                  </Button>
+                </Popover>
+              </Col>
+            )}
+            {getMessageActions().includes('reply') && (
+              <Col flex="0 0 100px">
                 <Button
                   type="default"
-                  icon={<LikeOutlined />}
-                  className={styles.likeButton}
-                  onClick={handleLikeButtonClicked}
+                  icon={<CommentOutlined />}
+                  onClick={handleCommentClicked}
+                  className={styles.commentButton}
                 >
-                  Like
+                  Comment
                 </Button>
-              </Popover>
-            </Col>
-            <Col flex="0 0 100px">
-              <Button
-                type="default"
-                icon={<CommentOutlined />}
-                onClick={handleCommentClicked}
-                className={styles.commentButton}
-              >
-                Comment
-              </Button>
-            </Col>
+              </Col>
+            )}
             <Col flex="1 1 auto" className={styles.replyCountContainer}>
               <Text type="secondary"> {message.reply_count} Replies </Text>
             </Col>

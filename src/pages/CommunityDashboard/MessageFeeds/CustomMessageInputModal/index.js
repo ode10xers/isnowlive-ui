@@ -23,7 +23,10 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     handleSubmit,
     openEmojiPicker,
     uploadNewFiles,
+    message,
   } = useMessageInputContext();
+
+  console.log(message);
 
   const handleMessageSend = (e) => {
     handleSubmit(e);
@@ -32,7 +35,7 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
   };
 
   // TODO: Add file handling later
-  const handleBeforeImageUpload = (file) => {
+  const handleBeforeFileUpload = (file) => {
     const isValidFileSize = file.size / 1024 / 1024 < 20; // Stream max file size = 20MB
     if (!isValidFileSize) {
       AntdMessage.error('Image must be smaller than 20MB!');
@@ -41,7 +44,7 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
     return isValidFileSize;
   };
 
-  const handleImageUpload = (fileData) => {
+  const handleFileUpload = (fileData) => {
     uploadNewFiles([fileData.file]);
   };
 
@@ -72,8 +75,8 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
                 defaultFileList={[]}
                 showUploadList={false}
                 multiple={false}
-                beforeUpload={handleBeforeImageUpload}
-                customRequest={handleImageUpload}
+                beforeUpload={handleBeforeFileUpload}
+                customRequest={handleFileUpload}
               >
                 <Button type="default" icon={<CloudUploadOutlined />} />
               </Upload>

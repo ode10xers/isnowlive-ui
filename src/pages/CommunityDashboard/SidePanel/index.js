@@ -25,8 +25,6 @@ const channelFilterObject = {
 };
 
 const ChannelListTemplate = ({ children, loading, LoadingIndicator, listTitle = 'Channels' }) => {
-  // TODO: Can also add LoadingErrorIndicator for failed loadings
-
   return (
     <div>
       <Title level={5} className={styles.pl10}>
@@ -153,8 +151,6 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
     }
   };
 
-  // TODO: Consider moving this outside so we can also use this for edit channel flow
-  // OR adjust ChannelListItem to have edit button
   return (
     <Spin spinning={isLoading} size="large">
       {isCourseOwner && (
@@ -162,21 +158,22 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
       )}
       <Space direction="vertical" className={styles.sidePanelContainer}>
         <div className={styles.navItem}>
-          <Title level={5} className={styles.textAlignCenter}>
-            {' '}
-            Hi, {client.user.name}{' '}
-          </Title>
-        </div>
-        <div className={styles.navItem}>
           <Button
             block
-            type="link"
+            ghost
+            type="default"
             className={styles.whiteText}
             icon={<ArrowLeftOutlined />}
             onClick={redirectToDashboard}
           >
             Back to Dashboard
           </Button>
+        </div>
+        <div className={styles.navItem}>
+          <Title level={5} className={styles.textAlignCenter}>
+            {' '}
+            Hi, {client.user.name}{' '}
+          </Title>
         </div>
         {isCourseOwner ? (
           <div className={styles.navItem}>
@@ -214,7 +211,7 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
         <div className={styles.channelListContainer}>
           <ChannelList
             channelRenderFilterFn={teamChannelFilter}
-            filter={{ ...userIncludedChannelsFilter, ...channelFilterObject.TEAM }}
+            filters={{ ...userIncludedChannelsFilter, ...channelFilterObject.TEAM }}
             sort={channelSortObject}
             EmptyStateIndicator={(emptyStateProps) => {
               return (
@@ -231,7 +228,7 @@ const SidePanel = ({ isCourseOwner = false, creatorUsername = null }) => {
         <div className={styles.channelListContainer}>
           <ChannelList
             channelRenderFilterFn={messagingChannelFilter}
-            filter={{ ...userIncludedChannelsFilter, ...channelFilterObject.MESSAGING }}
+            filters={{ ...userIncludedChannelsFilter, ...channelFilterObject.MESSAGING }}
             sort={channelSortObject}
             LoadingIndicator={ChannelListLoadingIndicator}
             EmptyStateIndicator={(emptyStateProps) => {
