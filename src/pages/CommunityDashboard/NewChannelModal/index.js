@@ -4,6 +4,8 @@ import { useChatContext } from 'stream-chat-react';
 
 import { Modal, Form, Button, Select, Input, Row, Col } from 'antd';
 
+import Routes from 'routes';
+
 import Loader from 'components/Loader';
 import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
 
@@ -59,10 +61,11 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
   useEffect(() => {
     if (visible) {
       fetchAvailableMembers();
+      form.resetFields();
     } else {
       setAvailableMembers([]);
     }
-  }, [visible, fetchAvailableMembers]);
+  }, [form, visible, fetchAvailableMembers]);
 
   const handleFormFinish = async (values) => {
     setIsLoading(true);
@@ -70,19 +73,39 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
       let newChannel = null;
 
       if (type === 'messaging') {
-        newChannel = await client.channel('messaging', {
-          members: [client.userID, values.channelMembers],
+        const privateMessageToAttendeeMembers = [client.userID, values.channelMembers];
+
+        const existingChannel = await client.queryChannels({
+          type: 'messaging',
+          members: { $eq: privateMessageToAttendeeMembers },
         });
+
+        if (existingChannel.length > 0) {
+          newChannel = existingChannel[0];
+        } else {
+          newChannel = await client.channel('messaging', {
+            members: [client.userID, values.channelMembers],
+          });
+          await newChannel.watch();
+        }
       } else {
+        // NOTE: We'll need to specify the channel id here,
+        // Stream by default generates an ID based on specified members
+        // and that might block us from creating 2 different channels with the same members
+        // In order to do that we'll need to specify the ID
         newChannel = await client.channel('team', {
           name: values.channelName ?? 'Channel Name',
           members: [client.userID, ...values.channelMembers],
         });
+        await newChannel.watch();
       }
 
       if (newChannel) {
-        await newChannel.watch();
-        history.push(`/community/${match.params.course_id}/channels`);
+        history.push(
+          `/community/${match.params.course_id}${
+            type === 'messaging' ? Routes.community.chatChannels : Routes.community.feeds
+          }`
+        );
         setActiveChannel(newChannel);
       }
 
@@ -94,8 +117,8 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
     setIsLoading(false);
   };
 
-  // TODO: Need to show list of buyers/team members here
-  // TODO: Filter the members if the single chat message already exists
+  // TODO: Need to show list of buyers here
+
   return (
     <Modal
       width={640}
@@ -103,7 +126,7 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
       centered={true}
       closable={true}
       visible={visible}
-      onClose={closeModal}
+      onCancel={closeModal}
       title="Create new chat"
       afterClose={resetBodyStyle}
     >
