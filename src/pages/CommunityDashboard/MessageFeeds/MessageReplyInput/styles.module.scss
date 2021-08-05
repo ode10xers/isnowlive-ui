@@ -10,6 +10,10 @@
     .str-chat__send-button {
       display: block;
     }
+
+    .str-chat__emojisearch {
+      z-index: 9999;
+    }
   }
 
   .emojiButton {

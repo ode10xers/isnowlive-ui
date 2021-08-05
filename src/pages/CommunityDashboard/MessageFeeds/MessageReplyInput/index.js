@@ -11,8 +11,10 @@ import {
   useChatContext,
   useChannelStateContext,
   useMessageInputContext,
+  DefaultTriggerProvider,
 } from 'stream-chat-react';
 
+import { isMobileDevice } from 'utils/device';
 import { preventDefaults } from 'utils/helper';
 
 import styles from './styles.module.scss';
@@ -40,15 +42,15 @@ const ReplyInputComponent = ({ resetTargetReply = () => {} }) => {
   return (
     <Row gutter={[8, 8]} className={styles.inputReplyContainer}>
       <Col flex="1 1 auto">
+        <DefaultTriggerProvider />
         <ChatAutoComplete />
       </Col>
       <Col flex="0 0 40px">
         <Space direction="vertical" align="center">
           <Popover
-            placement="topRight"
             overlayClassName={styles.emojiPopupContainer}
             visible={emojiPickerIsOpen}
-            content={<EmojiPicker />}
+            content={<EmojiPicker small={isMobileDevice} />}
             trigger="click"
           >
             <Button

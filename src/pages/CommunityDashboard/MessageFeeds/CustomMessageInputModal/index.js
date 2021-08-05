@@ -15,6 +15,7 @@ import {
 import { resetBodyStyle } from 'components/Modals/modals';
 
 import styles from './styles.module.scss';
+import { isMobileDevice } from 'utils/device';
 
 const { Text } = Typography;
 
@@ -54,16 +55,15 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
   // TODO: Editing a file with attachment doesn't render the images correctly. Investigate
   // the message pulled from MessageInputContext does have attachments property
   return (
-    <div className={styles.inputWrapper}>
+    <div id="input-wrapper-in-modal" className={styles.inputWrapper}>
       <Row gutter={[10, 12]}>
         <Col xs={24}>
           <Row gutter={[10, 10]}>
             <Col flex="0 0 40px">
               <Popover
-                placement="bottomLeft"
                 overlayClassName={styles.emojiPopupContainer}
                 visible={emojiPickerIsOpen}
-                content={<EmojiPicker />}
+                content={<EmojiPicker small={isMobileDevice} />}
                 trigger="click"
               >
                 <Button

@@ -34,7 +34,6 @@ const ThreadMessageItem = ({ handleEditMessageReply = () => {}, editedMessage = 
     handleReaction,
     isReactionEnabled,
     showDetailedReactions,
-    actionsEnabled,
     isMyMessage,
     getMessageActions,
   } = useMessageContext();
@@ -132,7 +131,7 @@ const ThreadMessageItem = ({ handleEditMessageReply = () => {}, editedMessage = 
       <Comment
         className={styles.messageReplyItem}
         actions={
-          actionsEnabled && isMyMessage()
+          isMyMessage()
             ? [
                 <Button
                   className={styles.replyActionButtons}
