@@ -33,7 +33,7 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
 
   const handleLikeButtonClicked = (e) => {
     preventDefaults(e);
-    setReactionPopoverVisible(true);
+    setReactionPopoverVisible(!reactionPopoverVisible);
   };
 
   const handleReactionClicked = (reaction, event) => {
@@ -74,12 +74,10 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
             </Col>
             <Col flex="1 1 auto">
               <Title level={5} className={styles.messageAuthor}>
-                {' '}
-                {message.user?.name}{' '}
+                {message.user?.name}
               </Title>
               <Text type="secondary">
-                {' '}
-                <MessageTimestamp format="DD/MM/YYYY, hh:mm A" />{' '}
+                <MessageTimestamp format="DD/MM/YYYY, hh:mm A" />
               </Text>
             </Col>
             {message.user.id === client.userID && (
@@ -121,7 +119,11 @@ const CustomMessageItem = ({ editMessage = () => {} }) => {
                 overlayInnerStyle={{
                   background: 'black',
                 }}
-                content={<ReactionSelector handleReaction={handleReactionClicked} />}
+                content={
+                  <div onMouseLeave={() => setReactionPopoverVisible(false)}>
+                    <ReactionSelector handleReaction={handleReactionClicked} />
+                  </div>
+                }
                 trigger="click"
               >
                 <Button

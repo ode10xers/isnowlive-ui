@@ -33,7 +33,7 @@ const attendeeUser1 = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYTQyYzBmZTEtMWI5ZC00M2I2LTlhYzEtNWRhYjdjNTBjYTcyIn0.UMDMDM4EgSEDymg7yylejEf2NE-i7MYpoeSZqIKChMQ',
 };
 
-// ellianto+1003@10xers.co
+// ellianto+1002@10xers.co
 const attendeeUser2 = {
   data: {
     id: 'da40d9fc-c1e6-4a24-8a40-3049aa9b08f7',
