@@ -4,6 +4,10 @@
 
 .channelHeaderContainer {
   background-color: map-get($map: $colors, $key: 'White') !important;
+
+  @media screen and (max-width: 993px) {
+    padding: 0 10px 0 50px !important;
+  }
 }
 
 .channelWindowContainer {
