@@ -1,7 +1,5 @@
 @import '../../../styles/variables.scss';
 
-// TODO: Override some Stream Variables here as required
-
 .channelHeaderContainer {
   background-color: map-get($map: $colors, $key: 'White') !important;
 
@@ -27,25 +25,34 @@
     }
     .str-chat__thread-list {
       .str-chat__list--thread {
-      .str-chat__reverse-infinite-scroll {
-        padding: 0px !important;
-        .str-chat__ul {
-          .str-chat__li--single, .str-chat__li--top, .str-chat__li--middle, .str-chat__li--bottom {
-            margin: 0 !important;
+        .str-chat__reverse-infinite-scroll {
+          padding: 0px !important;
+          .str-chat__ul {
+            .str-chat__li--single,
+            .str-chat__li--top,
+            .str-chat__li--middle,
+            .str-chat__li--bottom {
+              margin: 0 !important;
+            }
           }
         }
       }
     }
-
-    }
   }
-  
+
   .channelMemberListContainer {
-    padding: 0 10px;
-    flex: 0 0 auto !important;
-    max-width: 300px !important;
-    width: 100% !important;
     background-color: map-get($map: $colors, $key: 'ClearDay') !important;
+
+    @media screen and (min-width: 769px) {
+      flex: 0 0 auto !important;
+      max-width: 300px !important;
+      width: 100% !important;
+    }
+    @media screen and (max-width: 769px) {
+      position: absolute !important;
+      right: 0;
+      height: 100%;
+    }
   }
 }
 

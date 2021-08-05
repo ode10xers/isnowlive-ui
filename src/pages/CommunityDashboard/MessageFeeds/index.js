@@ -15,6 +15,7 @@ import MessageReplyInput from './MessageReplyInput';
 import CustomThreadHeader from './CustomThreadHeader';
 
 import styles from './styles.module.scss';
+import { TeamOutlined } from '@ant-design/icons';
 
 const { Header, Content, Sider } = Layout;
 
@@ -107,7 +108,15 @@ const MessageFeeds = ({ match, history }) => {
               )}
             />
           </Content>
-          <Sider className={styles.channelMemberListContainer}>
+          <Sider
+            breakpoint="md"
+            reverseArrow={true}
+            collapsedWidth={0}
+            trigger={<TeamOutlined />}
+            zeroWidthTriggerStyle={{ top: 20, backgroundColor: '#91d5ff' }}
+            theme="light"
+            className={styles.channelMemberListContainer}
+          >
             <ChannelMemberList />
           </Sider>
         </Layout>

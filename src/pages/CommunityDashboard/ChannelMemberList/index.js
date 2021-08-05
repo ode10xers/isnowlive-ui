@@ -33,24 +33,26 @@ const ChannelMemberList = () => {
   }, [fetchChannelMembers]);
 
   return (
-    <List
-      itemLayout="vertical"
-      split={false}
-      loading={{
-        spinning: isLoading,
-        tip: 'Loading members',
-      }}
-      rowKey={(member) => member.user_id}
-      header={`Members (${channelMembers.length})`}
-      dataSource={channelMembers}
-      renderItem={(member) => (
-        <List.Item.Meta
-          className={styles.channelMemberItems}
-          avatar={<Avatar name={member.user.name} shape="circle" size={32} />}
-          title={member.user.name}
-        />
-      )}
-    />
+    <div className={styles.p10}>
+      <List
+        itemLayout="vertical"
+        split={false}
+        loading={{
+          spinning: isLoading,
+          tip: 'Loading members',
+        }}
+        rowKey={(member) => member.user_id}
+        header={`Members (${channelMembers.length})`}
+        dataSource={channelMembers}
+        renderItem={(member) => (
+          <List.Item.Meta
+            className={styles.channelMemberItems}
+            avatar={<Avatar name={member.user.name} shape="circle" size={32} />}
+            title={member.user.name}
+          />
+        )}
+      />
+    </div>
   );
 };
 
