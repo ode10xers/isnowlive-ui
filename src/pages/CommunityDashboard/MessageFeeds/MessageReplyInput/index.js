@@ -9,6 +9,7 @@ import {
   EmojiPicker,
   MessageInput,
   useChatContext,
+  useChannelStateContext,
   useMessageInputContext,
 } from 'stream-chat-react';
 
@@ -30,7 +31,6 @@ const ReplyInputComponent = ({ resetTargetReply = () => {} }) => {
     preventDefaults(e);
 
     if (message) {
-      // clearEdit();
       resetTargetReply();
     }
 
@@ -68,6 +68,22 @@ const ReplyInputComponent = ({ resetTargetReply = () => {} }) => {
 
 const MessageReplyInput = ({ targetReply = null, resetTargetReply = () => {} }) => {
   const { client } = useChatContext();
+
+  const { channel, thread } = useChannelStateContext();
+
+  const overrideSubmitHandler = async (message, channelId) => {
+    if (thread && thread.id) {
+      const messageReplyData = {
+        ...message,
+        parent: thread,
+        parent_id: thread.id,
+      };
+
+      await channel.sendMessage(messageReplyData);
+      resetTargetReply();
+    }
+  };
+
   // TODO: Can also check flag for if reply is enabled
   return (
     <Comment
@@ -81,7 +97,7 @@ const MessageReplyInput = ({ targetReply = null, resetTargetReply = () => {} }) 
             grow={true}
             maxRows={5}
             Input={(inputProps) => <ReplyInputComponent {...inputProps} resetTargetReply={resetTargetReply} />}
-            // overrideSubmitHandler={overrideSubmitHandler}
+            overrideSubmitHandler={overrideSubmitHandler}
           />
         ) : (
           <MessageInput
@@ -89,7 +105,7 @@ const MessageReplyInput = ({ targetReply = null, resetTargetReply = () => {} }) 
             grow={true}
             maxRows={5}
             Input={(inputProps) => <ReplyInputComponent {...inputProps} resetTargetReply={resetTargetReply} />}
-            // overrideSubmitHandler={overrideSubmitHandler}
+            overrideSubmitHandler={overrideSubmitHandler}
           />
         )
       }
