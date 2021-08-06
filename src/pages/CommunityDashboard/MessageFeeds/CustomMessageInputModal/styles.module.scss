@@ -59,6 +59,12 @@
   :global {
     .str-chat__input--emojipicker, .str-chat__small-message-input-emojipicker {
       position: relative;
+
+      > section.emoji-mart {
+        @media screen and (max-width: 526px) {
+          width: 300px !important;
+        }
+      }
     }
   }
 }

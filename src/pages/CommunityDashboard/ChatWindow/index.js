@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import { Layout } from 'antd';
+import { TeamOutlined } from '@ant-design/icons';
 
 import { Channel, MessageList, MessageInput, Thread, Window, useChatContext } from 'stream-chat-react';
 
@@ -46,7 +47,15 @@ const ChatWindow = () => {
             </Window>
             <Thread fullWidth={true} />
           </Content>
-          <Sider className={styles.channelMemberListContainer}>
+          <Sider
+            breakpoint="md"
+            reverseArrow={true}
+            collapsedWidth={0}
+            trigger={<TeamOutlined />}
+            zeroWidthTriggerStyle={{ top: 20, backgroundColor: '#91d5ff' }}
+            theme="light"
+            className={styles.channelMemberListContainer}
+          >
             <ChannelMemberList />
           </Sider>
         </Layout>

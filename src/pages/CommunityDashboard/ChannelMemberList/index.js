@@ -6,6 +6,8 @@ import { useChannelStateContext, Avatar } from 'stream-chat-react';
 
 import styles from './styles.module.scss';
 
+// TODO: Add UI components and interactions here
+// For example, show roles (owner, mods) and their respective actions
 const ChannelMemberList = () => {
   const { channel } = useChannelStateContext();
 

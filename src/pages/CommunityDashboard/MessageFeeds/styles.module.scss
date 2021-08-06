@@ -38,17 +38,25 @@
         }
       }
     }
+
+    @media screen and (max-width: 960px) {
+      .str-chat__thread {
+        position: initial !important;
+        height: 100% !important;
+        z-index: initial !important;
+      }
+    }
   }
 
   .channelMemberListContainer {
     background-color: map-get($map: $colors, $key: 'ClearDay') !important;
 
-    @media screen and (min-width: 769px) {
+    @media screen and (min-width: 768px) {
       flex: 0 0 auto !important;
       max-width: 300px !important;
       width: 100% !important;
     }
-    @media screen and (max-width: 769px) {
+    @media screen and (max-width: 767px) {
       position: absolute !important;
       right: 0;
       height: 100%;

@@ -98,6 +98,13 @@ const CommunityDashboard = ({ match, history, location }) => {
     return courseDetails.creator_username === userDetails?.username;
   }, [courseDetails, userDetails]);
 
+  /*
+    TODO: Adjust with new flow once BE is implemented
+    1) Land on page
+    2) Get user token and course details
+    3) Connect to Stream after 2) is done
+  */
+
   useEffect(() => {
     const setupClient = async (userData) => {
       try {
@@ -156,7 +163,7 @@ const CommunityDashboard = ({ match, history, location }) => {
         >
           <SidePanel isCourseOwner={isCourseOwner} creatorUsername={courseDetails?.creator_username} />
         </Sider>
-        <Content>
+        <Content className={styles.h100}>
           <Switch>
             <Route exact path={match.url + Routes.community.feeds} component={MessageFeeds} />
             <Route exact path={match.url + Routes.community.chatChannels} component={ChatWindow} />

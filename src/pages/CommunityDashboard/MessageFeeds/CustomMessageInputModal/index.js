@@ -15,7 +15,6 @@ import {
 import { resetBodyStyle } from 'components/Modals/modals';
 
 import styles from './styles.module.scss';
-import { isMobileDevice } from 'utils/device';
 
 const { Text } = Typography;
 
@@ -61,9 +60,11 @@ const CustomInputComponent = ({ closeModal = () => {} }) => {
           <Row gutter={[10, 10]}>
             <Col flex="0 0 40px">
               <Popover
+                placement="bottomLeft"
+                getPopupContainer={() => document.getElementById('input-wrapper-in-modal')}
                 overlayClassName={styles.emojiPopupContainer}
                 visible={emojiPickerIsOpen}
-                content={<EmojiPicker small={isMobileDevice} />}
+                content={<EmojiPicker />}
                 trigger="click"
               >
                 <Button
