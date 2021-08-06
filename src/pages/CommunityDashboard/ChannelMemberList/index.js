@@ -135,11 +135,13 @@ const ChannelMemberList = () => {
   const handlePromoteUserToModerator = () => {
     // TODO: This will need API integration since
     // can only be done server-side
+    alert('Pending API Integration');
   };
 
   const handleDemoteUserFromModerator = () => {
     // TODO: This will need API integration since
     // can only be done server-side
+    alert('Pending API Integration');
   };
 
   const handleKickUserFromChannel = async (targetUser) => {
@@ -212,7 +214,12 @@ const ChannelMemberList = () => {
             {member.user_id !== client.userID && (
               <Space size="small" align="middle">
                 {isUserMuted(member) ? (
-                  <Button size="small" type="link" onClick={() => handleUnmuteUserInChannel(member)}>
+                  <Button
+                    className={styles.unmuteButton}
+                    size="small"
+                    type="link"
+                    onClick={() => handleUnmuteUserInChannel(member)}
+                  >
                     Unmute
                   </Button>
                 ) : (
@@ -220,14 +227,19 @@ const ChannelMemberList = () => {
                     trigger="click"
                     overlay={handleRenderDropdownMenu(({ key }) => handleMuteUserInChannel(member, parseInt(key)))}
                   >
-                    <Button size="small" type="link">
+                    <Button className={styles.muteButton} size="small" type="link">
                       Mute
                     </Button>
                   </Dropdown>
                 )}
                 {isChannelAdmin() || isChannelMod() ? (
                   isUserBanned(member) ? (
-                    <Button size="small" type="link" onClick={() => handleUnbanUserFromChannel(member)}>
+                    <Button
+                      className={styles.unbanButton}
+                      size="small"
+                      type="link"
+                      onClick={() => handleUnbanUserFromChannel(member)}
+                    >
                       Unban
                     </Button>
                   ) : (
@@ -235,7 +247,7 @@ const ChannelMemberList = () => {
                       trigger="click"
                       overlay={handleRenderDropdownMenu(({ key }) => handleBanUserFromChannel(member, parseInt(key)))}
                     >
-                      <Button size="small" type="link">
+                      <Button className={styles.banButton} size="small" type="link">
                         Ban
                       </Button>
                     </Dropdown>
@@ -243,11 +255,21 @@ const ChannelMemberList = () => {
                 ) : null}
                 {isChannelAdmin() ? (
                   isChannelMod(member) ? (
-                    <Button size="small" type="link" onClick={() => handleDemoteUserFromModerator(member)}>
+                    <Button
+                      className={styles.demoteButton}
+                      size="small"
+                      type="link"
+                      onClick={() => handleDemoteUserFromModerator(member)}
+                    >
                       Demote
                     </Button>
                   ) : (
-                    <Button size="small" type="link" onClick={() => handlePromoteUserToModerator(member)}>
+                    <Button
+                      className={styles.promoteButton}
+                      size="small"
+                      type="link"
+                      onClick={() => handlePromoteUserToModerator(member)}
+                    >
                       Promote
                     </Button>
                   )
@@ -258,7 +280,7 @@ const ChannelMemberList = () => {
                     okType="danger"
                     onConfirm={() => handleKickUserFromChannel(member)}
                   >
-                    <Button size="small" type="link">
+                    <Button danger size="small" type="link">
                       Kick
                     </Button>
                   </Popconfirm>

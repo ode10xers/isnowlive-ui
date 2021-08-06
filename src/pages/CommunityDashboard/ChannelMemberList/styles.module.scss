@@ -4,3 +4,23 @@
   align-items: baseline !important;
   margin-bottom: 4px !important;
 }
+
+.unmuteButton {
+  color: map-get($map: $colors, $key: 'Pumpkin') !important;
+}
+
+.unbanButton {
+  color: map-get($map: $colors, $key: 'EasternBlue') !important;
+}
+
+.banButton {
+  color: map-get($map: $colors, $key: 'FireBrick') !important;
+}
+
+.demoteButton {
+  color: map-get($map: $colors, $key: 'Razzmatazz') !important;
+}
+
+.promoteButton {
+  color: map-get($map: $colors, $key: 'KellyGreen') !important;
+}
