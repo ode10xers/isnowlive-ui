@@ -109,6 +109,7 @@ const MessageFeeds = ({ match, history }) => {
             />
           </Content>
           <Sider
+            width={280}
             breakpoint="md"
             reverseArrow={true}
             collapsedWidth={0}

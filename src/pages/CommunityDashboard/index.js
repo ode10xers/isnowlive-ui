@@ -153,6 +153,7 @@ const CommunityDashboard = ({ match, history, location }) => {
     <Chat client={chatClient}>
       <Layout>
         <Sider
+          width={260}
           className={styles.mainSideBar}
           collapsed={mainSidebarCollapsed}
           onCollapse={handleMainSidebarCollapsed}
@@ -165,8 +166,8 @@ const CommunityDashboard = ({ match, history, location }) => {
         </Sider>
         <Content className={styles.h100}>
           <Switch>
-            <Route exact path={match.url + Routes.community.feeds} component={MessageFeeds} />
-            <Route exact path={match.url + Routes.community.chatChannels} component={ChatWindow} />
+            <Route exact path={Routes.community.root + Routes.community.feeds} component={MessageFeeds} />
+            <Route exact path={Routes.community.root + Routes.community.chatChannels} component={ChatWindow} />
             <Redirect to={match.url + Routes.community.feeds} />
           </Switch>
         </Content>

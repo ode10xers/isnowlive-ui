@@ -4,30 +4,20 @@ import { useChatContext } from 'stream-chat-react';
 
 import { Modal, Form, Button, Select, Input, Row, Col } from 'antd';
 
+import apis from 'apis';
 import Routes from 'routes';
 
 import Loader from 'components/Loader';
-import { resetBodyStyle, showErrorModal } from 'components/Modals/modals';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import validationRules from 'utils/validation';
 import { isAPISuccess } from 'utils/helper';
 
 import { formLayout } from 'layouts/FormLayouts';
 
-const mockUserData = [
-  {
-    id: 'da40d9fc-c1e6-4a24-8a40-3049aa9b08f7',
-    name: 'Attendee Elli 2',
-    role: 'user',
-  },
-  {
-    id: 'a42c0fe1-1b9d-43b6-9ac1-5dab7c50ca72',
-    name: 'Attendee Me 1',
-    role: 'user',
-  },
-];
-
 // TODO: Implement Edit Channel flow
+// In this case, the edit can only be used to edit the name
+// Adding/removing channel members require different method and is handled differently
 const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
   const history = useHistory();
   const match = useRouteMatch();
@@ -38,34 +28,29 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [availableMembers, setAvailableMembers] = useState([]);
 
-  const fetchAvailableMembers = useCallback(() => {
+  const fetchAvailableMembers = useCallback(async (courseExternalId) => {
     setIsLoading(true);
     try {
-      const { status, data } = {
-        status: 200,
-        data: mockUserData,
-      };
+      const { status, data } = await apis.courses.getCreatorCourseDetailsById(courseExternalId);
 
       if (isAPISuccess(status) && data) {
-        setAvailableMembers(data);
+        setAvailableMembers(data.buyers);
       }
     } catch (error) {
       console.error(error);
       showErrorModal('Failed fetching available members', error?.response?.data?.message || 'Something went wrong.');
     }
     setIsLoading(false);
-
-    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
     if (visible) {
-      fetchAvailableMembers();
+      fetchAvailableMembers(match.params.course_id);
       form.resetFields();
     } else {
       setAvailableMembers([]);
     }
-  }, [form, visible, fetchAvailableMembers]);
+  }, [form, visible, match, fetchAvailableMembers]);
 
   const handleFormFinish = async (values) => {
     setIsLoading(true);
@@ -109,6 +94,7 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
         setActiveChannel(newChannel);
       }
 
+      showSuccessModal('Successfully created chat channel!');
       closeModal();
     } catch (error) {
       console.error(error);
@@ -117,14 +103,13 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
     setIsLoading(false);
   };
 
-  // TODO: Need to show list of buyers here
-
   return (
     <Modal
       width={640}
       footer={null}
       centered={true}
       closable={true}
+      maskClosable={false}
       visible={visible}
       onCancel={closeModal}
       title="Create new chat"
@@ -158,7 +143,7 @@ const NewChannelModal = ({ visible, closeModal, type = 'team' }) => {
                   mode={type === 'messaging' ? undefined : 'multiple'}
                   options={availableMembers.map((member) => ({
                     label: member.name,
-                    value: member.id,
+                    value: member.external_id,
                   }))}
                 />
               </Form.Item>

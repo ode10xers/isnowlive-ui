@@ -1,0 +1,13 @@
+@import '../../../../styles/variables.scss';
+
+.labelHelpText {
+  text-align: right;
+
+  @media screen and (max-width: 481px) {
+    text-align: left;
+  }
+}
+
+.memberSelectDropdown {
+  width: 100%;
+}
