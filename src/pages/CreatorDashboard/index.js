@@ -54,6 +54,8 @@ const CreatorDashboard = ({ match }) => {
           </MobileLayout>
         )}
       />
+      <Route exact path={match.url + Routes.creatorDashboard.createAvailabilities} component={Session} />
+      <Route exact path={match.url + Routes.creatorDashboard.updateAvailabilities} component={Session} />
       {/* <Route exact path={match.url + Routes.creatorDashboard.profile} component={ProfilePreview} /> */}
       <Route exact path={match.url + Routes.creatorDashboard.editProfile} component={Profile} />
       <Route exact path={match.url + Routes.creatorDashboard.livestream} component={LiveStream} />

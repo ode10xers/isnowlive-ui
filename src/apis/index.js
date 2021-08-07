@@ -45,6 +45,12 @@ export default {
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
   },
+  availabilities: {
+    getDetails: (sessionId, startDate, endDate) =>
+      http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
+    create: (payload) => http.post('/secure/creator/sessions', payload),
+    update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
+  },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
       http.get(`/secure/creator/sessions/${sessionId}?start_date=${startDate}&end_date=${endDate}`),

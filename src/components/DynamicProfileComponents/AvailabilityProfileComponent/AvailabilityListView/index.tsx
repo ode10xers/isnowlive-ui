@@ -24,7 +24,7 @@ const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
       {availabilities.length > 0 ? (
         <Row>
           <Col span={24}>
-            <Swiper slidesPerView={isMobileDevice ? 1.3 : 3.1}>
+            <Swiper slidesPerView={isMobileDevice ? 1.3 : 2.2}>
               {availabilities.map(renderAvailabilityListItem)}
             </Swiper>
           </Col>
