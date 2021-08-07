@@ -333,6 +333,7 @@ const Session = ({ match, history }) => {
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
     setSession({ ...session, session_image_url: imageUrl });
+    form.setFieldsValue({ ...form.getFieldsValue(), session_image_url: imageUrl });
   };
 
   const handleSessionCourseType = (e) => {
