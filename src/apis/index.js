@@ -18,6 +18,7 @@ export default {
     uploadImage: (payload) => http.post('/secure/upload?type=image', payload),
     uploadFile: (payload) => http.post('/secure/upload?type=document', payload),
     getSessionsByUsername: (type) => http.get(`/sessions/${type}`),
+    getAvailabilitiesByUsername: (type) => http.get(`/sessions/${type}?type=AVAILABILITY`),
     getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
