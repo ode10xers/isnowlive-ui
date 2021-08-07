@@ -37,12 +37,16 @@ export default {
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
       getDashboard: () => http.get('/secure/creator/profile/stripe/dashboard'),
     },
+    getCreatorPaymentCountries: () => http.get('/secure/creator/config/payment'),
     getAvailablePaymentMethods: (currency) =>
       http.get(`/secure/customer/payment/available-method-types?currency=${currency}`),
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
+    paypal: {
+      initiateCreatorPayPalAccount: (payload) => http.post('/secure/creator/profile/paypal', payload),
+    },
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
