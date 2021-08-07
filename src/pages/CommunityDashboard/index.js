@@ -48,6 +48,16 @@ const attendeeUser2 = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZGE0MGQ5ZmMtYzFlNi00YTI0LThhNDAtMzA0OWFhOWIwOGY3In0.RDI8CJqUVZrlYFDMEwzbLSE5L4bdtkWJP5b5v1qfs10',
 };
 
+const attendeeUser3 = {
+  data: {
+    id: '3696edd3-bf87-414d-8270-f0aa406e13f8',
+    name: 'Parth',
+    role: 'user',
+  },
+  token:
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMzY5NmVkZDMtYmY4Ny00MTRkLTgyNzAtZjBhYTQwNmUxM2Y4In0.uY4zgCk0zzESxugFBUeIp_CRplG1g-I-z7lI01uMvPU',
+};
+
 // ellianto+101@10xers.co
 const creatorUser = {
   data: {
@@ -59,7 +69,7 @@ const creatorUser = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiODUyZTI2ODMtODI5MS00Mzk4LWFkNWUtMTZkMDFmODVlYzIwIn0.IQA0KWts_k6UWkENV1jz7erAzZUIquovIiPTVaaGxSw',
 };
 
-const mockUsers = [attendeeUser1, attendeeUser2, creatorUser];
+const mockUsers = [attendeeUser1, attendeeUser2, attendeeUser3, creatorUser];
 
 const chatClient = StreamChat.getInstance('9kapp3pjzvmg');
 
