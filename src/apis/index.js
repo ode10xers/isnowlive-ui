@@ -51,10 +51,15 @@ export default {
     },
   },
   availabilities: {
+    getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),
     getDetails: (sessionId, startDate, endDate) =>
       http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
     create: (payload) => http.post('/secure/creator/sessions', payload),
     update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
+    getPastAvailability: () => http.get('/secure/creator/inventories/past?type=AVAILABILITY'),
+    getUpcomingAvailability: () => http.get('/secure/creator/inventories/upcoming?type=AVAILABILITY'),
+    publishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
+    unpublishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>

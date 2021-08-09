@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Row, Col, Typography, Button, Card, Popconfirm, Tooltip, Collapse } from 'antd';
 import { DeleteOutlined, EditOutlined, CopyOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -34,6 +34,8 @@ const { creator } = mixPanelEventTags;
 
 const ManageSessions = () => {
   const history = useHistory();
+  const location = useLocation();
+  const isAvailability = location.pathname.includes(Routes.creatorDashboard.manageAvailabilities);
   const [isLoading, setIsLoading] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
@@ -55,32 +57,42 @@ const ManageSessions = () => {
   const getSessionsList = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.session.getSession();
+      const { status, data } = isAvailability
+        ? await apis.availabilities.getAvailabilities()
+        : await apis.session.getSession();
 
       if (isAPISuccess(status) && data) {
         setSessions(data);
       }
     } catch (error) {
-      showErrorModal('Failed to fetch creator sessions', error?.response?.data?.message || 'Something went wrong.');
+      showErrorModal(
+        `Failed to fetch creator ${isAvailability ? 'availabilities' : 'sessions'}`,
+        error?.response?.data?.message || 'Something went wrong.'
+      );
     }
     setIsLoading(false);
-  }, []);
+  }, [isAvailability]);
 
   const publishSession = async (sessionId) => {
     setIsLoading(true);
     const eventTag = creator.click.sessions.manage.publishSession;
 
     try {
-      const { data } = await apis.session.publishSession(sessionId);
+      const { data } = isAvailability
+        ? await apis.availabilities.publishAvailability(sessionId)
+        : await apis.session.publishSession(sessionId);
 
       if (data) {
         trackSuccessEvent(eventTag, { session_id: sessionId });
-        showSuccessModal('Session published successfully!');
+        showSuccessModal(`${isAvailability ? 'Availability' : 'Session'} published successfully!`);
         getSessionsList();
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
-      showErrorModal('Failed to publish session', error.response?.data?.message || 'Something went wrong.');
+      showErrorModal(
+        `Failed to publish ${isAvailability ? 'availability' : 'session'}`,
+        error.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setIsLoading(false);
@@ -91,16 +103,21 @@ const ManageSessions = () => {
     const eventTag = creator.click.sessions.manage.unpublishSession;
 
     try {
-      const { data } = await apis.session.unpublishSession(sessionId);
+      const { data } = isAvailability
+        ? await apis.availabilities.unpublishAvailability(sessionId)
+        : await apis.session.unpublishSession(sessionId);
 
       if (data) {
         trackSuccessEvent(eventTag, { session_id: sessionId });
-        showSuccessModal('Session is now unpublished!');
+        showSuccessModal(`${isAvailability ? 'Availability' : 'Session'} is now unpublished!`);
         getSessionsList();
       }
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
-      showErrorModal('Failed to unpublish session', error.response?.data?.message || 'Something went wrong.');
+      showErrorModal(
+        `Failed to unpublish ${isAvailability ? 'availability' : 'session'}`,
+        error.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setIsLoading(false);
@@ -114,11 +131,14 @@ const ManageSessions = () => {
       await apis.session.deleteSession(sessionId);
 
       trackSuccessEvent(eventTag, { session_id: sessionId });
-      showSuccessModal('Session deleted successfully!');
+      showSuccessModal(`${isAvailability ? 'Availability' : 'Session'} deleted successfully!`);
       getSessionsList();
     } catch (error) {
       trackFailedEvent(eventTag, error, { session_id: sessionId });
-      showErrorModal('Failed to delete session', error.response?.data?.message || 'Something went wrong.');
+      showErrorModal(
+        `Failed to delete ${isAvailability ? 'availability' : 'session'}`,
+        error.response?.data?.message || 'Something went wrong.'
+      );
     }
 
     setIsLoading(false);
@@ -148,7 +168,7 @@ const ManageSessions = () => {
   const generateSessionColumns = () => {
     const initialColumns = [
       {
-        title: 'Session Name',
+        title: `${isAvailability ? 'Availability' : 'Session'} Name`,
         key: 'name',
         render: (text, record) => {
           return {
@@ -187,7 +207,7 @@ const ManageSessions = () => {
         render: (text, record) => <Text>{record.group ? 'Group' : '1-to-1'}</Text>,
       },
       {
-        title: 'Session Date',
+        title: `${isAvailability ? 'Availability' : 'Session'} Date`,
         dataIndex: 'session_date',
         key: 'session_date',
         width: '275px',
@@ -218,17 +238,22 @@ const ManageSessions = () => {
                     className={styles.detailsButton}
                     type="text"
                     onClick={() =>
-                      trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${record.session_id}/edit`, {
-                        beginning: record.beginning,
-                        expiry: record.expiry,
-                      })
+                      trackAndNavigate(
+                        `${Routes.creatorDashboard.rootPath}/manage/${isAvailability ? 'availability' : 'session'}/${
+                          record.session_id
+                        }/edit`,
+                        {
+                          beginning: record.beginning,
+                          expiry: record.expiry,
+                        }
+                      )
                     }
                     icon={<EditOutlined />}
                   />
                 </Tooltip>
               </Col>
               <Col xs={24} md={5}>
-                <Tooltip title="Copy Session Link">
+                <Tooltip title={`Copy ${isAvailability ? 'Availability' : 'Session'} Link`}>
                   <Button
                     type="text"
                     className={styles.detailsButton}
@@ -238,7 +263,9 @@ const ManageSessions = () => {
                 </Tooltip>
               </Col>
               <Col xs={24} md={8}>
-                <Tooltip title={`${record.is_active ? 'Hide' : 'Unhide'} Session`}>
+                <Tooltip
+                  title={`${record.is_active ? 'Hide' : 'Unhide'} ${isAvailability ? 'Availability' : 'Session'}`}
+                >
                   {!record.is_active ? (
                     <Button
                       type="text"
@@ -255,9 +282,9 @@ const ManageSessions = () => {
                 </Tooltip>
               </Col>
               <Col xs={24} md={5}>
-                <Tooltip title="Delete Session" placement="bottom">
+                <Tooltip title={`Delete ${isAvailability ? 'Availability' : 'Session'}`} placement="bottom">
                   <Popconfirm
-                    title="Do you want to delete session?"
+                    title={`Do you want to delete ${isAvailability ? 'availability' : 'session'}?`}
                     icon={<DeleteOutlined className={styles.danger} />}
                     okText="Yes"
                     cancelText="No"
@@ -308,10 +335,13 @@ const ManageSessions = () => {
           <div
             style={{ paddingTop: 12, borderTop: `6px solid ${item.color_code || '#FFF'}` }}
             onClick={() =>
-              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
-                beginning: item.beginning,
-                expiry: item.expiry,
-              })
+              trackAndNavigate(
+                `${Routes.creatorDashboard.rootPath}/manage/isAvailability ? 'availability' : 'session'/${item.session_id}/edit`,
+                {
+                  beginning: item.beginning,
+                  expiry: item.expiry,
+                }
+              )
             }
           >
             <Text>{item.name}</Text> {item.is_active ? null : <EyeInvisibleOutlined style={{ color: '#f00' }} />}
@@ -322,10 +352,13 @@ const ManageSessions = () => {
             className={styles.detailsButton}
             type="text"
             onClick={() =>
-              trackAndNavigate(`${Routes.creatorDashboard.rootPath}/manage/session/${item.session_id}/edit`, {
-                beginning: item.beginning,
-                expiry: item.expiry,
-              })
+              trackAndNavigate(
+                `${Routes.creatorDashboard.rootPath}/manage/isAvailability ? 'availability' : 'session'/${item.session_id}/edit`,
+                {
+                  beginning: item.beginning,
+                  expiry: item.expiry,
+                }
+              )
             }
             icon={<EditOutlined />}
           />,
@@ -347,7 +380,7 @@ const ManageSessions = () => {
             )}
           </>,
           <Popconfirm
-            title="Do you want to delete session?"
+            title={`Do you want to delete ${isAvailability ? 'availability' : 'session'}?`}
             icon={<DeleteOutlined className={styles.danger} />}
             okText="Yes"
             cancelText="No"
@@ -357,7 +390,12 @@ const ManageSessions = () => {
           </Popconfirm>,
         ]}
       >
-        {layout('Type', <Text>{item.group ? 'Group Session' : '1-to-1 Session'}</Text>)}
+        {layout(
+          'Type',
+          <Text>
+            {item.group ? 'Group' : '1-to-1'} {isAvailability ? 'Availability' : 'Session'}
+          </Text>
+        )}
         {layout(
           'Date',
           <>
@@ -383,15 +421,15 @@ const ManageSessions = () => {
 
   return (
     <div className={styles.box}>
-      <Title level={4}>Manage Sessions</Title>
+      <Title level={4}>Manage {isAvailability ? 'Availabilities' : 'Sessions'}</Title>
       <Collapse defaultActiveKey="Normal">
-        <Panel header={<Title level={5}> Normal Sessions </Title>} key="Normal">
+        <Panel header={<Title level={5}> Normal {isAvailability ? 'Availabilities' : 'Sessions'} </Title>} key="Normal">
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
+            <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}>
               {sessions?.filter((session) => !session.is_course).length > 0 ? (
                 sessions?.filter((session) => !session.is_course).map(renderSessionItem)
               ) : (
-                <div className="text-empty"> No Normal Sessions Found </div>
+                <div className="text-empty"> No Normal {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
               )}
             </Loader>
           ) : (
@@ -402,13 +440,13 @@ const ManageSessions = () => {
             />
           )}
         </Panel>
-        <Panel header={<Title level={5}> Course Sessions </Title>} key="Course">
+        <Panel header={<Title level={5}> Course {isAvailability ? 'Availabilities' : 'Sessions'} </Title>} key="Course">
           {isMobileDevice ? (
-            <Loader loading={isLoading} size="large" text="Loading sessions">
+            <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'}`}>
               {sessions?.filter((session) => session.is_course).length > 0 ? (
                 sessions?.filter((session) => session.is_course).map(renderSessionItem)
               ) : (
-                <div className="text-empty"> No Course Sessions Found </div>
+                <div className="text-empty"> No Course {isAvailability ? 'Availabilities' : 'Sessions'} Found </div>
               )}
             </Loader>
           ) : (

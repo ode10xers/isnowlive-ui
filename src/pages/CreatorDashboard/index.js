@@ -37,8 +37,11 @@ const CreatorDashboard = ({ match }) => {
   return (
     <Switch>
       <Route exact path={match.url + Routes.creatorDashboard.sessions} component={SessionsInventories} />
+      <Route exact path={match.url + Routes.creatorDashboard.availabilities} component={SessionsInventories} />
       <Route exact path={match.url + Routes.creatorDashboard.sessionsDetails} component={SessionsDetails} />
+      <Route exact path={match.url + Routes.creatorDashboard.availabilitiesDetails} component={SessionsDetails} />
       <Route exact path={match.url + Routes.creatorDashboard.manageSessions} component={ManageSessions} />
+      <Route exact path={match.url + Routes.creatorDashboard.manageAvailabilities} component={ManageSessions} />
       <Route exact path={match.url + Routes.creatorDashboard.createSessions} component={Session} />
       <Route exact path={match.url + Routes.creatorDashboard.updateSessions} component={Session} />
       <Route
