@@ -18,6 +18,7 @@ export default {
     uploadImage: (payload) => http.post('/secure/upload?type=image', payload),
     uploadFile: (payload) => http.post('/secure/upload?type=document', payload),
     getSessionsByUsername: (type) => http.get(`/sessions/${type}`),
+    getAvailabilitiesByUsername: (type) => http.get(`/sessions/${type}?type=AVAILABILITY`),
     getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
@@ -43,6 +44,12 @@ export default {
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
+  },
+  availabilities: {
+    getDetails: (sessionId, startDate, endDate) =>
+      http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
+    create: (payload) => http.post('/secure/creator/sessions', payload),
+    update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
