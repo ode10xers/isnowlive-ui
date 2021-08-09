@@ -216,9 +216,8 @@ const PaymentAccount = () => {
       const { status, data } = await apis.payment.paypal.initiateCreatorPayPalAccount(payload);
 
       if (isAPISuccess(status) && data) {
-        // TODO: Confirm what happens here
         showSuccessModal('Your PayPal Account has been successfully connected!');
-        setTimeout(() => window.location.reload(), 2000);
+        setTimeout(() => window.location.reload(), 1500);
       }
     } catch (error) {
       console.error(error);
@@ -263,7 +262,7 @@ const PaymentAccount = () => {
               <Input
                 placeholder="The email associated with your PayPal Account"
                 maxLength={50}
-                onChange={setCreatorPaypalEmail}
+                onChange={(e) => setCreatorPaypalEmail(e.target.value)}
                 value={creatorPaypalEmail}
               />
             </Col>
