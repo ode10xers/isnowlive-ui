@@ -13,7 +13,7 @@ import {
   MailOutlined,
   CompassOutlined,
 } from '@ant-design/icons';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -54,6 +54,8 @@ const SessionsInventories = ({ match }) => {
   const { showSendEmailPopup } = useGlobalContext();
 
   const history = useHistory();
+  const location = useLocation();
+  const isAvailability = location.pathname.includes(Routes.creatorDashboard.availabilities.split(':')[0]);
   const [isLoading, setIsLoading] = useState(true);
   const [sessions, setSessions] = useState([]);
   const [filteredByDateSession, setFilteredByDateSession] = useState([]);
@@ -65,68 +67,77 @@ const SessionsInventories = ({ match }) => {
   const [offlineEventAddressModalVisible, setOfflineEventAddressModalVisible] = useState(false);
   const [selectedInventoryForModal, setSelectedInventoryForModal] = useState(null);
 
-  const getStaffSession = useCallback(async (sessionType) => {
-    try {
-      const { data } =
-        sessionType === 'past' ? await apis.session.getPastSession() : await apis.session.getUpcomingSession();
-      if (data && data.length > 0) {
-        const unfilteredSessions = data.map((i, index) => ({
-          index,
-          key: i?.inventory_id,
-          name: i.name,
-          type: i.max_participants > 1 ? 'Group' : '1-on-1',
-          duration: getDuration(i.start_time, i.end_time),
-          days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
-          session_date: i?.session_date,
-          time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
-          start_time: i?.start_time,
-          end_time: i?.end_time,
-          num_participants: i.num_participants,
-          participants: i.participants,
-          start_url: i.start_url,
-          inventory_id: i?.inventory_id,
-          session_id: i.session_id,
-          max_participants: i.max_participants,
-          color_code: i.color_code,
-          is_published: i.is_published,
-          is_course: i.is_course,
-          external_id: i.inventory_external_id,
-          inventory_external_id: i.inventory_external_id,
-          is_offline: i.is_offline,
-          offline_event_address: i.offline_event_address,
-        }));
+  const getStaffSession = useCallback(
+    async (sessionType) => {
+      try {
+        const { data } = isAvailability
+          ? sessionType === 'past'
+            ? await apis.availabilities.getPastAvailability()
+            : await apis.availabilities.getUpcomingAvailability()
+          : sessionType === 'past'
+          ? await apis.session.getPastSession()
+          : await apis.session.getUpcomingSession();
 
-        let filterByDateSessions = [];
+        if (data && data.length > 0) {
+          const unfilteredSessions = data.map((i, index) => ({
+            index,
+            key: i?.inventory_id,
+            name: i.name,
+            type: i.max_participants > 1 ? 'Group' : '1-on-1',
+            duration: getDuration(i.start_time, i.end_time),
+            days: i?.start_time ? toLongDateWithDay(i.start_time) : null,
+            session_date: i?.session_date,
+            time: i?.start_time && i.end_time ? `${toLocaleTime(i.start_time)} - ${toLocaleTime(i.end_time)}` : null,
+            start_time: i?.start_time,
+            end_time: i?.end_time,
+            num_participants: i.num_participants,
+            participants: i.participants,
+            start_url: i.start_url,
+            inventory_id: i?.inventory_id,
+            session_id: i.session_id,
+            max_participants: i.max_participants,
+            color_code: i.color_code,
+            is_published: i.is_published,
+            is_course: i.is_course,
+            external_id: i.inventory_external_id,
+            inventory_external_id: i.inventory_external_id,
+            is_offline: i.is_offline,
+            offline_event_address: i.offline_event_address,
+          }));
 
-        unfilteredSessions.forEach((session) => {
-          const foundIndex = filterByDateSessions.findIndex(
-            (val) => val.start_time === toLocaleDate(session.start_time)
-          );
+          let filterByDateSessions = [];
 
-          if (foundIndex >= 0) {
-            filterByDateSessions[foundIndex].children.push(session);
-          } else {
-            filterByDateSessions.push({
-              start_time: toLocaleDate(session.start_time),
-              name: session.start_time,
-              is_date: true,
-              children: [session],
-            });
+          unfilteredSessions.forEach((session) => {
+            const foundIndex = filterByDateSessions.findIndex(
+              (val) => val.start_time === toLocaleDate(session.start_time)
+            );
+
+            if (foundIndex >= 0) {
+              filterByDateSessions[foundIndex].children.push(session);
+            } else {
+              filterByDateSessions.push({
+                start_time: toLocaleDate(session.start_time),
+                name: session.start_time,
+                is_date: true,
+                children: [session],
+              });
+            }
+          });
+          setSessions(unfilteredSessions);
+          setFilteredByDateSession(filterByDateSessions);
+
+          if (filterByDateSessions.length > 0) {
+            setExpandedRowKeys([filterByDateSessions[0].start_time]);
           }
-        });
-        setSessions(unfilteredSessions);
-        setFilteredByDateSession(filterByDateSessions);
-
-        if (filterByDateSessions.length > 0) {
-          setExpandedRowKeys([filterByDateSessions[0].start_time]);
         }
+        setIsLoading(false);
+      } catch (error) {
+        showErrorModal('Something went wrong', error.response?.data?.message);
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    } catch (error) {
-      showErrorModal('Something went wrong', error.response?.data?.message);
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [isAvailability]
+  );
 
   useEffect(() => {
     if (match?.params?.session_type) {
@@ -174,7 +185,11 @@ const SessionsInventories = ({ match }) => {
     trackSimpleEvent(eventTag, { session_data: item });
 
     if (item.inventory_id) {
-      history.push(`${Routes.creatorDashboard.rootPath}/sessions/e/${item.inventory_id}/details`);
+      history.push(
+        `${Routes.creatorDashboard.rootPath}/${isAvailability ? 'availabilities' : 'sessions'}/e/${
+          item.inventory_id
+        }/details`
+      );
     }
   };
 
@@ -228,7 +243,7 @@ const SessionsInventories = ({ match }) => {
 
   let dateColumns = [
     {
-      title: 'Session Name',
+      title: `${isAvailability ? 'Availability' : 'Session'} Name`,
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => {
@@ -350,7 +365,7 @@ const SessionsInventories = ({ match }) => {
                 </Tooltip>
               ) : (
                 <Popconfirm
-                  title="Do you want to cancel session?"
+                  title={`Do you want to cancel ${isAvailability ? 'availability' : 'session'}?`}
                   icon={<DeleteOutlined className={styles.danger} />}
                   okText="Yes"
                   cancelText="No"
@@ -483,7 +498,7 @@ const SessionsInventories = ({ match }) => {
         </Tooltip>
       ) : (
         <Popconfirm
-          title="Do you want to cancel session?"
+          title={`Do you want to cancel ${isAvailability ? 'availability' : 'session'}?`}
           icon={<DeleteOutlined className={styles.danger} />}
           okText="Yes"
           cancelText={'No'}
@@ -590,7 +605,9 @@ const SessionsInventories = ({ match }) => {
       <div className={styles.box}>
         <Row gutter={[8, 8]}>
           <Col xs={24} md={18} lg={20}>
-            <Title level={4}>{isPast ? 'Past' : 'Upcoming'} Sessions</Title>
+            <Title level={4}>
+              {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availabilities' : 'Sessions'}
+            </Title>
             <Radio.Group value={view} onChange={handleViewChange}>
               <Radio.Button value="list">List</Radio.Button>
               <Radio.Button value="calendar">Calendar</Radio.Button>
@@ -599,7 +616,11 @@ const SessionsInventories = ({ match }) => {
 
           <Col xs={24}>
             {view === 'calendar' ? (
-              <Loader loading={isLoading} size="large" text="Loading sessions">
+              <Loader
+                loading={isLoading}
+                size="large"
+                text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}
+              >
                 {sessions.length > 0 ? (
                   <CalendarView
                     inventories={sessions}
@@ -614,7 +635,11 @@ const SessionsInventories = ({ match }) => {
             ) : (
               <>
                 {isMobileDevice ? (
-                  <Loader loading={isLoading} size="large" text="Loading sessions">
+                  <Loader
+                    loading={isLoading}
+                    size="large"
+                    text={`Loading ${isAvailability ? 'availabilities' : 'sessions'}`}
+                  >
                     {sessions.length > 0 ? (
                       <Table
                         columns={mobileTableColumns}
@@ -649,7 +674,9 @@ const SessionsInventories = ({ match }) => {
                         }}
                       />
                     ) : (
-                      <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                      <div className="text-empty">
+                        No {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availability' : 'Session'}
+                      </div>
                     )}
                   </Loader>
                 ) : filteredByDateSession.length > 0 ? (
@@ -676,7 +703,9 @@ const SessionsInventories = ({ match }) => {
                     }}
                   />
                 ) : (
-                  <div className="text-empty">No {isPast ? 'Past' : 'Upcoming'} Session</div>
+                  <div className="text-empty">
+                    No {isPast ? 'Past' : 'Upcoming'} {isAvailability ? 'Availability' : 'Session'}
+                  </div>
                 )}
               </>
             )}

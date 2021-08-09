@@ -1,21 +1,22 @@
 import React from 'react';
 import { Button } from 'antd';
 import {
-  TagsOutlined,
-  VideoCameraOutlined,
-  ToolOutlined,
-  DollarOutlined,
-  PlayCircleOutlined,
-  BookOutlined,
-  ScheduleOutlined,
-  AuditOutlined,
-  FilePdfOutlined,
-  Html5Outlined,
-  TeamOutlined,
-  ControlOutlined,
-  PartitionOutlined,
-  GlobalOutlined,
   AppstoreOutlined,
+  AuditOutlined,
+  BookOutlined,
+  ClockCircleOutlined,
+  ControlOutlined,
+  DollarOutlined,
+  FilePdfOutlined,
+  GlobalOutlined,
+  Html5Outlined,
+  PartitionOutlined,
+  PlayCircleOutlined,
+  ScheduleOutlined,
+  TagsOutlined,
+  TeamOutlined,
+  ToolOutlined,
+  VideoCameraOutlined,
 } from '@ant-design/icons';
 import Routes from 'routes';
 import { mixPanelEventTags } from 'services/integrations/mixpanel';
@@ -103,6 +104,35 @@ export const creatorMenuItems = [
   },
   {
     order: 5,
+    key: 'availabilities',
+    title: 'Availabilities',
+    icon: <ClockCircleOutlined />,
+    children: [
+      {
+        order: 1,
+        key: 'upcoming_availabilities',
+        title: 'Upcoming Availabilities',
+        mixPanelTag: creator.click.dashboard.upcomingAvailabilities,
+        path: Routes.creatorDashboard.rootPath + '/availabilities/upcoming',
+      },
+      {
+        order: 2,
+        key: 'past_availabilities',
+        title: 'Past Availabilities',
+        mixPanelTag: creator.click.dashboard.pastAvailabilities,
+        path: Routes.creatorDashboard.rootPath + '/availabilities/past',
+      },
+      {
+        order: 3,
+        key: 'manage_availabilities',
+        title: 'Manage Availabilities',
+        mixPanelTag: creator.click.dashboard.manageSessions,
+        path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageAvailabilities,
+      },
+    ],
+  },
+  {
+    order: 6,
     is_button: false,
     key: 'video_library',
     title: 'Video Library',
@@ -111,7 +141,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
   },
   {
-    order: 6,
+    order: 7,
     is_button: false,
     key: 'passes_and_courses',
     title: 'Passes and Courses',
@@ -134,7 +164,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 7,
+    order: 8,
     is_button: false,
     key: 'subscriptions',
     title: 'Membership Subscriptions',
@@ -143,7 +173,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
   },
   {
-    order: 8,
+    order: 9,
     key: 'members',
     title: 'Members Dashboard',
     icon: <TeamOutlined />,
@@ -158,7 +188,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 9,
+    order: 10,
     key: 'passion_site',
     title: 'Your Passion Site',
     icon: <GlobalOutlined />,
@@ -194,7 +224,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 10,
+    order: 11,
     is_button: false,
     key: 'get_paid',
     title: 'Get Paid',
@@ -203,7 +233,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 11,
+    order: 12,
     is_button: false,
     key: 'business_tools',
     title: 'Business Tools',
@@ -226,7 +256,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 12,
+    order: 13,
     is_button: false,
     key: 'documents',
     title: 'Document Drive',
@@ -235,7 +265,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
   {
-    order: 13,
+    order: 14,
     is_button: false,
     key: 'newsletter',
     title: 'Newsletter',
@@ -258,7 +288,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 14,
+    order: 15,
     is_button: false,
     key: 'external_site_setting',
     title: 'External Site Settings',
@@ -281,7 +311,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 15,
+    order: 16,
     key: 'advanced_features',
     title: 'Advanced Features',
     icon: <ControlOutlined />,
@@ -303,7 +333,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 16,
+    order: 17,
     is_button: false,
     key: 'affiliates',
     title: 'Affiliates Dashboard',
