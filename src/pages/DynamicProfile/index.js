@@ -4,21 +4,23 @@ import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
-  EditOutlined,
-  SaveOutlined,
+  ArrowLeftOutlined,
+  CheckOutlined,
+  ClockCircleOutlined,
   CloseCircleOutlined,
+  EditOutlined,
+  GlobalOutlined,
   LikeOutlined,
   LinkOutlined,
   PlusCircleOutlined,
-  ArrowLeftOutlined,
-  GlobalOutlined,
-  CheckOutlined,
+  SaveOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import AvailabilityProfileComponent from 'components/DynamicProfileComponents/AvailabilityProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
@@ -51,6 +53,16 @@ const { Paragraph } = Typography;
 // },
 
 const componentsMap = {
+  AVAILABILITY: {
+    icon: <ClockCircleOutlined />,
+    component: AvailabilityProfileComponent,
+    label: 'Availability',
+    optional: true,
+    defaultProps: {
+      title: 'AVAILABILITY',
+      values: null,
+    },
+  },
   PRODUCTS: {
     icon: <LikeOutlined />,
     component: ProductsProfileComponent,

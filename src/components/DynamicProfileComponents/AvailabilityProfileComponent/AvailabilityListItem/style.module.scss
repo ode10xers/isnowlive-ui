@@ -1,0 +1,28 @@
+@import '../../../../styles/variables.scss';
+
+.availabilityItem {
+  padding: 12px;
+}
+
+.availabilityInfoSeparator {
+  color: #c4c4c4 !important;
+  font-size: 14px;
+  padding: 0 6px;
+}
+
+.availabilityInfo {
+  color: var(
+    --passion-profile-darker-color,
+    var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+  ) !important;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.availabilityTitle {
+  font-size: 17px;
+}
+
+.availabilityDescription {
+  font-size: 14px;
+}

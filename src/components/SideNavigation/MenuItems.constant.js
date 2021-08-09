@@ -38,7 +38,21 @@ export const creatorMenuItems = [
     },
   },
   {
-    order: 2,
+    order: 1,
+    key: 'create_availability_cta',
+    title: (
+      <Button block type="primary">
+        Create an Availability
+      </Button>
+    ),
+    is_button: true,
+    historyData: {
+      route: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createAvailabilities,
+      state: undefined,
+    },
+  },
+  {
+    order: 3,
     key: 'upload_video_cta',
     title: (
       <Button block type="primary">
@@ -52,7 +66,7 @@ export const creatorMenuItems = [
     },
   },
   {
-    order: 3,
+    order: 4,
     key: 'sessions',
     title: 'Sessions',
     icon: <VideoCameraOutlined />,
@@ -88,7 +102,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 4,
+    order: 5,
     is_button: false,
     key: 'video_library',
     title: 'Video Library',
@@ -97,7 +111,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos,
   },
   {
-    order: 5,
+    order: 6,
     is_button: false,
     key: 'passes_and_courses',
     title: 'Passes and Courses',
@@ -120,7 +134,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 6,
+    order: 7,
     is_button: false,
     key: 'subscriptions',
     title: 'Membership Subscriptions',
@@ -129,7 +143,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions,
   },
   {
-    order: 7,
+    order: 8,
     key: 'members',
     title: 'Members Dashboard',
     icon: <TeamOutlined />,
@@ -144,7 +158,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 8,
+    order: 9,
     key: 'passion_site',
     title: 'Your Passion Site',
     icon: <GlobalOutlined />,
@@ -180,7 +194,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 9,
+    order: 10,
     is_button: false,
     key: 'get_paid',
     title: 'Get Paid',
@@ -189,7 +203,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount,
   },
   {
-    order: 10,
+    order: 11,
     is_button: false,
     key: 'business_tools',
     title: 'Business Tools',
@@ -212,7 +226,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 11,
+    order: 12,
     is_button: false,
     key: 'documents',
     title: 'Document Drive',
@@ -221,7 +235,7 @@ export const creatorMenuItems = [
     path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.documents,
   },
   {
-    order: 12,
+    order: 13,
     is_button: false,
     key: 'newsletter',
     title: 'Newsletter',
@@ -244,7 +258,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 13,
+    order: 14,
     is_button: false,
     key: 'external_site_setting',
     title: 'External Site Settings',
@@ -267,7 +281,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 14,
+    order: 15,
     key: 'advanced_features',
     title: 'Advanced Features',
     icon: <ControlOutlined />,
@@ -289,7 +303,7 @@ export const creatorMenuItems = [
     ],
   },
   {
-    order: 15,
+    order: 16,
     is_button: false,
     key: 'affiliates',
     title: 'Affiliates Dashboard',

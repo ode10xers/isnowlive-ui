@@ -61,6 +61,7 @@ import { mapUserToPendo } from 'services/integrations/pendo';
 import http from 'services/http';
 
 import './styles/globals.scss';
+import 'swiper/swiper.scss';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
