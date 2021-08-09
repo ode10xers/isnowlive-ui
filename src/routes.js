@@ -57,6 +57,7 @@ const Routes = {
     manageSessions: '/manage/sessions',
     createSessions: '/manage/session',
     updateSessions: '/manage/session/:id/edit',
+    availabilities: '/availabilities/:session_type',
     manageAvailabilities: '/manage/availabilities',
     createAvailabilities: '/manage/availability',
     updateAvailabilities: '/manage/availability/:id/edit',

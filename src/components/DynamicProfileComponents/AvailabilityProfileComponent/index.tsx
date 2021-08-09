@@ -136,16 +136,16 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
                   <Button
                     type="primary"
                     onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.sessions, '_blank')
+                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.availabilities, '_blank')
                     }
                   >
-                    Manage my sessions
+                    Manage my availabilities
                   </Button>
                 </Space>
               </Col>
             </Row>
           ) : (
-            <Spin spinning={isLoading} tip="Fetching Passes">
+            <Spin spinning={isLoading} tip="Fetching Availabilities">
               <AvailabilityListView availabilities={availableSessions} />
             </Spin>
           )}
