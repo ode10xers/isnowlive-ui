@@ -58,9 +58,7 @@ const useOptions = () => {
   return options;
 };
 
-// NOTE: isFree is a flag sent from PaymentPopup in case the user does not need to pay
-// It can be used to bypass button disable condition, hide the card form, etc
-const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
+const CardForm = ({ btnProps, onBeforePayment, onAfterPayment }) => {
   const { text = 'PAY', disableButton = false } = btnProps;
   const {
     state: { paymentPopupVisible },
@@ -100,13 +98,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
 
   useEffect(() => {
     if (paymentPopupVisible) {
-      if (!isFree) {
-        fetchUserCards();
-      } else {
-        setSavedUserCards([]);
-        setSelectedCard(null);
-        setDisableSavedCards(false);
-      }
+      fetchUserCards();
     } else {
       setSavedUserCards([]);
       setSelectedCard(null);
@@ -119,7 +111,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
         }
       }
     }
-  }, [isFree, fetchUserCards, paymentPopupVisible, elements]);
+  }, [fetchUserCards, paymentPopupVisible, elements]);
 
   const makePayment = async (secret, paymentPayload) => {
     try {
@@ -191,8 +183,20 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
           use_saved_method: true,
         });
 
+        /*
+          TODO: Add more specific checks here
+          - The first check is similar to PaymentRetry, if the status is AUTHORIZATION_REQUIRED,
+            AWAITING_CONFIRMATION, or AWAITING_ACTION then proceed as per usual
+          - The second check is if the status is AWAITING_METHOD, then FE should redirect them
+            to input a card and go with the "pay with new card and save it" flow
+        */
+
         if (paymentSessionRes) {
-          if (paymentSessionRes.status === StripePaymentStatus.AUTHORIZATION_REQUIRED) {
+          if (
+            paymentSessionRes.status === StripePaymentStatus.AUTHORIZATION_REQUIRED ||
+            paymentSessionRes.status === StripePaymentStatus.AWAITING_CONFIRMATION ||
+            paymentSessionRes.status === StripePaymentStatus.AWAITING_ACTION
+          ) {
             // If the status is AUTHORIZATION_REQUIRED, we need to re-auth
             // The paymentSessionRes should contain the payment_method_id (beginning with pm_****)
             // We use that to re-auth the card
@@ -247,48 +251,42 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
 
   return (
     <Row gutter={[8, 12]} justify="center">
-      {!isFree && (
-        <>
-          {savedUserCards.length > 0 && (
-            <Col xs={24}>
-              <SavedCards
-                disabled={disableSavedCards}
-                userCards={savedUserCards}
-                selectedCard={selectedCard}
-                setSelectedCard={changeSelectedCard}
-              />
-            </Col>
-          )}
-          <Col xs={24} className={styles.inlineCardForm}>
-            <Spin spinning={isLoadingStripeComponent}>
-              <CardElement
-                options={options}
-                onReady={handleStripeComponentReady}
-                onChange={(event) => {
-                  setDisableSavedCards(!event.empty);
-
-                  if (event.complete) {
-                    setIsButtonDisabled(false);
-                  } else {
-                    setIsButtonDisabled(true);
-                  }
-                }}
-              />
-            </Spin>
-          </Col>
-        </>
+      {savedUserCards.length > 0 && (
+        <Col xs={24}>
+          <SavedCards
+            disabled={disableSavedCards}
+            userCards={savedUserCards}
+            selectedCard={selectedCard}
+            setSelectedCard={changeSelectedCard}
+          />
+        </Col>
       )}
+      <Col xs={24} className={styles.inlineCardForm}>
+        <Spin spinning={isLoadingStripeComponent}>
+          <CardElement
+            options={options}
+            onReady={handleStripeComponentReady}
+            onChange={(event) => {
+              setDisableSavedCards(!event.empty);
+
+              if (event.complete) {
+                setIsButtonDisabled(false);
+              } else {
+                setIsButtonDisabled(true);
+              }
+            }}
+          />
+        </Spin>
+      </Col>
 
       <Col xs={8} lg={6}>
         <Button
           block
           size="large"
           type="primary"
-          disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
+          disabled={disableButton || (isButtonDisabled && !selectedCard)}
           onClick={handleSubmit}
-          className={
-            disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn
-          }
+          className={disableButton || (isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn}
           loading={isSubmitting}
         >
           {text}

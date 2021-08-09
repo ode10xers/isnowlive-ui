@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
-import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Spin } from 'antd';
+import { Row, Col, Button, Space, Divider, Image, Typography, Modal, Collapse, Spin } from 'antd';
 import { CheckCircleFilled } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -14,8 +14,9 @@ import { isAPISuccess, preventDefaults, videoSourceType } from 'utils/helper';
 import styles from './styles.module.scss';
 
 const { Title, Text } = Typography;
+const { Panel } = Collapse;
 
-const VideoContentPopup = ({ visible, closeModal, addContentMethod = null }) => {
+const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, excludedVideos = [] }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [videos, setVideos] = useState([]);
   const [selectedVideoPopupContent, setSelectedVideoPopupContent] = useState([]);
@@ -26,13 +27,13 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null }) => 
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(data);
+        setVideos(data.filter((data) => !excludedVideos.includes(data.external_id)));
       }
     } catch (error) {
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
     }
     setIsLoading(false);
-  }, []);
+  }, [excludedVideos]);
 
   useEffect(() => {
     if (visible) {
@@ -172,8 +173,40 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null }) => 
     >
       <Spin spinning={isLoading} tip="Processing">
         <Row gutter={[12, 12]} justify="center" align="middle">
+          <Col xs={24}>
+            <Text type="danger">Your videos already added to this course will not show up here.</Text>
+          </Col>
           {videos.length > 0 ? (
-            videos.map(renderVideoContentItems)
+            <Col xs={24}>
+              <Collapse defaultActiveKey="published">
+                <Panel header={<Title level={5}> Published </Title>} key="published">
+                  <Row gutter={[12, 12]}>
+                    {videos.filter((video) => video.is_published).length > 0 ? (
+                      videos.filter((video) => video.is_published).map(renderVideoContentItems)
+                    ) : (
+                      <Col xs={24}>
+                        <Text className={styles.textAlignCenter}>
+                          Either you don’t have a video or have added all the published videos to this course already
+                        </Text>
+                      </Col>
+                    )}
+                  </Row>
+                </Panel>
+                <Panel header={<Title level={5}> Unpublished </Title>} key="unpublished">
+                  <Row gutter={[12, 12]}>
+                    {videos.filter((video) => !video.is_published).length > 0 ? (
+                      videos.filter((video) => !video.is_published).map(renderVideoContentItems)
+                    ) : (
+                      <Col xs={24}>
+                        <Text className={styles.textAlignCenter}>
+                          Either you don’t have a video or have added all the unpublished videos to this course already
+                        </Text>
+                      </Col>
+                    )}
+                  </Row>
+                </Panel>
+              </Collapse>
+            </Col>
           ) : (
             <Col xs={24}>
               <Row justify="center">

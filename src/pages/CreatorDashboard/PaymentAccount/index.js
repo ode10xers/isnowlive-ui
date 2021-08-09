@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import countryList from 'react-select-country-list';
-import { Select, Typography, Button, message, Row, Col, Modal } from 'antd';
+// import countryList from 'react-select-country-list';
+import { Select, Typography, Button, message, Row, Col, Modal, Input } from 'antd';
 import { CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import Section from 'components/Section';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import Earnings from 'pages/CreatorDashboard/Earnings';
 
-import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
+import { isAPISuccess, preventDefaults, StripeAccountStatus } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import { paymentProvider } from 'utils/constants';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
@@ -20,7 +22,7 @@ import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleT
 
 import styles from './styles.module.scss';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
 const { creator } = mixPanelEventTags;
 
@@ -29,7 +31,11 @@ const PaymentAccount = () => {
   const history = useHistory();
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const countries = countryList().getData();
+  // const countries = countryList().getData();
+  const [countries, setCountries] = useState([]);
+  const [paypalAccountModalVisible, setPaypalAccountModalVisible] = useState(false);
+  const [creatorPaypalEmail, setCreatorPaypalEmail] = useState(getLocalUserDetails().email);
+
   const {
     state: {
       userDetails: {
@@ -86,6 +92,27 @@ const PaymentAccount = () => {
     }
   }, [relinkStripe]);
 
+  const fetchSupportedCountriesForPayment = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.payment.getCreatorPaymentCountries();
+
+      if (isAPISuccess(status) && data) {
+        setCountries(Object.entries(data));
+      }
+    } catch (error) {
+      console.error(error);
+      message.error(error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchSupportedCountriesForPayment();
+  }, [fetchSupportedCountriesForPayment]);
+
   useEffect(() => {
     if (validateAccount && paymentConnected === StripeAccountStatus.VERIFICATION_PENDING) {
       const validateStripeAccount = async () => {
@@ -124,10 +151,6 @@ const PaymentAccount = () => {
     //eslint-disable-next-line
   }, [validateAccount, openStripeDashboard, setUserDetails]);
 
-  const handleChange = (value) => {
-    setSelectedCountry(value);
-  };
-
   const onboardUserToStripe = async () => {
     setIsLoading(true);
     const eventTag = creator.click.payment.connectStripe;
@@ -157,10 +180,104 @@ const PaymentAccount = () => {
     }
   };
 
+  const connectPayment = (e) => {
+    preventDefaults(e);
+
+    const selectedCountryPaymentProvider = countries.find(
+      ([countryName, countryData]) => countryData.country_code === selectedCountry
+    ).provider;
+
+    if (selectedCountryPaymentProvider === paymentProvider.STRIPE) {
+      onboardUserToStripe();
+    } else {
+      setPaypalAccountModalVisible(true);
+    }
+  };
+
+  // TODO: Implement analytics here later
+  const connectPayPalAccount = async () => {
+    const selectedCountryData = countries.find(
+      ([countryName, countryData]) => countryData.country_code === selectedCountry
+    );
+
+    if (!selectedCountry || !selectedCountryData) {
+      showErrorModal('Invalid country selected!');
+    }
+
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        country: selectedCountry,
+        currency: selectedCountryData[1].currency,
+        email: creatorPaypalEmail,
+      };
+
+      const { status, data } = await apis.payment.paypal.initiateCreatorPayPalAccount(payload);
+
+      if (isAPISuccess(status) && data) {
+        showSuccessModal('Your PayPal Account has been successfully connected!');
+        setTimeout(() => window.location.reload(), 1500);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal('Failed to initiate PayPal Account', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleConnectPaypalAccountClicked = () => {
+    Modal.confirm({
+      title: 'Confirm your PayPal email',
+      content: (
+        <>
+          <Paragraph>Are you sure you want to use this email below to receive PayPal payments?</Paragraph>
+          <Paragraph strong>{creatorPaypalEmail}</Paragraph>
+        </>
+      ),
+      okText: 'Confirm',
+      onOk: connectPayPalAccount,
+    });
+  };
+
   let view = null;
   if (paymentConnected === StripeAccountStatus.NOT_CONNECTED) {
     view = (
       <>
+        <Modal
+          centered={true}
+          closable={true}
+          visible={paypalAccountModalVisible}
+          onCancel={() => setPaypalAccountModalVisible(false)}
+          afterClose={resetBodyStyle}
+          footer={null}
+          title="Enter your PayPal Email"
+        >
+          <Row gutter={[8, 8]}>
+            <Col xs={24}>
+              <Text>Please enter the email to use with your PayPal Account.</Text>
+            </Col>
+            <Col xs={24}>
+              <Input
+                placeholder="The email associated with your PayPal Account"
+                maxLength={50}
+                onChange={(e) => setCreatorPaypalEmail(e.target.value)}
+                value={creatorPaypalEmail}
+              />
+            </Col>
+            <Col xs={24}>
+              <Row justify="end">
+                <Col>
+                  <Button type="primary" loading={isLoading} onClick={handleConnectPaypalAccountClicked}>
+                    Connect PayPal Account
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Modal>
+
         <Title level={2}>Get Paid</Title>
 
         <Row className={styles.mt50}>
@@ -185,19 +302,21 @@ const PaymentAccount = () => {
                   value={selectedCountry}
                   showSearch
                   style={{ width: 200 }}
-                  onChange={handleChange}
+                  onChange={setSelectedCountry}
                   placeholder="Select country"
                   optionFilterProp="children"
                   filterOption={(input, option) => option.children.toLowerCase().startsWith(input.toLowerCase())}
                 >
-                  {countries.map((country) => (
-                    <Option value={country.value}>{country.label}</Option>
+                  {countries.map(([countryName, countryData]) => (
+                    <Option key={countryData.country_code} value={countryData.country_code}>
+                      {countryName}
+                    </Option>
                   ))}
                 </Select>
               </Col>
               <Col sm={24} md={12} className={styles.connectBtn}>
-                <Button type="primary" loading={isLoading} onClick={onboardUserToStripe}>
-                  Connect Stripe
+                <Button type="primary" loading={isLoading} onClick={connectPayment}>
+                  Connect Payment
                 </Button>
               </Col>
             </Row>

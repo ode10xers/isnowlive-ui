@@ -8,6 +8,7 @@ import config from 'config';
 import apis from 'apis';
 
 import PaymentOptionsWrapper from 'components/Payment/PaymentOptionsWrapper';
+import PaypalPaymentButtons from 'components/Payment/PaypalPaymentButtons';
 import SupportedPayments from 'components/SupportedPayments/SupportedPayments';
 import TermsAndConditionsText from 'components/TermsAndConditionsText';
 import {
@@ -37,6 +38,7 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
 import validationRules from 'utils/validation';
+import { paymentProvider } from 'utils/constants';
 
 const { Text, Title } = Typography;
 const {
@@ -91,6 +93,7 @@ const PaymentPopup = () => {
   const [creatorCountry, setCreatorCountry] = useState('SG');
   const [creatorCurrency, setCreatorCurrency] = useState('SGD');
   const [creatorStripeAccountID, setCreatorStripeAccountID] = useState(null);
+  const [creatorPaymentProvider, setCreatorPaymentProvider] = useState(null);
   const [stripePromise, setStripePromise] = useState(null);
 
   const {
@@ -131,6 +134,10 @@ const PaymentPopup = () => {
           setCreatorCurrency(data.profile?.currency);
         }
 
+        if (data.profile?.payment_provider) {
+          setCreatorPaymentProvider(data.profile?.payment_provider);
+        }
+
         if (data.profile?.connect_account_id) {
           setCreatorStripeAccountID(data.profile?.connect_account_id);
         }
@@ -153,18 +160,20 @@ const PaymentPopup = () => {
       console.log('Using indian stripe key for this creator');
     }
 
-    if (creatorStripeAccountID) {
-      setStripePromise(
-        loadStripe(stripeKey, {
-          stripeAccount: creatorStripeAccountID,
-        })
-      );
-    } else {
-      setStripePromise(loadStripe(stripeKey));
+    if (creatorPaymentProvider === paymentProvider.STRIPE) {
+      if (creatorStripeAccountID) {
+        setStripePromise(
+          loadStripe(stripeKey, {
+            stripeAccount: creatorStripeAccountID,
+          })
+        );
+      } else {
+        setStripePromise(loadStripe(stripeKey));
+      }
     }
 
     //eslint-disable-next-line
-  }, [creatorStripeAccountID]);
+  }, [creatorStripeAccountID, creatorPaymentProvider]);
 
   useEffect(() => {
     if (!paymentPopupVisible) {
@@ -387,6 +396,11 @@ const PaymentPopup = () => {
     );
   };
 
+  const handlePurchaseFreeProduct = async () => {
+    const orderResponse = await handleBeforePayment();
+    await handleAfterPayment(orderResponse, null);
+  };
+
   const isFree = () =>
     flexiblePaymentDetails?.enabled
       ? false
@@ -531,24 +545,52 @@ const PaymentPopup = () => {
 
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={[8, 12]} justify="center">
-            <Col xs={24}>
-              <Elements stripe={stripePromise}>
-                <PaymentOptionsWrapper
-                  handleAfterPayment={handleAfterPayment}
-                  handleBeforePayment={handleBeforePayment}
-                  isFreeProduct={isFree()}
-                  // Currently, only subscriptions need payment details to be saved
-                  // so we can use the saved details to charge them offline for recurring payment
-                  shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
-                  minimumPriceRequirementFulfilled={isPriceLessThanMinimum()}
-                  creatorDetails={creatorDetails}
-                  amount={getAmountForPaymentRequest()}
+            {isFree() ? (
+              <Col xs={24} className={styles.p20}>
+                <Row justify="center">
+                  <Col xs={8} lg={6}>
+                    <Button
+                      block
+                      size="large"
+                      type="primary"
+                      className={styles.greenBtn}
+                      onClick={handlePurchaseFreeProduct}
+                    >
+                      Get
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+            ) : creatorPaymentProvider === paymentProvider.PAYPAL ? (
+              <Col xs={24}>
+                <PaypalPaymentButtons
+                  onBeforePayment={handleBeforePayment}
+                  onAfterPayment={handleAfterPayment}
+                  creatorCurrency={creatorCurrency}
                 />
-              </Elements>
-            </Col>
-            <Col xs={24}>
-              <SupportedPayments />
-            </Col>
+              </Col>
+            ) : (
+              <>
+                <Col xs={24}>
+                  <Elements stripe={stripePromise}>
+                    <PaymentOptionsWrapper
+                      handleAfterPayment={handleAfterPayment}
+                      handleBeforePayment={handleBeforePayment}
+                      // Currently, only subscriptions need payment details to be saved
+                      // so we can use the saved details to charge them offline for recurring payment
+                      shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
+                      minimumPriceRequirementFulfilled={isPriceLessThanMinimum()}
+                      creatorDetails={creatorDetails}
+                      amount={getAmountForPaymentRequest()}
+                    />
+                  </Elements>
+                </Col>
+                <Col xs={24}>
+                  <SupportedPayments />
+                </Col>
+              </>
+            )}
+
             <Col xs={24} className={styles.tncText}>
               <TermsAndConditionsText shouldCheck={false} />
             </Col>
