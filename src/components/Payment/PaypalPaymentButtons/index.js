@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+
+import { Spin } from 'antd';
 
 import config from 'config';
 
@@ -9,6 +11,8 @@ import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payme
 const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency = 'USD' }) => {
   const buttonContainerRef = useRef();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const renderPaypalButtons = useCallback(() => {
     if (window.paypal) {
       let orderData = null;
@@ -16,6 +20,7 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
       window.paypal
         .Buttons({
           createOrder: async (paypalData, actions) => {
+            setIsLoading(true);
             try {
               const orderResponse = await onBeforePayment();
 
@@ -28,6 +33,7 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
                 orderData = { ...orderResponse, transaction_id: paymentSessionResponse.transaction_id };
 
                 if (paymentSessionResponse && paymentSessionResponse?.pg_transaction_ref_id) {
+                  setIsLoading(false);
                   return paymentSessionResponse?.pg_transaction_ref_id;
                 }
               }
@@ -38,10 +44,12 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
                 error?.response?.data?.message || 'Something went wrong.'
               );
             }
-
+            setIsLoading(false);
             return null;
           },
           onApprove: async (paypalData, actions) => {
+            setIsLoading(true);
+
             try {
               if (orderData) {
                 const verifyOrderResponse = await verifyPaymentForOrder({
@@ -52,9 +60,7 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
 
                 onAfterPayment(orderData, verifyOrderResponse);
               } else {
-                // TODO: Change this
-                console.log('Order data not saved properly');
-                showErrorModal('Save order data properly!');
+                showErrorModal('Invalid order data!');
               }
             } catch (error) {
               console.error(error);
@@ -63,6 +69,8 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
                 error?.response?.data?.message || 'Something went wrong.'
               );
             }
+
+            setIsLoading(false);
           },
         })
         .render(buttonContainerRef.current);
@@ -102,7 +110,11 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
     );
   }, [creatorCurrency, renderPaypalButtons]);
 
-  return <div id="paypal-button-container" ref={buttonContainerRef}></div>;
+  return (
+    <Spin spinning={isLoading}>
+      <div id="paypal-button-container" ref={buttonContainerRef}></div>
+    </Spin>
+  );
 };
 
 export default PaypalPaymentButtons;
