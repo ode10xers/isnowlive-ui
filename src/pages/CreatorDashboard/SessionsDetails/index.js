@@ -11,7 +11,7 @@ import {
   CopyOutlined,
 } from '@ant-design/icons';
 import moment from 'moment';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import ReactHtmlParser from 'react-html-parser';
 
 import apis from 'apis';
@@ -47,6 +47,9 @@ const { creator } = mixPanelEventTags;
 
 const SessionsDetails = ({ match }) => {
   const history = useHistory();
+
+  const location = useLocation();
+  const isAvailability = location.pathname.includes(Routes.creatorDashboard.availabilitiesDetails.split(':')[0]);
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState(null);
   const [isPastSession, setIsPastSession] = useState(false);
@@ -133,7 +136,7 @@ const SessionsDetails = ({ match }) => {
         setIsEditingDocuments(false);
       }
     } catch (error) {
-      message.error('Failed to update session event document');
+      message.error(`Failed to update ${isAvailability ? 'availability' : 'session'} event document`);
     }
   };
 
@@ -150,7 +153,7 @@ const SessionsDetails = ({ match }) => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading session details">
+    <Loader loading={isLoading} size="large" text={`Loading ${isAvailability ? 'availability' : 'session'} details`}>
       <EventAddressModal
         visible={offlineEventAddressModalVisible}
         closeModal={hideEditOfflineEventAddressModal}
@@ -164,13 +167,13 @@ const SessionsDetails = ({ match }) => {
                 className={styles.headButton}
                 onClick={() =>
                   trackAndNavigate(
-                    '/creator/dashboard/sessions/past',
+                    `/creator/dashboard/${isAvailability ? 'availabilities' : 'sessions'}/past`,
                     creator.click.sessions.details.backToPastSessionsList
                   )
                 }
                 icon={<ArrowLeftOutlined />}
               >
-                Past Sessions
+                Past {isAvailability ? 'Availabilities' : 'Sessions'}
               </Button>
             </Col>
           </>
@@ -181,13 +184,13 @@ const SessionsDetails = ({ match }) => {
                 className={styles.headButton}
                 onClick={() =>
                   trackAndNavigate(
-                    '/creator/dashboard/sessions/upcoming',
+                    `/creator/dashboard/${isAvailability ? 'availabilities' : 'sessions'}/upcoming`,
                     creator.click.sessions.details.backToUpcomingSessionsList
                   )
                 }
                 icon={<ArrowLeftOutlined />}
               >
-                Upcoming Sessions
+                Upcoming {isAvailability ? 'Availabilities' : 'Sessions'}
               </Button>
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
@@ -197,7 +200,11 @@ const SessionsDetails = ({ match }) => {
             </Col>
             <Col xs={24} md={7} lg={5} xl={4}>
               <div className={styles.headButton}>
-                <Share label="Share Session" title={session?.name} shareUrl={publicUrl} />
+                <Share
+                  label={`Share ${isAvailability ? 'Availability' : 'Session'}`}
+                  title={session?.name}
+                  shareUrl={publicUrl}
+                />
               </div>
             </Col>
           </>
@@ -211,18 +218,33 @@ const SessionsDetails = ({ match }) => {
                 <Title level={5}>{session?.name}</Title>
               </Col>
               <Col span={24}>
-                <Title level={5}>Session Details</Title>
+                <Title level={5}>{isAvailability ? 'Availability' : 'Session'} Details</Title>
               </Col>
               <Col xs={24} md={12}>
-                {layout('Session Day and Date', toLongDateWithDay(session?.session_date))}
-                {layout('Session Type', session?.group ? 'Group Session' : '1-on-1 Session')}
-                {layout('Session Duration', getDuration(session?.start_time, session?.end_time))}
-              </Col>
-              <Col xs={24} md={12}>
-                {layout('Session Attendees', `${session?.num_participants} / ${session?.max_participants}`)}
-                {layout('Session Price', `${session?.price} ${session?.currency.toUpperCase()} `)}
                 {layout(
-                  'Session Earning',
+                  `${isAvailability ? 'Availability' : 'Session'} Day and Date`,
+                  toLongDateWithDay(session?.session_date)
+                )}
+                {layout(
+                  `${isAvailability ? 'Availability' : 'Session'} Type`,
+                  `${session?.group ? 'Group' : '1-on-1'} ${isAvailability ? 'Availability' : 'Session'}`
+                )}
+                {layout(
+                  `${isAvailability ? 'Availability' : 'Session'} Duration`,
+                  getDuration(session?.start_time, session?.end_time)
+                )}
+              </Col>
+              <Col xs={24} md={12}>
+                {layout(
+                  `${isAvailability ? 'Availability' : 'Session'} Attendees`,
+                  `${session?.num_participants} / ${session?.max_participants}`
+                )}
+                {layout(
+                  `${isAvailability ? 'Availability' : 'Session'} Price`,
+                  `${session?.price} ${session?.currency.toUpperCase()} `
+                )}
+                {layout(
+                  `${isAvailability ? 'Availability' : 'Session'} Earning`,
                   `${
                     session.participants
                       ? session.participants.reduce((item, participant) => item + (participant.fee_paid || 0), 0)
@@ -269,9 +291,10 @@ const SessionsDetails = ({ match }) => {
                         {' '}
                         THIS{' '}
                       </Text>{' '}
-                      session only. To change the docs for all sessions click on the{' '}
+                      {isAvailability ? 'availability' : 'session'} only. To change the docs for all{' '}
+                      {isAvailability ? 'availabilities' : 'sessions'} click on the{' '}
                       <Text strong type="danger">
-                        Edit Session
+                        Edit {isAvailability ? 'Availability' : 'Session'}
                       </Text>{' '}
                       button
                     </Paragraph>
@@ -292,7 +315,7 @@ const SessionsDetails = ({ match }) => {
                         trackAndNavigate(session?.start_url, creator.click.sessions.details.startSession, true)
                       }
                     >
-                      Start Session
+                      Start {isAvailability ? 'Availability' : 'Session'}
                     </Button>
                   </Col>
                   <Col xs={12} lg={24}>
@@ -303,7 +326,9 @@ const SessionsDetails = ({ match }) => {
                       icon={<EditOutlined />}
                       onClick={() =>
                         trackAndNavigate(
-                          `${Routes.creatorDashboard.rootPath}/manage/session/${session?.session_id}/edit`,
+                          `${Routes.creatorDashboard.rootPath}/manage/${isAvailability ? 'availability' : 'session'}/${
+                            session?.session_id
+                          }/edit`,
                           creator.click.sessions.details.editSession,
                           false,
                           {
@@ -313,7 +338,7 @@ const SessionsDetails = ({ match }) => {
                         )
                       }
                     >
-                      Edit Session
+                      Edit {isAvailability ? 'Availability' : 'Session'}
                     </Button>
                   </Col>
                   <Col xs={12} lg={24}>
@@ -331,7 +356,7 @@ const SessionsDetails = ({ match }) => {
                   </Col>
                   <Col xs={12} lg={24}>
                     <Popconfirm
-                      title="Do you want to cancel session?"
+                      title={`Do you want to cancel ${isAvailability ? 'availability' : 'session'}?`}
                       icon={<DeleteOutlined className={styles.danger} />}
                       okText="Yes"
                       cancelText="No"
@@ -346,7 +371,7 @@ const SessionsDetails = ({ match }) => {
                         className={styles.actionButton}
                         icon={<CloseCircleOutlined />}
                       >
-                        Cancel Session
+                        Cancel {isAvailability ? 'Availability' : 'Session'}
                       </Button>
                     </Popconfirm>
                   </Col>
@@ -357,7 +382,7 @@ const SessionsDetails = ({ match }) => {
                 {session?.is_offline && (
                   <Space direction="vertical">
                     <Space align="start">
-                      <Title level={5}>Session Location</Title>
+                      <Title level={5}>{isAvailability ? 'Availability' : 'Session'} Location</Title>
                       <Button
                         size="small"
                         type="link"
@@ -375,7 +400,7 @@ const SessionsDetails = ({ match }) => {
                 {session?.description && (
                   <>
                     <Title level={5} className={session?.is_offline ? styles.mt50 : undefined}>
-                      Session Information
+                      {isAvailability ? 'Availability' : 'Session'} Information
                     </Title>
                     <Text type="secondary" level={5}>
                       {ReactHtmlParser(session?.description)}
@@ -385,7 +410,7 @@ const SessionsDetails = ({ match }) => {
                 {session?.prerequisites && (
                   <>
                     <Title level={5} className={styles.mt50}>
-                      Session Prerequisite
+                      {isAvailability ? 'Availability' : 'Session'} Prerequisite
                     </Title>
                     <Text type="secondary" level={5}>
                       {ReactHtmlParser(session?.prerequisites)}
