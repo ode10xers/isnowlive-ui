@@ -325,8 +325,8 @@ const CourseModulesForm = ({ match, history }) => {
 
   const disabledEndDates = (currentDate) => {
     return (
-      dateIsBeforeDate(currentDate, moment().startOf('day')) ||
-      dateIsBeforeDate(currentDate, moment(courseStartDate).add(1, 'day'))
+      dateIsBeforeDate(currentDate, moment().startOf('day').subtract(1, 'second')) ||
+      dateIsBeforeDate(currentDate, moment(courseStartDate).subtract(1, 'second'))
     );
   };
 
