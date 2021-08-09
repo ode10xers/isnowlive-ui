@@ -37,6 +37,7 @@ export default {
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
       getDashboard: () => http.get('/secure/creator/profile/stripe/dashboard'),
     },
+    getCreatorPaymentProvider: () => http.get('/secure/creator/config/payment'),
     getCreatorPaymentCountries: () => http.get('/secure/creator/config/payment'),
     getAvailablePaymentMethods: (currency) =>
       http.get(`/secure/customer/payment/available-method-types?currency=${currency}`),
