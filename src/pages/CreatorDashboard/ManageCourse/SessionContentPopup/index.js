@@ -172,7 +172,8 @@ const SessionContentPopup = ({
 
   const disabledStartDate = (currDate) => dateIsBeforeDate(currDate, moment().startOf('day').subtract(1, 'second'));
   const disabledEndDate = (currDate) =>
-    dateIsBeforeDate(currDate, moment().startOf('day')) || dateIsBeforeDate(currDate, moment(startDate).add(1, 'day'));
+    dateIsBeforeDate(currDate, moment().startOf('day').subtract(1, 'second')) ||
+    dateIsBeforeDate(currDate, moment(startDate).subtract(1, 'second'));
 
   const applyDateChanges = (e) => {
     preventDefaults(e);

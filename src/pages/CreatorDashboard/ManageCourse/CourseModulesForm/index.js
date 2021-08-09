@@ -200,6 +200,8 @@ const CourseModulesForm = ({ match, history }) => {
   const [courseStartDate, setCourseStartDate] = useState(null);
   const [courseEndDate, setCourseEndDate] = useState(null);
 
+  const [excludedVideosInModal, setExcludedVideosInModal] = useState([]);
+
   //#region Start of Helper functions
 
   const redirectToCourseSectionDashboard = useCallback(
@@ -323,8 +325,8 @@ const CourseModulesForm = ({ match, history }) => {
 
   const disabledEndDates = (currentDate) => {
     return (
-      dateIsBeforeDate(currentDate, moment().startOf('day')) ||
-      dateIsBeforeDate(currentDate, moment(courseStartDate).add(1, 'day'))
+      dateIsBeforeDate(currentDate, moment().startOf('day').subtract(1, 'second')) ||
+      dateIsBeforeDate(currentDate, moment(courseStartDate).subtract(1, 'second'))
     );
   };
 
@@ -344,13 +346,18 @@ const CourseModulesForm = ({ match, history }) => {
         (acc, module) =>
           (acc = acc.concat(
             module.module_content
-              .filter((content) => content.product_type?.toUpperCase() === 'VIDEO')
+              .filter((content) => content?.product_type?.toUpperCase() === 'VIDEO')
               .map((content) => content.product_id)
           )),
         []
       )
     ),
   ];
+
+  const getExcludedVideoContentsForModal = () => {
+    const currModules = form.getFieldValue('modules');
+    return getVideoContentIDsFromModules(currModules);
+  };
 
   const isVideoContentModified = (newModules) => {
     if (!courseDetails?.modules) {
@@ -684,11 +691,13 @@ const CourseModulesForm = ({ match, history }) => {
   const openVideoPopup = (moduleIndex) => {
     const addContentFunction = initializeAddContentFunction(moduleIndex);
     setAddVideoContentMethod(() => addContentFunction);
+    setExcludedVideosInModal(getExcludedVideoContentsForModal());
     setVideoPopupVisible(true);
   };
 
   const closeVideoPopup = () => {
     setVideoPopupVisible(false);
+    setExcludedVideosInModal([]);
   };
 
   //#endregion End of UI Handlers
@@ -713,6 +722,7 @@ const CourseModulesForm = ({ match, history }) => {
         visible={videoPopupVisible}
         closeModal={closeVideoPopup}
         addContentMethod={addVideoContentMethod}
+        excludedVideos={excludedVideosInModal}
       />
       <div className={styles.box}>
         <Loader size="large" loading={isLoading}>

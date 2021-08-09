@@ -191,8 +191,20 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
           use_saved_method: true,
         });
 
+        /*
+          TODO: Add more specific checks here
+          - The first check is similar to PaymentRetry, if the status is AUTHORIZATION_REQUIRED,
+            AWAITING_CONFIRMATION, or AWAITING_ACTION then proceed as per usual
+          - The second check is if the status is AWAITING_METHOD, then FE should redirect them
+            to input a card and go with the "pay with new card and save it" flow
+        */
+
         if (paymentSessionRes) {
-          if (paymentSessionRes.status === StripePaymentStatus.AUTHORIZATION_REQUIRED) {
+          if (
+            paymentSessionRes.status === StripePaymentStatus.AUTHORIZATION_REQUIRED ||
+            paymentSessionRes.status === StripePaymentStatus.AWAITING_CONFIRMATION ||
+            paymentSessionRes.status === StripePaymentStatus.AWAITING_ACTION
+          ) {
             // If the status is AUTHORIZATION_REQUIRED, we need to re-auth
             // The paymentSessionRes should contain the payment_method_id (beginning with pm_****)
             // We use that to re-auth the card

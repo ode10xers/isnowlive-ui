@@ -59,7 +59,11 @@ const PaymentRetry = () => {
           });
 
           if (isAPISuccess(status) && paymentSessionData) {
-            if (paymentSessionData.status === StripePaymentStatus.AUTHORIZATION_REQUIRED) {
+            if (
+              paymentSessionData.status === StripePaymentStatus.AUTHORIZATION_REQUIRED ||
+              paymentSessionData.status === StripePaymentStatus.AWAITING_CONFIRMATION ||
+              paymentSessionData.status === StripePaymentStatus.AWAITING_ACTION
+            ) {
               const isPaymentSuccess = await makePayment(paymentSessionData.payment_gateway_session_token, {
                 payment_method: paymentSessionData.payment_method_id,
               });
