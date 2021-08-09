@@ -20,6 +20,8 @@ import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
+import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
+
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
@@ -107,7 +109,60 @@ const componentsMap = {
       values: null,
     },
   },
+  SESSIONS: {
+    icon: <LikeOutlined />,
+    label: 'Sessions',
+    optional: false,
+    component: SessionsProfileComponent,
+    defaultProps: {
+      title: 'My Sessions',
+      values: null,
+    },
+  },
+  // COURSES: {
+  //   icon: <LikeOutlined />,
+  //   label: 'Courses',
+  //   optional: false,
+  //   component: ProductsProfileComponent,
+  //   defaultProps: {
+  //     title: 'My Courses',
+  //     values: null,
+  //   },
+  // },
+  // VIDEOS: {
+  //   icon: <LikeOutlined />,
+  //   label: 'Videos',
+  //   optional: false,
+  //   component: ProductsProfileComponent,
+  //   defaultProps: {
+  //     title: 'My Videos',
+  //     values: null,
+  //   },
+  // },
 };
+
+const sectionData = [
+  {
+    key: 'SESSIONS',
+    title: 'My Sessions',
+    values: null,
+  },
+  {
+    key: 'SUBSCRIPTIONS',
+    title: 'My Memberships',
+    values: null,
+  },
+  {
+    key: 'PASSES',
+    title: 'My Passes',
+    values: null,
+  },
+  {
+    key: 'DONATIONS',
+    title: 'Buy me a coffee!',
+    values: [5, 10, 15, 20],
+  },
+];
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
@@ -161,7 +216,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   }, [fetchCreatorProfileData, creatorUsername]);
 
   useEffect(() => {
-    setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
+    setCreatorUIConfig(sectionData ?? []);
   }, [creatorProfileData]);
 
   useEffect(() => {
