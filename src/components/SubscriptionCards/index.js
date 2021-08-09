@@ -9,6 +9,8 @@ import TagListPopup from 'components/TagListPopup';
 
 import styles from './styles.module.scss';
 import { generateSubscriptionDuration } from 'utils/subscriptions';
+import { copyToClipboard, generateUrlFromUsername, preventDefaults } from 'utils/helper';
+import { getLocalUserDetails } from 'utils/storage';
 
 const { Text } = Typography;
 const defaultBorderColor = '#eeeeee';
@@ -113,6 +115,14 @@ const SubscriptionCards = ({
     <List.Item className={classNames(styles.cardListItem, item.className)}>{item.label}</List.Item>
   );
 
+  const copySubscriptionLink = (e) => {
+    preventDefaults(e);
+    const username = getLocalUserDetails().username;
+    const pageLink = `${generateUrlFromUsername(username)}/m/${subscription.external_id}`;
+
+    copyToClipboard(pageLink);
+  };
+
   return (
     <Card
       hoverable={true}
@@ -133,9 +143,6 @@ const SubscriptionCards = ({
       }
       bodyStyle={{ padding: '0px 10px' }}
       actions={[
-        // <Button disabled={editing} type="primary" danger onClick={() => deleteSubscription(subscription.external_id)}>
-        //   Delete
-        // </Button>,
         <div className={styles.p10}>
           {subscription.is_published ? (
             <Button
@@ -161,9 +168,11 @@ const SubscriptionCards = ({
             </Button>
           )}
         </div>,
-        // <Button disabled={editing} type="primary" onClick={() => editSubscription(subscription.external_id)}>
-        //   Edit
-        // </Button>,
+        <div className={styles.p10}>
+          <Button block ghost type="primary" onClick={copySubscriptionLink}>
+            Copy Link
+          </Button>
+        </div>,
       ]}
     >
       <List size="large" itemLayout="vertical" dataSource={cardData} renderItem={renderCardData} rowKey="label" />
