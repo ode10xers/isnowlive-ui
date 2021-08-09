@@ -396,6 +396,11 @@ const PaymentPopup = () => {
     );
   };
 
+  const handlePurchaseFreeProduct = async () => {
+    const orderResponse = await handleBeforePayment();
+    await handleAfterPayment(orderResponse, null);
+  };
+
   const isFree = () =>
     flexiblePaymentDetails?.enabled
       ? false
@@ -540,7 +545,23 @@ const PaymentPopup = () => {
 
         <Col xs={24} className={styles.topBorder}>
           <Row gutter={[8, 12]} justify="center">
-            {creatorPaymentProvider === paymentProvider.PAYPAL ? (
+            {isFree() ? (
+              <Col xs={24} className={styles.p20}>
+                <Row justify="center">
+                  <Col xs={8} lg={6}>
+                    <Button
+                      block
+                      size="large"
+                      type="primary"
+                      className={styles.greenBtn}
+                      onClick={handlePurchaseFreeProduct}
+                    >
+                      Get
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
+            ) : creatorPaymentProvider === paymentProvider.PAYPAL ? (
               <Col xs={24}>
                 <PaypalPaymentButtons
                   onBeforePayment={handleBeforePayment}
@@ -555,7 +576,6 @@ const PaymentPopup = () => {
                     <PaymentOptionsWrapper
                       handleAfterPayment={handleAfterPayment}
                       handleBeforePayment={handleBeforePayment}
-                      isFreeProduct={isFree()}
                       // Currently, only subscriptions need payment details to be saved
                       // so we can use the saved details to charge them offline for recurring payment
                       shouldSavePaymentDetails={productType === productTypeConstants.SUBSCRIPTION}
