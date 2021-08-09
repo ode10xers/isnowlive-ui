@@ -1,11 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Spin, Row, Col, Space, Button, Typography } from 'antd';
-import { LikeOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
-import ContainerCard from 'components/ContainerCard';
 import SessionListView from './SessionListView';
 import SessionEditView from './SessionEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
