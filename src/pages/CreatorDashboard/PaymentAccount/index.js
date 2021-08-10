@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-// import countryList from 'react-select-country-list';
 import { Select, Typography, Button, message, Row, Col, Modal, Input } from 'antd';
 import { CheckCircleTwoTone } from '@ant-design/icons';
 
@@ -31,7 +30,6 @@ const PaymentAccount = () => {
   const history = useHistory();
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  // const countries = countryList().getData();
   const [countries, setCountries] = useState([]);
   const [paypalAccountModalVisible, setPaypalAccountModalVisible] = useState(false);
   const [creatorPaypalEmail, setCreatorPaypalEmail] = useState(getLocalUserDetails().email);
@@ -167,7 +165,6 @@ const PaymentAccount = () => {
         error.response?.data?.code === 500 &&
         error.response?.data?.message === 'user already registered for account, trigger relink'
       ) {
-        // TODO: Add special handler here if selected country === IN (for India)
         relinkStripe();
       } else {
         pushToDataLayer(gtmTriggerEvents.STRIPE_CONNECT_FAILED, {

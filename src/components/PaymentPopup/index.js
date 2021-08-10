@@ -21,6 +21,8 @@ import {
 } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import validationRules from 'utils/validation';
+import { paymentProvider } from 'utils/constants';
 import { getLocalUserDetails } from 'utils/storage';
 import { followUpGetVideo, followUpBookSession } from 'utils/orderHelper';
 import {
@@ -37,8 +39,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './styles.module.scss';
-import validationRules from 'utils/validation';
-import { paymentProvider } from 'utils/constants';
 
 const { Text, Title } = Typography;
 const {

@@ -103,15 +103,6 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, buttonDisabled 
     document.getElementsByTagName('head')[0].appendChild(script);
   };
 
-  // useEffect(() => {
-  //   loadScript(
-  //     `https://www.paypal.com/sdk/js?currency=${creatorCurrency.toUpperCase()}&client-id=${
-  //       config.paypal.clientID
-  //     }&commit=true`,
-  //     renderPaypalButtons
-  //   );
-  // }, [creatorCurrency, renderPaypalButtons]);
-
   useEffect(() => {
     if (buttonDisabled) {
       document.getElementById('paypal-button-container').innerHTML = '';
