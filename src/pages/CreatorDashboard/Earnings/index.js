@@ -716,6 +716,17 @@ const Earnings = () => {
             {inProcess}
           </Col>
         </Row>
+        {userDetails?.profile?.payment_provider === paymentProvider.PAYPAL && (
+          <Row className={styles.mt10}>
+            <Col xs={24}>
+              <Paragraph type="secondary">
+                The amount shown above might be different from the amount you can see for each product below. This is
+                because it takes time (around 24 hours) to process the total amount from PayPal, which will be shown
+                above.
+              </Paragraph>
+            </Col>
+          </Row>
+        )}
         <Row className={styles.mt20}>
           <Col xs={24}>
             <Collapse activeKey={expandedSection} onChange={setExpandedSection}>
