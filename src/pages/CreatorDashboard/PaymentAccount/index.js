@@ -182,12 +182,12 @@ const PaymentAccount = () => {
 
     const selectedCountryPaymentProvider = countries.find(
       ([countryName, countryData]) => countryData.country_code === selectedCountry
-    ).provider;
+    )[1].provider;
 
-    if (selectedCountryPaymentProvider === paymentProvider.STRIPE) {
-      onboardUserToStripe();
-    } else {
+    if (selectedCountryPaymentProvider === paymentProvider.PAYPAL) {
       setPaypalAccountModalVisible(true);
+    } else {
+      onboardUserToStripe();
     }
   };
 
