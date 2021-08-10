@@ -721,8 +721,8 @@ const Earnings = () => {
             <Col xs={24}>
               <Paragraph type="secondary">
                 The amount shown above might be different from the amount you can see for each product below. This is
-                because it takes time (around 24 hours) to process the total amount from PayPal, which will be shown
-                above.
+                because it takes time to process the total amount from PayPal, which we will automatically update every
+                24 hours.
               </Paragraph>
             </Col>
           </Row>
