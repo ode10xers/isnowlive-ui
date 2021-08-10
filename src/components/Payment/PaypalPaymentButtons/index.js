@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-import { Spin } from 'antd';
+import { Spin, Typography } from 'antd';
 
 import config from 'config';
 
@@ -8,7 +8,11 @@ import { showErrorModal } from 'components/Modals/modals';
 
 import { createPaymentSessionForOrder, verifyPaymentForOrder } from 'utils/payment';
 
-const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency = 'USD' }) => {
+import styles from './styles.module.scss';
+
+const { Text } = Typography;
+
+const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, buttonDisabled = false, creatorCurrency = 'USD' }) => {
   const buttonContainerRef = useRef();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -75,9 +79,7 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
         })
         .render(buttonContainerRef.current);
     }
-
-    //eslint-disable-next-line
-  }, []);
+  }, [onAfterPayment, onBeforePayment]);
 
   const loadScript = (url, callback) => {
     const script = document.createElement('script');
@@ -101,18 +103,38 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, creatorCurrency
     document.getElementsByTagName('head')[0].appendChild(script);
   };
 
+  // useEffect(() => {
+  //   loadScript(
+  //     `https://www.paypal.com/sdk/js?currency=${creatorCurrency.toUpperCase()}&client-id=${
+  //       config.paypal.clientID
+  //     }&commit=true`,
+  //     renderPaypalButtons
+  //   );
+  // }, [creatorCurrency, renderPaypalButtons]);
+
   useEffect(() => {
-    loadScript(
-      `https://www.paypal.com/sdk/js?currency=${creatorCurrency.toUpperCase()}&client-id=${
-        config.paypal.clientID
-      }&commit=true`,
-      renderPaypalButtons
-    );
-  }, [creatorCurrency, renderPaypalButtons]);
+    if (buttonDisabled) {
+      document.getElementById('paypal-button-container').innerHTML = '';
+    } else {
+      loadScript(
+        `https://www.paypal.com/sdk/js?currency=${creatorCurrency.toUpperCase()}&client-id=${
+          config.paypal.clientID
+        }&commit=true`,
+        renderPaypalButtons
+      );
+    }
+  }, [buttonDisabled, creatorCurrency, renderPaypalButtons]);
 
   return (
     <Spin spinning={isLoading}>
-      <div id="paypal-button-container" ref={buttonContainerRef}></div>
+      <div className={styles.paypalContainer}>
+        {buttonDisabled && (
+          <Text type="danger" className={styles.disabledText}>
+            Please confirm all the information above is correct before paying
+          </Text>
+        )}
+        <div id="paypal-button-container" className={styles.paypalButtonContainer} ref={buttonContainerRef}></div>
+      </div>
     </Spin>
   );
 };
