@@ -277,6 +277,7 @@ const Earnings = () => {
       const { status } = await apis.session.createCreatorBalancePayout();
       if (isAPISuccess(status)) {
         trackSuccessEvent(eventTag);
+        getCreatorBalance();
         setIsLoadingPayout(false);
       }
     } catch (error) {
