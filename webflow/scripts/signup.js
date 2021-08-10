@@ -94,7 +94,6 @@ async function handleSignUpCreator(payload, ctaText) {
 
 async function handleLoginCreator(e) {
   const response = await sendPostRequest('/auth/login', getJSONFromForm(e));
-  console.log(response);
   if (successCodes.includes(response.status)) {
     setAuthToken(response);
   } else {

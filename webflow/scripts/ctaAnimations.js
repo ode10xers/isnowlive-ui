@@ -1,7 +1,6 @@
 // NOTE: handleSignUpCreator is defined in another script (signup.js)
 
 function validateEmailAndSignup(input, validation, ctaText) {
-  console.log(input);
   if (!!input.value && input.validity.valid) {
     validation.innerText = '';
 
