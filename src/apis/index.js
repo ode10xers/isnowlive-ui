@@ -48,6 +48,8 @@ export default {
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
     paypal: {
       initiateCreatorPayPalAccount: (payload) => http.post('/secure/creator/profile/paypal', payload),
+      updateCreatorPayPalAccount: (payload) => http.patch('/secure/creator/profile/paypal', payload),
+      getCreatorPayPalAccountDetails: () => http.get('/secure/creator/profile/paypal'),
     },
   },
   availabilities: {

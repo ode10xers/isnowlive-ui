@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
-import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm, Collapse } from 'antd';
+import { Row, Col, Typography, Button, Card, Empty, message, Popconfirm, Collapse, Modal, Input } from 'antd';
 import { useHistory } from 'react-router-dom';
 
 import apis from 'apis';
@@ -9,9 +9,10 @@ import dateUtil from 'utils/date';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import ShowAmount from 'components/ShowAmount';
-import { useGlobalContext } from 'services/globalContext';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 import { isMobileDevice } from 'utils/device';
-import { isAPISuccess, StripeAccountStatus } from 'utils/helper';
+import { paymentProvider } from 'utils/constants';
+import { isAPISuccess, preventDefaults, StripeAccountStatus } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -19,6 +20,7 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
+import { useGlobalContext } from 'services/globalContext';
 import { customNullValue, gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import styles from './styles.module.scss';
@@ -27,7 +29,7 @@ const cashIcon = require('assets/images/cash.png');
 const checkIcon = require('assets/images/check.png');
 const timerIcon = require('assets/images/timer.png');
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 const {
   formatDate: { toLongDateWithDayTime },
@@ -42,6 +44,8 @@ const getEarningsAPIs = {
   subscriptions: apis.subscriptions.getSubscriptionEarnings,
 };
 
+// TODO: Refactor the header/top section into separate component
+// as it seems to handle more and more business logic
 const Earnings = () => {
   const history = useHistory();
   const {
@@ -52,6 +56,9 @@ const Earnings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [balance, setBalance] = useState(null);
   const [isLoadingPayout, setIsLoadingPayout] = useState(false);
+  const [paypalAccountModalVisible, setPaypalAccountModalVisible] = useState(false);
+  const [creatorPaypalAccountDetails, setCreatorPaypalAccountDetails] = useState(null);
+  const [creatorPaypalEmail, setCreatorPaypalEmail] = useState(null);
 
   const [earnings, setEarnings] = useState({
     sessions: [],
@@ -218,6 +225,27 @@ const Earnings = () => {
     }
   }, [userDetails, setUserDetails]);
 
+  const fetchCreatorPaypalDetails = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.payment.paypal.getCreatorPayPalAccountDetails();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorPaypalAccountDetails(data);
+        setCreatorPaypalEmail(data?.email);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed to fetch creator PayPal account details',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     getCreatorBalance();
     getCreatorEarnings();
@@ -230,6 +258,12 @@ const Earnings = () => {
       });
     }
   }, [getCreatorBalance, getCreatorEarnings, checkAndSendCreatorConversionEvent, userDetails]);
+
+  useEffect(() => {
+    if (userDetails.profile?.payment_provider === paymentProvider.PAYPAL) {
+      fetchCreatorPaypalDetails();
+    }
+  }, [userDetails.profile.payment_provider, fetchCreatorPaypalDetails]);
 
   const confirmPayout = async () => {
     if (balance?.currency === 'inr') {
@@ -335,6 +369,7 @@ const Earnings = () => {
         </Col>
         {balance &&
           balance?.currency === 'inr' &&
+          userDetails.profile?.payment_provider === paymentProvider.STRIPE &&
           userDetails.profile?.payment_account_status === StripeAccountStatus.VERIFICATION_PENDING && (
             <Col xs={24}>
               <Text type="secondary" className={styles.tipText}>
@@ -343,6 +378,108 @@ const Earnings = () => {
             </Col>
           )}
       </Row>
+    </div>
+  );
+
+  const handleEditPaypalEmailClicked = (e) => {
+    preventDefaults(e);
+    setPaypalAccountModalVisible(true);
+  };
+
+  const updatePaypalAccount = async () => {
+    setIsLoading(true);
+
+    if (!creatorPaypalAccountDetails) {
+      showErrorModal('Invalid PayPal Account detected!');
+      return;
+    }
+
+    try {
+      const payload = {
+        country: creatorPaypalAccountDetails.country,
+        currency: creatorPaypalAccountDetails.currency,
+        email: creatorPaypalEmail,
+      };
+
+      const { status, data } = await apis.payment.paypal.updateCreatorPayPalAccount(payload);
+
+      if (isAPISuccess(status) && data) {
+        setPaypalAccountModalVisible(false);
+        showSuccessModal('PayPal account updated successfully!');
+        setTimeout(() => window.location.reload(), 1000);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed to update creator PayPal account',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleConnectPaypalAccountClicked = () => {
+    Modal.confirm({
+      title: 'Confirm your PayPal email',
+      content: (
+        <>
+          <Paragraph>Are you sure you want to use this email below to receive PayPal payments?</Paragraph>
+          <Paragraph strong>{creatorPaypalEmail}</Paragraph>
+        </>
+      ),
+      okText: 'Confirm',
+      onOk: updatePaypalAccount,
+    });
+  };
+
+  const paypalEditEmail = (
+    <div className={styles.box2}>
+      <Row>
+        <Col xs={24}>
+          <Text>Edit PayPal Email</Text>
+        </Col>
+        <Col xs={24}>
+          <Button className={styles.mt10} type="primary" onClick={handleEditPaypalEmailClicked}>
+            Edit Email
+          </Button>
+        </Col>
+      </Row>
+      <Modal
+        centered={true}
+        closable={true}
+        visible={paypalAccountModalVisible}
+        onCancel={() => setPaypalAccountModalVisible(false)}
+        afterClose={resetBodyStyle}
+        footer={null}
+        title="Update your PayPal Email"
+      >
+        <Row gutter={[8, 8]}>
+          <Col xs={24}>
+            <Text>Please enter the new email to use with your PayPal Account.</Text>
+          </Col>
+          <Col xs={24}>
+            <Text strong> Current Email : {creatorPaypalAccountDetails?.email} </Text>
+          </Col>
+          <Col xs={24}>
+            <Input
+              placeholder="The email associated with your PayPal Account"
+              maxLength={50}
+              onChange={(e) => setCreatorPaypalEmail(e.target.value)}
+              value={creatorPaypalEmail}
+            />
+          </Col>
+          <Col xs={24}>
+            <Row justify="end">
+              <Col>
+                <Button type="primary" loading={isLoading} onClick={handleConnectPaypalAccountClicked}>
+                  Update PayPal Account
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Modal>
     </div>
   );
 
@@ -557,10 +694,15 @@ const Earnings = () => {
             <Title level={2}>Your Earnings</Title>
           </Col>
           <Col xs={24} lg={8}>
-            {stripePaymentDashboard}
+            {userDetails?.profile?.payment_provider === paymentProvider.PAYPAL
+              ? paypalEditEmail
+              : stripePaymentDashboard}
           </Col>
           <Col xs={24} lg={8}>
-            {balance?.currency && balance?.currency !== 'inr' && availableForPayout}
+            {balance?.currency &&
+              balance?.currency !== 'inr' &&
+              userDetails?.profile?.payment_provider === paymentProvider.STRIPE &&
+              availableForPayout}
           </Col>
         </Row>
         <Row className={styles.mt20}>

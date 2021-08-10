@@ -217,6 +217,7 @@ const PaymentAccount = () => {
 
       if (isAPISuccess(status) && data) {
         showSuccessModal('Your PayPal Account has been successfully connected!');
+        setPaypalAccountModalVisible(false);
         setTimeout(() => window.location.reload(), 1500);
       }
     } catch (error) {
