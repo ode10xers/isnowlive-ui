@@ -1,0 +1,17 @@
+@import '../../../styles/variables.scss';
+
+.paypalContainer {
+  text-align: center;
+  min-height: 100px;
+
+  .disabledText {
+    margin: auto;
+    text-align: center;
+    vertical-align: center;
+  }
+
+  .paypalButtonContainer {
+    top: 0;
+    left: 0;
+  }
+}

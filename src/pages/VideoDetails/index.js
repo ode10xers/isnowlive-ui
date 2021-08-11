@@ -185,9 +185,11 @@ const VideoDetails = ({ match }) => {
               data.active.find(
                 (subscription) =>
                   subscription.products['VIDEO'] &&
-                  subscription.products['VIDEO']?.credits > 0 &&
+                  subscription.products['VIDEO']?.credits - subscription.products['VIDEO']?.credits_used > 0 &&
                   subscription.products['VIDEO']?.product_ids?.includes(videoId)
               ) || null;
+
+            console.log(usableSubscription);
 
             setUsableUserSubscription(usableSubscription);
           } else {
