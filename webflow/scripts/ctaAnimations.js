@@ -1,7 +1,4 @@
-// NOTE: handleSignUpCreator is defined in another script (signup.js)
-
 function validateEmailAndSignup(input, validation, ctaText) {
-  console.log(input);
   if (!!input.value && input.validity.valid) {
     validation.innerText = '';
 
@@ -23,8 +20,8 @@ let containers = document.getElementsByClassName('cta-animate-container');
   emailInput.style.visibility = 'hidden';
   emailInput.style.opacity = 0;
   emailInput.style.display = 'block';
-  emailInput.style.width = '0px';
-  emailInput.style.height = '0px';
+  emailInput.style.width = 0;
+  emailInput.style.height = 0;
   emailInput.style.border = 0;
   emailInput.style.padding = 0;
 
@@ -61,9 +58,7 @@ let containers = document.getElementsByClassName('cta-animate-container');
 
   container.prepend(emailInput);
   container.insertAdjacentElement('afterend', emailValidationMsg);
-
   ctaButton.addEventListener('mouseover', showEmailInput);
-
   ctaButton.addEventListener('click', (e) => {
     validateEmailAndSignup(emailInput, emailValidationMsg, e.target.innerText);
   });

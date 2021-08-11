@@ -105,7 +105,7 @@ const PaymentRedirectVerify = () => {
           showPurchaseSubscriptionSuccessModal();
           break;
         default:
-          console.error('Unhandled product type');
+          console.log('Unhandled product type');
           console.log(transactionOrderType);
           handleError('Something went wrong');
           break;

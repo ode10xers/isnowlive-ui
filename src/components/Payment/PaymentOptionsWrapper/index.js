@@ -38,7 +38,6 @@ const defaultAvailablePaymentOptions = paymentMethodOptions.CARD.options;
 const PaymentOptionsWrapper = ({
   handleAfterPayment,
   handleBeforePayment,
-  isFreeProduct = false,
   minimumPriceRequirementFulfilled = true,
   shouldSavePaymentDetails = false,
   creatorDetails,
@@ -142,8 +141,7 @@ const PaymentOptionsWrapper = ({
     [paymentMethodOptions.CARD.key]: {
       children: (
         <CardForm
-          btnProps={{ text: isFreeProduct ? 'Get' : 'Buy', disableButton: minimumPriceRequirementFulfilled }}
-          isFree={isFreeProduct}
+          btnProps={{ text: 'Buy', disableButton: minimumPriceRequirementFulfilled }}
           onBeforePayment={handleBeforePayment}
           onAfterPayment={handleAfterPayment}
         />
@@ -231,54 +229,41 @@ const PaymentOptionsWrapper = ({
   return (
     <Loader loading={isLoading} text="Fetching available payment methods...">
       <Row gutter={[8, 8]} className={styles.mb10}>
-        {isFreeProduct ? (
-          <Col xs={24}>
-            <CardForm
-              btnProps={{ text: isFreeProduct ? 'Get' : 'Buy', disableButton: minimumPriceRequirementFulfilled }}
-              isFree={isFreeProduct}
-              onBeforePayment={handleBeforePayment}
-              onAfterPayment={handleAfterPayment}
-            />
-          </Col>
-        ) : (
-          <>
-            <Col xs={24}>
-              <Text strong> Pay with </Text>
-            </Col>
-            <Col xs={24}>
-              <Tabs
-                className={styles.paymentOptionsContainer}
-                activeKey={selectedPaymentOption}
-                onChange={setSelectedPaymentOption}
-                renderTabBar={handleCustomTabBarRender}
+        <Col xs={24}>
+          <Text strong> Pay with </Text>
+        </Col>
+        <Col xs={24}>
+          <Tabs
+            className={styles.paymentOptionsContainer}
+            activeKey={selectedPaymentOption}
+            onChange={setSelectedPaymentOption}
+            renderTabBar={handleCustomTabBarRender}
+          >
+            {renderPaymentOptions()}
+            {/* Wallet payments only depends on client side requirements, so we process it separately */}
+            {paymentRequest && !shouldSavePaymentDetails && (
+              <TabPane
+                forceRender={true}
+                key={paymentMethodOptions.WALLET.key}
+                tab={
+                  <PaymentOptionsSelection
+                    paymentOptionKey={paymentMethodOptions.WALLET.key}
+                    isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
+                  />
+                }
               >
-                {renderPaymentOptions()}
-                {/* Wallet payments only depends on client side requirements, so we process it separately */}
-                {paymentRequest && !shouldSavePaymentDetails && (
-                  <TabPane
-                    forceRender={true}
-                    key={paymentMethodOptions.WALLET.key}
-                    tab={
-                      <PaymentOptionsSelection
-                        paymentOptionKey={paymentMethodOptions.WALLET.key}
-                        isActive={selectedPaymentOption === paymentMethodOptions.WALLET.key}
-                      />
-                    }
-                  >
-                    {paymentRequest && (
-                      <WalletPaymentButtons
-                        disabled={minimumPriceRequirementFulfilled}
-                        paymentRequest={paymentRequest}
-                        onBeforePayment={handleBeforePayment}
-                        onAfterPayment={handleAfterPayment}
-                      />
-                    )}
-                  </TabPane>
+                {paymentRequest && (
+                  <WalletPaymentButtons
+                    disabled={minimumPriceRequirementFulfilled}
+                    paymentRequest={paymentRequest}
+                    onBeforePayment={handleBeforePayment}
+                    onAfterPayment={handleAfterPayment}
+                  />
                 )}
-              </Tabs>
-            </Col>
-          </>
-        )}
+              </TabPane>
+            )}
+          </Tabs>
+        </Col>
 
         <Col xs={24}>
           <Divider className={styles.compactDivider} />

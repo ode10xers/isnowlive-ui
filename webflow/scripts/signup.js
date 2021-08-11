@@ -1,5 +1,3 @@
-// NOTE:
-
 let apiLoaderOverlay = document.createElement('div');
 
 function insertLoader() {
@@ -22,28 +20,6 @@ function hideApiLoader() {
   apiLoaderOverlay.style.display = 'none';
 }
 
-function pushGTMEvent(eName, eData) {
-  if (window.dataLayer && window.dataLayer.push) {
-    window.dataLayer.push({
-      event: eName,
-      ...eData,
-    });
-  }
-}
-
-function showErrorMessage(title, msg) {
-  if (Swal) {
-    Swal.fire({
-      title: title || 'An error occured',
-      text: msg || 'Something wrong happened',
-      icon: 'error',
-      confirmButtonText: 'Okay',
-    });
-  } else {
-    alert('An error occured!');
-  }
-}
-
 function closeModal(e) {
   document.getElementById(e.target.id.replace('-button', '-close')).click();
 }
@@ -51,6 +27,9 @@ function closeModal(e) {
 const isProd = window.location.hostname.includes('passion.do');
 const apiBaseUrl = isProd ? 'https://api.app.passion.do' : 'https://stage.api.app.is-now.live';
 const successCodes = [200, 201, 204];
+
+const mixpanelLoginEvent = '(Marketing) Creator Login';
+const mixpanelSignupEvent = '(Marketing) Creator Signup';
 
 function getJSONFromForm(e) {
   const formData = new FormData(document.getElementById(e.target.id.replace('-button', '')));
@@ -60,6 +39,27 @@ function getJSONFromForm(e) {
     payload[key] = val;
   });
   return payload;
+}
+
+function mixpanelSuccessEvent(eventTag, eventData = {}) {
+  if (mixpanel) {
+    mixpanel.track(eventTag, {
+      result: 'SUCCESS',
+      error_code: 'N/A',
+      error_message: 'N/A',
+      ...eventData,
+    });
+  }
+}
+
+function mixpanelFailedEvent(eventTag, error, eventData = {}) {
+  if (mixpanel) {
+    mixpanel.track(eventTag, {
+      result: 'FAILED',
+      error,
+      ...eventData,
+    });
+  }
 }
 
 async function sendPostRequest(apiPath, payload) {
@@ -85,20 +85,23 @@ async function handleSignUpCreator(payload, ctaText) {
       is_creator: true,
       signup_cta_text: ctaText || 'NA',
     });
+    mixpanelSuccessEvent(mixpanelSignupEvent, { ...response, ctaText });
     setAuthToken(response, true);
   } else {
     hideApiLoader();
     showErrorMessage();
+    mixpanelFailedEvent(mixpanelSignupEvent, response);
   }
 }
 
 async function handleLoginCreator(e) {
-  const response = await sendPostRequest('/auth/login', getJSONFromForm(e));
-  console.log(response);
+  const payload = getJSONFromForm(e);
+  const response = await sendPostRequest('/auth/login', payload);
   if (successCodes.includes(response.status)) {
     setAuthToken(response);
   } else {
     showErrorMessage();
+    mixpanelFailedEvent(mixpanelLoginEvent, response);
   }
 }
 
@@ -119,15 +122,22 @@ function setAuthToken(userData, isSignup = false) {
     creator_zoom_connected: userData.profile?.zoom_connected || 'NA',
   });
 
-  if (userData.profile && userData.profile?.custom_domain) {
-    window.location.href = `https://${userData.profile?.custom_domain}/creator/${
+  mixpanelSuccessEvent(mixpanelLoginEvent, userData);
+
+  let targetUrl = '';
+
+  if (userData.profile && userData.profile.custom_domain) {
+    targetUrl = `https://${userData.profile.custom_domain}/creator/${
       isSignup ? 'profile' : 'dashboard'
     }?signupAuthToken=${userData.auth_token}`;
   } else {
-    window.location.href = `https://${isSignup ? 'app' : userData.username || 'app'}${
-      isProd ? '' : '.stage'
-    }.passion.do/creator/${isSignup ? 'profile' : 'dashboard'}?signupAuthToken=${userData.auth_token}`;
+    targetUrl = `https://${isSignup ? 'app' : userData.username || 'app'}${isProd ? '' : '.stage'}.passion.do/creator/${
+      isSignup ? 'profile' : 'dashboard'
+    }?signupAuthToken=${userData.auth_token}`;
   }
+
+  targetUrl = GAURLDecorator(targetUrl);
+  window.location.href = targetUrl;
 }
 
 function getElementsAndAttachEvent(query, eventName, eventHandler) {
@@ -138,7 +148,13 @@ function getElementsAndAttachEvent(query, eventName, eventHandler) {
 
 function initFormClickHandler() {
   getElementsAndAttachEvent('[signup-creator-handler-btn=true]', 'click', (e) => {
+    e.preventDefault();
+
     const payload = { ...getJSONFromForm(e), is_creator: true };
+
+    const referralCode = localStorage.getItem('passion_creator_referral');
+
+    if (referralCode) payload = { ...payload, referrer: referralCode };
 
     const emailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if (payload.email.match(emailformat)) {
@@ -156,7 +172,7 @@ function initFormClickHandler() {
   };
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', (e) => {
   initFormClickHandler();
   insertLoader();
 });
