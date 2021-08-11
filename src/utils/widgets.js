@@ -6,7 +6,32 @@ export const widgetComponentsName = {
   CALENDAR: {
     value: 'calendar',
     label: 'Calendar',
-    styling: [],
+    styling: [
+      {
+        key: '--calendar-plugin-heading-font-color',
+        label: 'Heading Text Color',
+      },
+      {
+        key: '--calendar-plugin-heading-background-color',
+        label: 'Heading Background Color',
+      },
+      {
+        key: '--calendar-plugin-card-font-color',
+        label: 'Card Text Color',
+      },
+      {
+        key: '--calendar-plugin-card-background-color',
+        label: 'Card Background Color',
+      },
+      {
+        key: '--calendar-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+      {
+        key: '--calendar-plugin-cta-background-color',
+        label: 'Button Font Color',
+      },
+    ],
   },
   PASSES: {
     value: 'passes',

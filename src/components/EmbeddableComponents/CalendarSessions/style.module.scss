@@ -2,9 +2,15 @@
 
 .calendarSessionPluginContainer {
   padding: 20px;
+  background: transparent;
 }
 
 .passionLogo {
   height: 30px;
   float: right;
+}
+
+.timezoneHelpText {
+  font-weight: 600;
+  color: var(--calendar-plugin-heading-font-color, #373a3c) !important;
 }
