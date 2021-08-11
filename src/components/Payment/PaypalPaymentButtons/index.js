@@ -34,7 +34,11 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, buttonDisabled 
                   order_type: orderResponse.payment_order_type,
                 });
 
-                orderData = { ...orderResponse, transaction_id: paymentSessionResponse.transaction_id };
+                orderData = {
+                  ...orderResponse,
+                  transaction_id: paymentSessionResponse.transaction_id,
+                  order_id: paymentSessionResponse.order_id,
+                };
 
                 if (paymentSessionResponse && paymentSessionResponse?.pg_transaction_ref_id) {
                   setIsLoading(false);
