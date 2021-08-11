@@ -278,6 +278,8 @@ const PaymentPopup = () => {
     setPriceAmount(0);
     resetBodyStyle();
 
+    form.resetFields();
+
     hidePaymentPopup();
   };
 
