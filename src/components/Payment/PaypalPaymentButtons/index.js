@@ -15,11 +15,12 @@ const { Text } = Typography;
 const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, buttonDisabled = false, creatorCurrency = 'USD' }) => {
   const buttonContainerRef = useRef();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const renderPaypalButtons = useCallback(() => {
     if (window.paypal) {
       let orderData = null;
+      setIsLoading(true);
 
       window.paypal
         .Buttons({
@@ -82,6 +83,8 @@ const PaypalPaymentButtons = ({ onBeforePayment, onAfterPayment, buttonDisabled 
           },
         })
         .render(buttonContainerRef.current);
+
+      setIsLoading(false);
     }
   }, [onAfterPayment, onBeforePayment]);
 

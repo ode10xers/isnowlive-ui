@@ -430,7 +430,7 @@ const PaymentPopup = () => {
     <Modal
       visible={paymentPopupVisible}
       closable={true}
-      maskClosable={true}
+      maskClosable={false}
       centered={true}
       footer={null}
       title={<Title level={4}> Confirm your purchase </Title>}
