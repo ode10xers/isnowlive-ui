@@ -145,7 +145,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               data.active.find(
                 (subscription) =>
                   subscription.products['SESSION'] &&
-                  subscription.products['SESSION']?.credits > 0 &&
+                  subscription.products['SESSION']?.credits - subscription.products['SESSION']?.credits_used > 0 &&
                   subscription.products['SESSION']?.product_ids?.includes(classDetails.session_external_id)
               ) || null;
 

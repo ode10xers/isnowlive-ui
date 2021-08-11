@@ -248,19 +248,19 @@ const PublicPassList = ({ passes }) => {
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
               <Button
-                className={styles.seeMoreButton}
                 type="link"
-                onClick={() => collapseRow(pass.id)}
                 icon={<UpOutlined />}
+                className={styles.seeMoreButton}
+                onClick={() => collapseRow(pass.id)}
               >
                 Details
               </Button>
             ) : (
               <Button
-                className={styles.seeMoreButton}
                 type="link"
-                onClick={() => expandRow(pass.id)}
                 icon={<DownOutlined />}
+                className={styles.seeMoreButton}
+                onClick={() => expandRow(pass.id)}
               >
                 Details
               </Button>

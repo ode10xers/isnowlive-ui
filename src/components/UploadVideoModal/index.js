@@ -191,7 +191,7 @@ const UploadVideoModal = ({
               setFormPart(3);
             })
             .catch((error) => {
-              console.log(error);
+              console.error(error);
               showErrorModal(`Failed to get video token`);
             });
         } else {
@@ -480,7 +480,7 @@ const UploadVideoModal = ({
                 setFormPart(3);
               })
               .catch((error) => {
-                console.log(error);
+                console.error(error);
                 showErrorModal(`Failed to get video token`);
               });
           } else {
@@ -593,7 +593,7 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setIsLoading(false);
       showErrorModal('Something went wrong!');
     }
@@ -671,7 +671,7 @@ const UploadVideoModal = ({
         }
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setIsLoading(false);
       showErrorModal('Something went wrong!');
     }
