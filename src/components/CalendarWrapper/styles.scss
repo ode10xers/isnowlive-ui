@@ -83,8 +83,7 @@
       }
 
       &.past-event {
-        background-color: rgba(240, 240, 240, 0.5);
-        color: #aaaaaa;
+        opacity: 0.8;
         cursor: initial;
 
         .event-title,
@@ -208,6 +207,7 @@
 
     .rbc-agenda-date-cell, .rbc-agenda-time-cell {
       color: var(--calendar-plugin-heading-font-color, #373a3c);
+      
     }
   }
 
@@ -223,6 +223,17 @@
       } 
     } 
   } 
+
+  .rbc-off-range-bg {
+    background-color: transparent;
+    opacity: 0.15;
+  }
+
+  .rbc-date-cell {
+    a {
+      color: var(--calendar-plugin-heading-font-color, #373a3c);
+    }
+  }
 
   .rbc-month-view {
     .rbc-month-row {

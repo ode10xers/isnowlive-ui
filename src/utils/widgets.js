@@ -29,7 +29,7 @@ export const widgetComponentsName = {
       },
       {
         key: '--calendar-plugin-cta-background-color',
-        label: 'Button Font Color',
+        label: 'Button Background Color',
       },
     ],
   },
