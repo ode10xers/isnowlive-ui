@@ -31,6 +31,7 @@ const Passes = () => {
     };
 
     getPasses();
+    document.body.style.backgroundColor = 'transparent';
   }, []);
 
   return (
