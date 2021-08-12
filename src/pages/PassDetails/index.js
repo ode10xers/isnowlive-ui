@@ -27,6 +27,7 @@ import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
+/** @deprecated */
 const PassDetails = ({ match, history }) => {
   const { showPaymentPopup } = useGlobalContext();
 
