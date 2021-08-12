@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, message } from 'antd';
+import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookFilled,
@@ -31,6 +31,8 @@ import {
   orderType,
   productType,
   isUnapprovedUserError,
+  convertHexToRGB,
+  isBrightColorShade,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -148,24 +150,26 @@ const PassDetails = ({ match, history }) => {
     fetchCreatorOtherPasses();
   }, [fetchCreatorProfileDetails, fetchCreatorOtherPasses]);
 
-  // useEffect(() => {
-  //   let profileColorObject = null;
-  //   if (creatorProfileColor) {
-  //     profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
+  // TODO: This logic will be the basis of page coloring
+  // Should move this to a separate file (as a helper/custom hook)
+  useEffect(() => {
+    let profileColorObject = null;
+    if (creatorProfileColor) {
+      profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
 
-  //     Object.entries(profileColorObject).forEach(([key, val]) => {
-  //       document.documentElement.style.setProperty(key, val);
-  //     })
-  //   }
+      Object.entries(profileColorObject).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
 
-  //   return () => {
-  //     if (profileColorObject) {
-  //       Object.keys(profileColorObject).forEach((key) => {
-  //         document.documentElement.style.removeProperty(key);
-  //       })
-  //     }
-  //   }
-  // }, [creatorProfileColor]);
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfileColor]);
 
   //#endregion End of Use Effects
 
@@ -395,7 +399,9 @@ const PassDetails = ({ match, history }) => {
                 SEE MORE
               </div>
             </div>
-            <SessionListCard session={selectedPassDetails?.sessions[sessionItemLimit]} />
+            <div className={styles.fadedItem}>
+              <SessionListCard session={selectedPassDetails?.sessions[sessionItemLimit]} />
+            </div>
           </Col>
         ) : null}
       </Row>
@@ -436,7 +442,9 @@ const PassDetails = ({ match, history }) => {
                 SEE MORE
               </div>
             </div>
-            <VideoListCard video={selectedPassDetails?.videos[videoItemLimit]} />
+            <div className={styles.fadedItem}>
+              <VideoListCard video={selectedPassDetails?.videos[videoItemLimit]} />
+            </div>
           </Col>
         ) : null}
       </Row>
@@ -534,9 +542,17 @@ const PassDetails = ({ match, history }) => {
           <Row justify="center">
             <Col>
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
-                {selectedPassDetails?.total_price > 0
-                  ? `Proceed to Pay ${renderPassPrice(selectedPassDetails)}`
-                  : 'Get Pass'}
+                <Text
+                  className={
+                    creatorProfileColor && isBrightColorShade(convertHexToRGB(creatorProfileColor))
+                      ? styles.darkText
+                      : styles.whiteText
+                  }
+                >
+                  {selectedPassDetails?.total_price > 0
+                    ? `Proceed to Pay ${renderPassPrice(selectedPassDetails)}`
+                    : 'Get Pass'}
+                </Text>
               </Button>
             </Col>
           </Row>
@@ -581,8 +597,7 @@ const PassDetails = ({ match, history }) => {
               {creatorProfile && (
                 <>
                   <Col xs={24}>
-                    {' '}
-                    <Divider />{' '}
+                    <Divider />
                   </Col>
                   <Col xs={24}>{creatorProfileSection}</Col>
                 </>
@@ -592,7 +607,7 @@ const PassDetails = ({ match, history }) => {
         </Col>
         {/* Buy Section */}
         <Col xs={24} md={10}>
-          {buySection}
+          <Affix offsetTop={84}>{buySection}</Affix>
         </Col>
       </Row>
       <Drawer

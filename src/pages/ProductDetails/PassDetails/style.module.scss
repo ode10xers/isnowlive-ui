@@ -1,6 +1,8 @@
 @import '../../../styles/variables.scss';
 
 .passDetailsPageContainer {
+  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+
   padding: 50px;
 
   @media screen and (min-width: 1440px) {
@@ -17,13 +19,31 @@
 }
 
 .buySection {
-  box-shadow: 0px 4px 34px rgba(0, 0, 0, 0.1);
-  border-radius: 20px;
   padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 34px rgba(0, 0, 0, 0.1);
+  background-color: map-get($map: $colors, $key: 'White');
 
   .buySectionHeader {
-    color: map-get($map: $colors, $key: 'Smalt') !important;
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
     font-size: 24px;
+  }
+
+  .buyPassButton {
+    background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+    border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    .darkText {
+      color: map-get($map: $colors, $key: 'Zeus') !important;
+    }
+
+    .whiteText {
+      color: map-get($colors, 'White') !important;
+    }
   }
 
   .loadingPlaceholder {
@@ -34,12 +54,12 @@
   .loadingPlaceholderLarge {
     min-height: 200px;
     width: 100%;
-
   }
 
   .buyablePassItem {
     border: 1px dashed map-get($map: $colors, $key: 'Silver');
     padding: 12px;
+    cursor: pointer;
 
     .passCheckContainer {
       align-self: center;
@@ -78,16 +98,16 @@
     }
 
     &.selected {
-      border: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+      border: 1px solid var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
 
       .passCheckContainer {
         .passItemName {
-          color: map-get($map: $colors, $key: 'Cobalt') !important;
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
         }
   
         .checkIcon {
           font-size: 20px;
-          color: map-get($map: $colors, $key: 'DodgerBlue');
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
         }
       }
 
@@ -95,11 +115,11 @@
         text-align: right;
 
         .buyDetails {
-          color: map-get($map: $colors, $key: 'Cobalt') !important;
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
         }
   
         .buyDetailsDivider {
-          border-left: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
+          border-left: 1px solid var(--passion-profile-primary-color, map-get($map: $colors, $key: 'DodgerBlue'));
         }
       }
     }
@@ -107,7 +127,7 @@
 }
 
 .passName {
-  color: map-get($map: $colors, $key: 'Smalt') !important;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
   font-size: 42px !important;
 
   @media screen and (max-width: 768px) {
@@ -121,10 +141,11 @@
 
 .dotSeparator {
   opacity: 0.4;
+  color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')}) !important;
 }
 
 .passDetailItem {
-  color: map-get($map: $colors, $key: 'DodgerBlue') !important;
+  color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
   font-size: 18px;
 
   @media screen and (max-width: 768px) {
@@ -137,13 +158,16 @@
 }
 
 .sectionHeading {
-  color: map-get($map: $colors, $key: 'Cobalt') !important;
+  color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
 }
 
 .passContentContainer {
-
   .fadedItemContainer {
     position: relative;
+
+    .fadedItem {
+      opacity : 0.3;
+    }
 
     .fadedOverlay {
       position: absolute;
@@ -152,7 +176,7 @@
       z-index: 1;
       width: 100%;
       height: 100%;
-      background: rgba(255, 255, 255, 0.85);
+      // background: rgba(255, 255, 255, 0.85);
 
       display: flex;
       align-items: center;
@@ -160,11 +184,12 @@
       .seeMoreButton {
         margin: auto;
         text-align: center;
-        color: map-get($map: $colors, $key: 'Cobalt') !important;
+        color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
         font-size : 24px;
+        cursor: pointer;
 
         &:hover {
-          opacity : 0.6;
+          opacity : 0.7;
         }
 
         .seeMoreIcon {
@@ -178,17 +203,13 @@
 }
 
 .creatorProfileSection {
-  .creatorProfileImage {
-
-  }
-
   .creatorInfoContainer {
     .creatorName {
-      color: map-get($map: $colors, $key: 'Smalt') !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
 
     .joinTimeText {
-      color: map-get($map: $colors, $key: 'Smalt') !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
   }
 
@@ -231,14 +252,19 @@
 
   .creatorSocialMediaLinksContainer {
     .followMeText {
-      color: map-get($map: $colors, $key: 'Smalt') !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
   }
 }
 
 .moreContentDrawer {
-
   .bottomSheetsTitle {
-    color: map-get($map: $colors, $key: 'Smalt  ') !important;
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+  }
+
+  :global {
+    .ant-drawer-content {
+      background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+    }
   }
 }
