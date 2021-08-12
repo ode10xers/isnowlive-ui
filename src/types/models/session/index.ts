@@ -36,6 +36,7 @@ export interface UpcomingSessionInventory {
   start_url: URI
   tags: string[]
   total_price: number
+  type: 'AVAILABILITY' | 'NORMAL'
   user_timezone_offset: number
   user_timezone: string
 }
@@ -67,6 +68,7 @@ export interface Session {
   session_image_url: URI
   tags: string[]
   total_price: number
+  type: 'AVAILABILITY' | 'NORMAL'
   user_timezone_offset: number
   user_timezone: string
   Videos: null

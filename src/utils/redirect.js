@@ -28,7 +28,8 @@ export const redirectToSessionsPage = (session) => {
   }
 
   const baseUrl = generateUrlFromUsername(session.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}/s/${session.session_id}`;
+  const isAvailability = session.type === 'AVAILABILITY';
+  const targetUrl = `${baseUrl}/${isAvailability ? 'a' : 's'}/${session.session_id}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {

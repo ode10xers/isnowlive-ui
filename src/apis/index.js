@@ -54,6 +54,7 @@ export default {
   },
   availabilities: {
     getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),
+    getAvailabilityDetails: (sessionId) => http.get(`/session/${sessionId}`),
     getDetails: (sessionId, startDate, endDate) =>
       http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
     create: (payload) => http.post('/secure/creator/sessions', payload),

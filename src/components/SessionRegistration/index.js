@@ -58,7 +58,7 @@ const formInitialValues = {
   pwyw_price: null,
 };
 
-const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false }) => {
+const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDetails = false, fullWidth = false }) => {
   const {
     state: { userDetails },
     logIn,
@@ -1058,7 +1058,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
         {shouldShowSignInForm ? (
           <Col
             xs={24}
-            lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
+            lg={fullWidth ? 24 : { span: 14, offset: isMobileDevice ? 1 : 0 }}
             order={isMobileDevice ? 2 : 1}
             className={isMobileDevice ? styles.mt20 : styles.mt50}
           >
@@ -1068,7 +1068,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
           <>
             <Col
               xs={24}
-              lg={{ span: 14, offset: isMobileDevice ? 1 : 0 }}
+              lg={fullWidth ? 24 : { span: 14, offset: isMobileDevice ? 1 : 0 }}
               order={isMobileDevice ? 2 : 1}
               className={isMobileDevice ? styles.mt20 : styles.mt50}
             >
