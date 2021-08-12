@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, message } from 'antd';
+import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookFilled,
@@ -11,6 +11,7 @@ import {
   TwitterOutlined,
   CaretDownOutlined,
   CheckCircleFilled,
+  BarsOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -22,6 +23,7 @@ import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } 
 
 import dateUtil from 'utils/date';
 import { getExternalLink } from 'utils/url';
+import { generateColorPalletteForProfile } from 'utils/colors';
 import {
   isAPISuccess,
   reservedDomainName,
@@ -34,6 +36,7 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import { generateCardHeadingStyle } from 'components/ContainerCard';
 
 // TODO: Move these later to a separate file/constants be used everywhere it is needed
 // TODO: Use a better version of these icons according to the design
@@ -66,6 +69,11 @@ const PassDetails = ({ match, history }) => {
 
   const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
 
+  const [creatorProfileColor, setCreatorProfileColor] = useState(null);
+
+  const [moreView, setMoreView] = useState('sessions');
+  const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
+
   //#region Start of API Call Methods
 
   const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
@@ -76,6 +84,7 @@ const PassDetails = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfile(data);
+        setCreatorProfileColor(data.profile?.color ?? null);
       }
     } catch (error) {
       console.error(error);
@@ -138,6 +147,25 @@ const PassDetails = ({ match, history }) => {
 
     fetchCreatorOtherPasses();
   }, [fetchCreatorProfileDetails, fetchCreatorOtherPasses]);
+
+  // useEffect(() => {
+  //   let profileColorObject = null;
+  //   if (creatorProfileColor) {
+  //     profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
+
+  //     Object.entries(profileColorObject).forEach(([key, val]) => {
+  //       document.documentElement.style.setProperty(key, val);
+  //     })
+  //   }
+
+  //   return () => {
+  //     if (profileColorObject) {
+  //       Object.keys(profileColorObject).forEach((key) => {
+  //         document.documentElement.style.removeProperty(key);
+  //       })
+  //     }
+  //   }
+  // }, [creatorProfileColor]);
 
   //#endregion End of Use Effects
 
@@ -232,6 +260,20 @@ const PassDetails = ({ match, history }) => {
     }
 
     setAuthModalVisible(true);
+  };
+
+  const handleSeeMoreSessions = () => {
+    setMoreView('sessions');
+    setBottomSheetsVisible(true);
+  };
+
+  const handleSeeMoreVideos = () => {
+    setMoreView('videos');
+    setBottomSheetsVisible(true);
+  };
+
+  const handleCloseBottomSheets = () => {
+    setBottomSheetsVisible(false);
   };
 
   const closeAuthModal = () => {
@@ -332,35 +374,87 @@ const PassDetails = ({ match, history }) => {
     </Row>
   );
 
+  const sessionItemLimit = 3;
+
   const passSessionList = (
     <>
       <Title level={4} className={styles.sectionHeading}>
         Sessions purchasable with this pass
       </Title>
-      <Row gutter={[8, 8]}>
-        {selectedPassDetails?.sessions?.slice(0, 5).map((session) => (
+      <Row gutter={[8, 8]} className={styles.passContentContainer}>
+        {selectedPassDetails?.sessions?.slice(0, sessionItemLimit).map((session) => (
           <Col xs={24} md={12}>
             <SessionListCard session={session} />
           </Col>
         ))}
+        {selectedPassDetails?.sessions?.length > sessionItemLimit ? (
+          <Col xs={24} md={12} className={styles.fadedItemContainer}>
+            <div className={styles.fadedOverlay}>
+              <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
+                <BarsOutlined className={styles.seeMoreIcon} />
+                SEE MORE
+              </div>
+            </div>
+            <SessionListCard session={selectedPassDetails?.sessions[sessionItemLimit]} />
+          </Col>
+        ) : null}
       </Row>
     </>
   );
+
+  const moreSessionsListView =
+    selectedPassDetails?.sessions?.length > 0 ? (
+      <Row gutter={[16, 16]}>
+        {selectedPassDetails?.sessions?.map((session) => (
+          <Col xs={24} md={12} lg={8} xl={6}>
+            <SessionListCard session={session} />
+          </Col>
+        ))}
+      </Row>
+    ) : (
+      <Empty description="No sessions to show" />
+    );
+
+  const videoItemLimit = 5;
 
   const passVideoList = (
     <>
       <Title level={4} className={styles.sectionHeading}>
         Videos purchasable with this pass
       </Title>
-      <Row gutter={[8, 8]}>
-        {selectedPassDetails?.videos?.slice(0, 5).map((video) => (
+      <Row gutter={[8, 8]} className={styles.passContentContainer}>
+        {selectedPassDetails?.videos?.slice(0, videoItemLimit).map((video) => (
           <Col xs={24} md={12}>
             <VideoListCard video={video} />
           </Col>
         ))}
+        {selectedPassDetails?.videos?.length > videoItemLimit ? (
+          <Col xs={24} md={12} className={styles.fadedItemContainer}>
+            <div className={styles.fadedOverlay}>
+              <div className={styles.seeMoreButton} onClick={handleSeeMoreVideos}>
+                <BarsOutlined className={styles.seeMoreIcon} />
+                SEE MORE
+              </div>
+            </div>
+            <VideoListCard video={selectedPassDetails?.videos[videoItemLimit]} />
+          </Col>
+        ) : null}
       </Row>
     </>
   );
+
+  const moreVideosListView =
+    selectedPassDetails?.videos?.length > 0 ? (
+      <Row gutter={[16, 16]}>
+        {selectedPassDetails?.videos?.map((video) => (
+          <Col xs={24} md={12} lg={8} xl={6}>
+            <VideoListCard video={video} />
+          </Col>
+        ))}
+      </Row>
+    ) : (
+      <Empty description="No videos to show" />
+    );
 
   const creatorProfileSection = (
     <Row gutter={[8, 20]} className={styles.creatorProfileSection}>
@@ -401,7 +495,15 @@ const PassDetails = ({ match, history }) => {
             Buy Credit Pass
           </Title>
         </Col>
-        {initialPassDetails && renderBuyablePassItem(initialPassDetails)}
+        {isLoading ? (
+          <Col xs={24}>
+            <Spin spinning={true} size="large">
+              <div className={styles.loadingPlaceholder} />
+            </Spin>
+          </Col>
+        ) : initialPassDetails ? (
+          renderBuyablePassItem(initialPassDetails)
+        ) : null}
         {otherPassesLoading ? (
           <>
             <Col xs={24}>
@@ -410,7 +512,9 @@ const PassDetails = ({ match, history }) => {
               </Title>
             </Col>
             <Col xs={24}>
-              <Spin spinning={true} size="large" />
+              <Spin spinning={true} size="large">
+                <div className={styles.loadingPlaceholderLarge} />
+              </Spin>
             </Col>
           </>
         ) : creatorPasses.length > 0 ? (
@@ -491,6 +595,22 @@ const PassDetails = ({ match, history }) => {
           {buySection}
         </Col>
       </Row>
+      <Drawer
+        visible={bottomSheetsVisible}
+        placement="bottom"
+        height={560}
+        bodyStyle={{ padding: 10 }}
+        title={
+          <Text className={styles.bottomSheetsTitle}>
+            {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this pass`}
+          </Text>
+        }
+        headerStyle={generateCardHeadingStyle()}
+        onClose={handleCloseBottomSheets}
+        className={styles.moreContentDrawer}
+      >
+        {moreView === 'sessions' ? moreSessionsListView : moreVideosListView}
+      </Drawer>
     </div>
   );
 };
