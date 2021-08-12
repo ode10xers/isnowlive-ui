@@ -58,9 +58,7 @@ const useOptions = () => {
   return options;
 };
 
-// NOTE: isFree is a flag sent from PaymentPopup in case the user does not need to pay
-// It can be used to bypass button disable condition, hide the card form, etc
-const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
+const CardForm = ({ btnProps, onBeforePayment, onAfterPayment }) => {
   const { text = 'PAY', disableButton = false } = btnProps;
   const {
     state: { paymentPopupVisible },
@@ -100,13 +98,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
 
   useEffect(() => {
     if (paymentPopupVisible) {
-      if (!isFree) {
-        fetchUserCards();
-      } else {
-        setSavedUserCards([]);
-        setSelectedCard(null);
-        setDisableSavedCards(false);
-      }
+      fetchUserCards();
     } else {
       setSavedUserCards([]);
       setSelectedCard(null);
@@ -119,7 +111,7 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
         }
       }
     }
-  }, [isFree, fetchUserCards, paymentPopupVisible, elements]);
+  }, [fetchUserCards, paymentPopupVisible, elements]);
 
   const makePayment = async (secret, paymentPayload) => {
     try {
@@ -259,48 +251,42 @@ const CardForm = ({ btnProps, onBeforePayment, onAfterPayment, isFree }) => {
 
   return (
     <Row gutter={[8, 12]} justify="center">
-      {!isFree && (
-        <>
-          {savedUserCards.length > 0 && (
-            <Col xs={24}>
-              <SavedCards
-                disabled={disableSavedCards}
-                userCards={savedUserCards}
-                selectedCard={selectedCard}
-                setSelectedCard={changeSelectedCard}
-              />
-            </Col>
-          )}
-          <Col xs={24} className={styles.inlineCardForm}>
-            <Spin spinning={isLoadingStripeComponent}>
-              <CardElement
-                options={options}
-                onReady={handleStripeComponentReady}
-                onChange={(event) => {
-                  setDisableSavedCards(!event.empty);
-
-                  if (event.complete) {
-                    setIsButtonDisabled(false);
-                  } else {
-                    setIsButtonDisabled(true);
-                  }
-                }}
-              />
-            </Spin>
-          </Col>
-        </>
+      {savedUserCards.length > 0 && (
+        <Col xs={24}>
+          <SavedCards
+            disabled={disableSavedCards}
+            userCards={savedUserCards}
+            selectedCard={selectedCard}
+            setSelectedCard={changeSelectedCard}
+          />
+        </Col>
       )}
+      <Col xs={24} className={styles.inlineCardForm}>
+        <Spin spinning={isLoadingStripeComponent}>
+          <CardElement
+            options={options}
+            onReady={handleStripeComponentReady}
+            onChange={(event) => {
+              setDisableSavedCards(!event.empty);
+
+              if (event.complete) {
+                setIsButtonDisabled(false);
+              } else {
+                setIsButtonDisabled(true);
+              }
+            }}
+          />
+        </Spin>
+      </Col>
 
       <Col xs={8} lg={6}>
         <Button
           block
           size="large"
           type="primary"
-          disabled={disableButton || (!isFree && isButtonDisabled && !selectedCard)}
+          disabled={disableButton || (isButtonDisabled && !selectedCard)}
           onClick={handleSubmit}
-          className={
-            disableButton || (!isFree && isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn
-          }
+          className={disableButton || (isButtonDisabled && !selectedCard) ? styles.disabledBuyBtn : styles.greenBtn}
           loading={isSubmitting}
         >
           {text}

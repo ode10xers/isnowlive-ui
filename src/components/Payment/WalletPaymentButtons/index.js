@@ -55,7 +55,7 @@ const WalletPaymentButtons = ({ disabled = false, onBeforePayment, onAfterPaymen
               // re-show the payment interface, or show an error message and close
               // the payment interface.
               showErrorModal('Failed to Confirm Payment for Payment Request');
-              console.log(confirmError);
+              console.error(confirmError);
               ev.complete('fail');
             } else {
               // Report to the browser that the confirmation was successful, prompting

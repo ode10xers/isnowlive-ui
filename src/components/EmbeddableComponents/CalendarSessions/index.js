@@ -4,18 +4,18 @@ import { message, Empty, Typography, Row, Col } from 'antd';
 import apis from 'apis';
 
 import Loader from 'components/Loader';
-import CalendarWrapper from 'components/CalendarWrapper';
 import AuthModal from 'components/AuthModal';
+import CalendarWrapper from 'components/CalendarWrapper';
+import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 import { showAlreadyBookedModal, showBookSingleSessionSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess, orderType, productType, paymentSource, isUnapprovedUserError } from 'utils/helper';
 import dateUtil from 'utils/date';
+import { isAPISuccess, orderType, productType, paymentSource, isUnapprovedUserError } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
-import { getSessionCountByDate } from 'components/CalendarWrapper/helper';
 import styles from './style.module.scss';
-const logo = require('assets/images/Logo-passion-transparent.png');
+// const logo = require('assets/images/Logo-passion-transparent.png');
 
 const { Text } = Typography;
 const {
@@ -186,6 +186,8 @@ const CalendarSessions = () => {
 
   useEffect(() => {
     getCalendarSessions();
+
+    document.body.style.backgroundColor = 'transparent';
     // eslint-disable-next-line
   }, []);
 
@@ -200,14 +202,14 @@ const CalendarSessions = () => {
         {calendarSession.length > 0 && readyToPaint ? (
           <>
             <Row>
-              <Col xs={14}>
-                <Text type="primary" strong>
+              <Col xs={24}>
+                <Text type="primary" className={styles.timezoneHelpText}>
                   All event times shown below are in your local time zone ({getCurrentLongTimezone()})
                 </Text>
               </Col>
-              <Col xs={10}>
+              {/* <Col xs={10}>
                 <img src={logo} alt="Passion.do" className={styles.passionLogo} />
-              </Col>
+              </Col> */}
             </Row>
 
             <CalendarWrapper

@@ -53,7 +53,7 @@ const LiveStream = () => {
         form.setFieldsValue(data);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       setIsLoading(false);
       message.error(error.response?.data?.message || 'Something went wrong.');
     }

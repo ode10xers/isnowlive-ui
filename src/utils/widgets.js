@@ -6,49 +6,75 @@ export const widgetComponentsName = {
   CALENDAR: {
     value: 'calendar',
     label: 'Calendar',
-    styling: [],
+    styling: [
+      {
+        key: '--calendar-plugin-heading-font-color',
+        label: 'Heading Text Color',
+      },
+      {
+        key: '--calendar-plugin-heading-background-color',
+        label: 'Heading Background Color',
+      },
+      {
+        key: '--calendar-plugin-card-font-color',
+        label: 'Card Text Color',
+      },
+      {
+        key: '--calendar-plugin-card-background-color',
+        label: 'Card Background Color',
+      },
+      {
+        key: '--calendar-plugin-cta-font-color',
+        label: 'Button Text Color',
+      },
+      {
+        key: '--calendar-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+    ],
   },
   PASSES: {
     value: 'passes',
     label: 'Passes',
-    styling: [],
+    styling: [
+      {
+        key: '--pass-plugin-heading-background-color',
+        label: 'Table Heading Background Color',
+      },
+      {
+        key: '--pass-plugin-heading-text-color',
+        label: 'Table Heading Text Color',
+      },
+      {
+        key: '--pass-plugin-table-background-color',
+        label: 'Table Rows Background Color',
+      },
+      {
+        key: '--pass-plugin-table-text-color',
+        label: 'Table Rows Text Color',
+      },
+      {
+        key: '--pass-plugin-cta-background-color',
+        label: 'Button Background Color',
+      },
+      {
+        key: '--pass-plugin-cta-text-color',
+        label: 'Button Text Color',
+      },
+      {
+        key: '--pass-plugin-desc-text-color',
+        label: 'Description Text Color',
+      },
+    ],
   },
   VIDEOS: {
     value: 'videos',
     label: 'Videos',
     styling: [
-      // {
-      //   key: '--new-video-card-background-color',
-      //   label: 'Card Background',
-      // },
       {
         key: '--new-video-card-font-color ',
         label: 'Card Text Color',
       },
-      // {
-      //   key: '--video-card-background-color',
-      //   label: 'Card Background',
-      // },
-      // {
-      //   key: '--video-card-font-color',
-      //   label: 'Card Text Color',
-      // },
-      // {
-      //   key: '--primary-button-color',
-      //   label: 'Buy Button Color',
-      // },
-      // {
-      //   key: '--primary-button-font-color',
-      //   label: 'Buy Button Text Color',
-      // },
-      // {
-      //   key: '--secondary-button-color',
-      //   label: 'Details Button Color',
-      // },
-      // {
-      //   key: '--secondary-button-font-color',
-      //   label: 'Details Button Text Color',
-      // },
       {
         key: '--video-widget-background-color',
         label: 'Plugin Background',

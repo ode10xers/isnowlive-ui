@@ -50,7 +50,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
         <>
           <div
             className="custom-event-container custom-month-event-container"
-            style={{ border: `2px solid ${borderColor}` }}
+            style={{ border: `2px solid var(--calendar-plugin-cta-background-color, ${borderColor})` }}
             onClick={() => redirectToInventoryPage(event)}
           >
             <span className="event-title">{event.name}</span>
@@ -71,7 +71,7 @@ const CalendarWrapper = ({ calendarSessions, sessionCountByDate, onEventBookClic
       return (
         <div
           className={`custom-event-container custom-day-event-container ${event.isPast ? 'past-event' : ''}`}
-          style={{ border: `2px solid ${borderColor}` }}
+          style={{ border: `2px solid var(--calendar-plugin-cta-background-color, ${borderColor})` }}
           onClick={() => redirectToInventoryPage(event)}
         >
           <div className="event-title">{event.name}</div>
