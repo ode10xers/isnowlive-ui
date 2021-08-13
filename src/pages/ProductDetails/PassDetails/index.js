@@ -516,7 +516,7 @@ const PassDetails = ({ match, history }) => {
           <>
             <Col xs={24}>
               <Title level={5} className={styles.morePassSectionHeader}>
-                Save More
+                More pass options
               </Title>
             </Col>
             <Col xs={24}>
@@ -534,7 +534,8 @@ const PassDetails = ({ match, history }) => {
             </Col>
             {creatorPasses
               .filter((pass) => pass.external_id !== initialPassDetails?.external_id)
-              .slice(0, 3)
+              .sort((a, b) => b.total_price - a.total_price)
+              .slice(0, 5)
               .map(renderBuyablePassItem)}
           </>
         ) : null}

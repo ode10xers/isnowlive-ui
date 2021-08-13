@@ -184,7 +184,8 @@
       .seeMoreButton {
         margin: auto;
         text-align: center;
-        color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+        color: map-get($map: $colors, $key: 'Zeus') !important;
+        // color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
         font-size : 24px;
         cursor: pointer;
 
