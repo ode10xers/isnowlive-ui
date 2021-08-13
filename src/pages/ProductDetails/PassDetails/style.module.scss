@@ -217,8 +217,8 @@
     }
   }
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     content: '';
     position: absolute;
     top: calc(50% - 16px);
@@ -227,15 +227,15 @@
     border: 1px solid var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
     background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
   }
-  &:before {
-    left: 6px;
+  &::before {
+    left: 5px;
     border-radius: 0 16px 16px 0;
     border-left: none;
   }
-  &:after {
-    right: 6px;
+  &::after {
+    right: 5px;
     border-radius: 16px 0 0 16px;
-    border-right: none;
+    border-right: none
   }
 }
 
@@ -302,7 +302,7 @@
 }
 
 .creatorProfileSection {
-  margin-bottom: 50px;
+  margin-bottom: 70px;
 
   .creatorInfoContainer {
     .creatorName {

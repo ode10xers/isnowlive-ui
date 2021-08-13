@@ -160,6 +160,8 @@ const PassDetails = ({ match, history }) => {
     if (creatorProfileColor) {
       profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
 
+      console.log(profileColorObject);
+
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
       });
