@@ -10,7 +10,13 @@ const setQueryStringWithoutPageReload = (qsValue) => {
 
 const setQueryStringValue = (key, value, queryString = window.location.search) => {
   const values = new URLSearchParams(queryString.slice(1));
-  values.set(key, value);
+
+  if (value === null || value === undefined) {
+    values.delete(key);
+  } else {
+    values.set(key, value);
+  }
+
   setQueryStringWithoutPageReload(`?${values.toString()}`);
 };
 

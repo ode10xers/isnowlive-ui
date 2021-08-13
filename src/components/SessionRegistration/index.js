@@ -1255,7 +1255,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                       <div className={styles.mt10}>
                         <Item {...sessionRegistrationTailLayout}>
                           <Row gutter={[8, 8]}>
-                            <Col xs={8} md={8} xl={6}>
+                            <Col xs={fullWidth ? 24 : 8} md={fullWidth ? 24 : 8} xl={fullWidth ? 24 : 6}>
                               <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
                                 {user &&
                                 classDetails?.total_price > 0 &&
