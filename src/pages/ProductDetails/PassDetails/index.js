@@ -348,7 +348,7 @@ const PassDetails = ({ match, history }) => {
             <Space align="center">
               <CheckCircleFilled className={styles.checkIcon} />
               <Text
-                className={classNames(styles.passItemName, passData?.name.length > 20 ? styles.mediumText : undefined)}
+                className={classNames(styles.passItemName, passData?.name.length > 20 ? styles.longText : undefined)}
               >
                 {passData?.name}
               </Text>
@@ -371,7 +371,7 @@ const PassDetails = ({ match, history }) => {
 
   const passDetailInfo = (
     <div className={styles.currentPassDetailsContainer}>
-      <Row gutter={[8, 12]}>
+      <Row gutter={[8, 12]} align="middle">
         <Col xs={24}>
           <Row align="middle">
             <Col flex="1 1 auto">
@@ -385,7 +385,12 @@ const PassDetails = ({ match, history }) => {
           </Row>
         </Col>
         <Col xs={24}>
-          <Space size="large" split={<Text className={styles.dotSeparator}>●</Text>}>
+          <Space
+            size="large"
+            align="center"
+            className={styles.textAlignCenter}
+            split={<Text className={styles.dotSeparator}>●</Text>}
+          >
             {selectedPassDetails?.sessions?.length > 0 && (
               <Text className={styles.passDetailItem}>
                 {' '}
@@ -415,12 +420,12 @@ const PassDetails = ({ match, history }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.sessions?.slice(0, sessionItemLimit).map((session) => (
-          <Col xs={18} md={12} key={session.session_external_id}>
+          <Col xs={18} md={16} lg={12} key={session.session_external_id}>
             <SessionListCard session={session} />
           </Col>
         ))}
         {selectedPassDetails?.sessions?.length > sessionItemLimit ? (
-          <Col xs={18} md={12} className={styles.fadedItemContainer}>
+          <Col xs={18} md={16} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -458,12 +463,12 @@ const PassDetails = ({ match, history }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.videos?.slice(0, videoItemLimit).map((video) => (
-          <Col xs={16} md={12} key={video.external_id}>
+          <Col xs={16} lg={12} key={video.external_id}>
             <VideoListCard video={video} />
           </Col>
         ))}
         {selectedPassDetails?.videos?.length > videoItemLimit ? (
-          <Col xs={16} md={12} className={styles.fadedItemContainer}>
+          <Col xs={16} lg={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreVideos}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -566,7 +571,7 @@ const PassDetails = ({ match, history }) => {
               .map(renderBuyablePassItem)}
           </>
         ) : null}
-        <Col xs={24}>
+        <Col xs={0} lg={24}>
           <Row justify="center">
             <Col>
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
@@ -592,69 +597,113 @@ const PassDetails = ({ match, history }) => {
   //#endregion End of UI Components
 
   return (
-    <div className={styles.passDetailsPageContainer}>
-      <AuthModal visible={authModalVisible} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
-      <Row gutter={[20, 20]} className={styles.passDetailsPage}>
-        {/* Details Section */}
-        <Col xs={{ order: 2, span: 24 }} md={{ order: 1, span: 14 }}>
-          <Spin spinning={isLoading} size="large">
-            <Row gutter={[12, 12]}>
-              {/* Pass Details */}
-              <Col xs={24}>{passDetailInfo}</Col>
-              {/* Session Lists */}
-              {selectedPassDetails?.sessions?.length > 0 && (
-                <>
-                  <Col xs={24}>
-                    {' '}
-                    <Divider />{' '}
-                  </Col>
-                  <Col xs={24}>{passSessionList}</Col>
-                </>
-              )}
-              {/* Video Lists */}
-              {selectedPassDetails?.videos?.length > 0 && (
-                <>
-                  <Col xs={24}>
-                    {' '}
-                    <Divider />{' '}
-                  </Col>
-                  <Col xs={24}>{passVideoList}</Col>
-                </>
-              )}
-              {/* Creator Section */}
-              {creatorProfile && (
-                <>
-                  <Col xs={24}>
-                    <Divider />
-                  </Col>
-                  <Col xs={24}>{creatorProfileSection}</Col>
-                </>
-              )}
-            </Row>
-          </Spin>
-        </Col>
-        {/* Buy Section */}
-        <Col xs={{ order: 1, span: 24 }} md={{ order: 1, span: 10 }}>
-          {buySection}
-        </Col>
-      </Row>
-      <Drawer
-        visible={bottomSheetsVisible}
-        placement="bottom"
-        height={560}
-        bodyStyle={{ padding: 10 }}
-        title={
-          <Text className={styles.bottomSheetsTitle}>
-            {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this pass`}
-          </Text>
-        }
-        headerStyle={generateCardHeadingStyle()}
-        onClose={handleCloseBottomSheets}
-        className={styles.moreContentDrawer}
-      >
-        {moreView === 'sessions' ? moreSessionsListView : moreVideosListView}
-      </Drawer>
-    </div>
+    <>
+      <div className={styles.passDetailsPageContainer}>
+        <AuthModal
+          visible={authModalVisible}
+          closeModal={closeAuthModal}
+          onLoggedInCallback={showConfirmPaymentPopup}
+        />
+        <Row gutter={[20, 20]} className={styles.passDetailsPage}>
+          {/* Details Section */}
+          <Col xs={{ order: 2, span: 24 }} lg={{ order: 1, span: 14 }}>
+            <Spin spinning={isLoading} size="large">
+              <Row gutter={[12, 12]}>
+                {/* Pass Details */}
+                <Col xs={24}>{passDetailInfo}</Col>
+                {/* Session Lists */}
+                {selectedPassDetails?.sessions?.length > 0 && (
+                  <>
+                    <Col xs={24}>
+                      {' '}
+                      <Divider />{' '}
+                    </Col>
+                    <Col xs={24}>{passSessionList}</Col>
+                  </>
+                )}
+                {/* Video Lists */}
+                {selectedPassDetails?.videos?.length > 0 && (
+                  <>
+                    <Col xs={24}>
+                      {' '}
+                      <Divider />{' '}
+                    </Col>
+                    <Col xs={24}>{passVideoList}</Col>
+                  </>
+                )}
+                {/* Creator Section */}
+                {creatorProfile && (
+                  <>
+                    <Col xs={24}>
+                      <Divider />
+                    </Col>
+                    <Col xs={24}>{creatorProfileSection}</Col>
+                  </>
+                )}
+              </Row>
+            </Spin>
+          </Col>
+          {/* Buy Section */}
+          <Col xs={{ order: 1, span: 24 }} lg={{ order: 1, span: 10 }}>
+            {buySection}
+          </Col>
+        </Row>
+        <Drawer
+          visible={bottomSheetsVisible}
+          placement="bottom"
+          height={560}
+          bodyStyle={{ padding: 10 }}
+          title={
+            <Text className={styles.bottomSheetsTitle}>
+              {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this pass`}
+            </Text>
+          }
+          headerStyle={generateCardHeadingStyle()}
+          onClose={handleCloseBottomSheets}
+          className={styles.moreContentDrawer}
+        >
+          {moreView === 'sessions' ? moreSessionsListView : moreVideosListView}
+        </Drawer>
+      </div>
+      <div className={styles.mobileBuyButtonContainer}>
+        <div className={styles.mobileBuyButton}>
+          <Row gutter={[8, 12]} align="middle">
+            <Col xs={14} md={10}>
+              <Title
+                level={5}
+                className={classNames(
+                  styles.stickyPassName,
+                  selectedPassDetails?.name.length > 20 ? styles.longText : undefined
+                )}
+              >
+                {selectedPassDetails?.name}
+              </Title>
+            </Col>
+            <Col xs={0} md={8} className={styles.textAlignRight}>
+              <Space className={styles.stickyPassDetails} split={<Text className={styles.dotSeparator}>●</Text>}>
+                <Text className={styles.passDetailItem}>{renderPassCredits(selectedPassDetails)}</Text>
+                <Text className={styles.passDetailItem}>{renderPassValidity(selectedPassDetails)}</Text>
+              </Space>
+            </Col>
+            <Col xs={10} md={6} className={styles.textAlignRight}>
+              <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
+                <Text
+                  className={
+                    creatorProfileColor && isBrightColorShade(convertHexToRGB(creatorProfileColor))
+                      ? styles.darkText
+                      : styles.whiteText
+                  }
+                >
+                  {selectedPassDetails?.total_price > 0
+                    ? `Buy for ${renderPassPrice(selectedPassDetails)}`
+                    : 'Get for free'}
+                </Text>
+              </Button>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    </>
   );
 };
 
