@@ -13,6 +13,7 @@ const Routes = {
   profile: '/creator/profile',
   livestream: '/creator/livestream',
   sessionCreate: '/creator/session',
+  availabilityDetails: '/a/:session_id',
   courseSessionDetails: '/cs/:session_id',
   courseDetails: '/c/:course_id',
   videoDetails: '/v/:video_id',
