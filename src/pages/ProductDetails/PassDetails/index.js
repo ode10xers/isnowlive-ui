@@ -350,8 +350,7 @@ const PassDetails = ({ match, history }) => {
               <Text
                 className={classNames(styles.passItemName, passData?.name.length > 20 ? styles.mediumText : undefined)}
               >
-                {' '}
-                {passData?.name}{' '}
+                {passData?.name}
               </Text>
             </Space>
           </Col>
@@ -416,12 +415,12 @@ const PassDetails = ({ match, history }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.sessions?.slice(0, sessionItemLimit).map((session) => (
-          <Col xs={24} md={12}>
+          <Col xs={18} md={12} key={session.session_external_id}>
             <SessionListCard session={session} />
           </Col>
         ))}
         {selectedPassDetails?.sessions?.length > sessionItemLimit ? (
-          <Col xs={24} md={12} className={styles.fadedItemContainer}>
+          <Col xs={18} md={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreSessions}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -441,7 +440,7 @@ const PassDetails = ({ match, history }) => {
     selectedPassDetails?.sessions?.length > 0 ? (
       <Row gutter={[16, 16]}>
         {selectedPassDetails?.sessions?.map((session) => (
-          <Col xs={24} md={12} lg={8} xl={6}>
+          <Col xs={24} md={12} lg={8} xl={6} key={`more_${session.session_external_id}`}>
             <SessionListCard session={session} />
           </Col>
         ))}
@@ -459,12 +458,12 @@ const PassDetails = ({ match, history }) => {
       </Title>
       <Row gutter={[8, 8]} className={styles.passContentContainer}>
         {selectedPassDetails?.videos?.slice(0, videoItemLimit).map((video) => (
-          <Col xs={24} md={12}>
+          <Col xs={16} md={12} key={video.external_id}>
             <VideoListCard video={video} />
           </Col>
         ))}
         {selectedPassDetails?.videos?.length > videoItemLimit ? (
-          <Col xs={24} md={12} className={styles.fadedItemContainer}>
+          <Col xs={16} md={12} className={styles.fadedItemContainer}>
             <div className={styles.fadedOverlay}>
               <div className={styles.seeMoreButton} onClick={handleSeeMoreVideos}>
                 <BarsOutlined className={styles.seeMoreIcon} />
@@ -484,7 +483,7 @@ const PassDetails = ({ match, history }) => {
     selectedPassDetails?.videos?.length > 0 ? (
       <Row gutter={[16, 16]}>
         {selectedPassDetails?.videos?.map((video) => (
-          <Col xs={24} md={12} lg={8} xl={6}>
+          <Col xs={24} md={12} lg={8} xl={6} key={`more_${video.external_id}`}>
             <VideoListCard video={video} />
           </Col>
         ))}
