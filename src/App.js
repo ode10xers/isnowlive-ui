@@ -18,6 +18,7 @@ import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
+import AvailabilityDetails from 'pages/AvailabilityDetails';
 import Session from 'pages/Session';
 import InventoryDetails from 'pages/InventoryDetails';
 import SessionDetails from 'pages/SessionDetails';
@@ -259,6 +260,7 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
+            <RouteWithLayout layout={NavbarLayout} path={Routes.availabilityDetails} component={AvailabilityDetails} />
             <RouteWithLayout
               layout={NavbarLayout}
               exact

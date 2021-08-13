@@ -87,6 +87,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
               session_image_url: items[0].session_image_url,
               tags: items[0].tags,
               total_price: items[0].total_price,
+              type: items[0].type,
               user_timezone: items[0].user_timezone,
               user_timezone_offset: items[0].user_timezone_offset,
               Videos: null,
