@@ -40,6 +40,15 @@
     var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
   ) !important;
   font-size: 22px;
+
+  p,
+  span {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    // background-color: map-get($map: $colors, $key: 'White1') !important;
+    background: transparent !important;
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+  }
 }
 
 .availabilityTitleWrapper {
@@ -53,10 +62,6 @@
   ) !important;
   font-size: 20px !important;
   margin-bottom: 0 !important;
-}
-
-.availabilityDateWrapper {
-  margin-bottom: 24px;
 }
 
 .availabilityMonth {

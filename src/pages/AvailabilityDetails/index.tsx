@@ -179,22 +179,22 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
             <Divider />
 
             <Row align="middle" className={styles.availabilityTitleWrapper}>
-              <Col xs={16}>
+              <Col xs={12}>
                 <Title className={styles.availabilitDateTitle}>
                   Select Date
                 </Title>
               </Col>
-              <Col xs={8}>
+              <Col xs={12}>
                 <Select
                   className={styles.availabilityMonth}
-                  options={months.map(m => ({ text: m, value: m }))}
+                  options={months.map(m => ({ label: m, value: m }))}
                   value={selectedMonth}
                   onChange={handleChangeMonth}
                 />
               </Col>
             </Row>
 
-            <Swiper slidesPerView={isMobileDevice ? 5.3 : 7} spaceBetween={12}>
+            <Swiper slidesPerView={isMobileDevice ? 4.2 : 7} spaceBetween={12}>
               {dates.map(date => {
                 const momentDate = moment(date)
                 const dateString = momentDate.format('YYYY-MM-DD')
@@ -218,13 +218,17 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                           styles.availabilityDateDayOfWeek,
                           isSelected ? styles.availabilityTextSelected : undefined
                         )}
+                        ellipsis={{ rows: 1 }}
                       >
                         {momentDate.format("ddd")}
                       </Paragraph>
-                      <Paragraph className={classNames(
-                        styles.availabilityDateDayOfMonth,
-                        isSelected ? styles.availabilityTextSelected : undefined
-                      )}>
+                      <Paragraph
+                        className={classNames(
+                          styles.availabilityDateDayOfMonth,
+                          isSelected ? styles.availabilityTextSelected : undefined
+                        )}
+                        ellipsis={{ rows: 1 }}
+                      >
                         {momentDate.format("DD")}
                       </Paragraph>
                     </Card>
@@ -245,7 +249,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                   </Col>
                 </Row>
 
-                <Row className={styles.availabilityDateWrapper}>
+                <Row>
                   {inventories.map(inv => {
                     const momentStartTime = moment(inv.start_time)
                     const momentEndTime = moment(inv.end_time)
@@ -299,7 +303,14 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
             ) : null}
 
             {isMobileDevice ? (
-              <Button block onClick={() => setView('form')} size="large" type="primary">
+              <Button
+                block
+                className={styles.mt20}
+                disabled={!selectedInventory}
+                onClick={() => setView('form')}
+                size="large"
+                type="primary"
+              >
                 Confirm Booking
               </Button>
             ) : null}
