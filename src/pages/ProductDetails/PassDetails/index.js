@@ -2,15 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
+import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookFilled,
-  InstagramFilled,
   LinkedinFilled,
+  InstagramFilled,
   TwitterOutlined,
   CaretDownOutlined,
   CheckCircleFilled,
+  PlayCircleFilled,
+  BookFilled,
   BarsOutlined,
 } from '@ant-design/icons';
 
@@ -23,6 +25,7 @@ import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } 
 
 import dateUtil from 'utils/date';
 import { getExternalLink } from 'utils/url';
+import { isMobileDevice } from 'utils/device';
 import { generateColorPalletteForProfile } from 'utils/colors';
 import {
   isAPISuccess,
@@ -294,8 +297,9 @@ const PassDetails = ({ match, history }) => {
 
   const renderPassPrice = (passData) =>
     passData?.total_price > 0 ? `${passData?.currency?.toUpperCase()} ${passData?.total_price}` : 'Free';
-  const renderPassCredits = (passData) => `${passData?.class_count} Credits`;
-  const renderPassValidity = (passData) => `Valid ${passData?.validity} day${passData?.validity > 1 ? 's' : ''}`;
+  const renderPassCredits = (passData) => (passData?.limited ? `${passData?.class_count} Credits` : 'Unlimited');
+  const renderPassValidity = (passData) =>
+    `${passData?.validity ?? 1} day${passData?.validity > 1 ? 's' : ''} validity`;
 
   const renderCreatorExternalLinks = () => {
     if (!creatorProfile || !creatorProfile.profile || !creatorProfile.profile.social_media_links) {
@@ -340,13 +344,18 @@ const PassDetails = ({ match, history }) => {
         )}
       >
         <Row gutter={[8, 8]} align="end">
-          <Col xs={24} md={12} className={styles.passCheckContainer}>
+          <Col xs={24} lg={12} className={styles.passCheckContainer}>
             <Space align="center">
               <CheckCircleFilled className={styles.checkIcon} />
-              <Text className={styles.passItemName}> {passData?.name} </Text>
+              <Text
+                className={classNames(styles.passItemName, passData?.name.length > 20 ? styles.mediumText : undefined)}
+              >
+                {' '}
+                {passData?.name}{' '}
+              </Text>
             </Space>
           </Col>
-          <Col xs={24} md={12} className={styles.passItemDetailsContainer}>
+          <Col xs={24} lg={12} className={styles.passItemDetailsContainer}>
             <Space align="center" split={<Divider type="vertical" className={styles.buyDetailsDivider} />}>
               <Text className={styles.buyDetails}>{renderPassCredits(passData)}</Text>
               <Text className={styles.buyDetails}>{renderPassPrice(passData)}</Text>
@@ -362,20 +371,40 @@ const PassDetails = ({ match, history }) => {
   //#region Start of UI Components
 
   const passDetailInfo = (
-    <Row gutter={[8, 12]}>
-      <Col xs={24}>
-        <Title level={3} className={styles.passName}>
-          {selectedPassDetails?.name}
-        </Title>
-      </Col>
-      <Col xs={24}>
-        <Space size="large" split={<Text className={styles.dotSeparator}>●</Text>}>
-          <Text className={styles.passDetailItem}> {renderPassPrice(selectedPassDetails)} </Text>
-          <Text className={styles.passDetailItem}> {renderPassCredits(selectedPassDetails)} </Text>
-          <Text className={styles.passDetailItem}> {renderPassValidity(selectedPassDetails)} </Text>
-        </Space>
-      </Col>
-    </Row>
+    <div className={styles.currentPassDetailsContainer}>
+      <Row gutter={[8, 12]}>
+        <Col xs={24}>
+          <Row align="middle">
+            <Col flex="1 1 auto">
+              <Title level={3} className={styles.passName}>
+                {selectedPassDetails?.name}
+              </Title>
+            </Col>
+            <Col flex="0 0 120px">
+              <Text className={styles.passDetailValidity}>{renderPassValidity(selectedPassDetails)}</Text>
+            </Col>
+          </Row>
+        </Col>
+        <Col xs={24}>
+          <Space size="large" split={<Text className={styles.dotSeparator}>●</Text>}>
+            {selectedPassDetails?.sessions?.length > 0 && (
+              <Text className={styles.passDetailItem}>
+                {' '}
+                <BookFilled className={styles.passDetailItemIcon} /> {selectedPassDetails?.sessions?.length} Accessible
+                Sessions{' '}
+              </Text>
+            )}
+            {selectedPassDetails?.videos?.length > 0 && (
+              <Text className={styles.passDetailItem}>
+                {' '}
+                <PlayCircleFilled className={styles.passDetailItemIcon} /> {selectedPassDetails?.videos?.length}{' '}
+                Accessible Videos{' '}
+              </Text>
+            )}
+          </Space>
+        </Col>
+      </Row>
+    </div>
   );
 
   const sessionItemLimit = 3;
@@ -494,7 +523,6 @@ const PassDetails = ({ match, history }) => {
     </Row>
   );
 
-  // TODO: Might have to do dynamic font adjustment here
   const buySection = (
     <div className={styles.buySection}>
       <Row gutter={[12, 12]} align="middle">
@@ -503,7 +531,7 @@ const PassDetails = ({ match, history }) => {
             Buy Credit Pass
           </Title>
         </Col>
-        {isLoading ? (
+        {isLoading && !initialPassDetails ? (
           <Col xs={24}>
             <Spin spinning={true} size="large">
               <div className={styles.loadingPlaceholder} />
@@ -529,13 +557,13 @@ const PassDetails = ({ match, history }) => {
           <>
             <Col xs={24}>
               <Title level={5} className={styles.morePassSectionHeader}>
-                Save More
+                More pass options
               </Title>
             </Col>
             {creatorPasses
               .filter((pass) => pass.external_id !== initialPassDetails?.external_id)
               .sort((a, b) => b.total_price - a.total_price)
-              .slice(0, 5)
+              .slice(0, isMobileDevice ? 2 : 5)
               .map(renderBuyablePassItem)}
           </>
         ) : null}
@@ -567,9 +595,9 @@ const PassDetails = ({ match, history }) => {
   return (
     <div className={styles.passDetailsPageContainer}>
       <AuthModal visible={authModalVisible} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
-      <Row gutter={[20, 20]}>
+      <Row gutter={[20, 20]} className={styles.passDetailsPage}>
         {/* Details Section */}
-        <Col xs={24} md={14}>
+        <Col xs={{ order: 2, span: 24 }} md={{ order: 1, span: 14 }}>
           <Spin spinning={isLoading} size="large">
             <Row gutter={[12, 12]}>
               {/* Pass Details */}
@@ -607,8 +635,8 @@ const PassDetails = ({ match, history }) => {
           </Spin>
         </Col>
         {/* Buy Section */}
-        <Col xs={24} md={10}>
-          <Affix offsetTop={84}>{buySection}</Affix>
+        <Col xs={{ order: 1, span: 24 }} md={{ order: 1, span: 10 }}>
+          {buySection}
         </Col>
       </Row>
       <Drawer

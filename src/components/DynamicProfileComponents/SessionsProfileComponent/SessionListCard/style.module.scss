@@ -61,10 +61,28 @@ $card-border-radius: 8px;
     box-shadow: inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
 
+    @media screen and (max-width: 1024px) {
+      font-size: 14px;
+    }
+
+    @media screen and (max-width: 769px) {
+      font-size: 12px;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 14px;
+    }
+
     .sessionDayTagsContainer {
       .sessionTags {
         text-align: center;
         font-size: 12px;
+
+        @media screen and (max-width: 1025px) {
+          font-size: 11px;
+          padding: 0 4px;
+          margin-right: 4px;
+        }
       }
 
       .sessionTagsDisabled {
