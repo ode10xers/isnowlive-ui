@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, message } from 'antd';
+import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
 import {
   GlobalOutlined,
   FacebookFilled,
@@ -160,8 +160,6 @@ const PassDetails = ({ match, history }) => {
     if (creatorProfileColor) {
       profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
 
-      console.log(profileColorObject);
-
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
       });
@@ -283,6 +281,10 @@ const PassDetails = ({ match, history }) => {
 
   const handleCloseBottomSheets = () => {
     setBottomSheetsVisible(false);
+  };
+
+  const handleMobileTopStickyClicked = () => {
+    window.scroll({ top: 0, behavior: 'smooth' });
   };
 
   const closeAuthModal = () => {
@@ -596,6 +598,31 @@ const PassDetails = ({ match, history }) => {
     </div>
   );
 
+  const mobileTopSticky = (
+    <div className={styles.mobileStickyTopContainer}>
+      <Affix offsetTop={72}>
+        <Row className={styles.mobileStickyTop} onClick={handleMobileTopStickyClicked}>
+          <Col flex="1 1 auto">
+            <Row align="center">
+              <Col xs={24}>
+                <Text className={styles.stickyTopPassName}>{selectedPassDetails?.name}</Text>
+              </Col>
+              <Col xs={24}>
+                <Space align="center" split={<Text className={styles.dotSeparator}>●</Text>}>
+                  <Text className={styles.stickyTopDetails}>{renderPassCredits(selectedPassDetails)}</Text>
+                  <Text className={styles.stickyTopDetails}>{renderPassValidity(selectedPassDetails)}</Text>
+                </Space>
+              </Col>
+            </Row>
+          </Col>
+          <Col flex="0 0 20px">
+            <CaretDownOutlined className={styles.dropdownIcon} />
+          </Col>
+        </Row>
+      </Affix>
+    </div>
+  );
+
   //#endregion End of UI Components
 
   return (
@@ -612,7 +639,12 @@ const PassDetails = ({ match, history }) => {
             <Spin spinning={isLoading} size="large">
               <Row gutter={[12, 12]}>
                 {/* Pass Details */}
-                <Col xs={24}>{passDetailInfo}</Col>
+                <Col xs={24}>
+                  <div className={styles.highlightContainer}>
+                    {passDetailInfo}
+                    {mobileTopSticky}
+                  </div>
+                </Col>
                 {/* Session Lists */}
                 {selectedPassDetails?.sessions?.length > 0 && (
                   <>
@@ -682,7 +714,11 @@ const PassDetails = ({ match, history }) => {
               </Title>
             </Col>
             <Col xs={0} md={8} className={styles.textAlignRight}>
-              <Space className={styles.stickyPassDetails} split={<Text className={styles.dotSeparator}>●</Text>}>
+              <Space
+                align="center"
+                className={styles.stickyPassDetails}
+                split={<Text className={styles.dotSeparator}>●</Text>}
+              >
                 <Text className={styles.passDetailItem}>{renderPassCredits(selectedPassDetails)}</Text>
                 <Text className={styles.passDetailItem}>{renderPassValidity(selectedPassDetails)}</Text>
               </Space>

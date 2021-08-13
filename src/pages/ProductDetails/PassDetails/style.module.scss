@@ -1,6 +1,7 @@
 @import '../../../styles/variables.scss';
 
 .passDetailsPageContainer {
+  scroll-behavior: smooth;
   background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
   padding: 50px;
 
@@ -165,10 +166,16 @@
   }
 }
 
+.highlightContainer {
+  position: relative;
+}
+
 .currentPassDetailsContainer {
   padding: 12px 20px;
   border: 1px solid var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
   border-radius: 8px;
+  position:relative;
+  z-index : 7;
 
   background: linear-gradient(
     220.68deg,
@@ -228,14 +235,55 @@
     background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
   }
   &::before {
-    left: 5px;
+    left: -1px;
     border-radius: 0 16px 16px 0;
     border-left: none;
   }
   &::after {
-    right: 5px;
+    right: -1px;
     border-radius: 16px 0 0 16px;
     border-right: none
+  }
+}
+
+.mobileStickyTopContainer {
+  @media screen and (min-width:992px) {
+    display : none;
+  }
+  
+  z-index : 2;
+  position : absolute;
+  bottom : 0;
+  left : 12px;
+  width: calc(100% - 24px);
+
+  .mobileStickyTop {
+    width: 100%;
+    border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    border-radius : 12px;
+    background : linear-gradient(
+      220.68deg,
+      var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) -10.5%,
+      var(--passion-profile-lightest-color, #{map-get($colors, 'ColumbiaBlue')}) 52.15%,
+      var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) 145.15%
+    );
+    padding: 2px 8px;
+
+    .stickyTopPassName {
+      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      font-size : 16px;
+    }
+    
+    .stickyTopDetails {
+      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      font-size: 12px;
+    }
+
+    .dropdownIcon {
+      margin-top : 12px;
+      font-size : 24px;
+      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')})
+    }
   }
 }
 
