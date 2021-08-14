@@ -22,7 +22,7 @@ const YOUTUBE_THUMBNAIL_BASE_URL = 'https://img.youtube.com/vi';
 export const generateYoutubeThumbnailURL = (videoUrl) => {
   const videoID = getYoutubeVideoIDFromURL(videoUrl);
 
-  const imageQuality = THUMBNAIL_IMAGE_QUALITY.HIGH;
+  const imageQuality = THUMBNAIL_IMAGE_QUALITY.MEDIUM;
 
   return `${YOUTUBE_THUMBNAIL_BASE_URL}/${videoID}/${imageQuality}.jpg`;
 };
