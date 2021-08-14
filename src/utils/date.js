@@ -15,6 +15,7 @@ const formatDate = {
   toShortDayOfWeek: (date) => moment(date).format('ddd'),
   toShortMonth: (date) => moment(date).format('MMM'),
   toDate: (date) => moment(date).format('DD'),
+  toMonthYear: (date) => moment(date).format('MMMM YYYY'),
   toDateAndTime: (date) => moment(date).format('DD/MM/YYYY, hh:mm A'),
   toLongDateWithDay: (date) => moment(date).format('ddd, DD MMM'),
   toLongDateWithLongDay: (date) => moment(date).format('dddd, D MMMM YYYY'),

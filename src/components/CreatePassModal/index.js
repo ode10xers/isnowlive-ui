@@ -336,7 +336,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
           <Row className={styles.classPassRow} gutter={[8, 16]}>
             <Col xs={24} md={12}>
               <Form.Item id="passName" name="passName" label="Pass Name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Pass Name" maxLength={50} />
+                <Input placeholder="Enter Pass Name" maxLength={30} />
               </Form.Item>
             </Col>
             <Col xs={24} md={{ span: 11, offset: 1 }}>

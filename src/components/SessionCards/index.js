@@ -16,6 +16,7 @@ const DefaultImage = require('assets/images/greybg.jpg');
 
 const { Title } = Typography;
 
+/** @deprecated */
 const SessionCards = ({ sessions, shouldFetchInventories = true, compactView = false }) => {
   const [adjustedSessions, setAdjustedSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);

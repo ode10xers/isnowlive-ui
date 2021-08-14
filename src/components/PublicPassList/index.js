@@ -7,7 +7,7 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import SessionCards from 'components/SessionCards';
+// import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import AuthModal from 'components/AuthModal';
 
@@ -20,6 +20,7 @@ import { isMobileDevice } from 'utils/device';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 const { Text, Paragraph } = Typography;
 
@@ -198,25 +199,27 @@ const PublicPassList = ({ passes }) => {
   ];
 
   const renderPassDetails = (record) => (
-    <Row>
+    <Row className={styles.passDetailsExpansion}>
       {record?.sessions?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text strong className={styles.ml20}>
-              Sessions bookable with this pass
-            </Text>
+            <Text className={styles.expandableSectionHeader}>Sessions bookable with this pass</Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
-            <SessionCards sessions={record.sessions} />
+            <Row gutter={[8, 8]}>
+              {record?.sessions?.map((session) => (
+                <Col xs={24} sm={12} key={session.session_external_id}>
+                  <SessionListCard session={session} />
+                </Col>
+              ))}
+            </Row>
           </Col>
         </>
       )}
       {record?.videos?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text strong className={styles.ml20}>
-              Videos purchasable with this pass
-            </Text>
+            <Text className={styles.expandableSectionHeader}>Videos purchasable with this pass</Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
             <SimpleVideoCardsList passDetails={record} videos={record.videos} />
@@ -353,6 +356,7 @@ const PublicPassList = ({ passes }) => {
                   expandRowByClick: true,
                   expandIconColumnIndex: -1,
                   expandedRowKeys: expandedRowKeys,
+                  expandedRowClassName: () => styles.expandedTableRow,
                 }}
               />
             )}
