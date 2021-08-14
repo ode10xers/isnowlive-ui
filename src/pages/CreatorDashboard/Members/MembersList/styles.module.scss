@@ -3,3 +3,9 @@
 .tagDropdownContainer {
   width: 100%;
 }
+
+.orangeBtn {
+  background-color: map-get($map: $colors, $key: 'Pumpkin') !important;
+  border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
+  
+}
