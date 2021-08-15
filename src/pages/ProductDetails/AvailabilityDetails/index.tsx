@@ -1,23 +1,29 @@
-import { Button, Card, Col, Divider, Image, message, Row, Select, Typography } from 'antd'
-import apis from 'apis'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { match } from 'react-router'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import moment from 'moment'
+
 import HTMLReactParser from 'html-react-parser'
+import moment from 'moment'
 // @ts-ignore
 import classNames from 'classnames'
 
+import { Button, Card, Col, Divider, Image, message, Row, Select, Typography } from 'antd'
+
+import apis from 'apis'
+
 import Loader from 'components/Loader'
 import SessionRegistration from 'components/SessionRegistration'
+
 import type { Session, SessionInventory } from 'types/models/session'
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper'
+
 import dateUtil from 'utils/date'
 import { isMobileDevice } from 'utils/device'
+import { generateColorPalletteForProfile } from 'utils/colors'
+import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper'
+
+import useQueryParamState from 'hooks/useQueryParamState'
 
 import styles from './styles.module.scss';
-import useQueryParamState from 'hooks/useQueryParamState'
-import { generateColorPalletteForProfile } from 'utils/colors'
 
 const { formatDate: { getTimeDiff } } = dateUtil
 const { Paragraph, Text, Title } = Typography
@@ -305,7 +311,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
             {isMobileDevice ? (
               <Button
                 block
-                className={styles.mt20}
+                className={styles.confirmBookingButton}
                 disabled={!selectedInventory}
                 onClick={() => setView('form')}
                 size="large"

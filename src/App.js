@@ -18,7 +18,7 @@ import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
-import AvailabilityDetails from 'pages/AvailabilityDetails';
+import AvailabilityDetails from 'pages/ProductDetails/AvailabilityDetails';
 import Session from 'pages/Session';
 import InventoryDetails from 'pages/InventoryDetails';
 import SessionDetails from 'pages/SessionDetails';
