@@ -8,6 +8,7 @@ import moment from 'moment'
 import classNames from 'classnames'
 
 import { Button, Card, Col, Divider, Image, message, Row, Select, Typography } from 'antd'
+import { CaretDownOutlined } from '@ant-design/icons'
 
 import apis from 'apis'
 
@@ -17,14 +18,13 @@ import SessionRegistration from 'components/SessionRegistration'
 import type { Session, SessionInventory } from 'types/models/session'
 
 import dateUtil from 'utils/date'
-import { isMobileDevice } from 'utils/device'
+// import { isMobileDevice } from 'utils/device'
 import { generateColorPalletteForProfile } from 'utils/colors'
 import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper'
 
 import useQueryParamState from 'hooks/useQueryParamState'
 
 import styles from './styles.module.scss';
-import { CaretDownOutlined } from '@ant-design/icons'
 
 const { formatDate: { getTimeDiff } } = dateUtil
 const { Paragraph, Text, Title } = Typography
@@ -33,13 +33,13 @@ export interface AvailabilityDetailsProps {
   match?: match<{ session_id: string }>
 }
 
-type AvailabilityDetailsView = 'all' | 'date' | 'form'
+type AvailabilityDetailsView = 'all' | 'date' | 'form';
 
 const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [availability, setAvailability] = useState<Session>()
   const [showLongDescription, setShowLongDescription] = useState(false)
-  const inventoreiesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(() =>
+  const inventoriesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(() =>
     (availability?.inventory ?? [])
       .reduce((acc, inv) => {
         const momentStartTime = moment(inv.start_time)
@@ -50,23 +50,39 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       }, {} as Record<string, Record<string, SessionInventory[]>>),
     [availability],
   )
-  const months = useMemo<string[]>(() => Object.keys(inventoreiesByDates), [inventoreiesByDates])
+  const months = useMemo<string[]>(() => Object.keys(inventoriesByDates), [inventoriesByDates])
   const [selectedMonth, setSelectedMonth] = useQueryParamState('monthYear')
   useEffect(() => {
     if (selectedMonth === undefined) setSelectedMonth(months[0])
   }, [months, selectedMonth, setSelectedMonth])
   const dates = useMemo<string[]>(
-    () => selectedMonth && inventoreiesByDates[selectedMonth] !== undefined ? Object.keys(inventoreiesByDates[selectedMonth]) : [],
-    [inventoreiesByDates, selectedMonth],
+    () => selectedMonth && inventoriesByDates[selectedMonth] !== undefined ? Object.keys(inventoriesByDates[selectedMonth]) : [],
+    [inventoriesByDates, selectedMonth],
   )
-  const [selectedDate, setSelectedDate] = useQueryParamState('date')
-  const inventories = inventoreiesByDates[selectedMonth ?? '']?.[selectedDate ?? ''] ?? []
-  const [selectedInventoryId, setSelectedInventoryId] = useQueryParamState('inventory')
+  const [selectedDate, setSelectedDate] = useQueryParamState('date');
+  useEffect(() => {
+    if (selectedMonth) {
+      if (selectedDate === undefined) {
+        setSelectedDate(dates[0])
+      }
+    }
+  }, [selectedMonth, selectedDate, dates, setSelectedDate]);
+  
+  const inventories = inventoriesByDates[selectedMonth ?? '']?.[selectedDate ?? ''] ?? []
+  const [selectedInventoryId, setSelectedInventoryId] = useQueryParamState('inventory');
+  useEffect(() => {
+    if (selectedMonth && selectedDate) {
+      if (selectedInventoryId === undefined) {
+        setSelectedInventoryId(inventories[0].inventory_id);
+      }
+    }
+  }, [selectedMonth, selectedDate, selectedInventoryId, inventories, setSelectedInventoryId]);
   const selectedInventory = useMemo(
     () => availability?.inventory.find(inv => inv.inventory_id === Number(selectedInventoryId)),
     [availability, selectedInventoryId]
   )
-  const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
+  // const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
+  const [view, setView] = useState<AvailabilityDetailsView>('date');
 
   const fetchAvailabilityDetail = useCallback(async (session_id: string) => {
     setIsLoading(true)
@@ -101,12 +117,10 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         fetchAvailabilityDetail(match.params.session_id);
         updateProfileColor(domainUsername)
       }
-
-      document.getElementById('#date-selector-title')?.scrollIntoView();
     } else {
       message.error('Session details not found.');
     }
-  }, [fetchAvailabilityDetail, match, updateProfileColor])
+  }, [fetchAvailabilityDetail, match, updateProfileColor]);
 
   const handleChangeMonth = useCallback((month: string) => {
     setSelectedMonth(month)
@@ -121,7 +135,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
   const handleChangeTime = useCallback((inventory: SessionInventory) => {
     if (inventory.num_participants < 1) {
-      setSelectedInventoryId(inventory.inventory_id)
+      setSelectedInventoryId(inventory.inventory_id);
     }
   }, [setSelectedInventoryId])
 
@@ -166,7 +180,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         </Button>
       )}
     </>
-  ), [availability, showLongDescription])
+  ), [availability, showLongDescription]);
 
   return (
     <div className={styles.availabilityPageContainer}>
@@ -179,19 +193,18 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         width="100%"
       />
 
-      {isMobileDevice ? (
-        <Row>
-          <Col xs={24}>
-            {heading}
-          </Col>
-        </Row>
-      ) : null}
-
+      <Row className={styles.mobileOnly}>
+        <Col xs={24}>
+          {heading}
+        </Col>
+      </Row>
 
       <Row className={styles.availabilityContentContainer} gutter={[30, 0]}>
-        {view === 'all' || view === 'date' ? (
-          <Col xs={isMobileDevice ? 24 : 16}>
-            {isMobileDevice ? null : heading}
+        {/* {view === 'all' || view === 'date' ? ( */}
+          <Col xs={24} lg={16} className={classNames(styles.dateView, view === 'form' ? styles.hidden : undefined)}>
+            <div className={styles.desktopOnly}>
+              {heading}
+            </div>
 
             <Divider className={styles.availabilityDivider} />
 
@@ -211,7 +224,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               </Col>
             </Row>
 
-            <Swiper slidesPerView={isMobileDevice ? 4.2 : 7} spaceBetween={12}>
+            <Swiper slidesPerView={4.2} spaceBetween={12} breakpoints={{ 768 : { slidesPerView : 7, spaceBetween: 12 } }}>
               {dates.map(date => {
                 const momentDate = moment(date)
                 const dateString = momentDate.format('YYYY-MM-DD')
@@ -221,6 +234,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                   <SwiperSlide key={dateString}>
                     <Card
                       bordered={false}
+                      style={{ borderRadius: 14, }}
                       bodyStyle={{
                         backgroundColor: isSelected ? 'var(--passion-profile-lightest-color)' : undefined,
                         border: isSelected ? '1.8px solid var(--passion-profile-darker-color)' : '1.8px solid #D9D9D9',
@@ -274,7 +288,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                     const isBooked = inv.num_participants > 0
 
                     return (
-                      <Col xs={8}>
+                      <Col xs={8} key={inv.inventory_external_id}>
                         <Card
                           bordered={false}
                           bodyStyle={{
@@ -319,28 +333,24 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               </>
             ) : null}
 
-            {isMobileDevice ? (
-              <Button
-                block
-                className={styles.confirmBookingButton}
-                disabled={!selectedInventory}
-                onClick={() => setView('form')}
-                size="large"
-                type="primary"
-              >
-                Confirm Booking
-              </Button>
-            ) : null}
+            <Button
+              block
+              className={styles.confirmBookingButton}
+              disabled={!selectedInventory}
+              onClick={() => setView('form')}
+              size="large"
+              type="primary"
+            >
+              Confirm Booking
+            </Button>
           </Col>
-        ) : null}
+        {/* ) : null} */}
 
-        {view === 'all' || view === 'form' ? (
-          <Col xs={isMobileDevice ? 24 : 8}>
-            {isMobileDevice ? (
-              <Button  block className={styles.changeDateButton} onClick={() => setView('date')} size="large" type="primary">
-                Change Date
-              </Button>
-            ) : null}
+        {/* {view === 'all' || view === 'form' ? ( */}
+          <Col xs={24} lg={8} className={classNames(styles.formView, view === 'date' ? styles.hidden : undefined)}>
+            <Button  block className={styles.changeDateButton} onClick={() => setView('date')} size="large" type="primary">
+              Change Date
+            </Button>
 
             <SessionRegistration
               fullWidth
@@ -348,7 +358,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               isInventoryDetails={true}
             />
           </Col>
-        ) : null}
+        {/* ) : null} */}
       </Row>
     </Loader>
     </div>

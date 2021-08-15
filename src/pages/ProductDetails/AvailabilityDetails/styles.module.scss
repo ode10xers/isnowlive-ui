@@ -1,5 +1,27 @@
 @import '../../../styles/variables.scss';
 
+.mobileOnly {
+  display : none;
+  
+  @media screen and (max-width: 769px) {
+    display : initial;
+  }
+}
+
+.desktopOnly {
+  @media screen and (max-width: 769px) {
+    display : none;
+  }
+}
+
+.dateView, .formView {
+  @media screen and (max-width: 769px) {
+    &.hidden {
+      display : none;
+    }
+  }
+}
+
 .availabilityPageContainer {
   width: 100%;
   min-height: 100vh;
@@ -95,12 +117,7 @@
     --passion-profile-darker-color,
     var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
   ) !important;
-  font-size : 22px;
   margin-bottom : 0 !important;
-
-  @media screen and (max-width: 527px) {
-    font-size: 14px;
-  }
 
   p,
   span {
@@ -181,10 +198,18 @@
   background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   margin: 30px 0;
+
+  @media screen and (min-width: 769px) {
+    display : none !important;
+  }
 }
 
 .changeDateButton {
   background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   margin: 10px 0 0;
+  
+  @media screen and (min-width: 769px) {
+    display : none !important;
+  }
 }
