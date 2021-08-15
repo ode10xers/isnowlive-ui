@@ -502,7 +502,7 @@ const PassDetails = ({ match, history }) => {
     );
 
   const creatorProfileSection = (
-    <div className={styles.mb50}>
+    <div className={styles.bottomOffset}>
       <Row gutter={[8, 20]} className={styles.creatorProfileSection}>
         <Col xs={24}>
           <Space size={32}>

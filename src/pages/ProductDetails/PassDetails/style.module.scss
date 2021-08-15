@@ -218,6 +218,10 @@
 
     .passDetailItemIcon {
       margin-right: 8px;
+      
+      @media screen and (max-width: 526px) {
+        margin-right: 3px;
+      }
     }
   }
 
@@ -342,6 +346,10 @@
       }
     }
   }
+}
+
+.bottomOffset {
+  margin-bottom : 100px;
 }
 
 .creatorProfileSection {
