@@ -23,7 +23,13 @@ const VideoListCard = ({ video }) => {
       <div className={styles.videoImageContainer}>
         <Image
           preview={false}
-          className={video?.thumbnail_url?.endsWith('.gif') ? styles.videoThumbnail : styles.videoStaticImage}
+          className={
+            video?.thumbnail_url?.endsWith('.gif')
+              ? styles.videoThumbnail
+              : video?.thumbnail_url?.includes('img.youtube.com')
+              ? styles.youtubeThumbnail
+              : styles.videoStaticImage
+          }
           src={isValidFile(video?.thumbnail_url) ? video?.thumbnail_url : DefaultImage}
         />
       </div>
