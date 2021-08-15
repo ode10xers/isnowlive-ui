@@ -323,7 +323,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                               )
                             }
                           >
-                            {isSelected ? 'Selected' : (isBooked ? 'Booked' : 'Available')}
+                            {isBooked ? 'Booked' : (isSelected ? 'Selected' : 'Available')}
                           </Paragraph>
                         </Card>
                       </Col>
