@@ -126,6 +126,12 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     }
   }, [fetchAvailabilityDetail, match, updateProfileColor]);
 
+  useEffect(() => {
+    if (view === 'form') {
+      window.scrollTo({ left : 0, top : document.body.scrollHeight, behavior: 'smooth' });
+    }
+  }, [view]);
+
   const handleChangeMonth = useCallback((month: string) => {
     setSelectedMonth(month)
     setSelectedDate(undefined)
@@ -350,7 +356,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
         {/* {view === 'all' || view === 'form' ? ( */}
           <Col xs={24} lg={8} className={classNames(styles.formView, view === 'date' ? styles.hidden : undefined)}>
-            <Button  block className={styles.changeDateButton} onClick={() => setView('date')} size="large" type="primary">
+            <Button ghost block className={styles.changeDateButton} onClick={() => setView('date')} size="large" type="primary">
               Change Date
             </Button>
 

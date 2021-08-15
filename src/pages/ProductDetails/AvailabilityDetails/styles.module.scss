@@ -205,7 +205,7 @@
 }
 
 .changeDateButton {
-  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   margin: 10px 0 0;
   
