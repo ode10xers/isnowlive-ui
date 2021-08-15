@@ -147,9 +147,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     <>
       <Row>
         <Text className={styles.availabilityInfo}>
-          {availability?.currency.toUpperCase()}
-          {' '}
-          {availability?.price}
+          {availability?.total_price && availability?.total_price > 0 ? `${availability?.currency?.toUpperCase()} ${availability?.total_price}` : 'Free'}
         </Text>
         <Text className={styles.availabilityInfoSeparator}>
           {' ● '}
