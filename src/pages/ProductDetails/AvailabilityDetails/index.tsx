@@ -352,11 +352,15 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               Change Date
             </Button>
 
-            <SessionRegistration
-              fullWidth
-              classDetails={{ ...availability, ...selectedInventory }}
-              isInventoryDetails={true}
-            />
+            <Loader loading={isLoading} text="Processing...">
+            {availability && (
+              <SessionRegistration
+                fullWidth
+                classDetails={{ ...selectedInventory, ...availability, }}
+                isInventoryDetails={true}
+              />
+            )}
+            </Loader>
           </Col>
         {/* ) : null} */}
       </Row>
