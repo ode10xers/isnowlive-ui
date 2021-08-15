@@ -602,7 +602,7 @@ const PassDetails = ({ match, history }) => {
     <div className={styles.mobileStickyTopContainer}>
       <Affix offsetTop={72}>
         <Row className={styles.mobileStickyTop} onClick={handleMobileTopStickyClicked}>
-          <Col flex="1 1 auto">
+          <Col xs={22}>
             <Row align="center">
               <Col xs={24}>
                 <Text className={styles.stickyTopPassName}>{selectedPassDetails?.name}</Text>
@@ -615,7 +615,7 @@ const PassDetails = ({ match, history }) => {
               </Col>
             </Row>
           </Col>
-          <Col flex="0 0 20px">
+          <Col xs={2} className={styles.textAlignRight}>
             <CaretDownOutlined className={styles.dropdownIcon} />
           </Col>
         </Row>
