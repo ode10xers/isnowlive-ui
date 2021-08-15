@@ -73,7 +73,11 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   useEffect(() => {
     if (selectedMonth && selectedDate) {
       if (selectedInventoryId === undefined) {
-        setSelectedInventoryId(inventories[0].inventory_id);
+        const availableInventory = inventories.find((inv) => inv.num_participants === 0)?.inventory_id;
+        
+        if (availableInventory) {
+          setSelectedInventoryId(availableInventory);
+        }
       }
     }
   }, [selectedMonth, selectedDate, selectedInventoryId, inventories, setSelectedInventoryId]);
@@ -280,7 +284,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                   </Col>
                 </Row>
 
-                <Row>
+                <Row gutter={[8, 8]}>
                   {inventories.map(inv => {
                     const momentStartTime = moment(inv.start_time)
                     const momentEndTime = moment(inv.end_time)
