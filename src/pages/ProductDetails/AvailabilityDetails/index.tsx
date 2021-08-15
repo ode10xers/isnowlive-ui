@@ -238,7 +238,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                       bordered={false}
                       style={{ borderRadius: 14, }}
                       bodyStyle={{
-                        backgroundColor: isSelected ? 'var(--passion-profile-lightest-color)' : undefined,
+                        backgroundColor: isSelected ? 'var(--passion-profile-darker-color)' : undefined,
                         border: isSelected ? '1.8px solid var(--passion-profile-darker-color)' : '1.8px solid #D9D9D9',
                         borderRadius: 14,
                         marginBottom: 1,
@@ -294,7 +294,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                         <Card
                           bordered={false}
                           bodyStyle={{
-                            backgroundColor: isSelected ? 'var(--passion-profile-lightest-color)' : undefined,
+                            backgroundColor: isSelected ? 'var(--passion-profile-darker-color)' : undefined,
                             border: isSelected ? '1.8px solid var(--passion-profile-darker-color)' : '1.8px solid #D9D9D9',
                             borderRadius: 14,
                             marginBottom: 1,
