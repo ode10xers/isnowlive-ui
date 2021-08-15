@@ -1,37 +1,93 @@
 @import '../../../styles/variables.scss';
 
+.availabilityPageContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  padding: 50px;
+
+  @media screen and (min-width: 1440px) {
+    padding: 100px;
+  }
+  
+  @media screen and (max-width: 1025px) {
+    padding: 30px;
+  }
+
+  @media screen and (max-width: 769px) {
+    padding: 20px;
+  }
+
+  @media screen and (max-width: 526px) {
+    padding: 8px;
+  }
+}
+
+.readMoreButton {
+  color : var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  font-weight: 600;
+}
+
 .availabilityHeaderImage {
   border-radius: 16px;
-  margin-top: 60px;
-  margin-bottom: 60px;
+  margin-bottom: 30px;
+  object-fit: contain;
 }
 
 .availabilityContentContainer {
-  margin-top: 30px;
+  margin-top: 4px;
 }
 
 .availabilityInfoSeparator {
   color: #c4c4c4 !important;
-  font-size: 22px;
-  margin-bottom: 14px;
+  font-size: 18px;
+  // margin-bottom: 14px;
+  align-self : center;
   padding: 0 6px;
+
+  @media screen and (max-width: 527px) {
+    font-size: 12px;
+  }
 }
 
 .availabilityInfo {
   color: var(
     --passion-profile-darker-color,
-    var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
   ) !important;
   font-size: 22px;
   text-transform: uppercase;
+
+  @media screen and (max-width: 527px) {
+    font-size: 16px;
+  }
 }
 
 .availabilityTitle {
   color: var(
     --passion-profile-darker-color,
-    var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
   ) !important;
-  font-size: 30px;
+  font-size: 30px !important;
+
+  @media screen and (max-width: 527px) {
+    font-size: 24px !important;
+  }
+}
+
+.availabilityLocation {
+  color: var(
+    --passion-profile-darker-color,
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
+  ) !important;
+
+  font-size: 16px !important;
+  margin-bottom : 20px !important;
+}
+
+.availabilityDivider {
+  margin-top : 10px;
+  margin-bottom : 10px;
 }
 
 .availabilityDescription {
@@ -39,13 +95,17 @@
     --passion-profile-darker-color,
     var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
   ) !important;
-  font-size: 22px;
+  font-size : 22px;
+  margin-bottom : 0 !important;
+
+  @media screen and (max-width: 527px) {
+    font-size: 14px;
+  }
 
   p,
   span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    // background-color: map-get($map: $colors, $key: 'White1') !important;
     background: transparent !important;
     color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
   }
@@ -55,7 +115,7 @@
   margin-bottom: 30px;
 }
 
-.availabilitDateTitle {
+.availabilityDateTitle {
   color: var(
     --passion-profile-darker-color,
     var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
@@ -121,4 +181,10 @@
   background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
   margin: 30px 0;
+}
+
+.changeDateButton {
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  margin: 10px 0 0;
 }

@@ -1269,7 +1269,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                               <Col xs={24}>
                                 <Paragraph>
                                   Please select the date & time for the class you wish to attend
-                                  {isMobileDevice ? '' : ', in the calendar on the right'}
+                                  {isMobileDevice ? '' : ', in the calendar on the side'}
                                 </Paragraph>
                               </Col>
                             )}

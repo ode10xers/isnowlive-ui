@@ -24,6 +24,7 @@ import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/help
 import useQueryParamState from 'hooks/useQueryParamState'
 
 import styles from './styles.module.scss';
+import { CaretDownOutlined } from '@ant-design/icons'
 
 const { formatDate: { getTimeDiff } } = dateUtil
 const { Paragraph, Text, Title } = Typography
@@ -100,6 +101,8 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         fetchAvailabilityDetail(match.params.session_id);
         updateProfileColor(domainUsername)
       }
+
+      document.getElementById('#date-selector-title')?.scrollIntoView();
     } else {
       message.error('Session details not found.');
     }
@@ -141,6 +144,11 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       <Title className={styles.availabilityTitle}>
         {availability?.name}
       </Title>
+      {availability?.is_offline && (
+        <Title className={styles.availabilityLocation}>
+          Location : {availability?.offline_event_address}
+        </Title>
+      )}
       <Paragraph
         className={styles.availabilityDescription}
         style={showLongDescription ? undefined : { maxHeight: 70, overflow: 'hidden' }}
@@ -150,7 +158,9 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       {!showLongDescription && (
         <Button
           type="link"
+          className={styles.readMoreButton}
           onClick={() => setShowLongDescription(true)}
+          icon={<CaretDownOutlined />}
         >
           Read More
         </Button>
@@ -159,7 +169,8 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   ), [availability, showLongDescription])
 
   return (
-    // @ts-ignore
+    <div className={styles.availabilityPageContainer}>
+    {/* @ts-ignore */}
     <Loader loading={isLoading} size="large" text="Loading availability">
       <Image
         className={styles.availabilityHeaderImage}
@@ -182,11 +193,11 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
           <Col xs={isMobileDevice ? 24 : 16}>
             {isMobileDevice ? null : heading}
 
-            <Divider />
+            <Divider className={styles.availabilityDivider} />
 
             <Row align="middle" className={styles.availabilityTitleWrapper}>
               <Col xs={12}>
-                <Title className={styles.availabilitDateTitle}>
+                <Title id="date-selector-title" className={styles.availabilityDateTitle}>
                   Select Date
                 </Title>
               </Col>
@@ -207,7 +218,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                 const isSelected = dateString === selectedDate
 
                 return (
-                  <SwiperSlide>
+                  <SwiperSlide key={dateString}>
                     <Card
                       bordered={false}
                       bodyStyle={{
@@ -249,7 +260,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
                 <Row align="middle" className={styles.availabilityTitleWrapper}>
                   <Col xs={24}>
-                    <Title className={styles.availabilitDateTitle}>
+                    <Title className={styles.availabilityDateTitle}>
                       Select Time Slot
                     </Title>
                   </Col>
@@ -326,20 +337,21 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         {view === 'all' || view === 'form' ? (
           <Col xs={isMobileDevice ? 24 : 8}>
             {isMobileDevice ? (
-              <Button block onClick={() => setView('date')} size="large" type="primary">
+              <Button  block className={styles.changeDateButton} onClick={() => setView('date')} size="large" type="primary">
                 Change Date
               </Button>
             ) : null}
 
             <SessionRegistration
-              classDetails={selectedInventory}
               fullWidth
+              classDetails={selectedInventory}
               isInventoryDetails={true}
             />
           </Col>
         ) : null}
       </Row>
     </Loader>
+    </div>
   )
 }
 

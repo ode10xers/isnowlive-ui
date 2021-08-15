@@ -255,6 +255,11 @@ function App() {
               path={Routes.courseDetails}
               component={CourseDetails}
             />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              path={Routes.availabilityDetails}
+              component={AvailabilityDetails}
+            />
             <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
@@ -262,7 +267,6 @@ function App() {
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
-            <RouteWithLayout layout={NavbarLayout} path={Routes.availabilityDetails} component={AvailabilityDetails} />
             <RouteWithLayout
               layout={NavbarLayout}
               exact
