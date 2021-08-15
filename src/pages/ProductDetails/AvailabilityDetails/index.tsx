@@ -354,7 +354,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
             <SessionRegistration
               fullWidth
-              classDetails={selectedInventory}
+              classDetails={{ ...availability, ...selectedInventory }}
               isInventoryDetails={true}
             />
           </Col>
