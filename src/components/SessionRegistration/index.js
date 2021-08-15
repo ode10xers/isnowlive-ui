@@ -1072,13 +1072,15 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
               order={isMobileDevice ? 2 : 1}
               className={isMobileDevice ? styles.mt20 : styles.mt50}
             >
-              <div className={classNames(styles.box, styles.p50, styles.mb20)}>
+              <div className={styles.sessionRegistrationWrapper}>
                 <Row>
                   <Col xs={24}>
-                    <Title level={3}>Registration</Title>
+                    <Title level={3} className={styles.registrationTitle}>
+                      Registration
+                    </Title>
                   </Col>
                   <Col xs={24}>
-                    <Text>
+                    <Text className={styles.registrationHelpText}>
                       <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are
                       always available in your
                       <a
@@ -1092,7 +1094,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                       .
                     </Text>
                   </Col>
-                  <Col xs={24} className={styles.mt10}>
+                  <Col xs={24} className={styles.formContainer}>
                     {/* Form used to handle both Sign Up and Session Booking */}
                     <Form
                       form={form}
@@ -1151,8 +1153,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
 
                       {user && usableUserSubscription ? (
                         // Render help text that this session will be booked using user's subscription
-                        <Row className={styles.mt10}>
-                          <Paragraph>
+                        <Row>
+                          <Paragraph className={styles.bookingHelpText}>
                             Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                             class for{' '}
                             <Text delete>
@@ -1180,8 +1182,8 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                             )}
                           </div>
                           {selectedInventory && selectedPass && (
-                            <Row className={styles.mt10}>
-                              <Paragraph>
+                            <Row>
+                              <Paragraph className={styles.bookingHelpText}>
                                 Booking {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                                 class for{' '}
                                 <Text delete>
@@ -1243,7 +1245,7 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                           ) : (
                             // Render simple help text if no passes are available for class
                             <Item {...sessionRegistrationTailLayout}>
-                              <Title level={5}>
+                              <Title level={5} className={styles.bookingHelpText}>
                                 Book {selectedInventory ? toLongDateWithTime(selectedInventory.start_time) : 'this'}{' '}
                                 class
                               </Title>
@@ -1256,7 +1258,14 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                         <Item {...sessionRegistrationTailLayout}>
                           <Row gutter={[8, 8]}>
                             <Col xs={fullWidth ? 24 : 8} md={fullWidth ? 24 : 8} xl={fullWidth ? 24 : 6}>
-                              <Button block size="large" type="primary" htmlType="submit" disabled={!selectedInventory}>
+                              <Button
+                                block
+                                className={styles.bookBtn}
+                                size="large"
+                                type="primary"
+                                htmlType="submit"
+                                disabled={!selectedInventory}
+                              >
                                 {user &&
                                 classDetails?.total_price > 0 &&
                                 !(selectedPass && userPasses.length > 0) &&
