@@ -5,10 +5,10 @@ import { LikeOutlined } from '@ant-design/icons';
 import apis from 'apis';
 import Routes from 'routes';
 
-import ContainerCard from 'components/ContainerCard';
 import PassesListView from './PassesListView';
 import PassesEditView from './PassesEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -22,6 +22,7 @@ const PassesProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  title,
   ...customComponentProps
 }) => {
   const [passes, setPasses] = useState([]);
@@ -53,13 +54,12 @@ const PassesProfileComponent = ({
     <Row className={styles.p10} align="middle" justify="center" id="passes">
       {isEditing && (
         <Col xs={1}>
-          {' '}
-          <DragAndDropHandle {...dragHandleProps} />{' '}
+          <DragAndDropHandle {...dragHandleProps} />
         </Col>
       )}
       <Col xs={isEditing ? 22 : 24}>
-        <ContainerCard
-          title={customComponentProps?.title ?? 'CREDIT PASSES'}
+        <DynamicProfileComponentContainer
+          title={title ?? 'CREDIT PASSES'}
           icon={<LikeOutlined className={styles.mr10} />}
         >
           {isEditing ? (
@@ -83,12 +83,11 @@ const PassesProfileComponent = ({
               <PassesListView passes={passes || []} />
             </Spin>
           )}
-        </ContainerCard>
+        </DynamicProfileComponentContainer>
       </Col>
       {isEditing && (
         <Col xs={1}>
-          {' '}
-          <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
+          <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />
         </Col>
       )}
     </Row>
