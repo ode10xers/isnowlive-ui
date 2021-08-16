@@ -80,12 +80,12 @@ const CourseListItem = ({ course }) => {
 
   const bottomCardBar = (
     <Row className={styles.cardFooter}>
-      <Col xs={14} className={styles.timeText}>
+      <Col flex="1 1 auto" className={styles.timeText}>
         {course.type === courseType.VIDEO
           ? `VALIDITY : ${course?.validity} DAY${course?.validity > 1 ? 'S' : ''}`
           : `${renderCourseDate(course?.start_date)} - ${renderCourseDate(course?.end_date)}`}
       </Col>
-      <Col xs={10} className={styles.priceText}>
+      <Col flex="0 0 70px" className={styles.priceText}>
         {renderCoursePrice()}
       </Col>
     </Row>
@@ -99,9 +99,9 @@ const CourseListItem = ({ course }) => {
   return (
     <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
       <Row>
-        <Col xs={8}>{courseName}</Col>
-        <Col xs={8}>{courseContents}</Col>
-        <Col xs={8}>{bottomCardBar}</Col>
+        <Col xs={24}>{courseName}</Col>
+        <Col xs={24}>{courseContents}</Col>
+        <Col xs={24}>{bottomCardBar}</Col>
       </Row>
     </Card>
   );
