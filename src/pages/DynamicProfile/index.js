@@ -157,6 +157,11 @@ const componentsMap = {
 
 const sectionData = [
   {
+    key: 'SUBSCRIPTIONS',
+    title: 'My Memberships',
+    values: null,
+  },
+  {
     key: 'PASSES',
     title: 'My Passes',
     values: null,
@@ -174,11 +179,6 @@ const sectionData = [
   {
     key: 'COURSES',
     title: 'My Courses',
-    values: null,
-  },
-  {
-    key: 'SUBSCRIPTIONS',
-    title: 'My Memberships',
     values: null,
   },
   {

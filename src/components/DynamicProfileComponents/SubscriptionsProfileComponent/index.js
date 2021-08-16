@@ -8,11 +8,12 @@ import Routes from 'routes';
 import SubscriptionsListView from './SubscriptionListView';
 import SubscriptionsEditView from './SubscriptionEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
+// import ContainerCard from 'components/ContainerCard';
 
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
-import ContainerCard from 'components/ContainerCard';
 
 const { Text } = Typography;
 
@@ -22,6 +23,7 @@ const SubscriptionProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  title,
   ...customComponentProps
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,8 +59,8 @@ const SubscriptionProfileComponent = ({
         </Col>
       )}
       <Col xs={isEditing ? 22 : 24}>
-        <ContainerCard
-          title={customComponentProps?.title ?? 'MEMBERSHIPS'}
+        <DynamicProfileComponentContainer
+          title={title ?? 'MEMBERSHIPS'}
           icon={<ScheduleOutlined className={styles.mr10} />}
         >
           {isEditing ? (
@@ -82,7 +84,7 @@ const SubscriptionProfileComponent = ({
               <SubscriptionsListView subscriptions={subscriptions} />
             </Spin>
           )}
-        </ContainerCard>
+        </DynamicProfileComponentContainer>
       </Col>
       {isEditing && (
         <Col xs={1}>

@@ -396,7 +396,7 @@ const CreateSubscriptionCard = ({ cancelChanges, saveChanges, editedSubscription
               name="subscriptionName"
               rules={validationRules.nameValidation}
             >
-              <Input placeholder="Enter Subscription Name" maxLength={50} />
+              <Input placeholder="Enter Subscription Name" maxLength={30} />
             </Form.Item>
           }
           bodyStyle={{ padding: '0px 10px' }}
