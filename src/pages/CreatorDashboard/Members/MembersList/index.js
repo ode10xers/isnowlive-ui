@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Row, Col, Button, Form, Select, Typography, Card, Empty, Tooltip } from 'antd';
+import { Row, Col, Button, Form, Select, Typography, Card, Empty, Tooltip, Modal } from 'antd';
 import { SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -13,7 +13,7 @@ import { isMobileDevice } from 'utils/device';
 
 import styles from './styles.module.scss';
 
-const { Text, Title } = Typography;
+const { Text, Title, Paragraph } = Typography;
 
 const MembersList = () => {
   const [form] = Form.useForm();
@@ -94,12 +94,12 @@ const MembersList = () => {
     }
   };
 
-  const updateMemberApprovalStatus = (externalId) => {
+  const updateMemberApprovalStatus = (externalId, is_approved) => {
     const selectedMemberIndex = membersList.findIndex((member) => member.id === externalId);
 
     if (selectedMemberIndex >= 0) {
       const tempMembersList = membersList;
-      tempMembersList[selectedMemberIndex].is_approved = true;
+      tempMembersList[selectedMemberIndex].is_approved = is_approved ?? true;
       setMembersList(tempMembersList);
     }
   };
@@ -149,17 +149,56 @@ const MembersList = () => {
         is_approved: true,
       };
 
-      const { status } = await apis.audiences.approveCreatorMemberRequest(payload);
+      const { status } = await apis.audiences.setCreatorMemberRequestApproval(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('Member join request approved!');
-        updateMemberApprovalStatus(memberId);
+        updateMemberApprovalStatus(memberId, true);
       }
     } catch (error) {
       showErrorModal('Failed approving member request', error?.response?.data?.message || 'Something went wrong.');
     }
 
     setIsLoading(false);
+  };
+
+  const banMember = async (memberId) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        external_id: memberId,
+        is_approved: false,
+      };
+
+      const { status } = await apis.audiences.setCreatorMemberRequestApproval(payload);
+
+      if (isAPISuccess(status)) {
+        showSuccessModal('Member has been removed!');
+        updateMemberApprovalStatus(memberId, false);
+      }
+    } catch (error) {
+      showErrorModal('Failed removing member', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleBanMemberClicked = (memberId) => {
+    Modal.confirm({
+      title: 'Remove member?',
+      content: (
+        <>
+          <Paragraph>
+            Are you sure you want to remove this member? Doing this means they won't be able to access your content
+          </Paragraph>
+          <Paragraph>You can approve them again so to allow them to access your content.</Paragraph>
+        </>
+      ),
+      okText: 'Yes, remove member',
+      okButtonProps: { danger: true, type: 'primary' },
+      onOk: () => banMember(memberId),
+    });
   };
 
   const generateMembersListColumns = useCallback(
@@ -266,13 +305,19 @@ const MembersList = () => {
           title: 'Member Request',
           dataIndex: 'is_approved',
           key: 'is_approved',
-          width: '150px',
+          width: '280px',
           render: (text, record) =>
             record.is_approved ? (
-              <>
-                {' '}
-                <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
-              </>
+              <Row align="middle" gutter={[12, 12]}>
+                <Col>
+                  <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
+                </Col>
+                <Col>
+                  <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(record.id)}>
+                    Remove
+                  </Button>
+                </Col>
+              </Row>
             ) : (
               <Button type="primary" onClick={() => approveMemberRequest(record.id)}>
                 Allow
