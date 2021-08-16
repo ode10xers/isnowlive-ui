@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+import { useLocation } from 'react-router-dom';
+
 import { Row, Col, Button, Image, Space, Typography, Switch } from 'antd';
 import {
   GlobalOutlined,
@@ -9,15 +11,19 @@ import {
   TwitterOutlined,
   LinkedinOutlined,
 } from '@ant-design/icons';
+
+import apis from 'apis';
+
 import Share from 'components/Share';
 import DefaultImage from 'components/Icons/DefaultImage';
+import NewsletterModal from 'components/NewsletterModal';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
+
+import { getExternalLink } from 'utils/url';
 import { isMobileDevice } from 'utils/device';
 import { generateUrlFromUsername, isAPISuccess } from 'utils/helper';
-import NewsletterModal from 'components/NewsletterModal';
+
 import styles from './styles.module.scss';
-import { useLocation } from 'react-router-dom';
-import apis from 'apis';
 
 const { Title } = Typography;
 
@@ -95,19 +101,6 @@ const CreatorProfile = ({ profile, profileImage, showCoverImage = false, coverIm
       setCreatorProfile(profile);
     }
   }, [profile]);
-
-  const getExternalLink = (link = null) => {
-    // if (creatorProfile?.profile?.social_media_links?.website) {
-    if (link) {
-      if (link.includes('//')) {
-        return link;
-      } else {
-        return '//' + link;
-      }
-    } else {
-      return '';
-    }
-  };
 
   const showMoreCreatorBio = () => {
     setShouldExpandCreatorBio(true);

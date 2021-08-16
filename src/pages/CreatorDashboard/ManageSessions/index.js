@@ -160,7 +160,7 @@ const ManageSessions = () => {
 
   const copySessionLink = (sessionId) => {
     const username = getLocalUserDetails().username;
-    const pageLink = `${generateUrlFromUsername(username)}/s/${sessionId}`;
+    const pageLink = `${generateUrlFromUsername(username)}/${isAvailability ? 'a' : 's'}/${sessionId}`;
 
     copyToClipboard(pageLink);
   };

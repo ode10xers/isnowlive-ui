@@ -61,7 +61,7 @@ const componentsMap = {
     icon: <ClockCircleOutlined />,
     component: AvailabilityProfileComponent,
     label: 'Availability',
-    optional: true,
+    optional: false,
     defaultProps: {
       title: 'AVAILABILITY',
       values: null,

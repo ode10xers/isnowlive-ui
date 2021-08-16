@@ -18,6 +18,7 @@ import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
+import AvailabilityDetails from 'pages/ProductDetails/AvailabilityDetails';
 import Session from 'pages/Session';
 import InventoryDetails from 'pages/InventoryDetails';
 import SessionDetails from 'pages/SessionDetails';
@@ -29,10 +30,11 @@ import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
 import PaymentVerification from 'pages/PaymentVerification';
 import PaymentRetry from 'pages/PaymentRetry';
 import SessionReschedule from 'pages/SessionReschedule';
-import PassDetails from 'pages/PassDetails';
+// import PassDetails from 'pages/PassDetails';
 import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
 import VideoDetails from 'pages/ProductDetails/VideoDetails';
 import CourseDetails from 'pages/ProductDetails/CourseDetails';
+import PassDetails from 'pages/ProductDetails/PassDetails';
 import NewHome from 'pages/NewHome';
 import VideoDetailedListView from 'pages/DetailedListView/Videos';
 import SessionDetailedListView from 'pages/DetailedListView/Sessions';
@@ -253,10 +255,16 @@ function App() {
               path={Routes.courseDetails}
               component={CourseDetails}
             />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              path={Routes.availabilityDetails}
+              component={AvailabilityDetails}
+            />
+            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-            <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} />
+            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
             <RouteWithLayout
