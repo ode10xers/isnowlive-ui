@@ -1,19 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import classNames from 'classnames';
-import ReactHtmlParser from 'react-html-parser';
+// import ReactHtmlParser from 'react-html-parser';
 import { useLocation } from 'react-router-dom';
 
 import { Row, Col, Image, Space, Typography, Divider, Skeleton } from 'antd';
-import {
-  GlobalOutlined,
-  TwitterOutlined,
-  CaretDownOutlined,
-  FacebookFilled,
-  InstagramFilled,
-  LinkedinFilled,
-} from '@ant-design/icons';
+// import {
+// CaretDownOutlined,
+// } from '@ant-design/icons';
 
 import { getExternalLink } from 'utils/url';
+import { socialMediaIcons } from 'utils/constants';
 
 import styles from './styles.module.scss';
 
@@ -26,14 +22,89 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
 
   const { cover_image_url, profile_image_url, profile: profileData } = creatorProfile ?? {};
 
-  const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
+  // const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
 
-  const showMoreCreatorBio = () => {
-    setShouldExpandCreatorBio(true);
-  };
+  // const showMoreCreatorBio = () => {
+  //   setShouldExpandCreatorBio(true);
+  // };
 
   const checkSocialLinksExists = (linksObj) =>
     linksObj ? Object.entries(linksObj).filter(([key, val]) => val).length > 0 : false;
+
+  const renderCreatorExternalLinks = () => {
+    if (!creatorProfile || !creatorProfile.profile || !creatorProfile.profile.social_media_links) {
+      return null;
+    }
+
+    const creatorSocialMediaLinks = Object.entries(creatorProfile.profile.social_media_links).filter(
+      ([socialMedia, link]) => link
+    );
+
+    if (creatorSocialMediaLinks.length <= 0) {
+      return null;
+    }
+
+    return (
+      <Col xs={24} className={styles.socialIconWrapper}>
+        <Space size={36} align="center" className={styles.socialIconsList}>
+          {creatorSocialMediaLinks.map(([socialMedia, link]) => {
+            const IconElement = socialMediaIcons[socialMedia];
+
+            return (
+              <a href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
+                <IconElement />
+              </a>
+            );
+          })}
+          {/* {profileData?.social_media_links.website && (
+          <a
+            href={getExternalLink(profileData?.social_media_links?.website)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <GlobalOutlined className={styles.socialIcon} />
+          </a>
+        )}
+        {profileData?.social_media_links.facebook_link ? (
+          <a
+            href={getExternalLink(profileData?.social_media_links.facebook_link)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FacebookFilled className={styles.socialIcon} />
+          </a>
+        ) : null}
+        {profileData?.social_media_links.twitter_link ? (
+          <a
+            href={getExternalLink(profileData?.social_media_links.twitter_link)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <TwitterOutlined className={styles.socialIcon} />
+          </a>
+        ) : null}
+        {profileData?.social_media_links.instagram_link ? (
+          <a
+            href={getExternalLink(profileData?.social_media_links.instagram_link)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <InstagramFilled className={styles.socialIcon} />
+          </a>
+        ) : null}
+        {profileData?.social_media_links.linkedin_link ? (
+          <a
+            href={getExternalLink(profileData?.social_media_links.linkedin_link)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <LinkedinFilled className={styles.socialIcon} />
+          </a>
+        ) : null} */}
+        </Space>
+      </Col>
+    );
+  };
 
   return (
     <Row className={styles.creatorProfileWrapper}>
@@ -71,7 +142,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
           <Col xs={24}>
             <Divider className={styles.creatorProfileDivider} />
           </Col>
-          <Col xs={24} className={styles.creatorBio}>
+          {/* <Col xs={24} className={styles.creatorBio}>
             {shouldExpandCreatorBio ? (
               <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
             ) : (
@@ -82,60 +153,10 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
                 </div>
               </>
             )}
-          </Col>
+          </Col> */}
         </Row>
       </Col>
-      {checkSocialLinksExists(profileData?.social_media_links) ? (
-        <Col xs={24} className={styles.socialIconWrapper}>
-          <Space size={36} align="center" className={styles.socialIconsList}>
-            {profileData?.social_media_links.website && (
-              <a
-                href={getExternalLink(profileData?.social_media_links?.website)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GlobalOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profileData?.social_media_links.facebook_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.facebook_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FacebookFilled className={styles.socialIcon} />
-              </a>
-            ) : null}
-            {profileData?.social_media_links.twitter_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.twitter_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <TwitterOutlined className={styles.socialIcon} />
-              </a>
-            ) : null}
-            {profileData?.social_media_links.instagram_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.instagram_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <InstagramFilled className={styles.socialIcon} />
-              </a>
-            ) : null}
-            {profileData?.social_media_links.linkedin_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.linkedin_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <LinkedinFilled className={styles.socialIcon} />
-              </a>
-            ) : null}
-          </Space>
-        </Col>
-      ) : null}
+      {renderCreatorExternalLinks()}
       {isEditing && <div className={styles.clickDisableOverlay} />}
     </Row>
   );
