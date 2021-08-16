@@ -209,7 +209,7 @@ export default {
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     updateMemberTag: (payload) => http.put('secure/creator/audience', payload),
-    approveCreatorMemberRequest: (payload) => http.put('/secure/creator/audience', payload),
+    setCreatorMemberRequestApproval: (payload) => http.put('/secure/creator/audience', payload),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
     sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),
