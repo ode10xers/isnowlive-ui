@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Spin, Row, Col, Space, Button, Typography } from 'antd';
+import { PlayCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
@@ -7,6 +8,7 @@ import Routes from 'routes';
 import VideoListView from './VideoListView';
 import VideoEditView from './VideoEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -20,6 +22,7 @@ const VideosProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  title,
   ...customComponentProps
 }) => {
   const [videos, setVideos] = useState([]);
@@ -47,7 +50,7 @@ const VideosProfileComponent = ({
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
   return videos.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center" id="sessions">
+    <Row className={styles.p10} align="middle" justify="center" id="videos">
       {isEditing && (
         <Col xs={1}>
           {' '}
@@ -55,27 +58,32 @@ const VideosProfileComponent = ({
         </Col>
       )}
       <Col xs={isEditing ? 22 : 24}>
-        {isEditing ? (
-          <Row gutter={[8, 8]} justify="center" align="center">
-            <Col className={styles.textAlignCenter}>
-              <Space align="center" className={styles.textAlignCenter}>
-                <Text> The Vidoes you have created will show up here </Text>
-                <Button
-                  type="primary"
-                  onClick={() =>
-                    window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, '_blank')
-                  }
-                >
-                  Manage my Vidoes
-                </Button>
-              </Space>
-            </Col>
-          </Row>
-        ) : (
-          <Spin spinning={isLoading} tip="Fetching Vidoes">
-            <VideoListView videos={videos} />
-          </Spin>
-        )}
+        <DynamicProfileComponentContainer
+          title={title ?? 'VIDEOS'}
+          icon={<PlayCircleOutlined className={styles.mr10} />}
+        >
+          {isEditing ? (
+            <Row gutter={[8, 8]} justify="center" align="center">
+              <Col className={styles.textAlignCenter}>
+                <Space align="center" className={styles.textAlignCenter}>
+                  <Text> The Videos you have created will show up here </Text>
+                  <Button
+                    type="primary"
+                    onClick={() =>
+                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, '_blank')
+                    }
+                  >
+                    Manage my Videos
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+          ) : (
+            <Spin spinning={isLoading} tip="Fetching Videos">
+              <VideoListView videos={videos} />
+            </Spin>
+          )}
+        </DynamicProfileComponentContainer>
       </Col>
       {isEditing && (
         <Col xs={1}>

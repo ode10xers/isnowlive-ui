@@ -20,6 +20,7 @@ const CoursesProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  title,
   ...customComponentProps
 }) => {
   const [courses, setCourses] = useState([]);
@@ -58,14 +59,14 @@ const CoursesProfileComponent = ({
           <Row gutter={[8, 8]} justify="center" align="center">
             <Col className={styles.textAlignCenter}>
               <Space align="center" className={styles.textAlignCenter}>
-                <Text> The COurses you have created will show up here </Text>
+                <Text> The Courses you have created will show up here </Text>
                 <Button
                   type="primary"
                   onClick={() =>
                     window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses, '_blank')
                   }
                 >
-                  Manage my Vidoes
+                  Manage my Courses
                 </Button>
               </Space>
             </Col>

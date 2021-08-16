@@ -64,7 +64,7 @@ $spacing: (
   margin-bottom: map-get($spacing, '50');
 }
 .mr10 {
-  margin-right: map-get($map: $spacing, $key: '10');
+  margin-right: map-get($map: $spacing, $key: '10') !important;
 }
 .pl10 {
   padding-left: map-get($spacing, '10');

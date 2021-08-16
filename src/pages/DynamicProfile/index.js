@@ -158,7 +158,7 @@ const componentsMap = {
 const sectionData = [
   {
     key: 'VIDEOS',
-    title: 'My Vidoes',
+    title: 'My Videos',
     values: null,
   },
   {
