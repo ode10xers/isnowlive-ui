@@ -13,6 +13,8 @@ import {
   LinkedinFilled,
 } from '@ant-design/icons';
 
+import { getExternalLink } from 'utils/url';
+
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
@@ -25,18 +27,6 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
   const { cover_image_url, profile_image_url, profile: profileData } = creatorProfile ?? {};
 
   const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
-
-  const getExternalLink = (link = null) => {
-    if (link) {
-      if (link.includes('//')) {
-        return link;
-      } else {
-        return '//' + link;
-      }
-    } else {
-      return '';
-    }
-  };
 
   const showMoreCreatorBio = () => {
     setShouldExpandCreatorBio(true);

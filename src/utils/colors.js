@@ -1,3 +1,5 @@
+import { clamp } from 'utils/math';
+
 export const convertHSLToHex = (hslString) => {
   const regexString = /hsl\(\s*(\d+)\s*,\s*(\d+(?:\.\d+)?%)\s*,\s*(\d+(?:\.\d+)?%)\)/g;
 
@@ -69,7 +71,7 @@ export const convertHexToHSL = (hexColor) => {
   return [h, s, l];
 };
 
-export const formatHSLStyleString = (h, s, l) => `hsl(${h}, ${s}%, ${l}%)`;
+export const formatHSLStyleString = (h, s, l) => `hsl(${clamp(0, h, 360)}, ${clamp(0, s, 100)}%, ${clamp(0, l, 100)}%)`;
 
 export const generateColorPalletteForProfile = (primaryColor) => {
   const [h, s, l] = convertHexToHSL(primaryColor);

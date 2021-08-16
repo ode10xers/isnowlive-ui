@@ -18,6 +18,7 @@ export default {
     uploadImage: (payload) => http.post('/secure/upload?type=image', payload),
     uploadFile: (payload) => http.post('/secure/upload?type=document', payload),
     getSessionsByUsername: (type) => http.get(`/sessions/${type}`),
+    getAvailabilitiesByUsername: (type) => http.get(`/sessions/${type}?type=AVAILABILITY`),
     getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
@@ -50,6 +51,18 @@ export default {
       updateCreatorPayPalAccount: (payload) => http.patch('/secure/creator/profile/paypal', payload),
       getCreatorPayPalAccountDetails: () => http.get('/secure/creator/profile/paypal'),
     },
+  },
+  availabilities: {
+    getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),
+    getAvailabilityDetails: (sessionId) => http.get(`/session/${sessionId}`),
+    getDetails: (sessionId, startDate, endDate) =>
+      http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
+    create: (payload) => http.post('/secure/creator/sessions', payload),
+    update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
+    getPastAvailability: () => http.get('/secure/creator/inventories/past?type=AVAILABILITY'),
+    getUpcomingAvailability: () => http.get('/secure/creator/inventories/upcoming?type=AVAILABILITY'),
+    publishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
+    unpublishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>

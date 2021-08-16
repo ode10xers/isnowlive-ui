@@ -1,9 +1,29 @@
 @import '../../styles/variables.scss';
 
-.box {
+.sessionRegistrationWrapper {
+  // background: var(--passion-profile-light-color, #{map-get($colors, 'White1')});
   background: map-get($colors, 'White1');
+
   border-radius: 6px;
   padding: 15px;
+
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
+}
+
+.registrationTitle {
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+}
+
+.formContainer {
+  margin-top : 20px;
+  
+  // :global {
+  //   .ant-form-item-label {
+  //     label {
+  //       color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+  //     }
+  //   }
+  // }
 }
 
 .pwywInputWrapper {
@@ -20,6 +40,7 @@
 
 .smallText {
   font-size: 11px;
+  // color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
 }
 
 .card {
@@ -62,10 +83,24 @@
 .linkBtn {
   padding: 0px !important;
   cursor: pointer;
-  color: map-get($colors, 'DodgerBlue') !important;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
 
   &.setNewPassword {
     font-size: 15px !important;
+  }
+}
+
+.bookingHelpText {
+  margin-top : 10px;
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+}
+
+.bookBtn {
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+
+  &:disabled {
+    opacity : 0.7;
   }
 }
 
