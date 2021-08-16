@@ -1,7 +1,6 @@
 @import '../../../styles/variables.scss';
 
 .passDetailsPageContainer {
-  scroll-behavior: smooth;
   background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
   padding: 50px;
 
@@ -15,12 +14,10 @@
 
   @media screen and (max-width: 769px) {
     padding: 20px;
-    overflow-x: hidden;
   }
 
   @media screen and (max-width: 526px) {
     padding: 8px;
-    overflow-x: hidden;
   }
 }
 
@@ -221,6 +218,10 @@
 
     .passDetailItemIcon {
       margin-right: 8px;
+      
+      @media screen and (max-width: 526px) {
+        margin-right: 3px;
+      }
     }
   }
 
@@ -322,7 +323,6 @@
       z-index: 1;
       width: 100%;
       height: 100%;
-      // background: rgba(255, 255, 255, 0.85);
 
       display: flex;
       align-items: center;
@@ -331,7 +331,6 @@
         margin: auto;
         text-align: center;
         color: map-get($map: $colors, $key: 'Zeus') !important;
-        // color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
         font-size: 24px;
         cursor: pointer;
 
@@ -349,9 +348,11 @@
   }
 }
 
-.creatorProfileSection {
-  margin-bottom: 70px;
+.bottomOffset {
+  margin-bottom : 100px;
+}
 
+.creatorProfileSection {
   .creatorInfoContainer {
     .creatorName {
       color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
@@ -370,7 +371,6 @@
       span {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
           sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        // background-color: map-get($map: $colors, $key: 'White1') !important;
         background: transparent !important;
         color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
       }
@@ -381,7 +381,6 @@
       span {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
           sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        // background-color: map-get($map: $colors, $key: 'White1') !important;
         background: transparent !important;
         color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
       }

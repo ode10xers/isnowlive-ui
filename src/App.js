@@ -18,7 +18,7 @@ import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
-import AvailabilityDetails from 'pages/AvailabilityDetails';
+import AvailabilityDetails from 'pages/ProductDetails/AvailabilityDetails';
 import Session from 'pages/Session';
 import InventoryDetails from 'pages/InventoryDetails';
 import SessionDetails from 'pages/SessionDetails';
@@ -255,6 +255,11 @@ function App() {
               path={Routes.courseDetails}
               component={CourseDetails}
             />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              path={Routes.availabilityDetails}
+              component={AvailabilityDetails}
+            />
             <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
@@ -262,7 +267,6 @@ function App() {
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
-            <RouteWithLayout layout={NavbarLayout} path={Routes.availabilityDetails} component={AvailabilityDetails} />
             <RouteWithLayout
               layout={NavbarLayout}
               exact

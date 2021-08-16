@@ -1,18 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Col, Row, Space, Spin, Typography } from 'antd'
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Col, Row, Space, Spin, Typography } from 'antd';
 import { ClockCircleOutlined } from '@ant-design/icons';
 
-import apis from 'apis'
-import Routes from 'routes'
-import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
-import { isAPISuccess } from 'utils/helper'
+import apis from 'apis';
+import Routes from 'routes';
+import type { Session, UpcomingSessionInventory } from 'types/models/session';
 
 import AvailabilityListView from './AvailabilityListView';
-import AvailabilityEditView from './AvailabilityEditView'
+import AvailabilityEditView from './AvailabilityEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import ContainerCard from 'components/ContainerCard';
+// import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
-import styles from './style.module.scss'
-import type { Session, UpcomingSessionInventory } from 'types/models/session';
+import { isAPISuccess } from 'utils/helper';
+
+import styles from './style.module.scss';
 
 const { Text } = Typography;
 
@@ -124,7 +126,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
       )}
 
       <Col xs={isEditing ? 22 : 24}>
-        <DynamicProfileComponentContainer
+        <ContainerCard
           title={title ?? 'AVAILABILITY'}
           // @ts-ignore
           icon={<ClockCircleOutlined className={styles.mr10} />}
@@ -150,7 +152,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
               <AvailabilityListView availabilities={availableSessions} />
             </Spin>
           )}
-        </DynamicProfileComponentContainer>
+        </ContainerCard>
       </Col>
 
       {isEditing && (

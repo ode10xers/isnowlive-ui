@@ -1,7 +1,8 @@
 @import '../../../../styles/variables.scss';
 
-.availabilityItem {
-  padding: 12px;
+.availabilityImage {
+  align-self : center;
+  border-radius : 8px !important;
 }
 
 .availabilityInfoSeparator {
@@ -13,7 +14,7 @@
 .availabilityInfo {
   color: var(
     --passion-profile-darker-color,
-    var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
   ) !important;
   font-size: 14px;
   text-transform: uppercase;
@@ -21,8 +22,22 @@
 
 .availabilityTitle {
   font-size: 17px;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'PrussianBlue')}) !important;
 }
 
 .availabilityDescription {
-  font-size: 14px;
+  font-size: 11px !important;
+
+  height: 40px;
+  overflow: hidden;
+  margin-bottom : 0 !important;
+
+    p,
+    span {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      // background-color: map-get($map: $colors, $key: 'White1') !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+    }
 }

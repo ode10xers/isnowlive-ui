@@ -27,7 +27,7 @@ const TermsAndConditionsText = ({ shouldCheck = false, isChecked = false, setChe
       if (creatorUsername !== 'app') {
         const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
         if (isAPISuccess(status) && data) {
-          setCreatorName(`${data.first_name} ${data.last_name}`);
+          setCreatorName(`${data.first_name ?? ''} ${data.last_name ?? ''}`);
         }
       }
     } catch (error) {
@@ -40,19 +40,7 @@ const TermsAndConditionsText = ({ shouldCheck = false, isChecked = false, setChe
     getCreatorDetails();
   }, [getCreatorDetails]);
 
-  if (!shouldCheck) {
-    return (
-      <Paragraph type="secondary" className={classNames(styles.textAlignCenter, styles.smallText)}>
-        By paying, you agree to the{' '}
-        <Link href={`${generateUrlFromUsername(creatorUsername)}/terms`} target="_blank" underline>
-          waiver & refund policy
-        </Link>{' '}
-        set by {creatorName}
-      </Paragraph>
-    );
-  }
-
-  return (
+  return shouldCheck ? (
     <div className={styles.tncWrapper}>
       <Checkbox checked={isChecked} onChange={(e) => setChecked(e.target.checked)}>
         <Paragraph type="secondary" className={styles.smallText}>
@@ -72,6 +60,14 @@ const TermsAndConditionsText = ({ shouldCheck = false, isChecked = false, setChe
         </Paragraph>
       </Checkbox>
     </div>
+  ) : (
+    <Paragraph type="secondary" className={classNames(styles.textAlignCenter, styles.smallText)}>
+      By paying, you agree to the{' '}
+      <Link href={`${generateUrlFromUsername(creatorUsername)}/terms`} target="_blank" underline>
+        waiver & refund policy
+      </Link>{' '}
+      set by {creatorName}
+    </Paragraph>
   );
 };
 

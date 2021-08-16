@@ -1,23 +1,30 @@
-import { Button, Card, Col, Divider, Image, message, Row, Select, Typography } from 'antd'
-import apis from 'apis'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { match } from 'react-router'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import moment from 'moment'
+
 import HTMLReactParser from 'html-react-parser'
+import moment from 'moment'
 // @ts-ignore
 import classNames from 'classnames'
 
+import { Button, Card, Col, Divider, Image, message, Row, Select, Typography } from 'antd'
+import { CaretDownOutlined } from '@ant-design/icons'
+
+import apis from 'apis'
+
 import Loader from 'components/Loader'
 import SessionRegistration from 'components/SessionRegistration'
+
 import type { Session, SessionInventory } from 'types/models/session'
-import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper'
+
 import dateUtil from 'utils/date'
-import { isMobileDevice } from 'utils/device'
+// import { isMobileDevice } from 'utils/device'
+import { generateColorPalletteForProfile } from 'utils/colors'
+import { getUsernameFromUrl, isAPISuccess, reservedDomainName } from 'utils/helper'
+
+import useQueryParamState from 'hooks/useQueryParamState'
 
 import styles from './styles.module.scss';
-import useQueryParamState from 'hooks/useQueryParamState'
-import { generateColorPalletteForProfile } from 'utils/colors'
 
 const { formatDate: { getTimeDiff } } = dateUtil
 const { Paragraph, Text, Title } = Typography
@@ -26,13 +33,13 @@ export interface AvailabilityDetailsProps {
   match?: match<{ session_id: string }>
 }
 
-type AvailabilityDetailsView = 'all' | 'date' | 'form'
+type AvailabilityDetailsView = 'all' | 'date' | 'form';
 
 const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [availability, setAvailability] = useState<Session>()
   const [showLongDescription, setShowLongDescription] = useState(false)
-  const inventoreiesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(() =>
+  const inventoriesByDates = useMemo<Record<string, Record<string, SessionInventory[]>>>(() =>
     (availability?.inventory ?? [])
       .reduce((acc, inv) => {
         const momentStartTime = moment(inv.start_time)
@@ -43,23 +50,43 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       }, {} as Record<string, Record<string, SessionInventory[]>>),
     [availability],
   )
-  const months = useMemo<string[]>(() => Object.keys(inventoreiesByDates), [inventoreiesByDates])
+  const months = useMemo<string[]>(() => Object.keys(inventoriesByDates), [inventoriesByDates])
   const [selectedMonth, setSelectedMonth] = useQueryParamState('monthYear')
   useEffect(() => {
     if (selectedMonth === undefined) setSelectedMonth(months[0])
   }, [months, selectedMonth, setSelectedMonth])
   const dates = useMemo<string[]>(
-    () => selectedMonth && inventoreiesByDates[selectedMonth] !== undefined ? Object.keys(inventoreiesByDates[selectedMonth]) : [],
-    [inventoreiesByDates, selectedMonth],
+    () => selectedMonth && inventoriesByDates[selectedMonth] !== undefined ? Object.keys(inventoriesByDates[selectedMonth]) : [],
+    [inventoriesByDates, selectedMonth],
   )
-  const [selectedDate, setSelectedDate] = useQueryParamState('date')
-  const inventories = inventoreiesByDates[selectedMonth ?? '']?.[selectedDate ?? ''] ?? []
-  const [selectedInventoryId, setSelectedInventoryId] = useQueryParamState('inventory')
+  const [selectedDate, setSelectedDate] = useQueryParamState('date');
+  useEffect(() => {
+    if (selectedMonth) {
+      if (selectedDate === undefined) {
+        setSelectedDate(dates[0])
+      }
+    }
+  }, [selectedMonth, selectedDate, dates, setSelectedDate]);
+  
+  const inventories = inventoriesByDates[selectedMonth ?? '']?.[selectedDate ?? ''] ?? []
+  const [selectedInventoryId, setSelectedInventoryId] = useQueryParamState('inventory');
+  useEffect(() => {
+    if (selectedMonth && selectedDate) {
+      if (selectedInventoryId === undefined) {
+        const availableInventory = inventories.find((inv) => inv.num_participants === 0)?.inventory_id;
+        
+        if (availableInventory) {
+          setSelectedInventoryId(availableInventory);
+        }
+      }
+    }
+  }, [selectedMonth, selectedDate, selectedInventoryId, inventories, setSelectedInventoryId]);
   const selectedInventory = useMemo(
     () => availability?.inventory.find(inv => inv.inventory_id === Number(selectedInventoryId)),
     [availability, selectedInventoryId]
   )
-  const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
+  // const [view, setView] = useState<AvailabilityDetailsView>(isMobileDevice ? (selectedInventoryId ? 'form' : 'date') : 'all')
+  const [view, setView] = useState<AvailabilityDetailsView>('date');
 
   const fetchAvailabilityDetail = useCallback(async (session_id: string) => {
     setIsLoading(true)
@@ -97,7 +124,13 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     } else {
       message.error('Session details not found.');
     }
-  }, [fetchAvailabilityDetail, match, updateProfileColor])
+  }, [fetchAvailabilityDetail, match, updateProfileColor]);
+
+  useEffect(() => {
+    if (view === 'form') {
+      window.scrollTo({ left : 0, top : document.body.scrollHeight, behavior: 'smooth' });
+    }
+  }, [view]);
 
   const handleChangeMonth = useCallback((month: string) => {
     setSelectedMonth(month)
@@ -112,7 +145,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
   const handleChangeTime = useCallback((inventory: SessionInventory) => {
     if (inventory.num_participants < 1) {
-      setSelectedInventoryId(inventory.inventory_id)
+      setSelectedInventoryId(inventory.inventory_id);
     }
   }, [setSelectedInventoryId])
 
@@ -120,9 +153,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
     <>
       <Row>
         <Text className={styles.availabilityInfo}>
-          {availability?.currency.toUpperCase()}
-          {' '}
-          {availability?.price}
+          {availability?.total_price && availability?.total_price > 0 ? `${availability?.currency?.toUpperCase()} ${availability?.total_price}` : 'Free'}
         </Text>
         <Text className={styles.availabilityInfoSeparator}>
           {' ● '}
@@ -135,6 +166,11 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       <Title className={styles.availabilityTitle}>
         {availability?.name}
       </Title>
+      {availability?.is_offline && (
+        <Title className={styles.availabilityLocation}>
+          Location : {availability?.offline_event_address}
+        </Title>
+      )}
       <Paragraph
         className={styles.availabilityDescription}
         style={showLongDescription ? undefined : { maxHeight: 70, overflow: 'hidden' }}
@@ -144,16 +180,19 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
       {!showLongDescription && (
         <Button
           type="link"
+          className={styles.readMoreButton}
           onClick={() => setShowLongDescription(true)}
+          icon={<CaretDownOutlined />}
         >
           Read More
         </Button>
       )}
     </>
-  ), [availability, showLongDescription])
+  ), [availability, showLongDescription]);
 
   return (
-    // @ts-ignore
+    <div className={styles.availabilityPageContainer}>
+    {/* @ts-ignore */}
     <Loader loading={isLoading} size="large" text="Loading availability">
       <Image
         className={styles.availabilityHeaderImage}
@@ -162,25 +201,24 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         width="100%"
       />
 
-      {isMobileDevice ? (
-        <Row>
-          <Col xs={24}>
-            {heading}
-          </Col>
-        </Row>
-      ) : null}
-
+      <Row className={styles.mobileOnly}>
+        <Col xs={24}>
+          {heading}
+        </Col>
+      </Row>
 
       <Row className={styles.availabilityContentContainer} gutter={[30, 0]}>
-        {view === 'all' || view === 'date' ? (
-          <Col xs={isMobileDevice ? 24 : 16}>
-            {isMobileDevice ? null : heading}
+        {/* {view === 'all' || view === 'date' ? ( */}
+          <Col xs={24} lg={16} className={classNames(styles.dateView, view === 'form' ? styles.hidden : undefined)}>
+            <div className={styles.desktopOnly}>
+              {heading}
+            </div>
 
-            <Divider />
+            <Divider className={styles.availabilityDivider} />
 
             <Row align="middle" className={styles.availabilityTitleWrapper}>
               <Col xs={12}>
-                <Title className={styles.availabilitDateTitle}>
+                <Title id="date-selector-title" className={styles.availabilityDateTitle}>
                   Select Date
                 </Title>
               </Col>
@@ -194,18 +232,19 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               </Col>
             </Row>
 
-            <Swiper slidesPerView={isMobileDevice ? 4.2 : 7} spaceBetween={12}>
+            <Swiper slidesPerView={4.2} spaceBetween={12} breakpoints={{ 768 : { slidesPerView : 7, spaceBetween: 12 } }}>
               {dates.map(date => {
                 const momentDate = moment(date)
                 const dateString = momentDate.format('YYYY-MM-DD')
                 const isSelected = dateString === selectedDate
 
                 return (
-                  <SwiperSlide>
+                  <SwiperSlide key={dateString}>
                     <Card
                       bordered={false}
+                      style={{ borderRadius: 14, }}
                       bodyStyle={{
-                        backgroundColor: isSelected ? 'var(--passion-profile-lightest-color)' : undefined,
+                        backgroundColor: isSelected ? 'var(--passion-profile-darker-color)' : undefined,
                         border: isSelected ? '1.8px solid var(--passion-profile-darker-color)' : '1.8px solid #D9D9D9',
                         borderRadius: 14,
                         marginBottom: 1,
@@ -243,13 +282,13 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
                 <Row align="middle" className={styles.availabilityTitleWrapper}>
                   <Col xs={24}>
-                    <Title className={styles.availabilitDateTitle}>
+                    <Title className={styles.availabilityDateTitle}>
                       Select Time Slot
                     </Title>
                   </Col>
                 </Row>
 
-                <Row>
+                <Row gutter={[8, 8]}>
                   {inventories.map(inv => {
                     const momentStartTime = moment(inv.start_time)
                     const momentEndTime = moment(inv.end_time)
@@ -257,11 +296,11 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                     const isBooked = inv.num_participants > 0
 
                     return (
-                      <Col xs={8}>
+                      <Col xs={8} key={inv.inventory_external_id}>
                         <Card
                           bordered={false}
                           bodyStyle={{
-                            backgroundColor: isSelected ? 'var(--passion-profile-lightest-color)' : undefined,
+                            backgroundColor: isSelected ? 'var(--passion-profile-darker-color)' : undefined,
                             border: isSelected ? '1.8px solid var(--passion-profile-darker-color)' : '1.8px solid #D9D9D9',
                             borderRadius: 14,
                             marginBottom: 1,
@@ -292,7 +331,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
                               )
                             }
                           >
-                            {isSelected ? 'Selected' : (isBooked ? 'Booked' : 'Available')}
+                            {isBooked ? 'Booked' : (isSelected ? 'Selected' : 'Available')}
                           </Paragraph>
                         </Card>
                       </Col>
@@ -302,38 +341,39 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
               </>
             ) : null}
 
-            {isMobileDevice ? (
-              <Button
-                block
-                className={styles.mt20}
-                disabled={!selectedInventory}
-                onClick={() => setView('form')}
-                size="large"
-                type="primary"
-              >
-                Confirm Booking
-              </Button>
-            ) : null}
+            <Button
+              block
+              className={styles.confirmBookingButton}
+              disabled={!selectedInventory}
+              onClick={() => setView('form')}
+              size="large"
+              type="primary"
+            >
+              Confirm Booking
+            </Button>
           </Col>
-        ) : null}
+        {/* ) : null} */}
 
-        {view === 'all' || view === 'form' ? (
-          <Col xs={isMobileDevice ? 24 : 8}>
-            {isMobileDevice ? (
-              <Button block onClick={() => setView('date')} size="large" type="primary">
-                Change Date
-              </Button>
-            ) : null}
+        {/* {view === 'all' || view === 'form' ? ( */}
+          <Col xs={24} lg={8} className={classNames(styles.formView, view === 'date' ? styles.hidden : undefined)}>
+            <Button ghost block className={styles.changeDateButton} onClick={() => setView('date')} size="large" type="primary">
+              Change Date
+            </Button>
 
-            <SessionRegistration
-              classDetails={selectedInventory}
-              fullWidth
-              isInventoryDetails={true}
-            />
+            <Loader loading={isLoading} text="Processing...">
+            {availability && (
+              <SessionRegistration
+                fullWidth
+                classDetails={{ ...selectedInventory, ...availability, }}
+                isInventoryDetails={true}
+              />
+            )}
+            </Loader>
           </Col>
-        ) : null}
+        {/* ) : null} */}
       </Row>
     </Loader>
+    </div>
   )
 }
 

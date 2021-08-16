@@ -19,6 +19,7 @@ import {
 import apis from 'apis';
 
 import AuthModal from 'components/AuthModal';
+import { generateCardHeadingStyle } from 'components/ContainerCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
@@ -41,7 +42,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { generateCardHeadingStyle } from 'components/ContainerCard';
 
 // TODO: Move these later to a separate file/constants be used everywhere it is needed
 // TODO: Use a better version of these icons according to the design
@@ -502,33 +502,35 @@ const PassDetails = ({ match, history }) => {
     );
 
   const creatorProfileSection = (
-    <Row gutter={[8, 20]} className={styles.creatorProfileSection}>
-      <Col xs={24}>
-        <Space size={32}>
-          <Avatar size={72} src={creatorProfile?.profile_image_url} className={styles.creatorProfileImage} />
-          <div className={styles.creatorInfoContainer}>
-            <Title level={5} className={styles.creatorName}>
-              {' '}
-              {creatorProfile?.first_name} {creatorProfile?.last_name}{' '}
-            </Title>
-            <Text className={styles.joinTimeText}> Joined on {toMonthYear(creatorProfile?.signup_date)} </Text>
-          </div>
-        </Space>
-      </Col>
-      <Col xs={24} className={styles.creatorBio}>
-        {shouldExpandCreatorBio ? (
-          <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
-        ) : (
-          <>
-            <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
-            <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
-              READ MORE <CaretDownOutlined />
+    <div className={styles.bottomOffset}>
+      <Row gutter={[8, 20]} className={styles.creatorProfileSection}>
+        <Col xs={24}>
+          <Space size={32}>
+            <Avatar size={72} src={creatorProfile?.profile_image_url} className={styles.creatorProfileImage} />
+            <div className={styles.creatorInfoContainer}>
+              <Title level={5} className={styles.creatorName}>
+                {' '}
+                {creatorProfile?.first_name} {creatorProfile?.last_name}{' '}
+              </Title>
+              <Text className={styles.joinTimeText}> Joined on {toMonthYear(creatorProfile?.signup_date)} </Text>
             </div>
-          </>
-        )}
-      </Col>
-      {renderCreatorExternalLinks()}
-    </Row>
+          </Space>
+        </Col>
+        <Col xs={24} className={styles.creatorBio}>
+          {shouldExpandCreatorBio ? (
+            <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+          ) : (
+            <>
+              <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+              <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
+                READ MORE <CaretDownOutlined />
+              </div>
+            </>
+          )}
+        </Col>
+        {renderCreatorExternalLinks()}
+      </Row>
+    </div>
   );
 
   const buySection = (
@@ -602,7 +604,7 @@ const PassDetails = ({ match, history }) => {
     <div className={styles.mobileStickyTopContainer}>
       <Affix offsetTop={72}>
         <Row className={styles.mobileStickyTop} onClick={handleMobileTopStickyClicked}>
-          <Col flex="1 1 auto">
+          <Col xs={22}>
             <Row align="center">
               <Col xs={24}>
                 <Text className={styles.stickyTopPassName}>{selectedPassDetails?.name}</Text>
@@ -615,7 +617,7 @@ const PassDetails = ({ match, history }) => {
               </Col>
             </Row>
           </Col>
-          <Col flex="0 0 20px">
+          <Col xs={2} className={styles.textAlignRight}>
             <CaretDownOutlined className={styles.dropdownIcon} />
           </Col>
         </Row>
