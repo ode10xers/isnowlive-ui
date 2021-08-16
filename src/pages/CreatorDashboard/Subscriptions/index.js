@@ -1,22 +1,29 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 
-import { Row, Col, Button, Typography, List, Modal, Divider, Space } from 'antd';
+import { Row, Col, Button, Typography, List, Modal, Divider, Space, Result } from 'antd';
+import { ToolOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
-
-import { isAPISuccess } from 'utils/helper';
 
 import Loader from 'components/Loader';
 import CreateSubscriptionCard from 'components/CreateSubscriptionCard';
 import SubscriptionCards from 'components/SubscriptionCards';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
+import { isAPISuccess } from 'utils/helper';
+import { paymentProvider } from 'utils/constants';
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './styles.module.scss';
 
 const { Title, Text, Paragraph } = Typography;
 
 const Subscriptions = () => {
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [subscriptions, setSubscriptions] = useState([]);
@@ -289,13 +296,31 @@ const Subscriptions = () => {
         <Col xs={24}>
           <Title level={4}> Memberships </Title>
         </Col>
-        <Col xs={24}>
-          <Loader size="large" loading={isLoading} text="Fetching memberships...">
-            <Space split={<Divider type="horizontal" />} direction="vertical" className={styles.creatorMembershipList}>
-              {renderSubscriptionRows()}
-            </Space>
-          </Loader>
-        </Col>
+        {userDetails?.profile?.payment_provider === paymentProvider.PAYPAL ? (
+          <Col xs={24}>
+            <Row justify="center">
+              <Col xs={12}>
+                <Result
+                  icon={<ToolOutlined />}
+                  title="Support for memberships for PayPal creator is coming!"
+                  subTitle="Membership and recurring payments for PayPal Creator is not yet supported, but we are working hard on realizing it! Thank you for your patience and support for us, we will let you know once you can use this."
+                />
+              </Col>
+            </Row>
+          </Col>
+        ) : (
+          <Col xs={24}>
+            <Loader size="large" loading={isLoading} text="Fetching memberships...">
+              <Space
+                split={<Divider type="horizontal" />}
+                direction="vertical"
+                className={styles.creatorMembershipList}
+              >
+                {renderSubscriptionRows()}
+              </Space>
+            </Loader>
+          </Col>
+        )}
       </Row>
     </div>
   );

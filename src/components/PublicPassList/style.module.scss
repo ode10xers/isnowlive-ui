@@ -1,13 +1,46 @@
 @import '../../styles/variables.scss';
 
+.passListContainer {
+  padding: 20px;
+
+  :global {
+    .ant-table-thead {
+      th {
+        background-color: var(--pass-plugin-heading-background-color) !important;
+        color: var(--pass-plugin-heading-text-color) !important;
+      }
+    }
+  }
+}
+
 .card {
   margin-top: 10px !important;
+
+  :global {
+    .ant-card-head {
+      background-color: var(--pass-plugin-heading-background-color) !important;
+      color: var(--pass-plugin-heading-text-color) !important;
+    }
+
+    .ant-card-body, .ant-card-actions {
+      background-color: var(--pass-plugin-table-background-color) !important;
+      color: var(--pass-plugin-table-text-color) !important;
+    }
+  }
+
+  .cardHeadingText {
+    color: var(--pass-plugin-heading-text-color) !important;
+  }
+
+  .cardContentText {
+    color: var(--pass-plugin-table-text-color) !important;
+  }
 }
 
 .cardExpansion {
-  border: 1px solid map-get($map: $colors, $key: 'White1');
-  background-color: map-get($map: $colors, $key: 'White');
-  padding: 8px;
+  // border: 1px solid map-get($map: $colors, $key: 'White1');
+  background-color: transparent;
+  padding: 4px;
 }
 
 .passDetailsContainer {
@@ -16,4 +49,23 @@
   margin-top: 10px;
   margin-bottom: 16px;
   padding: 10px;
+}
+
+.descText {
+  color : var(--pass-plugin-desc-text-color, map-get($colors, 'Black')) !important;
+}
+
+.passListRow {
+  background-color :var(--pass-plugin-table-background-color);
+  color :var(--pass-plugin-table-text-color);
+}
+
+.expandButton, .purchaseButton {
+  background-color: var(--pass-plugin-cta-background-color) !important; 
+  border-color: var(--pass-plugin-cta-background-color) !important;
+  color: var(--pass-plugin-cta-text-color) !important;
+}
+
+.seeMoreButton {
+  color: var(--pass-plugin-cta-background-color) !important;
 }

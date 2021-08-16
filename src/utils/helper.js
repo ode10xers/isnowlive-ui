@@ -98,7 +98,7 @@ export const getCurrencyList = async () => {
     const currencyList = await fetch('https://openexchangerates.org/api/currencies.json').then((res) => res.json());
     return currencyList;
   } catch (error) {
-    console.log('Failed to load currency list', error?.response?.error);
+    console.error(error);
   }
 };
 
