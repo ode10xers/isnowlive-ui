@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 import { Row, Col, Button } from 'antd';
 
+import { isMobileDevice } from 'utils/device';
 import Routes from 'routes';
 
 import VideoListCard from '../VideoListCard';
@@ -23,7 +24,7 @@ const VideoListView = ({ limit = 2, videos = [], profileColor }) => {
   const history = useHistory();
 
   const renderVideoCards = (video) => (
-    <Col xs={24} sm={12} key={video.external_id}>
+    <Col xs={24} sm={8} key={video.external_id} className={isMobileDevice ? styles.videoHorizontalScroll : ''}>
       <VideoListCard video={video} />
     </Col>
   );

@@ -31,7 +31,7 @@ const SessionListView = ({ limit = 2, sessions = [], profileColor }) => {
   // };
 
   const renderSessionCards = (session) => (
-    <Col xs={24} sm={12} key={`${session.session_external_id}_${session?.inventory_id}`}>
+    <Col xs={24} sm={8} key={`${session.session_external_id}_${session?.inventory_id}`}>
       <SessionListCard session={session} />
     </Col>
   );

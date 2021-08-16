@@ -23,11 +23,13 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 import AvailabilityProfileComponent from 'components/DynamicProfileComponents/AvailabilityProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
+import VideosProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
+import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
 
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
-import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
+// import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
 
 import {
   deepCloneObject,
@@ -65,32 +67,32 @@ const componentsMap = {
       values: null,
     },
   },
-  PRODUCTS: {
-    icon: <LikeOutlined />,
-    component: ProductsProfileComponent,
-    label: 'Products',
-    optional: false,
-    defaultProps: {
-      title: '',
-      values: [
-        {
-          key: 'SESSIONS',
-          title: 'My Sessions',
-          values: null,
-        },
-        {
-          key: 'COURSES',
-          title: 'My Courses',
-          values: null,
-        },
-        {
-          key: 'VIDEOS',
-          title: 'My Videos',
-          values: null,
-        },
-      ],
-    },
-  },
+  // PRODUCTS: {
+  //   icon: <LikeOutlined />,
+  //   component: ProductsProfileComponent,
+  //   label: 'Products',
+  //   optional: false,
+  //   defaultProps: {
+  //     title: '',
+  //     values: [
+  //       {
+  //         key: 'SESSIONS',
+  //         title: 'My Sessions',
+  //         values: null,
+  //       },
+  //       {
+  //         key: 'COURSES',
+  //         title: 'My Courses',
+  //         values: null,
+  //       },
+  //       {
+  //         key: 'VIDEOS',
+  //         title: 'My Videos',
+  //         values: null,
+  //       },
+  //     ],
+  //   },
+  // },
   PASSES: {
     icon: <LikeOutlined />,
     label: 'Passes',
@@ -131,32 +133,42 @@ const componentsMap = {
       values: null,
     },
   },
-  // COURSES: {
-  //   icon: <LikeOutlined />,
-  //   label: 'Courses',
-  //   optional: false,
-  //   component: ProductsProfileComponent,
-  //   defaultProps: {
-  //     title: 'My Courses',
-  //     values: null,
-  //   },
-  // },
-  // VIDEOS: {
-  //   icon: <LikeOutlined />,
-  //   label: 'Videos',
-  //   optional: false,
-  //   component: ProductsProfileComponent,
-  //   defaultProps: {
-  //     title: 'My Videos',
-  //     values: null,
-  //   },
-  // },
+  COURSES: {
+    icon: <LikeOutlined />,
+    label: 'Courses',
+    optional: false,
+    component: CoursesProfileComponent,
+    defaultProps: {
+      title: 'My Courses',
+      values: null,
+    },
+  },
+  VIDEOS: {
+    icon: <LikeOutlined />,
+    label: 'Videos',
+    optional: false,
+    component: VideosProfileComponent,
+    defaultProps: {
+      title: 'My Videos',
+      values: null,
+    },
+  },
 };
 
 const sectionData = [
   {
+    key: 'VIDEOS',
+    title: 'My Vidoes',
+    values: null,
+  },
+  {
     key: 'SESSIONS',
     title: 'My Sessions',
+    values: null,
+  },
+  {
+    key: 'COURSES',
+    title: 'My Courses',
     values: null,
   },
   {

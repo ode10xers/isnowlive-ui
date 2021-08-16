@@ -43,8 +43,8 @@ const CoursesListView = ({ limit = 2, courses = [], profileColor }) => {
   return (
     <div>
       {courses.length > 0 && (
-        <Row gutter={[8, 16]}>
-          {courses.slice(0, limit).map(renderCourseCards)}
+        <Row>
+          <Col span={16}>{courses.slice(0, limit).map(renderCourseCards)}</Col>
           {courses.length > limit && (
             <Col xs={24}>
               <Row justify="center">

@@ -99,9 +99,9 @@ const CourseListItem = ({ course }) => {
   return (
     <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
       <Row>
-        <Col xs={24}>{courseName}</Col>
-        <Col xs={24}>{courseContents}</Col>
-        <Col xs={24}>{bottomCardBar}</Col>
+        <Col xs={8}>{courseName}</Col>
+        <Col xs={8}>{courseContents}</Col>
+        <Col xs={8}>{bottomCardBar}</Col>
       </Row>
     </Card>
   );

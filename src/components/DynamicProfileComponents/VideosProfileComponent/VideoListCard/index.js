@@ -1,22 +1,28 @@
 import React from 'react';
 
-import { Card, Typography, Image, Row, Col } from 'antd';
+import { Card, Typography, Image, Row, Col, Space } from 'antd';
 
+import dateUtil from 'utils/date';
 import { isValidFile, preventDefaults } from 'utils/helper';
 import { redirectToVideosPage } from 'utils/redirect';
-
+import { PlayCircleOutlined } from '@ant-design/icons';
 import styles from './style.module.scss';
+
 const DefaultImage = require('assets/images/greybg.jpg');
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
+
+const {
+  formatDate: { getVideoDuration },
+} = dateUtil;
 
 const VideoListCard = ({ video }) => {
-  // const videoDuration = (
-  //   <Space size={4} align="middle">
-  //     <PlayCircleOutlined className={styles.textIcons} />
-  //     <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
-  //   </Space>
-  // );
+  const videoDuration = (
+    <Space size={4} align="middle">
+      <PlayCircleOutlined className={styles.textIcons} />
+      <Text className={styles.videoDuration}> {getVideoDuration(video?.duration)} </Text>
+    </Space>
+  );
 
   const videoImage = (
     <div className={styles.videoCoverContainer}>
@@ -27,7 +33,7 @@ const VideoListCard = ({ video }) => {
           src={isValidFile(video?.thumbnail_url) ? video?.thumbnail_url : DefaultImage}
         />
       </div>
-      {/* <div className={styles.videoDurationContainer}>{videoDuration}</div> */}
+      <div className={styles.videoDurationContainer}>{videoDuration}</div>
     </div>
   );
 
@@ -37,26 +43,26 @@ const VideoListCard = ({ video }) => {
     </Title>
   );
 
-  // const renderVideoPrice = () => {
-  //   if (video?.pay_what_you_want) {
-  //     return 'Flexible';
-  //   } else if (video?.total_price === 0 || video?.currency === '') {
-  //     return 'Free';
-  //   } else {
-  //     return `${video?.currency?.toUpperCase()} ${video?.total_price}`;
-  //   }
-  // };
+  const renderVideoPrice = () => {
+    if (video?.pay_what_you_want) {
+      return 'Flexible';
+    } else if (video?.total_price === 0 || video?.currency === '') {
+      return 'Free';
+    } else {
+      return `${video?.currency?.toUpperCase()} ${video?.total_price}`;
+    }
+  };
 
-  // const bottomCardBar = (
-  //   <Row className={styles.cardFooter}>
-  //     <Col xs={14} className={styles.videoValidity}>
-  //       VALIDITY : {video?.validity} DAY{video?.validity > 1 ? 'S' : ''}
-  //     </Col>
-  //     <Col xs={10} className={styles.priceText}>
-  //       {renderVideoPrice()}
-  //     </Col>
-  //   </Row>
-  // );
+  const bottomCardBar = (
+    <Row className={styles.cardFooter}>
+      {/* <Col xs={14} className={styles.videoValidity}>
+        VALIDITY : {video?.validity} DAY{video?.validity > 1 ? 'S' : ''}
+      </Col> */}
+      <Col xs={10} className={styles.priceText}>
+        {renderVideoPrice()}
+      </Col>
+    </Row>
+  );
 
   const handleCardClicked = (e) => {
     preventDefaults(e);
@@ -73,7 +79,7 @@ const VideoListCard = ({ video }) => {
     >
       <Row>
         <Col xs={24}>{videoTitle}</Col>
-        {/* <Col xs={24}>{bottomCardBar}</Col> */}
+        <Col xs={24}>{bottomCardBar}</Col>
       </Row>
     </Card>
   );
