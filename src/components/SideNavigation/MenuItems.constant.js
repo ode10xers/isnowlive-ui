@@ -98,33 +98,27 @@ export const creatorMenuItems = [
         mixPanelTag: creator.click.dashboard.manageSessions,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageSessions,
       },
-      // {
-      //   key: 'create_session',
-      //   title: 'Create Session',
-      //   mixPanelTag: creator.click.dashboard.createSession,
-      //   path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions,
-      // },
     ]
       .map(attachOrderProperty(1))
       .map(attachGeneratedKeyProperty('title')),
   },
   {
     key: 'availabilities',
-    title: 'Availabilities',
+    title: 'Private Appointments',
     icon: <ClockCircleOutlined />,
     children: [
       {
-        title: 'Upcoming Availabilities',
+        title: 'Upcoming Appointments',
         mixPanelTag: creator.click.dashboard.upcomingAvailabilities,
         path: Routes.creatorDashboard.rootPath + '/availabilities/upcoming',
       },
       {
-        title: 'Past Availabilities',
+        title: 'Past Appointments',
         mixPanelTag: creator.click.dashboard.pastAvailabilities,
         path: Routes.creatorDashboard.rootPath + '/availabilities/past',
       },
       {
-        title: 'Manage Availabilities',
+        title: 'Manage Availability',
         mixPanelTag: creator.click.dashboard.manageSessions,
         path: Routes.creatorDashboard.rootPath + Routes.creatorDashboard.manageAvailabilities,
       },
