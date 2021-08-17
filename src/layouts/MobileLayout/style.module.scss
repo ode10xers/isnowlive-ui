@@ -1,7 +1,7 @@
 @import '../../styles/variables.scss';
 
 // We'll be basing the max-width on Ant Design's md breakpoint (768px)
-$navbar-height: 66px;
+$navbar-height: 64px;
 
 .mainContainer {
   height: 100%;
@@ -21,7 +21,7 @@ $navbar-height: 66px;
 }
 
 .topHeader {
-  background-color: map-get($colors, 'White') !important;
+  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')}) !important;
   border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
   padding: 0 20px !important;
   position: fixed;

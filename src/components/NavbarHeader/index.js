@@ -198,13 +198,12 @@ const NavbarHeader = () => {
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
               <Menu
                 mode="horizontal"
+                className={styles.menuContainer}
                 overflowedIndicator={
                   <Button ghost type="primary" className={styles.menuIndicator}>
-                    {' '}
-                    Menu{' '}
+                    Menu
                   </Button>
                 }
-                className={styles.menuContainer}
               >
                 <Menu.Item key="Home" onClick={() => history.push(Routes.root)}>
                   Site Home
@@ -331,6 +330,7 @@ const NavbarHeader = () => {
               </Row>
               <Modal
                 style={{ top: 0, margin: 0, maxWidth: '100vw' }}
+                bodyStyle={{ backgroundColor: `var(--passion-profile-lightest-color, white)` }}
                 className={styles.mobileMenuModal}
                 visible={showMobileMenu}
                 footer={null}
@@ -523,7 +523,13 @@ const NavbarHeader = () => {
                             </Button>
                           </Col>
                           <Col xs={12}>
-                            <Button block type="default" onClick={() => showSignUpModal()}>
+                            <Button
+                              className={styles.mobileSignUpBtn}
+                              ghost
+                              block
+                              type="primary"
+                              onClick={() => showSignUpModal()}
+                            >
                               Sign Up
                             </Button>
                           </Col>

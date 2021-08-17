@@ -109,11 +109,13 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
   return (
     <Row className={styles.creatorProfileWrapper}>
       <Col xs={24} className={styles.coverImageWrapper}>
-        {cover_image_url ? (
-          <Image preview={false} width="100%" className={styles.coverImage} src={cover_image_url ?? 'error'} />
-        ) : (
-          <Skeleton.Image height={320} />
-        )}
+        <Image
+          placeholder={<Skeleton.Image loading={true} width="100%" className={styles.coverImage} />}
+          preview={false}
+          width="100%"
+          className={styles.coverImage}
+          src={cover_image_url ?? 'error'}
+        />
       </Col>
       <Col
         xs={24}
@@ -126,11 +128,17 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
           <Col xs={24} className={styles.profileImageWrapper}>
             <Row justify="center">
               <Col>
-                {profile_image_url ? (
-                  <Image className={styles.profileImage} preview={false} src={profile_image_url || 'error'} />
-                ) : (
-                  <Skeleton avatar shape="circle" size="large" />
-                )}
+                <Image
+                  placeholder={
+                    <Skeleton
+                      loading={true}
+                      avatar={{ shape: 'circle', size: 'large', className: styles.profileImage }}
+                    />
+                  }
+                  className={styles.profileImage}
+                  preview={false}
+                  src={profile_image_url ?? 'error'}
+                />
               </Col>
             </Row>
           </Col>
