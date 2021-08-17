@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Row, Col, Button, Form, Select, Input, Space, Typography, Card, Empty, Tooltip, Modal } from 'antd';
+import { Row, Col, Button, Form, Select, Input, Space, Radio, Typography, Card, Empty, Tooltip, Modal } from 'antd';
 import { SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -16,12 +16,24 @@ import styles from './styles.module.scss';
 const { Text, Title, Paragraph } = Typography;
 const { Search } = Input;
 
+const memberViews = {
+  ACTIVE: {
+    label: 'Active Members',
+    value: 'active',
+  },
+  ARCHIVED: {
+    label: 'Deactivated Members',
+    value: 'archive',
+  },
+};
+
 const MembersList = () => {
   const [form] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
   const [membersList, setMembersList] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [archiveView, setArchiveView] = useState(memberViews.ACTIVE.value);
 
   const [searchString, setSearchString] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -48,30 +60,33 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMembersList = useCallback(async (pageNumber, itemsPerPage, searchString = null) => {
-    setIsLoading(true);
+  const fetchCreatorMembersList = useCallback(
+    async (pageNumber, itemsPerPage, searchString = null, fetchArchived = false) => {
+      setIsLoading(true);
 
-    try {
-      const { status, data } =
-        searchString && searchString.length > 0
-          ? await apis.audiences.searchCreatorMembers(pageNumber, itemsPerPage, searchString)
-          : await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage);
+      try {
+        const { status, data } =
+          searchString && searchString.length > 0
+            ? await apis.audiences.searchCreatorMembers(pageNumber, itemsPerPage, fetchArchived, searchString)
+            : await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage, fetchArchived);
 
-      if (isAPISuccess(status) && data) {
-        setMembersList((memberList) => [...memberList, ...data.data]);
-        setCanShowMore(data.next_page);
+        if (isAPISuccess(status) && data) {
+          setMembersList((memberList) => [...memberList, ...data.data]);
+          setCanShowMore(data.next_page);
+        }
+      } catch (error) {
+        if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
+          showErrorModal(
+            'Failed fetching creator members list',
+            error?.response?.data?.message || 'Something went wrong.'
+          );
+        }
       }
-    } catch (error) {
-      if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
-        showErrorModal(
-          'Failed fetching creator members list',
-          error?.response?.data?.message || 'Something went wrong.'
-        );
-      }
-    }
 
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    },
+    []
+  );
 
   const fetchCreatorPrivateCommunityFlag = useCallback(async () => {
     setIsLoading(false);
@@ -120,8 +135,8 @@ const MembersList = () => {
   }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
-    fetchCreatorMembersList(pageNumber, totalItemsPerPage, searchString);
-  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage, searchString]);
+    fetchCreatorMembersList(pageNumber, totalItemsPerPage, searchString, archiveView === memberViews.ARCHIVED.value);
+  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage, searchString, archiveView]);
 
   const updateSelectedMemberTag = async () => {
     if (!selectedMember) {
@@ -193,6 +208,27 @@ const MembersList = () => {
     setIsLoading(false);
   };
 
+  const reactivateMember = async (memberId) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        external_ids: [memberId],
+      };
+
+      const { status, data } = await apis.audiences.reactivateCreatorMembers(payload);
+
+      if (isAPISuccess(status) && data?.success) {
+        showSuccessModal('Member has been reactivated!');
+        setMembersList((prevList) => prevList.filter((member) => member.id !== memberId));
+      }
+    } catch (error) {
+      showErrorModal('Failed reactivating member', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
   const handleBanMemberClicked = (memberId) => {
     Modal.confirm({
       title: 'Remove member?',
@@ -215,6 +251,12 @@ const MembersList = () => {
     setPageNumber(1);
     setMembersList([]);
     setSearchString(searchInput ?? null);
+  };
+
+  const handleArchiveViewChanged = (e) => {
+    setArchiveView(e.target.value);
+    setPageNumber(1);
+    setMembersList([]);
   };
 
   const generateMembersListColumns = useCallback(
@@ -323,7 +365,11 @@ const MembersList = () => {
           key: 'is_approved',
           width: '280px',
           render: (text, record) =>
-            record.is_approved ? (
+            archiveView === memberViews.ARCHIVED.value ? (
+              <Button type="primary" onClick={() => reactivateMember(record.id)}>
+                Reactivate
+              </Button>
+            ) : record.is_approved ? (
               <Row align="middle" gutter={[12, 12]}>
                 <Col>
                   <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
@@ -346,7 +392,7 @@ const MembersList = () => {
 
       return initialColumns;
     }, //eslint-disable-next-line
-    [creatorMemberTags, isPrivateCommunity, selectedMember]
+    [creatorMemberTags, isPrivateCommunity, selectedMember, archiveView]
   );
 
   const renderMobileMembersCard = (member) => {
@@ -438,6 +484,15 @@ const MembersList = () => {
           <Paragraph type="secondary" className={styles.mt10}>
             To see all members, empty the search bar and hit Search again
           </Paragraph>
+        </Col>
+        <Col xs={24}>
+          <Radio.Group size="large" value={archiveView} onChange={handleArchiveViewChanged}>
+            {Object.values(memberViews).map((view) => (
+              <Radio.Button key={view.value} value={view.value}>
+                {view.label}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
         </Col>
         <Col xs={24}>
           <Form form={form} scrollToFirstError={true}>

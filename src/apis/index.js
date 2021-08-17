@@ -202,10 +202,15 @@ export default {
       http.get(`/secure/customer/subscriptions/orders/?course_id=${courseId}`),
   },
   audiences: {
-    searchCreatorMembers: (pageNo, perPage, searchString) =>
-      http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&text=${searchString}`),
-    getCreatorMembers: (pageNo, perPage) =>
-      http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}`),
+    reactivateCreatorMembers: (payload) => http.post('/secure/creator/audience/archive/reset', payload),
+    searchCreatorMembers: (pageNo, perPage, fetchArchived = false, searchString) =>
+      http.get(
+        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}&text=${searchString}`
+      ),
+    getCreatorMembers: (pageNo, perPage, fetchArchived = false) =>
+      http.get(
+        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
+      ),
     getCreatorAudiences: (pageNo, perPage) =>
       http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
