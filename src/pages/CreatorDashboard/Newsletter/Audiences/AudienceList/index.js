@@ -16,6 +16,7 @@ import SendAudienceEmailModal from 'components/SendAudienceEmailModal';
 const { Title, Text } = Typography;
 
 // NOTE: Cyrrently this is not used and the logic is combined in EmailList
+/** @deprecated */
 const AudienceList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [audienceList, setAudienceList] = useState([]);
@@ -49,7 +50,7 @@ const AudienceList = () => {
   const deleteAudience = async (audience) => {
     try {
       const { status } = await apis.audiences.deleteAudienceFromList({
-        id: [audience.id],
+        external_ids: [audience.id],
       });
 
       if (isAPISuccess(status)) {

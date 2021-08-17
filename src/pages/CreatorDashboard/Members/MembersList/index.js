@@ -167,15 +167,14 @@ const MembersList = () => {
 
     try {
       const payload = {
-        external_id: memberId,
-        is_approved: false,
+        external_ids: [memberId],
       };
 
-      const { status } = await apis.audiences.setCreatorMemberRequestApproval(payload);
+      const { status } = await apis.audiences.deleteAudienceFromList(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('Member has been removed!');
-        updateMemberApprovalStatus(memberId, false);
+        setMembersList((prevList) => prevList.filter((member) => member.id !== memberId));
       }
     } catch (error) {
       showErrorModal('Failed removing member', error?.response?.data?.message || 'Something went wrong.');

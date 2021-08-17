@@ -77,7 +77,11 @@ const Audiences = () => {
     <div className={styles.mb20}>
       <Radio.Group size="large" value={selectedTab} onChange={handleRadioTabChange}>
         {Array.isArray(props.panes) ? (
-          props.panes.map((pane) => <Radio.Button value={pane.key}>{pane.props.tab}</Radio.Button>)
+          props.panes.map((pane) => (
+            <Radio.Button key={pane.key} value={pane.key}>
+              {pane.props.tab}
+            </Radio.Button>
+          ))
         ) : (
           <Radio.Button value={props.panes.key}>{props.panes.props.tab}</Radio.Button>
         )}
