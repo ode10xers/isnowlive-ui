@@ -105,6 +105,12 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
+  const resetUIState = () => {
+    setPageNumber(1);
+    setMembersList([]);
+    setSelectedMember(null);
+  };
+
   const updateMemberTag = (tagId) => {
     const selectedMemberIndex = membersList.findIndex((member) => member.id === selectedMember.id);
 
@@ -248,15 +254,13 @@ const MembersList = () => {
 
   const handleMemberSearch = (value) => {
     const searchInput = encodeURI(value.trim());
-    setPageNumber(1);
-    setMembersList([]);
+    resetUIState();
     setSearchString(searchInput ?? null);
   };
 
   const handleArchiveViewChanged = (e) => {
+    resetUIState();
     setArchiveView(e.target.value);
-    setPageNumber(1);
-    setMembersList([]);
   };
 
   const generateMembersListColumns = useCallback(
