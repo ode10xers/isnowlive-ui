@@ -518,6 +518,17 @@ const MembersList = () => {
                 {membersList.length > 0 ? (
                   <Row gutter={[8, 8]} justify="center">
                     {membersList.map(renderMobileMembersCard)}
+                    <Col xs={24}>
+                      <Button
+                        block
+                        type="default"
+                        loading={isLoading}
+                        disabled={!canShowMore}
+                        onClick={() => setPageNumber(pageNumber + 1)}
+                      >
+                        Show more members
+                      </Button>
+                    </Col>
                   </Row>
                 ) : (
                   <Empty description="No members found" />
