@@ -694,7 +694,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   droppableId={creatorProfileData?.external_id || 'creator-profile-column'}
                 >
                   {(provided) => (
-                    <Row gutter={[8, 16]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
+                    <Row gutter={[8, 24]} justify="center" {...provided.droppableProps} ref={provided.innerRef}>
                       {editingMode
                         ? tempCreatorUIConfig?.map(renderDraggableCustomComponents)
                         : creatorUIConfig.map(renderDraggableCustomComponents)}
