@@ -6,7 +6,8 @@ $navbar-height: 66px;
 .mainContainer {
   height: 100%;
   // background-color: map-get($colors, 'WhiteSmoke1') !important;
-  background-color: map-get($map: $colors, $key: 'White') !important;
+  // background-color: var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')}) !important;
+  background : linear-gradient(259.47deg, var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')}) 2.46%, #{map-get($map: $colors, $key: 'White')} 109.66%);
 
   .mainContent {
     max-width: 767px;
