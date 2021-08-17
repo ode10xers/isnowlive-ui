@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Row, Col, Button, Form, Select, Typography, Card, Empty, Tooltip, Modal } from 'antd';
-import { SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
+import { Row, Col, Button, Form, Select, Input, Radio, Typography, Card, Empty, Tooltip, Modal } from 'antd';
+import { FilterFilled, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -14,6 +14,18 @@ import { isMobileDevice } from 'utils/device';
 import styles from './styles.module.scss';
 
 const { Text, Title, Paragraph } = Typography;
+const { Search } = Input;
+
+const memberViews = {
+  ACTIVE: {
+    label: 'Active Members',
+    value: 'active',
+  },
+  ARCHIVED: {
+    label: 'Inactive Members',
+    value: 'archive',
+  },
+};
 
 const MembersList = () => {
   const [form] = Form.useForm();
@@ -21,7 +33,9 @@ const MembersList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [membersList, setMembersList] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [archiveView, setArchiveView] = useState(memberViews.ACTIVE.value);
 
+  const [searchString, setSearchString] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [canShowMore, setCanShowMore] = useState(false);
   const totalItemsPerPage = 10;
@@ -46,22 +60,33 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMembersList = useCallback(async (pageNumber, itemsPerPage) => {
-    setIsLoading(true);
+  const fetchCreatorMembersList = useCallback(
+    async (pageNumber, itemsPerPage, searchString = null, fetchArchived = false) => {
+      setIsLoading(true);
 
-    try {
-      const { status, data } = await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage);
+      try {
+        const { status, data } =
+          searchString && searchString.length > 0
+            ? await apis.audiences.searchCreatorMembers(pageNumber, itemsPerPage, fetchArchived, searchString)
+            : await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage, fetchArchived);
 
-      if (isAPISuccess(status) && data) {
-        setMembersList((memberList) => [...memberList, ...data.data]);
-        setCanShowMore(data.next_page);
+        if (isAPISuccess(status) && data) {
+          setMembersList((memberList) => [...memberList, ...data.data]);
+          setCanShowMore(data.next_page);
+        }
+      } catch (error) {
+        if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
+          showErrorModal(
+            'Failed fetching creator members list',
+            error?.response?.data?.message || 'Something went wrong.'
+          );
+        }
       }
-    } catch (error) {
-      showErrorModal('Failed fetching creator members list', error?.response?.data?.message || 'Something went wrong.');
-    }
 
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    },
+    []
+  );
 
   const fetchCreatorPrivateCommunityFlag = useCallback(async () => {
     setIsLoading(false);
@@ -79,6 +104,12 @@ const MembersList = () => {
     }
     setIsLoading(false);
   }, []);
+
+  const resetUIState = () => {
+    setPageNumber(1);
+    setMembersList([]);
+    setSelectedMember(null);
+  };
 
   const updateMemberTag = (tagId) => {
     const selectedMemberIndex = membersList.findIndex((member) => member.id === selectedMember.id);
@@ -110,8 +141,8 @@ const MembersList = () => {
   }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
-    fetchCreatorMembersList(pageNumber, totalItemsPerPage);
-  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage]);
+    fetchCreatorMembersList(pageNumber, totalItemsPerPage, searchString, archiveView === memberViews.ARCHIVED.value);
+  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage, searchString, archiveView]);
 
   const updateSelectedMemberTag = async () => {
     if (!selectedMember) {
@@ -167,18 +198,38 @@ const MembersList = () => {
 
     try {
       const payload = {
-        external_id: memberId,
-        is_approved: false,
+        external_ids: [memberId],
       };
 
-      const { status } = await apis.audiences.setCreatorMemberRequestApproval(payload);
+      const { status } = await apis.audiences.deleteAudienceFromList(payload);
 
       if (isAPISuccess(status)) {
         showSuccessModal('Member has been removed!');
-        updateMemberApprovalStatus(memberId, false);
+        setMembersList((prevList) => prevList.filter((member) => member.id !== memberId));
       }
     } catch (error) {
       showErrorModal('Failed removing member', error?.response?.data?.message || 'Something went wrong.');
+    }
+
+    setIsLoading(false);
+  };
+
+  const reactivateMember = async (memberId) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        external_ids: [memberId],
+      };
+
+      const { status, data } = await apis.audiences.reactivateCreatorMembers(payload);
+
+      if (isAPISuccess(status) && data?.success) {
+        showSuccessModal('Member has been reactivated!');
+        setMembersList((prevList) => prevList.filter((member) => member.id !== memberId));
+      }
+    } catch (error) {
+      showErrorModal('Failed reactivating member', error?.response?.data?.message || 'Something went wrong.');
     }
 
     setIsLoading(false);
@@ -199,6 +250,17 @@ const MembersList = () => {
       okButtonProps: { danger: true, type: 'primary' },
       onOk: () => banMember(memberId),
     });
+  };
+
+  const handleMemberSearch = (value) => {
+    const searchInput = encodeURI(value.trim());
+    resetUIState();
+    setSearchString(searchInput ?? null);
+  };
+
+  const handleArchiveViewChanged = (e) => {
+    resetUIState();
+    setArchiveView(e.target.value);
   };
 
   const generateMembersListColumns = useCallback(
@@ -241,8 +303,7 @@ const MembersList = () => {
             ),
           filterIcon: (filtered) => (
             <Tooltip defaultVisible={true} title="Click here to filter">
-              {' '}
-              <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />{' '}
+              <FilterFilled style={{ fontSize: 16, color: filtered ? '#1890ff' : '#00ffd7' }} />
             </Tooltip>
           ),
           filters: [
@@ -263,34 +324,46 @@ const MembersList = () => {
         // it based on whether or not creator has tags
         const actionsColumnObject = {
           title: 'Actions',
-          width: '90px',
-          align: 'right',
+          width: '220px',
+          align: 'center',
           render: (record) => (
             <Row gutter={[8, 8]} justify="end">
               {record.id === selectedMember?.id ? (
                 <>
                   <Col xs={12}>
-                    <Tooltip title="Save Member Tag">
-                      <Button block type="link" icon={<SaveOutlined />} onClick={() => updateSelectedMemberTag()} />
-                    </Tooltip>
+                    <Button className={styles.greenText} block type="link" onClick={() => updateSelectedMemberTag()}>
+                      Save Tag
+                    </Button>
                   </Col>
                   <Col xs={12}>
-                    <Tooltip title="Cancel Changes">
-                      <Button
-                        block
-                        type="link"
-                        icon={<CloseCircleOutlined />}
-                        onClick={() => setSelectedMember(null)}
-                      />
-                    </Tooltip>
+                    <Button block danger type="link" onClick={() => setSelectedMember(null)}>
+                      Cancel
+                    </Button>
                   </Col>
                 </>
-              ) : (
-                <Col xs={24}>
-                  <Tooltip title="Edit Member Tag">
-                    <Button block type="link" icon={<EditOutlined />} onClick={() => setSelectedMember(record)} />
-                  </Tooltip>
+              ) : archiveView === memberViews.ARCHIVED.value ? (
+                <Col xs={24} className={styles.textAlignCenter}>
+                  <Button type="primary" onClick={() => reactivateMember(record.id)}>
+                    Reactivate
+                  </Button>
                 </Col>
+              ) : (
+                <>
+                  <Col xs={12}>
+                    <Button block type="link" onClick={() => setSelectedMember(record)}>
+                      Edit Tag
+                    </Button>
+                  </Col>
+                  <Col xs={12}>
+                    <Button
+                      className={styles.orangeBtn}
+                      type="primary"
+                      onClick={() => handleBanMemberClicked(record.id)}
+                    >
+                      Remove
+                    </Button>
+                  </Col>
+                </>
               )}
             </Row>
           ),
@@ -299,25 +372,19 @@ const MembersList = () => {
         initialColumns.splice(tagColumnPosition, 0, tagColumnObject, actionsColumnObject);
       }
 
-      if (isPrivateCommunity) {
+      if (isPrivateCommunity && archiveView === memberViews.ACTIVE.value) {
         // For this column we will put it in the last column, so we can use push()
         const memberApprovalColumnObject = {
           title: 'Member Request',
           dataIndex: 'is_approved',
           key: 'is_approved',
-          width: '280px',
+          align: 'center',
+          width: '140px',
           render: (text, record) =>
             record.is_approved ? (
-              <Row align="middle" gutter={[12, 12]}>
-                <Col>
-                  <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
-                </Col>
-                <Col>
-                  <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(record.id)}>
-                    Remove
-                  </Button>
-                </Col>
-              </Row>
+              <>
+                <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
+              </>
             ) : (
               <Button type="primary" onClick={() => approveMemberRequest(record.id)}>
                 Allow
@@ -330,7 +397,7 @@ const MembersList = () => {
 
       return initialColumns;
     }, //eslint-disable-next-line
-    [creatorMemberTags, isPrivateCommunity, selectedMember]
+    [creatorMemberTags, isPrivateCommunity, selectedMember, archiveView]
   );
 
   const renderMobileMembersCard = (member) => {
@@ -342,20 +409,29 @@ const MembersList = () => {
               {member.first_name} {member.last_name || ''}
             </Title>
           }
-          action={
+          actions={
             member.id === selectedMember?.id
               ? [
-                  <Tooltip title="Save Member Tag">
-                    <Button block type="link" icon={<SaveOutlined />} onClick={() => updateSelectedMemberTag()} />
-                  </Tooltip>,
-                  <Tooltip title="Cancel Changes">
-                    <Button block type="link" icon={<CloseCircleOutlined />} onClick={() => setSelectedMember(null)} />
-                  </Tooltip>,
+                  <Button className={styles.greenText} block type="link" onClick={() => updateSelectedMemberTag()}>
+                    Save Tag
+                  </Button>,
+                  <Button block danger type="link" onClick={() => setSelectedMember(null)}>
+                    Cancel
+                  </Button>,
+                ]
+              : archiveView === memberViews.ARCHIVED.value
+              ? [
+                  <Button type="primary" onClick={() => reactivateMember(member.id)}>
+                    Reactivate
+                  </Button>,
                 ]
               : [
-                  <Tooltip title="Edit Member Tag">
-                    <Button block type="link" icon={<EditOutlined />} onClick={() => setSelectedMember(member)} />
-                  </Tooltip>,
+                  <Button block type="link" onClick={() => setSelectedMember(member)}>
+                    Edit Tag
+                  </Button>,
+                  <Button className={styles.orangeBtn} type="primary" onClick={() => handleBanMemberClicked(member.id)}>
+                    Remove
+                  </Button>,
                 ]
           }
         >
@@ -365,8 +441,7 @@ const MembersList = () => {
               <Col xs={12}>
                 {member.is_approved ? (
                   <>
-                    {' '}
-                    <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>{' '}
+                    <CheckCircleTwoTone twoToneColor="#52c41a" /> <Text type="success"> Joined </Text>
                   </>
                 ) : (
                   <Button block type="primary" onClick={() => approveMemberRequest(member.id)}>
@@ -410,12 +485,50 @@ const MembersList = () => {
           <Title level={4}> Members List </Title>
         </Col>
         <Col xs={24}>
+          <Row gutter={[8, 8]} align="middle">
+            <Col>
+              <Text> Search members : </Text>
+            </Col>
+            <Col>
+              <Search
+                enterButton="Search"
+                placeholder="Member first/last name"
+                onSearch={handleMemberSearch}
+                className={styles.searchInput}
+              />
+            </Col>
+          </Row>
+          <Paragraph type="secondary" className={styles.mt10}>
+            To see all members, empty the search bar and hit Search again
+          </Paragraph>
+        </Col>
+        <Col xs={24}>
+          <Radio.Group value={archiveView} onChange={handleArchiveViewChanged}>
+            {Object.values(memberViews).map((view) => (
+              <Radio.Button key={view.value} value={view.value}>
+                {view.label}
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+        </Col>
+        <Col xs={24}>
           <Form form={form} scrollToFirstError={true}>
             {isMobileDevice ? (
               <Loader loading={isLoading} size="large" text="Fetching members list...">
                 {membersList.length > 0 ? (
                   <Row gutter={[8, 8]} justify="center">
                     {membersList.map(renderMobileMembersCard)}
+                    <Col xs={24}>
+                      <Button
+                        block
+                        type="default"
+                        loading={isLoading}
+                        disabled={!canShowMore}
+                        onClick={() => setPageNumber(pageNumber + 1)}
+                      >
+                        Show more members
+                      </Button>
+                    </Col>
                   </Row>
                 ) : (
                   <Empty description="No members found" />

@@ -7,5 +7,12 @@
 .orangeBtn {
   background-color: map-get($map: $colors, $key: 'Pumpkin') !important;
   border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
-  
+}
+
+.searchInput {
+  :global {
+    .ant-btn {
+      border-radius : 0px !important;
+    }
+  }
 }
