@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Row, Col, Button, Form, Select, Typography, Card, Empty, Tooltip, Modal } from 'antd';
+import { Row, Col, Button, Form, Select, Input, Space, Typography, Card, Empty, Tooltip, Modal } from 'antd';
 import { SaveOutlined, EditOutlined, FilterFilled, CloseCircleOutlined, CheckCircleTwoTone } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -14,6 +14,7 @@ import { isMobileDevice } from 'utils/device';
 import styles from './styles.module.scss';
 
 const { Text, Title, Paragraph } = Typography;
+const { Search } = Input;
 
 const MembersList = () => {
   const [form] = Form.useForm();
@@ -22,6 +23,7 @@ const MembersList = () => {
   const [membersList, setMembersList] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
 
+  const [searchString, setSearchString] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [canShowMore, setCanShowMore] = useState(false);
   const totalItemsPerPage = 10;
@@ -46,18 +48,26 @@ const MembersList = () => {
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorMembersList = useCallback(async (pageNumber, itemsPerPage) => {
+  const fetchCreatorMembersList = useCallback(async (pageNumber, itemsPerPage, searchString = null) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage);
+      const { status, data } =
+        searchString && searchString.length > 0
+          ? await apis.audiences.searchCreatorMembers(pageNumber, itemsPerPage, searchString)
+          : await apis.audiences.getCreatorMembers(pageNumber, itemsPerPage);
 
       if (isAPISuccess(status) && data) {
         setMembersList((memberList) => [...memberList, ...data.data]);
         setCanShowMore(data.next_page);
       }
     } catch (error) {
-      showErrorModal('Failed fetching creator members list', error?.response?.data?.message || 'Something went wrong.');
+      if (!(error?.response?.status === 404 && !error?.response?.data?.audiences)) {
+        showErrorModal(
+          'Failed fetching creator members list',
+          error?.response?.data?.message || 'Something went wrong.'
+        );
+      }
     }
 
     setIsLoading(false);
@@ -110,8 +120,8 @@ const MembersList = () => {
   }, [fetchCreatorMemberTags, fetchCreatorPrivateCommunityFlag]);
 
   useEffect(() => {
-    fetchCreatorMembersList(pageNumber, totalItemsPerPage);
-  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage]);
+    fetchCreatorMembersList(pageNumber, totalItemsPerPage, searchString);
+  }, [fetchCreatorMembersList, pageNumber, totalItemsPerPage, searchString]);
 
   const updateSelectedMemberTag = async () => {
     if (!selectedMember) {
@@ -198,6 +208,13 @@ const MembersList = () => {
       okButtonProps: { danger: true, type: 'primary' },
       onOk: () => banMember(memberId),
     });
+  };
+
+  const handleMemberSearch = (value) => {
+    const searchInput = encodeURI(value.trim());
+    setPageNumber(1);
+    setMembersList([]);
+    setSearchString(searchInput ?? null);
   };
 
   const generateMembersListColumns = useCallback(
@@ -407,6 +424,20 @@ const MembersList = () => {
       <Row gutter={[16, 16]}>
         <Col xs={24}>
           <Title level={4}> Members List </Title>
+        </Col>
+        <Col xs={24}>
+          <Space size="small">
+            <Text> Search members : </Text>
+            <Search
+              enterButton="Search"
+              placeholder="Member first/last name"
+              onSearch={handleMemberSearch}
+              className={styles.searchInput}
+            />
+          </Space>
+          <Paragraph type="secondary" className={styles.mt10}>
+            To see all members, empty the search bar and hit Search again
+          </Paragraph>
         </Col>
         <Col xs={24}>
           <Form form={form} scrollToFirstError={true}>

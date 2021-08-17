@@ -202,6 +202,8 @@ export default {
       http.get(`/secure/customer/subscriptions/orders/?course_id=${courseId}`),
   },
   audiences: {
+    searchCreatorMembers: (pageNo, perPage, searchString) =>
+      http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&text=${searchString}`),
     getCreatorMembers: (pageNo, perPage) =>
       http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}`),
     getCreatorAudiences: (pageNo, perPage) =>
