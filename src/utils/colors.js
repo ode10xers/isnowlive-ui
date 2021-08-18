@@ -86,6 +86,7 @@ export const generateColorPalletteForProfile = (primaryColor, shouldColorNavbar 
   };
 
   const navbarColors = {
+    '--passion-profile-backdrop-color': profileColors['--passion-profile-lightest-color'],
     '--passion-profile-navbar-bg': profileColors['--passion-profile-lightest-color'],
     '--passion-profile-navbar-logo': profileColors['--passion-profile-primary-color'],
     '--passion-profile-navbar-text': profileColors['--passion-profile-dark-color'],
