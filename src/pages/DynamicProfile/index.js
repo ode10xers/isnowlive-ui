@@ -828,6 +828,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               <CreatorProfileComponent
                 creatorProfile={creatorProfileData}
                 isEditing={editingMode && !previewMode}
+                isContained={containedUI}
                 refetchCreatorProfileData={() =>
                   fetchCreatorProfileData(creatorUsername ?? getLocalUserDetails()?.username ?? '')
                 }
