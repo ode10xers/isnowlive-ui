@@ -238,7 +238,14 @@ const sectionData = [
   {
     key: 'OTHER_LINKS',
     title: 'My other links',
-    values: null,
+    values: [
+      {
+        title: 'Bitbucket',
+        url: 'https://bitbucket.org',
+        textColor: '#ffffff',
+        backgroundColor: '#1890ff',
+      },
+    ],
   },
   // {
   //   key: 'DONATIONS',

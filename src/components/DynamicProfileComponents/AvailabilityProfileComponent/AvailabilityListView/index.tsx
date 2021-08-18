@@ -18,7 +18,7 @@ const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
 }) => {
   const renderAvailabilityListItem = useCallback((availability: Session) => (
     // <SwiperSlide key={availability.session_id}>
-    <Col xs={24} sm={12}>
+    <Col xs={16} md={12}>
       <AvailabilityListItem availability={availability} />
     </Col>
     // </SwiperSlide>
