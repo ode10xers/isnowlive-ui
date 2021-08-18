@@ -350,6 +350,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   useEffect(() => {
     let profileColorObject = null;
     if (creatorColorChoice) {
+      // TODO: Adjust the flag passed here based on creator profile config
       profileColorObject = generateColorPalletteForProfile(creatorColorChoice, !containedUI);
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
