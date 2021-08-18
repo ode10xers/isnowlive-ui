@@ -11,18 +11,20 @@ import styles from './style.module.scss';
 
 export interface AvailabilityListViewProps {
   availabilities?: Session[]
+  isContained?: boolean
 }
 
 const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
-  availabilities = []
+  availabilities = [],
+  isContained = false
 }) => {
   const renderAvailabilityListItem = useCallback((availability: Session) => (
     // <SwiperSlide key={availability.session_id}>
-    <Col xs={16} md={12}>
+    <Col xs={isContained ? 24 : 16} md={12}>
       <AvailabilityListItem availability={availability} />
     </Col>
     // </SwiperSlide>
-  ), [])
+  ), [isContained])
 
   return (
     <div>
@@ -34,7 +36,7 @@ const AvailabilityListView: React.VFC<AvailabilityListViewProps> = ({
         //     </Swiper>
         //   </Col>
         // </Row>
-        <Row gutter={[12, 4]} className={styles.availabilitiesContainer}>
+        <Row gutter={[12, 4]} className={isContained ? undefined : styles.availabilitiesContainer}>
           {availabilities.map(renderAvailabilityListItem)}
         </Row>
       ) : null}

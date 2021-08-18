@@ -115,7 +115,7 @@ const SessionsProfileComponent = ({
     </Row>
   ) : (
     <Spin spinning={isLoading} tip="Fetching sessions">
-      <SessionListView sessions={sessions || []} />
+      <SessionListView sessions={sessions || []} isContained={false} />
     </Spin>
   );
 

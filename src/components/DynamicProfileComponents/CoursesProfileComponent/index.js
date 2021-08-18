@@ -69,7 +69,7 @@ const CoursesProfileComponent = ({
     </Row>
   ) : (
     <Spin spinning={isLoading} tip="Fetching Courses">
-      <CoursesListView courses={courses} />
+      <CoursesListView courses={courses} isContained={false} />
     </Spin>
   );
 

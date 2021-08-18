@@ -12,7 +12,7 @@ import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from '
 
 import styles from './style.module.scss';
 
-const SessionListView = ({ limit = 5, sessions = [] }) => {
+const SessionListView = ({ limit = 5, sessions = [], isContained = false }) => {
   const history = useHistory();
 
   const handleMoreClicked = (e) => {
@@ -28,7 +28,11 @@ const SessionListView = ({ limit = 5, sessions = [] }) => {
   };
 
   const renderSessionCards = (session) => (
-    <Col xs={18} md={8} key={`${session.session_external_id}_${session?.inventory_id}`}>
+    <Col
+      xs={isContained ? 24 : 18}
+      md={isContained ? 12 : 8}
+      key={`${session.session_external_id}_${session?.inventory_id}`}
+    >
       <SessionListCard session={session} />
     </Col>
   );
@@ -36,10 +40,10 @@ const SessionListView = ({ limit = 5, sessions = [] }) => {
   return (
     <div>
       {sessions?.length > 0 && (
-        <Row gutter={[8, 8]} className={styles.sessionListContainer}>
+        <Row gutter={[8, 8]} className={isContained ? undefined : styles.sessionListContainer}>
           {sessions.slice(0, limit).map(renderSessionCards)}
           {sessions?.length > limit && (
-            <Col xs={18} md={8} className={styles.fadedItemContainer}>
+            <Col xs={isContained ? 24 : 18} md={isContained ? 12 : 8} className={styles.fadedItemContainer}>
               <div className={styles.fadedOverlay}>
                 <div className={styles.seeMoreButton} onClick={handleMoreClicked}>
                   <BarsOutlined className={styles.seeMoreIcon} />

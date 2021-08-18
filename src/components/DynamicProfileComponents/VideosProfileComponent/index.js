@@ -69,7 +69,7 @@ const VideosProfileComponent = ({
     </Row>
   ) : (
     <Spin spinning={isLoading} tip="Fetching Videos">
-      <VideoListView videos={videos} />
+      <VideoListView videos={videos} isContained={false} />
     </Spin>
   );
 

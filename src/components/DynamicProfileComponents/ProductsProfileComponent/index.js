@@ -206,7 +206,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('SESSIONS')}
       icon={<VideoCameraOutlined className={styles.mr10} />}
     >
-      <SessionListView sessions={sessions} profileColor={customComponentProps?.headerColor ?? null} />
+      <SessionListView limit={3} sessions={sessions} isContained={true} />
     </ProductCardTemplate>
   );
 
@@ -218,7 +218,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('VIDEOS')}
       icon={<PlayCircleOutlined className={styles.mr10} />}
     >
-      <VideoListView videos={videos} profileColor={customComponentProps?.headerColor ?? null} />
+      <VideoListView limit={3} videos={videos} isContained={true} />
     </ProductCardTemplate>
   );
 
@@ -230,7 +230,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('COURSES')}
       icon={<BookOutlined className={styles.mr10} />}
     >
-      <CoursesListView courses={courses} profileColor={customComponentProps?.headerColor ?? null} />
+      <CoursesListView limit={3} courses={courses} isContained={true} />
     </ProductCardTemplate>
   );
 

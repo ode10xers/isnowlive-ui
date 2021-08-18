@@ -137,7 +137,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
     </Row>
   ) : (
     <Spin spinning={isLoading} tip="Fetching Availabilities">
-      <AvailabilityListView availabilities={availableSessions} />
+      <AvailabilityListView availabilities={availableSessions} isContained={isContained} />
     </Spin>
   );
 

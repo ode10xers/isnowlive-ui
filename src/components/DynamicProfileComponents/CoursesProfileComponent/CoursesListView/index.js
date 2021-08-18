@@ -13,11 +13,11 @@ import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from '
 
 import styles from './style.module.scss';
 
-const CoursesListView = ({ limit = 2, courses = [], profileColor }) => {
+const CoursesListView = ({ limit = 2, courses = [], isContained = false }) => {
   const history = useHistory();
 
   const renderCourseCards = (course) => (
-    <Col xs={18} md={8} key={course.id}>
+    <Col xs={isContained ? 24 : 18} md={isContained ? 12 : 8} key={course.id}>
       <CoursesListItem course={course} />
     </Col>
   );
@@ -37,10 +37,10 @@ const CoursesListView = ({ limit = 2, courses = [], profileColor }) => {
   return (
     <div>
       {courses.length > 0 && (
-        <Row gutter={[8, 8]} className={styles.courseListContainer}>
+        <Row gutter={[8, 8]} className={isContained ? undefined : styles.courseListContainer}>
           {courses.slice(0, limit).map(renderCourseCards)}
           {courses.length > limit && (
-            <Col xs={18} md={8} className={styles.fadedItemContainer}>
+            <Col xs={isContained ? 24 : 18} md={isContained ? 12 : 8} className={styles.fadedItemContainer}>
               <div className={styles.fadedOverlay}>
                 <div className={styles.seeMoreButton} onClick={handleMoreClicked}>
                   <BarsOutlined className={styles.seeMoreIcon} />

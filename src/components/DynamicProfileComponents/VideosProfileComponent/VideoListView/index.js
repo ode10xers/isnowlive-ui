@@ -13,11 +13,11 @@ import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from '
 
 import styles from './style.module.scss';
 
-const VideoListView = ({ limit = 5, videos = [] }) => {
+const VideoListView = ({ limit = 5, videos = [], isContained = false }) => {
   const history = useHistory();
 
   const renderVideoCards = (video) => (
-    <Col xs={18} md={8} key={video.external_id}>
+    <Col xs={isContained ? 24 : 18} md={isContained ? 12 : 8} key={video.external_id}>
       <VideoListCard video={video} />
     </Col>
   );
@@ -37,10 +37,10 @@ const VideoListView = ({ limit = 5, videos = [] }) => {
   return (
     <div>
       {videos?.length > 0 && (
-        <Row gutter={[8, 8]} className={styles.videoListContainer}>
+        <Row gutter={[8, 8]} className={isContained ? undefined : styles.videoListContainer}>
           {videos.slice(0, limit).map(renderVideoCards)}
           {videos?.length > limit && (
-            <Col xs={18} md={8} className={styles.fadedItemContainer}>
+            <Col xs={isContained ? 24 : 18} md={isContained ? 12 : 8} className={styles.fadedItemContainer}>
               <div className={styles.fadedOverlay}>
                 <div className={styles.seeMoreButton} onClick={handleMoreClicked}>
                   <BarsOutlined className={styles.seeMoreIcon} />
