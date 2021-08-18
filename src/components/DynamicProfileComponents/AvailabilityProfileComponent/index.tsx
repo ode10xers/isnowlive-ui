@@ -23,7 +23,7 @@ export interface AvailabilityProfileComponentProps {
   isEditing?: boolean;
   dragHandleProps?: Record<string, any>;
   onUpdate: (identifier: unknown, config: unknown) => void;
-  onRemove: (identifier: unknown) => void;
+  // onRemove: (identifier: unknown) => void;
   isContained?: boolean;
   title?: string;
 }
@@ -32,7 +32,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
   dragHandleProps,
   identifier,
   isEditing,
-  onRemove,
+  // onRemove,
   onUpdate,
   isContained = false,
   title,
@@ -111,12 +111,12 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
   }, [fetchCreatorSession]);
 
   const handleUpdate = useCallback((config) => onUpdate(identifier, config), [identifier, onUpdate]);
-  const handleRemove = useCallback(() => onRemove(identifier), [identifier, onRemove]);
+  // const handleRemove = useCallback(() => onRemove(identifier), [identifier, onRemove]);
 
   const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
 
   const editingViewComponent = (
-    <AvailabilityEditView config={props} onRemove={handleRemove} onUpdate={handleUpdate} isContained={isContained} />
+    <AvailabilityEditView config={props} onUpdate={handleUpdate} isContained={isContained} />
   );
 
   const componentChildren = isEditing ? (
