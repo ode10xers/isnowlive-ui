@@ -54,7 +54,7 @@ const CoursesProfileComponent = ({
   const editingViewComponent = <CoursesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />;
 
   const componentChildren = isEditing ? (
-    <Row gutter={[8, 8]} justify="center" align="center" id="courses">
+    <Row gutter={[8, 8]} justify="center" align="center">
       <Col className={styles.textAlignCenter}>
         <Space align="center" className={styles.textAlignCenter}>
           <Text> The courses you have created will show up here </Text>
@@ -79,7 +79,7 @@ const CoursesProfileComponent = ({
   };
 
   return !isContained && (courses.length > 0 || isEditing) ? (
-    <Row className={styles.p10} align="middle" justify="center" id="courses">
+    <Row className={styles.p10} align="middle" justify="center">
       <Col xs={24}>
         <DynamicProfileComponentContainer
           {...commonContainerProps}

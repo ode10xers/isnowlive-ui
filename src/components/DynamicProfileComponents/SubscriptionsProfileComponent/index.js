@@ -89,7 +89,7 @@ const SubscriptionProfileComponent = ({
   };
 
   return subscriptions.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center" id="memberships">
+    <Row className={styles.p10} align="middle" justify="center">
       {isContained ? (
         <>
           {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}

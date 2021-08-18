@@ -7,6 +7,8 @@ const Routes = {
   sessions: '/sessions',
   videos: '/videos',
   courses: '/courses',
+  passes: '/passes',
+  subscriptions: '/memberships',
   passwordVerification: '/password/verify/:token',
   emailVerification: '/email/verify/:token',
   createPassword: '/password/create',

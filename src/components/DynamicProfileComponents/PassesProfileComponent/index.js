@@ -83,7 +83,7 @@ const PassesProfileComponent = ({
   };
 
   return passes.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center" id="passes">
+    <Row className={styles.p10} align="middle" justify="center">
       {isContained ? (
         <>
           {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}

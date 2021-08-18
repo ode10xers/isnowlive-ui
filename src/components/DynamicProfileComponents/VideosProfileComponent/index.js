@@ -79,7 +79,7 @@ const VideosProfileComponent = ({
   };
 
   return !isContained && (videos.length > 0 || isEditing) ? (
-    <Row className={styles.p10} align="middle" justify="center" id="videos">
+    <Row className={styles.p10} align="middle" justify="center">
       <Col xs={24}>
         <DynamicProfileComponentContainer
           {...commonContainerProps}

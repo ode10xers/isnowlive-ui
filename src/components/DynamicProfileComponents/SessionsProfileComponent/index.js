@@ -127,7 +127,7 @@ const SessionsProfileComponent = ({
   const editingViewComponent = <SessionEditView configValues={customComponentProps} updateHandler={saveEditChanges} />;
 
   return !isContained && (sessions.length > 0 || isEditing) ? (
-    <Row className={styles.p10} align="middle" justify="center" id="sessions">
+    <Row className={styles.p10} align="middle" justify="center">
       <Col xs={24}>
         <DynamicProfileComponentContainer
           {...commonContainerProps}

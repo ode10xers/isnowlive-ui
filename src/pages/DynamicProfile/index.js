@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
@@ -75,6 +75,7 @@ const componentsMap = {
     label: 'Availability',
     type: componentUIType.FLEXIBLE,
     optional: false,
+    elementId: 'availability',
     defaultProps: {
       title: 'AVAILABILITY',
       values: null,
@@ -86,6 +87,7 @@ const componentsMap = {
     label: 'Products',
     type: componentUIType.CONTAINED,
     optional: false,
+    elementId: 'products',
     defaultProps: {
       title: '',
       values: [
@@ -113,6 +115,7 @@ const componentsMap = {
     optional: false,
     type: componentUIType.FLEXIBLE,
     component: PassesProfileComponent,
+    elementId: 'passes',
     defaultProps: {
       title: 'CREDIT PASSES',
       values: null,
@@ -122,6 +125,7 @@ const componentsMap = {
     icon: <ScheduleOutlined />,
     label: 'Memberships',
     type: componentUIType.FLEXIBLE,
+    elementId: 'memberships',
     optional: false,
     component: SubscriptionProfileComponent,
     defaultProps: {
@@ -133,6 +137,7 @@ const componentsMap = {
     icon: <LinkOutlined />,
     label: 'Other Links',
     type: componentUIType.FLEXIBLE,
+    elementId: 'other-links',
     optional: true,
     component: OtherLinksProfileComponent,
     defaultProps: {
@@ -144,6 +149,7 @@ const componentsMap = {
     icon: <VideoCameraOutlined />,
     label: 'Sessions',
     type: componentUIType.OPEN,
+    elementId: 'sessions',
     optional: false,
     component: SessionsProfileComponent,
     defaultProps: {
@@ -155,6 +161,7 @@ const componentsMap = {
     icon: <BookOutlined />,
     label: 'Courses',
     type: componentUIType.OPEN,
+    elementId: 'courses',
     optional: false,
     component: CoursesProfileComponent,
     defaultProps: {
@@ -167,6 +174,7 @@ const componentsMap = {
     label: 'Videos',
     type: componentUIType.OPEN,
     optional: false,
+    elementId: 'videos',
     component: VideosProfileComponent,
     defaultProps: {
       title: 'My Videos',
@@ -243,6 +251,7 @@ const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6
 
 const DynamicProfile = ({ creatorUsername = null }) => {
   const history = useHistory();
+  const match = useRouteMatch();
 
   const [isLoading, setIsLoading] = useState(true);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
@@ -281,6 +290,41 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setIsLoading(false);
   }, []);
 
+  const scrollToComponent = useCallback(
+    (urlPath) => {
+      const scrollToElement = (elementId) => {
+        const targetElement = document.getElementById(elementId);
+        if (targetElement) {
+          targetElement.scrollIntoView();
+          window.scrollBy(0, -70);
+        }
+      };
+
+      // NOTE : These IDs need to be the same as the id that is set in each DynamicProfileComponent
+      switch (urlPath) {
+        case Routes.subscriptions:
+          scrollToElement('memberships');
+          break;
+        case Routes.passes:
+          scrollToElement('passes');
+          break;
+        case Routes.sessions:
+          scrollToElement(containedUI ? 'products' : 'sessions');
+          break;
+        case Routes.courses:
+          scrollToElement(containedUI ? 'products' : 'courses');
+          break;
+        case Routes.videos:
+          scrollToElement(containedUI ? 'products' : 'videos');
+          break;
+        default:
+          window.scrollTo(0, 0);
+          break;
+      }
+    },
+    [containedUI]
+  );
+
   //#region Start of Use Effects
 
   useEffect(() => {
@@ -314,6 +358,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       }
     };
   }, [creatorColorChoice, containedUI]);
+
+  useEffect(() => {
+    scrollToComponent(match.path);
+  }, [match.path, scrollToComponent]);
 
   //#endregion End of Use Effects
 
@@ -661,7 +709,12 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         key={component.key}
       >
         {(provided) => (
-          <Col xs={24} {...provided.draggableProps} ref={provided.innerRef}>
+          <Col
+            xs={24}
+            {...provided.draggableProps}
+            ref={provided.innerRef}
+            id={targetComponent.elementId ?? component.key}
+          >
             <RenderedComponent
               identifier={component.key}
               isEditing={editingMode && !previewMode}

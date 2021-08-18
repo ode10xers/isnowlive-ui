@@ -222,8 +222,7 @@ const NavbarHeader = () => {
                     key="Pass"
                     className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
                     onClick={() => {
-                      history.push(Routes.root);
-                      window.location.hash = 'passes';
+                      history.push(Routes.passes);
                     }}
                   >
                     Passes
@@ -252,8 +251,7 @@ const NavbarHeader = () => {
                     key="Membership"
                     className={siteLinkActive('membership') ? 'ant-menu-item-active' : undefined}
                     onClick={() => {
-                      history.push(Routes.root);
-                      window.location.hash = 'memberships';
+                      history.push(Routes.subscriptions);
                     }}
                   >
                     Memberships
@@ -403,8 +401,7 @@ const NavbarHeader = () => {
                           key="Creator Passes"
                           className={siteLinkActive('pass') ? styles.active : undefined}
                           onClick={() => {
-                            history.push(Routes.root);
-                            window.location.hash = 'passes';
+                            history.push(Routes.passes);
                             setShowMobileMenu(false);
                           }}
                         >
@@ -440,8 +437,7 @@ const NavbarHeader = () => {
                           key="Creator Memberships"
                           className={siteLinkActive('membership') ? styles.active : undefined}
                           onClick={() => {
-                            history.push(Routes.root);
-                            window.location.hash = 'memberships';
+                            history.push(Routes.subscriptions);
                             setShowMobileMenu(false);
                           }}
                         >
