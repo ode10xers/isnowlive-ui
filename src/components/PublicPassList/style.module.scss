@@ -1,13 +1,50 @@
 @import '../../styles/variables.scss';
 
+.passListContainer {
+  padding: 20px;
+
+  :global {
+    .ant-table {
+      background-color: transparent !important;
+    }
+
+    .ant-table-thead {
+      th {
+        background-color: var(--pass-plugin-heading-background-color) !important;
+        color: var(--pass-plugin-heading-text-color) !important;
+      }
+    }
+  }
+}
+
 .card {
   margin-top: 10px !important;
+
+  :global {
+    .ant-card-head {
+      background-color: var(--pass-plugin-heading-background-color) !important;
+      color: var(--pass-plugin-heading-text-color) !important;
+    }
+
+    .ant-card-body, .ant-card-actions {
+      background-color: var(--pass-plugin-table-background-color) !important;
+      color: var(--pass-plugin-table-text-color) !important;
+    }
+  }
+
+  .cardHeadingText {
+    color: var(--pass-plugin-heading-text-color) !important;
+  }
+
+  .cardContentText {
+    color: var(--pass-plugin-table-text-color) !important;
+  }
 }
 
 .cardExpansion {
-  border: 1px solid map-get($map: $colors, $key: 'White1');
-  background-color: map-get($map: $colors, $key: 'White');
-  padding: 8px;
+  // border: 1px solid map-get($map: $colors, $key: 'White1');
+  background-color: transparent;
+  padding: 4px;
 }
 
 .passDetailsContainer {
@@ -16,4 +53,52 @@
   margin-top: 10px;
   margin-bottom: 16px;
   padding: 10px;
+}
+
+.descText {
+  color : var(--pass-plugin-desc-text-color, map-get($colors, 'Black')) !important;
+}
+
+.passDetailsExpansion {
+  background-color: transparent;
+
+  .expandableSectionHeader {
+    color :var(--pass-plugin-table-text-color);
+  }
+}
+
+.passListRow {
+  background-color :var(--pass-plugin-table-background-color, #{map-get($colors, 'White')});
+  color :var(--pass-plugin-table-text-color, #{map-get($colors, 'Black')});
+  
+  transition: 0.3s;
+
+  &:hover {
+    box-shadow: -13px 12px 12px -4px rgba(0,0,0,0.59);
+    -webkit-box-shadow: -13px 12px 12px -4px rgba(0,0,0,0.59);
+    -moz-box-shadow: -13px 12px 12px -4px rgba(0,0,0,0.59);
+    transform: translate(4px, -2px);
+    
+    td {
+      background-color :var(--pass-plugin-table-background-color) !important;
+      color :var(--pass-plugin-table-text-color) !important;
+    }
+  }
+}
+
+.expandedTableRow {
+  background: transparent !important;
+  td {
+    background: transparent !important;
+  }
+}
+
+.expandButton, .purchaseButton {
+  background-color: var(--pass-plugin-cta-background-color) !important; 
+  border-color: var(--pass-plugin-cta-background-color) !important;
+  color: var(--pass-plugin-cta-text-color) !important;
+}
+
+.seeMoreButton {
+  color: var(--pass-plugin-cta-background-color) !important;
 }

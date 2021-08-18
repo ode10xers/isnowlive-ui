@@ -1,0 +1,43 @@
+@import '../../../../styles/variables.scss';
+
+.availabilityImage {
+  align-self : center;
+  border-radius : 8px !important;
+}
+
+.availabilityInfoSeparator {
+  color: #c4c4c4 !important;
+  font-size: 14px;
+  padding: 0 6px;
+}
+
+.availabilityInfo {
+  color: var(
+    --passion-profile-darker-color,
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
+  ) !important;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.availabilityTitle {
+  font-size: 17px;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'PrussianBlue')}) !important;
+}
+
+.availabilityDescription {
+  font-size: 11px !important;
+
+  height: 40px;
+  overflow: hidden;
+  margin-bottom : 0 !important;
+
+    p,
+    span {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      // background-color: map-get($map: $colors, $key: 'White1') !important;
+      background: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+    }
+}

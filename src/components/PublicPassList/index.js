@@ -7,7 +7,7 @@ import apis from 'apis';
 
 import Table from 'components/Table';
 import Loader from 'components/Loader';
-import SessionCards from 'components/SessionCards';
+// import SessionCards from 'components/SessionCards';
 import SimpleVideoCardsList from 'components/SimpleVideoCardsList';
 import AuthModal from 'components/AuthModal';
 
@@ -20,6 +20,7 @@ import { isMobileDevice } from 'utils/device';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
+import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 const { Text, Paragraph } = Typography;
 
@@ -163,23 +164,33 @@ const PublicPassList = ({ passes }) => {
     },
     {
       title: (
-        <Button shape="round" type="primary" onClick={() => toggleExpandAll()}>
+        <Button className={styles.expandButton} type="primary" onClick={() => toggleExpandAll()}>
           {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
         </Button>
       ),
       align: 'right',
       render: (text, record) => (
         <Space size="small">
-          <Button type="primary" onClick={() => openAuthModal(record.id)}>
+          <Button className={styles.purchaseButton} type="primary" onClick={() => openAuthModal(record.id)}>
             Buy Pass
           </Button>
           {expandedRowKeys.includes(record.id) ? (
-            <Button type="link" onClick={() => collapseRow(record.id)} icon={<UpOutlined />}>
-              Close
+            <Button
+              className={styles.seeMoreButton}
+              type="link"
+              onClick={() => collapseRow(record.id)}
+              icon={<UpOutlined />}
+            >
+              Details
             </Button>
           ) : (
-            <Button type="link" onClick={() => expandRow(record.id)} icon={<DownOutlined />}>
-              More
+            <Button
+              className={styles.seeMoreButton}
+              type="link"
+              onClick={() => expandRow(record.id)}
+              icon={<DownOutlined />}
+            >
+              Details
             </Button>
           )}
         </Space>
@@ -188,25 +199,27 @@ const PublicPassList = ({ passes }) => {
   ];
 
   const renderPassDetails = (record) => (
-    <Row>
+    <Row className={styles.passDetailsExpansion}>
       {record?.sessions?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text strong className={styles.ml20}>
-              Sessions bookable with this pass
-            </Text>
+            <Text className={styles.expandableSectionHeader}>Sessions bookable with this pass</Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
-            <SessionCards sessions={record.sessions} />
+            <Row gutter={[8, 8]}>
+              {record?.sessions?.map((session) => (
+                <Col xs={24} sm={12} key={session.session_external_id}>
+                  <SessionListCard session={session} />
+                </Col>
+              ))}
+            </Row>
           </Col>
         </>
       )}
       {record?.videos?.length > 0 && (
         <>
           <Col xs={24}>
-            <Text strong className={styles.ml20}>
-              Videos purchasable with this pass
-            </Text>
+            <Text className={styles.expandableSectionHeader}>Videos purchasable with this pass</Text>
           </Col>
           <Col xs={24} className={styles.passDetailsContainer}>
             <SimpleVideoCardsList passDetails={record} videos={record.videos} />
@@ -220,7 +233,7 @@ const PublicPassList = ({ passes }) => {
     const layout = (label, value) => (
       <Row>
         <Col span={9}>
-          <Text strong>{label}</Text>
+          <Text className={styles.cardContentText}>{label}</Text>
         </Col>
         <Col span={15}>: {value}</Col>
       </Row>
@@ -230,32 +243,51 @@ const PublicPassList = ({ passes }) => {
       <div key={pass.id}>
         <Card
           className={styles.card}
-          title={<Text>{pass.name}</Text>}
+          title={<Text className={styles.cardHeadingText}>{pass.name}</Text>}
+          bodyStyle={{ padding: 10 }}
           actions={[
-            <Button type="primary" onClick={() => openAuthModal(pass.id)}>
+            <Button className={styles.purchaseButton} type="primary" onClick={() => openAuthModal(pass.id)}>
               Buy Pass
             </Button>,
             expandedRowKeys.includes(pass.id) ? (
-              <Button type="link" onClick={() => collapseRow(pass.id)} icon={<UpOutlined />}>
-                Close
+              <Button
+                type="link"
+                icon={<UpOutlined />}
+                className={styles.seeMoreButton}
+                onClick={() => collapseRow(pass.id)}
+              >
+                Details
               </Button>
             ) : (
-              <Button type="link" onClick={() => expandRow(pass.id)} icon={<DownOutlined />}>
-                More
+              <Button
+                type="link"
+                icon={<DownOutlined />}
+                className={styles.seeMoreButton}
+                onClick={() => expandRow(pass.id)}
+              >
+                Details
               </Button>
             ),
           ]}
         >
-          {layout('Credit Count', <Text>{pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}</Text>)}
-          {layout('Validity', <Text>{`${pass.validity} day`}</Text>)}
-          {layout('Price', <Text>{`${pass.total_price} ${pass.currency.toUpperCase()}`}</Text>)}
+          {layout(
+            'Credit Count',
+            <Text className={styles.cardContentText}>
+              {pass.limited ? `${pass.class_count} Credits` : 'Unlimited Credits'}
+            </Text>
+          )}
+          {layout('Validity', <Text className={styles.cardContentText}>{`${pass.validity} day`}</Text>)}
+          {layout(
+            'Price',
+            <Text className={styles.cardContentText}>{`${pass.total_price} ${pass.currency.toUpperCase()}`}</Text>
+          )}
         </Card>
         {expandedRowKeys.includes(pass.id) && (
           <Row gutter={[8, 8]} className={styles.cardExpansion}>
             {pass.sessions?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Sessions bookable with this pass </Text>
+                  <Text> Sessions bookable with this pass </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -271,7 +303,7 @@ const PublicPassList = ({ passes }) => {
             {pass.videos?.length > 0 && (
               <>
                 <Col xs={24}>
-                  <Text className={styles.ml20}> Videos purchasable with this pass </Text>
+                  <Text> Videos purchasable with this pass </Text>
                 </Col>
                 <Col xs={24}>
                   <div className={styles.ml20}>
@@ -291,15 +323,15 @@ const PublicPassList = ({ passes }) => {
   };
 
   return (
-    <div className={styles.box}>
+    <div className={styles.passListContainer}>
       <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} size="large" text="Loading pass details">
         <Row gutter={[16, 16]}>
           <Col xs={24}>
-            <Paragraph>
+            <Paragraph className={styles.descText}>
               Passes enable you to make a single payment and forget the hassle of paying for each product seperately.
             </Paragraph>
-            <Paragraph>
+            <Paragraph className={styles.descText}>
               Depending on the pass you buy, you can use the credits and book the class or video products made available
               in that pass for free. A Pass is valid from the date you buy it until the validity period.
             </Paragraph>
@@ -310,21 +342,21 @@ const PublicPassList = ({ passes }) => {
                 passes.map(renderPassItem)
               ) : (
                 <div className={styles.textAlignCenter}>
-                  {' '}
                   <Text disabled> No Passes </Text>{' '}
                 </div>
               )
             ) : (
               <Table
-                sticky={true}
                 columns={passesColumns}
                 data={passes}
                 rowKey={(record) => record.id}
+                rowClassName={styles.passListRow}
                 expandable={{
                   expandedRowRender: (record) => renderPassDetails(record),
                   expandRowByClick: true,
                   expandIconColumnIndex: -1,
                   expandedRowKeys: expandedRowKeys,
+                  expandedRowClassName: () => styles.expandedTableRow,
                 }}
               />
             )}

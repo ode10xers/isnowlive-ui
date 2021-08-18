@@ -18,6 +18,7 @@ export default {
     uploadImage: (payload) => http.post('/secure/upload?type=image', payload),
     uploadFile: (payload) => http.post('/secure/upload?type=document', payload),
     getSessionsByUsername: (type) => http.get(`/sessions/${type}`),
+    getAvailabilitiesByUsername: (type) => http.get(`/sessions/${type}?type=AVAILABILITY`),
     getZoomCredentials: () => http.get('/secure/creator/profile/zoom'),
     storeZoomCredentials: (payload) => http.post('/secure/creator/profile/zoom', payload),
     authZoom: (code) => http.post(`/secure/creator/profile/zoom/${code}`),
@@ -37,12 +38,31 @@ export default {
       validate: () => http.post('/secure/creator/profile/stripe/validate'),
       getDashboard: () => http.get('/secure/creator/profile/stripe/dashboard'),
     },
+    getCreatorPaymentProvider: () => http.get('/secure/creator/config/payment'),
+    getCreatorPaymentCountries: () => http.get('/secure/creator/config/payment'),
     getAvailablePaymentMethods: (currency) =>
       http.get(`/secure/customer/payment/available-method-types?currency=${currency}`),
     createPaymentSessionForOrder: (payload) => http.post('/secure/customer/payment/session', payload),
     verifyPaymentForOrder: (payload) => http.post('/secure/customer/payment/verify', payload),
     getUserSavedCards: () => http.get('/secure/customer/payment/methods'),
     retryPayment: (payload) => http.post('/secure/customer/payment/retry', payload),
+    paypal: {
+      initiateCreatorPayPalAccount: (payload) => http.post('/secure/creator/profile/paypal', payload),
+      updateCreatorPayPalAccount: (payload) => http.patch('/secure/creator/profile/paypal', payload),
+      getCreatorPayPalAccountDetails: () => http.get('/secure/creator/profile/paypal'),
+    },
+  },
+  availabilities: {
+    getAvailabilities: () => http.get('/secure/creator/sessions?type=AVAILABILITY'),
+    getAvailabilityDetails: (sessionId) => http.get(`/session/${sessionId}`),
+    getDetails: (sessionId, startDate, endDate) =>
+      http.get(`/secure/creator/sessions/${sessionId}?type=AVAILABILITY&start_date=${startDate}&end_date=${endDate}`),
+    create: (payload) => http.post('/secure/creator/sessions', payload),
+    update: (sessionId, payload) => http.patch(`/secure/creator/sessions/${sessionId}`, payload),
+    getPastAvailability: () => http.get('/secure/creator/inventories/past?type=AVAILABILITY'),
+    getUpcomingAvailability: () => http.get('/secure/creator/inventories/upcoming?type=AVAILABILITY'),
+    publishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/enable`),
+    unpublishAvailability: (sessionId) => http.post(`/secure/creator/sessions/${sessionId}/disable`),
   },
   session: {
     getDetails: (sessionId, startDate, endDate) =>
@@ -182,14 +202,21 @@ export default {
       http.get(`/secure/customer/subscriptions/orders/?course_id=${courseId}`),
   },
   audiences: {
-    getCreatorMembers: (pageNo, perPage) =>
-      http.get(`/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}`),
+    reactivateCreatorMembers: (payload) => http.post('/secure/creator/audience/archive/reset', payload),
+    searchCreatorMembers: (pageNo, perPage, fetchArchived = false, searchString) =>
+      http.get(
+        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}&text=${searchString}`
+      ),
+    getCreatorMembers: (pageNo, perPage, fetchArchived = false) =>
+      http.get(
+        `/secure/creator/audience?user_type=MEMBER&page_no=${pageNo}&per_page=${perPage}&archived=${fetchArchived}`
+      ),
     getCreatorAudiences: (pageNo, perPage) =>
       http.get(`/secure/creator/audience?page_no=${pageNo}&per_page=${perPage}`),
     addAudienceList: (payload) => http.post('/secure/creator/audience', payload),
     deleteAudienceFromList: (payload) => http.delete('/secure/creator/audience', payload),
     updateMemberTag: (payload) => http.put('secure/creator/audience', payload),
-    approveCreatorMemberRequest: (payload) => http.put('/secure/creator/audience', payload),
+    setCreatorMemberRequestApproval: (payload) => http.put('/secure/creator/audience', payload),
     uploadAudienceCSVFile: (payload) => http.post('/secure/creator/audience/upload', payload),
     sendEmailToAudiences: (payload) => http.post('/secure/creator/audience/email', payload),
     sendNewletterSignupDetails: (payload) => http.post('/audience/signup', payload),

@@ -1,0 +1,502 @@
+@import '../../../styles/variables.scss';
+
+.passDetailsPageContainer {
+  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  padding: 50px;
+
+  @media screen and (min-width: 1440px) {
+    padding: 100px;
+  }
+  
+  @media screen and (max-width: 1025px) {
+    padding: 30px;
+  }
+
+  @media screen and (max-width: 769px) {
+    padding: 20px;
+  }
+
+  @media screen and (max-width: 526px) {
+    padding: 8px;
+  }
+}
+
+.buySection {
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 34px rgba(0, 0, 0, 0.1);
+  background-color: map-get($map: $colors, $key: 'White');
+
+  // Make it sticky from tablet upwards
+  @media screen and (min-width: 992px) {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 72px;
+  }
+
+  .buySectionHeader {
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+    font-size: 24px;
+  }
+
+  .buyPassButton {
+    background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+    border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    .darkText {
+      color: map-get($map: $colors, $key: 'Zeus') !important;
+    }
+
+    .whiteText {
+      color: map-get($colors, 'White') !important;
+    }
+  }
+
+  .loadingPlaceholder {
+    min-height: 60px;
+    width: 100%;
+  }
+
+  .loadingPlaceholderLarge {
+    min-height: 200px;
+    width: 100%;
+  }
+
+  .buyablePassItem {
+    border: 1px dashed map-get($map: $colors, $key: 'Silver');
+    padding: 12px;
+    cursor: pointer;
+
+    .passCheckContainer {
+      align-self: center;
+
+      .checkIcon {
+        font-size: 20px;
+        color: map-get($map: $colors, $key: 'Silver');
+      }
+
+      .passItemName {
+        font-size: 18px;
+
+        @media screen and (max-width: 1025px) {
+          font-size: 16px;
+        }
+
+        @media screen and (max-width: 769px) {
+          font-size: 14px;
+        }
+
+        &.longText {
+          font-size: 14px;
+
+          @media screen and (max-width: 1025px) {
+            font-size: 12px;
+          }
+
+          @media screen and (max-width: 769px) {
+            font-size: 11px;
+          }
+        }
+      }
+    }
+
+    .passItemDetailsContainer {
+      align-self: center;
+      text-align: right;
+
+      .buyDetails {
+        font-size: 14px;
+      }
+    }
+
+    &.selected {
+      border: 1px solid var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
+
+      .passCheckContainer {
+        .passItemName {
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+        }
+
+        .checkIcon {
+          font-size: 20px;
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
+        }
+      }
+
+      .passItemDetailsContainer {
+        text-align: right;
+
+        .buyDetails {
+          color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+        }
+
+        .buyDetailsDivider {
+          border-left: 1px solid var(--passion-profile-primary-color, map-get($map: $colors, $key: 'DodgerBlue'));
+        }
+      }
+    }
+  }
+}
+
+.sectionHeading {
+  color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
+}
+
+.dotSeparator {
+  opacity: 0.4;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'Black')}) !important;
+
+  @media screen and (max-width: 1025px) {
+    font-size: 16px;
+  }
+
+  @media screen and (max-width: 769px) {
+    font-size: 18px;
+  }
+
+  @media screen and (max-width: 526px) {
+    font-size: 12px;
+  }
+}
+
+.highlightContainer {
+  position: relative;
+}
+
+.currentPassDetailsContainer {
+  padding: 12px 20px;
+  border: 1px solid var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
+  border-radius: 8px;
+  position:relative;
+  z-index : 7;
+
+  background: linear-gradient(
+    220.68deg,
+    var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) -10.5%,
+    var(--passion-profile-lightest-color, #{map-get($colors, 'ColumbiaBlue')}) 52.15%,
+    var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) 145.15%
+  );
+
+  .passName {
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+    font-size: 42px !important;
+
+    @media screen and (max-width: 768px) {
+      font-size: 32px !important;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 24px !important;
+    }
+  }
+
+  .passDetailValidity {
+    font-weight: 600;
+    color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+    font-size: 16px;
+  }
+
+  .passDetailItem {
+    color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+    font-size: 18px;
+
+    @media screen and (max-width: 1025px) {
+      font-size: 16px;
+    }
+
+    @media screen and (max-width: 769px) {
+      font-size: 18px;
+    }
+
+    @media screen and (max-width: 526px) {
+      font-size: 12px;
+    }
+
+    .passDetailItemIcon {
+      margin-right: 8px;
+      
+      @media screen and (max-width: 526px) {
+        margin-right: 3px;
+      }
+    }
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 16px);
+    height: 32px;
+    width: 16px;
+    border: 1px solid var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
+    background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  }
+  &::before {
+    left: -1px;
+    border-radius: 0 16px 16px 0;
+    border-left: none;
+  }
+  &::after {
+    right: -1px;
+    border-radius: 16px 0 0 16px;
+    border-right: none
+  }
+}
+
+.mobileStickyTopContainer {
+  @media screen and (min-width:992px) {
+    display : none;
+  }
+  
+  z-index : 2;
+  position : absolute;
+  bottom : 0;
+  left : 4px;
+  width: calc(100% - 8px);
+
+  .mobileStickyTop {
+    width: 100%;
+    border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    border-radius : 12px;
+    background : linear-gradient(
+      220.68deg,
+      var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) -10.5%,
+      var(--passion-profile-lightest-color, #{map-get($colors, 'ColumbiaBlue')}) 52.15%,
+      var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')}) 145.15%
+    );
+    padding: 2px 8px;
+
+    .stickyTopPassName {
+      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      font-size : 16px;
+    }
+    
+    .stickyTopDetails {
+      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      font-size: 12px;
+    }
+
+    .dropdownIcon {
+      margin-top : 12px;
+      font-size : 24px;
+      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')})
+    }
+  }
+}
+
+.passContentContainer {
+  @media screen and (max-width: 993px) {
+    flex-flow: row nowrap !important;
+    overflow-x: scroll;
+    padding-bottom: 12px !important;
+
+    &::-webkit-scrollbar {
+      height: 12px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 20px;
+      background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'WhiteSmoke1')});
+      border: 3px solid var(--passion-profile-light-color, #{map-get($colors, 'White')});
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--passion-profile-lightest-color, #{map-get($colors, 'White1')});
+    }
+  }
+
+  .fadedItemContainer {
+    position: relative;
+
+    .fadedItem {
+      opacity: 0.3;
+    }
+
+    .fadedOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+
+      display: flex;
+      align-items: center;
+
+      .seeMoreButton {
+        margin: auto;
+        text-align: center;
+        color: map-get($map: $colors, $key: 'Zeus') !important;
+        font-size: 24px;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 0.7;
+        }
+
+        .seeMoreIcon {
+          display: block;
+          font-size: 48px;
+          margin-bottom: 12px;
+        }
+      }
+    }
+  }
+}
+
+.bottomOffset {
+  margin-bottom : 100px;
+}
+
+.creatorProfileSection {
+  .creatorInfoContainer {
+    .creatorName {
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+    }
+
+    .joinTimeText {
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+    }
+  }
+
+  .creatorBio {
+    padding: 0 12px !important;
+
+    .bio {
+      p,
+      span {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+        background: transparent !important;
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+      }
+    }
+
+    .collapsedBio {
+      p,
+      span {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+        background: transparent !important;
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+      }
+
+      max-height: 72px;
+      overflow: hidden;
+    }
+
+    .readMoreBio {
+      @extend .readMoreText;
+      color: var(--passion-profile-primary-color, #{map-get($colors, 'Smalt')}) !important;
+      margin: 8px 0;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+    }
+  }
+
+  .creatorSocialMediaLinksContainer {
+    .followMeText {
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+    }
+  }
+}
+
+.moreContentDrawer {
+  .bottomSheetsTitle {
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+  }
+
+  :global {
+    .ant-drawer-content {
+      background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+    }
+  }
+}
+
+.mobileBuyButtonContainer {
+  @media screen and (min-width: 992px) {
+    display: none;
+  }
+
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+
+  .mobileBuyButton {
+    border-radius: 12px 12px 0 0;
+    padding: 16px 12px;
+    border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    background-color: var(--passion-profile-light-color, #{map-get($colors, 'ColumbiaBlue')});
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
+
+    .stickyPassName {
+      margin-bottom: 0 !important;
+      color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Smalt')}) !important;
+      font-size: 24px !important;
+
+      @media screen and (max-width: 768px) {
+        font-size: 20px !important;
+      }
+
+      @media screen and (max-width: 526px) {
+        font-size: 16px !important;
+      }
+
+      &.longText {
+        font-size: 20px;
+
+        @media screen and (max-width: 768px) {
+          font-size: 16px;
+        }
+
+        @media screen and (max-width: 526px) {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .stickyPassDetails {
+      .passDetailItem {
+        color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+        font-size: 18px;
+
+        @media screen and (max-width: 1025px) {
+          font-size: 16px;
+        }
+
+        @media screen and (max-width: 769px) {
+          font-size: 18px;
+        }
+
+        @media screen and (max-width: 526px) {
+          font-size: 12px;
+        }
+      }
+    }
+
+    .stickyBuyButton {
+      background-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+      border-color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+
+      @media screen and (max-width: 993px) and (min-width: 576px) {
+        margin-right: 60px !important;
+      }
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      .darkText {
+        color: map-get($map: $colors, $key: 'Zeus') !important;
+      }
+
+      .whiteText {
+        color: map-get($colors, 'White') !important;
+      }
+    }
+  }
+}

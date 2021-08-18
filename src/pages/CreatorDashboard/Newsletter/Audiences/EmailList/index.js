@@ -125,7 +125,7 @@ const EmailList = () => {
   const deleteAudience = async (audience) => {
     try {
       const { status } = await apis.audiences.deleteAudienceFromList({
-        id: [audience.id],
+        external_ids: [audience.id],
       });
 
       if (isAPISuccess(status)) {

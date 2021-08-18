@@ -164,7 +164,7 @@ const IDealPayment = ({ disabled = false, onBeforePayment, onAfterPayment, payme
 
         if (error) {
           // Show error to your customer.
-          console.log(error);
+          console.error(error);
           showErrorModal('An error occurred!', error.message);
         }
 

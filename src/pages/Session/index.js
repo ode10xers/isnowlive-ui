@@ -124,6 +124,7 @@ const priceTypes = {
 
 const Session = ({ match, history }) => {
   const location = useLocation();
+  const isAvailability = location.pathname.includes(Routes.creatorDashboard.createAvailabilities);
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionImageUrl, setSessionImageUrl] = useState(null);
@@ -211,7 +212,10 @@ const Session = ({ match, history }) => {
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
       try {
-        const { data } = await apis.session.getDetails(sessionId, startDate, endDate);
+        const { data } = isAvailability
+          ? await apis.availabilities.getDetails(sessionId, startDate, endDate)
+          : await apis.session.getDetails(sessionId, startDate, endDate);
+
         if (data) {
           // The session_date gets messed up here, so trying to fix it here
           if (data.inventory.length > 0) {
@@ -265,7 +269,7 @@ const Session = ({ match, history }) => {
         }
       }
     },
-    [form, history, isOnboarding, getCreatorCurrencyDetails]
+    [form, history, isAvailability, isOnboarding, getCreatorCurrencyDetails]
   );
 
   const fetchCreatorDocuments = useCallback(async () => {
@@ -333,6 +337,7 @@ const Session = ({ match, history }) => {
   const onSessionImageUpload = (imageUrl) => {
     setSessionImageUrl(imageUrl);
     setSession({ ...session, session_image_url: imageUrl });
+    form.setFieldsValue({ ...form.getFieldsValue(), session_image_url: imageUrl });
   };
 
   const handleSessionCourseType = (e) => {
@@ -637,7 +642,7 @@ const Session = ({ match, history }) => {
             : values.price || (sessionPaymentType === priceTypes.FLEXIBLE ? 5 : 0), // Setting Default to 5 for Flexible payment
         pay_what_you_want: sessionPaymentType === priceTypes.FLEXIBLE,
         currency: values.currency?.toLowerCase() || stripeCurrency?.toLowerCase() || '',
-        max_participants: values.max_participants,
+        max_participants: isAvailability ? 1 : values.max_participants,
         name: values.name,
         description: values.description,
         prerequisites: values.prerequisites,
@@ -657,7 +662,9 @@ const Session = ({ match, history }) => {
             : values.selected_member_tags || session?.tags?.map((tag) => tag.external_id) || [],
         is_offline: isOfflineSession,
         offline_event_address: values.offline_event_address,
+        type: isAvailability ? 'AVAILABILITY' : null,
       };
+
       if (isSessionRecurring) {
         data.beginning = moment(values.recurring_dates_range[0]).startOf('day').utc().format();
         data.expiry = moment(values.recurring_dates_range[1]).endOf('day').utc().format();
@@ -675,7 +682,10 @@ const Session = ({ match, history }) => {
           await apis.session.delete(JSON.stringify(deleteSlot));
         }
         if (session.session_id) {
-          const updatedSessionResponse = await apis.session.update(session.session_id, data);
+          const updatedSessionResponse = isAvailability
+            ? await apis.availabilities.update(session.session_id, data)
+            : await apis.session.update(session.session_id, data);
+
           if (isAPISuccess(updatedSessionResponse.status)) {
             trackSuccessEvent(eventTagObject.submitUpdate, { form_values: values });
 
@@ -701,7 +711,9 @@ const Session = ({ match, history }) => {
             });
           }
         } else {
-          const newSessionResponse = await apis.session.create(data);
+          const newSessionResponse = isAvailability
+            ? await apis.availabilities.create(data)
+            : await apis.session.create(data);
 
           if (isAPISuccess(newSessionResponse.status)) {
             pushToDataLayer(gtmTriggerEvents.CREATOR_CREATE_SESSION, {
@@ -776,7 +788,7 @@ const Session = ({ match, history }) => {
               }
               icon={<ArrowLeftOutlined />}
             >
-              Sessions
+              {isAvailability ? 'Availabilities' : 'Sessions'}
             </Button>
           </Col>
         </Row>
@@ -784,13 +796,14 @@ const Session = ({ match, history }) => {
       <Space size="middle" className={!isOnboarding && styles.mt30}>
         <Typography>
           <Title level={isMobileDevice ? 3 : 1} className={styles.titleText}>
-            {session.session_id ? 'Update' : 'Create'} Session
+            {session.session_id ? 'Update' : 'Create'} {isAvailability ? 'Availability' : 'Session'}
           </Title>
           {isOnboarding && <a href={Routes.creatorDashboard.rootPath}>Do it later</a>}
           <Paragraph className={styles.mt10} type="secondary">
-            Setup the event you plan to host. Adding a name, session image and description for the attendees is
-            mandatory and you can also add pre-requisite or a document to make it more descriptive. Then select the days
-            and time you want to host this session.
+            Setup the event you plan to host. Adding a name, {isAvailability ? 'availability' : 'session'} image and
+            description for the attendees is mandatory and you can also add pre-requisite or a document to make it more
+            descriptive. Then select the days and time you want to host this{' '}
+            {isAvailability ? 'availability' : 'session'}.
           </Paragraph>
         </Typography>
       </Space>
@@ -818,7 +831,7 @@ const Session = ({ match, history }) => {
                 action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                 onChange={onSessionImageUpload}
                 value={sessionImageUrl}
-                label="Session Image (size of Facebook Cover Image)"
+                label={`${isAvailability ? 'Availability' : 'Session'} Image (size of Facebook Cover Image)`}
                 overlayHelpText="Click to change image (size of Facebook Cover Image)"
               />
             </div>
@@ -827,7 +840,7 @@ const Session = ({ match, history }) => {
           <Form.Item wrapperCol={24} hidden={match?.params?.id}>
             <Form.Item
               {...profileFormItemLayout}
-              label="Session Hosting Type"
+              label={`${isAvailability ? 'Availability' : 'Session'} Hosting Type`}
               name="is_offline"
               id="is_offline"
               rules={validationRules.requiredValidation}
@@ -857,7 +870,7 @@ const Session = ({ match, history }) => {
                     We will automatically generate the meeting link for each event. If you wish to input the meeting
                     details for each event, you can do so in the{' '}
                     <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath} target="_blank">
-                      Upcoming Sessions
+                      Upcoming {isAvailability ? 'Availabilities' : 'Sessions'}
                     </Link>
                     .
                   </Text>
@@ -878,13 +891,18 @@ const Session = ({ match, history }) => {
 
           {(isOfflineSession || zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
             <>
-              <Form.Item label="Session Name" id="name" name="name" rules={validationRules.nameValidation}>
-                <Input placeholder="Enter Session Name" maxLength={60} />
+              <Form.Item
+                label={`${isAvailability ? 'Availability' : 'Session'} Name`}
+                id="name"
+                name="name"
+                rules={validationRules.nameValidation}
+              >
+                <Input placeholder={`Enter ${isAvailability ? 'Availability' : 'Session'} Name`} maxLength={60} />
               </Form.Item>
 
               <Form.Item
                 className={classNames(styles.bgWhite, styles.textEditorLayout)}
-                label={<Text> Session Description </Text>}
+                label={<Text> {isAvailability ? 'Availability' : 'Session'} Description </Text>}
                 name="description"
                 id="description"
                 rules={validationRules.requiredValidation}
@@ -928,15 +946,19 @@ const Session = ({ match, history }) => {
 
               <Form.Item
                 className={classNames(styles.bgWhite, styles.textEditorLayout)}
-                label="Session Pre-requisite"
+                label={`${isAvailability ? 'Availability' : 'Session'} Pre-requisite`}
                 name="prerequisites"
               >
-                <TextEditor name="prerequisites" form={form} placeholder="  Please input session pre-requisite" />
+                <TextEditor
+                  name="prerequisites"
+                  form={form}
+                  placeholder={`  Please input ${isAvailability ? 'availability' : 'session'} pre-requisite`}
+                />
               </Form.Item>
 
               {/* ---- Session Course Type ---- */}
               <>
-                <Form.Item label="Session Type" required>
+                <Form.Item label={`${isAvailability ? 'Availability' : 'Session'} Type`} required>
                   <Form.Item
                     name="session_course_type"
                     id="session_course_type"
@@ -945,8 +967,8 @@ const Session = ({ match, history }) => {
                     className={styles.inlineFormItem}
                   >
                     <Radio.Group>
-                      <Radio value="normal">Normal Session</Radio>
-                      <Radio value="course">Course Session</Radio>
+                      <Radio value="normal">Normal {isAvailability ? 'Availability' : 'Session'}</Radio>
+                      <Radio value="course">Course {isAvailability ? 'Availability' : 'Session'}</Radio>
                     </Radio.Group>
                   </Form.Item>
                   <Form.Item className={styles.inlineFormItem}>
@@ -1019,15 +1041,19 @@ const Session = ({ match, history }) => {
                   name="type"
                   id="type"
                   label="Attendee Type"
-                  rules={validationRules.requiredValidation}
+                  rules={isAvailability ? undefined : validationRules.requiredValidation}
                   onChange={handleSessionType}
                 >
-                  <Radio.Group>
-                    <Radio value="Group">Group</Radio>
-                    <Radio disabled={isCourseSession} value="1-on-1">
-                      Private (1 individual)
-                    </Radio>
-                  </Radio.Group>
+                  {isAvailability ? (
+                    <Text>Availability is only available for Private Attendee (1 individual)</Text>
+                  ) : (
+                    <Radio.Group>
+                      <Radio value="Group">Group</Radio>
+                      <Radio disabled={isCourseSession} value="1-on-1">
+                        Private (1 individual)
+                      </Radio>
+                    </Radio.Group>
+                  )}
                 </Form.Item>
 
                 <Form.Item
@@ -1035,7 +1061,7 @@ const Session = ({ match, history }) => {
                   name="max_participants"
                   extra="Maximum 100 supported"
                   rules={validationRules.requiredValidation}
-                  hidden={!isSessionTypeGroup}
+                  hidden={isAvailability || !isSessionTypeGroup}
                 >
                   {isSessionTypeGroup && <InputNumber min={2} max={100} />}
                 </Form.Item>
@@ -1045,7 +1071,7 @@ const Session = ({ match, history }) => {
               <>
                 <Form.Item
                   name="price_type"
-                  label="Session Price"
+                  label={`${isAvailability ? 'Availability' : 'Session'} Price`}
                   rules={validationRules.requiredValidation}
                   onChange={handleSessionPriceType}
                 >
@@ -1112,7 +1138,10 @@ const Session = ({ match, history }) => {
                       onChange={handleRefundBeforeHoursChange}
                     >
                       <InputNumber value={refundBeforeHours} min={0} placeholder="Hours limit" />
-                      <span className="ant-form-text"> hour(s) before the session starts </span>
+                      <span className="ant-form-text">
+                        {' '}
+                        hour(s) before the {isAvailability ? 'availability' : 'session'} starts{' '}
+                      </span>
                     </Form.Item>
                   </>
                 )}
@@ -1138,17 +1167,17 @@ const Session = ({ match, history }) => {
           <>
             {/* ========= SESSION SCHEDULE =========== */}
             <Section>
-              <Title level={4}>2. Session Schedule</Title>
+              <Title level={4}>2. {isAvailability ? 'Availability' : 'Session'} Schedule</Title>
 
               <Form.Item
                 name="recurring"
-                label="Session Recurrence"
+                label={`${isAvailability ? 'Availability' : 'Session'} Recurrence`}
                 rules={validationRules.requiredValidation}
                 onChange={handleSessionRecurrence}
               >
                 <Radio.Group>
-                  <Radio value={false}>One Time Session</Radio>
-                  <Radio value={true}>Repeating Sessions</Radio>
+                  <Radio value={false}>One Time {isAvailability ? 'Availability' : 'Session'}</Radio>
+                  <Radio value={true}>Repeating {isAvailability ? 'Availabilities' : 'Sessions'}</Radio>
                 </Radio.Group>
               </Form.Item>
 
@@ -1159,8 +1188,12 @@ const Session = ({ match, history }) => {
                   {...(!isMobileDevice && profileFormTailLayout)}
                   layout="vertical"
                 >
-                  <Text>First Session Date: </Text>
-                  <Text className={isMobileDevice ? styles.ml5 : styles.ml30}> Last Session Date:</Text> <br />
+                  <Text>First {isAvailability ? 'Availability' : 'Session'} Date: </Text>
+                  <Text className={isMobileDevice ? styles.ml5 : styles.ml30}>
+                    {' '}
+                    Last {isAvailability ? 'Availability' : 'Session'} Date:
+                  </Text>{' '}
+                  <br />
                   <RangePicker
                     className={styles.rangePicker}
                     defaultValue={recurringDatesRanges}

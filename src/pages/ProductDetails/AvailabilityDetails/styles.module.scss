@@ -1,0 +1,215 @@
+@import '../../../styles/variables.scss';
+
+.mobileOnly {
+  display : none;
+  
+  @media screen and (max-width: 769px) {
+    display : initial;
+  }
+}
+
+.desktopOnly {
+  @media screen and (max-width: 769px) {
+    display : none;
+  }
+}
+
+.dateView, .formView {
+  @media screen and (max-width: 769px) {
+    &.hidden {
+      display : none;
+    }
+  }
+}
+
+.availabilityPageContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  padding: 50px;
+
+  @media screen and (min-width: 1440px) {
+    padding: 100px;
+  }
+  
+  @media screen and (max-width: 1025px) {
+    padding: 30px;
+  }
+
+  @media screen and (max-width: 769px) {
+    padding: 20px;
+  }
+
+  @media screen and (max-width: 526px) {
+    padding: 8px;
+  }
+}
+
+.readMoreButton {
+  color : var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  font-weight: 600;
+}
+
+.availabilityHeaderImage {
+  border-radius: 16px;
+  margin-bottom: 30px;
+  object-fit: contain;
+}
+
+.availabilityContentContainer {
+  margin-top: 4px;
+}
+
+.availabilityInfoSeparator {
+  color: #c4c4c4 !important;
+  font-size: 18px;
+  // margin-bottom: 14px;
+  align-self : center;
+  padding: 0 6px;
+
+  @media screen and (max-width: 527px) {
+    font-size: 12px;
+  }
+}
+
+.availabilityInfo {
+  color: var(
+    --passion-profile-darker-color,
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
+  ) !important;
+  font-size: 22px;
+  text-transform: uppercase;
+
+  @media screen and (max-width: 527px) {
+    font-size: 16px;
+  }
+}
+
+.availabilityTitle {
+  color: var(
+    --passion-profile-darker-color,
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
+  ) !important;
+  font-size: 30px !important;
+
+  @media screen and (max-width: 527px) {
+    font-size: 24px !important;
+  }
+}
+
+.availabilityLocation {
+  color: var(
+    --passion-profile-darker-color,
+    #{map-get($map: $colors, $key: 'PrussianBlue')}
+  ) !important;
+
+  font-size: 16px !important;
+  margin-bottom : 20px !important;
+}
+
+.availabilityDivider {
+  margin-top : 10px;
+  margin-bottom : 10px;
+}
+
+.availabilityDescription {
+  color: var(
+    --passion-profile-darker-color,
+    var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+  ) !important;
+  margin-bottom : 0 !important;
+
+  p,
+  span {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+    background: transparent !important;
+    color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+  }
+}
+
+.availabilityTitleWrapper {
+  margin-bottom: 30px;
+}
+
+.availabilityDateTitle {
+  color: var(
+    --passion-profile-darker-color,
+    var(--session-list-card-font-color, #{map-get($map: $colors, $key: 'PrussianBlue')})
+  ) !important;
+  font-size: 20px !important;
+  margin-bottom: 0 !important;
+}
+
+.availabilityMonth {
+  width: 100%;
+
+  :global {
+    .ant-select-selector {
+      border-radius: 1024px !important;
+      background-color: #86868619 !important;
+    }
+  }
+}
+
+.availabilityDateDayOfWeek {
+  color: #1f1f1f;
+  font-size: 19px;
+  opacity: 0.6;
+  margin-bottom: 4px !important;
+  text-align: center;
+}
+
+.availabilityDateDayOfMonth {
+  color: #1f1f1f;
+  font-size: 25px;
+  text-align: center;
+  margin-bottom: 0 !important;
+}
+
+.availabilityTimeRange {
+  color: #1f1f1f !important;
+  font-size: 18.3px;
+  text-align: center;
+}
+
+.availabilityTextSelected {
+  color: var(--passion-profile-lightest-color) !important;
+}
+
+.availabilityTimeInfo {
+  font-size: 14px;
+  text-align: center;
+}
+
+.availabilityTimeInfoSelected {
+  color: var(--passion-profile-lightest-color) !important;
+}
+
+.availabilityTimeInfoAvailable {
+  color: #5b8c00 !important;
+}
+
+.availabilityTimeInfoBooked {
+  color: #660000 !important;
+}
+
+.confirmBookingButton {
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  margin: 30px 0;
+
+  @media screen and (min-width: 769px) {
+    display : none !important;
+  }
+}
+
+.changeDateButton {
+  color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  margin: 10px 0 0;
+  
+  @media screen and (min-width: 769px) {
+    display : none !important;
+  }
+}

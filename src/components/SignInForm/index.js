@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import classNames from 'classnames';
 import { Form, Row, Col, Input, Typography, Button, message } from 'antd';
 
 import apis from 'apis';
@@ -83,19 +82,22 @@ const SignInForm = ({ user, hideSignInForm }) => {
   };
 
   return (
-    <div className={classNames(styles.box, styles.p50, styles.mb20)}>
+    <div className={styles.signInWrapper}>
       <Loader loading={isLoading} text="Signing in..." size="large">
         <Row>
           <Col xs={24} md={24}>
-            <Title level={3}> Sign In </Title>
+            <Title level={3} className={styles.signInTitle}>
+              {' '}
+              Sign In{' '}
+            </Title>
           </Col>
           <Col xs={24} md={24}>
-            <Text>
+            <Text className={styles.signInHelpText}>
               If you have ever bought a session with us, then you have an account. Please sign in or use the set new
               password option to set a password if you haven’t already
             </Text>
           </Col>
-          <Col xs={24} md={24} className={styles.mt10}>
+          <Col xs={24} md={24} className={styles.formContainer}>
             <Form form={form} labelAlign="left" onFinish={onFinish} scrollToFirstError={true} {...signInFormLayout}>
               <Form.Item label="Email" name="email" rules={validationRules.emailValidation}>
                 <Input className={styles.signInInput} placeholder="Enter your email" />
@@ -129,12 +131,12 @@ const SignInForm = ({ user, hideSignInForm }) => {
               </Form.Item>
               <Form.Item {...signInTailLayout}>
                 <Row>
-                  <Col xs={24} xl={6}>
-                    <Button size="large" type="primary" htmlType="submit">
+                  <Col xs={24}>
+                    <Button className={styles.signInButton} size="large" type="primary" htmlType="submit">
                       Sign In
                     </Button>
                   </Col>
-                  <Col xs={24} xl={18}>
+                  <Col xs={24}>
                     <Button className={styles.linkBtn} type="link" onClick={() => hideSignInForm()}>
                       Don't have an account? Register Now
                     </Button>

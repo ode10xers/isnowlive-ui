@@ -23,4 +23,7 @@ export default {
   zoom: {
     oAuthURL: `https://zoom.us/oauth/authorize?response_type=code&client_id=brQnuitATty_4L23JGrIYg&redirect_uri=https://app.passion.do/creator/dashboard/livestream`,
   },
+  paypal: {
+    clientID: 'AYjnZ5fGLF35MhFWkadUyPxLroWjN4N8UcyJ7Vj33v9zMbw1k5h85scWvga_9kFZh5CwbElxXz4SiYSB',
+  },
 };

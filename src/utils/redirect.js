@@ -1,5 +1,5 @@
 import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
-import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
+// import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { getLocalUserDetails } from 'utils/storage';
 
 export const redirectToInventoryPage = (inventory) => {
@@ -12,11 +12,12 @@ export const redirectToInventoryPage = (inventory) => {
   const baseUrl = generateUrlFromUsername(inventory.creator_username || inventory.username || urlUsername);
   const targetUrl = `${baseUrl}/e/${inventory.inventory_id}`;
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    window.open(targetUrl, '_self');
-  } else {
-    window.open(targetUrl);
-  }
+  window.open(targetUrl);
+  // if (isInIframeWidget() || isWidgetUrl()) {
+  //   window.open(targetUrl, '_self');
+  // } else {
+  //   window.open(targetUrl);
+  // }
 };
 
 export const redirectToSessionsPage = (session) => {
@@ -27,13 +28,15 @@ export const redirectToSessionsPage = (session) => {
   }
 
   const baseUrl = generateUrlFromUsername(session.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}/s/${session.session_id}`;
+  const isAvailability = session.type === 'AVAILABILITY';
+  const targetUrl = `${baseUrl}/${isAvailability ? 'a' : 's'}/${session.session_id}`;
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    window.open(targetUrl, '_self');
-  } else {
-    window.open(targetUrl);
-  }
+  window.open(targetUrl);
+  // if (isInIframeWidget() || isWidgetUrl()) {
+  //   window.open(targetUrl, '_self');
+  // } else {
+  //   window.open(targetUrl);
+  // }
 };
 
 export const redirectToVideosPage = (video) => {
@@ -47,11 +50,12 @@ export const redirectToVideosPage = (video) => {
 
   const targetUrl = `${baseUrl}/v/${video.external_id}`;
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    window.open(targetUrl, '_self');
-  } else {
-    window.open(targetUrl);
-  }
+  window.open(targetUrl);
+  // if (isInIframeWidget() || isWidgetUrl()) {
+  //   window.open(targetUrl, '_self');
+  // } else {
+  //   window.open(targetUrl);
+  // }
 };
 
 export const redirectToCoursesPage = (course) => {
@@ -82,11 +86,12 @@ export const redirectToPassesPage = (pass) => {
   const baseUrl = generateUrlFromUsername(pass.creator_username || urlUsername);
   const targetUrl = `${baseUrl}/p/${pass.id}`;
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    window.open(targetUrl, '_self');
-  } else {
-    window.open(targetUrl);
-  }
+  window.open(targetUrl);
+  // if (isInIframeWidget() || isWidgetUrl()) {
+  //   window.open(targetUrl, '_self');
+  // } else {
+  //   window.open(targetUrl);
+  // }
 };
 
 export const redirectToMembershipPage = (subscription) => {
@@ -105,9 +110,10 @@ export const redirectToMembershipPage = (subscription) => {
   const baseUrl = generateUrlFromUsername(subscription.creator_username || urlUsername);
   const targetUrl = `${baseUrl}/m/${subscription.external_id}`;
 
-  if (isInIframeWidget() || isWidgetUrl()) {
-    window.open(targetUrl, '_self');
-  } else {
-    window.open(targetUrl);
-  }
+  window.open(targetUrl);
+  // if (isInIframeWidget() || isWidgetUrl()) {
+  //   window.open(targetUrl, '_self');
+  // } else {
+  //   window.open(targetUrl);
+  // }
 };

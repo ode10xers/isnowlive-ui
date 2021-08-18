@@ -4,21 +4,23 @@ import { useHistory } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
-  EditOutlined,
-  SaveOutlined,
+  ArrowLeftOutlined,
+  CheckOutlined,
+  ClockCircleOutlined,
   CloseCircleOutlined,
+  EditOutlined,
+  GlobalOutlined,
   LikeOutlined,
   LinkOutlined,
   PlusCircleOutlined,
-  ArrowLeftOutlined,
-  GlobalOutlined,
-  CheckOutlined,
+  SaveOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import AvailabilityProfileComponent from 'components/DynamicProfileComponents/AvailabilityProfileComponent';
 import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
@@ -51,6 +53,16 @@ const { Paragraph } = Typography;
 // },
 
 const componentsMap = {
+  AVAILABILITY: {
+    icon: <ClockCircleOutlined />,
+    component: AvailabilityProfileComponent,
+    label: 'Availability',
+    optional: false,
+    defaultProps: {
+      title: 'AVAILABILITY',
+      values: null,
+    },
+  },
   PRODUCTS: {
     icon: <LikeOutlined />,
     component: ProductsProfileComponent,
@@ -477,11 +489,15 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   };
 
   const renderDraggableCustomComponents = (component, idx) => {
-    if (component.key === 'DONATIONS') {
+    // if (component.key === 'DONATIONS') {
+    //   return null;
+    // }
+
+    const RenderedComponent = componentsMap[component.key]?.component ?? null;
+
+    if (!RenderedComponent) {
       return null;
     }
-
-    const RenderedComponent = componentsMap[component.key].component;
 
     // NOTE : We are passing the color here to programatically add styling
     // to more buttons and nav bars, so we know if we need a light text (for dark BG)
