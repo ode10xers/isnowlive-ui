@@ -52,15 +52,23 @@ const PassesProfileComponent = ({
 
   return passes.length > 0 || isEditing ? (
     <Row className={styles.p10} align="middle" justify="center" id="passes">
-      {isEditing && (
+      {/* {isEditing && (
         <Col xs={1}>
           <DragAndDropHandle {...dragHandleProps} />
         </Col>
-      )}
       <Col xs={isEditing ? 22 : 24}>
+      )} */}
+      <Col xs={24}>
+        {/* <ContainerCard
+          title={title ?? 'CREDIT PASSES'}
+          icon={<LikeOutlined className={styles.mr10} />}
+        > */}
         <DynamicProfileComponentContainer
           title={title ?? 'CREDIT PASSES'}
           icon={<LikeOutlined className={styles.mr10} />}
+          isEditing={isEditing}
+          dragDropHandle={<DragAndDropHandle {...dragHandleProps} />}
+          editView={<PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />}
         >
           {isEditing ? (
             <Row gutter={[8, 8]} justify="center" align="center">
@@ -84,12 +92,13 @@ const PassesProfileComponent = ({
             </Spin>
           )}
         </DynamicProfileComponentContainer>
+        {/* </ContainerCard< */}
       </Col>
-      {isEditing && (
+      {/* {isEditing && (
         <Col xs={1}>
           <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />
         </Col>
-      )}
+      )} */}
     </Row>
   ) : null;
 };

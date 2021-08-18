@@ -22,7 +22,6 @@ const SessionsProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  title,
   ...customComponentProps
 }) => {
   const [sessions, setSessions] = useState([]);
@@ -97,46 +96,47 @@ const SessionsProfileComponent = ({
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="center">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> The sessions you have created will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() => window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.sessions, '_blank')}
+          >
+            Manage my sessions
+          </Button>
+        </Space>
+      </Col>
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching sessions">
+      <SessionListView sessions={sessions || []} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: customComponentProps?.title ?? 'SESSIONS',
+    icon: <VideoCameraOutlined className={styles.mr10} />,
+  };
+
+  const editingViewComponent = <SessionEditView configValues={customComponentProps} updateHandler={saveEditChanges} />;
+
   return sessions.length > 0 || isEditing ? (
     <Row className={styles.p10} align="middle" justify="center" id="sessions">
-      {isEditing && (
-        <Col xs={1}>
-          <DragAndDropHandle {...dragHandleProps} />
-        </Col>
-      )}
-      <Col xs={isEditing ? 22 : 24}>
+      <Col xs={24}>
         <DynamicProfileComponentContainer
-          title={title ?? 'SESSIONS'}
-          icon={<VideoCameraOutlined className={styles.mr10} />}
+          {...commonContainerProps}
+          isEditing={isEditing}
+          dragDropHandle={dragAndDropHandleComponent}
+          editView={editingViewComponent}
         >
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="center">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> The sessions you have created will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.sessions, '_blank')
-                    }
-                  >
-                    Manage my sessions
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching sessions">
-              <SessionListView sessions={sessions || []} />
-            </Spin>
-          )}
+          {componentChildren}
         </DynamicProfileComponentContainer>
       </Col>
-      {isEditing && (
-        <Col xs={1}>
-          <SessionEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
-        </Col>
-      )}
     </Row>
   ) : null;
 };

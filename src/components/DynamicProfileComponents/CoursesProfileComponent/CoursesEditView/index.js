@@ -48,9 +48,10 @@ const CoursesEditView = ({ configValues, updateHandler }) => {
     <>
       <Row justify="center">
         <Col xs={24} className={styles.editViewButtonContainer}>
-          <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
+          <Button ghost type="primary" onClick={handleEditComponentClicked} icon={<EditOutlined />} />
+          {/* <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
             <EditOutlined />
-          </button>
+          </button> */}
         </Col>
       </Row>
       <Modal

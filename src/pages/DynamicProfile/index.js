@@ -207,6 +207,16 @@ const sectionData = [
     title: 'My Courses',
     values: null,
   },
+  {
+    key: 'OTHER_LINKS',
+    title: 'My other links',
+    values: null,
+  },
+  // {
+  //   key: 'DONATIONS',
+  //   title: 'Buy me a coffee!',
+  //   values: [5, 10, 15, 20],
+  // },
 ];
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];

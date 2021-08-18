@@ -22,7 +22,6 @@ const VideosProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  title,
   ...customComponentProps
 }) => {
   const [videos, setVideos] = useState([]);
@@ -49,48 +48,47 @@ const VideosProfileComponent = ({
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const editingViewComponent = <VideoEditView configValues={customComponentProps} updateHandler={saveEditChanges} />;
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="center">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> The videos you have created will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() => window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, '_blank')}
+          >
+            Manage my videos
+          </Button>
+        </Space>
+      </Col>
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching Videos">
+      <VideoListView videos={videos} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: customComponentProps?.title ?? 'VIDEOS',
+    icon: <PlayCircleOutlined className={styles.mr10} />,
+  };
+
   return videos.length > 0 || isEditing ? (
     <Row className={styles.p10} align="middle" justify="center" id="videos">
-      {isEditing && (
-        <Col xs={1}>
-          {' '}
-          <DragAndDropHandle {...dragHandleProps} />{' '}
-        </Col>
-      )}
-      <Col xs={isEditing ? 22 : 24}>
+      <Col xs={24}>
         <DynamicProfileComponentContainer
-          title={title ?? 'VIDEOS'}
-          icon={<PlayCircleOutlined className={styles.mr10} />}
+          {...commonContainerProps}
+          isEditing={isEditing}
+          dragDropHandle={dragAndDropHandleComponent}
+          editView={editingViewComponent}
         >
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="center">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> The Videos you have created will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, '_blank')
-                    }
-                  >
-                    Manage my Videos
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching Videos">
-              <VideoListView videos={videos} />
-            </Spin>
-          )}
+          {componentChildren}
         </DynamicProfileComponentContainer>
       </Col>
-      {isEditing && (
-        <Col xs={1}>
-          {' '}
-          <VideoEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
-        </Col>
-      )}
     </Row>
   ) : null;
 };

@@ -10,7 +10,7 @@ import AvailabilityListView from './AvailabilityListView';
 import AvailabilityEditView from './AvailabilityEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
 import ContainerCard from 'components/ContainerCard';
-// import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -19,12 +19,13 @@ import styles from './style.module.scss';
 const { Text } = Typography;
 
 export interface AvailabilityProfileComponentProps {
-  identifier?: unknown
-  isEditing?: boolean
-  dragHandleProps?: Record<string, any>
-  onUpdate: (identifier: unknown, config: unknown) => void
-  onRemove: (identifier: unknown) => void
-  title?: string
+  identifier?: unknown;
+  isEditing?: boolean;
+  dragHandleProps?: Record<string, any>;
+  onUpdate: (identifier: unknown, config: unknown) => void;
+  onRemove: (identifier: unknown) => void;
+  isContained?: boolean;
+  title?: string;
 }
 
 const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps> = ({
@@ -33,25 +34,26 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
   isEditing,
   onRemove,
   onUpdate,
+  isContained = false,
   title,
   ...props
 }) => {
-  const [availableSessions, setAvailableSessions] = useState<Session[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [availableSessions, setAvailableSessions] = useState<Session[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchCreatorSession = useCallback(async () => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const { data, status } = await apis.user.getAvailabilitiesByUsername('upcoming')
+      const { data, status } = await apis.user.getAvailabilitiesByUsername('upcoming');
 
       if (isAPISuccess(status) && data) {
-        const upcomingInventories: UpcomingSessionInventory[] = data
-        const sessionIds = Array.from(new Set(upcomingInventories.map(inventory => inventory.session_id)))
-        const sessions: Session[] =
-          sessionIds
-            .map((sessionId) => upcomingInventories.filter((item) => item.session_id === sessionId)!)
-            .map((items): Session => ({
+        const upcomingInventories: UpcomingSessionInventory[] = data;
+        const sessionIds = Array.from(new Set(upcomingInventories.map((inventory) => inventory.session_id)));
+        const sessions: Session[] = sessionIds
+          .map((sessionId) => upcomingInventories.filter((item) => item.session_id === sessionId)!)
+          .map(
+            (items): Session => ({
               beginning: items[0].beginning,
               color_code: items[0].color_code,
               creator_username: items[0].creator_username,
@@ -60,7 +62,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
               document_urls: items[0].document_urls,
               expiry: items[0].expiry,
               group: items[0].group,
-              inventory: items.map((item)  => ({
+              inventory: items.map((item) => ({
                 end_time: item.end_time,
                 inventory_external_id: item.inventory_external_id,
                 inventory_id: item.inventory_id,
@@ -93,79 +95,83 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
               user_timezone: items[0].user_timezone,
               user_timezone_offset: items[0].user_timezone_offset,
               Videos: null,
-            }))
-        setAvailableSessions(sessions)
+            })
+          );
+        setAvailableSessions(sessions);
       }
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
 
-    setIsLoading(false)
-  }, [])
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
-    fetchCreatorSession()
-  }, [fetchCreatorSession])
+    fetchCreatorSession();
+  }, [fetchCreatorSession]);
 
-  const handleUpdate = useCallback(
-    (config) => onUpdate(identifier, config),
-    [identifier, onUpdate],
-  )
-  const handleRemove = useCallback(
-    () => onRemove(identifier),
-    [identifier, onRemove],
-  )
+  const handleUpdate = useCallback((config) => onUpdate(identifier, config), [identifier, onUpdate]);
+  const handleRemove = useCallback(() => onRemove(identifier), [identifier, onRemove]);
 
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const editingViewComponent = (
+    <AvailabilityEditView config={props} onRemove={handleRemove} onUpdate={handleUpdate} isContained={isContained} />
+  );
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="middle">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> Your upcoming session availability will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() =>
+              window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.availabilities, '_blank')
+            }
+          >
+            Manage my availabilities
+          </Button>
+        </Space>
+      </Col>
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching Availabilities">
+      <AvailabilityListView availabilities={availableSessions} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: title ?? 'AVAILABILITY',
+    icon: <ClockCircleOutlined className={styles.mr10} />,
+  };
 
   return availableSessions.length > 0 || isEditing === true ? (
     <Row align="middle" className={styles.p10} id="availability" justify="center">
-      {isEditing && (
-        <Col xs={1}>
-          <DragAndDropHandle {...dragHandleProps} />
-        </Col>
-      )}
+      {isContained ? (
+        <>
+          {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}
 
-      <Col xs={isEditing ? 22 : 24}>
-        <ContainerCard
-          title={title ?? 'AVAILABILITY'}
-          // @ts-ignore
-          icon={<ClockCircleOutlined className={styles.mr10} />}
-        >
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="middle">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> Your upcoming session availability will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.availabilities, '_blank')
-                    }
-                  >
-                    Manage my availabilities
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching Availabilities">
-              <AvailabilityListView availabilities={availableSessions} />
-            </Spin>
-          )}
-        </ContainerCard>
-      </Col>
+          <Col xs={isEditing ? 22 : 24}>
+            <ContainerCard {...commonContainerProps}>{componentChildren}</ContainerCard>
+          </Col>
 
-      {isEditing && (
-        <Col xs={1}>
-          <AvailabilityEditView
-            config={props}
-            onRemove={handleRemove}
-            onUpdate={handleUpdate}
-          />
+          {isEditing && <Col xs={1}>{editingViewComponent}</Col>}
+        </>
+      ) : (
+        <Col xs={24}>
+          <DynamicProfileComponentContainer
+            {...commonContainerProps}
+            isEditing={isEditing}
+            dragDropHandle={dragAndDropHandleComponent}
+            editView={editingViewComponent}
+          >
+            {componentChildren}
+          </DynamicProfileComponentContainer>
         </Col>
       )}
     </Row>
-  ) : null
-}
+  ) : null;
+};
 
-export default AvailabilityProfileComponent
+export default AvailabilityProfileComponent;

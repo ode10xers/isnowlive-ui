@@ -22,7 +22,6 @@ const CoursesProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  title,
   ...customComponentProps
 }) => {
   const [courses, setCourses] = useState([]);
@@ -49,45 +48,47 @@ const CoursesProfileComponent = ({
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const editingViewComponent = <CoursesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />;
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="center" id="courses">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> The courses you have created will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() => window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses, '_blank')}
+          >
+            Manage my courses
+          </Button>
+        </Space>
+      </Col>
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching Courses">
+      <CoursesListView courses={courses} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: customComponentProps?.title ?? 'COURSES',
+    icon: <BookOutlined className={styles.mr10} />,
+  };
+
   return courses.length > 0 || isEditing ? (
     <Row className={styles.p10} align="middle" justify="center" id="courses">
-      {isEditing && (
-        <Col xs={1}>
-          {' '}
-          <DragAndDropHandle {...dragHandleProps} />{' '}
-        </Col>
-      )}
-      <Col xs={isEditing ? 22 : 24}>
-        <DynamicProfileComponentContainer title={title ?? 'VIDEOS'} icon={<BookOutlined className={styles.mr10} />}>
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="center">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> The Courses you have created will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.courses, '_blank')
-                    }
-                  >
-                    Manage my Courses
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching Courses">
-              <CoursesListView courses={courses} />
-            </Spin>
-          )}
+      <Col xs={24}>
+        <DynamicProfileComponentContainer
+          {...commonContainerProps}
+          isEditing={isEditing}
+          dragDropHandle={dragAndDropHandleComponent}
+          editView={editingViewComponent}
+        >
+          {componentChildren}
         </DynamicProfileComponentContainer>
       </Col>
-      {isEditing && (
-        <Col xs={1}>
-          {' '}
-          <CoursesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
-        </Col>
-      )}
     </Row>
   ) : null;
 };

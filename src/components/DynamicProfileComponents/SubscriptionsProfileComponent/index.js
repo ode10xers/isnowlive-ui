@@ -8,8 +8,8 @@ import Routes from 'routes';
 import SubscriptionsListView from './SubscriptionListView';
 import SubscriptionsEditView from './SubscriptionEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import ContainerCard from 'components/ContainerCard';
 import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
-// import ContainerCard from 'components/ContainerCard';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -23,7 +23,7 @@ const SubscriptionProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  title,
+  isContained = false,
   ...customComponentProps
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -51,44 +51,63 @@ const SubscriptionProfileComponent = ({
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const editingViewComponent = (
+    <SubscriptionsEditView
+      configValues={customComponentProps}
+      updateHandler={saveEditChanges}
+      isContained={isContained}
+    />
+  );
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="center">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> The memberships you have created will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() =>
+              window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
+            }
+          >
+            Manage my memberships
+          </Button>
+        </Space>
+      </Col>
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching memberships">
+      <SubscriptionsListView subscriptions={subscriptions} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: customComponentProps?.title ?? 'MEMBERSHIPS',
+    icon: <ScheduleOutlined className={styles.mr10} />,
+  };
+
   return subscriptions.length > 0 || isEditing ? (
     <Row className={styles.p10} align="middle" justify="center" id="memberships">
-      {isEditing && (
-        <Col xs={1}>
-          <DragAndDropHandle {...dragHandleProps} />{' '}
-        </Col>
-      )}
-      <Col xs={isEditing ? 22 : 24}>
-        <DynamicProfileComponentContainer
-          title={title ?? 'MEMBERSHIPS'}
-          icon={<ScheduleOutlined className={styles.mr10} />}
-        >
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="center">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> The memberships you have created will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
-                    }
-                  >
-                    Manage my memberships
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching memberships">
-              <SubscriptionsListView subscriptions={subscriptions} />
-            </Spin>
-          )}
-        </DynamicProfileComponentContainer>
-      </Col>
-      {isEditing && (
-        <Col xs={1}>
-          <SubscriptionsEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
+      {isContained ? (
+        <>
+          {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}
+          <Col xs={isEditing ? 22 : 24}>
+            <ContainerCard {...commonContainerProps}>{componentChildren}</ContainerCard>
+          </Col>
+          {isEditing && <Col xs={1}>{editingViewComponent}</Col>}
+        </>
+      ) : (
+        <Col xs={24}>
+          <DynamicProfileComponentContainer
+            {...commonContainerProps}
+            isEditing={isEditing}
+            dragDropHandle={dragAndDropHandleComponent}
+            editView={editingViewComponent}
+          >
+            {componentChildren}
+          </DynamicProfileComponentContainer>
         </Col>
       )}
     </Row>
