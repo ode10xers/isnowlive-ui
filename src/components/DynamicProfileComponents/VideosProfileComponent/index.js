@@ -22,6 +22,7 @@ const VideosProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const [videos, setVideos] = useState([]);
@@ -77,7 +78,7 @@ const VideosProfileComponent = ({
     icon: <PlayCircleOutlined className={styles.mr10} />,
   };
 
-  return videos.length > 0 || isEditing ? (
+  return !isContained && (videos.length > 0 || isEditing) ? (
     <Row className={styles.p10} align="middle" justify="center" id="videos">
       <Col xs={24}>
         <DynamicProfileComponentContainer

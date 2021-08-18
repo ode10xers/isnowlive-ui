@@ -14,7 +14,7 @@ const formInitialValues = {
   title: null,
 };
 
-const PassesEditView = ({ configValues, updateHandler }) => {
+const PassesEditView = ({ configValues, updateHandler, isContained }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -48,10 +48,13 @@ const PassesEditView = ({ configValues, updateHandler }) => {
     <>
       <Row justify="center">
         <Col xs={24} className={styles.editViewButtonContainer}>
-          <Button ghost type="primary" onClick={handleEditComponentClicked} icon={<EditOutlined />} />
-          {/* <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
-            <EditOutlined />
-          </button> */}
+          {isContained ? (
+            <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
+              <EditOutlined />
+            </button>
+          ) : (
+            <Button ghost type="primary" onClick={handleEditComponentClicked} icon={<EditOutlined />} />
+          )}
         </Col>
       </Row>
       <Modal

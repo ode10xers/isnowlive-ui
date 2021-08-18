@@ -22,6 +22,7 @@ const SessionsProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const [sessions, setSessions] = useState([]);
@@ -125,7 +126,7 @@ const SessionsProfileComponent = ({
 
   const editingViewComponent = <SessionEditView configValues={customComponentProps} updateHandler={saveEditChanges} />;
 
-  return sessions.length > 0 || isEditing ? (
+  return !isContained && (sessions.length > 0 || isEditing) ? (
     <Row className={styles.p10} align="middle" justify="center" id="sessions">
       <Col xs={24}>
         <DynamicProfileComponentContainer

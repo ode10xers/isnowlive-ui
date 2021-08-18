@@ -22,6 +22,7 @@ const CoursesProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const [courses, setCourses] = useState([]);
@@ -77,7 +78,7 @@ const CoursesProfileComponent = ({
     icon: <BookOutlined className={styles.mr10} />,
   };
 
-  return courses.length > 0 || isEditing ? (
+  return !isContained && (courses.length > 0 || isEditing) ? (
     <Row className={styles.p10} align="middle" justify="center" id="courses">
       <Col xs={24}>
         <DynamicProfileComponentContainer

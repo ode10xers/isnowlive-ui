@@ -5,15 +5,21 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { message, Spin, Row, Col, Button, Space, Modal, Typography } from 'antd';
 import {
   ArrowLeftOutlined,
+  BookOutlined,
   CheckOutlined,
   ClockCircleOutlined,
   CloseCircleOutlined,
   EditOutlined,
+  GiftOutlined,
   GlobalOutlined,
   LikeOutlined,
   LinkOutlined,
+  PlayCircleOutlined,
   PlusCircleOutlined,
+  RetweetOutlined,
   SaveOutlined,
+  ScheduleOutlined,
+  VideoCameraOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -56,11 +62,18 @@ const { Paragraph } = Typography;
 //   ]
 // },
 
+const componentUIType = {
+  CONTAINED: 'CONTAINED', // Will only show when UI style is contained (is_contained = true)
+  OPEN: 'OPEN', // Will only show when UI style is open (is_contained = false)
+  FLEXIBLE: 'FLEXIBLE', // Can show in both
+};
+
 const componentsMap = {
   AVAILABILITY: {
     icon: <ClockCircleOutlined />,
     component: AvailabilityProfileComponent,
     label: 'Availability',
+    type: componentUIType.FLEXIBLE,
     optional: false,
     defaultProps: {
       title: 'AVAILABILITY',
@@ -68,9 +81,10 @@ const componentsMap = {
     },
   },
   PRODUCTS: {
-    icon: <LikeOutlined />,
+    icon: <GiftOutlined />,
     component: ProductsProfileComponent,
     label: 'Products',
+    type: componentUIType.CONTAINED,
     optional: false,
     defaultProps: {
       title: '',
@@ -97,6 +111,7 @@ const componentsMap = {
     icon: <LikeOutlined />,
     label: 'Passes',
     optional: false,
+    type: componentUIType.FLEXIBLE,
     component: PassesProfileComponent,
     defaultProps: {
       title: 'CREDIT PASSES',
@@ -104,8 +119,9 @@ const componentsMap = {
     },
   },
   SUBSCRIPTIONS: {
-    icon: <LikeOutlined />,
+    icon: <ScheduleOutlined />,
     label: 'Memberships',
+    type: componentUIType.FLEXIBLE,
     optional: false,
     component: SubscriptionProfileComponent,
     defaultProps: {
@@ -116,6 +132,7 @@ const componentsMap = {
   OTHER_LINKS: {
     icon: <LinkOutlined />,
     label: 'Other Links',
+    type: componentUIType.FLEXIBLE,
     optional: true,
     component: OtherLinksProfileComponent,
     defaultProps: {
@@ -124,8 +141,9 @@ const componentsMap = {
     },
   },
   SESSIONS: {
-    icon: <LikeOutlined />,
+    icon: <VideoCameraOutlined />,
     label: 'Sessions',
+    type: componentUIType.OPEN,
     optional: false,
     component: SessionsProfileComponent,
     defaultProps: {
@@ -134,8 +152,9 @@ const componentsMap = {
     },
   },
   COURSES: {
-    icon: <LikeOutlined />,
+    icon: <BookOutlined />,
     label: 'Courses',
+    type: componentUIType.OPEN,
     optional: false,
     component: CoursesProfileComponent,
     defaultProps: {
@@ -144,8 +163,9 @@ const componentsMap = {
     },
   },
   VIDEOS: {
-    icon: <LikeOutlined />,
+    icon: <PlayCircleOutlined />,
     label: 'Videos',
+    type: componentUIType.OPEN,
     optional: false,
     component: VideosProfileComponent,
     defaultProps: {
@@ -234,6 +254,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
   const [creatorColorChoice, setCreatorColorChoice] = useState(null);
+  const [containedUI, setContainedUI] = useState(false);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     if (!username) {
@@ -278,7 +299,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   useEffect(() => {
     let profileColorObject = null;
     if (creatorColorChoice) {
-      profileColorObject = generateColorPalletteForProfile(creatorColorChoice, true);
+      profileColorObject = generateColorPalletteForProfile(creatorColorChoice, !containedUI);
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
@@ -292,7 +313,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         });
       }
     };
-  }, [creatorColorChoice]);
+  }, [creatorColorChoice, containedUI]);
 
   //#endregion End of Use Effects
 
@@ -524,6 +545,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
   };
 
+  const handleChangeUIStyleClicked = (e) => {
+    preventDefaults(e);
+
+    setContainedUI(!containedUI);
+    message.success('UI Style changed!');
+  };
+
   //#endregion End of Dashboard Button Handlers
 
   //#region Start Of Component Edit View Handlers
@@ -603,9 +631,22 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     //   return null;
     // }
 
-    const RenderedComponent = componentsMap[component.key]?.component ?? null;
+    const targetComponent = componentsMap[component.key];
+
+    if (!targetComponent) {
+      return null;
+    }
+
+    const RenderedComponent = targetComponent?.component ?? null;
 
     if (!RenderedComponent) {
+      return null;
+    }
+
+    if (
+      (containedUI && targetComponent.type === componentUIType.OPEN) ||
+      (!containedUI && targetComponent.type === componentUIType.CONTAINED)
+    ) {
       return null;
     }
 
@@ -627,6 +668,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               updateConfigHandler={updateComponentConfig}
               removeComponentHandler={removeComponent}
               dragHandleProps={provided.dragHandleProps}
+              isContained={containedUI}
               title={component.title}
               values={component.values}
               headerColor={
@@ -688,6 +730,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   </Button>
                   <Button ghost type="primary" icon={<GlobalOutlined />} onClick={handleNavigateToPublicPage}>
                     Public Page
+                  </Button>
+                  <Button
+                    className={styles.orangeBtn}
+                    type="primary"
+                    icon={<RetweetOutlined />}
+                    onClick={handleChangeUIStyleClicked}
+                  >
+                    Change UI Style
                   </Button>
                 </>
               )}

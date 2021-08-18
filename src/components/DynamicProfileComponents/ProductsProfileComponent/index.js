@@ -73,6 +73,7 @@ const ProductsProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const { values: innerComponents } = customComponentProps;
@@ -155,6 +156,10 @@ const ProductsProfileComponent = ({
     };
     fetchAllProductsData();
   }, [fetchUpcomingSessions, fetchCreatorVideos, fetchCreatorCourses]);
+
+  if (!isContained) {
+    return null;
+  }
 
   const handleMenuClick = (key) => {
     history.push(menuKeyRouteMap[key]);
