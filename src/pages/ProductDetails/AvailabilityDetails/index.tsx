@@ -105,7 +105,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
     if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
       Object.entries(generateColorPalletteForProfile(
-        creatorDetailsResponse.data?.profile?.color || '#1890ff'),
+        creatorDetailsResponse.data?.profile?.color || '#1890ff', true),
       ).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val)
       })
@@ -113,6 +113,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
   }, [])
 
+  // TODO: Find a way to do color cleanup here
   useEffect(() => {
     if (match?.params.session_id) {
       const domainUsername = getUsernameFromUrl();

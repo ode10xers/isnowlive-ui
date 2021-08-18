@@ -34,7 +34,7 @@
   margin-left: -4px;
   font-size: 24px;
   font-weight: 700;
-  color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
+  color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')});
   cursor: pointer;
 
   &.textLength8 {
@@ -55,19 +55,19 @@
 
   :global  {
     .ant-menu-item {
-      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')}) !important;
+      color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
     }
 
     .ant-menu-item-active {
-      color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-      border-bottom: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+      color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+      border-bottom: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
     }
   }
 }
 
 .menuContainer {
   text-align: right !important;
-  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')}) !important;
+  background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
 }
 
 .overflowMenuIcon {
@@ -83,8 +83,8 @@
   font-size: 14px;
   padding: 4px 8px !important;
 
-  color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-  border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
 .navItem {
@@ -95,7 +95,7 @@
   }
 
   &.active {
-    color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    color: var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')});
   }
 }
 
@@ -117,8 +117,8 @@
   }
 
   .mobileSignUpBtn {
-    color: var(--passion-profile-primary-color, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
-  border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+    color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
   }
 
   ul.menuLinks {
@@ -126,7 +126,7 @@
     padding: 0;
 
     & li {
-      color : var(--passion-profile-dark-color, #{map-get($colors, 'Black')});
+      color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')});
       font-size: 16px;
       border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
       width: 100%;
@@ -140,8 +140,8 @@
       }
 
       &.active {
-        border-bottom: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
-        color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+        border-bottom: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')});
+        color: var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')});
       }
 
       &.divider {

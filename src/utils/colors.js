@@ -73,11 +73,10 @@ export const convertHexToHSL = (hexColor) => {
 
 export const formatHSLStyleString = (h, s, l) => `hsl(${clamp(0, h, 360)}, ${clamp(0, s, 100)}%, ${clamp(0, l, 100)}%)`;
 
-export const generateColorPalletteForProfile = (primaryColor) => {
+export const generateColorPalletteForProfile = (primaryColor, shouldColorNavbar = false) => {
   const [h, s, l] = convertHexToHSL(primaryColor);
 
-  // NOTE: We're using HSL here for easier programmatic control
-  return {
+  const profileColors = {
     '--passion-profile-lightest-color': formatHSLStyleString(h, s, l + 44),
     '--passion-profile-lighter-color': formatHSLStyleString(h, s, l + 36),
     '--passion-profile-light-color': formatHSLStyleString(h, s, l + 32),
@@ -85,4 +84,13 @@ export const generateColorPalletteForProfile = (primaryColor) => {
     '--passion-profile-dark-color': formatHSLStyleString(h, s, l - 21),
     '--passion-profile-darker-color': formatHSLStyleString(h, s, l - 28),
   };
+
+  const navbarColors = {
+    '--passion-profile-navbar-bg': profileColors['--passion-profile-lightest-color'],
+    '--passion-profile-navbar-logo': profileColors['--passion-profile-primary-color'],
+    '--passion-profile-navbar-text': profileColors['--passion-profile-dark-color'],
+  };
+
+  // NOTE: We're using HSL here for easier programmatic control
+  return shouldColorNavbar ? { ...profileColors, ...navbarColors } : profileColors;
 };

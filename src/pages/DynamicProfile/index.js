@@ -29,7 +29,7 @@ import CoursesProfileComponent from 'components/DynamicProfileComponents/Courses
 import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
-// import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
+import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
 
 import {
   deepCloneObject,
@@ -67,32 +67,32 @@ const componentsMap = {
       values: null,
     },
   },
-  // PRODUCTS: {
-  //   icon: <LikeOutlined />,
-  //   component: ProductsProfileComponent,
-  //   label: 'Products',
-  //   optional: false,
-  //   defaultProps: {
-  //     title: '',
-  //     values: [
-  //       {
-  //         key: 'SESSIONS',
-  //         title: 'My Sessions',
-  //         values: null,
-  //       },
-  //       {
-  //         key: 'COURSES',
-  //         title: 'My Courses',
-  //         values: null,
-  //       },
-  //       {
-  //         key: 'VIDEOS',
-  //         title: 'My Videos',
-  //         values: null,
-  //       },
-  //     ],
-  //   },
-  // },
+  PRODUCTS: {
+    icon: <LikeOutlined />,
+    component: ProductsProfileComponent,
+    label: 'Products',
+    optional: false,
+    defaultProps: {
+      title: '',
+      values: [
+        {
+          key: 'SESSIONS',
+          title: 'My Sessions',
+          values: null,
+        },
+        {
+          key: 'COURSES',
+          title: 'My Courses',
+          values: null,
+        },
+        {
+          key: 'VIDEOS',
+          title: 'My Videos',
+          values: null,
+        },
+      ],
+    },
+  },
   PASSES: {
     icon: <LikeOutlined />,
     label: 'Passes',
@@ -157,8 +157,34 @@ const componentsMap = {
 
 const sectionData = [
   {
+    key: 'PRODUCTS',
+    title: '',
+    values: [
+      {
+        key: 'SESSIONS',
+        title: 'My Sessions',
+        values: null,
+      },
+      {
+        key: 'COURSES',
+        title: 'My Courses',
+        values: null,
+      },
+      {
+        key: 'VIDEOS',
+        title: 'My Videos',
+        values: null,
+      },
+    ],
+  },
+  {
     key: 'SUBSCRIPTIONS',
     title: 'My Memberships',
+    values: null,
+  },
+  {
+    key: 'AVAILABILITY',
+    title: 'My Appointment times',
     values: null,
   },
   {
@@ -180,11 +206,6 @@ const sectionData = [
     key: 'COURSES',
     title: 'My Courses',
     values: null,
-  },
-  {
-    key: 'DONATIONS',
-    title: 'Buy me a coffee!',
-    values: [5, 10, 15, 20],
   },
 ];
 
@@ -243,12 +264,24 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     setCreatorUIConfig(sectionData ?? []);
   }, [creatorProfileData]);
 
+  // Use Effect to handle page coloring
   useEffect(() => {
+    let profileColorObject = null;
     if (creatorColorChoice) {
-      Object.entries(generateColorPalletteForProfile(creatorColorChoice)).forEach(([key, val]) => {
+      profileColorObject = generateColorPalletteForProfile(creatorColorChoice, true);
+
+      Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
       });
     }
+
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
   }, [creatorColorChoice]);
 
   //#endregion End of Use Effects

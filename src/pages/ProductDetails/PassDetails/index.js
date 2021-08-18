@@ -138,7 +138,7 @@ const PassDetails = ({ match, history }) => {
   useEffect(() => {
     let profileColorObject = null;
     if (creatorProfileColor) {
-      profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
+      profileColorObject = generateColorPalletteForProfile(creatorProfileColor, true);
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
