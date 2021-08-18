@@ -270,7 +270,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const [uiConfigChanged, setUiConfigChanged] = useState(false);
 
   const [creatorColorChoice, setCreatorColorChoice] = useState(null);
-  const [containedUI, setContainedUI] = useState(false);
+  const [containedUI, setContainedUI] = useState(true);
 
   const fetchCreatorProfileData = useCallback(async (username) => {
     if (!username) {

@@ -168,6 +168,7 @@ $spacing: (
   border-radius: 12px !important;
 }
 
+// Note: this class should be deprecated
 .moreButton {
   height: 100% !important;
   min-width: 144px;
@@ -182,7 +183,7 @@ $spacing: (
 }
 
 .topHeader {
-  background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')}) !important;
+  background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
   border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
   padding: 0 20px !important;
   position: fixed;
