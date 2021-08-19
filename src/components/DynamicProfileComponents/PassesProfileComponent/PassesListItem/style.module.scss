@@ -1,42 +1,105 @@
 @import '../../../../styles/variables.scss';
 
 .passItem {
-  background: map-get($map: $colors, $key: 'Ivory');
-  border: 1px dashed map-get($map: $colors, $key: 'Sulu');
-  box-sizing: border-box;
-  border-radius: 4px;
-  padding: 6px;
-  cursor: pointer;
+  padding : 8px 4px;
+  border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+  border-radius : 6px;
+  background-color: var(--passion-profile-light-color, #{map-get($colors, 'PaleCornflowerBlue')});
+
+  &::before,
+  &::after {
+    width: 8px;
+    content: '';
+    height: 12px;
+    position: absolute;
+    top: calc(50% - 6px);
+    border: 1px solid var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+    background-color: var(--passion-profile-lightest-color, #{map-get($colors, 'White')});
+  }
+  &::before {
+    left: 6px;
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+  }
+  &::after {
+    right: 6px;
+    border-radius: 8px 0 0 8px;
+    border-right: none
+  }
 
   .passTitle {
-    @extend .greenText;
+    color : var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
     text-align: center;
     margin: 0;
-    font-size: 20px;
-    line-height: 31px;
+    font-size: 18px;
+    line-height: 32px;
   }
 
   .passDetails {
     padding: 4px;
     width: 100%;
+    margin: 0 auto;
 
-    .passDivider {
-      margin: 0 auto;
-      min-height: 18px;
-    }
+    .passDividerContainer {
+      padding: 0 !important;
+      text-align: center;
 
-    .passValidity {
-      @extend .greenText;
-      font-size: 15px;
-
-      @media screen and (max-width: 376px) {
-        font-size: 12px;
+      .passDivider {
+        margin: 0 auto;
+        padding: 0;
+        min-height: 18px;
       }
     }
 
-    .passPrice {
-      @extend .passValidity;
-      font-weight: 500;
+    .passValidity, .passPrice {
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')});
+      font-size: 14px;
+      font-weight: 400;
+
+      @media screen and (max-width: 527px) {
+        font-size: 12px;
+      }
     }
   }
 }
+
+// .passItem {
+//   background: map-get($map: $colors, $key: 'Ivory');
+//   border: 1px dashed map-get($map: $colors, $key: 'Sulu');
+//   box-sizing: border-box;
+//   border-radius: 4px;
+//   padding: 6px;
+//   cursor: pointer;
+
+//   .passTitle {
+//     @extend .greenText;
+//     text-align: center;
+//     margin: 0;
+//     font-size: 20px;
+//     line-height: 31px;
+//   }
+
+//   .passDetails {
+//     padding: 4px;
+//     width: 100%;
+
+//     .passDivider {
+//       margin: 0 auto;
+//       min-height: 18px;
+//     }
+
+//     .passValidity {
+//       @extend .greenText;
+//       font-size: 15px;
+
+//       @media screen and (max-width: 376px) {
+//         font-size: 12px;
+//       }
+//     }
+
+//     .passPrice {
+//       @extend .passValidity;
+//       font-weight: 500;
+//     }
+//   }
+// }

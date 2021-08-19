@@ -11,7 +11,8 @@ import Routes from 'routes';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
 import dateUtil from 'utils/date';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
+import { generateColorPalletteForProfile } from 'utils/colors';
 import { isInIframeWidget } from 'utils/widgets';
 import parseQueryString from 'utils/parseQueryString';
 
@@ -35,6 +36,8 @@ const SessionDetailedListView = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(start_date ? moment(start_date) : moment());
   const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(start_date ? moment(start_date) : moment());
 
+  const [creatorProfile, setCreatorProfile] = useState(null);
+
   const fetchUpcomingSessions = useCallback(async () => {
     setIsLoading(true);
 
@@ -52,9 +55,52 @@ const SessionDetailedListView = () => {
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
+    try {
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorProfile(data);
+      }
+    } catch (error) {
+      message.error('Failed to fetch creator profile details');
+      console.error(error);
+    }
+  }, []);
+
   useEffect(() => {
+    const domainUsername = getUsernameFromUrl();
+
+    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
+      fetchCreatorProfileDetails(domainUsername);
+    }
+
     fetchUpcomingSessions();
-  }, [fetchUpcomingSessions]);
+  }, [fetchUpcomingSessions, fetchCreatorProfileDetails]);
+
+  useEffect(() => {
+    let profileColorObject = null;
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
+
+      Object.entries(profileColorObject).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfile]);
 
   const handleBackClicked = () => history.push(Routes.sessions);
 
@@ -136,8 +182,9 @@ const SessionDetailedListView = () => {
                     <>
                       <Col xs={4} md={2}>
                         <Button
-                          className={styles.blueText}
+                          className={styles.backButton}
                           size="large"
+                          type="primary"
                           icon={<ArrowLeftOutlined />}
                           onClick={handleBackClicked}
                         />
@@ -170,8 +217,10 @@ const SessionDetailedListView = () => {
         ) : (
           <Empty className={styles.w100} description="No sessions found for creator">
             <Button
-              className={styles.blueText}
+              ghost
+              className={styles.backButton}
               size="large"
+              type="primary"
               icon={<ArrowLeftOutlined />}
               onClick={() => history.push(Routes.root)}
             >

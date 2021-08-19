@@ -64,7 +64,7 @@ $spacing: (
   margin-bottom: map-get($spacing, '50');
 }
 .mr10 {
-  margin-right: map-get($map: $spacing, $key: '10');
+  margin-right: map-get($map: $spacing, $key: '10') !important;
 }
 .pl10 {
   padding-left: map-get($spacing, '10');
@@ -168,6 +168,7 @@ $spacing: (
   border-radius: 12px !important;
 }
 
+// Note: this class should be deprecated
 .moreButton {
   height: 100% !important;
   min-width: 144px;
@@ -179,4 +180,13 @@ $spacing: (
   &.lightBg {
     color: map-get($colors, 'Zeus') !important;
   }
+}
+
+.topHeader {
+  background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
+  border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
+  padding: 0 20px !important;
+  position: fixed;
+  z-index: 99;
+  width: 100vw;
 }

@@ -4,22 +4,16 @@ import ReactHtmlParser from 'react-html-parser';
 import { useLocation } from 'react-router-dom';
 
 import { Row, Col, Image, Space, Typography, Divider, Skeleton } from 'antd';
-import {
-  GlobalOutlined,
-  TwitterOutlined,
-  CaretDownOutlined,
-  FacebookFilled,
-  InstagramFilled,
-  LinkedinFilled,
-} from '@ant-design/icons';
+import { CaretDownOutlined } from '@ant-design/icons';
 
 import { getExternalLink } from 'utils/url';
+import { socialMediaIcons } from 'utils/constants';
 
 import styles from './styles.module.scss';
 
 const { Title } = Typography;
 
-const CreatorProfileView = ({ creatorProfile, isEditing }) => {
+const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
   let { search } = useLocation();
   const query = new URLSearchParams(search);
   localStorage.setItem('ref', JSON.stringify(query.get('ref')));
@@ -35,14 +29,46 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
   const checkSocialLinksExists = (linksObj) =>
     linksObj ? Object.entries(linksObj).filter(([key, val]) => val).length > 0 : false;
 
+  const renderCreatorExternalLinks = () => {
+    if (!creatorProfile || !creatorProfile.profile || !creatorProfile.profile.social_media_links) {
+      return null;
+    }
+
+    const creatorSocialMediaLinks = Object.entries(creatorProfile.profile.social_media_links).filter(
+      ([socialMedia, link]) => link
+    );
+
+    if (creatorSocialMediaLinks.length <= 0) {
+      return null;
+    }
+
+    return (
+      <Col xs={24} className={styles.socialIconWrapper}>
+        <Space size={36} align="center" className={isContained ? undefined : styles.socialIconsList}>
+          {creatorSocialMediaLinks.map(([socialMedia, link]) => {
+            const IconElement = socialMediaIcons[socialMedia];
+
+            return (
+              <a href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
+                <IconElement />
+              </a>
+            );
+          })}
+        </Space>
+      </Col>
+    );
+  };
+
   return (
-    <Row className={styles.creatorProfileWrapper}>
+    <Row className={isContained ? styles.containedCreatorProfileWrapper : styles.creatorProfileWrapper}>
       <Col xs={24} className={styles.coverImageWrapper}>
-        {cover_image_url ? (
-          <Image preview={false} width="100%" className={styles.coverImage} src={cover_image_url ?? 'error'} />
-        ) : (
-          <Skeleton.Image height={320} />
-        )}
+        <Image
+          placeholder={<Skeleton.Image loading={true} width="100%" className={styles.coverImage} />}
+          preview={false}
+          width="100%"
+          className={styles.coverImage}
+          src={cover_image_url ?? 'error'}
+        />
       </Col>
       <Col
         xs={24}
@@ -55,11 +81,17 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
           <Col xs={24} className={styles.profileImageWrapper}>
             <Row justify="center">
               <Col>
-                {profile_image_url ? (
-                  <Image className={styles.profileImage} preview={false} src={profile_image_url || 'error'} />
-                ) : (
-                  <Skeleton avatar shape="circle" size="large" />
-                )}
+                <Image
+                  placeholder={
+                    <Skeleton
+                      loading={true}
+                      avatar={{ shape: 'circle', size: 'large', className: styles.profileImage }}
+                    />
+                  }
+                  className={styles.profileImage}
+                  preview={false}
+                  src={profile_image_url ?? 'error'}
+                />
               </Col>
             </Row>
           </Col>
@@ -71,71 +103,23 @@ const CreatorProfileView = ({ creatorProfile, isEditing }) => {
           <Col xs={24}>
             <Divider className={styles.creatorProfileDivider} />
           </Col>
-          <Col xs={24} className={styles.creatorBio}>
-            {shouldExpandCreatorBio ? (
-              <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
-            ) : (
-              <>
-                <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
-                <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
-                  READ MORE <CaretDownOutlined />
-                </div>
-              </>
-            )}
-          </Col>
+          {isContained && (
+            <Col xs={24} className={styles.creatorBio}>
+              {shouldExpandCreatorBio ? (
+                <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+              ) : (
+                <>
+                  <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+                  <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
+                    READ MORE <CaretDownOutlined />
+                  </div>
+                </>
+              )}
+            </Col>
+          )}
         </Row>
       </Col>
-      {checkSocialLinksExists(profileData?.social_media_links) ? (
-        <Col xs={24} className={styles.socialIconWrapper}>
-          <Space size={36} align="center" className={styles.socialIconsList}>
-            {profileData?.social_media_links.website && (
-              <a
-                href={getExternalLink(profileData?.social_media_links?.website)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GlobalOutlined className={styles.socialIcon} />
-              </a>
-            )}
-            {profileData?.social_media_links.facebook_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.facebook_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FacebookFilled className={styles.socialIcon} />
-              </a>
-            ) : null}
-            {profileData?.social_media_links.twitter_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.twitter_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <TwitterOutlined className={styles.socialIcon} />
-              </a>
-            ) : null}
-            {profileData?.social_media_links.instagram_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.instagram_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <InstagramFilled className={styles.socialIcon} />
-              </a>
-            ) : null}
-            {profileData?.social_media_links.linkedin_link ? (
-              <a
-                href={getExternalLink(profileData?.social_media_links.linkedin_link)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <LinkedinFilled className={styles.socialIcon} />
-              </a>
-            ) : null}
-          </Space>
-        </Col>
-      ) : null}
+      {renderCreatorExternalLinks()}
       {isEditing && <div className={styles.clickDisableOverlay} />}
     </Row>
   );

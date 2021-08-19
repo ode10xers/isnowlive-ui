@@ -5,11 +5,16 @@ import CreatorProfileView from './CreatorProfileView';
 
 import styles from './style.module.scss';
 
-const CreatorProfileComponent = ({ creatorProfile, isEditing, refetchCreatorProfileData = () => {} }) => {
+const CreatorProfileComponent = ({
+  creatorProfile,
+  isEditing,
+  isContained = false,
+  refetchCreatorProfileData = () => {},
+}) => {
   return (
     <div className={styles.creatorProfileComponent}>
       <div className={styles.creatorProfileContainer}>
-        <CreatorProfileView creatorProfile={creatorProfile} isEditing={isEditing} />
+        <CreatorProfileView creatorProfile={creatorProfile} isEditing={isEditing} isContained={isContained} />
       </div>
       {isEditing && (
         <CreatorProfileEditView refetchCreatorProfileData={refetchCreatorProfileData} creatorProfile={creatorProfile} />

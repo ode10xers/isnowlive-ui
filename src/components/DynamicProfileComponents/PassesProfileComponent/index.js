@@ -5,10 +5,11 @@ import { LikeOutlined } from '@ant-design/icons';
 import apis from 'apis';
 import Routes from 'routes';
 
-import ContainerCard from 'components/ContainerCard';
 import PassesListView from './PassesListView';
 import PassesEditView from './PassesEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import ContainerCard from 'components/ContainerCard';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import { isAPISuccess } from 'utils/helper';
 
@@ -22,6 +23,7 @@ const PassesProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const [passes, setPasses] = useState([]);
@@ -49,46 +51,57 @@ const PassesProfileComponent = ({
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
-  return passes.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center" id="passes">
-      {isEditing && (
-        <Col xs={1}>
-          {' '}
-          <DragAndDropHandle {...dragHandleProps} />{' '}
-        </Col>
-      )}
-      <Col xs={isEditing ? 22 : 24}>
-        <ContainerCard
-          title={customComponentProps?.title ?? 'CREDIT PASSES'}
-          icon={<LikeOutlined className={styles.mr10} />}
-        >
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="center">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> The passes you have created will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes, '_blank')
-                    }
-                  >
-                    Manage my passes
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching Passes">
-              <PassesListView passes={passes || []} />
-            </Spin>
-          )}
-        </ContainerCard>
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const editingViewComponent = (
+    <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} isContained={isContained} />
+  );
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="center">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> The passes you have created will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() => window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.passes, '_blank')}
+          >
+            Manage my passes
+          </Button>
+        </Space>
       </Col>
-      {isEditing && (
-        <Col xs={1}>
-          {' '}
-          <PassesEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching Passes">
+      <PassesListView passes={passes || []} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: customComponentProps?.title ?? 'CREDIT PASSES',
+    icon: <LikeOutlined className={styles.mr10} />,
+  };
+
+  return passes.length > 0 || isEditing ? (
+    <Row className={styles.p10} align="middle" justify="center">
+      {isContained ? (
+        <>
+          {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}
+          <Col xs={isEditing ? 22 : 24}>
+            <ContainerCard {...commonContainerProps}>{componentChildren}</ContainerCard>
+          </Col>
+          {isEditing && <Col xs={1}>{editingViewComponent}</Col>}
+        </>
+      ) : (
+        <Col xs={24}>
+          <DynamicProfileComponentContainer
+            {...commonContainerProps}
+            isEditing={isEditing}
+            dragDropHandle={dragAndDropHandleComponent}
+            editView={editingViewComponent}
+          >
+            {componentChildren}
+          </DynamicProfileComponentContainer>
         </Col>
       )}
     </Row>

@@ -36,14 +36,16 @@
       .youtubeThumbnail {
         object-fit: cover;
         border-radius: 12px;
-        max-height: 205px;
+        max-height: 135px;
+
+        @media screen and (max-width: 768px) {
+          max-height: 150px;
+        }
       }
 
       .videoThumbnail {
-        border-radius: 12px;
-        object-fit: cover;
+        @extend .youtubeThumbnail;
         width: 100%;
-        max-height: 205px;
       }
 
       .videoStaticImage {
