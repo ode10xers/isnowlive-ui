@@ -5,8 +5,8 @@ import { EditOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
 
-import validationRules from 'utils/validation';
 import { preventDefaults } from 'utils/helper';
+import validationRules from 'utils/validation';
 
 import styles from './style.module.scss';
 
@@ -14,7 +14,7 @@ const formInitialValues = {
   title: null,
 };
 
-const SessionEditView = ({ configValues, updateHandler }) => {
+const VideoEditView = ({ configValues, updateHandler }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -97,4 +97,4 @@ const SessionEditView = ({ configValues, updateHandler }) => {
   );
 };
 
-export default SessionEditView;
+export default VideoEditView;

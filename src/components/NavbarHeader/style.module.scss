@@ -18,6 +18,10 @@
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
+.loggedInUsername {
+  color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')})
+}
+
 .domainNameWrapper {
   flex: 1 1 30%;
 

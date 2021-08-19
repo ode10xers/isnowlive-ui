@@ -51,16 +51,34 @@ import styles from './style.module.scss';
 
 const { Paragraph } = Typography;
 
-// {
-//   "key": "DONATIONS",
-//   "title": "Buy me a coffee!",
-//   "values": [
-//     5,
-//     10,
-//     15,
-//     20
-//   ]
-// },
+/*
+  Sample Data for future reference of components
+
+  OTHER LINKS
+  {
+    "title": "Reference Links",
+    "links": [
+        {
+            "title": "What a link!",
+            "url": "https://bitbucket.org",
+            "textColor": "#ffffff",
+            "backgroundColor": "#1890ff"
+        }
+    ]
+  }
+
+  DONATIONS
+  {
+  "key": "DONATIONS",
+  "title": "Buy me a coffee!",
+  "values": [
+    5,
+    10,
+    15,
+    20
+  ]
+},
+*/
 
 const componentUIType = {
   CONTAINED: 'CONTAINED', // Will only show when UI style is contained (is_contained = true)
@@ -183,89 +201,6 @@ const componentsMap = {
   },
 };
 
-const sectionData = [
-  {
-    key: 'PRODUCTS',
-    title: '',
-    values: [
-      {
-        key: 'SESSIONS',
-        title: 'My Sessions',
-        values: null,
-      },
-      {
-        key: 'COURSES',
-        title: 'My Courses',
-        values: null,
-      },
-      {
-        key: 'VIDEOS',
-        title: 'My Videos',
-        values: null,
-      },
-    ],
-  },
-  {
-    key: 'SUBSCRIPTIONS',
-    title: 'My Memberships',
-    values: null,
-  },
-  {
-    key: 'AVAILABILITY',
-    title: 'My Appointment times',
-    values: null,
-  },
-  {
-    key: 'PASSES',
-    title: 'My Passes',
-    values: null,
-  },
-  {
-    key: 'VIDEOS',
-    title: 'My Videos',
-    values: null,
-  },
-  {
-    key: 'SESSIONS',
-    title: 'My Sessions',
-    values: null,
-  },
-  {
-    key: 'COURSES',
-    title: 'My Courses',
-    values: null,
-  },
-  {
-    key: 'OTHER_LINKS',
-    title: 'My other links',
-    values: [
-      {
-        title: 'Bitbucket',
-        url: 'https://bitbucket.org',
-        textColor: '#ffffff',
-        backgroundColor: '#1890ff',
-      },
-      {
-        title: 'My Playlist',
-        url: 'https://open.spotify.com/',
-        textColor: '#ffffff',
-        backgroundColor: '#1ed760',
-      },
-      {
-        title: 'My YouTube Channel',
-        url: 'https://youtube.com',
-        textColor: '#ffffff',
-        backgroundColor: '#cc0000',
-      },
-    ],
-  },
-  // {
-  //   key: 'DONATIONS',
-  //   title: 'Buy me a coffee!',
-  //   values: [5, 10, 15, 20],
-  // },
-];
-
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
 const DynamicProfile = ({ creatorUsername = null }) => {
@@ -355,7 +290,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   }, [fetchCreatorProfileData, creatorUsername]);
 
   useEffect(() => {
-    setCreatorUIConfig(sectionData ?? []);
+    setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
   }, [creatorProfileData]);
 
   // Use Effect to handle page coloring
@@ -616,6 +551,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   const handleChangeUIStyleClicked = (e) => {
     preventDefaults(e);
 
+    // TODO: Make sure this flag is updated when they click on save
     setContainedUI(!containedUI);
     message.success('UI Style changed!');
   };

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Spin, Row, Col, Space, Button, Typography } from 'antd';
+import { Spin, Row, Col, Space, Button, Typography, message } from 'antd';
 import { PlayCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -37,8 +37,8 @@ const VideosProfileComponent = ({
         setVideos(data.sort((a, b) => (b.thumbnail_url?.endsWith('.gif') ? 1 : -1)));
       }
     } catch (error) {
-      console.error('Failed fetching videos for creator');
       console.error(error);
+      message.error('Failed fetching videos for creator');
     }
     setIsLoading(false);
   }, []);

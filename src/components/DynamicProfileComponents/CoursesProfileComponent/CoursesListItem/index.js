@@ -45,27 +45,6 @@ const CourseListItem = ({ course }) => {
     </Title>
   );
 
-  // const courseContents = (
-  //   <Space
-  //     split={<Divider className={styles.courseDivider} type="vertical" />}
-  //     align="center"
-  //     className={styles.courseContentContainer}
-  //   >
-  //     {course?.inventory_ids?.length > 0 && (
-  //       <Text className={styles.courseContents}>
-  //         {' '}
-  //         {course?.inventory_ids?.length} Session{course?.inventory_ids?.length > 1 ? 's' : ''}{' '}
-  //       </Text>
-  //     )}
-  //     {course?.videos?.length > 0 && (
-  //       <Text className={styles.courseContents}>
-  //         {' '}
-  //         {course?.videos?.length} Video{course?.videos?.length > 1 ? 's' : ''}{' '}
-  //       </Text>
-  //     )}
-  //   </Space>
-  // );
-
   const renderCourseDate = (date) => `${toDate(date)} ${toShortMonth(date)}`;
 
   const renderCoursePrice = () => {
@@ -100,7 +79,6 @@ const CourseListItem = ({ course }) => {
     <Card className={styles.courseListItem} cover={courseImage} bodyStyle={{ padding: 0 }} onClick={handleCardClicked}>
       <Row>
         <Col xs={24}>{courseName}</Col>
-        {/* <Col xs={24}>{courseContents}</Col> */}
         <Col xs={24}>{bottomCardBar}</Col>
       </Row>
     </Card>

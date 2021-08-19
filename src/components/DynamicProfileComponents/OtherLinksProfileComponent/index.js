@@ -2,14 +2,13 @@ import React from 'react';
 import { Row, Col } from 'antd';
 import { LinkOutlined } from '@ant-design/icons';
 
-// import ContainerCard from 'components/ContainerCard';
 import OtherLinksEditView from './OtherLinksEditView';
 import OtherLinksListView from './OtherLinksListView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import ContainerCard from 'components/ContainerCard';
 import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import styles from './style.module.scss';
-import ContainerCard from 'components/ContainerCard';
 
 const OtherLinksProfileComponent = ({
   identifier = null,

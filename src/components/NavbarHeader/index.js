@@ -267,7 +267,10 @@ const NavbarHeader = () => {
                       My Dashboard
                     </Menu.Item>
                     <Menu.Item key="UserName" disabled>
-                      <Text strong> Hi, {localUserDetails.first_name} </Text>
+                      <Text strong className={styles.loggedInUserName}>
+                        {' '}
+                        Hi, {localUserDetails.first_name}{' '}
+                      </Text>
                     </Menu.Item>
                     <Menu.Item key="SignOut">
                       <Button block danger ghost type="primary" onClick={() => logOut(history)}>

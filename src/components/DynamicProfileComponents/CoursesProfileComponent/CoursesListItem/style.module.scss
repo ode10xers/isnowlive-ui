@@ -47,22 +47,6 @@ $card-border-radius: 8px;
     }
   }
 
-  .courseContentContainer {
-    padding: 0 12px 12px 12px;
-
-    .courseDivider {
-      margin: 0 12px;
-      height: 24px;
-      color: map-get($map: $colors, $key: 'WhiteSmoke');
-    }
-
-    .courseContents {
-      font-size: 16px;
-    color: var(--passion-profile-darker-color, var(--course-card-font-color, #{map-get($map: $colors, $key: 'Chambray')})) !important;
-      
-    }
-  }
-
   .cardFooter {
     border-top: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
     padding: 12px;

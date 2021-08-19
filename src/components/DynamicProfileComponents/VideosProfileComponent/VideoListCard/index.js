@@ -2,10 +2,9 @@ import React from 'react';
 
 import { Card, Typography, Image, Row, Col } from 'antd';
 
-// import dateUtil from 'utils/date';
 import { isValidFile, preventDefaults } from 'utils/helper';
 import { redirectToVideosPage } from 'utils/redirect';
-// import { PlayCircleOutlined } from '@ant-design/icons';
+
 import styles from './style.module.scss';
 
 const DefaultImage = require('assets/images/greybg.jpg');

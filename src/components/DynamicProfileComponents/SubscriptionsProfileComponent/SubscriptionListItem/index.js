@@ -11,7 +11,7 @@ import styles from './style.module.scss';
 const { Text } = Typography;
 
 const SubscriptionListItem = ({ subscription }) => {
-  const getSubscriptionColorCode = () => subscription.color_code ?? '#1890ff';
+  const getSubscriptionColorCode = () => subscription?.color_code ?? '#1890ff';
 
   const handleMembershipItemClicked = (e) => {
     preventDefaults(e);
@@ -36,17 +36,17 @@ const SubscriptionListItem = ({ subscription }) => {
           <Row align="middle">
             <Col xs={18}>
               <Text className={styles.durationText}>
-                {' '}
-                {generateSubscriptionDuration(subscription, true)} access for up to{' '}
+                {generateSubscriptionDuration(subscription, true)} access for up to
               </Text>
               <Text className={styles.contentText}>
-                {' '}
-                {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}{' '}
+                {generateBaseCreditsText(subscription, false).replace(' credits/period', '')}
               </Text>
             </Col>
             <Col xs={6} className={styles.textAlignRight}>
               <Text className={styles.subscriptionPrice}>
-                {subscription?.currency?.toUpperCase()} {subscription?.total_price}
+                {subscription?.total_price > 0
+                  ? `${subscription?.currency?.toUpperCase()} ${subscription?.total_price}`
+                  : 'Free'}
               </Text>
             </Col>
           </Row>
@@ -92,7 +92,7 @@ const SubscriptionListItem = ({ subscription }) => {
     //         </Col>
     //         <Col xs={10}>
     //           <div className={styles.membershipPrice}>
-    //             {subscription?.currency?.toUpperCase()} {subscription?.total_price} /{' '}
+    //             {subscription?.currency?.toUpperCase()} {subscription?.total_price} /
     //             {generateSubscriptionDuration(subscription)}
     //           </div>
     //         </Col>

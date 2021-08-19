@@ -237,9 +237,9 @@ const ProductsProfileComponent = ({
   return (
     <Row>
       <Col xs={24} className={styles.navigationBarContainer}>
-        {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
+        {(isEditing || sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
           <Row gutter={[12, 12]} justify="center" align="center" className={styles.navigationBarMenu}>
-            {sessions.length > 0 && (
+            {(isEditing || sessions.length > 0) && (
               <Col xs={8} onClick={() => handleMenuClick('SESSIONS')}>
                 <div
                   className={classNames(
@@ -257,7 +257,7 @@ const ProductsProfileComponent = ({
                 </div>
               </Col>
             )}
-            {videos.length > 0 && (
+            {(isEditing || videos.length > 0) && (
               <Col xs={8} onClick={() => handleMenuClick('VIDEOS')}>
                 <div
                   className={classNames(
@@ -275,7 +275,7 @@ const ProductsProfileComponent = ({
                 </div>
               </Col>
             )}
-            {courses.length > 0 && (
+            {(isEditing || courses.length > 0) && (
               <Col xs={8} onClick={() => handleMenuClick('COURSES')}>
                 <div
                   className={classNames(
