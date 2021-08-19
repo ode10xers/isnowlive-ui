@@ -245,6 +245,18 @@ const sectionData = [
         textColor: '#ffffff',
         backgroundColor: '#1890ff',
       },
+      {
+        title: 'My Playlist',
+        url: 'https://open.spotify.com/',
+        textColor: '#ffffff',
+        backgroundColor: '#1ed760',
+      },
+      {
+        title: 'My YouTube Channel',
+        url: 'https://youtube.com',
+        textColor: '#ffffff',
+        backgroundColor: '#cc0000',
+      },
     ],
   },
   // {
