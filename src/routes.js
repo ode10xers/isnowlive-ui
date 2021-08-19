@@ -94,7 +94,6 @@ const Routes = {
     courseDetails: '/course/:course_id',
     subscriptions: '/subscriptions',
     referrals: '/referrals',
-    // TODO: Reconsider the path
     dashboardPage: '/products',
   },
 };

@@ -230,6 +230,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
+        setContainedUI(!data.profile?.new_profile);
 
         if (data.profile?.color) {
           setCreatorColorChoice(data.profile?.color);
@@ -297,7 +298,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   useEffect(() => {
     let profileColorObject = null;
     if (creatorColorChoice) {
-      // TODO: Adjust the flag passed here based on creator profile config
       profileColorObject = generateColorPalletteForProfile(creatorColorChoice, !containedUI);
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
@@ -418,14 +418,18 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         username: creatorProfileData?.username,
         profile: {
           sections: newCreatorUIConfig,
+          new_profile: !containedUI,
         },
       };
 
-      const { status } = await apis.user.updateProfile(payload);
+      const { status, data } = await apis.user.updateProfile(payload);
 
-      if (isAPISuccess(status)) {
+      if (isAPISuccess(status) && data) {
         setCreatorUIConfig(newCreatorUIConfig);
+        setCreatorProfileData(data);
+        setContainedUI(!data?.profile?.new_profile);
         setUiConfigChanged(false);
+        message.success('Profile changes saved!');
         disableEditingMode();
       }
     } catch (error) {
@@ -448,7 +452,10 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             Are you sure you want to close editing mode? You have made changes that will not be saved if you close now.
           </Paragraph>
         ),
-        onOk: disableEditingMode,
+        onOk: () => {
+          setContainedUI(!creatorProfileData?.profile?.new_profile);
+          disableEditingMode();
+        },
         okText: 'Close without saving',
         okButtonProps: {
           type: 'primary',
@@ -461,6 +468,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         afterClose: resetBodyStyle,
       });
     } else {
+      setContainedUI(!creatorProfileData?.profile?.new_profile);
       disableEditingMode();
     }
   };
@@ -550,10 +558,8 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   const handleChangeUIStyleClicked = (e) => {
     preventDefaults(e);
-
-    // TODO: Make sure this flag is updated when they click on save
     setContainedUI(!containedUI);
-    message.success('UI Style changed!');
+    message.success('UI style changed! Click on Save Changes to keep this change');
   };
 
   //#endregion End of Dashboard Button Handlers
@@ -716,6 +722,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                     Add Component
                   </Button>
                   <Button
+                    className={styles.orangeBtn}
+                    type="primary"
+                    icon={<RetweetOutlined />}
+                    onClick={handleChangeUIStyleClicked}
+                  >
+                    Change UI Style
+                  </Button>
+                  <Button
                     type="primary"
                     className={styles.greenBtn}
                     icon={<SaveOutlined />}
@@ -739,14 +753,6 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   </Button>
                   <Button ghost type="primary" icon={<GlobalOutlined />} onClick={handleNavigateToPublicPage}>
                     Public Page
-                  </Button>
-                  <Button
-                    className={styles.orangeBtn}
-                    type="primary"
-                    icon={<RetweetOutlined />}
-                    onClick={handleChangeUIStyleClicked}
-                  >
-                    Change UI Style
                   </Button>
                 </>
               )}

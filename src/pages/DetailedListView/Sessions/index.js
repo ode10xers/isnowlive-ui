@@ -36,7 +36,7 @@ const SessionDetailedListView = () => {
   const [selectedStartDate, setSelectedStartDate] = useState(start_date ? moment(start_date) : moment());
   const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(start_date ? moment(start_date) : moment());
 
-  const [creatorProfileColor, setCreatorProfileColor] = useState(null);
+  const [creatorProfile, setCreatorProfile] = useState(null);
 
   const fetchUpcomingSessions = useCallback(async () => {
     setIsLoading(true);
@@ -62,7 +62,7 @@ const SessionDetailedListView = () => {
         : await apis.user.getProfile();
 
       if (isAPISuccess(status) && data) {
-        setCreatorProfileColor(data.profile?.color ?? null);
+        setCreatorProfile(data);
       }
     } catch (error) {
       message.error('Failed to fetch creator profile details');
@@ -82,9 +82,11 @@ const SessionDetailedListView = () => {
 
   useEffect(() => {
     let profileColorObject = null;
-    if (creatorProfileColor) {
-      // TODO: Adjust the flag passed here based on creator profile config
-      profileColorObject = generateColorPalletteForProfile(creatorProfileColor, true);
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
@@ -98,7 +100,7 @@ const SessionDetailedListView = () => {
         });
       }
     };
-  }, [creatorProfileColor]);
+  }, [creatorProfile]);
 
   const handleBackClicked = () => history.push(Routes.sessions);
 

@@ -18,7 +18,7 @@ import styles from './style.module.scss';
 const VideoDetailedListView = ({ history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [videos, setVideos] = useState([]);
-  const [creatorProfileColor, setCreatorProfileColor] = useState(null);
+  const [creatorProfile, setCreatorProfile] = useState(null);
 
   const fetchCreatorVideos = useCallback(async () => {
     setIsLoading(true);
@@ -44,7 +44,7 @@ const VideoDetailedListView = ({ history }) => {
         : await apis.user.getProfile();
 
       if (isAPISuccess(status) && data) {
-        setCreatorProfileColor(data.profile?.color ?? null);
+        setCreatorProfile(data);
       }
     } catch (error) {
       message.error('Failed to fetch creator profile details');
@@ -64,9 +64,11 @@ const VideoDetailedListView = ({ history }) => {
 
   useEffect(() => {
     let profileColorObject = null;
-    if (creatorProfileColor) {
-      // TODO: Adjust the flag passed here based on creator profile config
-      profileColorObject = generateColorPalletteForProfile(creatorProfileColor, true);
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
@@ -80,7 +82,7 @@ const VideoDetailedListView = ({ history }) => {
         });
       }
     };
-  }, [creatorProfileColor]);
+  }, [creatorProfile]);
 
   const renderVideoCards = (video) => (
     <Col xs={24} sm={12} key={video.external_id}>

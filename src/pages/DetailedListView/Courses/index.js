@@ -37,7 +37,7 @@ const CourseDetailedListView = () => {
   const [courses, setCourses] = useState([]);
   const [selectedCourseType, setSelectedCourseType] = useState('all');
 
-  const [creatorProfileColor, setCreatorProfileColor] = useState(null);
+  const [creatorProfile, setCreatorProfile] = useState(null);
 
   const fetchCreatorCourses = useCallback(async () => {
     setIsLoading(true);
@@ -63,7 +63,7 @@ const CourseDetailedListView = () => {
         : await apis.user.getProfile();
 
       if (isAPISuccess(status) && data) {
-        setCreatorProfileColor(data.profile?.color ?? null);
+        setCreatorProfile(data);
       }
     } catch (error) {
       message.error('Failed to fetch creator profile details');
@@ -83,9 +83,11 @@ const CourseDetailedListView = () => {
 
   useEffect(() => {
     let profileColorObject = null;
-    if (creatorProfileColor) {
-      // TODO: Adjust the flag passed here based on creator profile config
-      profileColorObject = generateColorPalletteForProfile(creatorProfileColor, true);
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
@@ -99,7 +101,7 @@ const CourseDetailedListView = () => {
         });
       }
     };
-  }, [creatorProfileColor]);
+  }, [creatorProfile]);
 
   const handleBackClicked = () => history.push(Routes.courses);
 
