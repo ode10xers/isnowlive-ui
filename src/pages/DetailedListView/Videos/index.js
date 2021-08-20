@@ -12,6 +12,7 @@ import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/help
 import { generateColorPalletteForProfile } from 'utils/colors';
 
 import styles from './style.module.scss';
+import { isInIframeWidget } from 'utils/widgets';
 
 // TODO: Consider adding virtualized scroll later
 // See react-infinite-load or react-virtualized
@@ -97,32 +98,36 @@ const VideoDetailedListView = ({ history }) => {
       <Spin size="large" spinning={isLoading} tip="Fetching creator videos...">
         {videos.length > 0 ? (
           <>
-            <Button
-              ghost
-              size="large"
-              type="primary"
-              className={styles.backButton}
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBackClicked}
-            >
-              Back
-            </Button>
+            {!isInIframeWidget() && (
+              <Button
+                ghost
+                size="large"
+                type="primary"
+                className={styles.backButton}
+                icon={<ArrowLeftOutlined />}
+                onClick={handleBackClicked}
+              >
+                Back
+              </Button>
+            )}
             <Row className={styles.mt30} gutter={[8, 16]}>
               {videos.map(renderVideoCards)}
             </Row>
           </>
         ) : (
           <Empty className={styles.w100} description="No videos found for creator">
-            <Button
-              className={styles.backButton}
-              ghost
-              size="large"
-              type="primary"
-              icon={<ArrowLeftOutlined />}
-              onClick={() => history.push(Routes.root)}
-            >
-              Back to home
-            </Button>
+            {!isInIframeWidget() && (
+              <Button
+                className={styles.backButton}
+                ghost
+                size="large"
+                type="primary"
+                icon={<ArrowLeftOutlined />}
+                onClick={() => history.push(Routes.root)}
+              >
+                Back to home
+              </Button>
+            )}
           </Empty>
         )}
       </Spin>
