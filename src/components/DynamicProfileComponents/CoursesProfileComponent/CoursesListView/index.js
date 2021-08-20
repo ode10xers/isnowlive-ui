@@ -13,7 +13,7 @@ import { generateUrlFromUsername, isInCreatorDashboard, preventDefaults } from '
 
 import styles from './style.module.scss';
 
-const CoursesListView = ({ limit = 2, courses = [], isContained = false }) => {
+const CoursesListView = ({ limit = 5, courses = [], isContained = false }) => {
   const history = useHistory();
 
   const renderCourseCards = (course) => (

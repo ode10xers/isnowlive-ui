@@ -79,7 +79,7 @@ const SubscriptionProfileComponent = ({
     </Row>
   ) : (
     <Spin spinning={isLoading} tip="Fetching memberships">
-      <SubscriptionsListView subscriptions={subscriptions} />
+      <SubscriptionsListView subscriptions={subscriptions} isContained={isContained} />
     </Spin>
   );
 
