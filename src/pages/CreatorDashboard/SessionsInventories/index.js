@@ -246,6 +246,7 @@ const SessionsInventories = ({ match }) => {
       title: `${isAvailability ? 'Availability' : 'Session'} Name`,
       dataIndex: 'name',
       key: 'name',
+      width: '220px',
       render: (text, record) => {
         if (record.is_date) {
           return {
@@ -306,11 +307,7 @@ const SessionsInventories = ({ match }) => {
         renderSimpleTableCell(record.is_date, `${record.num_participants || 0} / ${record.max_participants}`),
     },
     {
-      title: (
-        <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
-          {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
-        </Button>
-      ),
+      title: 'Actions',
       width: '200px',
       render: (text, record) => {
         if (record.is_date) {
@@ -428,6 +425,7 @@ const SessionsInventories = ({ match }) => {
       title: '',
       dataIndex: 'name',
       key: 'name',
+      width: '200px',
       render: (text, record) => (
         <Text strong className={styles.textAlignLeft}>
           {toLongDateWithLongDay(text)}
@@ -613,6 +611,11 @@ const SessionsInventories = ({ match }) => {
               <Radio.Button value="calendar">Calendar</Radio.Button>
             </Radio.Group>
           </Col>
+          <Col xs={24} md={6} lg={4}>
+            <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
+              {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
+            </Button>
+          </Col>
 
           <Col xs={24}>
             {view === 'calendar' ? (
@@ -643,6 +646,7 @@ const SessionsInventories = ({ match }) => {
                     {sessions.length > 0 ? (
                       <Table
                         columns={mobileTableColumns}
+                        tableLayout="fixed"
                         data={filteredByDateSession.map((session) => ({
                           session_id: session.session_id,
                           start_time: session.start_time,
@@ -651,6 +655,7 @@ const SessionsInventories = ({ match }) => {
                           sessions: session.children,
                         }))}
                         loading={isLoading}
+                        showHeader={false}
                         rowKey={(record) =>
                           record.is_date ? record.start_time : `${record.session_id}_${record.start_time}`
                         }
@@ -693,6 +698,8 @@ const SessionsInventories = ({ match }) => {
                     }
                     expandable={{
                       expandedRowKeys: expandedRowKeys,
+                      rowExpandable: (record) => record.is_date,
+
                       onExpand: (expanded, record) => {
                         if (expanded) {
                           expandRow(record.start_time);
