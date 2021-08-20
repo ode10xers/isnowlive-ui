@@ -19,7 +19,7 @@
 }
 
 .loggedInUsername {
-  color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')})
+  color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
 }
 
 .domainNameWrapper {
