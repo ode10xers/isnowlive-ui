@@ -128,7 +128,12 @@ const SessionDetailedListView = () => {
   }, [selectedStartDate, sessions]);
 
   const renderSessionCards = (session) => (
-    <Col xs={24} sm={12} md={8} key={`${session.session_external_id}_${session.inventory_id}`}>
+    <Col
+      xs={24}
+      sm={12}
+      md={!creatorProfile?.profile?.new_profile ? 12 : 8}
+      key={`${session.session_external_id}_${session.inventory_id}`}
+    >
       <SessionListCard session={session} />
     </Col>
   );
