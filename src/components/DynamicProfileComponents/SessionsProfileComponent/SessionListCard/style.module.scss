@@ -62,9 +62,9 @@ $card-border-radius: 8px;
     box-shadow: inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
 
-    // @media screen and (max-width: 992px) and (min-width: 768px) {
-    //   font-size: 14px;
-    // }
+    @media screen and (max-width: 992px) and (min-width: 768px) {
+      font-size: 12px;
+    }
 
     @media screen and (max-width: 526px) and (min-width: 421px) {
       font-size: 16px;

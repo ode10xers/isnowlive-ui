@@ -106,7 +106,7 @@ const CourseDetailedListView = () => {
   const handleBackClicked = () => history.push(Routes.courses);
 
   const renderCourseItems = (course) => (
-    <Col xs={24} sm={12} md={8} key={course.id}>
+    <Col xs={24} sm={12} md={!creatorProfile?.profile?.new_profile ? 12 : 8} key={course.id}>
       <CourseListItem course={course} />
     </Col>
   );

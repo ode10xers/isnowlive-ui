@@ -268,8 +268,7 @@ const NavbarHeader = () => {
                     </Menu.Item>
                     <Menu.Item key="UserName" disabled>
                       <Text strong className={styles.loggedInUserName}>
-                        {' '}
-                        Hi, {localUserDetails.first_name}{' '}
+                        Hi, {localUserDetails.first_name}
                       </Text>
                     </Menu.Item>
                     <Menu.Item key="SignOut">
@@ -501,7 +500,10 @@ const NavbarHeader = () => {
                       {localUserDetails ? (
                         <>
                           <Col xs={24}>
-                            <Text strong> Hi, {localUserDetails.first_name} </Text>
+                            <Text strong className={styles.loggedInUsername}>
+                              {' '}
+                              Hi, {localUserDetails.first_name}{' '}
+                            </Text>
                           </Col>
                           <Col xs={24}>
                             <Button block danger type="default" onClick={() => logOut(history)}>
