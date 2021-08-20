@@ -530,15 +530,16 @@ const VideoDetails = ({ match, history }) => {
   const renderVideoDetailItem = (value) => <Text className={styles.videoDetailItem}>{value}</Text>;
 
   const renderPassItems = (pass) => (
-    <Col xs={12} md={8} lg={creatorProfile?.profile?.new_profile ? 6 : 8} key={pass.external_id}>
+    <Col xs={12} md={8} lg={!creatorProfile?.profile?.new_profile ? 8 : 6} key={pass.external_id}>
       <PassesListItem pass={pass} />
     </Col>
   );
 
   const renderCourseItems = (course) => (
     <Col
-      xs={creatorProfile?.profile?.new_profile ? 24 : 18}
-      md={creatorProfile?.profile?.new_profile ? 12 : 8}
+      xs={!creatorProfile?.profile?.new_profile ? 24 : 18}
+      md={12}
+      lg={!creatorProfile?.profile?.new_profile ? 12 : 8}
       key={course.id}
     >
       <CourseListItem course={course} />
@@ -550,8 +551,7 @@ const VideoDetails = ({ match, history }) => {
 
     return (
       <Col xs={24}>
-        {' '}
-        <ContainingComponent {...props}>{children}</ContainingComponent>{' '}
+        <ContainingComponent {...props}>{children}</ContainingComponent>
       </Col>
     );
   };
@@ -696,8 +696,7 @@ const VideoDetails = ({ match, history }) => {
                                   'Flexible'
                                 ) : videoData?.total_price > 0 ? (
                                   <>
-                                    {' '}
-                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0{' '}
+                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0
                                   </>
                                 ) : (
                                   'Free'
@@ -709,9 +708,9 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have{' '}
+                            purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have
                             {usableSubscription.products['VIDEO'].credits -
-                              usableSubscription.products['VIDEO'].credits_used}{' '}
+                              usableSubscription.products['VIDEO'].credits_used}
                             credits left.
                           </Paragraph>
                         </Col>
@@ -742,11 +741,11 @@ const VideoDetails = ({ match, history }) => {
                               <Text className={styles.buyVideoBtnText}>
                                 {videoData?.pay_what_you_want ? (
                                   <>
-                                    {videoData?.currency?.toUpperCase()} <del>Flexible</del> 0{' '}
+                                    {videoData?.currency?.toUpperCase()} <del>Flexible</del> 0
                                   </>
                                 ) : videoData?.total_price > 0 ? (
                                   <>
-                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0{' '}
+                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0
                                   </>
                                 ) : (
                                   'Free'
@@ -758,7 +757,7 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usablePass.pass_name} </b> Pass. You currently have{' '}
+                            purchased <b> {usablePass.pass_name} </b> Pass. You currently have
                             {usablePass.classes_remaining} credits left.
                           </Paragraph>
                         </Col>
