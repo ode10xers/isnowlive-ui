@@ -363,7 +363,9 @@ const MembershipDetails = ({ match, history }) => {
       return null;
     }
 
-    const componentChild = <SubscriptionsListView subscriptions={otherSubscriptions} />;
+    const componentChild = (
+      <SubscriptionsListView subscriptions={otherSubscriptions} isContained={!creatorProfile?.profile?.new_profile} />
+    );
 
     const commonContainerProps = {
       title: 'OTHER MEMBERSHIPS',
