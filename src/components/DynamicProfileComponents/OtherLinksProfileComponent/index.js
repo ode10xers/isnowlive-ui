@@ -38,7 +38,7 @@ const OtherLinksProfileComponent = ({
       <Col className={styles.textAlignCenter}>Links that you've entered will show up here</Col>
     </Row>
   ) : (
-    <OtherLinksListView links={customComponentProps?.values ?? []} />
+    <OtherLinksListView links={customComponentProps?.values ?? []} isContained={isContained} />
   );
 
   const commonContainerProps = {

@@ -86,7 +86,7 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
               price: items[0].price,
               recurring: items[0].recurring,
               refund_before_hours: items[0].refund_before_hours,
-              session_external_id: items[0].prerequisites,
+              session_external_id: items[0].session_external_id,
               session_id: items[0].session_id,
               session_image_url: items[0].session_image_url,
               tags: items[0].tags,

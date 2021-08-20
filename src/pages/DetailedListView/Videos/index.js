@@ -10,6 +10,7 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 
 import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
 import { generateColorPalletteForProfile } from 'utils/colors';
+import { isInIframeWidget } from 'utils/widgets';
 
 import styles from './style.module.scss';
 
@@ -85,7 +86,7 @@ const VideoDetailedListView = ({ history }) => {
   }, [creatorProfile]);
 
   const renderVideoCards = (video) => (
-    <Col xs={24} sm={12} key={video.external_id}>
+    <Col xs={24} sm={12} md={8} key={video.external_id}>
       <VideoListCard video={video} />
     </Col>
   );
@@ -97,32 +98,36 @@ const VideoDetailedListView = ({ history }) => {
       <Spin size="large" spinning={isLoading} tip="Fetching creator videos...">
         {videos.length > 0 ? (
           <>
-            <Button
-              ghost
-              size="large"
-              type="primary"
-              className={styles.backButton}
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBackClicked}
-            >
-              Back
-            </Button>
+            {!isInIframeWidget() && (
+              <Button
+                ghost
+                size="large"
+                type="primary"
+                className={styles.backButton}
+                icon={<ArrowLeftOutlined />}
+                onClick={handleBackClicked}
+              >
+                Back
+              </Button>
+            )}
             <Row className={styles.mt30} gutter={[8, 16]}>
               {videos.map(renderVideoCards)}
             </Row>
           </>
         ) : (
           <Empty className={styles.w100} description="No videos found for creator">
-            <Button
-              className={styles.backButton}
-              ghost
-              size="large"
-              type="primary"
-              icon={<ArrowLeftOutlined />}
-              onClick={() => history.push(Routes.root)}
-            >
-              Back to home
-            </Button>
+            {!isInIframeWidget() && (
+              <Button
+                className={styles.backButton}
+                ghost
+                size="large"
+                type="primary"
+                icon={<ArrowLeftOutlined />}
+                onClick={() => history.push(Routes.root)}
+              >
+                Back to home
+              </Button>
+            )}
           </Empty>
         )}
       </Spin>

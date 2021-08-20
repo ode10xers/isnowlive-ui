@@ -1,19 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
 
 import { Row, Col, Button, Spin, Typography, message, Affix, Drawer } from 'antd';
-import { ArrowLeftOutlined, ScheduleTwoTone, PlayCircleTwoTone, VideoCameraTwoTone } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  BarsOutlined,
+  ScheduleOutlined,
+  PlayCircleOutlined,
+  VideoCameraOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import AuthModal from 'components/AuthModal';
-import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
+import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
+import { generateColorPalletteForProfile } from 'utils/colors';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import {
   getShadeForHexColor,
@@ -22,10 +30,13 @@ import {
   orderType,
   isUnapprovedUserError,
   productType,
+  getUsernameFromUrl,
+  reservedDomainName,
 } from 'utils/helper';
 
-import styles from './style.module.scss';
 import { useGlobalContext } from 'services/globalContext';
+
+import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
@@ -45,6 +56,8 @@ const MembershipDetails = ({ match, history }) => {
 
   const [moreView, setMoreView] = useState('sessions');
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
+
+  const [creatorProfile, setCreatorProfile] = useState(null);
 
   const fetchCreatorSubscriptions = useCallback(async (subscriptionId = null) => {
     setIsLoading(true);
@@ -72,6 +85,54 @@ const MembershipDetails = ({ match, history }) => {
 
     setIsLoading(false);
   }, []);
+
+  const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
+    try {
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorProfile(data);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed to fetch creator profile details',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    const domainUsername = getUsernameFromUrl();
+
+    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
+      fetchCreatorProfileDetails(domainUsername);
+    }
+  }, [fetchCreatorProfileDetails]);
+
+  useEffect(() => {
+    let profileColorObject = null;
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
+
+      Object.entries(profileColorObject).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfile]);
 
   useEffect(() => {
     fetchCreatorSubscriptions(membershipId);
@@ -195,76 +256,143 @@ const MembershipDetails = ({ match, history }) => {
 
   //#region Start of UI Components
 
-  const renderSessionCards = (session) => (
-    <Col xs={24} sm={12} key={session.session_external_id}>
-      <SessionListCard session={session} />
-    </Col>
-  );
+  const renderContainerComponent = (props, children) => {
+    const ContainingComponent = creatorProfile?.profile?.new_profile ? DynamicProfileComponentContainer : ContainerCard;
 
-  const renderSessionsComponent = (sessions = []) =>
-    sessions.length > 0 ? (
-      <ContainerCard
-        title="SESSIONS INCLUDED"
-        icon={<VideoCameraTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
-      >
-        <Row gutter={[16, 16]}>
-          {sessions.slice(0, 2).map(renderSessionCards)}
-          {sessions?.length > 2 && (
-            <Col xs={24}>
-              <Row justify="center">
-                <Col>
-                  <Button size="large" type="primary" onClick={handleMoreSessionsClicked}>
-                    MORE
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          )}
-        </Row>
-      </ContainerCard>
-    ) : null;
+    return <ContainingComponent {...props}>{children}</ContainingComponent>;
+  };
 
-  const renderVideoCards = (video) => (
-    <Col xs={24} sm={12} key={video.external_id}>
-      <VideoListCard video={video} />
-    </Col>
-  );
+  const sessionsItemLimit = 5;
 
-  const renderVideosComponent = (videos = []) =>
-    videos.length > 0 ? (
-      <ContainerCard
-        title="VIDEOS INCLUDED"
-        icon={<PlayCircleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
-      >
-        <Row gutter={[16, 16]}>
-          {videos.slice(0, 2).map(renderVideoCards)}
-          {videos?.length > 2 && (
-            <Col xs={24}>
-              <Row justify="center">
-                <Col>
-                  <Button size="large" type="primary" onClick={handleMoreVideoClicked}>
-                    MORE
-                  </Button>
-                </Col>
-              </Row>
-            </Col>
-          )}
-        </Row>
-      </ContainerCard>
-    ) : null;
+  const renderSessionsComponent = (sessions = []) => {
+    if (!sessions.length) {
+      return null;
+    }
 
-  const otherSubscriptionsComponent = (
-    <ContainerCard title="OTHER MEMBERSHIPS" icon={<ScheduleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}>
-      <SubscriptionsListView subscriptions={otherSubscriptions} />
-    </ContainerCard>
-  );
+    const componentChild = (
+      <Row gutter={[16, 16]}>
+        {sessions.slice(0, sessionsItemLimit).map((session) => (
+          <Col
+            xs={!creatorProfile?.profile?.new_profile ? 24 : 18}
+            md={12}
+            lg={!creatorProfile?.profile?.new_profile ? 12 : 8}
+            key={session.session_external_id}
+          >
+            <SessionListCard session={session} />
+          </Col>
+        ))}
+        {sessions?.length > sessionsItemLimit && (
+          <Col
+            className={styles.fadedItemContainer}
+            xs={!creatorProfile?.profile?.new_profile ? 24 : 18}
+            md={12}
+            lg={!creatorProfile?.profile?.new_profile ? 12 : 8}
+          >
+            <div className={styles.fadedOverlay}>
+              <div className={styles.seeMoreButton} onClick={handleMoreSessionsClicked}>
+                <BarsOutlined className={styles.seeMoreIcon} />
+                SEE MORE
+              </div>
+            </div>
+            <div className={styles.fadedItem}>
+              <SessionListCard session={sessions[sessionsItemLimit]} />
+            </div>
+          </Col>
+        )}
+      </Row>
+    );
+
+    const commonContainerProps = {
+      title: 'SESSIONS INCLUDED',
+      icon: <VideoCameraOutlined className={styles.icon} />,
+    };
+
+    return renderContainerComponent(commonContainerProps, componentChild);
+  };
+
+  const videoItemLimit = 5;
+
+  const renderVideosComponent = (videos = []) => {
+    if (!videos.length) {
+      return null;
+    }
+
+    const componentChild = (
+      <Row gutter={[16, 16]}>
+        {videos.slice(0, videoItemLimit).map((video) => (
+          <Col
+            xs={!creatorProfile?.profile?.new_profile ? 24 : 18}
+            md={12}
+            lg={!creatorProfile?.profile?.new_profile ? 12 : 8}
+            key={video.external_id}
+          >
+            <VideoListCard video={video} />
+          </Col>
+        ))}
+        {videos?.length > videoItemLimit && (
+          <Col
+            className={styles.fadedItemContainer}
+            xs={!creatorProfile?.profile?.new_profile ? 24 : 18}
+            md={12}
+            lg={!creatorProfile?.profile?.new_profile ? 12 : 8}
+          >
+            <div className={styles.fadedOverlay}>
+              <div className={styles.seeMoreButton} onClick={handleMoreVideoClicked}>
+                <BarsOutlined className={styles.seeMoreIcon} />
+                SEE MORE
+              </div>
+            </div>
+            <div className={styles.fadedItem}>
+              <VideoListCard video={videos[videoItemLimit]} />
+            </div>
+          </Col>
+        )}
+      </Row>
+    );
+
+    const commonContainerProps = {
+      title: 'VIDEOS INCLUDED',
+      icon: <PlayCircleOutlined className={styles.icon} />,
+    };
+
+    return renderContainerComponent(commonContainerProps, componentChild);
+  };
+
+  const renderOtherSubscriptionsList = () => {
+    if (!otherSubscriptions.length) {
+      return null;
+    }
+
+    const componentChild = (
+      <SubscriptionsListView subscriptions={otherSubscriptions} isContained={!creatorProfile?.profile?.new_profile} />
+    );
+
+    const commonContainerProps = {
+      title: 'OTHER MEMBERSHIPS',
+      icon: <ScheduleOutlined className={styles.icon} />,
+    };
+
+    return renderContainerComponent(commonContainerProps, componentChild);
+  };
 
   const moreVideosListView = (
-    <Row gutter={[16, 16]}>{selectedSubscription?.product_details?.VIDEO?.map(renderVideoCards)}</Row>
+    <Row gutter={[16, 16]}>
+      {selectedSubscription?.product_details?.VIDEO?.map((video) => (
+        <Col xs={24} md={12} lg={8} key={`more_${video.external_id}`}>
+          <VideoListCard video={video} />
+        </Col>
+      ))}
+    </Row>
   );
 
   const moreSessionsListView = (
-    <Row gutter={[16, 16]}>{selectedSubscription?.product_details?.SESSION?.map(renderSessionCards)}</Row>
+    <Row gutter={[16, 16]}>
+      {selectedSubscription?.product_details?.SESSION?.map((session) => (
+        <Col xs={24} md={12} lg={8} key={`more_${session.session_external_id}`}>
+          <SessionListCard session={session} />
+        </Col>
+      ))}
+    </Row>
   );
 
   //#endregion End of UI Components
@@ -318,7 +446,7 @@ const MembershipDetails = ({ match, history }) => {
             )}
 
             {/* Other Memberships List */}
-            {otherSubscriptions.length > 0 && <Col xs={24}>{otherSubscriptionsComponent}</Col>}
+            {otherSubscriptions.length > 0 && <Col xs={24}>{renderOtherSubscriptionsList()}</Col>}
           </Row>
         </div>
       </Spin>
@@ -329,9 +457,8 @@ const MembershipDetails = ({ match, history }) => {
         height={560}
         bodyStyle={{ padding: 10 }}
         title={
-          <Text style={{ color: '#0050B3' }}>
-            {' '}
-            {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this membership`}{' '}
+          <Text style={{ color: 'var(--passion-profile-darker-color, #0050B3)' }}>
+            {`${moreView[0].toUpperCase()}${moreView.slice(1)} included in this membership`}
           </Text>
         }
         headerStyle={generateCardHeadingStyle()}
@@ -348,6 +475,7 @@ const MembershipDetails = ({ match, history }) => {
             <Row gutter={8} align="middle">
               <Col xs={3}>
                 <Button
+                  className={styles.backButton}
                   ghost
                   block
                   size="large"

@@ -106,7 +106,7 @@ const CourseDetailedListView = () => {
   const handleBackClicked = () => history.push(Routes.courses);
 
   const renderCourseItems = (course) => (
-    <Col xs={24} sm={12} key={course.id}>
+    <Col xs={24} sm={12} md={8} key={course.id}>
       <CourseListItem course={course} />
     </Col>
   );
@@ -183,15 +183,17 @@ const CourseDetailedListView = () => {
           </>
         ) : (
           <Empty className={styles.w100} description="No courses found for creator">
-            <Button
-              className={styles.backButton}
-              size="large"
-              type="primary"
-              icon={<ArrowLeftOutlined />}
-              onClick={() => history.push(Routes.root)}
-            >
-              Back to home
-            </Button>
+            {!isInIframeWidget() && (
+              <Button
+                className={styles.backButton}
+                size="large"
+                type="primary"
+                icon={<ArrowLeftOutlined />}
+                onClick={() => history.push(Routes.root)}
+              >
+                Back to home
+              </Button>
+            )}
           </Empty>
         )}
       </Spin>

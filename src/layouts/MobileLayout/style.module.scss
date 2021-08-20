@@ -10,7 +10,7 @@ $navbar-height: 64px;
   background : linear-gradient(259.47deg, var(--passion-profile-backdrop-color, #{map-get($map: $colors, $key: 'White')}) 2.46%, #{map-get($map: $colors, $key: 'White')} 109.66%);
 
   .mainContent {
-    max-width: 767px;
+    max-width: var(--passion-profile-max-width, 767px);
     width: 100%;
   }
 

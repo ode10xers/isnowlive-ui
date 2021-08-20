@@ -18,9 +18,9 @@ const DynamicProfileComponentContainer: React.FC<DynamicProfileComponentContaine
   children,
   icon,
   textColor,
-  isEditing,
-  dragDropHandle,
-  editView,
+  isEditing = false,
+  dragDropHandle = null,
+  editView = null,
   title,
 }) => (
   <>

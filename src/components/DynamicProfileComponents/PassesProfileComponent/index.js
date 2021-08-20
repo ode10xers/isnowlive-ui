@@ -73,7 +73,7 @@ const PassesProfileComponent = ({
     </Row>
   ) : (
     <Spin spinning={isLoading} tip="Fetching Passes">
-      <PassesListView passes={passes || []} />
+      <PassesListView passes={passes || []} isContained={isContained} />
     </Spin>
   );
 
