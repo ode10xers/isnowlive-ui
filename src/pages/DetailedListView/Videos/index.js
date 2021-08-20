@@ -85,7 +85,7 @@ const VideoDetailedListView = ({ history }) => {
   }, [creatorProfile]);
 
   const renderVideoCards = (video) => (
-    <Col xs={24} sm={12} key={video.external_id}>
+    <Col xs={24} sm={12} md={8} key={video.external_id}>
       <VideoListCard video={video} />
     </Col>
   );

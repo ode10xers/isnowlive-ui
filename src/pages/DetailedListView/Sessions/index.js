@@ -128,7 +128,7 @@ const SessionDetailedListView = () => {
   }, [selectedStartDate, sessions]);
 
   const renderSessionCards = (session) => (
-    <Col xs={24} sm={12} key={`${session.session_external_id}_${session.inventory_id}`}>
+    <Col xs={24} sm={12} md={8} key={`${session.session_external_id}_${session.inventory_id}`}>
       <SessionListCard session={session} />
     </Col>
   );
@@ -137,8 +137,7 @@ const SessionDetailedListView = () => {
     <Col xs={24} key={sessionDateData.key}>
       <Space direction="vertical" className={styles.w100}>
         <Title level={4} className={styles.sessionDateSeparator}>
-          {' '}
-          {sessionDateData.title}{' '}
+          {sessionDateData.title}
         </Title>
         <Row gutter={[8, 8]}>{sessionDateData.children.map(renderSessionCards)}</Row>
       </Space>
