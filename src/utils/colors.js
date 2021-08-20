@@ -87,8 +87,7 @@ export const generateColorPalletteForProfile = (primaryColor, shouldColorNavbar 
 
   // NOTE : We also add a new max-width value here since the new UI needs to be wider
   const navbarColors = {
-    // '--passion-profile-max-width': '992px',
-    '--passion-profile-max-width': '98%',
+    '--passion-profile-max-width': '992px',
     '--passion-profile-backdrop-color': profileColors['--passion-profile-lightest-color'],
     '--passion-profile-navbar-bg': profileColors['--passion-profile-lightest-color'],
     '--passion-profile-navbar-logo': profileColors['--passion-profile-primary-color'],
