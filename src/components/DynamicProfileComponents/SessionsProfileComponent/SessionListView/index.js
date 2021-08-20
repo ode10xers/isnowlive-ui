@@ -31,7 +31,7 @@ const SessionListView = ({ limit = 5, sessions = [], isContained = false }) => {
     <Col
       xs={isContained ? 24 : 18}
       md={isContained ? 12 : 8}
-      key={`${session.session_external_id}_${session?.inventory_id}`}
+      key={`${session.session_external_id}_${session?.inventory_id ?? session?.session_id}`}
     >
       <SessionListCard session={session} />
     </Col>

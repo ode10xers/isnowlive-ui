@@ -262,7 +262,7 @@ const MembershipDetails = ({ match, history }) => {
     return <ContainingComponent {...props}>{children}</ContainingComponent>;
   };
 
-  const sessionsItemLimit = 2;
+  const sessionsItemLimit = 5;
 
   const renderSessionsComponent = (sessions = []) => {
     if (!sessions.length) {

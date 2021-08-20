@@ -10,9 +10,9 @@ import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComp
 
 import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
 import { generateColorPalletteForProfile } from 'utils/colors';
+import { isInIframeWidget } from 'utils/widgets';
 
 import styles from './style.module.scss';
-import { isInIframeWidget } from 'utils/widgets';
 
 // TODO: Consider adding virtualized scroll later
 // See react-infinite-load or react-virtualized
