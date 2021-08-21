@@ -33,6 +33,7 @@
     "react-big-calendar": "^0.30.0",
     "react-color": "^2.19.3",
     "react-cookie-consent": "^6.2.3",
+    "react-device-preview": "^1.0.6",
     "react-dom": "^16.13.1",
     "react-draft-wysiwyg": "^1.14.7",
     "react-email-editor": "^1.2.0",
