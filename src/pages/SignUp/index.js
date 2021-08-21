@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Row, Col, message } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -14,8 +14,6 @@ import {
 import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
 import validationRules from 'utils/validation';
-
-import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
@@ -57,21 +55,20 @@ const SignUp = ({ history }) => {
   };
 
   return (
-    <Row align="middle" className={styles.mt50}>
-      <Col xs={24} md={{ span: 12, offset: 6 }}>
-        <Form form={form} {...formLayout} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
-          <Item label="Email" name="email" rules={validationRules.emailValidation}>
-            <Input />
+    <div className={styles.signupContainer}>
+      <div className={styles.signupHeadingText}>Let’s get started</div>
+      <div className={styles.signupHeadingSubtext}>Enter your details to get started</div>
+      <div className={styles.signupForm}>
+        <Form form={form} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
+          <Item name="email" rules={validationRules.emailValidation}>
+            <Input placeholder="Enter Your Email" />
           </Item>
-
-          <Item {...formTailLayout}>
-            <Button type="primary" htmlType="submit" loading={isLoading}>
-              Submit
-            </Button>
-          </Item>
+          <Button className={styles.signupButton} type="primary" htmlType="submit" loading={isLoading}>
+            Continue
+          </Button>
         </Form>
-      </Col>
-    </Row>
+      </div>
+    </div>
   );
 };
 
