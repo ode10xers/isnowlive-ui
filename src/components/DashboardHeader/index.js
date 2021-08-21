@@ -1,36 +1,39 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
-import { Row, Col, Button } from 'antd';
+// import { useHistory } from 'react-router-dom';
+import { Row, Col } from 'antd';
 
-import { useGlobalContext } from 'services/globalContext';
-import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
-import { isMobileDevice } from 'utils/device';
+import DashboardToggle from 'components/DashboardToggle';
+
+// import { isMobileDevice } from 'utils/device';
+
+// import { useGlobalContext } from 'services/globalContext';
+// import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
-import DashboardToggle from 'components/DashboardToggle';
-const logo = require('assets/images/Logo-passion-transparent.png');
 
-const { user } = mixPanelEventTags;
+const logo = require('assets/images/passion-orange-logo.png');
+
+// const { user } = mixPanelEventTags;
 
 const DashboardHeader = () => {
-  const { logOut } = useGlobalContext();
-  const history = useHistory();
+  // const { logOut } = useGlobalContext();
+  // const history = useHistory();
 
-  const trackAndLogOut = (eventTag) => {
-    trackSimpleEvent(eventTag);
-    logOut(history, true);
-  };
+  // const trackAndLogOut = (eventTag) => {
+  //   trackSimpleEvent(eventTag);
+  //   logOut(history, true);
+  // };
 
   return (
     <Row className={styles.headerContainer} gutter={[20, 8]}>
-      <Col flex={isMobileDevice ? 'auto' : '240px'} className={isMobileDevice && styles.logoWrapper}>
+      <Col className={styles.logoWrapper}>
         <img src={logo} alt="Passion.do" className={styles.logo} />
       </Col>
-      <Col flex="auto" className={isMobileDevice && styles.navItemWrapper}>
+      <Col className={styles.navItemWrapper}>
         <DashboardToggle />
-        <Button type="primary" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
+        {/* <Button type="primary" className={styles.logout} onClick={() => trackAndLogOut(user.click.logOut)}>
           Logout
-        </Button>
+        </Button> */}
       </Col>
     </Row>
   );

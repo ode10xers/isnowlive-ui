@@ -553,7 +553,7 @@ const SessionsInventories = ({ match }) => {
           </Radio.Group>
         </Col>
         <Col xs={24} md={6} lg={4}>
-          <Button block shape="round" type="primary" onClick={() => toggleExpandAll()}>
+          <Button block ghost type="primary" onClick={() => toggleExpandAll()}>
             {expandedRowKeys.length > 0 ? 'Collapse' : 'Expand'} All
           </Button>
         </Col>

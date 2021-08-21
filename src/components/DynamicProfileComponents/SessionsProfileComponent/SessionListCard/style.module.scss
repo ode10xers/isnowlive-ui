@@ -26,6 +26,7 @@ $card-border-radius: 8px;
         border-radius: $card-border-radius $card-border-radius 0 0;
         object-fit: scale-down;
         height: 100%;
+        border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
       }
     }
   }
