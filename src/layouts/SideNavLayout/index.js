@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Divider } from 'antd';
+import { Layout, Divider, Button } from 'antd';
 
 import SideNavigation from 'components/SideNavigation';
 import DashboardHeader from 'components/DashboardHeader';
@@ -26,7 +26,19 @@ const SideNavLayout = ({ children }) => {
       <DashboardHeader />
       <Divider className={styles.divider} />
       <Layout className={styles.container}>
-        <Sider className={styles.sideIcon} width={250} breakpoint="lg" collapsedWidth="0" onCollapse={handleCollapsed}>
+        <Sider
+          className={styles.sideIcon}
+          width={250}
+          breakpoint="lg"
+          collapsedWidth="0"
+          onCollapse={handleCollapsed}
+          trigger={
+            <Button ghost size="small" type="primary" className={styles.siderTriggerMenuButton}>
+              {' '}
+              Menu{' '}
+            </Button>
+          }
+        >
           <SideNavigation />
         </Sider>
         <Layout className={styles.mainContent}>

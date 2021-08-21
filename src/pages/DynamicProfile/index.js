@@ -833,7 +833,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             </Col>
             <Col xs={24} className={styles.textAlignCenter}>
               <div className={styles.passionBranding} onClick={handlePassionBrandingClicked}>
-                Build yours with
+                Build your site with
                 <span className={styles.passionLogoContainer}>
                   <img src={PassionLogo} alt="Passion.do" className={styles.passionLogo} />
                 </span>

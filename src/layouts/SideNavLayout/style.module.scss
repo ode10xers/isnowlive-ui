@@ -16,6 +16,10 @@
   box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
 }
 
+.siderTriggerMenuButton {
+  margin: 0;
+}
+
 @media screen and (max-width: 993px) {
   .sideIcon {
     position: absolute !important;
@@ -24,10 +28,16 @@
     box-shadow: 2px 0 4px -3px #333 !important;
     :global {
       .ant-layout-sider-zero-width-trigger {
-        top: 20px;
-        right: -36px;
-        color: map-get($colors, 'White');
-        background: map-get($map: $colors, $key: 'DodgerBlue');
+        top: -56px;
+        right: -60px;
+        width: 56px;
+
+        // color: map-get($colors, 'White');
+        background: map-get($map: $colors, $key: 'White');
+
+        &.expanded {
+          right : 190px;
+        }
       }
     }
   }
@@ -42,12 +52,14 @@
     :global {
       .ant-layout-sider-zero-width-trigger {
         top: -50px;
-        right: -36px;
+        right: -60px;
+        width: 56px;
         color: map-get($colors, 'Black');
+        font-size: 11px;
         background: transparent;
 
         &.expanded {
-          right: 210px;
+          right: 190px;
         }
       }
     }

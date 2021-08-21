@@ -335,12 +335,12 @@ const SessionsInventories = ({ match }) => {
           </Row>
         ) : (
           <Row justify="start" gutter={[8, 8]}>
-            <Col md={24} lg={24} xl={4}>
+            <Col xs={12} md={8} xl={4}>
               <Tooltip title="Send Customer Email">
                 <Button type="text" onClick={() => showEmailPopup(record)} icon={<MailOutlined />} />
               </Tooltip>
             </Col>
-            <Col md={24} lg={24} xl={4}>
+            <Col xs={12} md={8} xl={4}>
               <Tooltip title="Edit Event Details">
                 <Button
                   type="link"
@@ -350,12 +350,12 @@ const SessionsInventories = ({ match }) => {
                 />
               </Tooltip>
             </Col>
-            <Col md={24} lg={24} xl={4}>
+            <Col xs={12} md={8} xl={4}>
               <Tooltip title="Copy Event Page Link">
                 <Button type="text" onClick={() => copyInventoryLink(record.inventory_id)} icon={<CopyOutlined />} />
               </Tooltip>
             </Col>
-            <Col md={24} lg={24} xl={4}>
+            <Col xs={12} md={8} xl={4}>
               {isDisabled ? (
                 <Tooltip title="Event cannot be cancelled">
                   <Button type="text" disabled icon={<DeleteOutlined />} />
@@ -377,7 +377,7 @@ const SessionsInventories = ({ match }) => {
 
             {!isPast &&
               (record.is_offline ? (
-                <Col md={24} lg={24} xl={4}>
+                <Col xs={12} md={8} xl={4}>
                   <Tooltip title="Edit event location">
                     <Button
                       icon={<CompassOutlined />}
@@ -388,12 +388,12 @@ const SessionsInventories = ({ match }) => {
                 </Col>
               ) : record.start_url ? (
                 <>
-                  <Col md={24} lg={24} xl={4}>
+                  <Col xs={12} md={8} xl={4}>
                     <Tooltip title="Show Zoom Meeting Details">
                       <Button type="link" icon={<Icons.VideoLink />} onClick={() => showZoomDetailsModal(record)} />
                     </Tooltip>
                   </Col>
-                  <Col md={24} lg={24} xl={4}>
+                  <Col xs={12} md={8} xl={4}>
                     <Tooltip title="Start event">
                       <Button
                         type="text"
@@ -404,7 +404,7 @@ const SessionsInventories = ({ match }) => {
                   </Col>
                 </>
               ) : (
-                <Col md={24} lg={24} xl={4}>
+                <Col xs={12} md={8} xl={4}>
                   <Tooltip title="Add Zoom Meeting Details">
                     <Button
                       type="link"
