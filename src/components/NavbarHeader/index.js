@@ -271,11 +271,11 @@ const NavbarHeader = () => {
                         Hi, {localUserDetails.first_name}
                       </Text>
                     </Menu.Item>
-                    <Menu.Item key="SignOut">
+                    {/* <Menu.Item key="SignOut">
                       <Button block danger ghost type="primary" onClick={() => logOut(history)}>
                         Sign Out
                       </Button>
-                    </Menu.Item>
+                    </Menu.Item> */}
                   </>
                 ) : (
                   <>
