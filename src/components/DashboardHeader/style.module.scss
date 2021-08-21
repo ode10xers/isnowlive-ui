@@ -5,7 +5,7 @@
   padding: 14px;
 
   @media (max-width: 525px) {
-    height: 96px;
+    // height: 96px;
     padding: 5px;
   }
 }
@@ -24,6 +24,7 @@
   flex: 0 0 240px;
   @media screen and (max-width: 525px) {
     flex: 1 1 auto;
+    display: none;
   }
 }
 
@@ -34,5 +35,6 @@
   @media screen and (max-width: 525px) {
     flex: 1 1 100%;
     text-align: center;
+    align-self:center
   }
 }
