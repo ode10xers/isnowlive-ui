@@ -49,7 +49,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
             const IconElement = socialMediaIcons[socialMedia];
 
             return (
-              <a href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
+              <a key={socialMedia} href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
                 <IconElement />
               </a>
             );

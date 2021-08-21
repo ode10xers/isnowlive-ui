@@ -62,6 +62,7 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
+import DeviceUIPreview from 'components/DeviceUIPreview';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -222,6 +223,8 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
+            {/* TODO: Remove this later */}
+            <RouteWithLayout layout={DefaultLayout} exact path="/testing-preview" component={DeviceUIPreview} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}

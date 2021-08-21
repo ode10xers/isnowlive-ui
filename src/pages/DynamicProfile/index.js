@@ -205,11 +205,11 @@ const componentsMap = {
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
-const DynamicProfile = ({ creatorUsername = null }) => {
+const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, overrideUserColor = '' }) => {
   const history = useHistory();
   const match = useRouteMatch();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(overrideUserObject ? false : true);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
   const [editingMode, setEditingMode] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
@@ -285,12 +285,25 @@ const DynamicProfile = ({ creatorUsername = null }) => {
   //#region Start of Use Effects
 
   useEffect(() => {
-    if (!creatorUsername) {
-      fetchCreatorProfileData(getLocalUserDetails()?.username ?? '');
+    if (overrideUserObject) {
+      setCreatorProfileData(overrideUserObject);
+      setContainedUI(!overrideUserObject?.profile?.new_profile);
     } else {
-      fetchCreatorProfileData(creatorUsername);
+      if (!creatorUsername) {
+        fetchCreatorProfileData(getLocalUserDetails()?.username ?? '');
+      } else {
+        fetchCreatorProfileData(creatorUsername);
+      }
     }
-  }, [fetchCreatorProfileData, creatorUsername]);
+  }, [fetchCreatorProfileData, creatorUsername, overrideUserObject]);
+
+  useEffect(() => {
+    if (overrideUserColor) {
+      setCreatorColorChoice(overrideUserColor);
+    } else {
+      setCreatorColorChoice(null);
+    }
+  }, [overrideUserColor]);
 
   useEffect(() => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
@@ -311,13 +324,13 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     }
 
     Object.entries(profileStyleObject).forEach(([key, val]) => {
-      document.documentElement.style.setProperty(key, val);
+      window.document.documentElement.style.setProperty(key, val);
     });
 
     return () => {
       if (profileStyleObject) {
         Object.keys(profileStyleObject).forEach((key) => {
-          document.documentElement.style.removeProperty(key);
+          window.document.documentElement.style.removeProperty(key);
         });
       }
     };
