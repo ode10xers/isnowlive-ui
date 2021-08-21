@@ -38,7 +38,7 @@
   margin-left: -4px;
   font-size: 24px;
   font-weight: 700;
-  color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')});
+  color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
   cursor: pointer;
 
   &.textLength8 {

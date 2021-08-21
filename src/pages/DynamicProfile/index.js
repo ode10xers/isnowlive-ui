@@ -49,6 +49,8 @@ import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWid
 
 import styles from './style.module.scss';
 
+const PassionLogo = require('assets/images/passion-orange-logo.png');
+
 const { Paragraph } = Typography;
 
 /*
@@ -569,6 +571,15 @@ const DynamicProfile = ({ creatorUsername = null }) => {
     message.success('UI style changed! Click on Save Changes to keep this change');
   };
 
+  const handlePassionBrandingClicked = (e) => {
+    preventDefaults(e);
+    const targetUrl =
+      window.location.hostname.includes('stage') || window.location.hostname.includes('localhost')
+        ? 'https://passion-do.webflow.io'
+        : 'https://passion.do';
+    window.open(`${targetUrl}?ref=${creatorProfileData.username}`, '_blank');
+  };
+
   //#endregion End of Dashboard Button Handlers
 
   //#region Start Of Component Edit View Handlers
@@ -803,7 +814,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                 }
               />
             </Col>
-            <Col xs={24} className={styles.mb20}>
+            <Col xs={24} className={styles.mb10}>
               <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable
                   isDropDisabled={!editingMode || previewMode}
@@ -819,6 +830,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
                   )}
                 </Droppable>
               </DragDropContext>
+            </Col>
+            <Col xs={24} className={styles.textAlignCenter}>
+              <div className={styles.passionBranding} onClick={handlePassionBrandingClicked}>
+                Build your site with
+                <span className={styles.passionLogoContainer}>
+                  <img src={PassionLogo} alt="Passion.do" className={styles.passionLogo} />
+                </span>
+              </div>
             </Col>
           </Row>
         </Spin>

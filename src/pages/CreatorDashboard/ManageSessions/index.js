@@ -319,10 +319,10 @@ const ManageSessions = () => {
   const renderSessionItem = (item) => {
     const layout = (label, value) => (
       <Row>
-        <Col span={9}>
+        <Col span={6}>
           <Text>{label}</Text>
         </Col>
-        <Col span={15}>: {value}</Col>
+        <Col span={18}>: {value}</Col>
       </Row>
     );
 

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Menu } from 'antd';
+import { Menu, Button } from 'antd';
 
 import Routes from 'routes';
 import { creatorMenuItems, attendeeMenuItems } from './MenuItems.constant';
 
+import { useGlobalContext } from 'services/globalContext';
 import { trackSimpleEvent } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
@@ -16,6 +17,8 @@ const SideNavigation = () => {
   const [showMenu, setShowMenu] = useState(() => creatorMenuItems.sort((a, b) => a.order - b.order));
   const history = useHistory();
 
+  const { logOut } = useGlobalContext();
+
   useEffect(() => {
     if (history.location.pathname.includes(Routes.creatorDashboard.rootPath)) {
       setShowMenu(creatorMenuItems.sort((a, b) => a.order - b.order));
@@ -24,8 +27,23 @@ const SideNavigation = () => {
     }
   }, [history.location.pathname]);
 
+  const clickSideNavTrigger = () => {
+    const sideTrigger = document.getElementsByClassName('ant-layout-sider-zero-width-trigger')[0];
+
+    if (sideTrigger) {
+      sideTrigger.click();
+    }
+  };
+
+  const handleLogOutClicked = () => {
+    logOut(history, true);
+  };
+
   const trackAndNavigate = (item) => {
     trackSimpleEvent(item.mixPanelTag);
+
+    clickSideNavTrigger();
+
     history.push(item.path);
   };
 
@@ -72,6 +90,11 @@ const SideNavigation = () => {
           </Item>
         )
       )}
+      <Item key="logout">
+        <Button ghost danger block type="primary" onClick={handleLogOutClicked}>
+          Logout
+        </Button>
+      </Item>
     </Menu>
   );
 };

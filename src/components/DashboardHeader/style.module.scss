@@ -3,46 +3,38 @@
 .headerContainer {
   height: 64px;
   padding: 14px;
+
+  @media (max-width: 525px) {
+    // height: 96px;
+    padding: 5px;
+  }
 }
-.navItemWrapper {
-  text-align: end;
-}
+
+
 .logo {
   height: 40px;
   margin-left: 5px;
-}
-.logout {
-  @extend .redBtn;
-  margin-left: auto;
-  margin-right: 0;
-  float: right;
+
+  @media screen and (max-width: 992px) and (min-width: 525px) {
+    margin-left : 64px;
+  }
 }
 
-@media (max-width: 767px) {
-  .navItemWrapper {
+.logoWrapper {
+  flex: 0 0 240px;
+  @media screen and (max-width: 525px) {
+    flex: 1 1 auto;
+    display: none;
+  }
+}
+
+.navItemWrapper {
+  flex : 1 1 auto;
+  text-align: left;
+  
+  @media screen and (max-width: 525px) {
+    flex: 1 1 100%;
     text-align: center;
-    align-self: center;
-  }
-  .logoWrapper {
-    text-align: center;
-  }
-  .logout {
-    margin-left: 0px;
-    margin-top: 4px;
-  }
-}
-
-@media (max-width: 426px) {
-  .headerContainer {
-    height: 96px;
-    padding: 5px;
-  }
-
-  .navSwitchWrapper {
-    margin: 4px 0;
-  }
-
-  .logout {
-    margin-top: -40px;
+    align-self:center
   }
 }
