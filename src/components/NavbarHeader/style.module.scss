@@ -18,6 +18,10 @@
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
+.loggedInUsername {
+  color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
+}
+
 .domainNameWrapper {
   flex: 1 1 30%;
 
@@ -34,7 +38,7 @@
   margin-left: -4px;
   font-size: 24px;
   font-weight: 700;
-  color: map-get($map: $colors, $key: 'DodgerBlue');
+  color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')});
   cursor: pointer;
 
   &.textLength8 {
@@ -52,10 +56,22 @@
   &.dashboard {
     flex: 1 1 320px;
   }
+
+  :global  {
+    .ant-menu-item {
+      color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')}) !important;
+    }
+
+    .ant-menu-item-active {
+      color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+      border-bottom: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
+    }
+  }
 }
 
 .menuContainer {
   text-align: right !important;
+  background-color: var(--passion-profile-navbar-bg, #{map-get($colors, 'White')}) !important;
 }
 
 .overflowMenuIcon {
@@ -70,6 +86,9 @@
 .menuIndicator {
   font-size: 14px;
   padding: 4px 8px !important;
+
+  color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
 }
 
 .navItem {
@@ -80,7 +99,7 @@
   }
 
   &.active {
-    color: map-get($colors, 'DodgerBlue');
+    color: var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')});
   }
 }
 
@@ -101,11 +120,17 @@
     margin-bottom: 10px;
   }
 
+  .mobileSignUpBtn {
+    color: var(--passion-profile-navbar-logo, #{map-get($map: $colors, $key: 'DodgerBlue')}) !important;
+  border: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')}) !important;
+  }
+
   ul.menuLinks {
     list-style: none;
     padding: 0;
 
     & li {
+      color : var(--passion-profile-navbar-text, #{map-get($colors, 'Black')});
       font-size: 16px;
       border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke2');
       width: 100%;
@@ -119,8 +144,8 @@
       }
 
       &.active {
-        border-bottom: 1px solid map-get($map: $colors, $key: 'DodgerBlue');
-        color: map-get($map: $colors, $key: 'DodgerBlue');
+        border-bottom: 1px solid var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')});
+        color: var(--passion-profile-navbar-logo, #{map-get($colors, 'DodgerBlue')});
       }
 
       &.divider {

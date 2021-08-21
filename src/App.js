@@ -297,7 +297,7 @@ function App() {
             <RouteWithLayout
               layout={MobileLayout}
               exact
-              path={[Routes.root, Routes.sessions, Routes.videos, Routes.courses]}
+              path={[Routes.root, Routes.sessions, Routes.videos, Routes.courses, Routes.subscriptions, Routes.passes]}
               component={NewHome}
             />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.legals} component={Legals} />

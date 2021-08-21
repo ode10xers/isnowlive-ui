@@ -22,8 +22,6 @@ const { Panel } = Collapse;
 
 const creatorUsernameRegex = new RegExp('^[a-z]*$');
 
-// TODO: Think about the New Creator Flow
-// TODO: Implement Testimonials Once decided
 const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = () => {} }) => {
   const { setUserDetails } = useGlobalContext();
   const [form] = Form.useForm();

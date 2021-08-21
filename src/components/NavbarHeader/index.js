@@ -198,13 +198,12 @@ const NavbarHeader = () => {
             <Col className={classNames(styles.inlineMenu, inDashboard() ? styles.dashboard : undefined)}>
               <Menu
                 mode="horizontal"
+                className={styles.menuContainer}
                 overflowedIndicator={
                   <Button ghost type="primary" className={styles.menuIndicator}>
-                    {' '}
-                    Menu{' '}
+                    Menu
                   </Button>
                 }
-                className={styles.menuContainer}
               >
                 <Menu.Item key="Home" onClick={() => history.push(Routes.root)}>
                   Site Home
@@ -223,8 +222,7 @@ const NavbarHeader = () => {
                     key="Pass"
                     className={siteLinkActive('pass') ? 'ant-menu-item-active' : undefined}
                     onClick={() => {
-                      history.push(Routes.root);
-                      window.location.hash = 'passes';
+                      history.push(Routes.passes);
                     }}
                   >
                     Passes
@@ -253,8 +251,7 @@ const NavbarHeader = () => {
                     key="Membership"
                     className={siteLinkActive('membership') ? 'ant-menu-item-active' : undefined}
                     onClick={() => {
-                      history.push(Routes.root);
-                      window.location.hash = 'memberships';
+                      history.push(Routes.subscriptions);
                     }}
                   >
                     Memberships
@@ -270,10 +267,12 @@ const NavbarHeader = () => {
                       My Dashboard
                     </Menu.Item>
                     <Menu.Item key="UserName" disabled>
-                      <Text strong> Hi, {localUserDetails.first_name} </Text>
+                      <Text strong className={styles.loggedInUserName}>
+                        Hi, {localUserDetails.first_name}
+                      </Text>
                     </Menu.Item>
                     <Menu.Item key="SignOut">
-                      <Button block danger type="default" onClick={() => logOut(history)}>
+                      <Button block danger ghost type="primary" onClick={() => logOut(history)}>
                         Sign Out
                       </Button>
                     </Menu.Item>
@@ -331,6 +330,7 @@ const NavbarHeader = () => {
               </Row>
               <Modal
                 style={{ top: 0, margin: 0, maxWidth: '100vw' }}
+                bodyStyle={{ backgroundColor: `var(--passion-profile-lightest-color, white)` }}
                 className={styles.mobileMenuModal}
                 visible={showMobileMenu}
                 footer={null}
@@ -403,8 +403,7 @@ const NavbarHeader = () => {
                           key="Creator Passes"
                           className={siteLinkActive('pass') ? styles.active : undefined}
                           onClick={() => {
-                            history.push(Routes.root);
-                            window.location.hash = 'passes';
+                            history.push(Routes.passes);
                             setShowMobileMenu(false);
                           }}
                         >
@@ -440,8 +439,7 @@ const NavbarHeader = () => {
                           key="Creator Memberships"
                           className={siteLinkActive('membership') ? styles.active : undefined}
                           onClick={() => {
-                            history.push(Routes.root);
-                            window.location.hash = 'memberships';
+                            history.push(Routes.subscriptions);
                             setShowMobileMenu(false);
                           }}
                         >
@@ -502,7 +500,10 @@ const NavbarHeader = () => {
                       {localUserDetails ? (
                         <>
                           <Col xs={24}>
-                            <Text strong> Hi, {localUserDetails.first_name} </Text>
+                            <Text strong className={styles.loggedInUsername}>
+                              {' '}
+                              Hi, {localUserDetails.first_name}{' '}
+                            </Text>
                           </Col>
                           <Col xs={24}>
                             <Button block danger type="default" onClick={() => logOut(history)}>
@@ -523,7 +524,13 @@ const NavbarHeader = () => {
                             </Button>
                           </Col>
                           <Col xs={12}>
-                            <Button block type="default" onClick={() => showSignUpModal()}>
+                            <Button
+                              className={styles.mobileSignUpBtn}
+                              ghost
+                              block
+                              type="primary"
+                              onClick={() => showSignUpModal()}
+                            >
                               Sign Up
                             </Button>
                           </Col>

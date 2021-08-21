@@ -9,7 +9,8 @@ import Routes from 'routes';
 
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
+import { generateColorPalletteForProfile } from 'utils/colors';
 import { isInIframeWidget } from 'utils/widgets';
 import { getLiveCoursesFromCourses, getVideoCoursesFromCourses } from 'utils/productsHelper';
 
@@ -36,6 +37,8 @@ const CourseDetailedListView = () => {
   const [courses, setCourses] = useState([]);
   const [selectedCourseType, setSelectedCourseType] = useState('all');
 
+  const [creatorProfile, setCreatorProfile] = useState(null);
+
   const fetchCreatorCourses = useCallback(async () => {
     setIsLoading(true);
 
@@ -53,14 +56,57 @@ const CourseDetailedListView = () => {
     setIsLoading(false);
   }, []);
 
+  const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
+    try {
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorProfile(data);
+      }
+    } catch (error) {
+      message.error('Failed to fetch creator profile details');
+      console.error(error);
+    }
+  }, []);
+
   useEffect(() => {
+    const domainUsername = getUsernameFromUrl();
+
+    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
+      fetchCreatorProfileDetails(domainUsername);
+    }
+
     fetchCreatorCourses();
-  }, [fetchCreatorCourses]);
+  }, [fetchCreatorCourses, fetchCreatorProfileDetails]);
+
+  useEffect(() => {
+    let profileColorObject = null;
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
+
+      Object.entries(profileColorObject).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfile]);
 
   const handleBackClicked = () => history.push(Routes.courses);
 
   const renderCourseItems = (course) => (
-    <Col xs={24} sm={12} key={course.id}>
+    <Col xs={24} sm={12} md={!creatorProfile?.profile?.new_profile ? 12 : 8} key={course.id}>
       <CourseListItem course={course} />
     </Col>
   );
@@ -103,8 +149,9 @@ const CourseDetailedListView = () => {
                     <>
                       <Col xs={4} md={2}>
                         <Button
-                          className={styles.blueText}
                           size="large"
+                          type="primary"
+                          className={styles.backButton}
                           icon={<ArrowLeftOutlined />}
                           onClick={handleBackClicked}
                         />
@@ -136,14 +183,17 @@ const CourseDetailedListView = () => {
           </>
         ) : (
           <Empty className={styles.w100} description="No courses found for creator">
-            <Button
-              className={styles.blueText}
-              size="large"
-              icon={<ArrowLeftOutlined />}
-              onClick={() => history.push(Routes.root)}
-            >
-              Back to home
-            </Button>
+            {!isInIframeWidget() && (
+              <Button
+                className={styles.backButton}
+                size="large"
+                type="primary"
+                icon={<ArrowLeftOutlined />}
+                onClick={() => history.push(Routes.root)}
+              >
+                Back to home
+              </Button>
+            )}
           </Empty>
         )}
       </Spin>

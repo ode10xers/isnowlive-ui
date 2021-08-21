@@ -6,9 +6,14 @@ import { isValidFile, preventDefaults } from 'utils/helper';
 import { redirectToVideosPage } from 'utils/redirect';
 
 import styles from './style.module.scss';
+
 const DefaultImage = require('assets/images/greybg.jpg');
 
 const { Title } = Typography;
+
+// const {
+//   formatDate: { getVideoDuration },
+// } = dateUtil;
 
 const VideoListCard = ({ video }) => {
   // const videoDuration = (
@@ -55,9 +60,9 @@ const VideoListCard = ({ video }) => {
 
   // const bottomCardBar = (
   //   <Row className={styles.cardFooter}>
-  //     <Col xs={14} className={styles.videoValidity}>
+  //     {/* <Col xs={14} className={styles.videoValidity}>
   //       VALIDITY : {video?.validity} DAY{video?.validity > 1 ? 'S' : ''}
-  //     </Col>
+  //     </Col> */}
   //     <Col xs={10} className={styles.priceText}>
   //       {renderVideoPrice()}
   //     </Col>

@@ -18,7 +18,7 @@ const formInitialValues = {
 const { Text, Title, Paragraph } = Typography;
 const { Panel } = Collapse;
 
-const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
+const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -99,15 +99,23 @@ const OtherLinksEditView = ({ configValues, deleteHandler, updateHandler }) => {
   return (
     <>
       <Row justify="center">
-        <Col xs={24} className={styles.editViewButtonContainer}>
-          <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
-            <EditOutlined />
-          </button>
+        <Col xs={isContained ? 24 : 12} className={styles.editViewButtonContainer}>
+          {isContained ? (
+            <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
+              <EditOutlined />
+            </button>
+          ) : (
+            <Button ghost type="primary" onClick={handleEditComponentClicked} icon={<EditOutlined />} />
+          )}
         </Col>
-        <Col xs={24} className={styles.editViewButtonContainer}>
-          <button className={styles.deleteComponentButton} onClick={handleDeleteComponentClicked}>
-            <DeleteOutlined />
-          </button>
+        <Col xs={isContained ? 24 : 12} className={styles.editViewButtonContainer}>
+          {isContained ? (
+            <button className={styles.deleteComponentButton} onClick={handleDeleteComponentClicked}>
+              <DeleteOutlined />
+            </button>
+          ) : (
+            <Button danger ghost type="primary" onClick={handleDeleteComponentClicked} icon={<DeleteOutlined />} />
+          )}
         </Col>
       </Row>
       <Modal

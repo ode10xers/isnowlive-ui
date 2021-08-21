@@ -1,15 +1,16 @@
 @import '../../styles/variables.scss';
 
 // We'll be basing the max-width on Ant Design's md breakpoint (768px)
-$navbar-height: 66px;
+$navbar-height: 64px;
 
 .mainContainer {
   height: 100%;
   // background-color: map-get($colors, 'WhiteSmoke1') !important;
-  background-color: map-get($map: $colors, $key: 'White') !important;
+  // background-color: var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')}) !important;
+  background : linear-gradient(259.47deg, var(--passion-profile-backdrop-color, #{map-get($map: $colors, $key: 'White')}) 2.46%, #{map-get($map: $colors, $key: 'White')} 109.66%);
 
   .mainContent {
-    max-width: 767px;
+    max-width: var(--passion-profile-max-width, 767px);
     width: 100%;
   }
 
@@ -17,13 +18,4 @@ $navbar-height: 66px;
     margin-top: $navbar-height;
     min-height: calc(100vh - #{$navbar-height}) !important;
   }
-}
-
-.topHeader {
-  background-color: map-get($colors, 'White') !important;
-  border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
-  padding: 0 20px !important;
-  position: fixed;
-  z-index: 99;
-  width: 100vw;
 }

@@ -6,6 +6,7 @@ $card-border-radius: 8px;
   border-radius: $card-border-radius !important;
   cursor: pointer;
   background-color: var(--course-card-background-color, #{map-get($map: $colors, $key: 'White')}) !important;
+  border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
 
   .courseCoverContainer {
     height: 100%;
@@ -31,34 +32,18 @@ $card-border-radius: 8px;
 
   .courseName {
     height: 52px;
-    padding: 12px;
+    padding: 8px;
     overflow: hidden;
     color: var(--passion-profile-darker-color, var(--course-card-font-color, #{map-get($map: $colors, $key: 'Chambray')})) !important;
 
     &.textLength28 {
-      font-size: 20px;
+      font-size: 16px;
     }
     &.textLength56 {
       font-size: 14px;
     }
     &.textLength84 {
       font-size: 12px;
-    }
-  }
-
-  .courseContentContainer {
-    padding: 0 12px 12px 12px;
-
-    .courseDivider {
-      margin: 0 12px;
-      height: 24px;
-      color: map-get($map: $colors, $key: 'WhiteSmoke');
-    }
-
-    .courseContents {
-      font-size: 16px;
-    color: var(--passion-profile-darker-color, var(--course-card-font-color, #{map-get($map: $colors, $key: 'Chambray')})) !important;
-      
     }
   }
 
@@ -72,6 +57,16 @@ $card-border-radius: 8px;
     background-color: var(--course-card-background-color, #{map-get($map: $colors, $key: 'White')}) !important;
     box-shadow: inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
     border-radius: 0 0 $card-border-radius $card-border-radius;
+
+    flex-wrap: nowrap;
+
+    @media screen and (max-width: 992px) and (min-width: 768px) {
+      font-size : 14px;
+    }
+
+    // @media screen and (max-width: 527px) {
+    //   font-size: 14px;
+    // }
 
     .timeText {
       font-weight: 500;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import moment from 'moment';
+import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, message, Image, Collapse, List, Space, Carousel } from 'antd';
 import {
@@ -21,6 +22,7 @@ import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBooked
 
 import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import { generateColorPalletteForProfile } from 'utils/colors';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import {
   isAPISuccess,
@@ -31,6 +33,8 @@ import {
   isUnapprovedUserError,
   preventDefaults,
   deepCloneObject,
+  isBrightColorShade,
+  convertHexToRGB,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -164,6 +168,28 @@ const CourseDetails = ({ match }) => {
       getCourseDetails(courseId);
     }
   }, [getCourseDetails, courseId]);
+
+  useEffect(() => {
+    let profileColorObject = null;
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileColorObject = generateColorPalletteForProfile(
+        creatorProfile?.profile?.color,
+        creatorProfile?.profile?.new_profile
+      );
+
+      Object.entries(profileColorObject).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfile]);
 
   //#region Start of Buy Logics
 
@@ -345,8 +371,7 @@ const CourseDetails = ({ match }) => {
     <Row gutter={[8, 16]}>
       <Col xs={24}>
         <Title level={3} className={styles.longDescriptionTitle}>
-          {' '}
-          {title}{' '}
+          {title}
         </Title>
       </Col>
       <Col xs={24}>
@@ -357,9 +382,9 @@ const CourseDetails = ({ match }) => {
 
   const renderContentIcon = (productType) =>
     productType.toUpperCase() === 'SESSION' ? (
-      <VideoCameraOutlined className={styles.blueText} />
+      <VideoCameraOutlined className={styles.contentIcon} />
     ) : (
-      <PlayCircleOutlined className={styles.blueText} />
+      <PlayCircleOutlined className={styles.contentIcon} />
     );
 
   const renderContentDetails = (contentData) => {
@@ -388,12 +413,15 @@ const CourseDetails = ({ match }) => {
   };
 
   const renderModuleContents = (content) => (
-    <List.Item key={content.product_id}>
+    <List.Item key={content.product_id} className={styles.moduleContentItems}>
       <Row gutter={[8, 8]} className={styles.w100} align="middle">
         <Col xs={24} md={12} lg={14}>
           <Space className={styles.w100}>
             {renderContentIcon(content.product_type)}
-            <Text strong> {content.name} </Text>
+            <Text strong className={styles.moduleContentName}>
+              {' '}
+              {content.name}{' '}
+            </Text>
           </Space>
         </Col>
         <Col xs={24} md={12} lg={10} className={styles.textAlignRight}>
@@ -483,7 +511,12 @@ const CourseDetails = ({ match }) => {
                       <Button
                         size="large"
                         type="primary"
-                        className={styles.courseBuyBtn}
+                        className={classNames(
+                          styles.courseBuyBtn,
+                          isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                            ? styles.darkText
+                            : styles.lightText
+                        )}
                         onClick={handleCourseBuyClicked}
                         disabled={!course || (!course.current_capacity && course.type !== 'VIDEO') || !course.modules}
                       >

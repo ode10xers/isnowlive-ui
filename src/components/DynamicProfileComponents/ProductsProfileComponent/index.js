@@ -73,6 +73,7 @@ const ProductsProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const { values: innerComponents } = customComponentProps;
@@ -156,6 +157,10 @@ const ProductsProfileComponent = ({
     fetchAllProductsData();
   }, [fetchUpcomingSessions, fetchCreatorVideos, fetchCreatorCourses]);
 
+  if (!isContained) {
+    return null;
+  }
+
   const handleMenuClick = (key) => {
     history.push(menuKeyRouteMap[key]);
   };
@@ -201,7 +206,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('SESSIONS')}
       icon={<VideoCameraOutlined className={styles.mr10} />}
     >
-      <SessionListView sessions={sessions} profileColor={customComponentProps?.headerColor ?? null} />
+      <SessionListView limit={3} sessions={sessions} isContained={true} />
     </ProductCardTemplate>
   );
 
@@ -213,7 +218,7 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('VIDEOS')}
       icon={<PlayCircleOutlined className={styles.mr10} />}
     >
-      <VideoListView videos={videos} profileColor={customComponentProps?.headerColor ?? null} />
+      <VideoListView limit={3} videos={videos} isContained={true} />
     </ProductCardTemplate>
   );
 
@@ -225,16 +230,16 @@ const ProductsProfileComponent = ({
       title={getComponentTitle('COURSES')}
       icon={<BookOutlined className={styles.mr10} />}
     >
-      <CoursesListView courses={courses} profileColor={customComponentProps?.headerColor ?? null} />
+      <CoursesListView limit={3} courses={courses} isContained={true} />
     </ProductCardTemplate>
   );
 
   return (
     <Row>
       <Col xs={24} className={styles.navigationBarContainer}>
-        {(sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
+        {(isEditing || sessions.length > 0 || videos.length > 0 || courses.length > 0) && (
           <Row gutter={[12, 12]} justify="center" align="center" className={styles.navigationBarMenu}>
-            {sessions.length > 0 && (
+            {(isEditing || sessions.length > 0) && (
               <Col xs={8} onClick={() => handleMenuClick('SESSIONS')}>
                 <div
                   className={classNames(
@@ -252,7 +257,7 @@ const ProductsProfileComponent = ({
                 </div>
               </Col>
             )}
-            {videos.length > 0 && (
+            {(isEditing || videos.length > 0) && (
               <Col xs={8} onClick={() => handleMenuClick('VIDEOS')}>
                 <div
                   className={classNames(
@@ -270,7 +275,7 @@ const ProductsProfileComponent = ({
                 </div>
               </Col>
             )}
-            {courses.length > 0 && (
+            {(isEditing || courses.length > 0) && (
               <Col xs={8} onClick={() => handleMenuClick('COURSES')}>
                 <div
                   className={classNames(

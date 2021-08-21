@@ -5,7 +5,7 @@
   width: 100%;
 
   .sessionListContainer {
-    max-width: 767px;
+    max-width: var(--passion-profile-max-width, 767px);
     min-height: 700px;
     margin: 0 auto;
   }

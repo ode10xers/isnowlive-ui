@@ -4,9 +4,9 @@ import { Row, Col } from 'antd';
 
 import PassesListItem from '../PassesListItem';
 
-const PassesListView = ({ passes = [] }) => {
+const PassesListView = ({ passes = [], isContained = false }) => {
   const renderPassListItems = (pass) => (
-    <Col xs={12} sm={8} key={pass.external_id}>
+    <Col xs={12} md={8} lg={isContained ? 8 : 6} key={pass.external_id}>
       <PassesListItem pass={pass} />
     </Col>
   );

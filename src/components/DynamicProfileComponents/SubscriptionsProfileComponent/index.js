@@ -8,11 +8,12 @@ import Routes from 'routes';
 import SubscriptionsListView from './SubscriptionListView';
 import SubscriptionsEditView from './SubscriptionEditView';
 import DragAndDropHandle from '../DragAndDropHandle';
+import ContainerCard from 'components/ContainerCard';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
-import ContainerCard from 'components/ContainerCard';
 
 const { Text } = Typography;
 
@@ -22,6 +23,7 @@ const SubscriptionProfileComponent = ({
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
+  isContained = false,
   ...customComponentProps
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -49,44 +51,63 @@ const SubscriptionProfileComponent = ({
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
-  return subscriptions.length > 0 || isEditing ? (
-    <Row className={styles.p10} align="middle" justify="center" id="memberships">
-      {isEditing && (
-        <Col xs={1}>
-          <DragAndDropHandle {...dragHandleProps} />{' '}
-        </Col>
-      )}
-      <Col xs={isEditing ? 22 : 24}>
-        <ContainerCard
-          title={customComponentProps?.title ?? 'MEMBERSHIPS'}
-          icon={<ScheduleOutlined className={styles.mr10} />}
-        >
-          {isEditing ? (
-            <Row gutter={[8, 8]} justify="center" align="center">
-              <Col className={styles.textAlignCenter}>
-                <Space align="center" className={styles.textAlignCenter}>
-                  <Text> The memberships you have created will show up here </Text>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
-                    }
-                  >
-                    Manage my memberships
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          ) : (
-            <Spin spinning={isLoading} tip="Fetching memberships">
-              <SubscriptionsListView subscriptions={subscriptions} />
-            </Spin>
-          )}
-        </ContainerCard>
+  const dragAndDropHandleComponent = <DragAndDropHandle {...dragHandleProps} />;
+
+  const editingViewComponent = (
+    <SubscriptionsEditView
+      configValues={customComponentProps}
+      updateHandler={saveEditChanges}
+      isContained={isContained}
+    />
+  );
+
+  const componentChildren = isEditing ? (
+    <Row gutter={[8, 8]} justify="center" align="center">
+      <Col className={styles.textAlignCenter}>
+        <Space align="center" className={styles.textAlignCenter}>
+          <Text> The memberships you have created will show up here </Text>
+          <Button
+            type="primary"
+            onClick={() =>
+              window.open(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.subscriptions, '_blank')
+            }
+          >
+            Manage my memberships
+          </Button>
+        </Space>
       </Col>
-      {isEditing && (
-        <Col xs={1}>
-          <SubscriptionsEditView configValues={customComponentProps} updateHandler={saveEditChanges} />{' '}
+    </Row>
+  ) : (
+    <Spin spinning={isLoading} tip="Fetching memberships">
+      <SubscriptionsListView subscriptions={subscriptions} isContained={isContained} />
+    </Spin>
+  );
+
+  const commonContainerProps = {
+    title: customComponentProps?.title ?? 'MEMBERSHIPS',
+    icon: <ScheduleOutlined className={styles.mr10} />,
+  };
+
+  return subscriptions.length > 0 || isEditing ? (
+    <Row className={styles.p10} align="middle" justify="center">
+      {isContained ? (
+        <>
+          {isEditing && <Col xs={1}>{dragAndDropHandleComponent}</Col>}
+          <Col xs={isEditing ? 22 : 24}>
+            <ContainerCard {...commonContainerProps}>{componentChildren}</ContainerCard>
+          </Col>
+          {isEditing && <Col xs={1}>{editingViewComponent}</Col>}
+        </>
+      ) : (
+        <Col xs={24}>
+          <DynamicProfileComponentContainer
+            {...commonContainerProps}
+            isEditing={isEditing}
+            dragDropHandle={dragAndDropHandleComponent}
+            editView={editingViewComponent}
+          >
+            {componentChildren}
+          </DynamicProfileComponentContainer>
         </Col>
       )}
     </Row>

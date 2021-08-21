@@ -4,12 +4,3 @@
   margin-top: 66px;
   background-color: map-get($colors, 'White') !important;
 }
-
-.topHeader {
-  background-color: map-get($colors, 'White') !important;
-  border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
-  padding: 0 20px !important;
-  position: fixed;
-  z-index: 99;
-  width: 100vw;
-}

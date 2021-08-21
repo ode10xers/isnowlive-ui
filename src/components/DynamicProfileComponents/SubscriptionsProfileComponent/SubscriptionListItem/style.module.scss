@@ -1,5 +1,47 @@
 @import '../../../../styles/variables.scss';
 
+.subscriptionItem {
+  background-color : var(--primary-color);
+  border-radius: 8px;
+  padding: 12px 12px 12px 20px;
+
+  .subscriptionName {
+    color: var(--ternary-color);
+    width: fit-content;
+    padding: 4px 12px;
+    margin-top : -12px;
+    background-color: var(--secondary-color);
+    border-radius : 0 0 8px 8px;
+    font-size : 15px;
+    font-weight: 500;
+  }
+
+  .subscriptionPrice {
+    color: var(--ternary-color);
+    font-weight: 500;
+    text-align: right;
+    font-size : 16px;
+  }
+
+  .durationText {
+    color: var(--ternary-color);
+    font-weight: 500;
+    display: block;
+    font-size : 20px;
+
+    @media screen and (min-width: 992px) {
+      font-size: 18px;
+    }
+  }
+
+  .contentText {
+    color: var(--ternary-color);
+    display: block;
+    font-size : 14px;
+  }
+}
+
+/*
 .membershipItem {
   background-color: var(--primary-color);
   border: 1px solid var(--secondary-color);
@@ -44,3 +86,4 @@
     text-align: right;
   }
 }
+*/
