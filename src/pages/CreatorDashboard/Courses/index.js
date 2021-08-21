@@ -235,6 +235,7 @@ const Courses = ({ history }) => {
         title: 'Duration',
         dataIndex: 'start_time',
         key: 'start_time',
+        width: '190px',
         render: (text, record) =>
           record?.type === 'VIDEO'
             ? `${record?.validity ?? 0} days`

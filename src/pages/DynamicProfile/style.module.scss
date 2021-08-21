@@ -8,6 +8,31 @@
   margin-bottom: 50px;
 }
 
+.passionBranding {
+  margin-top : 40px;
+  margin-bottom : 20px;
+  cursor : pointer;
+
+  line-height: 16px;
+  font-weight: 500;
+  font-size: 16px;
+
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
+
+  .passionLogoContainer {
+    height: 24px;
+    margin: 0 8px;
+
+    .passionLogo {
+      height: 36px;
+    }
+  }
+
+  @media screen and (max-width:768px) {
+    margin-bottom : 50px;
+  }
+}
+
 .colorChoicesContainer {
   width: 100%;
   padding: 8px;

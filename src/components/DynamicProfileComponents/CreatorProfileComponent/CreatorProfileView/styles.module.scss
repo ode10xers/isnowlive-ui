@@ -37,15 +37,25 @@
 
   .profileImageWrapper {
     $profile-image-size: 100px;
+    $profile-image-size-large: 150px;
     background: transparent;
-    margin-top: calc(-1 * (#{$profile-image-size} * 0.4));
+    margin-top: calc(-1 * (#{$profile-image-size-large} * 0.5));
+    
+    @media screen and (max-width: 768px) {
+      margin-top: calc(-1 * (#{$profile-image-size} * 0.5));
+    }
 
     .profileImage {
-      width: $profile-image-size;
-      height: $profile-image-size;
+      width: $profile-image-size-large;
+      height: $profile-image-size-large;
       object-fit: scale-down;
       border: 4px solid map-get($map: $colors, $key: 'White');
       border-radius: 50%;
+
+      @media screen and (max-width: 768px) {
+        width: $profile-image-size;
+        height: $profile-image-size;
+      }
     }
   }
 
