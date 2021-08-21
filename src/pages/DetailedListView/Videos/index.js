@@ -9,7 +9,7 @@ import Routes from 'routes';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
 import { isAPISuccess, reservedDomainName, getUsernameFromUrl } from 'utils/helper';
-import { generateColorPalletteForProfile } from 'utils/colors';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import { isInIframeWidget } from 'utils/widgets';
 
 import styles from './style.module.scss';
@@ -64,21 +64,26 @@ const VideoDetailedListView = ({ history }) => {
   }, [fetchCreatorVideos, fetchCreatorProfileDetails]);
 
   useEffect(() => {
-    let profileColorObject = null;
-    if (creatorProfile && creatorProfile?.profile?.color) {
-      profileColorObject = generateColorPalletteForProfile(
-        creatorProfile?.profile?.color,
-        creatorProfile?.profile?.new_profile
-      );
+    let profileStyleObject = {};
 
-      Object.entries(profileColorObject).forEach(([key, val]) => {
-        document.documentElement.style.setProperty(key, val);
-      });
+    if (creatorProfile && creatorProfile?.profile?.new_profile) {
+      profileStyleObject = { ...profileStyleObject, ...getNewProfileUIMaxWidth() };
     }
 
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileStyleObject = {
+        ...profileStyleObject,
+        ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
+      };
+    }
+
+    Object.entries(profileStyleObject).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
+
     return () => {
-      if (profileColorObject) {
-        Object.keys(profileColorObject).forEach((key) => {
+      if (profileStyleObject) {
+        Object.keys(profileStyleObject).forEach((key) => {
           document.documentElement.style.removeProperty(key);
         });
       }
