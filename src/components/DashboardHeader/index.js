@@ -2,13 +2,16 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Row, Col, Button } from 'antd';
 
-import { useGlobalContext } from 'services/globalContext';
-import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+import DashboardToggle from 'components/DashboardToggle';
+
 import { isMobileDevice } from 'utils/device';
 
+import { useGlobalContext } from 'services/globalContext';
+import { trackSimpleEvent, mixPanelEventTags } from 'services/integrations/mixpanel';
+
 import styles from './style.module.scss';
-import DashboardToggle from 'components/DashboardToggle';
-const logo = require('assets/images/Logo-passion-transparent.png');
+
+const logo = require('assets/images/passion-orange-logo.png');
 
 const { user } = mixPanelEventTags;
 
