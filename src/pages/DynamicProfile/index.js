@@ -45,7 +45,7 @@ import {
   generateUrlFromUsername,
 } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
-import { convertHSLToHex, generateColorPalletteForProfile } from 'utils/colors';
+import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
 import styles from './style.module.scss';
 
@@ -296,18 +296,25 @@ const DynamicProfile = ({ creatorUsername = null }) => {
 
   // Use Effect to handle page coloring
   useEffect(() => {
-    let profileColorObject = null;
-    if (creatorColorChoice) {
-      profileColorObject = generateColorPalletteForProfile(creatorColorChoice, !containedUI);
-
-      Object.entries(profileColorObject).forEach(([key, val]) => {
-        document.documentElement.style.setProperty(key, val);
-      });
+    let profileStyleObject = {};
+    if (!containedUI) {
+      profileStyleObject = { ...profileStyleObject, ...getNewProfileUIMaxWidth() };
     }
 
+    if (creatorColorChoice) {
+      profileStyleObject = {
+        ...profileStyleObject,
+        ...generateColorPalletteForProfile(creatorColorChoice, !containedUI),
+      };
+    }
+
+    Object.entries(profileStyleObject).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
+
     return () => {
-      if (profileColorObject) {
-        Object.keys(profileColorObject).forEach((key) => {
+      if (profileStyleObject) {
+        Object.keys(profileStyleObject).forEach((key) => {
           document.documentElement.style.removeProperty(key);
         });
       }
