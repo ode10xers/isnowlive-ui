@@ -22,7 +22,7 @@ import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileCo
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile } from 'utils/colors';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import {
   isAPISuccess,
   preventDefaults,
@@ -234,21 +234,26 @@ const VideoDetails = ({ match, history }) => {
   }, [fetchCreatorProfileDetails]);
 
   useEffect(() => {
-    let profileColorObject = null;
-    if (creatorProfile && creatorProfile?.profile?.color) {
-      profileColorObject = generateColorPalletteForProfile(
-        creatorProfile?.profile?.color,
-        creatorProfile?.profile?.new_profile
-      );
+    let profileStyleObject = {};
 
-      Object.entries(profileColorObject).forEach(([key, val]) => {
-        document.documentElement.style.setProperty(key, val);
-      });
+    if (creatorProfile && creatorProfile?.profile?.new_profile) {
+      profileStyleObject = { ...profileStyleObject, ...getNewProfileUIMaxWidth() };
     }
 
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileStyleObject = {
+        ...profileStyleObject,
+        ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
+      };
+    }
+
+    Object.entries(profileStyleObject).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
+
     return () => {
-      if (profileColorObject) {
-        Object.keys(profileColorObject).forEach((key) => {
+      if (profileStyleObject) {
+        Object.keys(profileStyleObject).forEach((key) => {
           document.documentElement.style.removeProperty(key);
         });
       }

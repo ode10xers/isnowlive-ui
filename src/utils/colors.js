@@ -85,9 +85,7 @@ export const generateColorPalletteForProfile = (primaryColor, shouldColorNavbar 
     '--passion-profile-darker-color': formatHSLStyleString(h, s, l - 28),
   };
 
-  // NOTE : We also add a new max-width value here since the new UI needs to be wider
   const navbarColors = {
-    '--passion-profile-max-width': '992px',
     '--passion-profile-backdrop-color': profileColors['--passion-profile-lightest-color'],
     '--passion-profile-navbar-bg': profileColors['--passion-profile-lightest-color'],
     '--passion-profile-navbar-logo': profileColors['--passion-profile-primary-color'],
@@ -96,4 +94,10 @@ export const generateColorPalletteForProfile = (primaryColor, shouldColorNavbar 
 
   // NOTE: We're using HSL here for easier programmatic control
   return shouldColorNavbar ? { ...profileColors, ...navbarColors } : profileColors;
+};
+
+export const getNewProfileUIMaxWidth = () => {
+  return {
+    '--passion-profile-max-width': '992px',
+  };
 };

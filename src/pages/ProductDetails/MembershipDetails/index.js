@@ -21,7 +21,7 @@ import DynamicProfileComponentContainer from 'components/DynamicProfileComponent
 import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
-import { generateColorPalletteForProfile } from 'utils/colors';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import {
   getShadeForHexColor,
@@ -113,21 +113,25 @@ const MembershipDetails = ({ match, history }) => {
   }, [fetchCreatorProfileDetails]);
 
   useEffect(() => {
-    let profileColorObject = null;
-    if (creatorProfile && creatorProfile?.profile?.color) {
-      profileColorObject = generateColorPalletteForProfile(
-        creatorProfile?.profile?.color,
-        creatorProfile?.profile?.new_profile
-      );
-
-      Object.entries(profileColorObject).forEach(([key, val]) => {
-        document.documentElement.style.setProperty(key, val);
-      });
+    let profileStyleObject = {};
+    if (creatorProfile && creatorProfile?.profile?.new_profile) {
+      profileStyleObject = { ...profileStyleObject, ...getNewProfileUIMaxWidth() };
     }
 
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileStyleObject = {
+        ...profileStyleObject,
+        ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
+      };
+    }
+
+    Object.entries(profileStyleObject).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
+
     return () => {
-      if (profileColorObject) {
-        Object.keys(profileColorObject).forEach((key) => {
+      if (profileStyleObject) {
+        Object.keys(profileStyleObject).forEach((key) => {
           document.documentElement.style.removeProperty(key);
         });
       }
