@@ -2,15 +2,8 @@
 
 .mainContent {
   margin-top: 66px;
-  background-color: map-get($colors, 'White') !important;
-  width: 100%;
-}
+  // background-color: map-get($colors, 'White') !important;
+  background : linear-gradient(259.47deg, var(--passion-profile-backdrop-color, #{map-get($map: $colors, $key: 'White')}) 2.46%, #{map-get($map: $colors, $key: 'White')} 109.66%);
 
-.topHeader {
-  background-color: map-get($colors, 'White') !important;
-  border-bottom: 1px solid map-get($map: $colors, $key: 'WhiteSmoke1');
-  padding: 0 20px !important;
-  position: fixed;
-  z-index: 99;
-  width: 100vw;
+  width: 100%;
 }

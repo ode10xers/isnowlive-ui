@@ -52,8 +52,7 @@ const CreatorDashboard = ({ match }) => {
         ]}
         render={({ props }) => (
           <MobileLayout>
-            {' '}
-            <DynamicProfile />{' '}
+            <DynamicProfile />
           </MobileLayout>
         )}
       />

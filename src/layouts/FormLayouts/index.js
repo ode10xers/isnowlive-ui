@@ -90,7 +90,7 @@ export const signInTailLayout = {
     xl: { span: 20, offset: 4 },
   },
 };
-// TODO: These course modal Layouts are to be deprecated soon
+// NOTE: These course modal Layouts are to be deprecated soon
 export const courseModalFormLayout = {
   labelCol: { span: 8 },
   wrapperCol: { span: 16 },

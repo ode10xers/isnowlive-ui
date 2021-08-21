@@ -14,7 +14,7 @@ const formInitialValues = {
   title: null,
 };
 
-const SubscriptionsEditView = ({ configValues, updateHandler }) => {
+const SubscriptionsEditView = ({ configValues, updateHandler, isContained }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -48,9 +48,13 @@ const SubscriptionsEditView = ({ configValues, updateHandler }) => {
     <>
       <Row>
         <Col xs={24} className={styles.editViewButtonContainer}>
-          <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
-            <EditOutlined />
-          </button>
+          {isContained ? (
+            <button className={styles.editComponentButton} onClick={handleEditComponentClicked}>
+              <EditOutlined />
+            </button>
+          ) : (
+            <Button ghost type="primary" onClick={handleEditComponentClicked} icon={<EditOutlined />} />
+          )}
         </Col>
       </Row>
       <Modal

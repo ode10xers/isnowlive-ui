@@ -90,7 +90,7 @@ const {
   formatDate: { toLocaleTime, toLocaleDate, toLongDateWithDay, toLongDateWithLongDay },
 } = dateUtil;
 
-// TODO: Soon to be deprecated
+/** @deprecated */
 const CreateCourseModal = ({
   visible,
   closeModal,

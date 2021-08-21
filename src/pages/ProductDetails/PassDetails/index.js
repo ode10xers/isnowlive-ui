@@ -3,18 +3,7 @@ import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Empty, Affix, message } from 'antd';
-import {
-  GlobalOutlined,
-  FacebookFilled,
-  LinkedinFilled,
-  InstagramFilled,
-  TwitterOutlined,
-  CaretDownOutlined,
-  CheckCircleFilled,
-  PlayCircleFilled,
-  BookFilled,
-  BarsOutlined,
-} from '@ant-design/icons';
+import { CaretDownOutlined, CheckCircleFilled, PlayCircleFilled, BookFilled, BarsOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -27,6 +16,7 @@ import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } 
 import dateUtil from 'utils/date';
 import { getExternalLink } from 'utils/url';
 import { isMobileDevice } from 'utils/device';
+import { socialMediaIcons } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
 import {
   isAPISuccess,
@@ -42,16 +32,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-
-// TODO: Move these later to a separate file/constants be used everywhere it is needed
-// TODO: Use a better version of these icons according to the design
-const socialMediaIcons = {
-  website: <GlobalOutlined />,
-  facebook_link: <FacebookFilled />,
-  twitter_link: <TwitterOutlined />,
-  instagram_link: <InstagramFilled />,
-  linkedin_link: <LinkedinFilled />,
-};
 
 const {
   formatDate: { toMonthYear },
@@ -158,7 +138,7 @@ const PassDetails = ({ match, history }) => {
   useEffect(() => {
     let profileColorObject = null;
     if (creatorProfileColor) {
-      profileColorObject = generateColorPalletteForProfile(creatorProfileColor);
+      profileColorObject = generateColorPalletteForProfile(creatorProfileColor, true);
 
       Object.entries(profileColorObject).forEach(([key, val]) => {
         document.documentElement.style.setProperty(key, val);
@@ -326,11 +306,15 @@ const PassDetails = ({ match, history }) => {
           </Col>
           <Col>
             <Space>
-              {creatorSocialMediaLinks.map(([socialMedia, link]) => (
-                <a href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
-                  {socialMediaIcons[socialMedia]}
-                </a>
-              ))}
+              {creatorSocialMediaLinks.map(([socialMedia, link]) => {
+                const IconElement = socialMediaIcons[socialMedia];
+
+                return (
+                  <a href={getExternalLink(link)} target="_blank" rel="noopener noreferrer">
+                    <IconElement />
+                  </a>
+                );
+              })}
             </Space>
           </Col>
         </Row>

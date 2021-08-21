@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
+import classNames from 'classnames';
 
 import { Row, Col, Button, Spin, Typography, Divider, Space, Drawer, Image, Statistic, message } from 'antd';
-import { BookTwoTone, LikeTwoTone, ScheduleTwoTone, GiftOutlined, DollarOutlined } from '@ant-design/icons';
+import { LikeOutlined, ScheduleOutlined, GiftOutlined, DollarOutlined, BookOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -15,11 +16,13 @@ import {
 } from 'components/Modals/modals';
 import AuthModal from 'components/AuthModal';
 import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
+import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 import PassesListItem from 'components/DynamicProfileComponents/PassesProfileComponent/PassesListItem';
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 
 import dateUtil from 'utils/date';
+import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import {
   isAPISuccess,
   preventDefaults,
@@ -28,6 +31,10 @@ import {
   productType,
   videoSourceType,
   isUnapprovedUserError,
+  getUsernameFromUrl,
+  reservedDomainName,
+  isBrightColorShade,
+  convertHexToRGB,
 } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
@@ -53,6 +60,7 @@ const VideoDetails = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [videoData, setVideoData] = useState(null);
+  const [creatorProfile, setCreatorProfile] = useState(null);
 
   // Related Products State
   const [relatedSubscriptions, setRelatedSubscriptions] = useState([]);
@@ -195,9 +203,62 @@ const VideoDetails = ({ match, history }) => {
     [getCourseDetailsForVideo]
   );
 
+  const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
+    try {
+      const { status, data } = creatorUsername
+        ? await apis.user.getProfileByUsername(creatorUsername)
+        : await apis.user.getProfile();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorProfile(data);
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorModal(
+        'Failed to fetch creator profile details',
+        error?.response?.data?.message || 'Something went wrong.'
+      );
+    }
+  }, []);
+
   //#endregion End of API Calls
 
   //#region Start of Use Effects
+
+  useEffect(() => {
+    const domainUsername = getUsernameFromUrl();
+
+    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
+      fetchCreatorProfileDetails(domainUsername);
+    }
+  }, [fetchCreatorProfileDetails]);
+
+  useEffect(() => {
+    let profileStyleObject = {};
+
+    if (creatorProfile && creatorProfile?.profile?.new_profile) {
+      profileStyleObject = { ...profileStyleObject, ...getNewProfileUIMaxWidth() };
+    }
+
+    if (creatorProfile && creatorProfile?.profile?.color) {
+      profileStyleObject = {
+        ...profileStyleObject,
+        ...generateColorPalletteForProfile(creatorProfile?.profile?.color, creatorProfile?.profile?.new_profile),
+      };
+    }
+
+    Object.entries(profileStyleObject).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
+
+    return () => {
+      if (profileStyleObject) {
+        Object.keys(profileStyleObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfile]);
 
   // Fetching data required for UI
   useEffect(() => {
@@ -474,50 +535,82 @@ const VideoDetails = ({ match, history }) => {
   const renderVideoDetailItem = (value) => <Text className={styles.videoDetailItem}>{value}</Text>;
 
   const renderPassItems = (pass) => (
-    <Col xs={12} sm={8} key={pass.external_id}>
+    <Col xs={12} md={8} lg={!creatorProfile?.profile?.new_profile ? 8 : 6} key={pass.external_id}>
       <PassesListItem pass={pass} />
     </Col>
   );
 
   const renderCourseItems = (course) => (
-    <Col xs={24} sm={12} key={course.id}>
+    <Col
+      xs={!creatorProfile?.profile?.new_profile ? 24 : 18}
+      md={12}
+      lg={!creatorProfile?.profile?.new_profile ? 12 : 8}
+      key={course.id}
+    >
       <CourseListItem course={course} />
     </Col>
   );
+
+  const renderContainerComponent = (props, children) => {
+    const ContainingComponent = creatorProfile?.profile?.new_profile ? DynamicProfileComponentContainer : ContainerCard;
+
+    return (
+      <Col xs={24}>
+        <ContainingComponent {...props}>{children}</ContainingComponent>
+      </Col>
+    );
+  };
 
   //#endregion End of UI Handlers
 
   //#region Start of UI Components
 
-  const relatedCoursesComponent = (
-    <Col xs={24}>
-      <ContainerCard
-        title="Courses containing this video"
-        icon={<BookTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
-      >
-        <Row gutter={[10, 10]}>{relatedCourses.map(renderCourseItems)}</Row>
-      </ContainerCard>
-    </Col>
-  );
+  const renderRelatedCoursesComponent = () => {
+    if (!relatedCourses.length) {
+      return null;
+    }
 
-  const relatedPassesComponent = (
-    <Col xs={24}>
-      <ContainerCard
-        title="Buy a pass and this video"
-        icon={<LikeTwoTone className={styles.mr10} twoToneColor="#0050B3" />}
-      >
-        <Row gutter={[10, 10]}>{relatedPasses.map(renderPassItems)}</Row>
-      </ContainerCard>
-    </Col>
-  );
+    const componentChild = <Row gutter={[10, 10]}>{relatedCourses.map(renderCourseItems)}</Row>;
 
-  const relatedSubscriptionsComponent = (
-    <Col xs={24}>
-      <ContainerCard title="Memberships" icon={<ScheduleTwoTone className={styles.mr10} twoToneColor="#0050B3" />}>
-        <SubscriptionsListView subscriptions={relatedSubscriptions} />
-      </ContainerCard>
-    </Col>
-  );
+    const commonContainerProps = {
+      title: 'Courses containing this video',
+      icon: <BookOutlined className={styles.icon} />,
+    };
+
+    return renderContainerComponent(commonContainerProps, componentChild);
+  };
+
+  const renderRelatedPassesComponent = () => {
+    if (!relatedPasses.length) {
+      return null;
+    }
+
+    const componentChild = <Row gutter={[10, 10]}>{relatedPasses.map(renderPassItems)}</Row>;
+
+    const commonContainerProps = {
+      title: 'Buy a pass and this video',
+      icon: <LikeOutlined className={styles.icon} />,
+    };
+
+    return renderContainerComponent(commonContainerProps, componentChild);
+  };
+
+  const renderRelatedSubscriptionsComponent = () => {
+    if (!relatedSubscriptions.length) {
+      return null;
+    }
+
+    const componentChild = (
+      <SubscriptionsListView subscriptions={relatedSubscriptions} isContained={!creatorProfile?.profile?.new_profile} />
+    );
+
+    const commonContainerProps = {
+      title: 'Memberships',
+      icon: <ScheduleOutlined className={styles.icon} />,
+    };
+
+    return renderContainerComponent(commonContainerProps, componentChild);
+  };
 
   //#endregion End of UI Components
 
@@ -576,7 +669,7 @@ const VideoDetails = ({ match, history }) => {
 
           {/* Related Products */}
           {videoData?.is_course ? (
-            relatedCoursesComponent
+            renderRelatedCoursesComponent()
           ) : (
             <>
               <Col xs={24}>
@@ -589,7 +682,12 @@ const VideoDetails = ({ match, history }) => {
                             block
                             type="primary"
                             size="large"
-                            className={styles.buyVideoBtn}
+                            className={classNames(
+                              styles.buyVideoBtn,
+                              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                                ? styles.darkText
+                                : styles.lightText
+                            )}
                             icon={<DollarOutlined />}
                             onClick={handleVideoBuyClicked}
                           >
@@ -603,8 +701,7 @@ const VideoDetails = ({ match, history }) => {
                                   'Flexible'
                                 ) : videoData?.total_price > 0 ? (
                                   <>
-                                    {' '}
-                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0{' '}
+                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0
                                   </>
                                 ) : (
                                   'Free'
@@ -616,9 +713,9 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have{' '}
+                            purchased <b> {usableSubscription.subscription_name} </b> membership. You currently have
                             {usableSubscription.products['VIDEO'].credits -
-                              usableSubscription.products['VIDEO'].credits_used}{' '}
+                              usableSubscription.products['VIDEO'].credits_used}
                             credits left.
                           </Paragraph>
                         </Col>
@@ -632,7 +729,12 @@ const VideoDetails = ({ match, history }) => {
                             block
                             type="primary"
                             size="large"
-                            className={styles.buyVideoBtn}
+                            className={classNames(
+                              styles.buyVideoBtn,
+                              isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                                ? styles.darkText
+                                : styles.lightText
+                            )}
                             icon={<DollarOutlined />}
                             onClick={handleVideoBuyClicked}
                           >
@@ -643,10 +745,12 @@ const VideoDetails = ({ match, history }) => {
                               <Text className={styles.buyVideoBtnText}> BUY WITH PASS </Text>
                               <Text className={styles.buyVideoBtnText}>
                                 {videoData?.pay_what_you_want ? (
-                                  'Flexible'
+                                  <>
+                                    {videoData?.currency?.toUpperCase()} <del>Flexible</del> 0
+                                  </>
                                 ) : videoData?.total_price > 0 ? (
                                   <>
-                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0{' '}
+                                    {videoData?.currency?.toUpperCase()} <del>{videoData?.total_price}</del> 0
                                   </>
                                 ) : (
                                   'Free'
@@ -658,7 +762,7 @@ const VideoDetails = ({ match, history }) => {
                         <Col xs={24}>
                           <Paragraph className={styles.buyVideoDesc}>
                             Get this video for 1 credit with your <br />
-                            purchased <b> {usablePass.pass_name} </b> Pass. You currently have{' '}
+                            purchased <b> {usablePass.pass_name} </b> Pass. You currently have
                             {usablePass.classes_remaining} credits left.
                           </Paragraph>
                         </Col>
@@ -696,7 +800,12 @@ const VideoDetails = ({ match, history }) => {
                               block
                               type="primary"
                               size="large"
-                              className={styles.buyVideoBtn}
+                              className={classNames(
+                                styles.buyVideoBtn,
+                                isBrightColorShade(convertHexToRGB(creatorProfile?.profile?.color ?? '#1890ff'))
+                                  ? styles.darkText
+                                  : styles.lightText
+                              )}
                               icon={<DollarOutlined />}
                               onClick={handleVideoBuyClicked}
                             >
@@ -724,8 +833,8 @@ const VideoDetails = ({ match, history }) => {
                   )}
                 </Row>
               </Col>
-              {relatedPasses?.length > 0 && relatedPassesComponent}
-              {relatedSubscriptions?.length > 0 && relatedSubscriptionsComponent}
+              {relatedPasses?.length > 0 && renderRelatedPassesComponent()}
+              {relatedSubscriptions?.length > 0 && renderRelatedSubscriptionsComponent()}
             </>
           )}
         </Row>
@@ -735,18 +844,21 @@ const VideoDetails = ({ match, history }) => {
         height={560}
         bodyStyle={{ padding: 10 }}
         title={
-          bottomSheetsView === 'membership' ? (
-            <Text style={{ color: '#0050B3' }}>Select your plan</Text>
-          ) : (
-            <Text style={{ color: '#0050B3' }}>Select the pass to buy</Text>
-          )
+          <Text style={{ color: 'var(--passion-profile-darker-color, #0050B3)' }}>
+            {bottomSheetsView === 'membership' ? 'Select your plan' : 'Select the pass to buy'}
+          </Text>
         }
         headerStyle={generateCardHeadingStyle()}
         visible={bottomSheetsVisible}
         onClose={handleBottomSheetsClosed}
         className={styles.videoBottomSheets}
       >
-        {bottomSheetsView === 'membership' ? <SubscriptionsListView subscriptions={relatedSubscriptions} /> : null}
+        {bottomSheetsView === 'membership' ? (
+          <SubscriptionsListView
+            subscriptions={relatedSubscriptions}
+            isContained={!creatorProfile?.profile?.new_profile}
+          />
+        ) : null}
       </Drawer>
     </div>
   );

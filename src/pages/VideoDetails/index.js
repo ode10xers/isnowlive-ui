@@ -47,6 +47,7 @@ const {
 } = dateUtil;
 
 // NOTE : Will be deprecated soon, to be replaced with NewVideoDetails
+/** @deprecated */
 const VideoDetails = ({ match }) => {
   const {
     showPaymentPopup,

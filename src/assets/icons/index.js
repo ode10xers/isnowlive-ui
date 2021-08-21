@@ -1,4 +1,4 @@
-import { VideoLink } from './VideoLink';
+import { VideoLink } from './videoLink/VideoLink';
 
 const Icons = {
   VideoLink,

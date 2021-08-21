@@ -1,7 +1,11 @@
 @import '../../../styles/variables.scss';
 
+.contentIcon {
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')});
+}
+
 .longDescriptionTitle {
-  color: map-get($map: $colors, $key: 'Cobalt') !important;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Cobalt')}) !important;
 
   @media screen and (max-width: 769px) {
     font-size: 32px !important;
@@ -13,11 +17,14 @@
 }
 
 .longContentWrapper {
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+
   p,
   span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: map-get($map: $colors, $key: 'White') !important;
+    background-color: transparent !important;
+    color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
   }
 }
 
@@ -71,6 +78,19 @@
           margin: 20px auto 0;
         }
 
+        .courseBuyBtn {
+          background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+          border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')});
+
+          &.lightText {
+            color : map-get($colors, 'White');
+          }
+
+          &.darkText {
+            color : map-get($colors, 'Zeus');
+          }
+        }
+
         .courseName {
           font-size: 48px;
           line-height: 52px;
@@ -118,8 +138,8 @@
   .courseInfoContainer {
     margin: -70px auto 20px;
     border-radius: 12px;
-    background-color: map-get($map: $colors, $key: 'White');
-    border: 1px solid map-get($map: $colors, $key: 'White1');
+    background-color: var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')});
+    border: 1px solid var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'White1')});
     padding: 30px;
     box-shadow: 0px 4px 44px rgba(0, 0, 0, 0.08);
 
@@ -163,18 +183,11 @@
         text-align: center;
         display: block;
         font-weight: 700;
+        color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
 
         @media screen and (max-width: 1140px) {
           font-size: 24px;
         }
-
-        // @media screen and (max-width: 769px) {
-        //   font-size: 20px;
-        // }
-
-        // @media screen and (max-width: 526px) {
-        //   font-size: 16px;
-        // }
       }
 
       .courseTitleContainer {
@@ -185,32 +198,18 @@
           font-size: 20px;
           line-height: 28px;
           margin-right: 8px;
-          color: map-get($map: $colors, $key: 'DodgerBlue');
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'DodgerBlue')});
 
           @media screen and (max-width: 769px) {
             font-size: 16px;
             line-height: 20px;
           }
-
-          // @media screen and (max-width: 526px) {
-          //   font-size: 12px;
-          //   line-height: 18px;
-          //   margin-right: 4px;
-          // }
         }
 
         .courseInfoTitle {
           font-size: 14px;
           vertical-align: super;
-
-          // @media screen and (max-width: 769px) {
-          //   font-size: 12px;
-          // }
-
-          // @media screen and (max-width: 526px) {
-          //   font-size: 10px;
-          //   vertical-align: unset;
-          // }
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')});
         }
       }
     }
@@ -219,7 +218,7 @@
   .personaContainer {
     .personaItemWrapper {
       padding: 10px 12px;
-      border: 1px solid map-get($map: $colors, $key: 'Silver');
+      border: 1px solid var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Silver')});
       border-radius: 8px;
       min-height: 200px;
       height: 100%;
@@ -231,14 +230,19 @@
           text-align: center;
           font-size: 20px;
           font-weight: 600;
+  color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+
         }
 
         .personaItemContent {
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+
           p,
           span {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
               sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
             background-color: map-get($map: $colors, $key: 'White') !important;
+            color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
           }
         }
       }
@@ -255,7 +259,7 @@
 
       .courseCurriculumText {
         font-size: 32px;
-        color: map-get($map: $colors, $key: 'Denim');
+        color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Denim')});
         text-align: center;
       }
 
@@ -263,11 +267,11 @@
         width: 100%;
         padding: 4px 12px 12px;
         border-radius: 12px;
-        background-color: map-get($map: $colors, $key: 'White');
+        background-color: var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')});
         box-shadow: 0px 4px 44px rgba(0, 0, 0, 0.08);
 
         .curriculumExpandIcon {
-          color: map-get($colors, 'Denim') !important;
+          color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Denim')}) !important;
           font-size: 16px !important;
         }
 
@@ -275,13 +279,21 @@
           font-size: 18px;
           font-weight: 600;
           line-height: 24px;
-          color: map-get($colors, 'Denim');
+          color: var(--passion-profile-dark-color, #{map-get($map: $colors, $key: 'Denim')}) !important;
+        }
+
+        .moduleContentItems {
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+          
+          .moduleContentName {
+            color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+          }
         }
 
         :global {
           .ant-collapse-header {
             margin-top: 12px;
-            background-color: map-get($map: $colors, $key: 'Lavender');
+            background-color: var(--passion-profile-light-color, #{map-get($map: $colors, $key: 'Lavender')});
             border-radius: 8px !important;
           }
         }
@@ -304,7 +316,7 @@
   .coursePreviewImagesSection {
     margin: -50px 0;
     padding: 30px 80px !important;
-    background: linear-gradient(41.18deg, #e6f7ff 16.22%, #fff5f6 82.56%), #f8faff;
+    background: linear-gradient(41.18deg, var(--passion-profile-lightest-color, #e6f7ff) 16.22%, var(--passion-profile-light-color, #fff5f6) 82.56%);
 
     @media screen and (max-width: 769px) {
       padding: 20px !important;
@@ -315,7 +327,7 @@
     }
 
     .coursePreviewTitle {
-      color: map-get($colors, 'Cobalt') !important;
+      color: var(--passion-profile-dark-color, #{map-get($colors, 'Cobalt')}) !important;
       font-size: 28px;
       font-weight: 500;
       text-align: center;
@@ -329,7 +341,7 @@
       :global {
         .slick-active {
           > button {
-            background: #006cd0 !important;
+            background: var(--passion-profile-primary-color, #006cd0) !important;
           }
         }
       }
@@ -362,29 +374,33 @@
 
         .faqHeader {
           font-size: 18px;
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
 
         .faqExpandIcon {
           font-size: 16px;
           top: 20%;
           right: 32px;
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
         }
 
         :global {
           .ant-collapse-header {
             margin-top: 12px;
-            background-color: map-get($map: $colors, $key: 'White');
+            background-color: var(--passion-profile-lightest-color, #{map-get($map: $colors, $key: 'White')});
             border-radius: 8px !important;
             padding: 20px;
           }
         }
 
         .faqContentWrapper {
+          color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
+
           p,
           span {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
               sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-            color: map-get($map: $colors, $key: 'Black') !important;
+            color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
             background-color: transparent !important;
           }
         }
