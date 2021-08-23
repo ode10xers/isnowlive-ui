@@ -103,20 +103,20 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
           <Col xs={24}>
             <Divider className={styles.creatorProfileDivider} />
           </Col>
-          {isContained && (
-            <Col xs={24} className={styles.creatorBio}>
-              {shouldExpandCreatorBio ? (
-                <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
-              ) : (
-                <>
-                  <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
-                  <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
-                    READ MORE <CaretDownOutlined />
-                  </div>
-                </>
-              )}
-            </Col>
-          )}
+          {/* {isContained && ( */}
+          <Col xs={24} className={styles.creatorBio}>
+            {shouldExpandCreatorBio ? (
+              <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+            ) : (
+              <>
+                <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+                <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
+                  READ MORE <CaretDownOutlined />
+                </div>
+              </>
+            )}
+          </Col>
+          {/* )} */}
         </Row>
       </Col>
       {renderCreatorExternalLinks()}
