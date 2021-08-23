@@ -62,6 +62,7 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
+import PassDetailPreview from 'pages/PreviewPages/PassDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -259,6 +260,12 @@ function App() {
               layout={NavbarFullWidthLayout}
               path={Routes.availabilityDetails}
               component={AvailabilityDetails}
+            />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.previewPages.passes}
+              component={PassDetailPreview}
             />
             <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />

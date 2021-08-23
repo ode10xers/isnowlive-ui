@@ -23,6 +23,9 @@ const Routes = {
   inventoryDetails: '/e/:inventory_id',
   sessionDetails: '/s/:session_id',
   membershipDetails: '/m/:membership_id',
+  previewPages: {
+    passes: '/demo-preview/p/:pass_id',
+  },
   sessionUpdate: '/creator/session/:id/edit',
   sessionReschedule: '/reschedule',
   profilePreview: '/profile/preview',
