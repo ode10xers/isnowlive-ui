@@ -1,0 +1,9 @@
+@import '../../styles/variables.scss';
+
+.contentContainer {
+  width: 100%;
+  height: 100%;
+  // NOTE : this styling is to disable click interactions
+  // But still enable scrolling
+  pointer-events: none;
+}
