@@ -4,6 +4,7 @@ import { LikeOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import PassesListView from './PassesListView';
 import PassesEditView from './PassesEditView';
@@ -20,10 +21,12 @@ const { Text } = Typography;
 const PassesProfileComponent = ({
   identifier = null,
   isEditing = false,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  isContained = false,
   ...customComponentProps
 }) => {
   const [passes, setPasses] = useState([]);
@@ -46,8 +49,12 @@ const PassesProfileComponent = ({
   }, []);
 
   useEffect(() => {
-    fetchCreatorPasses();
-  }, [fetchCreatorPasses]);
+    if (!isLiveData) {
+      setPasses(dummy[dummyTemplateType].PASSES ?? []);
+    } else {
+      fetchCreatorPasses();
+    }
+  }, [fetchCreatorPasses, isLiveData, dummyTemplateType]);
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
