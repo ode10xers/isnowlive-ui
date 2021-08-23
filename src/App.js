@@ -16,6 +16,7 @@ import Profile from 'pages/Profile';
 import LiveStream from 'pages/LiveStream';
 import ProfilePreview from 'pages/ProfilePreview';
 import SignUp from 'pages/SignUp';
+import Onboarding from 'pages/Onboarding';
 import Login from 'pages/Login';
 import AdminLogin from 'pages/AdminLogin';
 import AvailabilityDetails from 'pages/ProductDetails/AvailabilityDetails';
@@ -279,6 +280,7 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
+            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.Onboarding} component={Onboarding} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout
