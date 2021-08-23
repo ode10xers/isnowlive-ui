@@ -9,7 +9,6 @@ $card-border-radius: 8px;
   border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
 
   .sessionCoverContainer {
-    height: 100%;
     position: relative;
 
     .extraTagsContainer {
@@ -25,7 +24,7 @@ $card-border-radius: 8px;
       .sessionImage {
         border-radius: $card-border-radius $card-border-radius 0 0;
         object-fit: scale-down;
-        height: 100%;
+        // height: 100%;
         border: 1px solid map-get($map: $colors, $key: 'Silver') !important;
       }
     }

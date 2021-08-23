@@ -15,6 +15,8 @@ const deviceTypes = {
   DESKTOP: 'macbookpro',
 };
 
+// NOTE : caveat is that the URL needs to contain username
+// So we might not be able to allow them to edit this here
 const DeviceUIPreview = () => {
   const [contentRef, setContentRef] = useState(null);
   const mountNode = contentRef?.contentWindow?.document?.body;
@@ -142,6 +144,7 @@ const DeviceUIPreview = () => {
     if (!contentRef) {
       return;
     }
+    // setTimeout(() => {
     const win = contentRef?.contentWindow;
     const linkEls = win.parent.document.querySelectorAll('link');
     if (linkEls.length) {
@@ -160,15 +163,17 @@ const DeviceUIPreview = () => {
     const metaViewportElement = document.createElement('meta');
     metaViewportElement.name = 'viewport';
     // For iPhone X
-    metaViewportElement.content = 'width=375, initial-scale=1';
+    // metaViewportElement.content = 'width=375, initial-scale=1';
     // FOr Macbook Pro
     // metaViewportElement.content = "width=1280 initial-scale=1";
+    metaViewportElement.content = 'width=1330 initial-scale=1';
 
     win.document.head.appendChild(metaViewportElement);
+    // }, 3000);
   }, [contentRef]);
 
   return (
-    <ReactDevicePreview device={deviceTypes.MOBILE} scale="0.8">
+    <ReactDevicePreview device={deviceTypes.DESKTOP} scale="1">
       <iframe
         className={styles.contentContainer}
         title="Device Profile Preview"
