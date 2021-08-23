@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, Collapse, message, Row, Col, Upload, Button } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Form, Input, Collapse, message, Row, Col, Upload, Button, Typography, Space } from 'antd';
+import { UploadOutlined, CheckOutlined } from '@ant-design/icons';
 import classNames from 'classnames';
 
 import Routes from 'routes';
@@ -15,20 +15,25 @@ import {
 } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
 
+import { preventDefaults } from 'utils/helper';
 import validationRules from 'utils/validation';
 import TextEditor from 'components/TextEditor';
 
 import styles from './style.module.scss';
 
 const { Panel } = Collapse;
+const { Title } = Typography;
 
-const { Item } = Form;
 const { user } = mixPanelEventTags;
+
+const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
 const Onboarding = ({ history }) => {
   const [form] = Form.useForm();
   const { logIn } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [creatorColorChoice, setCreatorColorChoice] = useState(null);
 
   const onFinish = async (values) => {
     const eventTag = user.click.signUp;
@@ -63,11 +68,71 @@ const Onboarding = ({ history }) => {
     console.log(key);
   };
 
+  const saveCreatorColorPalletteChoice = async (e) => {
+    preventDefaults(e);
+
+    setIsLoading(true);
+
+    // try {
+    //   const payload = {
+    //     cover_image_url: creatorProfileData?.cover_image_url,
+    //     profile_image_url: creatorProfileData?.profile_image_url,
+    //     first_name: creatorProfileData?.first_name,
+    //     last_name: creatorProfileData?.last_name,
+    //     username: creatorProfileData?.username,
+    //     profile: {
+    //       color: creatorColorChoice,
+    //     },
+    //   };
+
+    //   const { status } = await apis.user.updateProfile(payload);
+
+    //   if (isAPISuccess(status)) {
+    //     message.success('Creator profile color successfully updated');
+    //   }
+    // } catch (error) {
+    //   showErrorModal(
+    //     'Failed updating Creator Profile UI Colors',
+    //     error?.response?.data?.message || 'Something went wrong.'
+    //   );
+    // }
+
+    setIsLoading(false);
+  };
+
   return (
     <Row>
       <Col span={8} offset={1}>
         <Form form={form} onFinish={onFinish} scrollToFirstError={true}>
-          <Collapse defaultActiveKey={['1']} onChange={callbackCollapse}>
+          <Title level={3}>My Public Page</Title>
+          <Form.Item>
+            <Button htmlType="submit" type="primary">
+              SAVE
+            </Button>
+          </Form.Item>
+          <Space className={styles.colorChoicesContainer}>
+            {colorPalletteChoices.map((color) => (
+              <div
+                className={classNames(
+                  styles.colorContainer,
+                  creatorColorChoice === color ? styles.selected : undefined
+                )}
+                onClick={() => setCreatorColorChoice(color)}
+              >
+                <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
+              </div>
+            ))}
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={saveCreatorColorPalletteChoice}
+              loading={isLoading}
+            >
+              Apply Color
+            </Button>
+          </Space>
+
+          <Collapse defaultActiveKey={['header']} onChange={callbackCollapse}>
             <Panel header="Header" key="header">
               <Form.Item
                 id="cover_image_url"
@@ -140,6 +205,12 @@ const Onboarding = ({ history }) => {
               </Form.Item>
             </Panel>
             <Panel header="Other Links" key="other"></Panel>
+            <Panel header="Passes" key="other"></Panel>
+            <Panel header="Memberships" key="other"></Panel>
+            <Panel header="Sessions" key="other"></Panel>
+            <Panel header="Vidoes" key="other"></Panel>
+            <Panel header="Courses" key="other"></Panel>
+            <Panel header="Subscriptions" key="other"></Panel>
           </Collapse>
         </Form>
       </Col>
