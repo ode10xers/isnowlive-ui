@@ -577,7 +577,8 @@ const DynamicProfile = ({ creatorUsername = null }) => {
       window.location.hostname.includes('stage') || window.location.hostname.includes('localhost')
         ? 'https://passion-do.webflow.io'
         : 'https://passion.do';
-    window.open(`${targetUrl}?ref=${creatorProfileData.username}`, '_blank');
+
+    window.open(`${targetUrl}?creator-ref=${creatorProfileData.username}`, '_blank');
   };
 
   //#endregion End of Dashboard Button Handlers
