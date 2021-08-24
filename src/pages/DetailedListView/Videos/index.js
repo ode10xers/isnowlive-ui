@@ -5,6 +5,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 
@@ -59,9 +60,16 @@ const VideoDetailedListView = ({ history }) => {
     if (domainUsername && !reservedDomainName.includes(domainUsername)) {
       fetchCreatorProfileDetails(domainUsername);
     }
-
-    fetchCreatorVideos();
   }, [fetchCreatorVideos, fetchCreatorProfileDetails]);
+
+  useEffect(() => {
+    if (!creatorProfile?.profile?.live_mode) {
+      setVideos(dummy[creatorProfile?.profile?.category ?? 'YOGA'].VIDEOS ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorVideos();
+    }
+  }, [fetchCreatorVideos, creatorProfile]);
 
   useEffect(() => {
     let profileStyleObject = {};

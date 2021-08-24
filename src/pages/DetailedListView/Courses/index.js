@@ -6,6 +6,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileComponent/CoursesListItem';
 
@@ -77,9 +78,16 @@ const CourseDetailedListView = () => {
     if (domainUsername && !reservedDomainName.includes(domainUsername)) {
       fetchCreatorProfileDetails(domainUsername);
     }
+  }, [fetchCreatorProfileDetails]);
 
-    fetchCreatorCourses();
-  }, [fetchCreatorCourses, fetchCreatorProfileDetails]);
+  useEffect(() => {
+    if (!creatorProfile?.profile?.live_mode) {
+      setCourses(dummy[creatorProfile?.profile?.category ?? 'YOGA'].COURSES ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorCourses();
+    }
+  }, [fetchCreatorCourses, creatorProfile]);
 
   useEffect(() => {
     let profileStyleObject = {};
