@@ -63,7 +63,7 @@ const VideoDetailedListView = ({ history }) => {
   }, [fetchCreatorVideos, fetchCreatorProfileDetails]);
 
   useEffect(() => {
-    if (!creatorProfile?.profile?.live_mode) {
+    if (!creatorProfile?.profile?.live_mode && !isInIframeWidget()) {
       setVideos(dummy[creatorProfile?.profile?.category ?? 'YOGA'].VIDEOS ?? []);
       setTimeout(() => setIsLoading(false), 800);
     } else {

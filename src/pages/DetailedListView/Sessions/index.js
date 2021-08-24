@@ -81,7 +81,7 @@ const SessionDetailedListView = () => {
   }, [fetchCreatorProfileDetails]);
 
   useEffect(() => {
-    if (!creatorProfile?.profile?.live_mode) {
+    if (!creatorProfile?.profile?.live_mode && !isInIframeWidget()) {
       const sessionsData = dummy[creatorProfile?.profile?.category ?? 'YOGA'].SESSIONS ?? [];
       setSessions(sessionsData.map((session) => session.inventory.map((inv) => ({ ...session, ...inv }))).flat());
       setTimeout(() => setIsLoading(false), 800);

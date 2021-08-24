@@ -81,7 +81,7 @@ const CourseDetailedListView = () => {
   }, [fetchCreatorProfileDetails]);
 
   useEffect(() => {
-    if (!creatorProfile?.profile?.live_mode) {
+    if (!creatorProfile?.profile?.live_mode && !isInIframeWidget()) {
       setCourses(dummy[creatorProfile?.profile?.category ?? 'YOGA'].COURSES ?? []);
       setTimeout(() => setIsLoading(false), 800);
     } else {
