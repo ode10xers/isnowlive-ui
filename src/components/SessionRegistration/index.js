@@ -26,6 +26,7 @@ import validationRules from 'utils/validation';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
 import {
+  getUsernameFromUrl,
   generateUrlFromUsername,
   isUnapprovedUserError,
   isAPISuccess,
@@ -1084,9 +1085,9 @@ const SessionRegistration = ({ availablePasses = [], classDetails, isInventoryDe
                       <a href="https://zoom.us/download"> Zoom </a> details to join will be sent over email and are
                       always available in your
                       <a
-                        href={`${generateUrlFromUsername('app')}${Routes.attendeeDashboard.rootPath}${
-                          Routes.attendeeDashboard.defaultPath
-                        }`}
+                        href={`${generateUrlFromUsername(
+                          classDetails?.creator_username ?? classDetails?.username ?? getUsernameFromUrl()
+                        )}${Routes.attendeeDashboard.rootPath}${Routes.attendeeDashboard.defaultPath}`}
                       >
                         {' '}
                         dashboard

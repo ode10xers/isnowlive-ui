@@ -14,7 +14,7 @@ import apis from 'apis';
 import dummy from 'data/dummy';
 
 import Loader from 'components/Loader';
-import SessionRegistration from 'components/SessionRegistration';
+import SessionRegistrationPreview from '../SessionRegistrationPreview';
 
 import type { Session, SessionInventory } from 'types/models/session';
 
@@ -403,7 +403,7 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
 
             <Loader loading={isLoading} text="Processing...">
               {availability && (
-                <SessionRegistration
+                <SessionRegistrationPreview
                   fullWidth
                   classDetails={{ ...selectedInventory, ...availability }}
                   isInventoryDetails={true}
