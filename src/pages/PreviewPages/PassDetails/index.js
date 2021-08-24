@@ -6,6 +6,7 @@ import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Emp
 import { CaretDownOutlined, CheckCircleFilled, PlayCircleFilled, BookFilled, BarsOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 import dummy from 'data/dummy';
 
 import { generateCardHeadingStyle } from 'components/ContainerCard';
@@ -58,8 +59,7 @@ const PassDetailPreview = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
-        //TODO: adjust this once the flag has been set
-        setPasses(dummy['YOGA'].PASSES);
+        setPasses(dummy[data?.profile?.category ?? 'YOGA'].PASSES);
         setCreatorProfileColor(data?.profile?.color ?? null);
       }
     } catch (error) {
@@ -86,8 +86,12 @@ const PassDetailPreview = ({ match, history }) => {
         setSelectedPassDetails(targetPass);
         setCreatorPasses(passes.filter((pass) => pass.id !== targetPass.id));
         setOtherPassesLoading(false);
+      } else {
+        message.error('Invalid pass ID');
+        setTimeout(() => history.push(Routes.root), 800);
       }
     }
+    // eslint-disable-next-line
   }, [passes, match.params]);
 
   useEffect(() => {

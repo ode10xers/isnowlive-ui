@@ -51,6 +51,7 @@ const PassesProfileComponent = ({
   useEffect(() => {
     if (!isLiveData) {
       setPasses(dummy[dummyTemplateType].PASSES ?? []);
+      setTimeout(() => setIsLoading(false), 800);
     } else {
       fetchCreatorPasses();
     }

@@ -4,6 +4,7 @@ import { BookOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import CoursesListView from './CoursesListView';
 import CoursesEditView from './CoursesEditView';
@@ -19,10 +20,12 @@ const { Text } = Typography;
 const CoursesProfileComponent = ({
   identifier = null,
   isEditing = false,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  isContained = false,
   ...customComponentProps
 }) => {
   const [courses, setCourses] = useState([]);
@@ -44,8 +47,13 @@ const CoursesProfileComponent = ({
   }, []);
 
   useEffect(() => {
-    fetchCreatorCourses();
-  }, [fetchCreatorCourses]);
+    if (!isLiveData) {
+      setCourses(dummy[dummyTemplateType].COURSES ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorCourses();
+    }
+  }, [fetchCreatorCourses, dummyTemplateType, isLiveData]);
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 

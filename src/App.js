@@ -63,6 +63,7 @@ import http from 'services/http';
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
 import PassDetailPreview from 'pages/PreviewPages/PassDetails';
+import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -250,6 +251,12 @@ function App() {
               component={MembershipDetails}
             />
 
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.previewPages.courses}
+              component={CourseDetailPreview}
+            />
             <RouteWithLayout
               layout={NavbarFullWidthLayout}
               exact
