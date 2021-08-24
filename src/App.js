@@ -66,6 +66,7 @@ import PassDetailPreview from 'pages/PreviewPages/PassDetails';
 import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
 import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
 import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
+import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -270,6 +271,11 @@ function App() {
               exact
               path={Routes.courseDetails}
               component={CourseDetails}
+            />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              path={Routes.previewPages.availabilities}
+              component={AvailabilityDetailPreview}
             />
             <RouteWithLayout
               layout={NavbarFullWidthLayout}

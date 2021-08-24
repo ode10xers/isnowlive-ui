@@ -73,7 +73,7 @@ export const convertHexToHSL = (hexColor) => {
 
 export const formatHSLStyleString = (h, s, l) => `hsl(${clamp(0, h, 360)}, ${clamp(0, s, 100)}%, ${clamp(0, l, 100)}%)`;
 
-export const generateColorPalletteForProfile = (primaryColor, shouldColorNavbar = false) => {
+export const generateColorPalletteForProfile = (primaryColor = '#1890ff', shouldColorNavbar = false) => {
   const [h, s, l] = convertHexToHSL(primaryColor);
 
   const profileColors = {

@@ -15,6 +15,7 @@ import DynamicProfileComponentContainer from 'components/DynamicProfileComponent
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
+import dummy from 'data/dummy';
 
 const { Text } = Typography;
 
@@ -25,6 +26,8 @@ export interface AvailabilityProfileComponentProps {
   onUpdate: (identifier: unknown, config: unknown) => void;
   // onRemove: (identifier: unknown) => void;
   isContained?: boolean;
+  isLiveData?: boolean;
+  dummyTemplateType: string;
   title?: string;
 }
 
@@ -32,9 +35,11 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
   dragHandleProps,
   identifier,
   isEditing,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   // onRemove,
   onUpdate,
-  isContained = false,
   title,
   ...props
 }) => {
@@ -107,8 +112,14 @@ const AvailabilityProfileComponent: React.VFC<AvailabilityProfileComponentProps>
   }, []);
 
   useEffect(() => {
-    fetchCreatorSession();
-  }, [fetchCreatorSession]);
+    if (!isLiveData) {
+      //@ts-ignore
+      setAvailableSessions(dummy[dummyTemplateType].AVAILABILITIES ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorSession();
+    }
+  }, [fetchCreatorSession, dummyTemplateType, isLiveData]);
 
   const handleUpdate = useCallback((config) => onUpdate(identifier, config), [identifier, onUpdate]);
   // const handleRemove = useCallback(() => onRemove(identifier), [identifier, onRemove]);
