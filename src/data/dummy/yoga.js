@@ -6,6 +6,7 @@ const dateFormat = 'YYYY-MM-DD';
 
 const sessions = [
   {
+    is_dummy: true,
     price: 30,
     currency: 'usd',
     max_participants: 10,
@@ -33,7 +34,7 @@ const sessions = [
     is_active: true,
     session_id: 143,
     session_external_id: '2a1b9e93-caeb-4b86-8178-961201283d02',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     // offline_event_address: 'Jimbaran, Bali',
     offline_event_address: '',
@@ -82,6 +83,7 @@ const sessions = [
     ],
   },
   {
+    is_dummy: true,
     price: 45,
     currency: 'usd',
     max_participants: 10,
@@ -109,7 +111,7 @@ const sessions = [
     is_active: true,
     session_id: 144,
     session_external_id: '682ba5d3-9ccb-4698-acad-9814e9b13931',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     offline_event_address: 'Ubud, Bali',
     Videos: null,
@@ -149,6 +151,7 @@ const sessions = [
     ],
   },
   {
+    is_dummy: true,
     price: 60,
     currency: 'usd',
     max_participants: 2,
@@ -175,7 +178,7 @@ const sessions = [
     is_active: true,
     session_id: 145,
     session_external_id: '43f97606-8c64-41c3-97ca-daaaa9bfc82b',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     offline_event_address: 'Canggu, Bali',
     Videos: null,
@@ -218,6 +221,7 @@ const sessions = [
 
 const availabilities = [
   {
+    is_dummy: true,
     price: 0,
     currency: '',
     max_participants: 1,
@@ -244,7 +248,7 @@ const availabilities = [
     group: false,
     is_active: true,
     session_external_id: 'f270d497-4e3b-4835-9159-4d5d479a8a83',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     offline_event_address: 'Canggu, Bali',
     Videos: null,
@@ -300,6 +304,7 @@ const availabilities = [
     ],
   },
   {
+    is_dummy: true,
     price: 70,
     currency: 'usd',
     max_participants: 1,
@@ -325,7 +330,7 @@ const availabilities = [
     group: false,
     is_active: true,
     session_external_id: 'a8ad9f5a-cbf8-447e-bc6b-1f67c93d9d43',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     offline_event_address: 'Uluwatu, Bali',
     Videos: null,
@@ -368,6 +373,7 @@ const availabilities = [
 
 const videos = [
   {
+    is_dummy: true,
     title: 'Hatha Yoga',
     description: '<p>Soothing</p>\n',
     validity: 10,
@@ -383,12 +389,13 @@ const videos = [
     is_published: true,
     duration: 323.2,
     status: 'UPLOAD_SUCCESS',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     total_price: 60,
     sessions: [],
   },
   {
+    is_dummy: true,
     title: 'Ashtanga Yoga',
     description:
       '<p>Compared to other yoga practices, Ashtanga yoga is a bit more intense since it’s all about the continuous movement of these eight limbs. However, its fast pace helps us center our breathing and intensely concentrate on our movements, which can result in a meditative, transcendent experience.</p>\n<p>Not only does Ashtanga benefit your mental, emotional, and spiritual states, but it also has several physical benefits as well. By practicing Ashtanga, you will become stronger, more flexible, and have much more stamina in your everyday life.</p>\n',
@@ -405,12 +412,13 @@ const videos = [
     is_published: true,
     duration: 323.2,
     status: 'UPLOAD_SUCCESS',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     total_price: 45,
     sessions: [],
   },
   {
+    is_dummy: true,
     title: 'Vinyasa Flow',
     description:
       '<p>Compared to other yoga practices, Ashtanga yoga is a bit more intense since it’s all about the continuous movement of these eight limbs. However, its fast pace helps us center our breathing and intensely concentrate on our movements, which can result in a meditative, transcendent experience.</p>\n<p>Not only does Ashtanga benefit your mental, emotional, and spiritual states, but it also has several physical benefits as well. By practicing Ashtanga, you will become stronger, more flexible, and have much more stamina in your everyday life.</p>\n',
@@ -427,7 +435,7 @@ const videos = [
     is_published: true,
     duration: 323.2,
     status: 'UPLOAD_SUCCESS',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tags: [],
     total_price: 135,
     sessions: [],
@@ -436,6 +444,7 @@ const videos = [
 
 const courses = [
   {
+    is_dummy: true,
     name: 'Beginners Yoga Course',
     description:
       'Compared to other yoga practices, Ashtanga yoga is a bit more intense since it’s all about the continuous movement of these eight limbs. However, its fast pace helps us center our breathing and intensely concentrate on our movements, which can result in a meditative, transcendent',
@@ -452,7 +461,7 @@ const courses = [
     price: 200,
     currency: 'usd',
     max_participants: 10,
-    creator_username: 'isabellhalim',
+    creator_username: '',
     faqs: [],
     modules: [
       {
@@ -489,6 +498,7 @@ const courses = [
     current_capacity: 10,
   },
   {
+    is_dummy: true,
     name: 'Intermediate Yoga Course',
     description:
       "For those who have gone through the Beginner's course, this course will have a more thorough practice using pre-recorded videos",
@@ -498,7 +508,7 @@ const courses = [
     price: 250,
     currency: 'usd',
     max_participants: 1,
-    creator_username: 'isabellhalim',
+    creator_username: '',
     faqs: [],
     modules: [
       {
@@ -537,6 +547,7 @@ const courses = [
     current_capacity: 1,
   },
   {
+    is_dummy: true,
     name: 'Expert Yoga Course',
     description:
       'Strictly contains live sessions with me. The training will be intense and quick since it is more geared towards experts',
@@ -548,7 +559,7 @@ const courses = [
     price: 350,
     currency: 'usd',
     max_participants: 20,
-    creator_username: 'isabellhalim',
+    creator_username: '',
     faqs: [],
     modules: [
       {
@@ -583,6 +594,7 @@ const courses = [
 
 const passes = [
   {
+    is_dummy: true,
     id: 36,
     name: '15 Days Pass',
     class_count: 20,
@@ -594,7 +606,7 @@ const passes = [
     videos: [],
     limited: true,
     color_code: '#bf6d11',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     external_id: 'bc67b8f3-14c2-4e11-8cf9-1c924f3616c5',
     tag: {
       name: '',
@@ -603,6 +615,7 @@ const passes = [
     total_price: 170,
   },
   {
+    is_dummy: true,
     id: 35,
     name: '30 Days Pass',
     class_count: 50,
@@ -614,7 +627,7 @@ const passes = [
     videos: [],
     limited: true,
     color_code: '#795548',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     external_id: '462d36e0-26ae-44b5-9c78-f06cd9b967a8',
     tag: {
       name: '',
@@ -626,6 +639,7 @@ const passes = [
 
 const memberships = [
   {
+    is_dummy: true,
     name: 'Weekly Video Access',
     price: 100,
     total_price: 120,
@@ -643,7 +657,7 @@ const memberships = [
     color_code: '#673AB7',
     is_published: true,
     external_id: '5dcd7ed3ce2b-zkse-mm90-846q-ahi8907pq',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tag_id: '',
     tag: {
       name: '',
@@ -651,6 +665,7 @@ const memberships = [
     },
   },
   {
+    is_dummy: true,
     name: 'Monthly Session Access',
     price: 200,
     total_price: 225,
@@ -668,7 +683,7 @@ const memberships = [
     color_code: '#1890FF',
     is_published: true,
     external_id: 'ahi8907pq-mm90-846q-zkse-5dcd7ed3ce2b',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tag_id: '',
     tag: {
       name: '',
@@ -676,6 +691,7 @@ const memberships = [
     },
   },
   {
+    is_dummy: true,
     name: 'Monthly All Access',
     price: 300,
     total_price: 350,
@@ -698,7 +714,7 @@ const memberships = [
     color_code: '#4CAF50',
     is_published: true,
     external_id: '65ac95d5-e98a-4d99-9287-5dcd7ed3ce2b',
-    creator_username: 'isabellhalim',
+    creator_username: '',
     tag_id: '',
     tag: {
       name: '',
