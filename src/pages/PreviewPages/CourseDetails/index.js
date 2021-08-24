@@ -15,7 +15,6 @@ import {
 } from '@ant-design/icons';
 
 import apis from 'apis';
-import Routes from 'routes';
 import dummy from 'data/dummy';
 
 import Loader from 'components/Loader';
@@ -78,8 +77,6 @@ const CourseDetailPreview = ({ match, history }) => {
     ).flat();
     const videosData = dummy[dataTemplate].VIDEOS;
 
-    console.log(inventoriesData);
-
     if (courseData.modules && courseData.modules?.length > 0) {
       try {
         tempCourseData.modules = courseData.modules.map((courseModule) => {
@@ -138,11 +135,8 @@ const CourseDetailPreview = ({ match, history }) => {
         fetchCourseContentDetails(targetCourse, templateData);
       } else {
         message.error('Invalid course ID');
-        setTimeout(() => history.push(Routes.root), 800);
       }
     }
-
-    // eslint-disable-next-line
   }, [creatorProfile, match.params, fetchCourseContentDetails]);
 
   useEffect(() => {

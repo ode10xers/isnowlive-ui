@@ -22,6 +22,7 @@ import CourseListItem from 'components/DynamicProfileComponents/CoursesProfileCo
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 
 import dateUtil from 'utils/date';
+import { getLocalUserDetails } from 'utils/storage';
 import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import {
   isAPISuccess,
@@ -40,7 +41,6 @@ import {
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
-import { getLocalUserDetails } from 'utils/storage';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -49,6 +49,8 @@ const {
   timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
+// NOTE : This page still has the logic to show related courses
+// Confirm with BE if the api is still valid, if no then we can remove it safely
 const VideoDetails = ({ match, history }) => {
   const videoId = match.params.video_id;
 

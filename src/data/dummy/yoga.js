@@ -603,7 +603,7 @@ const passes = [
     currency: 'usd',
     is_published: true,
     sessions: [sessions[sessions.length - 1]],
-    videos: [],
+    videos: [videos[videos.length - 1]],
     limited: true,
     color_code: '#bf6d11',
     creator_username: '',
@@ -637,7 +637,7 @@ const passes = [
   },
 ];
 
-const memberships = [
+const subscriptions = [
   {
     is_dummy: true,
     name: 'Weekly Video Access',
@@ -729,5 +729,5 @@ export default {
   VIDEOS: videos,
   PASSES: passes,
   COURSES: courses,
-  MEMBERSHIPS: memberships,
+  SUBSCRIPTIONS: subscriptions,
 };

@@ -64,6 +64,7 @@ import './styles/globals.scss';
 import 'swiper/swiper.scss';
 import PassDetailPreview from 'pages/PreviewPages/PassDetails';
 import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
+import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -273,6 +274,12 @@ function App() {
               exact
               path={Routes.previewPages.passes}
               component={PassDetailPreview}
+            />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.previewPages.videos}
+              component={VideoDetailPreview}
             />
             <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />

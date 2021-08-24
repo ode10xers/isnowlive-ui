@@ -6,7 +6,6 @@ import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Emp
 import { CaretDownOutlined, CheckCircleFilled, PlayCircleFilled, BookFilled, BarsOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
-import Routes from 'routes';
 import dummy from 'data/dummy';
 
 import { generateCardHeadingStyle } from 'components/ContainerCard';
@@ -78,7 +77,7 @@ const PassDetailPreview = ({ match, history }) => {
   }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (match.params.pass_id) {
+    if (match.params.pass_id && passes.length > 0) {
       const targetPass = passes.find((pass) => pass.id === parseInt(match.params.pass_id));
 
       if (targetPass) {
@@ -88,10 +87,8 @@ const PassDetailPreview = ({ match, history }) => {
         setOtherPassesLoading(false);
       } else {
         message.error('Invalid pass ID');
-        setTimeout(() => history.push(Routes.root), 800);
       }
     }
-    // eslint-disable-next-line
   }, [passes, match.params]);
 
   useEffect(() => {
