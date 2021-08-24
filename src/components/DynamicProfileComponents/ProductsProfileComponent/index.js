@@ -14,6 +14,7 @@ import {
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import SessionListView from '../SessionsProfileComponent/SessionListView';
 import VideoListView from '../VideosProfileComponent/VideoListView';
@@ -69,11 +70,12 @@ const menuKeyRouteMap = {
 // NOTE : Remove handler is not used since this component is mandatory
 const ProductsProfileComponent = ({
   identifier = null,
-  isEditing,
+  isEditing = false,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   dragHandleProps,
   updateConfigHandler,
-  removeComponentHandler,
-  isContained = false,
   ...customComponentProps
 }) => {
   const { values: innerComponents } = customComponentProps;
@@ -146,16 +148,23 @@ const ProductsProfileComponent = ({
   // TODO: Reimplement when we find a way to simplify the API Call
   // e.g. get count of products, which should be much lighter
   useEffect(() => {
-    const fetchAllProductsData = async () => {
-      setIsLoading(true);
-      const sessionsPromise = fetchUpcomingSessions();
-      const videosPromise = fetchCreatorVideos();
-      const coursesPromise = fetchCreatorCourses();
-      await Promise.all([sessionsPromise, videosPromise, coursesPromise]);
-      setIsLoading(false);
-    };
-    fetchAllProductsData();
-  }, [fetchUpcomingSessions, fetchCreatorVideos, fetchCreatorCourses]);
+    if (!isLiveData) {
+      setSessions(dummy[dummyTemplateType].SESSIONS ?? []);
+      setVideos(dummy[dummyTemplateType].VIDEOS ?? []);
+      setCourses(dummy[dummyTemplateType].COURSES ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      const fetchAllProductsData = async () => {
+        setIsLoading(true);
+        const sessionsPromise = fetchUpcomingSessions();
+        const videosPromise = fetchCreatorVideos();
+        const coursesPromise = fetchCreatorCourses();
+        await Promise.all([sessionsPromise, videosPromise, coursesPromise]);
+        setIsLoading(false);
+      };
+      fetchAllProductsData();
+    }
+  }, [fetchUpcomingSessions, fetchCreatorVideos, fetchCreatorCourses, isLiveData, dummyTemplateType]);
 
   if (!isContained) {
     return null;
