@@ -68,6 +68,7 @@ import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
 import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
 import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
 import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
+import InventoryDetailsPreview from 'pages/PreviewPages/InventoryDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -289,14 +290,20 @@ function App() {
               path={Routes.previewPages.passes}
               component={PassDetailPreview}
             />
+            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout
               layout={MobileLayout}
               exact
               path={Routes.previewPages.videos}
               component={VideoDetailPreview}
             />
-            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+            <RouteWithLayout
+              layout={NavbarLayout}
+              exact
+              path={Routes.previewPages.inventories}
+              component={InventoryDetailsPreview}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
             <RouteWithLayout
               layout={NavbarLayout}
