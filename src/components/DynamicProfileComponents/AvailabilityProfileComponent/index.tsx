@@ -4,6 +4,7 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 import type { Session, UpcomingSessionInventory } from 'types/models/session';
 
 import AvailabilityListView from './AvailabilityListView';
@@ -15,7 +16,6 @@ import DynamicProfileComponentContainer from 'components/DynamicProfileComponent
 import { isAPISuccess } from 'utils/helper';
 
 import styles from './style.module.scss';
-import dummy from 'data/dummy';
 
 const { Text } = Typography;
 

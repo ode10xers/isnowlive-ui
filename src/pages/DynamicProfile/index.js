@@ -706,7 +706,7 @@ const DynamicProfile = ({ creatorUsername = null }) => {
               title={component.title}
               values={component.values}
               isLiveData={creatorProfileData?.profile?.live_mode ?? true}
-              dummyTemplateType={creatorProfileData?.profile?.category ?? 'YOGA'}
+              dummyTemplateType={creatorProfileData?.profile?.category || 'YOGA'}
               headerColor={
                 creatorColorChoice
                   ? convertHSLToHex(

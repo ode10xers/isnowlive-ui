@@ -565,7 +565,7 @@ const PassDetails = ({ match, history }) => {
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
                 <Text
                   className={
-                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor || '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }
@@ -711,7 +711,7 @@ const PassDetails = ({ match, history }) => {
               <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
                 <Text
                   className={
-                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor || '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }

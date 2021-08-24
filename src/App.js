@@ -42,6 +42,14 @@ import CourseDetailedListView from 'pages/DetailedListView/Courses';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
 
+import PassDetailPreview from 'pages/PreviewPages/PassDetails';
+import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
+import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
+import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
+import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
+import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
+import InventoryDetailsPreview from 'pages/PreviewPages/InventoryDetails';
+
 // import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
@@ -62,13 +70,6 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
-import PassDetailPreview from 'pages/PreviewPages/PassDetails';
-import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
-import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
-import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
-import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
-import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
-import InventoryDetailsPreview from 'pages/PreviewPages/InventoryDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
