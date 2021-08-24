@@ -118,7 +118,7 @@ const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({
   }, [fetchCreatorProfile]);
 
   useEffect(() => {
-    if (match?.params.session_id) {
+    if (match?.params.session_id && creatorProfile) {
       const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
       //@ts-ignore

@@ -68,7 +68,7 @@ const MembershipDetailPreview = ({ match, history }) => {
   }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (match.params.membership_id) {
+    if (match.params.membership_id && creatorProfile) {
       const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
       const subsData = deepCloneObject(dummy[templateData].SUBSCRIPTIONS);

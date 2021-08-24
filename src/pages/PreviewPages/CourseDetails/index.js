@@ -126,7 +126,7 @@ const CourseDetailPreview = ({ match, history }) => {
   }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (match.params.course_id) {
+    if (match.params.course_id && creatorProfile) {
       const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
       const targetCourse = dummy[templateData].COURSES.find((course) => course.id === match.params.course_id);

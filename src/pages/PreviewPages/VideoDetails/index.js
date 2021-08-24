@@ -85,7 +85,7 @@ const VideoDetailPreview = ({ match, history }) => {
   }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (match.params.video_id) {
+    if (match.params.video_id && creatorProfile) {
       const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
       const targetVideo = dummy[templateData].VIDEOS.find((video) => video.external_id === match.params.video_id);

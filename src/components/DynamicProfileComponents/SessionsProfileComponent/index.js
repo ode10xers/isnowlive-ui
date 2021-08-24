@@ -4,6 +4,7 @@ import { VideoCameraOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import SessionListView from './SessionListView';
 import SessionEditView from './SessionEditView';
@@ -19,10 +20,12 @@ const { Text } = Typography;
 const SessionsProfileComponent = ({
   identifier = null,
   isEditing = false,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  isContained = false,
   ...customComponentProps
 }) => {
   const [sessions, setSessions] = useState([]);
@@ -92,8 +95,13 @@ const SessionsProfileComponent = ({
   }, []);
 
   useEffect(() => {
-    fetchCreatorSessions();
-  }, [fetchCreatorSessions]);
+    if (!isLiveData) {
+      setSessions(dummy[dummyTemplateType].SESSIONS ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorSessions();
+    }
+  }, [fetchCreatorSessions, isLiveData, dummyTemplateType]);
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 

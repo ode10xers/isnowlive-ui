@@ -67,6 +67,7 @@ import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
 import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
 import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
 import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
+import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -297,6 +298,12 @@ function App() {
             <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
+            <RouteWithLayout
+              layout={NavbarLayout}
+              exact
+              path={Routes.previewPages.sessions}
+              component={SessionDetailsPreview}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}

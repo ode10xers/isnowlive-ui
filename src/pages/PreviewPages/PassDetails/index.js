@@ -76,7 +76,7 @@ const PassDetailPreview = ({ match, history }) => {
   }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (match.params.pass_id) {
+    if (match.params.pass_id && creatorProfileData) {
       const templateData = creatorProfileData?.profile?.category ?? 'YOGA';
 
       const passData = deepCloneObject(dummy[templateData].PASSES);
