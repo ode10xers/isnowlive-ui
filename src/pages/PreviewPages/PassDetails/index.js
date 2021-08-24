@@ -24,6 +24,7 @@ import {
   getUsernameFromUrl,
   convertHexToRGB,
   isBrightColorShade,
+  deepCloneObject,
 } from 'utils/helper';
 
 import styles from './style.module.scss';
@@ -42,7 +43,6 @@ const PassDetailPreview = ({ match, history }) => {
   const [creatorProfileColor, setCreatorProfileColor] = useState(null);
   const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
 
-  const [passes, setPasses] = useState([]);
   const [creatorPasses, setCreatorPasses] = useState([]);
   const [initialPassDetails, setInitialPassDetails] = useState(null);
   const [selectedPassDetails, setSelectedPassDetails] = useState(null);
@@ -58,7 +58,6 @@ const PassDetailPreview = ({ match, history }) => {
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
-        setPasses(dummy[data?.profile?.category ?? 'YOGA'].PASSES);
         setCreatorProfileColor(data?.profile?.color ?? null);
       }
     } catch (error) {
@@ -77,19 +76,22 @@ const PassDetailPreview = ({ match, history }) => {
   }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (match.params.pass_id && passes.length > 0) {
-      const targetPass = passes.find((pass) => pass.id === parseInt(match.params.pass_id));
+    if (match.params.pass_id) {
+      const templateData = creatorProfileData?.profile?.category ?? 'YOGA';
+
+      const passData = deepCloneObject(dummy[templateData].PASSES);
+      const targetPass = passData.find((pass) => pass.id === parseInt(match.params.pass_id));
 
       if (targetPass) {
         setInitialPassDetails(targetPass);
         setSelectedPassDetails(targetPass);
-        setCreatorPasses(passes.filter((pass) => pass.id !== targetPass.id));
+        setCreatorPasses(passData.filter((pass) => pass.id !== targetPass.id));
         setOtherPassesLoading(false);
       } else {
         message.error('Invalid pass ID');
       }
     }
-  }, [passes, match.params]);
+  }, [creatorProfileData, match.params]);
 
   useEffect(() => {
     let profileColorObject = null;

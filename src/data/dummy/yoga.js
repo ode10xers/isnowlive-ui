@@ -651,7 +651,7 @@ const subscriptions = [
       },
     },
     product_details: {
-      VIDEOS: videos,
+      VIDEO: videos,
     },
     validity: 7,
     color_code: '#673AB7',

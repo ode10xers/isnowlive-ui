@@ -65,6 +65,7 @@ import 'swiper/swiper.scss';
 import PassDetailPreview from 'pages/PreviewPages/PassDetails';
 import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
 import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
+import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -245,6 +246,12 @@ function App() {
               component={PaymentVerification}
             />
             <PrivateRoute layout={NavbarLayout} exact path={Routes.paymentConfirm} component={PaymentRedirectVerify} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.previewPages.memberships}
+              component={MembershipDetailPreview}
+            />
             <RouteWithLayout
               layout={MobileLayout}
               exact
