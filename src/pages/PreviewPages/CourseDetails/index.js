@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import ReactHtmlParser from 'react-html-parser';
+import React, { useState, useCallback, useEffect } from 'react';
 import moment from 'moment';
+import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Button, message, Image, Collapse, List, Space, Carousel } from 'antd';
@@ -15,28 +15,24 @@ import {
 } from '@ant-design/icons';
 
 import apis from 'apis';
+import dummy from 'data/dummy';
 
 import Loader from 'components/Loader';
-import AuthModal from 'components/AuthModal';
-import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { generateColorPalletteForProfile } from 'utils/colors';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
 import {
   isAPISuccess,
-  orderType,
-  productType,
-  videoSourceType,
-  paymentSource,
-  isUnapprovedUserError,
-  preventDefaults,
   deepCloneObject,
-  isBrightColorShade,
+  preventDefaults,
+  reservedDomainName,
+  getUsernameFromUrl,
+  videoSourceType,
   convertHexToRGB,
+  isBrightColorShade,
 } from 'utils/helper';
-
-import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
@@ -44,90 +40,74 @@ const { Text, Title } = Typography;
 const { Panel } = Collapse;
 const {
   formatDate: { toLongDateWithDay, toLocaleTime },
-  timezoneUtils: { getTimezoneLocation },
 } = dateUtil;
 
-const CourseDetails = ({ match }) => {
-  const courseId = match.params.course_id;
-
-  const { showPaymentPopup } = useGlobalContext();
-
-  const [course, setCourse] = useState(null);
+const CourseDetailPreview = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [creatorProfile, setCreatorProfile] = useState(null);
+  const [course, setCourse] = useState(null);
+
   const [creatorImageUrl, setCreatorImageUrl] = useState(null);
 
   const [expandedCourseModules, setExpandedCourseModules] = useState([]);
 
-  const getCreatorProfileDetails = useCallback(async (creatorUsername) => {
+  const fetchCreatorDetails = useCallback(async (creatorUsername) => {
+    setIsLoading(true);
+
     try {
-      const { data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
-      if (data) {
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
+
+      if (isAPISuccess(status) && data) {
         setCreatorProfile(data);
         setCreatorImageUrl(data.profile_image_url);
-        setIsLoading(false);
       }
     } catch (error) {
-      console.error(error);
-      message.error(error?.response?.data?.message || 'Failed to load profile details');
-      setIsLoading(false);
+      message.error(error?.response?.data?.message || 'Failed to fetch creator profile');
     }
+
+    setIsLoading(false);
   }, []);
 
-  const fetchCourseContentDetails = useCallback(async (courseData = {}) => {
+  const fetchCourseContentDetails = useCallback(async (courseData = {}, dataTemplate = 'YOGA') => {
     let tempCourseData = deepCloneObject(courseData);
+
+    const inventoriesData = dummy[dataTemplate].SESSIONS.map((session) =>
+      session.inventory.map((inventory) => ({ ...session, ...inventory }))
+    ).flat();
+    const videosData = dummy[dataTemplate].VIDEOS;
 
     if (courseData.modules && courseData.modules?.length > 0) {
       try {
-        tempCourseData.modules = await Promise.all(
-          courseData.modules.map(async (courseModule) => {
-            let tempModuleData = deepCloneObject(courseModule);
+        tempCourseData.modules = courseData.modules.map((courseModule) => {
+          let tempModuleData = deepCloneObject(courseModule);
 
-            if (courseModule.module_content?.length > 0) {
-              try {
-                tempModuleData.module_content = await Promise.all(
-                  courseModule.module_content.map(async (moduleContent) => {
-                    let productData = null;
-                    let targetAPI = null;
+          if (courseModule.module_content?.length > 0) {
+            try {
+              tempModuleData.module_content = courseModule.module_content.map((moduleContent) => {
+                let productData = null;
 
-                    if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
-                      targetAPI = apis.videos.getVideoById;
-                    } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
-                      targetAPI = apis.session.getInventoryDetailsByExternalId;
-                    }
+                if (moduleContent.product_type.toUpperCase() === 'VIDEO') {
+                  productData = videosData.find((video) => video.external_id === moduleContent.product_id);
+                } else if (moduleContent.product_type.toUpperCase() === 'SESSION') {
+                  productData = inventoriesData.find(
+                    (inventory) => inventory.inventory_external_id === moduleContent.product_id
+                  );
+                }
 
-                    if (targetAPI) {
-                      try {
-                        const { status, data } = await targetAPI(moduleContent.product_id);
-
-                        if (isAPISuccess(status) && data) {
-                          productData = data;
-                        }
-                      } catch (error) {
-                        console.error('Failed fetching product details for content');
-                        console.error(error);
-                      }
-                    }
-
-                    return {
-                      ...moduleContent,
-                      product_data: productData,
-                    };
-                  })
-                );
-              } catch (error) {
-                console.error('Failed fetching course content details');
-                console.error(error);
-              }
+                return {
+                  ...moduleContent,
+                  product_data: productData,
+                };
+              });
+            } catch (error) {
+              console.error('Failed fetching course content details');
+              console.error(error);
             }
+          }
 
-            return tempModuleData;
-          })
-        );
+          return tempModuleData;
+        });
       } catch (error) {
         console.error('Failed fetching course module details');
         console.error(error);
@@ -137,36 +117,27 @@ const CourseDetails = ({ match }) => {
     setCourse(tempCourseData);
   }, []);
 
-  const getCourseDetails = useCallback(
-    async (courseId) => {
-      setIsLoading(true);
+  useEffect(() => {
+    const creatorUsername = getUsernameFromUrl();
 
-      try {
-        const { status, data } = await apis.courses.getDetails(courseId);
-
-        if (isAPISuccess(status) && data) {
-          setExpandedCourseModules(data.modules?.map((courseModule) => courseModule.name) ?? []);
-          if (data.creator_username) {
-            getCreatorProfileDetails(data.creator_username);
-          }
-
-          await fetchCourseContentDetails(data);
-        }
-      } catch (error) {
-        console.error(error);
-        showErrorModal('Failed fetching course details', error?.response?.data?.message || 'Something went wrong.');
-      }
-
-      setIsLoading(false);
-    },
-    [fetchCourseContentDetails, getCreatorProfileDetails]
-  );
+    if (creatorUsername && !reservedDomainName.includes(creatorUsername)) {
+      fetchCreatorDetails(creatorUsername);
+    }
+  }, [fetchCreatorDetails]);
 
   useEffect(() => {
-    if (courseId) {
-      getCourseDetails(courseId);
+    if (match.params.course_id && creatorProfile) {
+      const templateData = creatorProfile?.profile?.category ?? 'YOGA';
+
+      const targetCourse = dummy[templateData].COURSES.find((course) => course.id === match.params.course_id);
+
+      if (targetCourse) {
+        fetchCourseContentDetails(targetCourse, templateData);
+      } else {
+        message.error('Invalid course ID');
+      }
     }
-  }, [getCourseDetails, courseId]);
+  }, [creatorProfile, match.params, fetchCourseContentDetails]);
 
   useEffect(() => {
     let profileColorObject = null;
@@ -190,106 +161,7 @@ const CourseDetails = ({ match }) => {
     };
   }, [creatorProfile]);
 
-  //#region Start of Buy Logics
-
-  const showConfirmPaymentPopup = async () => {
-    if (!course) {
-      showErrorModal('Something went wrong', 'Invalid Course Selected');
-      return;
-    }
-
-    let desc = [];
-
-    const sessionContentCount = getCourseSessionContentCount(course.modules ?? []);
-    const videoContentCount = getCourseVideoContentCount(course.modules ?? []);
-
-    if (sessionContentCount > 0) {
-      desc.push(`${sessionContentCount} Sessions`);
-    }
-
-    if (videoContentCount > 0) {
-      desc.push(`${videoContentCount} Videos`);
-    }
-
-    let paymentPopupData = {
-      productId: course.id,
-      productType: productType.COURSE,
-      itemList: [
-        {
-          name: course.name,
-          description: desc.join(', '),
-          currency: course.currency,
-          price: course.total_price,
-        },
-      ],
-    };
-
-    showPaymentPopup(paymentPopupData, buySingleCourse);
-  };
-
-  const buySingleCourse = async (couponCode = '') => {
-    if (!course) {
-      showErrorModal('Something went wrong', 'Invalid Course Selected');
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { status, data } = await apis.courses.createOrderForUser({
-        course_id: course.id,
-        price: course.total_price,
-        currency: course.currency?.toLowerCase(),
-        timezone_location: getTimezoneLocation(),
-        coupon_code: couponCode,
-        payment_source: paymentSource.GATEWAY,
-      });
-
-      if (isAPISuccess(status) && data) {
-        setIsLoading(false);
-
-        if (data.payment_required) {
-          return {
-            ...data,
-            is_successful_order: true,
-            payment_order_type: orderType.COURSE,
-            payment_order_id: data.course_order_id,
-          };
-        } else {
-          showPurchaseSingleCourseSuccessModal();
-          return {
-            ...data,
-            is_successful_order: true,
-          };
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {
-        showErrorModal(
-          'Discount Code Not Applicable',
-          'The discount code you entered is not applicable this product. Please try again with a different discount code'
-        );
-      } else if (
-        error?.response?.status === 500 &&
-        error?.response?.data?.message === 'user already has a confirmed order for this course'
-      ) {
-        showAlreadyBookedModal(productType.COURSE);
-      } else if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      }
-    }
-
-    return {
-      is_successful_order: false,
-    };
-  };
-
-  //#endregion End of Buy Logics
-
-  const closeAuthModal = () => {
-    setShowAuthModal(false);
-  };
+  //#region Start of UI Render Methods
 
   const handleCourseBuyClicked = (e) => {
     preventDefaults(e);
@@ -299,7 +171,7 @@ const CourseDetails = ({ match }) => {
       return;
     }
 
-    setShowAuthModal(true);
+    message.info('This page is just a preview, so you cannot buy this product');
   };
 
   const renderCourseInfoItem = ({ icon, title, content }) => (
@@ -483,9 +355,10 @@ const CourseDetails = ({ match }) => {
     ));
   };
 
+  //#endregion End of UI Render Methods
+
   return (
     <div className={styles.newCourseDetails}>
-      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Loader loading={isLoading} size="large">
         <Row gutter={[8, 50]}>
           <Col xs={24}>
@@ -667,4 +540,4 @@ const CourseDetails = ({ match }) => {
   );
 };
 
-export default CourseDetails;
+export default CourseDetailPreview;

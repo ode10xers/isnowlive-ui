@@ -11,9 +11,10 @@ import { Button, Card, Col, Divider, Image, message, Row, Select, Typography } f
 import { CaretDownOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import dummy from 'data/dummy';
 
 import Loader from 'components/Loader';
-import SessionRegistration from 'components/SessionRegistration';
+import SessionRegistrationPreview from '../SessionRegistrationPreview';
 
 import type { Session, SessionInventory } from 'types/models/session';
 
@@ -30,13 +31,13 @@ const {
 } = dateUtil;
 const { Paragraph, Text, Title } = Typography;
 
-export interface AvailabilityDetailsProps {
+export interface AvailabilityDetailsPreviewProps {
   match?: match<{ session_id: string }>;
 }
 
 type AvailabilityDetailsView = 'all' | 'date' | 'form';
 
-const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => {
+const AvailabilityDetailPreview: React.VFC<AvailabilityDetailsPreviewProps> = ({ match }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [availability, setAvailability] = useState<Session>();
   const [showLongDescription, setShowLongDescription] = useState(false);
@@ -94,38 +95,43 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
 
-  const fetchAvailabilityDetail = useCallback(async (session_id: string) => {
+  const fetchCreatorProfile = useCallback(async (username: string) => {
     setIsLoading(true);
+    try {
+      const creatorDetailsResponse = await apis.user.getProfileByUsername(username);
 
-    const { data, status } = (await apis.availabilities.getAvailabilityDetails(session_id)) ?? {};
-
-    if (isAPISuccess(status) && data) {
-      setAvailability(data);
+      if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
+        setCreatorProfile(creatorDetailsResponse.data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch creator profile');
     }
-
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorProfile = useCallback(async (username: string) => {
-    const creatorDetailsResponse = await apis.user.getProfileByUsername(username);
+  useEffect(() => {
+    const domainUsername = getUsernameFromUrl();
 
-    if (isAPISuccess(creatorDetailsResponse.status) && creatorDetailsResponse.data) {
-      setCreatorProfile(creatorDetailsResponse.data);
+    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
+      fetchCreatorProfile(domainUsername);
     }
-  }, []);
+  }, [fetchCreatorProfile]);
 
   useEffect(() => {
-    if (match?.params.session_id) {
-      const domainUsername = getUsernameFromUrl();
+    if (match?.params.session_id && creatorProfile) {
+      const templateData = creatorProfile?.profile?.category ?? 'YOGA';
 
-      if (domainUsername && !reservedDomainName.includes(domainUsername)) {
-        fetchAvailabilityDetail(match.params.session_id);
-        fetchCreatorProfile(domainUsername);
+      //@ts-ignore
+      const dummyAvailabilities = dummy[templateData].AVAILABILITIES;
+      const targetAvail = dummyAvailabilities.find((avail : Session) => avail.session_id === parseInt(match?.params?.session_id));
+
+      if (targetAvail) {
+        setAvailability(targetAvail);
+      } else {
+        message.error('Invalid availability ID');
       }
-    } else {
-      message.error('Session details not found.');
     }
-  }, [fetchAvailabilityDetail, match, fetchCreatorProfile]);
+  }, [match, creatorProfile]);
 
   useEffect(() => {
     let profileColorObject: Record<string, string> | null = null;
@@ -397,7 +403,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
 
             <Loader loading={isLoading} text="Processing...">
               {availability && (
-                <SessionRegistration
+                <SessionRegistrationPreview
                   fullWidth
                   classDetails={{ ...selectedInventory, ...availability }}
                   isInventoryDetails={true}
@@ -412,4 +418,4 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
   );
 };
 
-export default AvailabilityDetails;
+export default AvailabilityDetailPreview

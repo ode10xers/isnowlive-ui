@@ -216,6 +216,11 @@ const Profile = () => {
     values.cover_image_url = coverImage;
     values.profile_image_url = profileImage;
     values.profile.testimonials = testimonials;
+
+    // TODO: Right now, the category is hard coded to YOGA
+    // Later we'll need to make a dropdown of choices
+    values.profile.category = 'YOGA';
+
     if (isPublicUrlAvaiable) {
       updateProfileDetails(values);
     } else {

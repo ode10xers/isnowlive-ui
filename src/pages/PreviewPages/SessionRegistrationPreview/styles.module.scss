@@ -1,0 +1,126 @@
+@import '../../../styles/variables.scss';
+
+.sessionRegistrationWrapper {
+  // background: var(--passion-profile-light-color, #{map-get($colors, 'White1')});
+  background: map-get($colors, 'White1');
+
+  border-radius: 6px;
+  padding: 15px;
+
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')});
+}
+
+.registrationTitle {
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+}
+
+.formContainer {
+  margin-top : 20px;
+}
+
+.pwywInputWrapper {
+  margin: auto 0 !important;
+}
+
+.compactNumericalInput {
+  width: 56px !important;
+
+  &.highlightInput {
+    border: 1.8px solid map-get($map: $colors, $key: 'KellyGreen') !important;
+  }
+}
+
+.smallText {
+  font-size: 11px;
+}
+
+.card {
+  margin-top: 10px !important;
+}
+
+.cardExpansion {
+  border: 1px solid map-get($map: $colors, $key: 'White1');
+  background-color: map-get($map: $colors, $key: 'White');
+  padding: 8px;
+}
+.nameInputWrapper {
+  margin: 0px !important;
+}
+.nameInput {
+  max-width: 155px;
+  display: inline-block !important;
+  margin-right: 10px !important;
+}
+.emailInput {
+  input {
+    max-width: 320px;
+  }
+}
+.passwordInput {
+  span {
+    max-width: 320px;
+  }
+}
+
+.passwordHelpText {
+  margin-top: -26px;
+  max-width: 320px;
+
+  .span {
+    color: map-get($colors, 'Charcoal') !important;
+  }
+}
+
+.linkBtn {
+  padding: 0px !important;
+  cursor: pointer;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'DodgerBlue')}) !important;
+
+  &.setNewPassword {
+    font-size: 15px !important;
+  }
+}
+
+.bookingHelpText {
+  margin-top : 10px;
+  color : var(--passion-profile-darker-color, #{map-get($colors, 'Black')}) !important;
+}
+
+.bookBtn {
+  background-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+  border-color: var(--passion-profile-primary-color, #{map-get($colors, 'DodgerBlue')}) !important;
+
+  &:disabled {
+    opacity : 0.7;
+  }
+}
+
+.roundBtn {
+  cursor: pointer;
+  margin-top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  border: solid 1px map-get($colors, 'NightRider');
+}
+
+.roundBtn:hover {
+  border: solid 1px map-get($colors, 'DodgerBlue');
+}
+
+@media (max-width: 768px) {
+  .nameInput {
+    max-width: 100%;
+    display: block !important;
+    margin-right: 10px !important;
+  }
+
+  .passwordHelpText {
+    margin-top: -24px;
+    font-size: 12px;
+
+    .linkBtn {
+      font-size: 12px;
+    }
+  }
+}

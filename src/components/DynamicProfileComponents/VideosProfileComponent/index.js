@@ -4,6 +4,7 @@ import { PlayCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import VideoListView from './VideoListView';
 import VideoEditView from './VideoEditView';
@@ -19,10 +20,12 @@ const { Text } = Typography;
 const VideosProfileComponent = ({
   identifier = null,
   isEditing = false,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  isContained = false,
   ...customComponentProps
 }) => {
   const [videos, setVideos] = useState([]);
@@ -44,8 +47,13 @@ const VideosProfileComponent = ({
   }, []);
 
   useEffect(() => {
-    fetchCreatorVideos();
-  }, [fetchCreatorVideos]);
+    if (!isLiveData) {
+      setVideos(dummy[dummyTemplateType].VIDEOS ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorVideos();
+    }
+  }, [fetchCreatorVideos, dummyTemplateType, isLiveData]);
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 

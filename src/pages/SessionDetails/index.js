@@ -125,7 +125,7 @@ const SessionDetails = ({ match, history }) => {
           />
         </Col>
         <Col xs={24}>
-          <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
+          <Title level={3}>{session?.name}</Title>
         </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50}>
