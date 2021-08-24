@@ -150,7 +150,7 @@ const sessions = [
   },
   {
     price: 60,
-    currency: '',
+    currency: 'usd',
     max_participants: 2,
     name: 'Hatha Noon Session',
     description:
@@ -590,7 +590,6 @@ const passes = [
     price: 150,
     currency: 'usd',
     is_published: true,
-    // TODO: Make sure these data are consistent with the ones in sessions
     sessions: [sessions[sessions.length - 1]],
     videos: [],
     limited: true,

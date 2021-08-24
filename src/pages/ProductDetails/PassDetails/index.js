@@ -133,8 +133,6 @@ const PassDetails = ({ match, history }) => {
     fetchCreatorOtherPasses();
   }, [fetchCreatorProfileDetails, fetchCreatorOtherPasses]);
 
-  // TODO: This logic will be the basis of page coloring
-  // Should move this to a separate file (as a helper/custom hook)
   useEffect(() => {
     let profileColorObject = null;
     if (creatorProfileColor) {
@@ -567,7 +565,7 @@ const PassDetails = ({ match, history }) => {
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
                 <Text
                   className={
-                    creatorProfileColor && isBrightColorShade(convertHexToRGB(creatorProfileColor))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }
@@ -713,7 +711,7 @@ const PassDetails = ({ match, history }) => {
               <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
                 <Text
                   className={
-                    creatorProfileColor && isBrightColorShade(convertHexToRGB(creatorProfileColor))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }

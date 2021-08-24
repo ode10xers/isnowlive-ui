@@ -16,6 +16,8 @@ import { showErrorModal } from 'components/Modals/modals';
 import dateUtil from 'utils/date';
 import { getExternalLink } from 'utils/url';
 import { socialMediaIcons } from 'utils/constants';
+import { generateColorPalletteForProfile } from 'utils/colors';
+
 import {
   isAPISuccess,
   reservedDomainName,
@@ -77,7 +79,6 @@ const PassDetailPreview = ({ match, history }) => {
 
   useEffect(() => {
     if (match.params.pass_id) {
-      console.log(passes);
       const targetPass = passes.find((pass) => pass.id === parseInt(match.params.pass_id));
 
       if (targetPass) {
@@ -88,6 +89,25 @@ const PassDetailPreview = ({ match, history }) => {
       }
     }
   }, [passes, match.params]);
+
+  useEffect(() => {
+    let profileColorObject = null;
+    if (creatorProfileColor) {
+      profileColorObject = generateColorPalletteForProfile(creatorProfileColor, true);
+
+      Object.entries(profileColorObject).forEach(([key, val]) => {
+        document.documentElement.style.setProperty(key, val);
+      });
+    }
+
+    return () => {
+      if (profileColorObject) {
+        Object.keys(profileColorObject).forEach((key) => {
+          document.documentElement.style.removeProperty(key);
+        });
+      }
+    };
+  }, [creatorProfileColor]);
 
   //#region Start of helper functions
 
@@ -420,7 +440,7 @@ const PassDetailPreview = ({ match, history }) => {
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
                 <Text
                   className={
-                    creatorProfileColor && isBrightColorShade(convertHexToRGB(creatorProfileColor))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }
@@ -561,7 +581,7 @@ const PassDetailPreview = ({ match, history }) => {
               <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
                 <Text
                   className={
-                    creatorProfileColor && isBrightColorShade(convertHexToRGB(creatorProfileColor))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }

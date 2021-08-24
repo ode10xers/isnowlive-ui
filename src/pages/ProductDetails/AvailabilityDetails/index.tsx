@@ -210,7 +210,7 @@ const AvailabilityDetails: React.VFC<AvailabilityDetailsProps> = ({ match }) => 
         )}
         <Paragraph
           className={styles.availabilityDescription}
-          style={showLongDescription ? undefined : { maxHeight: 70, overflow: 'hidden' }}
+          style={showLongDescription ? undefined : { maxHeight: 64, overflow: 'hidden' }}
         >
           {HTMLReactParser(availability?.description ?? '')}
         </Paragraph>
