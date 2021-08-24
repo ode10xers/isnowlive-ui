@@ -7,6 +7,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 
@@ -32,6 +33,7 @@ const SessionDetailedListView = () => {
   const { start_date } = parseQueryString(window.location.href);
 
   const [isLoading, setIsLoading] = useState(false);
+  // NOTE : Here the state is called sessions, but the actual data contains inventories
   const [sessions, setSessions] = useState([]);
   const [selectedStartDate, setSelectedStartDate] = useState(start_date ? moment(start_date) : moment());
   const [selectedDatePickerDate, setSelectedDatePickerDate] = useState(start_date ? moment(start_date) : moment());
@@ -76,9 +78,17 @@ const SessionDetailedListView = () => {
     if (domainUsername && !reservedDomainName.includes(domainUsername)) {
       fetchCreatorProfileDetails(domainUsername);
     }
+  }, [fetchCreatorProfileDetails]);
 
-    fetchUpcomingSessions();
-  }, [fetchUpcomingSessions, fetchCreatorProfileDetails]);
+  useEffect(() => {
+    if (!creatorProfile?.profile?.live_mode && !isInIframeWidget()) {
+      const sessionsData = dummy[creatorProfile?.profile?.category ?? 'YOGA'].SESSIONS ?? [];
+      setSessions(sessionsData.map((session) => session.inventory.map((inv) => ({ ...session, ...inv }))).flat());
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchUpcomingSessions();
+    }
+  }, [fetchUpcomingSessions, creatorProfile]);
 
   useEffect(() => {
     let profileStyleObject = {};

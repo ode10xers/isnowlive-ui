@@ -1,3 +1,4 @@
+import Routes from 'routes';
 import { getUsernameFromUrl, generateUrlFromUsername, reservedDomainName } from 'utils/helper';
 // import { isInIframeWidget, isWidgetUrl } from 'utils/widgets';
 import { getLocalUserDetails } from 'utils/storage';
@@ -10,7 +11,7 @@ export const redirectToInventoryPage = (inventory) => {
   }
 
   const baseUrl = generateUrlFromUsername(inventory.creator_username || inventory.username || urlUsername);
-  const targetUrl = `${baseUrl}/e/${inventory.inventory_id}`;
+  const targetUrl = `${baseUrl}${inventory.is_dummy ? Routes.previewPages.root : ''}/e/${inventory.inventory_id}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -29,7 +30,9 @@ export const redirectToSessionsPage = (session) => {
 
   const baseUrl = generateUrlFromUsername(session.creator_username || urlUsername);
   const isAvailability = session.type === 'AVAILABILITY';
-  const targetUrl = `${baseUrl}/${isAvailability ? 'a' : 's'}/${session.session_id}`;
+  const targetUrl = `${baseUrl}${session.is_dummy ? Routes.previewPages.root : ''}/${isAvailability ? 'a' : 's'}/${
+    session.session_id
+  }`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -48,7 +51,7 @@ export const redirectToVideosPage = (video) => {
 
   const baseUrl = generateUrlFromUsername(video.creator_username || urlUsername);
 
-  const targetUrl = `${baseUrl}/v/${video.external_id}`;
+  const targetUrl = `${baseUrl}${video.is_dummy ? Routes.previewPages.root : ''}/v/${video.external_id}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -66,7 +69,7 @@ export const redirectToCoursesPage = (course) => {
   }
 
   const baseUrl = generateUrlFromUsername(course.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}/c/${course.id}`;
+  const targetUrl = `${baseUrl}${course.is_dummy ? Routes.previewPages.root : ''}/c/${course.id}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -84,7 +87,7 @@ export const redirectToPassesPage = (pass) => {
   }
 
   const baseUrl = generateUrlFromUsername(pass.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}/p/${pass.id}`;
+  const targetUrl = `${baseUrl}${pass.is_dummy ? Routes.previewPages.root : ''}/p/${pass.id}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {
@@ -108,7 +111,7 @@ export const redirectToMembershipPage = (subscription) => {
   }
 
   const baseUrl = generateUrlFromUsername(subscription.creator_username || urlUsername);
-  const targetUrl = `${baseUrl}/m/${subscription.external_id}`;
+  const targetUrl = `${baseUrl}${subscription.is_dummy ? Routes.previewPages.root : ''}/m/${subscription.external_id}`;
 
   window.open(targetUrl);
   // if (isInIframeWidget() || isWidgetUrl()) {

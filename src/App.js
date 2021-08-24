@@ -42,6 +42,14 @@ import CourseDetailedListView from 'pages/DetailedListView/Courses';
 import EmbeddablePage from 'pages/EmbeddablePage';
 import Legals from 'pages/Legals';
 
+import PassDetailPreview from 'pages/PreviewPages/PassDetails';
+import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
+import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
+import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
+import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
+import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
+import InventoryDetailsPreview from 'pages/PreviewPages/InventoryDetails';
+
 // import CookieConsentPopup from 'components/CookieConsentPopup';
 import PaymentPopup from 'components/PaymentPopup';
 import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
@@ -245,10 +253,22 @@ function App() {
             <RouteWithLayout
               layout={MobileLayout}
               exact
+              path={Routes.previewPages.memberships}
+              component={MembershipDetailPreview}
+            />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
               path={Routes.membershipDetails}
               component={MembershipDetails}
             />
 
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.previewPages.courses}
+              component={CourseDetailPreview}
+            />
             <RouteWithLayout
               layout={NavbarFullWidthLayout}
               exact
@@ -257,12 +277,41 @@ function App() {
             />
             <RouteWithLayout
               layout={NavbarFullWidthLayout}
+              path={Routes.previewPages.availabilities}
+              component={AvailabilityDetailPreview}
+            />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
               path={Routes.availabilityDetails}
               component={AvailabilityDetails}
             />
+            <RouteWithLayout
+              layout={NavbarFullWidthLayout}
+              exact
+              path={Routes.previewPages.passes}
+              component={PassDetailPreview}
+            />
             <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.passDetails} component={PassDetails} />
+            <RouteWithLayout
+              layout={MobileLayout}
+              exact
+              path={Routes.previewPages.videos}
+              component={VideoDetailPreview}
+            />
             <RouteWithLayout layout={MobileLayout} exact path={Routes.videoDetails} component={VideoDetails} />
+            <RouteWithLayout
+              layout={NavbarLayout}
+              exact
+              path={Routes.previewPages.inventories}
+              component={InventoryDetailsPreview}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.inventoryDetails} component={InventoryDetails} />
+            <RouteWithLayout
+              layout={NavbarLayout}
+              exact
+              path={Routes.previewPages.sessions}
+              component={SessionDetailsPreview}
+            />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
             {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}

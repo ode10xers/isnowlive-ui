@@ -4,6 +4,7 @@ import { ScheduleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
 import SubscriptionsListView from './SubscriptionListView';
 import SubscriptionsEditView from './SubscriptionEditView';
@@ -20,10 +21,12 @@ const { Text } = Typography;
 const SubscriptionProfileComponent = ({
   identifier = null,
   isEditing = false,
+  isContained = false,
+  isLiveData = true,
+  dummyTemplateType = 'YOGA',
   dragHandleProps,
   updateConfigHandler,
   removeComponentHandler,
-  isContained = false,
   ...customComponentProps
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,8 +49,13 @@ const SubscriptionProfileComponent = ({
   }, []);
 
   useEffect(() => {
-    fetchCreatorSubscriptions();
-  }, [fetchCreatorSubscriptions]);
+    if (!isLiveData) {
+      setSubscriptions(dummy[dummyTemplateType].SUBSCRIPTIONS ?? []);
+      setTimeout(() => setIsLoading(false), 800);
+    } else {
+      fetchCreatorSubscriptions();
+    }
+  }, [fetchCreatorSubscriptions, isLiveData, dummyTemplateType]);
 
   const saveEditChanges = (newConfig) => updateConfigHandler(identifier, newConfig);
 
