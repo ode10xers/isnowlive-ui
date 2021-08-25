@@ -2,9 +2,8 @@
 
 .dndHandle {
   color: map-get($map: $colors, $key: 'Cobalt');
-  height: 64px;
-  line-height: 42px;
-  margin: 0 auto;
+  height: 100%;
+  margin: auto;
   max-width: 120px;
   padding: 8px 4px;
   text-align: center;

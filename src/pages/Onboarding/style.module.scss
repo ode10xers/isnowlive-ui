@@ -36,14 +36,48 @@
   }
 }
 
+.nameInputWrapper {
+  // TODO: Add dekstop styling here later
+  width: 100%;
+}
+
+.creatorCoverImage {
+  width: 100%;
+  max-height: 320px;
+}
+
+.creatorProfileImage {
+  text-align: center;
+}
+
 .componentsSectionContainer {
   width: 100%;
 
   :global {
     .ant-collapse-item {
-      margin: 16px 0 !important;
+      margin: 10px 0 !important;
       border: 1px solid map-get($map: $colors, $key: 'SuvaGrey') !important;
       border-radius: 12px !important;
+    }
+  }
+}
+.customAccordionContainers {
+  .customAccordionItem {
+    border: 1px solid map-get($map: $colors, $key: 'Silver');
+    border-radius: 12px;
+    margin: 10px 0;
+
+    .customAccordionHeader {
+      padding: 10px 8px;
+    }
+
+    .customAccordionContent {
+      padding: 20px;
+      transition: 0.3s;
+
+      &.hidden {
+        display : none;
+      }
     }
   }
 }
