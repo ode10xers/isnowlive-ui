@@ -57,9 +57,9 @@ const SignUp = ({ history }) => {
   return (
     <div className={styles.signupContainer}>
       <div className={styles.signupHeadingText}>Let’s get started</div>
-      <div className={styles.signupHeadingSubtext}>Enter your details to get started</div>
+      <div className={styles.signupHeadingSubtext}>Enter your email to get started</div>
       <div className={styles.signupForm}>
-        <Form form={form} name="basic" initialValues={{ remember: true }} onFinish={onFinish}>
+        <Form form={form} name="signupForm" onFinish={onFinish}>
           <Item name="email" rules={validationRules.emailValidation}>
             <Input placeholder="Enter Your Email" />
           </Item>

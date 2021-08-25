@@ -1,9 +1,9 @@
 @import '../../styles/variables.scss';
 
-html, body {
-    height: 100%;
-    background-color: #FAFAFA !important;
-}
+// html, body {
+//     height: 100%;
+//     background-color: #FAFAFA !important;
+// }
 
 .signupContainer {
     position: absolute;
@@ -24,10 +24,10 @@ html, body {
 
 .signupHeadingText{
     width: 368px;
-    font-family: Overpass;
-    font-style: normal;
-    font-weight: 800;
-    font-size: 48px;
+    // font-family: Overpass;
+    // font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
     line-height: 74px;    
     text-align: center;
     color: #434343;
@@ -39,7 +39,7 @@ html, body {
 }
 
 .signupHeadingSubtext{
-    font-family: Inter;
+    // font-family: Inter;
     font-style: normal;
     font-weight: normal;
     font-size: 20px;
@@ -55,7 +55,7 @@ html, body {
     height: 56px !important;
     background: linear-gradient(94.06deg, #FF820B 0%, rgba(255, 134, 19, 0.75) 106.52%) !important;
     border-radius: 8px !important;
-    font-family: Inter;
+    // font-family: Inter;
     font-style: normal;
     font-weight: 500 !important;
     font-size: 20px !important;
