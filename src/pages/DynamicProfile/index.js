@@ -345,12 +345,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         username: creatorProfileData?.username,
         profile: {
           color: creatorColorChoice,
+          new_profile: !containedUI,
         },
       };
 
-      const { status } = await apis.user.updateProfile(payload);
+      const { status, data } = await apis.user.updateProfile(payload);
 
-      if (isAPISuccess(status)) {
+      if (isAPISuccess(status) && data) {
+        setContainedUI(!data?.profile?.new_profile);
         message.success('Creator profile color successfully updated');
       }
     } catch (error) {
