@@ -590,7 +590,8 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, ove
       window.location.hostname.includes('stage') || window.location.hostname.includes('localhost')
         ? 'https://passion-do.webflow.io'
         : 'https://passion.do';
-    window.open(`${targetUrl}?ref=${creatorProfileData.username}`, '_blank');
+
+    window.open(`${targetUrl}?creator-ref=${creatorProfileData.username}`, '_blank');
   };
 
   //#endregion End of Dashboard Button Handlers
@@ -717,6 +718,8 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, ove
               isContained={containedUI}
               title={component.title}
               values={component.values}
+              isLiveData={creatorProfileData?.profile?.live_mode ?? true}
+              dummyTemplateType={creatorProfileData?.profile?.category || 'YOGA'}
               headerColor={
                 creatorColorChoice
                   ? convertHSLToHex(

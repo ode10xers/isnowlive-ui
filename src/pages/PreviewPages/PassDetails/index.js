@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ReactHtmlParser from 'react-html-parser';
 import classNames from 'classnames';
 
@@ -6,132 +6,92 @@ import { Row, Col, Typography, Space, Avatar, Divider, Spin, Button, Drawer, Emp
 import { CaretDownOutlined, CheckCircleFilled, PlayCircleFilled, BookFilled, BarsOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import dummy from 'data/dummy';
 
-import AuthModal from 'components/AuthModal';
 import { generateCardHeadingStyle } from 'components/ContainerCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
-import { showErrorModal, showPurchasePassSuccessModal, showAlreadyBookedModal } from 'components/Modals/modals';
+import { showErrorModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { getExternalLink } from 'utils/url';
-import { isMobileDevice } from 'utils/device';
 import { socialMediaIcons } from 'utils/constants';
 import { generateColorPalletteForProfile } from 'utils/colors';
+
 import {
   isAPISuccess,
   reservedDomainName,
   getUsernameFromUrl,
-  orderType,
-  productType,
-  isUnapprovedUserError,
   convertHexToRGB,
   isBrightColorShade,
+  deepCloneObject,
 } from 'utils/helper';
 
-import { useGlobalContext } from 'services/globalContext';
-
 import styles from './style.module.scss';
+
+const { Title, Text } = Typography;
 
 const {
   formatDate: { toMonthYear },
 } = dateUtil;
 
-const { Title, Text } = Typography;
-
-const PassDetails = ({ match, history }) => {
-  const { showPaymentPopup } = useGlobalContext();
-
-  const [isLoading, setIsLoading] = useState(true);
-
+const PassDetailPreview = ({ match, history }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [otherPassesLoading, setOtherPassesLoading] = useState(true);
-  const [creatorPasses, setCreatorPasses] = useState([]);
 
-  const [creatorProfile, setCreatorProfile] = useState(null);
-  const [initialPassDetails, setInitialPassDetails] = useState(null);
-  const [selectedPassDetails, setSelectedPassDetails] = useState(null);
-  const [authModalVisible, setAuthModalVisible] = useState(false);
-
+  const [creatorProfileData, setCreatorProfileData] = useState(null);
+  const [creatorProfileColor, setCreatorProfileColor] = useState(null);
   const [shouldExpandCreatorBio, setShouldExpandCreatorBio] = useState(false);
 
-  const [creatorProfileColor, setCreatorProfileColor] = useState(null);
+  const [creatorPasses, setCreatorPasses] = useState([]);
+  const [initialPassDetails, setInitialPassDetails] = useState(null);
+  const [selectedPassDetails, setSelectedPassDetails] = useState(null);
 
   const [moreView, setMoreView] = useState('sessions');
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
 
-  //#region Start of API Call Methods
-
-  const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
-    try {
-      const { status, data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
-
-      if (isAPISuccess(status) && data) {
-        setCreatorProfile(data);
-        setCreatorProfileColor(data.profile?.color ?? null);
-      }
-    } catch (error) {
-      console.error(error);
-      showErrorModal(
-        'Failed to fetch creator profile details',
-        error?.response?.data?.message || 'Something went wrong.'
-      );
-    }
-  }, []);
-
-  const fetchInitialPassDetails = useCallback(async (pass_id) => {
+  const fetchCreatorDetails = useCallback(async (creatorUsername) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.passes.getPassById(pass_id);
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
 
       if (isAPISuccess(status) && data) {
-        setInitialPassDetails(data);
-        setSelectedPassDetails(data);
+        setCreatorProfileData(data);
+        setCreatorProfileColor(data?.profile?.color ?? null);
       }
     } catch (error) {
-      console.error(error);
-      showErrorModal('Failed to fetch pass details', error?.response?.data?.message || 'Something went wrong.');
+      message.error(error?.response?.data?.message || 'Failed to fetch creator profile');
     }
 
     setIsLoading(false);
   }, []);
 
-  const fetchCreatorOtherPasses = useCallback(async () => {
-    setOtherPassesLoading(true);
-    try {
-      const { status, data } = await apis.passes.getPassesByUsername();
+  useEffect(() => {
+    const creatorUsername = getUsernameFromUrl();
 
-      if (isAPISuccess(status) && data) {
-        setCreatorPasses(data);
+    if (creatorUsername && !reservedDomainName.includes(creatorUsername)) {
+      fetchCreatorDetails(creatorUsername);
+    }
+  }, [fetchCreatorDetails]);
+
+  useEffect(() => {
+    if (match.params.pass_id && creatorProfileData) {
+      const templateData = creatorProfileData?.profile?.category ?? 'YOGA';
+
+      const passData = deepCloneObject(dummy[templateData].PASSES);
+      const targetPass = passData.find((pass) => pass.id === parseInt(match.params.pass_id));
+
+      if (targetPass) {
+        setInitialPassDetails(targetPass);
+        setSelectedPassDetails(targetPass);
+        setCreatorPasses(passData.filter((pass) => pass.id !== targetPass.id));
+        setOtherPassesLoading(false);
+      } else {
+        message.error('Invalid pass ID');
       }
-    } catch (error) {
-      console.error(error);
-      message.error('Failed to fetch other passes for creator');
     }
-    setOtherPassesLoading(false);
-  }, []);
-
-  //#endregion End of API Call Methods
-
-  //#region Start of Use Effects
-
-  useEffect(() => {
-    if (match.params.pass_id) {
-      fetchInitialPassDetails(match.params.pass_id);
-    }
-  }, [match.params.pass_id, fetchInitialPassDetails]);
-
-  useEffect(() => {
-    const domainUsername = getUsernameFromUrl();
-
-    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
-      fetchCreatorProfileDetails(domainUsername);
-    }
-
-    fetchCreatorOtherPasses();
-  }, [fetchCreatorProfileDetails, fetchCreatorOtherPasses]);
+  }, [creatorProfileData, match.params]);
 
   useEffect(() => {
     let profileColorObject = null;
@@ -152,84 +112,6 @@ const PassDetails = ({ match, history }) => {
     };
   }, [creatorProfileColor]);
 
-  //#endregion End of Use Effects
-
-  //#region Start of purchase logic
-
-  const createOrder = async (couponCode = '') => {
-    if (!selectedPassDetails) {
-      showErrorModal('Something went wrong', 'Invalid Pass Selected');
-      return null;
-    }
-
-    setIsLoading(true);
-    try {
-      const { status, data } = await apis.passes.createOrderForUser({
-        pass_id: selectedPassDetails.external_id,
-        price: selectedPassDetails.total_price,
-        coupon_code: couponCode,
-        currency: selectedPassDetails.currency.toLowerCase(),
-      });
-
-      if (isAPISuccess(status) && data) {
-        setIsLoading(false);
-
-        if (data.payment_required) {
-          return {
-            ...data,
-            is_successful_order: true,
-            payment_order_type: orderType.PASS,
-            payment_order_id: data.pass_order_id,
-          };
-        } else {
-          showPurchasePassSuccessModal(data.pass_order_id);
-
-          return {
-            ...data,
-            is_successful_order: true,
-          };
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      if (error.response?.data?.message === 'user already has a confirmed order for this pass') {
-        showAlreadyBookedModal(productType.PASS);
-      } else if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      }
-    }
-
-    return {
-      is_successful_order: false,
-    };
-  };
-
-  const showConfirmPaymentPopup = () => {
-    if (!selectedPassDetails) {
-      showErrorModal('Something went wrong', 'Invalid Pass Selected');
-      return;
-    }
-
-    const desc = `${selectedPassDetails.class_count} Credits, Valid for ${selectedPassDetails.validity} days`;
-
-    const paymentPopupData = {
-      productId: selectedPassDetails.external_id,
-      productType: productType.PASS,
-      itemList: [
-        {
-          name: selectedPassDetails.name,
-          description: desc,
-          currency: selectedPassDetails.currency,
-          price: selectedPassDetails.total_price,
-        },
-      ],
-    };
-
-    showPaymentPopup(paymentPopupData, createOrder);
-  };
-
-  //#endregion End of purchase logic
-
   //#region Start of helper functions
 
   const handleSelectPassItem = (targetPass) => {
@@ -244,7 +126,7 @@ const PassDetails = ({ match, history }) => {
       return;
     }
 
-    setAuthModalVisible(true);
+    message.info('This page is just a preview, so you cannot buy this product');
   };
 
   const handleSeeMoreSessions = () => {
@@ -265,10 +147,6 @@ const PassDetails = ({ match, history }) => {
     window.scroll({ top: 0, behavior: 'smooth' });
   };
 
-  const closeAuthModal = () => {
-    setAuthModalVisible(false);
-  };
-
   const showMoreCreatorBio = () => {
     setShouldExpandCreatorBio(true);
   };
@@ -284,11 +162,11 @@ const PassDetails = ({ match, history }) => {
     `${passData?.validity ?? 1} day${passData?.validity > 1 ? 's' : ''} validity`;
 
   const renderCreatorExternalLinks = () => {
-    if (!creatorProfile || !creatorProfile.profile || !creatorProfile.profile.social_media_links) {
+    if (!creatorProfileData || !creatorProfileData.profile || !creatorProfileData.profile.social_media_links) {
       return null;
     }
 
-    const creatorSocialMediaLinks = Object.entries(creatorProfile.profile.social_media_links).filter(
+    const creatorSocialMediaLinks = Object.entries(creatorProfileData.profile.social_media_links).filter(
       ([socialMedia, link]) => link
     );
 
@@ -488,22 +366,22 @@ const PassDetails = ({ match, history }) => {
       <Row gutter={[8, 20]} className={styles.creatorProfileSection}>
         <Col xs={24}>
           <Space size={32}>
-            <Avatar size={72} src={creatorProfile?.profile_image_url} className={styles.creatorProfileImage} />
+            <Avatar size={72} src={creatorProfileData?.profile_image_url} className={styles.creatorProfileImage} />
             <div className={styles.creatorInfoContainer}>
               <Title level={5} className={styles.creatorName}>
                 {' '}
-                {creatorProfile?.first_name} {creatorProfile?.last_name}{' '}
+                {creatorProfileData?.first_name} {creatorProfileData?.last_name}{' '}
               </Title>
-              <Text className={styles.joinTimeText}> Joined on {toMonthYear(creatorProfile?.signup_date)} </Text>
+              <Text className={styles.joinTimeText}> Joined on {toMonthYear(creatorProfileData?.signup_date)} </Text>
             </div>
           </Space>
         </Col>
         <Col xs={24} className={styles.creatorBio}>
           {shouldExpandCreatorBio ? (
-            <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+            <div className={styles.bio}>{ReactHtmlParser(creatorProfileData?.profile?.bio)}</div>
           ) : (
             <>
-              <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
+              <div className={styles.collapsedBio}>{ReactHtmlParser(creatorProfileData?.profile?.bio)}</div>
               <div className={styles.readMoreBio} onClick={showMoreCreatorBio}>
                 READ MORE <CaretDownOutlined />
               </div>
@@ -555,7 +433,7 @@ const PassDetails = ({ match, history }) => {
             {creatorPasses
               .filter((pass) => pass.external_id !== initialPassDetails?.external_id)
               .sort((a, b) => b.total_price - a.total_price)
-              .slice(0, isMobileDevice ? 2 : 5)
+              .slice(0, 2)
               .map(renderBuyablePassItem)}
           </>
         ) : null}
@@ -565,7 +443,7 @@ const PassDetails = ({ match, history }) => {
               <Button size="large" type="primary" className={styles.buyPassButton} onClick={handleBuyPassClicked}>
                 <Text
                   className={
-                    isBrightColorShade(convertHexToRGB(creatorProfileColor || '#1890ff'))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }
@@ -612,11 +490,6 @@ const PassDetails = ({ match, history }) => {
   return (
     <>
       <div className={styles.passDetailsPageContainer}>
-        <AuthModal
-          visible={authModalVisible}
-          closeModal={closeAuthModal}
-          onLoggedInCallback={showConfirmPaymentPopup}
-        />
         <Row gutter={[20, 20]} className={styles.passDetailsPage}>
           {/* Details Section */}
           <Col xs={{ order: 2, span: 24 }} lg={{ order: 1, span: 14 }}>
@@ -650,7 +523,7 @@ const PassDetails = ({ match, history }) => {
                   </>
                 )}
                 {/* Creator Section */}
-                {creatorProfile && (
+                {creatorProfileData && (
                   <>
                     <Col xs={24}>
                       <Divider />
@@ -711,7 +584,7 @@ const PassDetails = ({ match, history }) => {
               <Button onClick={handleBuyPassClicked} type="primary" className={styles.stickyBuyButton}>
                 <Text
                   className={
-                    isBrightColorShade(convertHexToRGB(creatorProfileColor || '#1890ff'))
+                    isBrightColorShade(convertHexToRGB(creatorProfileColor ?? '#1890ff'))
                       ? styles.darkText
                       : styles.whiteText
                   }
@@ -729,4 +602,4 @@ const PassDetails = ({ match, history }) => {
   );
 };
 
-export default PassDetails;
+export default PassDetailPreview;

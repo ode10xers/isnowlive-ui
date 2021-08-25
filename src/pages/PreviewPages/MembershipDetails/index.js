@@ -11,106 +11,77 @@ import {
 
 import apis from 'apis';
 import Routes from 'routes';
+import dummy from 'data/dummy';
 
-import AuthModal from 'components/AuthModal';
 import VideoListCard from 'components/DynamicProfileComponents/VideosProfileComponent/VideoListCard';
 import SessionListCard from 'components/DynamicProfileComponents/SessionsProfileComponent/SessionListCard';
 import SubscriptionsListView from 'components/DynamicProfileComponents/SubscriptionsProfileComponent/SubscriptionListView';
 import ContainerCard, { generateCardHeadingStyle } from 'components/ContainerCard';
 import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
-import { showErrorModal, showPurchaseSubscriptionSuccessModal } from 'components/Modals/modals';
 
-import dateUtil from 'utils/date';
+import { deepCloneObject } from 'utils/helper';
 import { generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 import { generateBaseCreditsText, generateSubscriptionDuration } from 'utils/subscriptions';
 import {
   getShadeForHexColor,
   preventDefaults,
   isAPISuccess,
-  orderType,
-  isUnapprovedUserError,
-  productType,
   getUsernameFromUrl,
   reservedDomainName,
 } from 'utils/helper';
-
-import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
 const { Title, Text } = Typography;
 
-const {
-  timezoneUtils: { getTimezoneLocation },
-} = dateUtil;
-
-const MembershipDetails = ({ match, history }) => {
-  const membershipId = match.params.membership_id;
-
-  const { showPaymentPopup } = useGlobalContext();
-
+const MembershipDetailPreview = ({ match, history }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [creatorProfile, setCreatorProfile] = useState(null);
   const [otherSubscriptions, setOtherSubscriptions] = useState([]);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
 
   const [moreView, setMoreView] = useState('sessions');
   const [bottomSheetsVisible, setBottomSheetsVisible] = useState(false);
 
-  const [creatorProfile, setCreatorProfile] = useState(null);
-
-  const fetchCreatorSubscriptions = useCallback(async (subscriptionId = null) => {
+  const fetchCreatorDetails = useCallback(async (creatorUsername) => {
     setIsLoading(true);
 
     try {
-      const { status, data } = await apis.subscriptions.getSubscriptionsByUsername();
-
-      if (isAPISuccess(status) && data) {
-        const sortedSubs = data.sort((a, b) => a.total_price - b.total_price);
-
-        const targetSubsIndex = sortedSubs.findIndex((subs) => subs.external_id === subscriptionId);
-
-        if (targetSubsIndex >= 0) {
-          const targetSubscription = sortedSubs.splice(targetSubsIndex, 1)[0];
-
-          setSelectedSubscription(targetSubscription);
-        }
-
-        setOtherSubscriptions(sortedSubs);
-      }
-    } catch (error) {
-      console.error(error);
-      message.error(error?.response?.data?.message || 'Failed to load subscription details');
-    }
-
-    setIsLoading(false);
-  }, []);
-
-  const fetchCreatorProfileDetails = useCallback(async (creatorUsername) => {
-    try {
-      const { status, data } = creatorUsername
-        ? await apis.user.getProfileByUsername(creatorUsername)
-        : await apis.user.getProfile();
+      const { status, data } = await apis.user.getProfileByUsername(creatorUsername);
 
       if (isAPISuccess(status) && data) {
         setCreatorProfile(data);
       }
     } catch (error) {
-      console.error(error);
-      showErrorModal(
-        'Failed to fetch creator profile details',
-        error?.response?.data?.message || 'Something went wrong.'
-      );
+      message.error(error?.response?.data?.message || 'Failed to fetch creator profile');
     }
+
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    const domainUsername = getUsernameFromUrl();
+    const creatorUsername = getUsernameFromUrl();
 
-    if (domainUsername && !reservedDomainName.includes(domainUsername)) {
-      fetchCreatorProfileDetails(domainUsername);
+    if (creatorUsername && !reservedDomainName.includes(creatorUsername)) {
+      fetchCreatorDetails(creatorUsername);
     }
-  }, [fetchCreatorProfileDetails]);
+  }, [fetchCreatorDetails]);
+
+  useEffect(() => {
+    if (match.params.membership_id && creatorProfile) {
+      const templateData = creatorProfile?.profile?.category ?? 'YOGA';
+
+      const subsData = deepCloneObject(dummy[templateData].SUBSCRIPTIONS);
+      const targetSubs = subsData.find((subs) => subs.external_id === match.params.membership_id);
+
+      if (targetSubs) {
+        setSelectedSubscription(targetSubs);
+        setOtherSubscriptions(subsData.filter((subs) => subs.external_id !== targetSubs.external_id));
+      } else {
+        message.error('Invalid membership ID');
+      }
+    }
+  }, [match.params, creatorProfile]);
 
   useEffect(() => {
     let profileStyleObject = {};
@@ -138,104 +109,16 @@ const MembershipDetails = ({ match, history }) => {
     };
   }, [creatorProfile]);
 
-  useEffect(() => {
-    fetchCreatorSubscriptions(membershipId);
-  }, [fetchCreatorSubscriptions, membershipId]);
-
-  //#region Start of Purchase Business Logic
-
-  const showConfirmPaymentPopup = () => {
-    if (!selectedSubscription) {
-      showErrorModal('Something went wrong', 'Invalid Subscription Selected');
-      return;
-    }
-
-    let itemDescription = [];
-
-    itemDescription.push(generateBaseCreditsText(selectedSubscription, false));
-
-    if (selectedSubscription.products['COURSE']) {
-      itemDescription.push(generateBaseCreditsText(selectedSubscription, true));
-    }
-
-    const paymentPopupData = {
-      productId: selectedSubscription.external_id,
-      productType: productType.SUBSCRIPTION,
-      itemList: [
-        {
-          name: selectedSubscription.name,
-          description: itemDescription.join(', '),
-          currency: selectedSubscription.currency,
-          price: selectedSubscription.total_price,
-        },
-      ],
-    };
-
-    showPaymentPopup(paymentPopupData, createOrder);
-  };
-
-  const createOrder = async (couponCode = '') => {
-    setIsLoading(true);
-    try {
-      const payload = {
-        subscription_id: selectedSubscription.external_id,
-        coupon_code: couponCode,
-        user_timezone_location: getTimezoneLocation(),
-      };
-
-      const { status, data } = await apis.subscriptions.createOrderForUser(payload);
-
-      if (isAPISuccess(status) && data) {
-        setIsLoading(false);
-
-        if (data.payment_required) {
-          return {
-            ...data,
-            is_successful_order: true,
-            payment_order_type: orderType.SUBSCRIPTION,
-            payment_order_id: data.subscription_order_id,
-          };
-        } else {
-          showPurchaseSubscriptionSuccessModal();
-          return {
-            ...data,
-            is_successful_order: true,
-          };
-        }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      if (error?.response?.status === 500 && error?.response?.data?.message === 'unable to apply discount to order') {
-        showErrorModal(
-          'Discount Code Not Applicable',
-          'The discount code you entered is not applicable this product. Please try again with a different discount code'
-        );
-      } else if (!isUnapprovedUserError(error.response)) {
-        message.error(error.response?.data?.message || 'Something went wrong');
-      }
-    }
-
-    return {
-      is_successful_order: false,
-    };
-  };
-
-  //#endregion End of Purchase Business Logic
-
   //#region Start of UI Handlers
+
+  const openPurchaseModal = (e) => {
+    preventDefaults(e);
+    message.info('This page is just a preview, so you cannot buy this product');
+  };
 
   const handleBackClicked = (e) => {
     preventDefaults(e);
     history.push(Routes.root);
-  };
-
-  const openPurchaseModal = (e) => {
-    preventDefaults(e);
-    setShowAuthModal(true);
-  };
-
-  const closeAuthModal = () => {
-    setShowAuthModal(false);
   };
 
   const handleMoreSessionsClicked = (e) => {
@@ -403,7 +286,6 @@ const MembershipDetails = ({ match, history }) => {
 
   return (
     <div className={styles.membershipDetailsContainer}>
-      <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
       <Spin spinning={isLoading} tip="Fetching membership details..." size="large">
         <div className={styles.pageContent}>
           <Row gutter={[8, 16]} justify="center">
@@ -507,4 +389,4 @@ const MembershipDetails = ({ match, history }) => {
   );
 };
 
-export default MembershipDetails;
+export default MembershipDetailPreview;

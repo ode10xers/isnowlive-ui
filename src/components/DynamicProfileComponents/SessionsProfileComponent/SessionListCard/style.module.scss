@@ -70,6 +70,10 @@ $card-border-radius: 8px;
       font-size: 16px;
     }
 
+    @media screen and (max-width: 325px) {
+      font-size: 12px;
+    }
+
     // @media screen and (max-width: 420px) {
     //   font-size: 14px;
     // }

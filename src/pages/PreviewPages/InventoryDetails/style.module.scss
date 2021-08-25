@@ -1,4 +1,4 @@
-@import '../../styles/variables.scss';
+@import '../../../styles/variables.scss';
 
 .imageWrapper {
   position: relative;
@@ -32,6 +32,7 @@
 .subText {
   margin-top: 0px !important;
 }
+
 .longTextExpanded {
   p,
   span {
@@ -55,6 +56,7 @@
   max-height: 200px;
   overflow: hidden;
 }
+
 .readMoreText {
   margin-top: 10px;
   cursor: pointer;
