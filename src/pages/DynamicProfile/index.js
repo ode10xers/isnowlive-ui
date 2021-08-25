@@ -205,7 +205,7 @@ const componentsMap = {
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
-const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, overrideUserColor = '' }) => {
+const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) => {
   const history = useHistory();
   const match = useRouteMatch();
 
@@ -288,6 +288,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, ove
     if (overrideUserObject) {
       setCreatorProfileData(overrideUserObject);
       setContainedUI(!overrideUserObject?.profile?.new_profile);
+      setCreatorColorChoice(overrideUserObject?.profile?.color);
     } else {
       if (!creatorUsername) {
         fetchCreatorProfileData(getLocalUserDetails()?.username ?? '');
@@ -296,14 +297,6 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, ove
       }
     }
   }, [fetchCreatorProfileData, creatorUsername, overrideUserObject]);
-
-  useEffect(() => {
-    if (overrideUserColor) {
-      setCreatorColorChoice(overrideUserColor);
-    } else {
-      setCreatorColorChoice(null);
-    }
-  }, [overrideUserColor]);
 
   useEffect(() => {
     setCreatorUIConfig(creatorProfileData?.profile?.sections ?? []);
@@ -796,6 +789,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null, ove
             <Space className={styles.colorChoicesContainer}>
               {colorPalletteChoices.map((color) => (
                 <div
+                  key={color}
                   className={classNames(
                     styles.colorContainer,
                     creatorColorChoice === color ? styles.selected : undefined

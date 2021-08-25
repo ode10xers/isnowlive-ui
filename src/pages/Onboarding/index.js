@@ -1,220 +1,218 @@
-import React, { useState } from 'react';
-import { Form, Input, Collapse, message, Row, Col, Upload, Button, Typography, Space } from 'antd';
-import { UploadOutlined, CheckOutlined } from '@ant-design/icons';
+import React, { useState, useCallback, useEffect } from 'react';
 import classNames from 'classnames';
 
-import Routes from 'routes';
+import { Row, Col, Typography, Space, Form, Input, Collapse, Spin, Button, message } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+
 import apis from 'apis';
 
-import { useGlobalContext } from 'services/globalContext';
-import {
-  mixPanelEventTags,
-  mapUserToMixPanel,
-  trackSuccessEvent,
-  trackFailedEvent,
-} from 'services/integrations/mixpanel';
-import { gtmTriggerEvents, pushToDataLayer } from 'services/integrations/googleTagManager';
-
-import { preventDefaults } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
 import validationRules from 'utils/validation';
-import TextEditor from 'components/TextEditor';
 
 import styles from './style.module.scss';
+import DeviceUIPreview from 'components/DeviceUIPreview';
 
+const { Title, Text } = Typography;
 const { Panel } = Collapse;
-const { Title } = Typography;
-
-const { user } = mixPanelEventTags;
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
+const SimpleEditForm = ({ name, fieldKey, ...restFields }) => {
+  return (
+    <Form.Item
+      {...restFields}
+      name={[name, 'title']}
+      fieldKey={[fieldKey, 'title']}
+      label="Container Title"
+      rules={validationRules.requiredValidation}
+    >
+      <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+    </Form.Item>
+  );
+};
+
+const editViewMap = {
+  AVAILABILITY: {
+    label: 'Availability',
+    component: SimpleEditForm,
+  },
+  PASSES: {
+    label: 'Passes',
+    component: SimpleEditForm,
+  },
+  SUBSCRIPTIONS: {
+    label: 'Memberships',
+    component: SimpleEditForm,
+  },
+  SESSIONS: {
+    label: 'Sessions',
+    component: SimpleEditForm,
+  },
+  COURSES: {
+    label: 'Courses',
+    component: SimpleEditForm,
+  },
+  VIDEOS: {
+    label: 'Videos',
+    component: SimpleEditForm,
+  },
+};
+
+// TODO: We need this page to open in with username in hostname
 const Onboarding = ({ history }) => {
   const [form] = Form.useForm();
-  const { logIn } = useGlobalContext();
+
   const [isLoading, setIsLoading] = useState(false);
+  const [creatorProfileData, setCreatorProfileData] = useState(null);
 
   const [creatorColorChoice, setCreatorColorChoice] = useState(null);
+  const [isContainedUI, setIsContainedUI] = useState(false);
 
-  const onFinish = async (values) => {
-    const eventTag = user.click.signUp;
-    const referenceCode = JSON.parse(localStorage.getItem('ref'));
-    try {
-      setIsLoading(true);
-      const { data } = await apis.user.signup({
-        email: values.email,
-        is_creator: true,
-        referrer: referenceCode,
-      });
-      if (data) {
-        pushToDataLayer(gtmTriggerEvents.CREATOR_SIGNUP, {
-          creator_email: values.email,
-          creator_external_id: data.external_id,
-        });
-        logIn(data, true);
-        setIsLoading(false);
-        mapUserToMixPanel(data);
-        localStorage.removeItem('ref');
-        trackSuccessEvent(eventTag, { email: values.email });
-        history.push(Routes.profile);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      trackFailedEvent(eventTag, error, { email: values.email });
-      message.error(error.response?.data?.message || 'Something went wrong.');
-    }
-  };
-
-  const callbackCollapse = (key) => {
-    console.log(key);
-  };
-
-  const saveCreatorColorPalletteChoice = async (e) => {
-    preventDefaults(e);
-
+  const fetchCreatorProfileData = useCallback(async () => {
     setIsLoading(true);
 
-    // try {
-    //   const payload = {
-    //     cover_image_url: creatorProfileData?.cover_image_url,
-    //     profile_image_url: creatorProfileData?.profile_image_url,
-    //     first_name: creatorProfileData?.first_name,
-    //     last_name: creatorProfileData?.last_name,
-    //     username: creatorProfileData?.username,
-    //     profile: {
-    //       color: creatorColorChoice,
-    //     },
-    //   };
+    try {
+      const { status, data } = await apis.user.getProfile();
 
-    //   const { status } = await apis.user.updateProfile(payload);
+      if (isAPISuccess(status) && data) {
+        setCreatorProfileData(data);
+        setCreatorColorChoice(data?.profile?.color ?? null);
+        setIsContainedUI(!data?.profile?.new_profile);
 
-    //   if (isAPISuccess(status)) {
-    //     message.success('Creator profile color successfully updated');
-    //   }
-    // } catch (error) {
-    //   showErrorModal(
-    //     'Failed updating Creator Profile UI Colors',
-    //     error?.response?.data?.message || 'Something went wrong.'
-    //   );
-    // }
+        form.setFieldsValue(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to load creator profile details');
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, [form]);
+
+  useEffect(() => {
+    fetchCreatorProfileData();
+  }, [fetchCreatorProfileData]);
+
+  const renderSectionComponents = ({ key, name, fieldKey, ...restFields }) => {
+    const componentKey = form.getFieldValue(['profile', 'sections', name, 'key']);
+
+    if (!editViewMap[componentKey]) {
+      return null;
+    }
+
+    const sectionLabel = editViewMap[componentKey].label;
+    const EditComponent = editViewMap[componentKey].component;
+
+    return (
+      <Panel key={name} header={<Text strong>{sectionLabel}</Text>}>
+        <EditComponent name={name} fieldKey={fieldKey} {...restFields} />
+      </Panel>
+    );
+  };
+
+  const handleFormFinish = async (values) => {
+    setIsLoading(true);
+
+    try {
+      const payload = {
+        ...creatorProfileData,
+        ...values,
+        profile: {
+          ...creatorProfileData.profile,
+          ...values.profile,
+          color: creatorColorChoice,
+          new_profile: !isContainedUI,
+        },
+      };
+
+      console.log(payload);
+      setCreatorProfileData(payload);
+      setIsLoading(false);
+      return;
+
+      const { status, data } = await apis.user.updateProfile(payload);
+
+      if (isAPISuccess(status) && data) {
+        setCreatorProfileData(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to update user profile');
+      console.error(error);
+    }
 
     setIsLoading(false);
   };
 
   return (
-    <Row>
-      <Col span={8} offset={1}>
-        <Form form={form} onFinish={onFinish} scrollToFirstError={true}>
-          <Title level={3}>My Public Page</Title>
-          <Form.Item>
-            <Button htmlType="submit" type="primary">
-              SAVE
-            </Button>
-          </Form.Item>
-          <Space className={styles.colorChoicesContainer}>
-            {colorPalletteChoices.map((color) => (
-              <div
-                className={classNames(
-                  styles.colorContainer,
-                  creatorColorChoice === color ? styles.selected : undefined
-                )}
-                onClick={() => setCreatorColorChoice(color)}
-              >
-                <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
-              </div>
-            ))}
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={saveCreatorColorPalletteChoice}
-              loading={isLoading}
-            >
-              Apply Color
-            </Button>
-          </Space>
-
-          <Collapse defaultActiveKey={['header']} onChange={callbackCollapse}>
-            <Panel header="Header" key="header">
-              <Form.Item
-                id="cover_image_url"
-                name="cover_image_url"
-                rules={validationRules.requiredValidation}
-                label="Cover Photo"
-              >
-                <Upload>
-                  <Button icon={<UploadOutlined />}>Upload</Button>
-                </Upload>
-              </Form.Item>
-
-              <Form.Item
-                id="profile_image_url"
-                name="profile_image_url"
-                rules={validationRules.requiredValidation}
-                label="Your Photo"
-              >
-                <Upload>
-                  <Button icon={<UploadOutlined />}>Upload</Button>
-                </Upload>
-              </Form.Item>
-
-              <Form.Item required className={styles.nameInputWrapper} label="Name">
-                <Form.Item
-                  className={styles.nameInput}
-                  style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-                  name="first_name"
-                  rules={validationRules.nameValidation}
-                >
-                  <Input placeholder="First Name" />
-                </Form.Item>
-                <Form.Item
-                  className={styles.nameInput}
-                  style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-                  name="last_name"
-                  rules={validationRules.nameValidation}
-                >
-                  <Input placeholder="Last Name" />
-                </Form.Item>
-              </Form.Item>
-
-              <Form.Item
-                className={classNames(styles.bgWhite, styles.textEditorLayout)}
-                label="Short bio"
-                name={['profile', 'bio']}
-              >
-                <TextEditor name={['profile', 'bio']} form={form} placeholder="  Please input your short bio" />
-              </Form.Item>
-            </Panel>
-            <Panel header="Social Links" key="social">
-              <Form.Item label="Website" name={['profile', 'social_media_links', 'website']}>
-                <Input placeholder="Your website link" />
-              </Form.Item>
-
-              <Form.Item label="Facebook" name={['profile', 'social_media_links', 'facebook_link']}>
-                <Input placeholder="Facebook profile link" />
-              </Form.Item>
-
-              <Form.Item label="Twitter" name={['profile', 'social_media_links', 'twitter_link']}>
-                <Input placeholder="Twitter profile link" />
-              </Form.Item>
-
-              <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
-                <Input placeholder="Instagram profile link" />
-              </Form.Item>
-
-              <Form.Item label="LinkedIn" name={['profile', 'social_media_links', 'linkedin_link']}>
-                <Input placeholder="LinkedIn profile link" />
-              </Form.Item>
-            </Panel>
-            <Panel header="Other Links" key="other"></Panel>
-            <Panel header="Passes" key="other"></Panel>
-            <Panel header="Memberships" key="other"></Panel>
-            <Panel header="Sessions" key="other"></Panel>
-            <Panel header="Vidoes" key="other"></Panel>
-            <Panel header="Courses" key="other"></Panel>
-            <Panel header="Subscriptions" key="other"></Panel>
-          </Collapse>
-        </Form>
-      </Col>
-    </Row>
+    <div className={styles.editPageContainer}>
+      <Spin spinning={isLoading} size="large">
+        <Row gutter={[10, 20]}>
+          <Col xs={24} lg={12}>
+            <div className={styles.profileFormContainer}>
+              <Form form={form} scrollToFirstError={true} onFinish={handleFormFinish}>
+                <Row gutter={[12, 12]} align="middle" justify="center">
+                  <Col xs={12}>
+                    <Title level={4}> My Public Page </Title>
+                  </Col>
+                  <Col xs={12} className={styles.textAlignRight}>
+                    <Button type="primary" className={styles.greenBtn} htmlType="submit" loading={isLoading}>
+                      {' '}
+                      Save And Preview{' '}
+                    </Button>
+                  </Col>
+                  <Col xs={24}>
+                    {/* Color Selectipn */}
+                    <Space className={styles.colorChoicesContainer}>
+                      {colorPalletteChoices.map((color) => (
+                        <div
+                          key={color}
+                          className={classNames(
+                            styles.colorContainer,
+                            creatorColorChoice === color ? styles.selected : undefined
+                          )}
+                          onClick={() => setCreatorColorChoice(color)}
+                        >
+                          <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
+                        </div>
+                      ))}
+                    </Space>
+                  </Col>
+                  {creatorProfileData && (
+                    <Col xs={24}>
+                      <Row gutter={[10, 10]}>
+                        {/* Profile Section */}
+                        <Col xs={24}></Col>
+                        {/* Components Section */}
+                        <Col xs={24}>
+                          <Form.List name={['profile', 'sections']}>
+                            {(sectionFields, { addSection, removeSection }) => (
+                              <Collapse
+                                expandIconPosition="right"
+                                ghost
+                                className={styles.componentsSectionContainer}
+                                expandIcon={({ isActive }) => <DownOutlined rotate={isActive ? 180 : 0} />}
+                              >
+                                {sectionFields.map(renderSectionComponents)}
+                              </Collapse>
+                            )}
+                          </Form.List>
+                        </Col>
+                        <Col xs={24}></Col>
+                      </Row>
+                    </Col>
+                  )}
+                </Row>
+              </Form>
+            </div>
+          </Col>
+          {creatorProfileData && (
+            <Col xs={24} lg={12}>
+              <DeviceUIPreview creatorProfileData={creatorProfileData} />
+            </Col>
+          )}
+        </Row>
+      </Spin>
+    </div>
   );
 };
 
