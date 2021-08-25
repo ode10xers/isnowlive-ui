@@ -3,7 +3,7 @@ const Routes = {
   legals: '/terms',
   login: '/login',
   signup: '/signup',
-  Onboarding: '/Onboarding',
+  onboarding: '/onboarding',
   adminLogin: '/admin',
   sessions: '/sessions',
   videos: '/videos',

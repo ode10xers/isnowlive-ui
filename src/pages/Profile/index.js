@@ -29,7 +29,7 @@ const Profile = () => {
   const [coverImage, setCoverImage] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
-  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
   const [testimonials, setTestimonials] = useState([]);
   const [isOnboarding, setIsOnboarding] = useState(true);
   const [form] = Form.useForm();
@@ -207,7 +207,7 @@ const Profile = () => {
     // Later we'll need to make a dropdown of choices
     values.profile.category = 'YOGA';
 
-    if (isPublicUrlAvaiable) {
+    if (isPublicUrlAvailable) {
       updateProfileDetails(values);
     } else {
       setIsLoading(false);
@@ -224,9 +224,9 @@ const Profile = () => {
           username: e.target.value?.toLowerCase(),
         });
         if (data) {
-          setIsPublicUrlAvaiable(true);
+          setIsPublicUrlAvailable(true);
         } else {
-          setIsPublicUrlAvaiable(false);
+          setIsPublicUrlAvailable(false);
         }
         setIsLoadingUsernameCheck(false);
       } catch (error) {
@@ -248,52 +248,38 @@ const Profile = () => {
             labelAlign={isMobileDevice ? 'left' : 'right'}
             scrollToFirstError={true}
           >
-            <Form.Item required className={styles.nameInputWrapper}>
-              <Form.Item
-                className={styles.nameInput}
-                style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-                name="first_name"
-                rules={validationRules.nameValidation}
-              >
+            <Form.Item className={styles.nameInputWrapper}>
+              <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
                 <Input placeholder="First Name" />
               </Form.Item>
-              <Form.Item
-                className={styles.nameInput}
-                style={{ display: 'inline-block', width: 'calc(50% - 12px)' }}
-                name="last_name"
-                rules={validationRules.nameValidation}
-              >
+              <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
                 <Input placeholder="Last Name" />
               </Form.Item>
             </Form.Item>
 
-            <Form.Item required>
-              <Row align="middle" className={styles.alignUrl}>
-                <Col>
+            <Form.Item>
+              <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
+                <Col flex="0 0 120px">
                   <Form.Item name="username" rules={validationRules.publicUrlValidation} onBlur={handlePublicUrlChange}>
-                    <Input placeholder="username" />
+                    <Input placeholder="username" maxLength={30} />
                   </Form.Item>
                 </Col>
-                <Col className={classNames(styles.ml10)}>
+                <Col flex="0 0 70px">
                   <Text>.passion.do</Text>
                 </Col>
-                {isLoadingUsernameCheck ? (
-                  <Col className={classNames(styles.ml10)}>
+
+                <Col flex="1 1 auto">
+                  {isLoadingUsernameCheck ? (
                     <Spin />
-                  </Col>
-                ) : (
-                  <Col className={classNames(styles.ml10)}>
-                    {isPublicUrlAvaiable ? (
-                      <Text type="success">
-                        <span className={classNames(styles.dot, styles.success)}></span> Available
-                      </Text>
-                    ) : (
-                      <Text type="danger">
-                        <span className={classNames(styles.dot, styles.danger)}></span> Unavailable
-                      </Text>
-                    )}
-                  </Col>
-                )}
+                  ) : (
+                    <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
+                      <span
+                        className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
+                      ></span>{' '}
+                      {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
+                    </Text>
+                  )}
+                </Col>
               </Row>
             </Form.Item>
 

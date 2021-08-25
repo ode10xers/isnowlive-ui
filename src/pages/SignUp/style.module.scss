@@ -1,10 +1,5 @@
 @import '../../styles/variables.scss';
 
-// html, body {
-//     height: 100%;
-//     background-color: #FAFAFA !important;
-// }
-
 .signupContainer {
     position: absolute;
     left: 50%;
@@ -19,13 +14,11 @@
     background: #FFFFFF;
     border-radius: 20px;
     padding: 80px;
-    width: 490px;
+    max-width: 490px;
 }
 
 .signupHeadingText{
     width: 368px;
-    // font-family: Overpass;
-    // font-style: normal;
     font-weight: 700;
     font-size: 36px;
     line-height: 74px;    
@@ -34,12 +27,11 @@
 }
 
 .signupForm{
-    width: 368px;
+    width: 100%;
     text-align: center;
 }
 
 .signupHeadingSubtext{
-    // font-family: Inter;
     font-style: normal;
     font-weight: normal;
     font-size: 20px;
@@ -50,12 +42,11 @@
 }
 
 .signupButton{
-    border: 1px solid #FF820B !important ;
-    width: 240px;
-    height: 56px !important;
-    background: linear-gradient(94.06deg, #FF820B 0%, rgba(255, 134, 19, 0.75) 106.52%) !important;
+    // border: 1px solid #FF820B !important;
+    // background: linear-gradient(94.06deg, #FF820B 0%, rgba(255, 134, 19, 0.75) 106.52%) !important;
+    @extend .orangeBtn;
+    min-height: 52px !important;
     border-radius: 8px !important;
-    // font-family: Inter;
     font-style: normal;
     font-weight: 500 !important;
     font-size: 20px !important;

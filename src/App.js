@@ -332,7 +332,7 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
             <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.Onboarding} component={Onboarding} />
+            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.onboarding} component={Onboarding} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout
