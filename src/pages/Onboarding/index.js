@@ -3,7 +3,14 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 
 import { Row, Col, Typography, Space, Form, Input, Collapse, Spin, Button, Tooltip, Divider, message } from 'antd';
-import { DownOutlined, PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import {
+  DownOutlined,
+  PlusCircleOutlined,
+  MinusCircleOutlined,
+  DesktopOutlined,
+  MobileOutlined,
+  EditOutlined,
+} from '@ant-design/icons';
 
 import apis from 'apis';
 
@@ -17,6 +24,7 @@ import DragAndDropHandle from 'components/DynamicProfileComponents/DragAndDropHa
 import { newProfileFormLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
+import TextEditor from 'components/TextEditor';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
@@ -31,8 +39,6 @@ const SimpleEditForm = ({ name, fieldKey, ...restFields }) => {
       name={[name, 'title']}
       fieldKey={[fieldKey, 'title']}
       rules={validationRules.requiredValidation}
-      // getValueFromEvent={(e) => {console.log(e.target); return e.target.value}}
-      // trigger="onBlur"
     >
       <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
     </Form.Item>
@@ -217,9 +223,10 @@ const Onboarding = ({ history }) => {
   const [creatorProfileImageUrl, setCreatorProfileImageUrl] = useState(null);
 
   const [creatorColorChoice, setCreatorColorChoice] = useState(null);
-  const [isContainedUI, setIsContainedUI] = useState(false);
 
   const [expandedComponentsSection, setExpandedComponentsSection] = useState([]);
+
+  const [isMobileView, setIsMobileView] = useState(true);
 
   const fetchCreatorProfileData = useCallback(async () => {
     setIsLoading(true);
@@ -228,23 +235,22 @@ const Onboarding = ({ history }) => {
       const { status, data } = await apis.user.getProfile();
 
       if (isAPISuccess(status) && data) {
-        const creatorData = {
-          ...data,
-          profile: {
-            ...data.profile,
-            bio: data?.profile?.bio?.replace(/(<([^>]+)>)/gi, '').replaceAll('&nbsp;', ''),
-          },
-        };
+        // const creatorData = {
+        //   ...data,
+        //   profile: {
+        //     ...data.profile,
+        //     bio: data?.profile?.bio?.replace(/(<([^>]+)>)/gi, '').replaceAll('&nbsp;', ''),
+        //   },
+        // };
 
-        setCreatorProfileData(creatorData);
+        setCreatorProfileData(data);
 
         setCreatorCoverImageUrl(data.cover_image_url);
         setCreatorProfileImageUrl(data.profile_image_url);
 
         setCreatorColorChoice(data?.profile?.color ?? null);
-        setIsContainedUI(!data?.profile?.new_profile);
 
-        form.setFieldsValue(creatorData);
+        form.setFieldsValue(data);
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed to load creator profile details');
@@ -318,7 +324,7 @@ const Onboarding = ({ history }) => {
           ...creatorProfileData.profile,
           ...values.profile,
           color: creatorColorChoice,
-          new_profile: !isContainedUI,
+          new_profile: true,
         },
       };
 
@@ -377,6 +383,10 @@ const Onboarding = ({ history }) => {
         },
       });
     }
+  };
+
+  const handleEditUsernameClicked = () => {
+    // TODO: create edit username modal here
   };
 
   return (
@@ -477,13 +487,21 @@ const Onboarding = ({ history }) => {
                                 name={['profile', 'bio']}
                                 label="Short Bio"
                                 rules={validationRules.requiredValidation}
+                                className={classNames(styles.bgWhite, styles.textEditorLayout)}
                               >
-                                <Input.TextArea
+                                {/* <Input.TextArea
                                   autoSize={true}
                                   showCount={true}
                                   maxLength={2000}
                                   className={styles.textAreaInput}
-                                />
+                                /> */}
+                                <div>
+                                  <TextEditor
+                                    name={['profile', 'bio']}
+                                    form={form}
+                                    placeholder="Your description here"
+                                  />
+                                </div>
                               </Form.Item>
                             </Panel>
                             <Panel key="social_links" header={<Text strong> Social Media Links (optional) </Text>}>
@@ -542,9 +560,58 @@ const Onboarding = ({ history }) => {
             </div>
           </Col>
           {creatorProfileData && (
-            <Col xs={24} lg={12} className={styles.textAlignCenter}>
-              <DeviceUIPreview creatorProfileData={creatorProfileData} />
-            </Col>
+            <>
+              <Col xs={0} lg={12}>
+                <Row gutter={[10, 10]}>
+                  <Col xs={24} lg={12}>
+                    <Space className={styles.usernameContainer} align="center">
+                      <Text copyable={true}>
+                        {' '}
+                        <Text strong>{creatorProfileData?.username}</Text>.passion.do{' '}
+                      </Text>
+                      <Button icon={<EditOutlined />} type="link" onClick={handleEditUsernameClicked} />
+                    </Space>
+                  </Col>
+                  <Col xs={0} lg={12} className={styles.textAlignRight}>
+                    {isMobileView ? (
+                      <Button type="default" icon={<DesktopOutlined />} onClick={() => setIsMobileView(false)}>
+                        Web View
+                      </Button>
+                    ) : (
+                      <Button type="default" icon={<MobileOutlined />} onClick={() => setIsMobileView(true)}>
+                        Mobile View
+                      </Button>
+                    )}
+                  </Col>
+                  <Col xs={24} className={styles.textAlignCenter}>
+                    <div className={styles.deviceContainer}>
+                      {isMobileView ? (
+                        <DeviceUIPreview
+                          key="desktop-mobile-preview"
+                          creatorProfileData={creatorProfileData}
+                          isMobilePreview={true}
+                        />
+                      ) : (
+                        <DeviceUIPreview
+                          key="desktop-web-preview"
+                          creatorProfileData={creatorProfileData}
+                          isMobilePreview={false}
+                        />
+                      )}
+                    </div>
+                  </Col>
+                </Row>
+              </Col>
+              <Col xs={24} lg={0}>
+                <div className={styles.mobileDeviceContainer}>
+                  <DeviceUIPreview
+                    key="mobile-preview"
+                    creatorProfileData={creatorProfileData}
+                    isMobilePreview={true}
+                  />
+                </div>
+              </Col>
+            </>
           )}
         </Row>
       </Spin>

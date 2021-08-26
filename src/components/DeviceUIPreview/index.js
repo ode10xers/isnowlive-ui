@@ -20,7 +20,7 @@ const deviceTypes = {
   DESKTOP: {
     key: 'macbookpro',
     viewportWidth: '1280',
-    previewScale: '0.6',
+    previewScale: '0.5',
   },
 };
 

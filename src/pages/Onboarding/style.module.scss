@@ -89,3 +89,19 @@
     }
   }
 }
+
+.usernameContainer {
+  padding: 10px;
+  background-color: map-get($map: $colors, $key: 'White');
+  border-radius: 12px;
+}
+
+.deviceContainer {
+  margin-top: 20px;
+  margin-left : 80px;
+  text-align: center;
+}
+
+.mobileDeviceContainer {
+  text-align: center;
+}
