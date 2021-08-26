@@ -75,10 +75,35 @@ const Subscriptions = () => {
     setIsLoading(false);
   }, []);
 
+  // TODO: Remove this later
+  const hideAllSubscriptions = useCallback(async (subscriptionList) => {
+    setIsLoading(true);
+    await Promise.all(
+      subscriptionList.map(async (subs) => {
+        try {
+          const { status } = await apis.subscriptions.unpublishSubscription(subs.external_id);
+
+          if (isAPISuccess(status)) {
+            console.log(`Unpublished membership "${subs.name}"`);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      })
+    );
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     getCreatorSubscriptions();
     fetchCreatorMemberTags();
   }, [getCreatorSubscriptions, fetchCreatorMemberTags]);
+
+  useEffect(() => {
+    if (userDetails?.profile?.payment_provider === paymentProvider.PAYPAL && subscriptions.length > 0) {
+      hideAllSubscriptions(subscriptions);
+    }
+  }, [subscriptions, userDetails, hideAllSubscriptions]);
 
   const publishSubscription = async (subscriptionId) => {
     setIsLoading(true);
