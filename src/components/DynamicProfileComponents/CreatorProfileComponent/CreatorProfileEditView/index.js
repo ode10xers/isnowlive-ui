@@ -22,7 +22,7 @@ const { Panel } = Collapse;
 
 const creatorUsernameRegex = new RegExp('^[a-z]*$');
 
-const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = () => {} }) => {
+const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = () => {}, isContained = false }) => {
   const { setUserDetails } = useGlobalContext();
   const [form] = Form.useForm();
 
@@ -87,7 +87,13 @@ const CreatorProfileEditView = ({ creatorProfile, refetchCreatorProfileData = ()
   const handleFinishEditComponent = async (values) => {
     setIsLoading(true);
     try {
-      const { status } = await apis.user.updateProfile(values);
+      const { status } = await apis.user.updateProfile({
+        ...values,
+        profile: {
+          ...values.profile,
+          new_profile: !isContained,
+        },
+      });
 
       if (isAPISuccess(status)) {
         const localUserDetails = getLocalUserDetails();

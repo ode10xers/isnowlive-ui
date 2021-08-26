@@ -17,7 +17,11 @@ const CreatorProfileComponent = ({
         <CreatorProfileView creatorProfile={creatorProfile} isEditing={isEditing} isContained={isContained} />
       </div>
       {isEditing && (
-        <CreatorProfileEditView refetchCreatorProfileData={refetchCreatorProfileData} creatorProfile={creatorProfile} />
+        <CreatorProfileEditView
+          refetchCreatorProfileData={refetchCreatorProfileData}
+          creatorProfile={creatorProfile}
+          isContained={isContained}
+        />
       )}
     </div>
   );
