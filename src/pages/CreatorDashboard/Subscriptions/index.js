@@ -79,17 +79,19 @@ const Subscriptions = () => {
   const hideAllSubscriptions = useCallback(async (subscriptionList) => {
     setIsLoading(true);
     await Promise.all(
-      subscriptionList.map(async (subs) => {
-        try {
-          const { status } = await apis.subscriptions.unpublishSubscription(subs.external_id);
+      subscriptionList
+        .filter((subs) => subs.external_id)
+        .map(async (subs) => {
+          try {
+            const { status } = await apis.subscriptions.unpublishSubscription(subs.external_id);
 
-          if (isAPISuccess(status)) {
-            console.log(`Unpublished membership "${subs.name}"`);
+            if (isAPISuccess(status)) {
+              console.log(`Unpublished membership "${subs.name}"`);
+            }
+          } catch (error) {
+            console.error(error);
           }
-        } catch (error) {
-          console.error(error);
-        }
-      })
+        })
     );
     setIsLoading(false);
   }, []);
