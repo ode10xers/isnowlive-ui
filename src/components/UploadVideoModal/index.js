@@ -530,11 +530,64 @@ const UploadVideoModal = ({
                 };
 
                 const updatePassResponse = await apis.passes.updateClassPass(pass.id, passPayload);
-                console.log(updatePassResponse);
+                console.log(updatePassResponse.status);
               })
             );
+
+            await fetchPassesForCreator();
           } catch (error) {
             message.error('Failed to attach video to pass');
+            console.error(error);
+          }
+
+          const targetMembershipIds = selectedMembershipIds || values.membership_ids || [];
+          const targetMemberships = creatorMemberships.filter((cSubs) =>
+            targetMembershipIds.includes(cSubs.external_id)
+          );
+
+          try {
+            await Promise.all(
+              targetMemberships.map(async (subs) => {
+                let sessionsProductInfo = subs.products['SESSION'] ?? null;
+                let videosProductInfo = subs.products['VIDEO'] ?? null;
+
+                if (videosProductInfo) {
+                  videosProductInfo.product_ids = [...new Set([...videosProductInfo.product_ids, data.external_id])];
+                } else if (sessionsProductInfo) {
+                  const totalCredits = sessionsProductInfo.credits;
+
+                  sessionsProductInfo.credits = Math.floor(totalCredits / 2) + (totalCredits % 2);
+                  videosProductInfo = {
+                    credits: Math.floor(totalCredits / 2),
+                    product_ids: [data.external_id],
+                  };
+                }
+
+                let productsData = {
+                  VIDEO: videosProductInfo,
+                };
+
+                if (sessionsProductInfo) {
+                  productsData.SESSION = sessionsProductInfo;
+                }
+
+                const subsPayload = {
+                  name: subs.name,
+                  price: subs.price,
+                  validity: subs.validity,
+                  tag_id: subs.tag.external_id,
+                  color_code: subs.color_code,
+                  products: productsData,
+                };
+
+                const updateSubsResponse = await apis.subscriptions.updateSubscription(subs.external_id, subsPayload);
+                console.log(updateSubsResponse.status);
+              })
+            );
+
+            await fetchSubscriptionsForCreator();
+          } catch (error) {
+            message.error('Failed to attach video to membership');
             console.error(error);
           }
         }
@@ -965,7 +1018,7 @@ const UploadVideoModal = ({
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24}>
+              <Col xs={editedVideo ? 0 : 24}>
                 <Form.Item id="pass_ids" name="pass_ids" label="Related Pass(es)">
                   <Select
                     showArrow
@@ -1018,6 +1071,65 @@ const UploadVideoModal = ({
                       {creatorPasses?.filter((pass) => !pass.is_published).length <= 0 && (
                         <Select.Option disabled value="no_unpublished_pass">
                           <Text disabled> No unpublished passes </Text>
+                        </Select.Option>
+                      )}
+                    </Select.OptGroup>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={editedVideo ? 0 : 24}>
+                <Form.Item id="membership_ids" name="membership_ods" label="Related Memberships(s)">
+                  <Select
+                    showArrow
+                    showSearch={false}
+                    mode="multiple"
+                    value={selectedMembershipIds}
+                    onChange={setSelectedMembershipIds}
+                    placeholder="Select the memberships usable for this video"
+                    maxTagCount={2}
+                    optionLabelProp="label"
+                  >
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                      key="Published Memberships"
+                    >
+                      {creatorMemberships
+                        ?.filter((subs) => subs.is_published)
+                        .map((subs) => (
+                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17}>{subs.name}</Col>
+                              <Col xs={7}>
+                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {creatorMemberships?.filter((subs) => subs.is_published).length <= 0 && (
+                        <Select.Option disabled value="no_published_subs">
+                          <Text disabled> No published memberships </Text>
+                        </Select.Option>
+                      )}
+                    </Select.OptGroup>
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                      key="Unpublished Memberships"
+                    >
+                      {creatorMemberships
+                        ?.filter((subs) => !subs.is_published)
+                        .map((subs) => (
+                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17}>{subs.name}</Col>
+                              <Col xs={7}>
+                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
+                        <Select.Option disabled value="no_unpublished_subs">
+                          <Text disabled> No unpublished memberships </Text>
                         </Select.Option>
                       )}
                     </Select.OptGroup>
