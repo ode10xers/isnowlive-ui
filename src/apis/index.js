@@ -97,7 +97,7 @@ export default {
     submitZoomMeetingInfo: (inventoryId, payload) =>
       http.patch(`/secure/creator/inventories/id/${inventoryId}/zoom`, payload),
     getZoomMeetingInfo: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}/zoom`),
-    updateSessionInventoryDocument: (inventoryId, payload) =>
+    updateSessionInventory: (inventoryId, payload) =>
       http.patch(`/secure/creator/inventories/id/${inventoryId}`, payload),
     updateOfflineEventAddress: (inventoryExternalId, payload) =>
       http.patch(`/secure/creator/inventories/id/${inventoryExternalId}/address`, payload),
