@@ -510,6 +510,33 @@ const UploadVideoModal = ({
             video_creator_username: getLocalUserDetails().username,
             video_currency: data.currency || customNullValue,
           });
+
+          const targetPassIds = selectedPassIds || values.pass_ids || [];
+          const targetPasses = creatorPasses.filter((cPass) => targetPassIds.includes(cPass.external_id));
+          try {
+            await Promise.all(
+              targetPasses.map(async (pass) => {
+                const passPayload = {
+                  currency: pass.currency,
+                  price: pass.price,
+                  name: pass.name,
+                  validity: pass.validity,
+                  session_ids: pass.sessions.map((session) => session.session_id),
+                  video_ids: [...new Set([...pass.videos.map((video) => video.external_id), data.external_id])],
+                  limited: pass.limited,
+                  class_count: pass.limited ? pass.class_count : 1000,
+                  color_code: pass.color_code,
+                  tag_id: pass.tag?.external_id,
+                };
+
+                const updatePassResponse = await apis.passes.updateClassPass(pass.id, passPayload);
+                console.log(updatePassResponse);
+              })
+            );
+          } catch (error) {
+            message.error('Failed to attach video to pass');
+            console.error(error);
+          }
         }
 
         refetchVideos();
@@ -948,6 +975,7 @@ const UploadVideoModal = ({
                     onChange={setSelectedPassIds}
                     placeholder="Select the passes usable for this video"
                     maxTagCount={2}
+                    optionLabelProp="label"
                   >
                     <Select.OptGroup
                       label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
