@@ -2,12 +2,12 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Form, Input, Collapse, Spin, Button, Divider, message } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { Row, Col, Typography, Space, Form, Input, Collapse, Spin, Button, Tooltip, Divider, message } from 'antd';
+import { DownOutlined, PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
 
-import { deepCloneObject, isAPISuccess } from 'utils/helper';
+import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
 import validationRules from 'utils/validation';
 
 import ImageUpload from 'components/ImageUpload';
@@ -27,13 +27,151 @@ const SimpleEditForm = ({ name, fieldKey, ...restFields }) => {
   return (
     <Form.Item
       {...restFields}
+      label="Container Title"
       name={[name, 'title']}
       fieldKey={[fieldKey, 'title']}
-      label="Container Title"
       rules={validationRules.requiredValidation}
+      // getValueFromEvent={(e) => {console.log(e.target); return e.target.value}}
+      // trigger="onBlur"
     >
       <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
     </Form.Item>
+  );
+};
+
+const OtherLinksEditForm = ({ name, fieldKey, ...restFields }) => {
+  const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([]);
+
+  return (
+    <>
+      <Form.Item
+        {...restFields}
+        label="Container Title"
+        name={[name, 'title']}
+        fieldKey={[fieldKey, 'title']}
+        rules={validationRules.requiredValidation}
+      >
+        <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+      </Form.Item>
+      <Form.Item label="Your Links" required={true}>
+        <Form.List
+          {...restFields}
+          name={[name, 'values']}
+          fieldKey={[fieldKey, 'name']}
+          rules={validationRules.otherLinksValidation}
+        >
+          {(fields, { add, remove }, { errors }) => (
+            <Row className={styles.ml10} gutter={[8, 12]}>
+              <Col xs={24}>
+                <Collapse
+                  defaultActiveKey={fields[0]?.name ?? 0}
+                  activeKey={expandedAccordionKeys}
+                  onChange={setExpandedAccordionKeys}
+                >
+                  {fields.map(({ name: otherLinksName, fieldKey: otherLinksFieldKey, ...otherLinksRestField }) => (
+                    <Panel
+                      key={otherLinksName}
+                      header={
+                        <Space align="baseline">
+                          <Title level={5} className={styles.blueText}>
+                            Link Item
+                          </Title>
+                          {fields.length > 1 ? (
+                            <Tooltip title="Remove this link item">
+                              <MinusCircleOutlined
+                                className={styles.redText}
+                                onClick={(e) => {
+                                  preventDefaults(e);
+                                  // NOTE : We use the name as Panel key
+                                  setExpandedAccordionKeys((prevKeys) =>
+                                    prevKeys.filter((val) => val !== otherLinksName)
+                                  );
+                                  remove(otherLinksName);
+                                }}
+                              />
+                            </Tooltip>
+                          ) : null}
+                        </Space>
+                      }
+                    >
+                      <Row gutter={[8, 4]}>
+                        <Col xs={24} md={12}>
+                          <Form.Item
+                            className={styles.compactFormItem}
+                            {...otherLinksRestField}
+                            label="Link Title"
+                            fieldKey={[otherLinksFieldKey, 'title']}
+                            name={[otherLinksName, 'title']}
+                            rules={validationRules.requiredValidation}
+                          >
+                            <Input placeholder="Text to show (max. 50)" maxLength={50} />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} md={12}>
+                          <Form.Item
+                            className={styles.compactFormItem}
+                            {...otherLinksRestField}
+                            label="Link URL"
+                            fieldKey={[otherLinksFieldKey, 'url']}
+                            name={[otherLinksName, 'url']}
+                            rules={validationRules.urlValidation}
+                          >
+                            <Input placeholder="Paste your URL here" type="url" />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} md={12}>
+                          <Form.Item
+                            className={styles.compactFormItem}
+                            {...otherLinksRestField}
+                            label="Title Color"
+                            fieldKey={[otherLinksFieldKey, 'textColor']}
+                            name={[otherLinksName, 'textColor']}
+                            rules={[...validationRules.requiredValidation, ...validationRules.hexColorValidation()]}
+                          >
+                            <Input placeholder="Hex color code of the title" />
+                          </Form.Item>
+                        </Col>
+                        <Col xs={24} md={12}>
+                          <Form.Item
+                            className={styles.compactFormItem}
+                            {...otherLinksRestField}
+                            label="Background Color"
+                            fieldKey={[otherLinksFieldKey, 'backgroundColor']}
+                            name={[otherLinksName, 'backgroundColor']}
+                            rules={[...validationRules.requiredValidation, ...validationRules.hexColorValidation()]}
+                          >
+                            <Input placeholder="Hex color code of the background" />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Panel>
+                  ))}
+                </Collapse>
+              </Col>
+              <Col xs={24}>
+                <Button
+                  block
+                  type="dashed"
+                  onClick={(e) => {
+                    preventDefaults(e);
+                    // NOTE : Since the new one will be added at the last place
+                    // We ad the length of current array to the expanded keys
+                    setExpandedAccordionKeys((prevKeys) => [...new Set([...prevKeys, fields.length])]);
+                    add();
+                  }}
+                  icon={<PlusCircleOutlined />}
+                >
+                  Add more links
+                </Button>
+              </Col>
+              <Col xs={24}>
+                <Form.ErrorList errors={errors} />
+              </Col>
+            </Row>
+          )}
+        </Form.List>
+      </Form.Item>
+    </>
   );
 };
 
@@ -61,6 +199,10 @@ const editViewMap = {
   VIDEOS: {
     label: 'Videos',
     component: SimpleEditForm,
+  },
+  OTHER_LINKS: {
+    label: 'Other Links',
+    component: OtherLinksEditForm,
   },
 };
 

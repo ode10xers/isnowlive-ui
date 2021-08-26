@@ -44,6 +44,14 @@
 .creatorCoverImage {
   width: 100%;
   max-height: 320px;
+  margin: 0 auto;
+
+  :global {
+    .ant-upload-select-picture {
+      min-width: 200px;
+      text-align: center;
+    }
+  }
 }
 
 .creatorProfileImage {

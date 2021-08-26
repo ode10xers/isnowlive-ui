@@ -49,7 +49,7 @@ const validationRules = {
     },
   ],
   hexColorValidation: (message = 'Please input a valid hex color code') => {
-    const regexTester = new RegExp(/^[0-9A-Fa-f]{6}$/);
+    const regexTester = new RegExp(/^[#]?[0-9A-Fa-f]{6}$/);
 
     return [
       {
