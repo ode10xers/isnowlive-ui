@@ -11,8 +11,6 @@ export const getYoutubeVideoDetails = async (videoUrl) => {
   const response = await fetch(`${baseUrl}?${queryStrings}`);
 
   const youtubeVideoDetails = await response.json();
-
-  console.log(youtubeVideoDetails);
   return youtubeVideoDetails;
 };
 
