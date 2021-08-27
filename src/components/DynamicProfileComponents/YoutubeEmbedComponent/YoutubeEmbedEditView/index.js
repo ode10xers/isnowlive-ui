@@ -10,7 +10,7 @@ import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
 
 const formInitialValues = {
   title: null,
@@ -119,6 +119,13 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
                 <Form.List name="values" rules={validationRules.dynamicArrayItemValidation}>
                   {(fields, { add, remove }, { errors }) => (
                     <Row gutter={[8, 12]}>
+                      <Col xs={24}>
+                        <Paragraph>Accepts YouTube Links with this format:</Paragraph>
+                        <Paragraph>
+                          <Text strong>https://youtu.be/[video-id]</Text> or{' '}
+                          <Text strong>https://www.youtube.com/watch?v=[video-id]</Text>
+                        </Paragraph>
+                      </Col>
                       <Col xs={24}>
                         {fields.map(({ name, fieldKey, ...restField }) => (
                           <Row gutter={[8, 12]} align="middle">
