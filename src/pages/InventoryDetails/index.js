@@ -125,6 +125,7 @@ const InventoryDetails = ({ match, history }) => {
             </div>
           )}
         </Col>
+
         <Col xs={24} lg={14}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
         </Col>
