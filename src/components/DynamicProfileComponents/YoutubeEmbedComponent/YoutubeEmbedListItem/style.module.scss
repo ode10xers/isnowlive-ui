@@ -3,6 +3,13 @@
 .youtubeVideoItem {
   cursor: pointer;
 
+  .placeholderImage {
+    width: 100% !important;
+    text-align: center;
+    min-height: 120px;
+    max-height: 200px;
+  }
+
   .thumbnailContainer {
     width: 100%;
     // src : https://stackoverflow.com/questions/33604360/using-css-only-to-remove-the-black-bars-from-youtube-hqdefault-image

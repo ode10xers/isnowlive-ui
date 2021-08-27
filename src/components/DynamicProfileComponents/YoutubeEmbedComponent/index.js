@@ -3,13 +3,13 @@ import React from 'react';
 import { Row, Col } from 'antd';
 import { YoutubeOutlined } from '@ant-design/icons';
 
+import YoutubeEmbedEditView from './YoutubeEmbedEditView';
+import YoutubeEmbedListView from './YoutubeEmbedListView';
 import DragAndDropHandle from '../DragAndDropHandle';
 import ContainerCard from 'components/ContainerCard';
 import DynamicProfileComponentContainer from 'components/DynamicProfileComponentContainer';
 
 import styles from './style.module.scss';
-import YoutubeEmbedEditView from './YoutubeEmbedEditView';
-import YoutubeEmbedListView from './YoutubeEmbedListView';
 
 const YoutubeEmbedComponent = ({
   identifier = null,

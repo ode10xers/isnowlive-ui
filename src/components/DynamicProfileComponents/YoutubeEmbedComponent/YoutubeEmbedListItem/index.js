@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { Image, Row, Col, Typography, Spin } from 'antd';
+import { Image, Row, Col, Typography, Spin, Skeleton } from 'antd';
 
 import { getYoutubeVideoDetails } from 'utils/video';
 
@@ -34,10 +34,17 @@ const YoutubeEmbedListItem = ({ url }) => {
 
   return (
     <Spin spinning={isLoading}>
-      {isLoading ? (
-        <div></div>
-      ) : videoDetails ? (
-        <div className={styles.youtubeVideoItem}>
+      <div className={styles.youtubeVideoItem}>
+        {isLoading ? (
+          <Row gutter={[8, 8]}>
+            <Col xs={24} className={styles.textAlignCenter}>
+              <Skeleton.Image className={styles.placeholderImage} />
+            </Col>
+            <Col xs={24}>
+              <Skeleton active={true} paragraph={{ rows: 1, width: '100%' }} />
+            </Col>
+          </Row>
+        ) : videoDetails ? (
           <Row gutter={[8, 8]}>
             <Col xs={24}>
               <div className={styles.thumbnailContainer}>
@@ -53,8 +60,8 @@ const YoutubeEmbedListItem = ({ url }) => {
               <Text className={styles.videoTitle}>{videoDetails.title}</Text>
             </Col>
           </Row>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </Spin>
   );
 };
