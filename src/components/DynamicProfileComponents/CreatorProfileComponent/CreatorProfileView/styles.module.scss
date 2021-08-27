@@ -77,30 +77,23 @@
     text-align: center;
     padding: 0 12px !important;
 
-    .bio {
-      p,
-      span {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        text-align: center !important;
-        background: transparent !important;
-        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
-      }
+    .bio * {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+      background-color: transparent !important;
+      color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
 
     .collapsedBio {
-      p,
-      span {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        text-align: center !important;
-        background: transparent !important;
-        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
-
-      }
-
       max-height: 72px;
       overflow: hidden;
+    }
+
+    .collapsedBio * {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+          sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
+        background-color: transparent !important;
+        color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
     }
 
     .readMoreBio {

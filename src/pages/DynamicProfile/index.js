@@ -22,6 +22,7 @@ import {
   ScheduleOutlined,
   VideoCameraOutlined,
   YoutubeOutlined,
+  OrderedListOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -52,6 +53,7 @@ import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWid
 
 import styles from './style.module.scss';
 import DescriptionProfileComponent from 'components/DynamicProfileComponents/DescriptionProfileComponent';
+import TextListProfileComponent from 'components/DynamicProfileComponents/TextListProfileComponent';
 
 const PassionLogo = require('assets/images/passion-orange-logo.png');
 
@@ -226,6 +228,18 @@ const componentsMap = {
     component: DescriptionProfileComponent,
     defaultProps: {
       title: 'About Me',
+      values: null,
+    },
+  },
+  TEXT_LIST: {
+    icon: <OrderedListOutlined />,
+    label: 'List Items',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'list-items',
+    component: TextListProfileComponent,
+    defaultProps: {
+      title: 'List Items',
       values: null,
     },
   },
