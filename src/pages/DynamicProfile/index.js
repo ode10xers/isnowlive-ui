@@ -16,6 +16,7 @@ import {
   LinkOutlined,
   PlayCircleOutlined,
   PlusCircleOutlined,
+  ProfileOutlined,
   RetweetOutlined,
   SaveOutlined,
   ScheduleOutlined,
@@ -50,6 +51,7 @@ import { getLocalUserDetails } from 'utils/storage';
 import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
 import styles from './style.module.scss';
+import DescriptionProfileComponent from 'components/DynamicProfileComponents/DescriptionProfileComponent';
 
 const PassionLogo = require('assets/images/passion-orange-logo.png');
 
@@ -131,42 +133,6 @@ const componentsMap = {
       ],
     },
   },
-  PASSES: {
-    icon: <LikeOutlined />,
-    label: 'Passes',
-    optional: false,
-    type: componentUIType.FLEXIBLE,
-    component: PassesProfileComponent,
-    elementId: 'passes',
-    defaultProps: {
-      title: 'CREDIT PASSES',
-      values: null,
-    },
-  },
-  SUBSCRIPTIONS: {
-    icon: <ScheduleOutlined />,
-    label: 'Memberships',
-    type: componentUIType.FLEXIBLE,
-    elementId: 'memberships',
-    optional: false,
-    component: SubscriptionProfileComponent,
-    defaultProps: {
-      title: 'MEMBERSHIPS',
-      values: null,
-    },
-  },
-  OTHER_LINKS: {
-    icon: <LinkOutlined />,
-    label: 'Other Links',
-    type: componentUIType.FLEXIBLE,
-    elementId: 'other-links',
-    optional: true,
-    component: OtherLinksProfileComponent,
-    defaultProps: {
-      title: 'OTHER LINKS',
-      values: null,
-    },
-  },
   SESSIONS: {
     icon: <VideoCameraOutlined />,
     label: 'Sessions',
@@ -203,6 +169,42 @@ const componentsMap = {
       values: null,
     },
   },
+  PASSES: {
+    icon: <LikeOutlined />,
+    label: 'Passes',
+    optional: false,
+    type: componentUIType.FLEXIBLE,
+    component: PassesProfileComponent,
+    elementId: 'passes',
+    defaultProps: {
+      title: 'CREDIT PASSES',
+      values: null,
+    },
+  },
+  SUBSCRIPTIONS: {
+    icon: <ScheduleOutlined />,
+    label: 'Memberships',
+    type: componentUIType.FLEXIBLE,
+    elementId: 'memberships',
+    optional: false,
+    component: SubscriptionProfileComponent,
+    defaultProps: {
+      title: 'MEMBERSHIPS',
+      values: null,
+    },
+  },
+  OTHER_LINKS: {
+    icon: <LinkOutlined />,
+    label: 'Other Links',
+    type: componentUIType.FLEXIBLE,
+    elementId: 'other-links',
+    optional: true,
+    component: OtherLinksProfileComponent,
+    defaultProps: {
+      title: 'OTHER LINKS',
+      values: null,
+    },
+  },
   YOUTUBE_LINKS: {
     icon: <YoutubeOutlined />,
     label: 'Youtube Videos',
@@ -212,6 +214,18 @@ const componentsMap = {
     component: YoutubeEmbedComponent,
     defaultProps: {
       title: 'Youtube Videos',
+      values: null,
+    },
+  },
+  DESCRIPTION: {
+    icon: <ProfileOutlined />,
+    label: 'Description',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'long-description',
+    component: DescriptionProfileComponent,
+    defaultProps: {
+      title: 'About Me',
       values: null,
     },
   },
