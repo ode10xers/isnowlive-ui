@@ -131,6 +131,11 @@ const UploadVideoModal = ({
   const [activeTabKey, setActiveTabKey] = useState('preview');
   const [videoPreviewLoading, setVideoPreviewLoading] = useState(true);
 
+  const [creatorPasses, setCreatorPasses] = useState([]);
+  const [selectedPassIds, setSelectedPassIds] = useState([]);
+  const [creatorMemberships, setCreatorMemberships] = useState([]);
+  const [selectedMembershipIds, setSelectedMembershipIds] = useState([]);
+
   //#region Start of Uppy Related Methods
 
   const uppy = useRef(null);
@@ -232,7 +237,42 @@ const UploadVideoModal = ({
         setClasses(data);
       }
     } catch (error) {
-      showErrorModal('Failed to fetch classes', error?.response?.data?.message || 'Something went wrong');
+      message.error(error?.response?.data?.message || 'Failed to fetch classes');
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchPassesForCreator = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.passes.getCreatorPasses();
+
+      if (isAPISuccess(status) && data) {
+        setCreatorPasses(data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch passes');
+      console.error(error);
+    }
+
+    setIsLoading(false);
+  }, []);
+
+  const fetchSubscriptionsForCreator = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      const { status, data } = await apis.subscriptions.getCreatorSubscriptions(1, 25);
+
+      if (isAPISuccess(status) && data) {
+        setCreatorMemberships(data.Data);
+      }
+    } catch (error) {
+      message.error(error?.response?.data?.message || 'Failed to fetch memberships');
+      console.error(error);
     }
 
     setIsLoading(false);
@@ -266,8 +306,15 @@ const UploadVideoModal = ({
   //#region Start of Use Effects
 
   useEffect(() => {
+    fetchAllClassesForCreator();
+    fetchPassesForCreator();
+    fetchSubscriptionsForCreator();
+  }, [fetchAllClassesForCreator, fetchPassesForCreator, fetchSubscriptionsForCreator]);
+
+  useEffect(() => {
     if (visible) {
       if (editedVideo) {
+        // TODO: Handle edit flow here later
         form.setFieldsValue({
           ...editedVideo,
           price: editedVideo.currency === '' ? 0 : editedVideo.price,
@@ -319,13 +366,14 @@ const UploadVideoModal = ({
       if (formPart === 1) {
         getCreatorCurrencyDetails();
       }
-      fetchAllClassesForCreator();
     } else {
       resetBodyStyle();
     }
     return () => {
       setCoverImageUrl(null);
       setSelectedSessionIds([]);
+      setSelectedPassIds([]);
+      setSelectedMembershipIds([]);
       setVideoType(videoPriceTypes.FREE.name);
       setVideoPreviewTime('');
       setIsCourseVideo(false);
@@ -337,7 +385,7 @@ const UploadVideoModal = ({
       setVideoUrlType(videoSourceTypes.CLOUDFLARE.name);
     };
     //eslint-disable-next-line
-  }, [visible, editedVideo, fetchAllClassesForCreator, getCreatorCurrencyDetails, form, formPart]);
+  }, [visible, editedVideo, getCreatorCurrencyDetails, form, formPart]);
 
   useEffect(() => {
     if (editedVideo || formPart === 2) {
@@ -462,6 +510,86 @@ const UploadVideoModal = ({
             video_creator_username: getLocalUserDetails().username,
             video_currency: data.currency || customNullValue,
           });
+
+          const targetPassIds = selectedPassIds || values.pass_ids || [];
+          const targetPasses = creatorPasses.filter((cPass) => targetPassIds.includes(cPass.external_id));
+          try {
+            await Promise.all(
+              targetPasses.map(async (pass) => {
+                const passPayload = {
+                  currency: pass.currency,
+                  price: pass.price,
+                  name: pass.name,
+                  validity: pass.validity,
+                  session_ids: pass.sessions.map((session) => session.session_id),
+                  video_ids: [...new Set([...pass.videos.map((video) => video.external_id), data.external_id])],
+                  limited: pass.limited,
+                  class_count: pass.limited ? pass.class_count : 1000,
+                  color_code: pass.color_code,
+                  tag_id: pass.tag?.external_id,
+                };
+
+                const updatePassResponse = await apis.passes.updateClassPass(pass.id, passPayload);
+                console.log(updatePassResponse.status);
+              })
+            );
+
+            await fetchPassesForCreator();
+          } catch (error) {
+            message.error('Failed to attach video to pass');
+            console.error(error);
+          }
+
+          const targetMembershipIds = selectedMembershipIds || values.membership_ids || [];
+          const targetMemberships = creatorMemberships.filter((cSubs) =>
+            targetMembershipIds.includes(cSubs.external_id)
+          );
+
+          try {
+            await Promise.all(
+              targetMemberships.map(async (subs) => {
+                let sessionsProductInfo = subs.products['SESSION'] ?? null;
+                let videosProductInfo = subs.products['VIDEO'] ?? null;
+
+                if (videosProductInfo) {
+                  videosProductInfo.product_ids = [...new Set([...videosProductInfo.product_ids, data.external_id])];
+                } else if (sessionsProductInfo) {
+                  const totalCredits = sessionsProductInfo.credits;
+
+                  sessionsProductInfo.credits = Math.floor(totalCredits / 2) + (totalCredits % 2);
+                  videosProductInfo = {
+                    credits: Math.floor(totalCredits / 2),
+                    product_ids: [data.external_id],
+                  };
+                }
+
+                let productsData = {
+                  VIDEO: videosProductInfo,
+                };
+
+                if (sessionsProductInfo) {
+                  productsData.SESSION = sessionsProductInfo;
+                }
+
+                const subsPayload = {
+                  name: subs.name,
+                  price: subs.price,
+                  validity: subs.validity,
+                  tag_id: subs.tag.external_id,
+                  color_code: subs.color_code,
+                  products: productsData,
+                };
+
+                const updateSubsResponse = await apis.subscriptions.updateSubscription(subs.external_id, subsPayload);
+                console.log(updateSubsResponse.status);
+              })
+            );
+
+            await fetchSubscriptionsForCreator();
+          } catch (error) {
+            message.error('Failed to attach video to membership');
+            console.error(error);
+          }
         }
 
         refetchVideos();
@@ -808,7 +936,7 @@ const UploadVideoModal = ({
                     mode="multiple"
                     maxTagCount={2}
                     value={selectedSessionIds}
-                    onChange={(val) => setSelectedSessionIds(val)}
+                    onChange={setSelectedSessionIds}
                     optionLabelProp="label"
                   >
                     <Select.OptGroup
@@ -884,6 +1012,124 @@ const UploadVideoModal = ({
                       {classes?.filter((session) => !session.is_active).length <= 0 && (
                         <Select.Option disabled value="no_unpublished_session">
                           <Text disabled> No unpublished sessions </Text>
+                        </Select.Option>
+                      )}
+                    </Select.OptGroup>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={editedVideo ? 0 : 24}>
+                <Form.Item id="pass_ids" name="pass_ids" label="Related Pass(es)">
+                  <Select
+                    showArrow
+                    showSearch={false}
+                    mode="multiple"
+                    value={selectedPassIds}
+                    onChange={setSelectedPassIds}
+                    placeholder="Select the passes usable for this video"
+                    maxTagCount={2}
+                    optionLabelProp="label"
+                  >
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                      key="Published Passes"
+                    >
+                      {creatorPasses
+                        ?.filter((pass) => pass.is_published)
+                        .map((pass) => (
+                          <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17}>{pass.name}</Col>
+                              <Col xs={7}>
+                                {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {creatorPasses?.filter((pass) => pass.is_published).length <= 0 && (
+                        <Select.Option disabled value="no_published_pass">
+                          <Text disabled> No published passes </Text>
+                        </Select.Option>
+                      )}
+                    </Select.OptGroup>
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                      key="Unpublished Passes"
+                    >
+                      {creatorPasses
+                        ?.filter((pass) => !pass.is_published)
+                        .map((pass) => (
+                          <Select.Option key={pass.external_id} value={pass.external_id} label={pass.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17}>{pass.name}</Col>
+                              <Col xs={7}>
+                                {pass.price > 0 ? `${pass.currency.toUpperCase()} ${pass.price}` : 'Free'}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {creatorPasses?.filter((pass) => !pass.is_published).length <= 0 && (
+                        <Select.Option disabled value="no_unpublished_pass">
+                          <Text disabled> No unpublished passes </Text>
+                        </Select.Option>
+                      )}
+                    </Select.OptGroup>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={editedVideo ? 0 : 24}>
+                <Form.Item id="membership_ids" name="membership_ods" label="Related Memberships(s)">
+                  <Select
+                    showArrow
+                    showSearch={false}
+                    mode="multiple"
+                    value={selectedMembershipIds}
+                    onChange={setSelectedMembershipIds}
+                    placeholder="Select the memberships usable for this video"
+                    maxTagCount={2}
+                    optionLabelProp="label"
+                  >
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Visible publicly </Text>}
+                      key="Published Memberships"
+                    >
+                      {creatorMemberships
+                        ?.filter((subs) => subs.is_published)
+                        .map((subs) => (
+                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17}>{subs.name}</Col>
+                              <Col xs={7}>
+                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {creatorMemberships?.filter((subs) => subs.is_published).length <= 0 && (
+                        <Select.Option disabled value="no_published_subs">
+                          <Text disabled> No published memberships </Text>
+                        </Select.Option>
+                      )}
+                    </Select.OptGroup>
+                    <Select.OptGroup
+                      label={<Text className={styles.optionSeparatorText}> Hidden from anyone </Text>}
+                      key="Unpublished Memberships"
+                    >
+                      {creatorMemberships
+                        ?.filter((subs) => !subs.is_published)
+                        .map((subs) => (
+                          <Select.Option key={subs.external_id} value={subs.external_id} label={subs.name}>
+                            <Row gutter={[8, 8]}>
+                              <Col xs={17}>{subs.name}</Col>
+                              <Col xs={7}>
+                                {subs.price > 0 ? `${subs.currency.toUpperCase()} ${subs.price}` : 'Free'}
+                              </Col>
+                            </Row>
+                          </Select.Option>
+                        ))}
+                      {creatorMemberships?.filter((subs) => !subs.is_published).length <= 0 && (
+                        <Select.Option disabled value="no_unpublished_subs">
+                          <Text disabled> No unpublished memberships </Text>
                         </Select.Option>
                       )}
                     </Select.OptGroup>
