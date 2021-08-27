@@ -20,6 +20,7 @@ import {
   SaveOutlined,
   ScheduleOutlined,
   VideoCameraOutlined,
+  YoutubeOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -36,6 +37,7 @@ import SubscriptionProfileComponent from 'components/DynamicProfileComponents/Su
 import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
 import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
+import YoutubeEmbedComponent from 'components/DynamicProfileComponents/YoutubeEmbedComponent';
 
 import {
   deepCloneObject,
@@ -198,6 +200,18 @@ const componentsMap = {
     component: VideosProfileComponent,
     defaultProps: {
       title: 'My Videos',
+      values: null,
+    },
+  },
+  YOUTUBE_LINKS: {
+    icon: <YoutubeOutlined />,
+    label: 'Youtube Videos',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'youtube-videos',
+    component: YoutubeEmbedComponent,
+    defaultProps: {
+      title: 'Youtube Videos',
       values: null,
     },
   },
