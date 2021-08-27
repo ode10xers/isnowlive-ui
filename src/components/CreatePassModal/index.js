@@ -104,7 +104,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
       const { status, data } = await apis.videos.getCreatorVideos();
 
       if (isAPISuccess(status) && data) {
-        setVideos(data.filter((video) => video.price > 0));
+        setVideos(data);
       }
     } catch (error) {
       showErrorModal('Failed to fetch videos', error?.response?.data?.message || 'Something went wrong');
@@ -162,7 +162,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         form.setFieldsValue({
           passName: editedPass.name,
           classList: editedPass.sessions.map((session) => session.session_id),
-          videoList: editedPass.videos.filter((video) => video.price > 0).map((video) => video.external_id),
+          videoList: editedPass.videos.map((video) => video.external_id),
           passType: editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name,
           classCount: editedPass.class_count,
           validity: editedPass.validity,
@@ -176,7 +176,7 @@ const CreatePassModal = ({ visible, closeModal, editedPass = null, creatorMember
         setCurrency(editedPass.currency.toUpperCase() || '');
         setPassType(editedPass.limited ? passTypes.LIMITED.name : passTypes.UNLIMITED.name);
         setSelectedClasses(editedPass.sessions.map((session) => session.session_id));
-        setSelectedVideos(editedPass.videos.filter((video) => video.price > 0).map((video) => video.external_id));
+        setSelectedVideos(editedPass.videos.map((video) => video.external_id));
         setColorCode(editedPass.color_code || whiteColor);
       } else {
         form.resetFields();
