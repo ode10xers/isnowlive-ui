@@ -1,9 +1,26 @@
 @import '../../../../styles/variables.scss';
 
-.availabilityImage {
-  align-self : center;
-  border-radius : 8px !important;
+.availabilityImageContainer {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+
+  :global {
+    .ant-image {
+      height: 100%;
+    }
+  }
+
+  .availabilityImage {
+    align-self : center;
+    border-radius : 8px !important;
+    min-width: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    object-fit: cover;
+  }  
 }
+
 
 .availabilityInfoSeparator {
   color: #c4c4c4 !important;

@@ -4,6 +4,8 @@ import { createPortal } from 'react-dom';
 // Props list can be found here https://github.com/bdryanovski/react-device-preview/blob/master/src/index.js
 import ReactDevicePreview from 'react-device-preview';
 
+import { Spin } from 'antd';
+
 import DynamicProfile from 'pages/DynamicProfile';
 import MobileLayout from 'layouts/MobileLayout';
 
@@ -28,37 +30,48 @@ const deviceTypes = {
 // So we might not be able to allow them to edit this here
 const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) => {
   const [contentRef, setContentRef] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const mountNode = contentRef?.contentWindow?.document?.body;
 
   useEffect(() => {
     if (!contentRef) {
       return;
     }
-    // Copy all the style and link tags from main document
-    // to <head> of iframe
-    const win = contentRef?.contentWindow;
-    const linkEls = win.parent.document.querySelectorAll('link');
-    if (linkEls.length) {
-      linkEls.forEach((el) => {
-        win.document.head.appendChild(el.cloneNode(true));
-      });
-    }
 
-    const styleEls = win.parent.document.querySelectorAll('style');
-    if (styleEls.length) {
-      styleEls.forEach((el) => {
-        win.document.head.appendChild(el.cloneNode(true));
-      });
-    }
+    const timeoutID = setTimeout(() => {
+      // Copy all the style and link tags from main document
+      // to <head> of iframe
+      const win = contentRef?.contentWindow;
+      const linkEls = win.parent.document.querySelectorAll('link');
+      if (linkEls.length) {
+        linkEls.forEach((el) => {
+          win.document.head.appendChild(el.cloneNode(true));
+        });
+      }
 
-    const metaViewportElement = document.createElement('meta');
-    metaViewportElement.name = 'viewport';
+      const styleEls = win.parent.document.querySelectorAll('style');
+      if (styleEls.length) {
+        styleEls.forEach((el) => {
+          win.document.head.appendChild(el.cloneNode(true));
+        });
+      }
 
-    metaViewportElement.content = `width=${
-      deviceTypes[isMobilePreview ? 'MOBILE' : 'DESKTOP'].viewportWidth
-    }, initial-scale=1`;
+      const metaViewportElement = document.createElement('meta');
+      metaViewportElement.name = 'viewport';
 
-    win.document.head.appendChild(metaViewportElement);
+      metaViewportElement.content = `width=${
+        deviceTypes[isMobilePreview ? 'MOBILE' : 'DESKTOP'].viewportWidth
+      }, initial-scale=1`;
+
+      win.document.head.appendChild(metaViewportElement);
+      setIsLoading(false);
+    }, 3000);
+
+    return () => {
+      if (timeoutID) {
+        clearTimeout(timeoutID);
+      }
+    };
   }, [contentRef, isMobilePreview]);
 
   // TODO: Also need to pass override user sections here as another props
@@ -69,19 +82,22 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
   );
 
   return (
-    <ReactDevicePreview
-      device={deviceTypes[isMobilePreview ? 'MOBILE' : 'DESKTOP'].key}
-      scale={deviceTypes[isMobilePreview ? 'MOBILE' : 'DESKTOP'].previewScale}
-    >
-      <iframe
-        className={styles.contentContainer}
-        title="Device Profile Preview"
-        ref={setContentRef}
-        onClick={preventDefaults}
+    <Spin spinning={isLoading} tip="Loading preview...">
+      <ReactDevicePreview
+        device={deviceTypes[isMobilePreview ? 'MOBILE' : 'DESKTOP'].key}
+        scale={deviceTypes[isMobilePreview ? 'MOBILE' : 'DESKTOP'].previewScale}
       >
-        {mountNode && createPortal(creatorProfilePreview, mountNode)}
-      </iframe>
-    </ReactDevicePreview>
+        <iframe
+          style={{ display: isLoading ? 'none' : 'block' }}
+          className={styles.contentContainer}
+          title="Device Profile Preview"
+          ref={setContentRef}
+          onClick={preventDefaults}
+        >
+          {mountNode && createPortal(creatorProfilePreview, mountNode)}
+        </iframe>
+      </ReactDevicePreview>
+    </Spin>
   );
 };
 
