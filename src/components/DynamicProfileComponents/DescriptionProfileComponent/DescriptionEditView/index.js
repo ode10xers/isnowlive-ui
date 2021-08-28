@@ -18,7 +18,7 @@ const formInitialValues = {
   values: null,
 };
 
-const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
+const DescriptionEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -148,4 +148,4 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
   );
 };
 
-export default YoutubeEmbedEditView;
+export default DescriptionEditView;
