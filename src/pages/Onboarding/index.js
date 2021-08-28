@@ -923,8 +923,9 @@ const Onboarding = ({ history }) => {
   const reloadWithNewUsername = (newUsername) => {
     const { protocol, hostname, pathname } = window.location;
 
-    hostname.split('.').splice(0, 1, newUsername);
-    let updatedHost = hostname.join('.');
+    const oldHostname = hostname.split('.');
+    oldHostname.splice(0, 1, newUsername);
+    let updatedHost = oldHostname.join('.');
     window.open(`${protocol}//${updatedHost}${pathname}`, '_self');
   };
 
