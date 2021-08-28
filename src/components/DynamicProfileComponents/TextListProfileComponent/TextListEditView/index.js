@@ -10,14 +10,14 @@ import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Paragraph, Text } = Typography;
+const { Paragraph } = Typography;
 
 const formInitialValues = {
   title: null,
   values: [],
 };
 
-const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
+const TextListEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -31,7 +31,7 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
     } else {
       form.resetFields();
     }
-  }, [configValues, form, editModalVisible]);
+  }, [configValues, form]);
 
   const handleEditComponentClicked = (e) => {
     preventDefaults(e);
@@ -114,29 +114,26 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item label="Youtube Video Links" required={true}>
+              <Form.Item label="Text List Items" required={true}>
                 <Form.List name="values" rules={validationRules.dynamicArrayItemValidation}>
                   {(fields, { add, remove }, { errors }) => (
                     <Row gutter={[8, 12]}>
-                      <Col xs={24}>
-                        <Paragraph>Accepts YouTube Links with this format:</Paragraph>
-                        <Paragraph>
-                          <Text strong>https://youtu.be/[video-id]</Text> or{' '}
-                          <Text strong>https://www.youtube.com/watch?v=[video-id]</Text>
-                        </Paragraph>
-                      </Col>
                       <Col xs={24}>
                         {fields.map(({ name, fieldKey, ...restField }) => (
                           <Row gutter={[8, 12]} align="middle">
                             <Col flex="1 1 auto">
                               <Form.Item
-                                className={styles.compactFormItem}
                                 {...restField}
                                 fieldKey={fieldKey}
                                 name={name}
-                                rules={validationRules.youtubeLinkValidation}
+                                rules={validationRules.requiredValidation}
                               >
-                                <Input placeholder="Put YouTube video link here" maxLength={100} />
+                                <Input.TextArea
+                                  placeholder="Place any text here (max 200 chars)"
+                                  maxLength={200}
+                                  showCount={true}
+                                  autoSize={true}
+                                />
                               </Form.Item>
                             </Col>
                             <Col flex="0 0 40px">
@@ -163,7 +160,7 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
                           }}
                           icon={<PlusCircleOutlined />}
                         >
-                          Add more links
+                          Add more items
                         </Button>
                       </Col>
                       <Col xs={24}>
@@ -195,4 +192,4 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
   );
 };
 
-export default YoutubeEmbedEditView;
+export default TextListEditView;
