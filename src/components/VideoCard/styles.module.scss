@@ -72,13 +72,13 @@
       }
     }
 
-    .descWrapper {
-      p,
-      span {
+    .descWrapper * {
+      // p,
+      // span {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
           sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-        background-color: map-get($map: $colors, $key: 'White') !important;
-      }
+        background-color: transparent !important;
+      // }
     }
 
     .buttonWrapper {

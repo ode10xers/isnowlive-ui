@@ -119,13 +119,16 @@
   ) !important;
   margin-bottom : 0 !important;
 
-  p,
-  span {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+  // p,
+  // span {
+  // }
+}
+
+.availabilityDescription * {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background: transparent !important;
+    background-color: transparent !important;
     color: var(--passion-profile-darker-color, #{map-get($colors, 'Smalt')}) !important;
-  }
 }
 
 .availabilityTitleWrapper {

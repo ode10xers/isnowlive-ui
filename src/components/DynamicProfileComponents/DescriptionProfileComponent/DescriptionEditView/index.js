@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-
-import { Modal, Row, Col, Input, Button, Form, Typography, Tooltip } from 'antd';
-import { EditOutlined, MinusCircleOutlined, PlusCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import classNames from 'classnames';
+import { Modal, Row, Col, Input, Button, Form, Typography } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { resetBodyStyle } from 'components/Modals/modals';
+import TextEditor from 'components/TextEditor';
 
 import validationRules from 'utils/validation';
 import { preventDefaults } from 'utils/helper';
 
 import styles from './style.module.scss';
 
-const { Paragraph, Text } = Typography;
+const { Paragraph } = Typography;
 
 const formInitialValues = {
   title: null,
-  values: [],
+  values: null,
 };
 
-const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
+const DescriptionEditView = ({ configValues, deleteHandler, updateHandler, isContained }) => {
   const [form] = Form.useForm();
 
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -26,12 +27,12 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
     if (configValues) {
       form.setFieldsValue({
         title: configValues.title,
-        values: configValues.values ?? [],
+        values: configValues.values ?? '',
       });
     } else {
       form.resetFields();
     }
-  }, [configValues, form, editModalVisible]);
+  }, [configValues, form]);
 
   const handleEditComponentClicked = (e) => {
     preventDefaults(e);
@@ -114,64 +115,16 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
               </Form.Item>
             </Col>
             <Col xs={24}>
-              <Form.Item label="Youtube Video Links" required={true}>
-                <Form.List name="values" rules={validationRules.dynamicArrayItemValidation}>
-                  {(fields, { add, remove }, { errors }) => (
-                    <Row gutter={[8, 12]}>
-                      <Col xs={24}>
-                        <Paragraph>Accepts YouTube Links with this format:</Paragraph>
-                        <Paragraph>
-                          <Text strong>https://youtu.be/[video-id]</Text> or{' '}
-                          <Text strong>https://www.youtube.com/watch?v=[video-id]</Text>
-                        </Paragraph>
-                      </Col>
-                      <Col xs={24}>
-                        {fields.map(({ name, fieldKey, ...restField }) => (
-                          <Row gutter={[8, 12]} align="middle">
-                            <Col flex="1 1 auto">
-                              <Form.Item
-                                className={styles.compactFormItem}
-                                {...restField}
-                                fieldKey={fieldKey}
-                                name={name}
-                                rules={validationRules.youtubeLinkValidation}
-                              >
-                                <Input placeholder="Put YouTube video link here" maxLength={100} />
-                              </Form.Item>
-                            </Col>
-                            <Col flex="0 0 40px">
-                              <Tooltip title="Remove this item">
-                                <MinusCircleOutlined
-                                  className={styles.redText}
-                                  onClick={(e) => {
-                                    preventDefaults(e);
-                                    remove(name);
-                                  }}
-                                />
-                              </Tooltip>
-                            </Col>
-                          </Row>
-                        ))}
-                      </Col>
-                      <Col xs={24}>
-                        <Button
-                          block
-                          type="dashed"
-                          onClick={(e) => {
-                            preventDefaults(e);
-                            add();
-                          }}
-                          icon={<PlusCircleOutlined />}
-                        >
-                          Add more links
-                        </Button>
-                      </Col>
-                      <Col xs={24}>
-                        <Form.ErrorList errors={errors} />
-                      </Col>
-                    </Row>
-                  )}
-                </Form.List>
+              <Form.Item
+                className={classNames(styles.bgWhite, styles.textEditorLayout)}
+                id="values"
+                name="values"
+                label="Content"
+                rules={validationRules.requiredValidation}
+              >
+                <div>
+                  <TextEditor form={form} name="values" placeholder="Describe yourself here" />
+                </div>
               </Form.Item>
             </Col>
             <Col xs={24}>
@@ -195,4 +148,4 @@ const YoutubeEmbedEditView = ({ configValues, deleteHandler, updateHandler, isCo
   );
 };
 
-export default YoutubeEmbedEditView;
+export default DescriptionEditView;
