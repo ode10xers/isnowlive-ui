@@ -1,0 +1,11 @@
+@import '../../../../styles/variables.scss';
+
+.textListContainer {
+  width: 100%;
+}
+
+.textListItem {
+  width: 100%;
+  color: var(--passion-profile-dark-color, #{map-get($colors, 'Smalt')}) !important;
+  font-weight: 500;
+}

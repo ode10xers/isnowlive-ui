@@ -1,59 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
 import Routes from 'routes';
 import apis from 'apis';
-
-import DefaultLayout from 'layouts/DefaultLayout';
-import SideNavLayout from 'layouts/SideNavLayout';
-import SideNavWithHeaderLayout from 'layouts/SideNavWithHeaderLayout';
-import NavbarFullWidthLayout from 'layouts/NavbarFullWidthLayout';
-import NavbarLayout from 'layouts/NavbarLayout';
-import MobileLayout from 'layouts/MobileLayout';
-
-import Home from 'pages/Home';
-import Profile from 'pages/Profile';
-import LiveStream from 'pages/LiveStream';
-import ProfilePreview from 'pages/ProfilePreview';
-import SignUp from 'pages/SignUp';
-import Onboarding from 'pages/Onboarding';
-import Login from 'pages/Login';
-import AdminLogin from 'pages/AdminLogin';
-import AvailabilityDetails from 'pages/ProductDetails/AvailabilityDetails';
-import Session from 'pages/Session';
-import InventoryDetails from 'pages/InventoryDetails';
-import SessionDetails from 'pages/SessionDetails';
-import CreatorDashboard from 'pages/CreatorDashboard';
-import AttendeeDashboard from 'pages/AttendeeDashboard';
-import ResetPassword from 'pages/ResetPassword';
-import EmailVerification from 'pages/EmailVerification';
-import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
-import PaymentVerification from 'pages/PaymentVerification';
-import PaymentRetry from 'pages/PaymentRetry';
-import SessionReschedule from 'pages/SessionReschedule';
-// import PassDetails from 'pages/PassDetails';
-import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
-import VideoDetails from 'pages/ProductDetails/VideoDetails';
-import CourseDetails from 'pages/ProductDetails/CourseDetails';
-import PassDetails from 'pages/ProductDetails/PassDetails';
-import NewHome from 'pages/NewHome';
-import VideoDetailedListView from 'pages/DetailedListView/Videos';
-import SessionDetailedListView from 'pages/DetailedListView/Sessions';
-import CourseDetailedListView from 'pages/DetailedListView/Courses';
-import EmbeddablePage from 'pages/EmbeddablePage';
-import Legals from 'pages/Legals';
-
-import PassDetailPreview from 'pages/PreviewPages/PassDetails';
-import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
-import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
-import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
-import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
-import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
-import InventoryDetailsPreview from 'pages/PreviewPages/InventoryDetails';
-
-// import CookieConsentPopup from 'components/CookieConsentPopup';
-import PaymentPopup from 'components/PaymentPopup';
-import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 
 import parseQueryString from 'utils/parseQueryString';
 import { storeCreatorDetailsToLS } from 'utils/storage';
@@ -71,7 +20,56 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
-import DeviceUIPreview from 'components/DeviceUIPreview';
+
+const DefaultLayout = lazy(() => import('layouts/DefaultLayout'));
+const SideNavLayout = lazy(() => import('layouts/SideNavLayout'));
+const SideNavWithHeaderLayout = lazy(() => import('layouts/SideNavWithHeaderLayout'));
+const NavbarFullWidthLayout = lazy(() => import('layouts/NavbarFullWidthLayout'));
+const NavbarLayout = lazy(() => import('layouts/NavbarLayout'));
+const MobileLayout = lazy(() => import('layouts/MobileLayout'));
+
+const Home = lazy(() => import('pages/Home'));
+const Profile = lazy(() => import('pages/Profile'));
+const LiveStream = lazy(() => import('pages/LiveStream'));
+const ProfilePreview = lazy(() => import('pages/ProfilePreview'));
+const SignUp = lazy(() => import('pages/SignUp'));
+const Login = lazy(() => import('pages/Login'));
+const AdminLogin = lazy(() => import('pages/AdminLogin'));
+const AvailabilityDetails = lazy(() => import('pages/ProductDetails/AvailabilityDetails'));
+const Session = lazy(() => import('pages/Session'));
+const InventoryDetails = lazy(() => import('pages/InventoryDetails'));
+const SessionDetails = lazy(() => import('pages/SessionDetails'));
+const CreatorDashboard = lazy(() => import('pages/CreatorDashboard'));
+const AttendeeDashboard = lazy(() => import('pages/AttendeeDashboard'));
+const ResetPassword = lazy(() => import('pages/ResetPassword'));
+const EmailVerification = lazy(() => import('pages/EmailVerification'));
+const PaymentRedirectVerify = lazy(() => import('pages/PaymentRedirectVerify'));
+const PaymentVerification = lazy(() => import('pages/PaymentVerification'));
+const PaymentRetry = lazy(() => import('pages/PaymentRetry'));
+const SessionReschedule = lazy(() => import('pages/SessionReschedule'));
+const MembershipDetails = lazy(() => import('pages/ProductDetails/MembershipDetails'));
+const VideoDetails = lazy(() => import('pages/ProductDetails/VideoDetails'));
+const CourseDetails = lazy(() => import('pages/ProductDetails/CourseDetails'));
+const PassDetails = lazy(() => import('pages/ProductDetails/PassDetails'));
+const NewHome = lazy(() => import('pages/NewHome'));
+const VideoDetailedListView = lazy(() => import('pages/DetailedListView/Videos'));
+const SessionDetailedListView = lazy(() => import('pages/DetailedListView/Sessions'));
+const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses'));
+const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
+const Legals = lazy(() => import('pages/Legals'));
+const Onboarding = lazy(() => import('pages/Onboarding'));
+
+const PassDetailPreview = lazy(() => import('pages/PreviewPages/PassDetails'));
+const CourseDetailPreview = lazy(() => import('pages/PreviewPages/CourseDetails'));
+const VideoDetailPreview = lazy(() => import('pages/PreviewPages/VideoDetails'));
+const MembershipDetailPreview = lazy(() => import('pages/PreviewPages/MembershipDetails'));
+const AvailabilityDetailPreview = lazy(() => import('pages/PreviewPages/AvailabilityDetails'));
+const SessionDetailsPreview = lazy(() => import('pages/PreviewPages/SessionDetails'));
+const InventoryDetailsPreview = lazy(() => import('pages/PreviewPages/InventoryDetails'));
+
+// const CookieConsentPopup = lazy(() => import('components/CookieConsentPopup'));
+const PaymentPopup = lazy(() => import('components/PaymentPopup'));
+const SendCustomerEmailModal = lazy(() => import('components/SendCustomerEmailModal'));
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -224,7 +222,7 @@ function App() {
   }
 
   return (
-    <>
+    <Suspense fallback={<div> Loading... </div>}>
       <PaymentPopup />
       {userDetails && userDetails.is_creator && <SendCustomerEmailModal />}
       <Router>
@@ -232,8 +230,6 @@ function App() {
           <EmbeddablePage widget={widgetType} />
         ) : (
           <Switch>
-            {/* TODO: Remove this later */}
-            <RouteWithLayout layout={DefaultLayout} exact path="/testing-preview" component={DeviceUIPreview} />
             <PrivateRoute layout={SideNavLayout} path={Routes.creatorDashboard.rootPath} component={CreatorDashboard} />
             <PrivateRoute
               layout={SideNavWithHeaderLayout}
@@ -367,7 +363,7 @@ function App() {
         )}
       </Router>
       {/* {!isWidget && <CookieConsentPopup />} */}
-    </>
+    </Suspense>
   );
 }
 

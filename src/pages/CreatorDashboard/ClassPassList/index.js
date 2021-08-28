@@ -170,9 +170,9 @@ const ClassPassList = () => {
   const getPassesForCreator = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data } = await apis.passes.getCreatorPasses();
+      const { status, data } = await apis.passes.getCreatorPasses();
 
-      if (data) {
+      if (isAPISuccess(status) && data) {
         setPasses(
           data.map((classPass, index) => ({
             index,

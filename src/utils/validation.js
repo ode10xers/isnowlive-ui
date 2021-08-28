@@ -26,6 +26,15 @@ const validationRules = {
       // validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
     },
   ],
+  dynamicArrayItemValidation: [
+    {
+      type: 'array',
+      required: true,
+      message: 'Please add min. one item',
+      min: 1,
+      // validator: (_, value) => (value.length > 0 ? Promise.resolve() : Promise.reject('Select at least one item')),
+    },
+  ],
   numberValidation: (message, min = 0, maxLimited = true, max = 10000) => {
     const errorMessage = message || `Please input valid amount (${min} - ${max})`;
     const invalidValue = (value) => value === undefined || value === null || value < min || (maxLimited && value > max);
@@ -111,20 +120,6 @@ const validationRules = {
       min: 1,
       message: 'Please add at least one module!',
       required: true,
-      // defaultField: {
-      //   // message: 'Make sure to add at least 1 content to each module!',
-      //   type: 'object',
-      //   fields: {
-      //     module_content : [
-      //       {
-      //         type: 'array',
-      //         required : true,
-      //         min: 1,
-      //         message: 'Make sure to add at least 1 content to each module!',
-      //       }
-      //     ]
-      //   }
-      // }
     },
   ],
   courseModuleContentValidation: [
@@ -133,6 +128,17 @@ const validationRules = {
       required: true,
       min: 1,
       message: 'Please add at least one content!',
+    },
+  ],
+  youtubeLinkValidation: [
+    {
+      required: true,
+      message: 'Please input a YouTube video link',
+    },
+    {
+      // eslint-disable-next-line
+      pattern: new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*$/g),
+      message: 'Please input a valid YouTube video link',
     },
   ],
 };

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import classNames from 'classnames';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -16,26 +16,20 @@ import {
   LinkOutlined,
   PlayCircleOutlined,
   PlusCircleOutlined,
+  ProfileOutlined,
   RetweetOutlined,
   SaveOutlined,
   ScheduleOutlined,
   VideoCameraOutlined,
+  YoutubeOutlined,
+  OrderedListOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import AvailabilityProfileComponent from 'components/DynamicProfileComponents/AvailabilityProfileComponent';
-import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
-import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
-import VideosProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
-import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
-
-import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
-import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
-import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
 
 import {
   deepCloneObject,
@@ -48,6 +42,26 @@ import { getLocalUserDetails } from 'utils/storage';
 import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
 import styles from './style.module.scss';
+
+const AvailabilityProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/AvailabilityProfileComponent')
+);
+const PassesProfileComponent = lazy(() => import('components/DynamicProfileComponents/PassesProfileComponent'));
+const SessionsProfileComponent = lazy(() => import('components/DynamicProfileComponents/SessionsProfileComponent'));
+const VideosProfileComponent = lazy(() => import('components/DynamicProfileComponents/VideosProfileComponent'));
+const CoursesProfileComponent = lazy(() => import('components/DynamicProfileComponents/CoursesProfileComponent'));
+
+const SubscriptionProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/SubscriptionsProfileComponent')
+);
+const OtherLinksProfileComponent = lazy(() => import('components/DynamicProfileComponents/OtherLinksProfileComponent'));
+// const CreatorProfileComponent = lazy(() => import('components/DynamicProfileComponents/CreatorProfileComponent'));
+const ProductsProfileComponent = lazy(() => import('components/DynamicProfileComponents/ProductsProfileComponent'));
+const YoutubeEmbedComponent = lazy(() => import('components/DynamicProfileComponents/YoutubeEmbedComponent'));
+const DescriptionProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/DescriptionProfileComponent')
+);
+const TextListProfileComponent = lazy(() => import('components/DynamicProfileComponents/TextListProfileComponent'));
 
 const PassionLogo = require('assets/images/passion-orange-logo.png');
 
@@ -129,6 +143,42 @@ const componentsMap = {
       ],
     },
   },
+  SESSIONS: {
+    icon: <VideoCameraOutlined />,
+    label: 'Sessions',
+    type: componentUIType.OPEN,
+    elementId: 'sessions',
+    optional: false,
+    component: SessionsProfileComponent,
+    defaultProps: {
+      title: 'My Sessions',
+      values: null,
+    },
+  },
+  COURSES: {
+    icon: <BookOutlined />,
+    label: 'Courses',
+    type: componentUIType.OPEN,
+    elementId: 'courses',
+    optional: false,
+    component: CoursesProfileComponent,
+    defaultProps: {
+      title: 'My Courses',
+      values: null,
+    },
+  },
+  VIDEOS: {
+    icon: <PlayCircleOutlined />,
+    label: 'Videos',
+    type: componentUIType.OPEN,
+    optional: false,
+    elementId: 'videos',
+    component: VideosProfileComponent,
+    defaultProps: {
+      title: 'My Videos',
+      values: null,
+    },
+  },
   PASSES: {
     icon: <LikeOutlined />,
     label: 'Passes',
@@ -165,39 +215,39 @@ const componentsMap = {
       values: null,
     },
   },
-  SESSIONS: {
-    icon: <VideoCameraOutlined />,
-    label: 'Sessions',
-    type: componentUIType.OPEN,
-    elementId: 'sessions',
-    optional: false,
-    component: SessionsProfileComponent,
+  YOUTUBE_LINKS: {
+    icon: <YoutubeOutlined />,
+    label: 'Youtube Videos',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'youtube-videos',
+    component: YoutubeEmbedComponent,
     defaultProps: {
-      title: 'My Sessions',
+      title: 'Youtube Videos',
       values: null,
     },
   },
-  COURSES: {
-    icon: <BookOutlined />,
-    label: 'Courses',
-    type: componentUIType.OPEN,
-    elementId: 'courses',
-    optional: false,
-    component: CoursesProfileComponent,
+  DESCRIPTION: {
+    icon: <ProfileOutlined />,
+    label: 'Description',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'long-description',
+    component: DescriptionProfileComponent,
     defaultProps: {
-      title: 'My Courses',
+      title: 'About Me',
       values: null,
     },
   },
-  VIDEOS: {
-    icon: <PlayCircleOutlined />,
-    label: 'Videos',
-    type: componentUIType.OPEN,
-    optional: false,
-    elementId: 'videos',
-    component: VideosProfileComponent,
+  TEXT_LIST: {
+    icon: <OrderedListOutlined />,
+    label: 'List Items',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'list-items',
+    component: TextListProfileComponent,
     defaultProps: {
-      title: 'My Videos',
+      title: 'List Items',
       values: null,
     },
   },
@@ -704,25 +754,27 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
             ref={provided.innerRef}
             id={targetComponent.elementId ?? component.key}
           >
-            <RenderedComponent
-              identifier={component.key}
-              isEditing={editingMode && !previewMode}
-              updateConfigHandler={updateComponentConfig}
-              removeComponentHandler={removeComponent}
-              dragHandleProps={provided.dragHandleProps}
-              isContained={containedUI}
-              title={component.title}
-              values={component.values}
-              isLiveData={creatorProfileData?.profile?.live_mode ?? true}
-              dummyTemplateType={creatorProfileData?.profile?.category || 'YOGA'}
-              headerColor={
-                creatorColorChoice
-                  ? convertHSLToHex(
-                      generateColorPalletteForProfile(creatorColorChoice)['--passion-profile-primary-color']
-                    )
-                  : null
-              }
-            />
+            <Suspense fallback={<Spin spinning={true} tip="Loading..." />}>
+              <RenderedComponent
+                identifier={component.key}
+                isEditing={editingMode && !previewMode}
+                updateConfigHandler={updateComponentConfig}
+                removeComponentHandler={removeComponent}
+                dragHandleProps={provided.dragHandleProps}
+                isContained={containedUI}
+                title={component.title}
+                values={component.values}
+                isLiveData={creatorProfileData?.profile?.live_mode ?? true}
+                dummyTemplateType={creatorProfileData?.profile?.category || 'YOGA'}
+                headerColor={
+                  creatorColorChoice
+                    ? convertHSLToHex(
+                        generateColorPalletteForProfile(creatorColorChoice)['--passion-profile-primary-color']
+                      )
+                    : null
+                }
+              />
+            </Suspense>
           </Col>
         )}
       </Draggable>
