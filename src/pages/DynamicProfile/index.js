@@ -27,6 +27,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
+import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
 
 import {
   deepCloneObject,
@@ -52,7 +53,7 @@ const SubscriptionProfileComponent = lazy(() =>
   import('components/DynamicProfileComponents/SubscriptionsProfileComponent')
 );
 const OtherLinksProfileComponent = lazy(() => import('components/DynamicProfileComponents/OtherLinksProfileComponent'));
-const CreatorProfileComponent = lazy(() => import('components/DynamicProfileComponents/CreatorProfileComponent'));
+// const CreatorProfileComponent = lazy(() => import('components/DynamicProfileComponents/CreatorProfileComponent'));
 const ProductsProfileComponent = lazy(() => import('components/DynamicProfileComponents/ProductsProfileComponent'));
 const YoutubeEmbedComponent = lazy(() => import('components/DynamicProfileComponents/YoutubeEmbedComponent'));
 
@@ -831,16 +832,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
           <Row gutter={8} justify="center">
             <Col xs={24}>
-              <Suspense fallback={<Spin spinning={true} tip="Loading..." />}>
-                <CreatorProfileComponent
-                  creatorProfile={creatorProfileData}
-                  isEditing={editingMode && !previewMode}
-                  isContained={containedUI}
-                  refetchCreatorProfileData={() =>
-                    fetchCreatorProfileData(creatorUsername ?? getLocalUserDetails()?.username ?? '')
-                  }
-                />
-              </Suspense>
+              <CreatorProfileComponent
+                creatorProfile={creatorProfileData}
+                isEditing={editingMode && !previewMode}
+                isContained={containedUI}
+                refetchCreatorProfileData={() =>
+                  fetchCreatorProfileData(creatorUsername ?? getLocalUserDetails()?.username ?? '')
+                }
+              />
             </Col>
             <Col xs={24} className={styles.mb10}>
               <DragDropContext onDragEnd={handleDragEnd}>
