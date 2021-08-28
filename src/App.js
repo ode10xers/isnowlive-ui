@@ -1,58 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
 import Routes from 'routes';
 import apis from 'apis';
-
-import DefaultLayout from 'layouts/DefaultLayout';
-import SideNavLayout from 'layouts/SideNavLayout';
-import SideNavWithHeaderLayout from 'layouts/SideNavWithHeaderLayout';
-import NavbarFullWidthLayout from 'layouts/NavbarFullWidthLayout';
-import NavbarLayout from 'layouts/NavbarLayout';
-import MobileLayout from 'layouts/MobileLayout';
-
-import Home from 'pages/Home';
-import Profile from 'pages/Profile';
-import LiveStream from 'pages/LiveStream';
-import ProfilePreview from 'pages/ProfilePreview';
-import SignUp from 'pages/SignUp';
-import Login from 'pages/Login';
-import AdminLogin from 'pages/AdminLogin';
-import AvailabilityDetails from 'pages/ProductDetails/AvailabilityDetails';
-import Session from 'pages/Session';
-import InventoryDetails from 'pages/InventoryDetails';
-import SessionDetails from 'pages/SessionDetails';
-import CreatorDashboard from 'pages/CreatorDashboard';
-import AttendeeDashboard from 'pages/AttendeeDashboard';
-import ResetPassword from 'pages/ResetPassword';
-import EmailVerification from 'pages/EmailVerification';
-import PaymentRedirectVerify from 'pages/PaymentRedirectVerify';
-import PaymentVerification from 'pages/PaymentVerification';
-import PaymentRetry from 'pages/PaymentRetry';
-import SessionReschedule from 'pages/SessionReschedule';
-// import PassDetails from 'pages/PassDetails';
-import MembershipDetails from 'pages/ProductDetails/MembershipDetails';
-import VideoDetails from 'pages/ProductDetails/VideoDetails';
-import CourseDetails from 'pages/ProductDetails/CourseDetails';
-import PassDetails from 'pages/ProductDetails/PassDetails';
-import NewHome from 'pages/NewHome';
-import VideoDetailedListView from 'pages/DetailedListView/Videos';
-import SessionDetailedListView from 'pages/DetailedListView/Sessions';
-import CourseDetailedListView from 'pages/DetailedListView/Courses';
-import EmbeddablePage from 'pages/EmbeddablePage';
-import Legals from 'pages/Legals';
-
-import PassDetailPreview from 'pages/PreviewPages/PassDetails';
-import CourseDetailPreview from 'pages/PreviewPages/CourseDetails';
-import VideoDetailPreview from 'pages/PreviewPages/VideoDetails';
-import MembershipDetailPreview from 'pages/PreviewPages/MembershipDetails';
-import AvailabilityDetailPreview from 'pages/PreviewPages/AvailabilityDetails';
-import SessionDetailsPreview from 'pages/PreviewPages/SessionDetails';
-import InventoryDetailsPreview from 'pages/PreviewPages/InventoryDetails';
-
-// import CookieConsentPopup from 'components/CookieConsentPopup';
-import PaymentPopup from 'components/PaymentPopup';
-import SendCustomerEmailModal from 'components/SendCustomerEmailModal';
 
 import parseQueryString from 'utils/parseQueryString';
 import { storeCreatorDetailsToLS } from 'utils/storage';
@@ -70,6 +20,55 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
+
+const DefaultLayout = lazy(() => 'layouts/DefaultLayout');
+const SideNavLayout = lazy(() => 'layouts/SideNavLayout');
+const SideNavWithHeaderLayout = lazy(() => 'layouts/SideNavWithHeaderLayout');
+const NavbarFullWidthLayout = lazy(() => 'layouts/NavbarFullWidthLayout');
+const NavbarLayout = lazy(() => 'layouts/NavbarLayout');
+const MobileLayout = lazy(() => 'layouts/MobileLayout');
+
+const Home = lazy(() => 'pages/Home');
+const Profile = lazy(() => 'pages/Profile');
+const LiveStream = lazy(() => 'pages/LiveStream');
+const ProfilePreview = lazy(() => 'pages/ProfilePreview');
+const SignUp = lazy(() => 'pages/SignUp');
+const Login = lazy(() => 'pages/Login');
+const AdminLogin = lazy(() => 'pages/AdminLogin');
+const AvailabilityDetails = lazy(() => 'pages/ProductDetails/AvailabilityDetails');
+const Session = lazy(() => 'pages/Session');
+const InventoryDetails = lazy(() => 'pages/InventoryDetails');
+const SessionDetails = lazy(() => 'pages/SessionDetails');
+const CreatorDashboard = lazy(() => 'pages/CreatorDashboard');
+const AttendeeDashboard = lazy(() => 'pages/AttendeeDashboard');
+const ResetPassword = lazy(() => 'pages/ResetPassword');
+const EmailVerification = lazy(() => 'pages/EmailVerification');
+const PaymentRedirectVerify = lazy(() => 'pages/PaymentRedirectVerify');
+const PaymentVerification = lazy(() => 'pages/PaymentVerification');
+const PaymentRetry = lazy(() => 'pages/PaymentRetry');
+const SessionReschedule = lazy(() => 'pages/SessionReschedule');
+const MembershipDetails = lazy(() => 'pages/ProductDetails/MembershipDetails');
+const VideoDetails = lazy(() => 'pages/ProductDetails/VideoDetails');
+const CourseDetails = lazy(() => 'pages/ProductDetails/CourseDetails');
+const PassDetails = lazy(() => 'pages/ProductDetails/PassDetails');
+const NewHome = lazy(() => 'pages/NewHome');
+const VideoDetailedListView = lazy(() => 'pages/DetailedListView/Videos');
+const SessionDetailedListView = lazy(() => 'pages/DetailedListView/Sessions');
+const CourseDetailedListView = lazy(() => 'pages/DetailedListView/Courses');
+const EmbeddablePage = lazy(() => 'pages/EmbeddablePage');
+const Legals = lazy(() => 'pages/Legals');
+
+const PassDetailPreview = lazy(() => 'pages/PreviewPages/PassDetails');
+const CourseDetailPreview = lazy(() => 'pages/PreviewPages/CourseDetails');
+const VideoDetailPreview = lazy(() => 'pages/PreviewPages/VideoDetails');
+const MembershipDetailPreview = lazy(() => 'pages/PreviewPages/MembershipDetails');
+const AvailabilityDetailPreview = lazy(() => 'pages/PreviewPages/AvailabilityDetails');
+const SessionDetailsPreview = lazy(() => 'pages/PreviewPages/SessionDetails');
+const InventoryDetailsPreview = lazy(() => 'pages/PreviewPages/InventoryDetails');
+
+// const CookieConsentPopup = lazy(() => 'components/CookieConsentPopup');
+const PaymentPopup = lazy(() => 'components/PaymentPopup');
+const SendCustomerEmailModal = lazy(() => 'components/SendCustomerEmailModal');
 
 function RouteWithLayout({ layout, component, ...rest }) {
   return (
@@ -222,7 +221,7 @@ function App() {
   }
 
   return (
-    <>
+    <Suspense fallback={<div> Loading... </div>}>
       <PaymentPopup />
       {userDetails && userDetails.is_creator && <SendCustomerEmailModal />}
       <Router>
@@ -362,7 +361,7 @@ function App() {
         )}
       </Router>
       {/* {!isWidget && <CookieConsentPopup />} */}
-    </>
+    </Suspense>
   );
 }
 
