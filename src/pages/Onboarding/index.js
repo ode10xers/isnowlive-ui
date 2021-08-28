@@ -17,6 +17,7 @@ import {
   Divider,
   message,
 } from 'antd';
+
 import {
   DownOutlined,
   PlusCircleOutlined,
@@ -36,9 +37,11 @@ import {
   YoutubeOutlined,
   OrderedListOutlined,
   DeleteOutlined,
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import validationRules from 'utils/validation';
 import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername } from 'utils/helper';
@@ -417,7 +420,7 @@ const TextListEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
   </>
 );
 
-// NOTE : we're ignoring PRODUCTS component for now
+// NOTE: we're ignoring PRODUCTS component for now
 const componentUIType = {
   CONTAINED: 'CONTAINED', // Will only show when UI style is contained (is_contained = true)
   OPEN: 'OPEN', // Will only show when UI style is open (is_contained = false)
@@ -621,6 +624,7 @@ const editViewMap = {
 // TODO: We need this page to open in with username in hostname
 const Onboarding = ({ history }) => {
   const [form] = Form.useForm();
+  const [usernameForm] = Form.useForm();
 
   const [isLoading, setIsLoading] = useState(false);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
@@ -635,6 +639,10 @@ const Onboarding = ({ history }) => {
   const [isMobileView, setIsMobileView] = useState(true);
 
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
+  const [editUsernameModalVisible, setEditUsernameModalVisible] = useState(false);
+
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
+  const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
 
   const fetchCreatorProfileData = useCallback(async () => {
     setIsLoading(true);
@@ -831,12 +839,11 @@ const Onboarding = ({ history }) => {
         },
       };
 
-      console.log(payload);
-
       const { status, data } = await apis.user.updateProfile(payload);
 
       if (isAPISuccess(status) && data) {
         setCreatorProfileData(data);
+        message.success('Profile Saved Successfully!');
       }
     } catch (error) {
       message.error(error?.response?.data?.message || 'Failed to update user profile');
@@ -877,17 +884,142 @@ const Onboarding = ({ history }) => {
     }
   };
 
-  const handleEditUsernameClicked = () => {
-    // TODO: create edit username modal here
-  };
-
   const handleAddProfileComponent = (e) => {
     preventDefaults(e);
     setAddComponentModalVisible(true);
   };
 
+  const handleBackToDashboardClicked = (e) => {
+    preventDefaults(e);
+    history.push(Routes.creatorDashboard.rootPath);
+  };
+
+  const handleEditUsernameClicked = (e) => {
+    preventDefaults(e);
+    setEditUsernameModalVisible(true);
+  };
+
+  const handlePublicUrlChange = async (e) => {
+    let regex = new RegExp('^[a-z]*$');
+    if (regex.test(e.target.value)) {
+      try {
+        setIsLoadingUsernameCheck(true);
+        const { data } = await apis.user.validUsernameCheck({
+          username: e.target.value?.toLowerCase(),
+        });
+        if (data) {
+          setIsPublicUrlAvailable(true);
+        } else {
+          setIsPublicUrlAvailable(false);
+        }
+        setIsLoadingUsernameCheck(false);
+      } catch (error) {
+        setIsLoadingUsernameCheck(false);
+        message.error(error.response?.data?.message || 'Something went wrong.');
+      }
+    }
+  };
+
+  const reloadWithNewUsername = (newUsername) => {
+    const { protocol, hostname, pathname } = window.location;
+
+    let updatedHost = hostname;
+    updatedHost.splice(0, 1, newUsername);
+    window.open(`${protocol}//${updatedHost}${pathname}`, '_self');
+  };
+
+  const handleFinishEditUsername = async () => {
+    setIsLoading(true);
+
+    if (isPublicUrlAvailable) {
+      try {
+        const values = usernameForm.getFieldsValue();
+        const payload = {
+          ...creatorProfileData,
+          ...values,
+        };
+
+        const { status, data } = await apis.user.updateProfile(payload);
+
+        if (isAPISuccess(status) && data) {
+          setCreatorProfileData(data);
+          message.success('Username updated!');
+
+          reloadWithNewUsername(values.username);
+        }
+      } catch (error) {
+        message.error(error?.response?.data?.message || 'Failed to update username');
+        console.error(error);
+      }
+    } else {
+      message.error('Please enter valid username.');
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className={styles.editPageContainer}>
+      <Modal
+        visible={editUsernameModalVisible}
+        title="Edit username"
+        centered={true}
+        footer={null}
+        onCancel={() => setEditUsernameModalVisible(false)}
+        afterClose={resetBodyStyle}
+      >
+        <Spin spinning={isLoading}>
+          <Row gutter={[8, 8]} className={styles.editUsernameContainer}>
+            <Col xs={24}>
+              <Paragraph type="danger">
+                Changing this username will refresh the page! Please make sure to save any changes before proceeding or
+                you might lose any unsaved changes.
+              </Paragraph>
+            </Col>
+            <Col xs={24}>
+              <Form
+                form={usernameForm}
+                scrollToFirstError={true}
+                initialValues={{ username: creatorProfileData?.username ?? '' }}
+              >
+                <Form.Item>
+                  <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
+                    <Col flex="0 0 120px">
+                      <Form.Item
+                        name="username"
+                        rules={validationRules.publicUrlValidation}
+                        onBlur={handlePublicUrlChange}
+                      >
+                        <Input placeholder="username" maxLength={30} />
+                      </Form.Item>
+                    </Col>
+                    <Col flex="0 0 70px">
+                      <Text>.passion.do</Text>
+                    </Col>
+
+                    <Col flex="1 1 auto">
+                      {isLoadingUsernameCheck ? (
+                        <Spin />
+                      ) : (
+                        <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
+                          <span
+                            className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
+                          ></span>{' '}
+                          {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
+                        </Text>
+                      )}
+                    </Col>
+                  </Row>
+                </Form.Item>
+              </Form>
+              <Form.Item>
+                <Button type="primary" onClick={handleFinishEditUsername}>
+                  Update Username
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Spin>
+      </Modal>
       <Modal
         visible={addComponentModalVisible}
         title="Select a component to add"
@@ -919,6 +1051,14 @@ const Onboarding = ({ history }) => {
       <Spin spinning={isLoading} size="large">
         <Row gutter={[10, 20]}>
           <Col xs={24} lg={12}>
+            <Button
+              className={styles.mb20}
+              type="default"
+              onClick={handleBackToDashboardClicked}
+              icon={<ArrowLeftOutlined />}
+            >
+              Back to Dashboard
+            </Button>
             <div className={styles.profileFormContainer}>
               <Form {...newProfileFormLayout} form={form} scrollToFirstError={true} onFinish={handleFormFinish}>
                 <Row gutter={[12, 12]} align="middle" justify="center">
@@ -1096,7 +1236,7 @@ const Onboarding = ({ history }) => {
           </Col>
           {creatorProfileData && (
             <>
-              <Col xs={0} lg={12}>
+              <Col xs={24} lg={12}>
                 <Row gutter={[10, 10]}>
                   <Col xs={24} lg={12}>
                     <Space className={styles.usernameContainer} align="center">
@@ -1117,7 +1257,7 @@ const Onboarding = ({ history }) => {
                       </Button>
                     )}
                   </Col>
-                  <Col xs={24} className={styles.textAlignCenter}>
+                  <Col xs={0} lg={24} className={styles.textAlignCenter}>
                     <div className={styles.deviceContainer}>
                       {isMobileView ? (
                         <DeviceUIPreview

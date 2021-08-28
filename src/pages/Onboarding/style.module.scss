@@ -4,6 +4,27 @@
   margin-bottom : 4px !important;
 }
 
+.editUsernameContainer {
+  .alignUrl {
+    align-items: baseline !important;
+  }
+
+  .dot {
+    height: 10px;
+    width: 10px;
+    background-color: map-get($colors, $key: 'White1');
+    border-radius: 50%;
+    display: inline-block;
+
+    &.success {
+      background-color: map-get($colors, $key: 'KellyGreen');
+    }
+    &.danger {
+      background-color: map-get($colors, $key: 'FireBrick');
+    }
+  }
+}
+
 .editPageContainer {
   @extend .box;
   min-height: 100vh;
