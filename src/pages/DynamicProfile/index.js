@@ -832,16 +832,14 @@ const DynamicProfile = ({ creatorUsername = null }) => {
         <Spin spinning={isLoading} size="large" tip="Fetching creator details...">
           <Row gutter={8} justify="center">
             <Col xs={24}>
-              <Suspense fallback={<Spin spinning={true} tip="Loading..." />}>
-                <CreatorProfileComponent
-                  creatorProfile={creatorProfileData}
-                  isEditing={editingMode && !previewMode}
-                  isContained={containedUI}
-                  refetchCreatorProfileData={() =>
-                    fetchCreatorProfileData(creatorUsername ?? getLocalUserDetails()?.username ?? '')
-                  }
-                />
-              </Suspense>
+              <CreatorProfileComponent
+                creatorProfile={creatorProfileData}
+                isEditing={editingMode && !previewMode}
+                isContained={containedUI}
+                refetchCreatorProfileData={() =>
+                  fetchCreatorProfileData(creatorUsername ?? getLocalUserDetails()?.username ?? '')
+                }
+              />
             </Col>
             <Col xs={24} className={styles.mb10}>
               <DragDropContext onDragEnd={handleDragEnd}>
