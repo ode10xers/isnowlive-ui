@@ -641,7 +641,7 @@ const Onboarding = ({ history }) => {
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [editUsernameModalVisible, setEditUsernameModalVisible] = useState(false);
 
-  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(false);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
 
   const fetchCreatorProfileData = useCallback(async () => {
@@ -923,8 +923,8 @@ const Onboarding = ({ history }) => {
   const reloadWithNewUsername = (newUsername) => {
     const { protocol, hostname, pathname } = window.location;
 
-    let updatedHost = hostname;
-    updatedHost.splice(0, 1, newUsername);
+    hostname.split('.').splice(0, 1, newUsername);
+    let updatedHost = hostname.join('.');
     window.open(`${protocol}//${updatedHost}${pathname}`, '_self');
   };
 
@@ -1012,7 +1012,7 @@ const Onboarding = ({ history }) => {
                 </Form.Item>
               </Form>
               <Form.Item>
-                <Button type="primary" onClick={handleFinishEditUsername}>
+                <Button disabled={!isPublicUrlAvailable} type="primary" onClick={handleFinishEditUsername}>
                   Update Username
                 </Button>
               </Form.Item>
