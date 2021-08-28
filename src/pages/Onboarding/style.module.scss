@@ -1,5 +1,9 @@
 @import '../../styles/variables.scss';
 
+.compactFormItem {
+  margin-bottom : 4px !important;
+}
+
 .editPageContainer {
   @extend .box;
   min-height: 100vh;
@@ -100,6 +104,9 @@
   margin-top: 20px;
   margin-left : 80px;
   text-align: center;
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  top: 72px;
 }
 
 .mobileDeviceContainer {

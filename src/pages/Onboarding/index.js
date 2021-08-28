@@ -35,6 +35,7 @@ import {
   VideoCameraOutlined,
   YoutubeOutlined,
   OrderedListOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -52,7 +53,7 @@ import { newProfileFormLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
@@ -61,12 +62,12 @@ const SimpleEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
   return (
     <Form.Item
       {...restFields}
-      label="Container Title"
+      label="Section Title"
       name={[name, 'title']}
       fieldKey={[fieldKey, 'title']}
       rules={validationRules.requiredValidation}
     >
-      <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+      <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
     </Form.Item>
   );
 };
@@ -78,16 +79,21 @@ const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => 
     <>
       <Form.Item
         {...restFields}
-        labelCol={24}
-        wrapperCol={24}
-        label="Container Title"
+        labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
+        wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
+        label="Title"
         name={[name, 'title']}
         fieldKey={[fieldKey, 'title']}
         rules={validationRules.requiredValidation}
       >
-        <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+        <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
       </Form.Item>
-      <Form.Item labelCol={24} wrapperCol={24} label="Your Links" required={true}>
+      <Form.Item
+        labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
+        wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
+        label="Your Links"
+        required={true}
+      >
         <Form.List
           {...restFields}
           name={[name, 'values']}
@@ -216,10 +222,10 @@ const DescriptionEditForm = ({ formInstance, name, fieldKey, ...restFields }) =>
       id="title"
       name={[name, 'title']}
       fieldKey={[fieldKey, 'title']}
-      label="Container Title"
+      label="Section Title"
       rules={validationRules.requiredValidation}
     >
-      <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+      <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
     </Form.Item>
     <Form.Item
       {...restFields}
@@ -241,9 +247,176 @@ const DescriptionEditForm = ({ formInstance, name, fieldKey, ...restFields }) =>
   </>
 );
 
-// TODO: Adjust this for new components
-// NOTE : we're ignoring PRODUCTS component for now
+const YoutubeLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
+  <>
+    <Form.Item
+      id="title"
+      {...restFields}
+      name={[name, 'title']}
+      fieldKey={[fieldKey, 'title']}
+      label="Title"
+      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
+      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
+      rules={validationRules.requiredValidation}
+    >
+      <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+    </Form.Item>
+    <Form.Item
+      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
+      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
+      label="Video Links"
+      required={true}
+    >
+      <Form.List
+        {...restFields}
+        fieldKey={[fieldKey, 'values']}
+        name={[name, 'values']}
+        rules={validationRules.dynamicArrayItemValidation}
+      >
+        {(fields, { add, remove }, { errors }) => (
+          <Row gutter={[8, 12]}>
+            <Col xs={24}>
+              <Paragraph>Accepts YouTube Links with this format:</Paragraph>
+              <Paragraph>
+                <Text strong>https://youtu.be/[video-id]</Text> or{' '}
+                <Text strong>https://www.youtube.com/watch?v=[video-id]</Text>
+              </Paragraph>
+            </Col>
+            <Col xs={24}>
+              {fields.map(({ name: youtubeLinksName, fieldKey: youtubeLinksFieldKey, ...youtubeLinksRestFields }) => (
+                <Row gutter={[8, 12]} align="middle">
+                  <Col flex="1 1 auto">
+                    <Form.Item
+                      {...youtubeLinksRestFields}
+                      className={styles.compactFormItem}
+                      fieldKey={youtubeLinksFieldKey}
+                      name={youtubeLinksName}
+                      rules={validationRules.youtubeLinkValidation}
+                    >
+                      <Input placeholder="Put YouTube video link here" maxLength={100} />
+                    </Form.Item>
+                  </Col>
+                  <Col flex="0 0 40px">
+                    <Tooltip title="Remove this item">
+                      <MinusCircleOutlined
+                        className={styles.redText}
+                        onClick={(e) => {
+                          preventDefaults(e);
+                          remove(youtubeLinksName);
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+                </Row>
+              ))}
+            </Col>
+            <Col xs={24}>
+              <Button
+                block
+                type="dashed"
+                onClick={(e) => {
+                  preventDefaults(e);
+                  add();
+                }}
+                icon={<PlusCircleOutlined />}
+              >
+                Add more links
+              </Button>
+            </Col>
+            <Col xs={24}>
+              <Form.ErrorList errors={errors} />
+            </Col>
+          </Row>
+        )}
+      </Form.List>
+    </Form.Item>
+  </>
+);
 
+const TextListEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
+  <>
+    <Form.Item
+      id="title"
+      {...restFields}
+      fieldKey={[fieldKey, 'title']}
+      name={[name, 'title']}
+      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
+      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
+      label="Section Title"
+      rules={validationRules.requiredValidation}
+    >
+      <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
+    </Form.Item>
+    <Form.Item
+      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
+      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
+      label="List Items"
+      required={true}
+    >
+      <Form.List
+        {...restFields}
+        fieldKey={[fieldKey, 'values']}
+        name={[name, 'values']}
+        rules={validationRules.dynamicArrayItemValidation}
+      >
+        {(fields, { add, remove }, { errors }) => (
+          <Row gutter={[8, 12]}>
+            <Col xs={24}>
+              {fields.map(({ name: textListName, fieldKey: textListFieldKey, ...textListRestFields }) => (
+                <Row gutter={[8, 12]} align="middle">
+                  <Col flex="1 1 auto">
+                    <Form.Item
+                      {...textListRestFields}
+                      fieldKey={textListFieldKey}
+                      name={textListName}
+                      rules={validationRules.requiredValidation}
+                    >
+                      <Input.TextArea
+                        placeholder="Place any text here (max 200 chars)"
+                        maxLength={200}
+                        showCount={true}
+                        autoSize={true}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col flex="0 0 40px">
+                    <Tooltip title="Remove this item">
+                      <MinusCircleOutlined
+                        className={styles.redText}
+                        onClick={(e) => {
+                          preventDefaults(e);
+                          remove(textListName);
+                        }}
+                      />
+                    </Tooltip>
+                  </Col>
+                </Row>
+              ))}
+            </Col>
+            <Col xs={24}>
+              <Button
+                block
+                type="dashed"
+                onClick={(e) => {
+                  preventDefaults(e);
+                  add();
+                }}
+                icon={<PlusCircleOutlined />}
+              >
+                Add more items
+              </Button>
+            </Col>
+            <Col xs={24}>
+              <Form.ErrorList errors={errors} />
+            </Col>
+          </Row>
+        )}
+      </Form.List>
+    </Form.Item>
+  </>
+);
+
+// NOTE : we're ignoring PRODUCTS component for now
 const componentUIType = {
   CONTAINED: 'CONTAINED', // Will only show when UI style is contained (is_contained = true)
   OPEN: 'OPEN', // Will only show when UI style is open (is_contained = false)
@@ -432,6 +605,16 @@ const editViewMap = {
     component: DescriptionEditForm,
     optional: true,
   },
+  YOUTUBE_LINKS: {
+    label: 'Youtube Links',
+    component: YoutubeLinksEditForm,
+    optional: true,
+  },
+  TEXT_LIST: {
+    label: 'List Items',
+    component: TextListEditForm,
+    optional: true,
+  },
 };
 
 // TODO: We need this page to open in with username in hostname
@@ -495,6 +678,19 @@ const Onboarding = ({ history }) => {
   const getExistingComponentInstance = (identifier) =>
     creatorProfileData?.profile?.sections?.find((component) => component.key === identifier);
 
+  const updateSections = (newSections) => {
+    const newCreatorProfileData = {
+      ...creatorProfileData,
+      profile: {
+        ...creatorProfileData.profile,
+        sections: newSections,
+      },
+    };
+
+    setCreatorProfileData(newCreatorProfileData);
+    form.setFieldsValue(newCreatorProfileData);
+  };
+
   const addComponent = (identifier = null, props) => {
     if (!identifier) {
       showErrorModal('Invalid section identifier!');
@@ -516,13 +712,49 @@ const Onboarding = ({ history }) => {
 
     showSuccessModal('Section added', `Make sure to save so you don't lose the changes`);
     setAddComponentModalVisible(false);
-    setCreatorProfileData((prevData) => ({
-      ...prevData,
-      profile: {
-        ...prevData.profile,
-        sections: currentComponentList,
+
+    updateSections(currentComponentList);
+  };
+
+  const removeComponent = (identifier = null) => {
+    if (!identifier) {
+      showErrorModal('Invalid identifier passed');
+      return;
+    }
+
+    const currentComponentList = deepCloneObject(creatorProfileData?.profile?.sections) || [];
+    const targetIndex = currentComponentList.findIndex((component) => component.key === identifier);
+
+    if (targetIndex === -1) {
+      showErrorModal(`Component with identifier ${identifier} not found!`);
+      return;
+    }
+
+    currentComponentList.splice(targetIndex, 1);
+
+    updateSections(currentComponentList);
+    message.success('Section removed');
+  };
+
+  const handleDeleteComponentClicked = (e, identifier) => {
+    preventDefaults(e);
+
+    Modal.confirm({
+      closable: true,
+      centered: true,
+      mask: true,
+      maskClosable: false,
+      title: 'Delete this section?',
+      content: <Paragraph>Are you sure you want to remove this section?</Paragraph>,
+      okText: 'Yes, remove it',
+      okButtonProps: {
+        danger: true,
+        type: 'primary',
       },
-    }));
+      cancelText: 'Cancel',
+      onOk: () => removeComponent(identifier),
+      afterClose: resetBodyStyle,
+    });
   };
 
   const renderSectionComponents = ({ key, name, fieldKey, ...restFields }) => {
@@ -534,6 +766,7 @@ const Onboarding = ({ history }) => {
 
     const sectionLabel = editViewMap[componentKey].label;
     const EditComponent = editViewMap[componentKey].component;
+    const isOptional = editViewMap[componentKey].optional;
 
     const isExpanded = expandedComponentsSection.includes(componentKey);
 
@@ -552,7 +785,17 @@ const Onboarding = ({ history }) => {
                   <DragAndDropHandle {...provided.dragHandleProps} />
                 </Col>
                 <Col flex="1 1 auto">
-                  <Text strong> {sectionLabel} </Text>
+                  <Space>
+                    <Text strong> {sectionLabel} </Text>
+                    {isOptional ? (
+                      <Button
+                        danger
+                        type="link"
+                        onClick={(e) => handleDeleteComponentClicked(e, componentKey)}
+                        icon={<DeleteOutlined />}
+                      />
+                    ) : null}
+                  </Space>
                 </Col>
                 <Col flex="0 0 40px">
                   <DownOutlined rotate={isExpanded ? 180 : 0} />
@@ -629,15 +872,7 @@ const Onboarding = ({ history }) => {
       formSectionValues.splice(source.index, 1);
       formSectionValues.splice(destination.index, 0, targetComponent);
 
-      const oldFormValues = form.getFieldsValue();
-
-      form.setFieldsValue({
-        ...oldFormValues,
-        profile: {
-          ...oldFormValues?.profile,
-          sections: formSectionValues,
-        },
-      });
+      updateSections(formSectionValues);
     }
   };
 

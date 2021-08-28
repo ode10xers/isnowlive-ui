@@ -370,7 +370,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
       };
     }
 
-    console.log(window.document.documentElement);
+    console.log(window.document);
     Object.entries(profileStyleObject).forEach(([key, val]) => {
       window.document.documentElement.style.setProperty(key, val);
     });
