@@ -7,6 +7,7 @@ pipelines:
       - step:
           name: Build
           image: node:12
+          size: 2x
           caches:
             - node
             - npm
@@ -35,6 +36,7 @@ pipelines:
       - step:
           name: Build
           image: node:12
+          size: 2x
           caches:
             - node
             - npm
@@ -63,6 +65,7 @@ pipelines:
       - step:
           name: Build
           image: node:12
+          size: 2x
           caches:
             - node
             - npm
