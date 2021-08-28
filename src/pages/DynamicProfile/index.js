@@ -42,8 +42,6 @@ import { getLocalUserDetails } from 'utils/storage';
 import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWidth } from 'utils/colors';
 
 import styles from './style.module.scss';
-import DescriptionProfileComponent from 'components/DynamicProfileComponents/DescriptionProfileComponent';
-import TextListProfileComponent from 'components/DynamicProfileComponents/TextListProfileComponent';
 
 const AvailabilityProfileComponent = lazy(() =>
   import('components/DynamicProfileComponents/AvailabilityProfileComponent')
@@ -60,6 +58,10 @@ const OtherLinksProfileComponent = lazy(() => import('components/DynamicProfileC
 // const CreatorProfileComponent = lazy(() => import('components/DynamicProfileComponents/CreatorProfileComponent'));
 const ProductsProfileComponent = lazy(() => import('components/DynamicProfileComponents/ProductsProfileComponent'));
 const YoutubeEmbedComponent = lazy(() => import('components/DynamicProfileComponents/YoutubeEmbedComponent'));
+const DescriptionProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/DescriptionProfileComponent')
+);
+const TextListProfileComponent = lazy(() => import('components/DynamicProfileComponents/TextListProfileComponent'));
 
 const PassionLogo = require('assets/images/passion-orange-logo.png');
 
