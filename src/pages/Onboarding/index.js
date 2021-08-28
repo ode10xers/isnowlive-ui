@@ -40,8 +40,8 @@ import {
 
 import apis from 'apis';
 
-import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
 import validationRules from 'utils/validation';
+import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername } from 'utils/helper';
 
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
@@ -58,6 +58,7 @@ const { Panel } = Collapse;
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
+// TODO: Clean up this file
 const SimpleEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
   return (
     <Form.Item
@@ -284,7 +285,7 @@ const YoutubeLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) =
             </Col>
             <Col xs={24}>
               {fields.map(({ name: youtubeLinksName, fieldKey: youtubeLinksFieldKey, ...youtubeLinksRestFields }) => (
-                <Row gutter={[8, 12]} align="middle">
+                <Row gutter={[8, 12]} align="middle" key={`youtube-fields-${youtubeLinksFieldKey}`}>
                   <Col flex="1 1 auto">
                     <Form.Item
                       {...youtubeLinksRestFields}
@@ -363,7 +364,7 @@ const TextListEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
           <Row gutter={[8, 12]}>
             <Col xs={24}>
               {fields.map(({ name: textListName, fieldKey: textListFieldKey, ...textListRestFields }) => (
-                <Row gutter={[8, 12]} align="middle">
+                <Row gutter={[8, 12]} align="middle" key={`text-list-fields-${textListFieldKey}`}>
                   <Col flex="1 1 auto">
                     <Form.Item
                       {...textListRestFields}
@@ -679,15 +680,18 @@ const Onboarding = ({ history }) => {
     creatorProfileData?.profile?.sections?.find((component) => component.key === identifier);
 
   const updateSections = (newSections) => {
+    const profileData = form.getFieldsValue();
     const newCreatorProfileData = {
-      ...creatorProfileData,
+      // ...creatorProfileData,
+      ...profileData,
       profile: {
-        ...creatorProfileData.profile,
+        // ...creatorProfileData.profile,
+        ...profileData.profile,
         sections: newSections,
       },
     };
 
-    setCreatorProfileData(newCreatorProfileData);
+    // setCreatorProfileData(newCreatorProfileData);
     form.setFieldsValue(newCreatorProfileData);
   };
 
@@ -828,9 +832,6 @@ const Onboarding = ({ history }) => {
       };
 
       console.log(payload);
-      setCreatorProfileData(payload);
-      setIsLoading(false);
-      return;
 
       const { status, data } = await apis.user.updateProfile(payload);
 
@@ -1099,7 +1100,7 @@ const Onboarding = ({ history }) => {
                 <Row gutter={[10, 10]}>
                   <Col xs={24} lg={12}>
                     <Space className={styles.usernameContainer} align="center">
-                      <Text copyable={true}>
+                      <Text copyable={{ text: generateUrlFromUsername(creatorProfileData?.username) }}>
                         <Text strong>{creatorProfileData?.username}</Text>.passion.do
                       </Text>
                       <Button icon={<EditOutlined />} type="link" onClick={handleEditUsernameClicked} />
