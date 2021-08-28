@@ -63,6 +63,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
     <Row className={isContained ? styles.containedCreatorProfileWrapper : styles.creatorProfileWrapper}>
       <Col xs={24} className={styles.coverImageWrapper}>
         <Image
+          loading="lazy"
           placeholder={<Skeleton.Image loading={true} width="100%" className={styles.coverImage} />}
           preview={false}
           width="100%"
@@ -82,6 +83,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
             <Row justify="center">
               <Col>
                 <Image
+                  loading="lazy"
                   placeholder={
                     <Skeleton
                       loading={true}

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import classNames from 'classnames';
 import { useHistory, useRouteMatch } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -29,17 +29,7 @@ import apis from 'apis';
 import Routes from 'routes';
 
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
-import AvailabilityProfileComponent from 'components/DynamicProfileComponents/AvailabilityProfileComponent';
-import PassesProfileComponent from 'components/DynamicProfileComponents/PassesProfileComponent';
-import SessionsProfileComponent from 'components/DynamicProfileComponents/SessionsProfileComponent';
-import VideosProfileComponent from 'components/DynamicProfileComponents/VideosProfileComponent';
-import CoursesProfileComponent from 'components/DynamicProfileComponents/CoursesProfileComponent';
-
-import SubscriptionProfileComponent from 'components/DynamicProfileComponents/SubscriptionsProfileComponent';
-import OtherLinksProfileComponent from 'components/DynamicProfileComponents/OtherLinksProfileComponent';
 import CreatorProfileComponent from 'components/DynamicProfileComponents/CreatorProfileComponent';
-import ProductsProfileComponent from 'components/DynamicProfileComponents/ProductsProfileComponent';
-import YoutubeEmbedComponent from 'components/DynamicProfileComponents/YoutubeEmbedComponent';
 
 import {
   deepCloneObject,
@@ -54,6 +44,22 @@ import { convertHSLToHex, generateColorPalletteForProfile, getNewProfileUIMaxWid
 import styles from './style.module.scss';
 import DescriptionProfileComponent from 'components/DynamicProfileComponents/DescriptionProfileComponent';
 import TextListProfileComponent from 'components/DynamicProfileComponents/TextListProfileComponent';
+
+const AvailabilityProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/AvailabilityProfileComponent')
+);
+const PassesProfileComponent = lazy(() => import('components/DynamicProfileComponents/PassesProfileComponent'));
+const SessionsProfileComponent = lazy(() => import('components/DynamicProfileComponents/SessionsProfileComponent'));
+const VideosProfileComponent = lazy(() => import('components/DynamicProfileComponents/VideosProfileComponent'));
+const CoursesProfileComponent = lazy(() => import('components/DynamicProfileComponents/CoursesProfileComponent'));
+
+const SubscriptionProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/SubscriptionsProfileComponent')
+);
+const OtherLinksProfileComponent = lazy(() => import('components/DynamicProfileComponents/OtherLinksProfileComponent'));
+// const CreatorProfileComponent = lazy(() => import('components/DynamicProfileComponents/CreatorProfileComponent'));
+const ProductsProfileComponent = lazy(() => import('components/DynamicProfileComponents/ProductsProfileComponent'));
+const YoutubeEmbedComponent = lazy(() => import('components/DynamicProfileComponents/YoutubeEmbedComponent'));
 
 const PassionLogo = require('assets/images/passion-orange-logo.png');
 
@@ -740,25 +746,27 @@ const DynamicProfile = ({ creatorUsername = null }) => {
             ref={provided.innerRef}
             id={targetComponent.elementId ?? component.key}
           >
-            <RenderedComponent
-              identifier={component.key}
-              isEditing={editingMode && !previewMode}
-              updateConfigHandler={updateComponentConfig}
-              removeComponentHandler={removeComponent}
-              dragHandleProps={provided.dragHandleProps}
-              isContained={containedUI}
-              title={component.title}
-              values={component.values}
-              isLiveData={creatorProfileData?.profile?.live_mode ?? true}
-              dummyTemplateType={creatorProfileData?.profile?.category || 'YOGA'}
-              headerColor={
-                creatorColorChoice
-                  ? convertHSLToHex(
-                      generateColorPalletteForProfile(creatorColorChoice)['--passion-profile-primary-color']
-                    )
-                  : null
-              }
-            />
+            <Suspense fallback={<Spin spinning={true} tip="Loading..." />}>
+              <RenderedComponent
+                identifier={component.key}
+                isEditing={editingMode && !previewMode}
+                updateConfigHandler={updateComponentConfig}
+                removeComponentHandler={removeComponent}
+                dragHandleProps={provided.dragHandleProps}
+                isContained={containedUI}
+                title={component.title}
+                values={component.values}
+                isLiveData={creatorProfileData?.profile?.live_mode ?? true}
+                dummyTemplateType={creatorProfileData?.profile?.category || 'YOGA'}
+                headerColor={
+                  creatorColorChoice
+                    ? convertHSLToHex(
+                        generateColorPalletteForProfile(creatorColorChoice)['--passion-profile-primary-color']
+                      )
+                    : null
+                }
+              />
+            </Suspense>
           </Col>
         )}
       </Draggable>
