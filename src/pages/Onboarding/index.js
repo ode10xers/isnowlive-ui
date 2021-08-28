@@ -2,7 +2,21 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 
-import { Row, Col, Typography, Space, Form, Input, Collapse, Spin, Button, Tooltip, Divider, message } from 'antd';
+import {
+  Row,
+  Col,
+  Typography,
+  Space,
+  Form,
+  Input,
+  Collapse,
+  Modal,
+  Spin,
+  Button,
+  Tooltip,
+  Divider,
+  message,
+} from 'antd';
 import {
   DownOutlined,
   PlusCircleOutlined,
@@ -10,6 +24,17 @@ import {
   DesktopOutlined,
   MobileOutlined,
   EditOutlined,
+  BookOutlined,
+  ClockCircleOutlined,
+  GiftOutlined,
+  LikeOutlined,
+  LinkOutlined,
+  PlayCircleOutlined,
+  ProfileOutlined,
+  ScheduleOutlined,
+  VideoCameraOutlined,
+  YoutubeOutlined,
+  OrderedListOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -17,21 +42,22 @@ import apis from 'apis';
 import { deepCloneObject, isAPISuccess, preventDefaults } from 'utils/helper';
 import validationRules from 'utils/validation';
 
+import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
 import DeviceUIPreview from 'components/DeviceUIPreview';
 import DragAndDropHandle from 'components/DynamicProfileComponents/DragAndDropHandle';
+import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
 import { newProfileFormLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
-import TextEditor from 'components/TextEditor';
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
-const SimpleEditForm = ({ name, fieldKey, ...restFields }) => {
+const SimpleEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
   return (
     <Form.Item
       {...restFields}
@@ -45,13 +71,15 @@ const SimpleEditForm = ({ name, fieldKey, ...restFields }) => {
   );
 };
 
-const OtherLinksEditForm = ({ name, fieldKey, ...restFields }) => {
+const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
   const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([]);
 
   return (
     <>
       <Form.Item
         {...restFields}
+        labelCol={24}
+        wrapperCol={24}
         label="Container Title"
         name={[name, 'title']}
         fieldKey={[fieldKey, 'title']}
@@ -59,7 +87,7 @@ const OtherLinksEditForm = ({ name, fieldKey, ...restFields }) => {
       >
         <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
       </Form.Item>
-      <Form.Item label="Your Links" required={true}>
+      <Form.Item labelCol={24} wrapperCol={24} label="Your Links" required={true}>
         <Form.List
           {...restFields}
           name={[name, 'values']}
@@ -181,34 +209,228 @@ const OtherLinksEditForm = ({ name, fieldKey, ...restFields }) => {
   );
 };
 
+const DescriptionEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
+  <>
+    <Form.Item
+      {...restFields}
+      id="title"
+      name={[name, 'title']}
+      fieldKey={[fieldKey, 'title']}
+      label="Container Title"
+      rules={validationRules.requiredValidation}
+    >
+      <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
+    </Form.Item>
+    <Form.Item
+      {...restFields}
+      className={classNames(styles.bgWhite, styles.textEditorLayout)}
+      id="values"
+      name={[name, 'values']}
+      fieldKey={[fieldKey, 'values']}
+      label="Content"
+      rules={validationRules.requiredValidation}
+    >
+      <div>
+        <TextEditor
+          form={formInstance}
+          name={['profile', 'sections', name, 'values']}
+          placeholder="Describe yourself here"
+        />
+      </div>
+    </Form.Item>
+  </>
+);
+
+// TODO: Adjust this for new components
+// NOTE : we're ignoring PRODUCTS component for now
+
+const componentUIType = {
+  CONTAINED: 'CONTAINED', // Will only show when UI style is contained (is_contained = true)
+  OPEN: 'OPEN', // Will only show when UI style is open (is_contained = false)
+  FLEXIBLE: 'FLEXIBLE', // Can show in both
+};
+
+const componentsMap = {
+  AVAILABILITY: {
+    icon: <ClockCircleOutlined />,
+    label: 'Availability',
+    type: componentUIType.FLEXIBLE,
+    optional: false,
+    elementId: 'availability',
+    defaultProps: {
+      title: 'AVAILABILITY',
+      values: null,
+    },
+  },
+  // Currently here we're forcing user to new UI
+  PRODUCTS: {
+    icon: <GiftOutlined />,
+    label: 'Products',
+    type: componentUIType.CONTAINED,
+    optional: false,
+    elementId: 'products',
+    defaultProps: {
+      title: '',
+      values: [
+        {
+          key: 'SESSIONS',
+          title: 'My Sessions',
+          values: null,
+        },
+        {
+          key: 'COURSES',
+          title: 'My Courses',
+          values: null,
+        },
+        {
+          key: 'VIDEOS',
+          title: 'My Videos',
+          values: null,
+        },
+      ],
+    },
+  },
+  SESSIONS: {
+    icon: <VideoCameraOutlined />,
+    label: 'Sessions',
+    type: componentUIType.OPEN,
+    elementId: 'sessions',
+    optional: false,
+    defaultProps: {
+      title: 'My Sessions',
+      values: null,
+    },
+  },
+  COURSES: {
+    icon: <BookOutlined />,
+    label: 'Courses',
+    type: componentUIType.OPEN,
+    elementId: 'courses',
+    optional: false,
+    defaultProps: {
+      title: 'My Courses',
+      values: null,
+    },
+  },
+  VIDEOS: {
+    icon: <PlayCircleOutlined />,
+    label: 'Videos',
+    type: componentUIType.OPEN,
+    optional: false,
+    elementId: 'videos',
+    defaultProps: {
+      title: 'My Videos',
+      values: null,
+    },
+  },
+  PASSES: {
+    icon: <LikeOutlined />,
+    label: 'Passes',
+    optional: false,
+    type: componentUIType.FLEXIBLE,
+    elementId: 'passes',
+    defaultProps: {
+      title: 'CREDIT PASSES',
+      values: null,
+    },
+  },
+  SUBSCRIPTIONS: {
+    icon: <ScheduleOutlined />,
+    label: 'Memberships',
+    type: componentUIType.FLEXIBLE,
+    elementId: 'memberships',
+    optional: false,
+    defaultProps: {
+      title: 'MEMBERSHIPS',
+      values: null,
+    },
+  },
+  OTHER_LINKS: {
+    icon: <LinkOutlined />,
+    label: 'Other Links',
+    type: componentUIType.FLEXIBLE,
+    elementId: 'other-links',
+    optional: true,
+    defaultProps: {
+      title: 'OTHER LINKS',
+      values: null,
+    },
+  },
+  YOUTUBE_LINKS: {
+    icon: <YoutubeOutlined />,
+    label: 'Youtube Videos',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'youtube-videos',
+    defaultProps: {
+      title: 'Youtube Videos',
+      values: null,
+    },
+  },
+  DESCRIPTION: {
+    icon: <ProfileOutlined />,
+    label: 'Description',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'long-description',
+    defaultProps: {
+      title: 'About Me',
+      values: null,
+    },
+  },
+  TEXT_LIST: {
+    icon: <OrderedListOutlined />,
+    label: 'List Items',
+    type: componentUIType.FLEXIBLE,
+    optional: true,
+    elementId: 'list-items',
+    defaultProps: {
+      title: 'List Items',
+      values: null,
+    },
+  },
+};
+
 const editViewMap = {
   AVAILABILITY: {
     label: 'Availability',
     component: SimpleEditForm,
+    optional: false,
   },
   PASSES: {
     label: 'Passes',
     component: SimpleEditForm,
+    optional: false,
   },
   SUBSCRIPTIONS: {
     label: 'Memberships',
     component: SimpleEditForm,
+    optional: false,
   },
   SESSIONS: {
     label: 'Sessions',
     component: SimpleEditForm,
+    optional: false,
   },
   COURSES: {
     label: 'Courses',
     component: SimpleEditForm,
+    optional: false,
   },
   VIDEOS: {
     label: 'Videos',
     component: SimpleEditForm,
+    optional: false,
   },
   OTHER_LINKS: {
     label: 'Other Links',
     component: OtherLinksEditForm,
+    optional: true,
+  },
+  DESCRIPTION: {
+    label: 'Description',
+    component: DescriptionEditForm,
+    optional: true,
   },
 };
 
@@ -228,6 +450,8 @@ const Onboarding = ({ history }) => {
 
   const [isMobileView, setIsMobileView] = useState(true);
 
+  const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
+
   const fetchCreatorProfileData = useCallback(async () => {
     setIsLoading(true);
 
@@ -235,15 +459,13 @@ const Onboarding = ({ history }) => {
       const { status, data } = await apis.user.getProfile();
 
       if (isAPISuccess(status) && data) {
-        // const creatorData = {
-        //   ...data,
-        //   profile: {
-        //     ...data.profile,
-        //     bio: data?.profile?.bio?.replace(/(<([^>]+)>)/gi, '').replaceAll('&nbsp;', ''),
-        //   },
-        // };
-
-        setCreatorProfileData(data);
+        setCreatorProfileData({
+          ...data,
+          profile: {
+            ...data.profile,
+            new_profile: true,
+          },
+        });
 
         setCreatorCoverImageUrl(data.cover_image_url);
         setCreatorProfileImageUrl(data.profile_image_url);
@@ -269,6 +491,39 @@ const Onboarding = ({ history }) => {
 
   const collapseComponentSection = (componentKey) =>
     setExpandedComponentsSection(expandedComponentsSection.filter((key) => key !== componentKey));
+
+  const getExistingComponentInstance = (identifier) =>
+    creatorProfileData?.profile?.sections?.find((component) => component.key === identifier);
+
+  const addComponent = (identifier = null, props) => {
+    if (!identifier) {
+      showErrorModal('Invalid section identifier!');
+      return;
+    }
+
+    const existingComponentInstance = getExistingComponentInstance(identifier);
+
+    if (existingComponentInstance) {
+      showErrorModal('Duplicate of this section already exists!');
+      return;
+    }
+
+    const currentComponentList = deepCloneObject(creatorProfileData?.profile?.sections) || [];
+    currentComponentList.push({
+      key: identifier,
+      ...props,
+    });
+
+    showSuccessModal('Section added', `Make sure to save so you don't lose the changes`);
+    setAddComponentModalVisible(false);
+    setCreatorProfileData((prevData) => ({
+      ...prevData,
+      profile: {
+        ...prevData.profile,
+        sections: currentComponentList,
+      },
+    }));
+  };
 
   const renderSectionComponents = ({ key, name, fieldKey, ...restFields }) => {
     const componentKey = form.getFieldValue(['profile', 'sections', name, 'key']);
@@ -305,7 +560,7 @@ const Onboarding = ({ history }) => {
               </Row>
             </div>
             <div className={classNames(styles.customAccordionContent, isExpanded ? undefined : styles.hidden)}>
-              <EditComponent name={name} fieldKey={fieldKey} {...restFields} />
+              <EditComponent formInstance={form} name={name} fieldKey={fieldKey} {...restFields} />
             </div>
           </div>
         )}
@@ -317,6 +572,7 @@ const Onboarding = ({ history }) => {
     setIsLoading(true);
 
     try {
+      // TODO: Currently hardcoding this to new UI
       const payload = {
         ...creatorProfileData,
         ...values,
@@ -389,8 +645,41 @@ const Onboarding = ({ history }) => {
     // TODO: create edit username modal here
   };
 
+  const handleAddProfileComponent = (e) => {
+    preventDefaults(e);
+    setAddComponentModalVisible(true);
+  };
+
   return (
     <div className={styles.editPageContainer}>
+      <Modal
+        visible={addComponentModalVisible}
+        title="Select a component to add"
+        centered={true}
+        footer={null}
+        width={420}
+        onCancel={() => setAddComponentModalVisible(false)}
+        afterClose={resetBodyStyle}
+      >
+        <Row gutter={[8, 8]}>
+          {Object.entries(componentsMap).map(([componentKey, componentOptions]) =>
+            componentOptions.optional ? (
+              <Col xs={24} sm={12} key={componentKey}>
+                <Button
+                  block
+                  type="text"
+                  icon={componentOptions.icon}
+                  disabled={getExistingComponentInstance(componentKey)}
+                  onClick={() => addComponent(componentKey, componentOptions.defaultProps)}
+                >
+                  {componentOptions.label}
+                </Button>
+              </Col>
+            ) : null
+          )}
+        </Row>
+      </Modal>
+
       <Spin spinning={isLoading} size="large">
         <Row gutter={[10, 20]}>
           <Col xs={24} lg={12}>
@@ -551,7 +840,17 @@ const Onboarding = ({ history }) => {
                             </Form.List>
                           </DragDropContext>
                         </Col>
-                        <Col xs={24}></Col>
+                        <Col xs={24}>
+                          <Button
+                            ghost
+                            type="primary"
+                            block
+                            onClick={handleAddProfileComponent}
+                            icon={<PlusCircleOutlined />}
+                          >
+                            Add a section
+                          </Button>
+                        </Col>
                       </Row>
                     </Col>
                   )}
@@ -566,8 +865,7 @@ const Onboarding = ({ history }) => {
                   <Col xs={24} lg={12}>
                     <Space className={styles.usernameContainer} align="center">
                       <Text copyable={true}>
-                        {' '}
-                        <Text strong>{creatorProfileData?.username}</Text>.passion.do{' '}
+                        <Text strong>{creatorProfileData?.username}</Text>.passion.do
                       </Text>
                       <Button icon={<EditOutlined />} type="link" onClick={handleEditUsernameClicked} />
                     </Space>

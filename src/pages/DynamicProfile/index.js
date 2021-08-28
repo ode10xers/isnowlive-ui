@@ -255,6 +255,9 @@ const componentsMap = {
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
 
+// TODO: Most of the edit functionality in this page will be moved to the new onboarding page
+// Remove code as necessary
+// TODO: Fix coloring targeting parent element instead of iframe
 const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) => {
   const history = useHistory();
   const match = useRouteMatch();
@@ -337,7 +340,8 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
   useEffect(() => {
     if (overrideUserObject) {
       setCreatorProfileData(overrideUserObject);
-      setContainedUI(!overrideUserObject?.profile?.new_profile);
+      // setContainedUI(!overrideUserObject?.profile?.new_profile);
+      setContainedUI(false);
       setCreatorColorChoice(overrideUserObject?.profile?.color);
     } else {
       if (!creatorUsername) {
@@ -366,6 +370,7 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
       };
     }
 
+    console.log(window.document.documentElement);
     Object.entries(profileStyleObject).forEach(([key, val]) => {
       window.document.documentElement.style.setProperty(key, val);
     });
