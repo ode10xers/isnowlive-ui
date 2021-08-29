@@ -370,19 +370,40 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
       };
     }
 
-    console.log(window.document);
     Object.entries(profileStyleObject).forEach(([key, val]) => {
-      window.document.documentElement.style.setProperty(key, val);
+      if (overrideUserObject) {
+        for (let idx = 0; idx <= window.frames.length; idx++) {
+          try {
+            window.frames[idx].document.documentElement.style.setProperty(key, val);
+          } catch (error) {
+            console.log('Silently passing error');
+            console.error(error);
+          }
+        }
+      } else {
+        window.document.documentElement.style.setProperty(key, val);
+      }
     });
 
     return () => {
       if (profileStyleObject) {
         Object.keys(profileStyleObject).forEach((key) => {
-          window.document.documentElement.style.removeProperty(key);
+          if (overrideUserObject) {
+            for (let idx = 0; idx <= window.frames.length; idx++) {
+              try {
+                window.frames[idx].document.documentElement.style.removeProperty(key);
+              } catch (error) {
+                console.log('Silently passing error');
+                console.error(error);
+              }
+            }
+          } else {
+            window.document.documentElement.style.removeProperty(key);
+          }
         });
       }
     };
-  }, [creatorColorChoice, containedUI]);
+  }, [creatorColorChoice, containedUI, overrideUserObject]);
 
   useEffect(() => {
     scrollToComponent(match.path);
@@ -459,11 +480,6 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
     setEditingMode(false);
     setPreviewMode(false);
   };
-
-  // const handleTogglePreviewMode = (e) => {
-  //   preventDefaults(e);
-  //   setPreviewMode(!previewMode);
-  // };
 
   const handleEditDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);

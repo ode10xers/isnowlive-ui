@@ -62,8 +62,9 @@
 }
 
 .nameInputWrapper {
-  // TODO: Add dekstop styling here later
-  width: 100%;
+  width: calc(50% - 8px);
+  display: inline-block;
+  margin-right: 4px;
 }
 
 .creatorCoverImage {
@@ -94,6 +95,7 @@
     }
   }
 }
+
 .customAccordionContainers {
   .customAccordionItem {
     border: 1px solid map-get($map: $colors, $key: 'Silver');
@@ -125,9 +127,6 @@
   margin-top: 20px;
   margin-left : 80px;
   text-align: center;
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  top: 72px;
 }
 
 .mobileDeviceContainer {
