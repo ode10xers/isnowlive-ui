@@ -25,7 +25,7 @@ function closeModal(e) {
 }
 
 const isProd = window.location.hostname.includes('passion.do');
-const apiBaseUrl = isProd ? 'https://api.app.passion.do' : 'https://stage.api.app.is-now.live';
+const apiBaseUrl = isProd ? 'https://api.app.passion.do' : 'https://stage.api.app.passion.do';
 const successCodes = [200, 201, 204];
 
 const mixpanelLoginEvent = '(Marketing) Creator Login';
