@@ -326,7 +326,8 @@ const Onboarding = ({ match, history }) => {
     customFCWidgetStyle.id = 'custom-fc-widget-style';
     customFCWidgetStyle.innerHTML = `      @media screen and (max-width: 576px) {
       .custom_fc_frame {
-        bottom: 10px !important;
+        bottom: 2px !important;
+        right: 2px !important;
       }
     }`;
     window.document.head.appendChild(customFCWidgetStyle);

@@ -58,7 +58,7 @@ const ImageUpload = ({
   };
 
   return (
-    <ImgCrop shape={shape} aspect={aspect}>
+    <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image">
       <Upload
         className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
         listType={listType}
