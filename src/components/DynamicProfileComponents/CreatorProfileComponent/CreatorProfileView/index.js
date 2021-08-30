@@ -6,12 +6,14 @@ import { useLocation } from 'react-router-dom';
 import { Row, Col, Image, Space, Typography, Divider } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
 
-import DefaultImage from 'components/Icons/DefaultImage';
+// import DefaultImage from 'components/Icons/DefaultImage';
 
 import { getExternalLink } from 'utils/url';
 import { socialMediaIcons } from 'utils/constants';
 
 import styles from './styles.module.scss';
+
+const DefaultImage = require('assets/images/greybg.jpg');
 
 const { Title } = Typography;
 
