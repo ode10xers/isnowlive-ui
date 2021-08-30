@@ -1109,6 +1109,17 @@ const Onboarding = ({ match, history }) => {
     setUpdateTimeoutID(newTimeout);
   };
 
+  const handleColorChange = (color) => {
+    setCreatorColorChoice(color);
+    setCreatorProfileData((prevData) => ({
+      ...prevData,
+      profile: {
+        ...prevData.profile,
+        color: color,
+      },
+    }));
+  };
+
   return (
     <div className={styles.editPageContainer}>
       <Modal
@@ -1245,7 +1256,7 @@ const Onboarding = ({ match, history }) => {
                             styles.colorContainer,
                             creatorColorChoice === color ? styles.selected : undefined
                           )}
-                          onClick={() => setCreatorColorChoice(color)}
+                          onClick={() => handleColorChange(color)}
                         >
                           <div className={styles.colorChoice} style={{ backgroundColor: color }}></div>
                         </div>
