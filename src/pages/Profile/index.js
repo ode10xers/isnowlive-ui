@@ -168,12 +168,12 @@ const Profile = () => {
                     </Form.Item>
                   </Col>
                   <Col xs={8} lg={12}>
-                    <Row>
-                      <Col xs={24} lg={{ flex: '0 0 70px' }} className={styles.textAlignLeft}>
+                    <Row gutter={8}>
+                      <Col xs={24} lg={10} lassName={styles.textAlignLeft}>
                         <Text>.passion.do</Text>
                       </Col>
 
-                      <Col xs={24} lg={{ flex: '1 1 auto' }} className={styles.textAlignLeft}>
+                      <Col xs={24} lg={14} className={styles.textAlignLeft}>
                         {isLoadingUsernameCheck ? (
                           <Spin />
                         ) : (
