@@ -45,7 +45,7 @@ const SignUp = ({ history }) => {
         mapUserToMixPanel(data);
         localStorage.removeItem('ref');
         trackSuccessEvent(eventTag, { email: values.email });
-        history.push(Routes.profile);
+        history.push(Routes.onboardingName);
       }
     } catch (error) {
       setIsLoading(false);
