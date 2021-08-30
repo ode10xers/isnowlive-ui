@@ -38,6 +38,7 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
       return;
     }
 
+    setIsLoading(true);
     const timeoutID = setTimeout(() => {
       // Copy all the style and link tags from main document
       // to <head> of iframe
