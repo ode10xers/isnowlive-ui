@@ -483,10 +483,10 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
 
     window.open(`${generateUrlFromUsername(creatorProfileData?.username)}${Routes.profileEdit}`, '_self');
 
-    setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
-    setEditingMode(true);
-    setPreviewMode(false);
-    setUiConfigChanged(false);
+    // setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
+    // setEditingMode(true);
+    // setPreviewMode(false);
+    // setUiConfigChanged(false);
   };
 
   const handleSaveDynamicProfileButtonClicked = async (e) => {

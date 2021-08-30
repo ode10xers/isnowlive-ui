@@ -1177,7 +1177,7 @@ const Onboarding = ({ match, history }) => {
                   </Col>
                   <Col xs={12} className={styles.textAlignRight}>
                     <Button type="primary" className={styles.greenBtn} htmlType="submit" loading={isLoading}>
-                      Save And Preview
+                      Save {!isOnboarding ? 'and Preview' : ''}
                     </Button>
                   </Col>
                   <Col xs={24}>
