@@ -38,8 +38,6 @@ import {
   OrderedListOutlined,
   DeleteOutlined,
   ArrowLeftOutlined,
-  CopyOutlined,
-  CheckCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
@@ -54,7 +52,7 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 import { newProfileFormLayout } from 'layouts/FormLayouts';
 
 import validationRules from 'utils/validation';
-import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername } from 'utils/helper';
+import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername, copyToClipboard } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 
@@ -871,26 +869,18 @@ const Onboarding = ({ match, history }) => {
                 <Col xs={24}>
                   <Paragraph>You can now share your website</Paragraph>
                   <Paragraph>
-                    <Space>
-                      <Link
-                        href={creatorUrl}
-                        target="_blank"
-                        copyable={{
-                          icon: [
-                            <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
-                              Copy
-                            </Button>,
-                            <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
-                              Copied!
-                            </Button>,
-                          ],
-                        }}
-                      >
+                    <Space direction="vertical">
+                      <Link href={creatorUrl} target="_blank">
                         {creatorUrl}
                       </Link>
-                      <Button size="small" type="primary" onClick={() => showCreatorProfilePreview(creatorUrl)}>
-                        Show me!
-                      </Button>
+                      <Space>
+                        <Button ghost size="small" type="primary" onClick={() => copyToClipboard(creatorUrl)}>
+                          Copy
+                        </Button>
+                        <Button size="small" type="primary" onClick={() => showCreatorProfilePreview(creatorUrl)}>
+                          Show me!
+                        </Button>
+                      </Space>
                     </Space>
                   </Paragraph>
                   <Paragraph>on your social media or with your audience.</Paragraph>

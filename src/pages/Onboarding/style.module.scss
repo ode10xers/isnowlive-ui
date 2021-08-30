@@ -28,6 +28,7 @@
 .editPageContainer {
   @extend .box;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .profileFormContainer {
