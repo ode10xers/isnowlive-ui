@@ -69,13 +69,16 @@
   margin: 5px;
 }
 
-.creatorBio {
-  p,
-  span {
+.creatorBio * {
+  // p,
+  // span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: map-get($map: $colors, $key: 'White1') !important;
-  }
+    background-color: transparent !important;
+  // }
+}
+.creatorBio {
+
   background-color: map-get($colors, 'White1') !important;
 
   max-height: 240px;
@@ -87,11 +90,11 @@
   cursor: pointer;
 }
 
-.longTextExpanded {
-  p,
-  span {
+.longTextExpanded * {
+  // p,
+  // span {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
       'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
-    background-color: map-get($colors, 'White1') !important;
-  }
+    background-color: transparent !important;
+  // }
 }

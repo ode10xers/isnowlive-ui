@@ -17,17 +17,18 @@ import ReactHtmlParser from 'react-html-parser';
 import apis from 'apis';
 import Routes from 'routes';
 
-import Section from 'components/Section';
+import Share from 'components/Share';
 import Loader from 'components/Loader';
+import Section from 'components/Section';
 import SessionDate from 'components/SessionDate';
 import SessionInfo from 'components/SessionInfo';
 import ParticipantsList from 'components/ParticipantsList';
-import Share from 'components/Share';
+import EventAddressModal from 'components/EventAddressModal';
 import InventoryDocumentEditor from './InventoryDocumentEditor';
 
 import dateUtil from 'utils/date';
-import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
+import { generateUrlFromUsername, isAPISuccess, getDuration, copyToClipboard, isValidFile } from 'utils/helper';
 
 import {
   mixPanelEventTags,
@@ -37,7 +38,7 @@ import {
 } from 'services/integrations/mixpanel';
 
 import styles from './styles.module.scss';
-import EventAddressModal from 'components/EventAddressModal';
+import InventoryDescriptionEditor from './InventoryDescriptionEditor';
 
 const {
   formatDate: { toLongDateWithDay, getTimeDiff },
@@ -56,6 +57,8 @@ const SessionsDetails = ({ match }) => {
   const [publicUrl, setPublicUrl] = useState(null);
   const [isEditingDocuments, setIsEditingDocuments] = useState(false);
   const [offlineEventAddressModalVisible, setOfflineEventAddressModalVisible] = useState(false);
+
+  const [isEditingDescription, setIsEditingDescription] = useState(false);
 
   const getInventoryDetails = useCallback(async (inventory_id) => {
     try {
@@ -127,8 +130,9 @@ const SessionsDetails = ({ match }) => {
 
   const handleDocumentUrlUpload = async (documentUrls) => {
     try {
-      const { status } = await apis.session.updateSessionInventoryDocument(session.inventory_id, {
+      const { status } = await apis.session.updateSessionInventory(session.inventory_id, {
         document_urls: documentUrls,
+        description: session.description,
       });
 
       if (isAPISuccess(status)) {
@@ -137,6 +141,22 @@ const SessionsDetails = ({ match }) => {
       }
     } catch (error) {
       message.error(`Failed to update ${isAvailability ? 'availability' : 'session'} event document`);
+    }
+  };
+
+  const editInventoryDescription = async (updatedSessionDescription) => {
+    try {
+      const { status } = await apis.session.updateSessionInventory(session.inventory_id, {
+        document_urls: session.document_urls,
+        description: updatedSessionDescription,
+      });
+
+      if (isAPISuccess(status)) {
+        setSession({ ...session, description: updatedSessionDescription });
+        setIsEditingDescription(false);
+      }
+    } catch (error) {
+      message.error(`Failed to update ${isAvailability ? 'availability' : 'session'} description`);
     }
   };
 
@@ -280,7 +300,11 @@ const SessionsDetails = ({ match }) => {
                         onCancel={() => setIsEditingDocuments(false)}
                       />
                     ) : (
-                      <Button icon={<EditOutlined />} onClick={() => setIsEditingDocuments(true)}>
+                      <Button
+                        disabled={isEditingDescription}
+                        icon={<EditOutlined />}
+                        onClick={() => setIsEditingDocuments(true)}
+                      >
                         Change document
                       </Button>
                     )}
@@ -387,6 +411,7 @@ const SessionsDetails = ({ match }) => {
                         size="small"
                         type="link"
                         icon={<EditOutlined />}
+                        disabled={isEditingDescription || isEditingDocuments}
                         onClick={showEditOfflineEventAddressModal}
                       >
                         Edit
@@ -397,15 +422,28 @@ const SessionsDetails = ({ match }) => {
                     </Text>
                   </Space>
                 )}
-                {session?.description && (
-                  <>
-                    <Title level={5} className={session?.is_offline ? styles.mt50 : undefined}>
-                      {isAvailability ? 'Availability' : 'Session'} Information
-                    </Title>
-                    <Text type="secondary" level={5}>
-                      {ReactHtmlParser(session?.description)}
-                    </Text>
-                  </>
+                <Title level={5} className={session?.is_offline ? styles.mt50 : undefined}>
+                  {isAvailability ? 'Availability' : 'Session'} Description{' '}
+                  <Button
+                    type="link"
+                    icon={<EditOutlined />}
+                    disabled={isEditingDescription || isEditingDocuments}
+                    onClick={() => setIsEditingDescription(true)}
+                  >
+                    {' '}
+                    Edit{' '}
+                  </Button>
+                </Title>
+                {isEditingDescription ? (
+                  <InventoryDescriptionEditor
+                    description={session?.description}
+                    onFinish={editInventoryDescription}
+                    onCancel={() => setIsEditingDescription(false)}
+                  />
+                ) : (
+                  <Text type="secondary" level={5}>
+                    {session?.description ? ReactHtmlParser(session?.description) : 'No description available'}
+                  </Text>
                 )}
                 {session?.prerequisites && (
                   <>
