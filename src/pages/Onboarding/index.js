@@ -646,7 +646,7 @@ const Onboarding = ({ match, history }) => {
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [editUsernameModalVisible, setEditUsernameModalVisible] = useState(false);
 
-  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(false);
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
 
   const [updateTimeoutID, setUpdateTimeoutID] = useState(null);
