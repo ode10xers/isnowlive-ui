@@ -78,7 +78,7 @@ const DashboardToggle = () => {
         okText: 'Become Host',
         cancelText: 'Talk to Us',
         onOk: () => {
-          setTimeout(() => trackAndNavigate(Routes.profile, attendee.click.dashboard.becomeHost), 100);
+          setTimeout(() => trackAndNavigate(Routes.onboardingName, attendee.click.dashboard.becomeHost), 100);
         },
         onCancel: () => openFreshChatWidget(),
       });

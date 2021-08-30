@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, message, Spin, Modal } from 'antd';
-import { CopyOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { Form, Typography, Button, Row, Col, Input, message, Spin } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
@@ -20,20 +18,17 @@ import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
-const { Text, Paragraph, Link } = Typography;
+const { Text } = Typography;
 const { creator } = mixPanelEventTags;
 
+// TODO: This page still have some old logic (need to cleanup)
+// The old logic is related to dashboard checking, etc
 const Profile = () => {
   const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [coverImage, setCoverImage] = useState(null);
-  const [profileImage, setProfileImage] = useState(null);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
-  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
-  const [testimonials, setTestimonials] = useState([]);
-  const [isOnboarding, setIsOnboarding] = useState(true);
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(false);
   const [form] = Form.useForm();
-  const history = useHistory();
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -44,9 +39,6 @@ const Profile = () => {
           data.username = '';
         }
         form.setFieldsValue(data);
-        setCoverImage(data.cover_image_url);
-        setProfileImage(data.profile_image_url);
-        setTestimonials(data.profile?.testimonials || []);
         setIsLoading(false);
       }
     } catch (error) {
@@ -56,12 +48,7 @@ const Profile = () => {
     }
   }, [form]);
 
-  const showCreatorProfilePreview = (creatorUrl) => {
-    const newWindow = window.open(creatorUrl);
-    newWindow.blur();
-    window.focus();
-  };
-
+  // Also adjust the event tags when necessary
   const updateProfileDetails = async (values) => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
@@ -72,13 +59,19 @@ const Profile = () => {
         await apis.user.convertUserToCreator();
       }
 
-      const { status, data } = await apis.user.updateProfile(values);
+      const payload = {
+        ...values,
+        profile: {
+          category: 'YOGA',
+        },
+      };
+
+      // TODO: Right now, the category is hard coded to YOGA
+      // Later we'll need to make a dropdown of choices
+      const { status, data } = await apis.user.updateProfile(payload);
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
-        trackSuccessEvent(eventTag, { form_values: values });
-        message.success('Profile successfully updated.');
-        localUserDetails = data;
-
+        trackSuccessEvent(eventTag, { form_values: payload });
         pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
           creator_external_id: localUserDetails.external_id,
           creator_email: localUserDetails.email,
@@ -92,96 +85,8 @@ const Profile = () => {
           creator_payment_currency: localUserDetails.profile?.currency || customNullValue,
           creator_zoom_connected: localUserDetails.profile?.zoom_connected || customNullValue,
         });
-
-        setUserDetails(localUserDetails);
-
-        if (isOnboarding) {
-          const creatorUrl = generateUrlFromUsername(values.username);
-
-          const modalRef = Modal.success({
-            width: 550,
-            okButtonProps: { style: { display: 'none' } },
-            title: 'Awesome! Your public website is ready',
-            content: (
-              <Row gutter={[8, 12]}>
-                <Col xs={24}>
-                  <Paragraph>You can now share your website</Paragraph>
-                  <Paragraph>
-                    <Space>
-                      <Link
-                        href={creatorUrl}
-                        target="_blank"
-                        copyable={{
-                          icon: [
-                            <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
-                              Copy
-                            </Button>,
-                            <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
-                              Copied!
-                            </Button>,
-                          ],
-                        }}
-                      >
-                        {creatorUrl}
-                      </Link>
-                      <Button size="small" type="primary" onClick={() => showCreatorProfilePreview(creatorUrl)}>
-                        Show me!
-                      </Button>
-                    </Space>
-                  </Paragraph>
-                  <Paragraph>on your social media or with your audience.</Paragraph>
-                  <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
-                </Col>
-                <Col xs={24}>
-                  <Row gutter={[8, 8]} justify="space-around">
-                    <Col xs={24} md={12}>
-                      <Button
-                        block
-                        type="primary"
-                        onClick={() => {
-                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, {
-                            onboarding: true,
-                          });
-                          modalRef.destroy();
-                        }}
-                      >
-                        Upload a Video
-                      </Button>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Button
-                        block
-                        type="primary"
-                        className={styles.greenBtn}
-                        onClick={() => {
-                          history.push(Routes.sessionCreate);
-                          window.scrollTo(0, 0);
-                          modalRef.destroy();
-                        }}
-                      >
-                        Schedule a Session
-                      </Button>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Button
-                        block
-                        type="link"
-                        onClick={() => {
-                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath);
-                          modalRef.destroy();
-                        }}
-                      >
-                        I'll do these later
-                      </Button>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            ),
-          });
-        } else {
-          history.push('/creator/dashboard/profile');
-        }
+        setUserDetails(data);
+        window.open(`${generateUrlFromUsername(data.username)}${Routes.onboardingProfile}`, '_self');
       }
     } catch (error) {
       setIsLoading(false);
@@ -191,21 +96,11 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (history.location.pathname.includes('dashboard')) {
-      setIsOnboarding(false);
-    }
     getProfileDetails();
-  }, [getProfileDetails, history.location.pathname]);
+  }, [getProfileDetails]);
 
   const onFinish = (values) => {
     setIsLoading(true);
-    values.cover_image_url = coverImage;
-    values.profile_image_url = profileImage;
-    values.profile.testimonials = testimonials;
-
-    // TODO: Right now, the category is hard coded to YOGA
-    // Later we'll need to make a dropdown of choices
-    values.profile.category = 'YOGA';
 
     if (isPublicUrlAvailable) {
       updateProfileDetails(values);
@@ -237,61 +132,72 @@ const Profile = () => {
   };
 
   return (
-    <Loader loading={isLoading} size="large" text="Loading profile">
-      <div className={styles.signupContainer}>
-        <div className={styles.signupHeadingText}>Name your Site</div>
-        <div className={styles.signupHeadingSubtext}>Set a public URL for your website</div>
-        <div className={styles.signupForm}>
-          <Form
-            form={form}
-            onFinish={onFinish}
-            labelAlign={isMobileDevice ? 'left' : 'right'}
-            scrollToFirstError={true}
-          >
-            <Form.Item className={styles.nameInputWrapper}>
-              <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-                <Input placeholder="First Name" />
+    <div className={styles.onboardingPage}>
+      <Loader loading={isLoading} size="large" text="Loading profile">
+        <div className={styles.formContainer}>
+          <div className={styles.formHeadingText}>Name your Site</div>
+          <div className={styles.formHeadingSubtext}>Set a public URL for your website</div>
+          <div className={styles.formContent}>
+            <Form
+              form={form}
+              onFinish={onFinish}
+              labelAlign={isMobileDevice ? 'left' : 'right'}
+              scrollToFirstError={true}
+            >
+              <Form.Item className={styles.nameInputWrapper}>
+                <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
+                  <Input placeholder="First Name" />
+                </Form.Item>
+                <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
+                  <Input placeholder="Last Name" />
+                </Form.Item>
               </Form.Item>
-              <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-                <Input placeholder="Last Name" />
+
+              <Form.Item>
+                <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
+                  <Col flex="0 0 120px">
+                    <Form.Item
+                      name="username"
+                      rules={validationRules.publicUrlValidation}
+                      onBlur={handlePublicUrlChange}
+                    >
+                      <Input placeholder="Username" maxLength={30} />
+                    </Form.Item>
+                  </Col>
+                  <Col flex="0 0 70px">
+                    <Text>.passion.do</Text>
+                  </Col>
+
+                  <Col flex="1 1 auto">
+                    {isLoadingUsernameCheck ? (
+                      <Spin />
+                    ) : (
+                      <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
+                        <span
+                          className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
+                        ></span>{' '}
+                        {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
+                      </Text>
+                    )}
+                  </Col>
+                </Row>
               </Form.Item>
-            </Form.Item>
 
-            <Form.Item>
-              <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
-                <Col flex="0 0 120px">
-                  <Form.Item name="username" rules={validationRules.publicUrlValidation} onBlur={handlePublicUrlChange}>
-                    <Input placeholder="username" maxLength={30} />
-                  </Form.Item>
-                </Col>
-                <Col flex="0 0 70px">
-                  <Text>.passion.do</Text>
-                </Col>
-
-                <Col flex="1 1 auto">
-                  {isLoadingUsernameCheck ? (
-                    <Spin />
-                  ) : (
-                    <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
-                      <span
-                        className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
-                      ></span>{' '}
-                      {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
-                    </Text>
-                  )}
-                </Col>
-              </Row>
-            </Form.Item>
-
-            <Form.Item>
-              <Button className={styles.signupButton} htmlType="submit" type="primary">
-                Continue
-              </Button>
-            </Form.Item>
-          </Form>
+              <Form.Item>
+                <Button
+                  disabled={!isPublicUrlAvailable}
+                  className={styles.submitButton}
+                  htmlType="submit"
+                  type="primary"
+                >
+                  Continue
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
         </div>
-      </div>
-    </Loader>
+      </Loader>
+    </div>
   );
 };
 

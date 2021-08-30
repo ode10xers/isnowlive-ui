@@ -37,10 +37,10 @@ const Login = ({ history }) => {
     (user) => {
       if (user) {
         if (user.is_creator) {
-          if (user.profile_complete === false) {
-            history.push(Routes.profile);
-            // } else if (user.profile?.zoom_connected === ZoomAuthType.NOT_CONNECTED) {
-            //   history.push(Routes.livestream);
+          if (!user.first_name || !user.last_name || !user.username) {
+            history.push(Routes.onboardingName);
+          } else if (user.profile_complete === false) {
+            history.push(Routes.onboardingProfile);
           } else {
             history.push(Routes.creatorDashboard.rootPath);
           }

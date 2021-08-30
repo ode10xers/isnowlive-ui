@@ -38,13 +38,12 @@ import {
   OrderedListOutlined,
   DeleteOutlined,
   ArrowLeftOutlined,
+  CopyOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
 
 import apis from 'apis';
 import Routes from 'routes';
-
-import validationRules from 'utils/validation';
-import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername } from 'utils/helper';
 
 import TextEditor from 'components/TextEditor';
 import ImageUpload from 'components/ImageUpload';
@@ -54,9 +53,14 @@ import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Mod
 
 import { newProfileFormLayout } from 'layouts/FormLayouts';
 
+import validationRules from 'utils/validation';
+import { deepCloneObject, isAPISuccess, preventDefaults, generateUrlFromUsername } from 'utils/helper';
+
+import { useGlobalContext } from 'services/globalContext';
+
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text, Paragraph, Link } = Typography;
 const { Panel } = Collapse;
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
@@ -621,10 +625,12 @@ const editViewMap = {
   },
 };
 
-// TODO: We need this page to open in with username in hostname
-const Onboarding = ({ history }) => {
+const Onboarding = ({ match, history }) => {
   const [form] = Form.useForm();
   const [usernameForm] = Form.useForm();
+  const { setUserDetails } = useGlobalContext();
+
+  const isOnboarding = match.path.includes('/onboarding');
 
   const [isLoading, setIsLoading] = useState(false);
   const [creatorProfileData, setCreatorProfileData] = useState(null);
@@ -823,6 +829,12 @@ const Onboarding = ({ history }) => {
     );
   };
 
+  const showCreatorProfilePreview = (creatorUrl) => {
+    const newWindow = window.open(creatorUrl);
+    newWindow.blur();
+    window.focus();
+  };
+
   const handleFormFinish = async (values) => {
     setIsLoading(true);
 
@@ -842,6 +854,95 @@ const Onboarding = ({ history }) => {
       const { status, data } = await apis.user.updateProfile(payload);
 
       if (isAPISuccess(status) && data) {
+        if (isOnboarding) {
+          setUserDetails(data);
+          const creatorUrl = generateUrlFromUsername(data.username);
+
+          const modalRef = Modal.success({
+            closbale: false,
+            maskClosable: false,
+            width: 550,
+            okButtonProps: { style: { display: 'none' } },
+            title: 'Awesome! Your public website is ready',
+            content: (
+              <Row gutter={[8, 12]}>
+                <Col xs={24}>
+                  <Paragraph>You can now share your website</Paragraph>
+                  <Paragraph>
+                    <Space>
+                      <Link
+                        href={creatorUrl}
+                        target="_blank"
+                        copyable={{
+                          icon: [
+                            <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
+                              Copy
+                            </Button>,
+                            <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
+                              Copied!
+                            </Button>,
+                          ],
+                        }}
+                      >
+                        {creatorUrl}
+                      </Link>
+                      <Button size="small" type="primary" onClick={() => showCreatorProfilePreview(creatorUrl)}>
+                        Show me!
+                      </Button>
+                    </Space>
+                  </Paragraph>
+                  <Paragraph>on your social media or with your audience.</Paragraph>
+                  <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
+                </Col>
+                <Col xs={24}>
+                  <Row gutter={[8, 8]} justify="space-around">
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="primary"
+                        onClick={() => {
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, {
+                            onboarding: true,
+                          });
+                          modalRef.destroy();
+                        }}
+                      >
+                        Upload a Video
+                      </Button>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="primary"
+                        className={styles.greenBtn}
+                        onClick={() => {
+                          history.push(Routes.sessionCreate);
+                          window.scrollTo(0, 0);
+                          modalRef.destroy();
+                        }}
+                      >
+                        Schedule a Session
+                      </Button>
+                    </Col>
+                    <Col xs={24} md={12}>
+                      <Button
+                        block
+                        type="link"
+                        onClick={() => {
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath);
+                          modalRef.destroy();
+                        }}
+                      >
+                        I'll do these later
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            ),
+          });
+        }
+
         setCreatorProfileData(data);
         message.success('Profile Saved Successfully!');
       }
@@ -1052,14 +1153,16 @@ const Onboarding = ({ history }) => {
       <Spin spinning={isLoading} size="large">
         <Row gutter={[10, 20]}>
           <Col xs={24} lg={12}>
-            <Button
-              className={styles.mb20}
-              type="default"
-              onClick={handleBackToDashboardClicked}
-              icon={<ArrowLeftOutlined />}
-            >
-              Back to Dashboard
-            </Button>
+            {!isOnboarding && (
+              <Button
+                className={styles.mb20}
+                type="default"
+                onClick={handleBackToDashboardClicked}
+                icon={<ArrowLeftOutlined />}
+              >
+                Back to Dashboard
+              </Button>
+            )}
             <div className={styles.profileFormContainer}>
               <Form {...newProfileFormLayout} form={form} scrollToFirstError={true} onFinish={handleFormFinish}>
                 <Row gutter={[12, 12]} align="middle" justify="center">
@@ -1258,22 +1361,20 @@ const Onboarding = ({ history }) => {
                       </Button>
                     )}
                   </Col>
-                  <Col xs={0} lg={24} className={styles.textAlignCenter}>
-                    <div className={styles.deviceContainer}>
-                      {isMobileView ? (
-                        <DeviceUIPreview
-                          key="desktop-mobile-preview"
-                          creatorProfileData={creatorProfileData}
-                          isMobilePreview={true}
-                        />
-                      ) : (
-                        <DeviceUIPreview
-                          key="desktop-web-preview"
-                          creatorProfileData={creatorProfileData}
-                          isMobilePreview={false}
-                        />
-                      )}
-                    </div>
+                  <Col xs={0} lg={24} className={styles.deviceContainer}>
+                    {isMobileView ? (
+                      <DeviceUIPreview
+                        key="desktop-mobile-preview"
+                        creatorProfileData={creatorProfileData}
+                        isMobilePreview={true}
+                      />
+                    ) : (
+                      <DeviceUIPreview
+                        key="desktop-web-preview"
+                        creatorProfileData={creatorProfileData}
+                        isMobilePreview={false}
+                      />
+                    )}
                   </Col>
                 </Row>
               </Col>

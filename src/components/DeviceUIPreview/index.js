@@ -74,7 +74,6 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
     };
   }, [contentRef, isMobilePreview]);
 
-  // TODO: Also need to pass override user sections here as another props
   const creatorProfilePreview = (
     <MobileLayout>
       <DynamicProfile overrideUserObject={creatorProfileData} />

@@ -20,6 +20,7 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
+import FullWidthLayout from 'layouts/FullWidthLayout';
 
 const DefaultLayout = lazy(() => import('layouts/DefaultLayout'));
 const SideNavLayout = lazy(() => import('layouts/SideNavLayout'));
@@ -236,7 +237,9 @@ function App() {
               path={Routes.attendeeDashboard.rootPath}
               component={AttendeeDashboard}
             />
-            <PrivateRoute layout={DefaultLayout} exact path={Routes.profile} component={Profile} />
+            <PrivateRoute layout={FullWidthLayout} exact path={Routes.profileEdit} component={Onboarding} />
+            <PrivateRoute layout={FullWidthLayout} exact path={Routes.onboardingProfile} component={Onboarding} />
+            <PrivateRoute layout={FullWidthLayout} exact path={Routes.onboardingName} component={Profile} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.livestream} component={LiveStream} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionCreate} component={Session} />
             <PrivateRoute layout={DefaultLayout} exact path={Routes.sessionUpdate} component={Session} />
@@ -313,9 +316,6 @@ function App() {
               component={SessionDetailsPreview}
             />
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.sessionDetails} component={SessionDetails} />
-            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.passDetails} component={PassDetails} /> */}
-            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.videoDetails} component={VideoDetails} /> */}
-            {/* <RouteWithLayout layout={NavbarLayout} exact path={Routes.courseDetails} component={CourseDetails} /> */}
             <RouteWithLayout
               layout={NavbarLayout}
               exact
@@ -327,8 +327,7 @@ function App() {
             <RouteWithLayout layout={NavbarLayout} path={Routes.passwordVerification} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.createPassword} component={ResetPassword} />
             <RouteWithLayout layout={NavbarLayout} path={Routes.emailVerification} component={EmailVerification} />
-            <RouteWithLayout layout={DefaultLayout} exact path={Routes.signup} component={SignUp} />
-            <RouteWithLayout layout={NavbarFullWidthLayout} exact path={Routes.onboarding} component={Onboarding} />
+            <RouteWithLayout layout={FullWidthLayout} exact path={Routes.signup} component={SignUp} />
             {/* New Pages are put higher for more priority matching */}
             <RouteWithLayout layout={NavbarLayout} exact path={Routes.root + 'old'} component={Home} />
             <RouteWithLayout

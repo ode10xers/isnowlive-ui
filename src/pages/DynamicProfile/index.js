@@ -257,7 +257,6 @@ const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6
 
 // TODO: Most of the edit functionality in this page will be moved to the new onboarding page
 // Remove code as necessary
-// TODO: Fix coloring targeting parent element instead of iframe
 const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) => {
   const history = useHistory();
   const match = useRouteMatch();
@@ -377,7 +376,6 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
             window.frames[idx].document.documentElement.style.setProperty(key, val);
           } catch (error) {
             console.log('Silently passing error');
-            console.error(error);
           }
         }
       } else {
@@ -394,7 +392,6 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
                 window.frames[idx].document.documentElement.style.removeProperty(key);
               } catch (error) {
                 console.log('Silently passing error');
-                console.error(error);
               }
             }
           } else {
@@ -483,6 +480,8 @@ const DynamicProfile = ({ creatorUsername = null, overrideUserObject = null }) =
 
   const handleEditDynamicProfileButtonClicked = (e) => {
     preventDefaults(e);
+
+    window.open(`${generateUrlFromUsername(creatorProfileData?.username)}${Routes.profileEdit}`, '_self');
 
     setTempCreatorUIConfig(deepCloneObject(creatorUIConfig));
     setEditingMode(true);

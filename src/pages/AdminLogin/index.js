@@ -24,8 +24,10 @@ const AdminLogin = ({ history }) => {
   const redirectBasedOnProfileCriteria = useCallback(
     (user) => {
       if (user.is_creator) {
-        if (user.profile_complete === false) {
-          history.push(Routes.profile);
+        if (!user.first_name || !user.last_name || !user.username) {
+          history.push(Routes.onboardingName);
+        } else if (user.profile_complete === false) {
+          history.push(Routes.onboardingProfile);
         } else if (user.profile?.zoom_connected === false) {
           history.push(Routes.livestream);
         } else {

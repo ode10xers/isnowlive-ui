@@ -1,87 +1,40 @@
 @import '../../styles/variables.scss';
 
-.button {
-  margin-right: 20px;
+.onboardingPage {
+  min-height: 100vh;
+  padding-top: 30px;
 }
+
 .dot {
   height: 10px;
   width: 10px;
   background-color: map-get($colors, $key: 'White1');
   border-radius: 50%;
   display: inline-block;
-}
-.success {
-  background-color: map-get($colors, $key: 'KellyGreen');
-}
-.danger {
-  background-color: map-get($colors, $key: 'FireBrick');
-}
-.imageWrapper {
-  position: relative;
-  min-height: 365px;
-}
-.coverImageWrapper {
-  text-align: right;
-  top: 0;
-  left: 0;
-  margin-bottom: 0 !important;
-}
-.profileImageWrapper {
-  position: relative;
-  bottom: 30px;
-  left: 30px;
-  margin-bottom: 0 !important;
-  z-index: 20;
 
-  .ant-form-item-explain {
-    position: absolute;
-    bottom: -30px;
+  &.success {
+    background-color: map-get($colors, $key: 'KellyGreen');
+  }
+  &.danger {
+    background-color: map-get($colors, $key: 'FireBrick');
   }
 }
-.coverImage > div {
-  width: 100% !important;
-  min-height: 365px;
-  // height: 300px !important;
-}
-.profileImage {
-  position: absolute;
-  bottom: -40px;
-  left: 20px;
-}
-.subtext {
-  color: map-get($colors, $key: 'SuvaGrey');
-  margin-left: map-get($spacing, '20');
-  margin-bottom: map-get($spacing, '20');
-}
+
 .alignUrl {
   align-items: baseline !important;
 }
 .nameInputWrapper {
   margin: 0px !important;
-}
-.nameInput {
-  max-width: 180px;
-  display: inline-block !important;
-  width: calc(50% - 12px);
-  margin-right: 10px !important;
-}
-.card {
-  margin: 10px !important;
-}
 
-@media (max-width: 768px) {
   .nameInput {
-    max-width: 230px;
-  }
-  .card {
-    margin-left: -20px !important;
-    margin-right: -20px !important;
+    display: inline-block !important;
+    width: calc(50% - 6px);
+    margin-right: 6px !important;
   }
 }
 
-// TODO: Rename these classes later for better context
-.signupContainer {
-  box-shadow: inset 0px 1px 0px map-get($map: $colors, $key: 'Lavender');
+.formContainer {
+  box-shadow: -4px 3px 2px map-get($map: $colors, $key: 'Lavender');
   border: 1px solid map-get($map: $colors, $key: 'Silver');
 
   position: absolute;
@@ -94,44 +47,58 @@
   flex-direction: column;
   align-items: center;
   top: 340px;
-  background: #FFFFFF;
+  background: #ffffff;
   border-radius: 20px;
-  padding: 80px;
   max-width: 490px;
+  padding: 80px;
+
+  @media screen and (max-width: 526px) {
+    padding: 60px 16px;
+  }
 }
 
-.signupHeadingText{
-  width: 368px;
+.formHeadingText{
+  min-width: 360px;
   font-weight: 700;
   font-size: 36px;
-  line-height: 74px;    
+  line-height: 74px;
   text-align: center;
   color: #434343;
+
+  @media screen and (max-width: 526px) {
+    min-width: 300px;
+    font-size: 28px;
+    line-height: 54px;
+  }
 }
 
-.signupForm{
-  width: 100%;
-  text-align: center;
-}
-
-.signupHeadingSubtext{
-  font-style: normal;
-  font-weight: normal;
+.formHeadingSubtext{
   font-size: 20px;
   line-height: 32px;
   text-align: center;
   color: #232323;
   padding-bottom: 40px;
+  
+  @media screen and (max-width: 526px) {
+    font-size: 16px;
+    padding-bottom: 20px;
+  }
 }
 
-.signupButton{
-  // border: 1px solid #FF820B !important;
-  // background: linear-gradient(94.06deg, #FF820B 0%, rgba(255, 134, 19, 0.75) 106.52%) !important;
+.formContent{
+  width: 100%;
+  text-align: center;
+}
+
+.submitButton{
   @extend .orangeBtn;
   min-height: 52px !important;
   border-radius: 8px !important;
-  font-style: normal;
   font-weight: 500 !important;
   font-size: 20px !important;
   line-height: 24px !important;
+
+  &:disabled{
+    opacity : 0.7;
+  }
 }
