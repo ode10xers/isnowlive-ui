@@ -763,31 +763,39 @@ const Onboarding = ({ match, history }) => {
                 initialValues={{ username: creatorProfileData?.username ?? '' }}
               >
                 <Form.Item>
-                  <Row align="middle" gutter={[10, 10]} className={styles.alignUrl} justify="center">
-                    <Col flex="0 0 120px">
+                  <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
+                    <Col xs={16} lg={12}>
                       <Form.Item
                         name="username"
                         rules={validationRules.publicUrlValidation}
+                        normalize={(value) => value?.toLowerCase()}
                         onBlur={handlePublicUrlChange}
                       >
-                        <Input placeholder="username" maxLength={30} />
+                        <Input placeholder="Username" maxLength={30} />
                       </Form.Item>
                     </Col>
-                    <Col flex="0 0 70px">
-                      <Text>.passion.do</Text>
-                    </Col>
+                    <Col xs={8} lg={12}>
+                      <Row gutter={8}>
+                        <Col xs={24} lg={10} lassName={styles.textAlignLeft}>
+                          <Text>.passion.do</Text>
+                        </Col>
 
-                    <Col flex="0 0 120px">
-                      {isLoadingUsernameCheck ? (
-                        <Spin />
-                      ) : (
-                        <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
-                          <span
-                            className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
-                          ></span>{' '}
-                          {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
-                        </Text>
-                      )}
+                        <Col xs={24} lg={14} className={styles.textAlignLeft}>
+                          {isLoadingUsernameCheck ? (
+                            <Spin />
+                          ) : (
+                            <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
+                              <span
+                                className={classNames(
+                                  styles.dot,
+                                  isPublicUrlAvailable ? styles.success : styles.danger
+                                )}
+                              ></span>{' '}
+                              {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
+                            </Text>
+                          )}
+                        </Col>
+                      </Row>
                     </Col>
                   </Row>
                 </Form.Item>
