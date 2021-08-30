@@ -9,14 +9,14 @@ import { storeCreatorDetailsToLS } from 'utils/storage';
 import { isAPISuccess, isInCustomDomain } from 'utils/helper';
 import { isInIframeWidget, isWidgetUrl, publishedWidgets } from 'utils/widgets';
 
+import http from 'services/http';
 import { useGlobalContext } from 'services/globalContext';
-import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
+import { mapUserToPendo } from 'services/integrations/pendo';
 import { initMixPanel } from 'services/integrations/mixpanel';
 import { getAuthCookie, setAuthCookie } from 'services/authCookie';
-import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 import { setGTMUserAttributes } from 'services/integrations/googleTagManager';
-import { mapUserToPendo } from 'services/integrations/pendo';
-import http from 'services/http';
+import { initFreshChatWidget, initializeFreshChat } from 'services/integrations/fresh-chat';
+import { deleteAuthTokenFromLS, getAuthTokenFromLS, setAuthTokenInLS } from 'services/localAuthToken';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
@@ -58,7 +58,7 @@ const SessionDetailedListView = lazy(() => import('pages/DetailedListView/Sessio
 const CourseDetailedListView = lazy(() => import('pages/DetailedListView/Courses'));
 const EmbeddablePage = lazy(() => import('pages/EmbeddablePage'));
 const Legals = lazy(() => import('pages/Legals'));
-const Onboarding = lazy(() => import('pages/Onboarding'));
+const Onboarding = lazy(() => import('pages/EditProfile'));
 
 const PassDetailPreview = lazy(() => import('pages/PreviewPages/PassDetails'));
 const CourseDetailPreview = lazy(() => import('pages/PreviewPages/CourseDetails'));

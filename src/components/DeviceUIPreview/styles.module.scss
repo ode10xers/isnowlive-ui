@@ -1,7 +1,7 @@
 @import '../../styles/variables.scss';
 
 .contentContainer {
-  $scrollbar-width: 18px;
+  $scrollbar-width: 8px;
   width: calc(100% + #{$scrollbar-width});
   overflow-x: hidden;
   height: 100%;

@@ -2,26 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 
-import {
-  Row,
-  Col,
-  Typography,
-  Space,
-  Form,
-  Input,
-  Collapse,
-  Modal,
-  Spin,
-  Button,
-  Tooltip,
-  Divider,
-  message,
-} from 'antd';
+import { Row, Col, Typography, Space, Form, Input, Collapse, Modal, Spin, Button, Divider, message } from 'antd';
 
 import {
   DownOutlined,
   PlusCircleOutlined,
-  MinusCircleOutlined,
   DesktopOutlined,
   MobileOutlined,
   EditOutlined,
@@ -49,6 +34,12 @@ import DeviceUIPreview from 'components/DeviceUIPreview';
 import DragAndDropHandle from 'components/DynamicProfileComponents/DragAndDropHandle';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
+import DescriptionEditForm from './DescriptionEditForm';
+import OtherLinksEditForm from './OtherLinksEditForm';
+import SimpleEditForm from './SimpleEditForm';
+import TextListEditForm from './TextListEditForm';
+import YoutubeLinksEditForm from './YoutubeLinksEditForm';
+
 import { newProfileFormLayout } from 'layouts/FormLayouts';
 
 import validationRules from 'utils/validation';
@@ -62,366 +53,6 @@ const { Title, Text, Paragraph, Link } = Typography;
 const { Panel } = Collapse;
 
 const colorPalletteChoices = ['#ff0a54', '#ff700a', '#ffc60a', '#0affb6', '#0ab6ff', '#b10aff', '#40A9FF'];
-
-// TODO: Clean up this file
-const SimpleEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
-  return (
-    <Form.Item
-      {...restFields}
-      label="Section Title"
-      name={[name, 'title']}
-      fieldKey={[fieldKey, 'title']}
-      rules={validationRules.requiredValidation}
-    >
-      <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
-    </Form.Item>
-  );
-};
-
-const OtherLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => {
-  const [expandedAccordionKeys, setExpandedAccordionKeys] = useState([]);
-
-  return (
-    <>
-      <Form.Item
-        {...restFields}
-        labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
-        wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
-        label="Title"
-        name={[name, 'title']}
-        fieldKey={[fieldKey, 'title']}
-        rules={validationRules.requiredValidation}
-      >
-        <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
-      </Form.Item>
-      <Form.Item
-        labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
-        wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
-        label="Your Links"
-        required={true}
-      >
-        <Form.List
-          {...restFields}
-          name={[name, 'values']}
-          fieldKey={[fieldKey, 'name']}
-          rules={validationRules.otherLinksValidation}
-        >
-          {(fields, { add, remove }, { errors }) => (
-            <Row className={styles.ml10} gutter={[8, 12]}>
-              <Col xs={24}>
-                <Collapse
-                  defaultActiveKey={fields[0]?.name ?? 0}
-                  activeKey={expandedAccordionKeys}
-                  onChange={setExpandedAccordionKeys}
-                >
-                  {fields.map(({ name: otherLinksName, fieldKey: otherLinksFieldKey, ...otherLinksRestField }) => (
-                    <Panel
-                      key={otherLinksName}
-                      header={
-                        <Space align="baseline">
-                          <Title level={5} className={styles.blueText}>
-                            Link Item
-                          </Title>
-                          {fields.length > 1 ? (
-                            <Tooltip title="Remove this link item">
-                              <MinusCircleOutlined
-                                className={styles.redText}
-                                onClick={(e) => {
-                                  preventDefaults(e);
-                                  // NOTE : We use the name as Panel key
-                                  setExpandedAccordionKeys((prevKeys) =>
-                                    prevKeys.filter((val) => val !== otherLinksName)
-                                  );
-                                  remove(otherLinksName);
-                                }}
-                              />
-                            </Tooltip>
-                          ) : null}
-                        </Space>
-                      }
-                    >
-                      <Row gutter={[8, 4]}>
-                        <Col xs={24} md={12}>
-                          <Form.Item
-                            className={styles.compactFormItem}
-                            {...otherLinksRestField}
-                            label="Link Title"
-                            fieldKey={[otherLinksFieldKey, 'title']}
-                            name={[otherLinksName, 'title']}
-                            rules={validationRules.requiredValidation}
-                          >
-                            <Input placeholder="Text to show (max. 50)" maxLength={50} />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} md={12}>
-                          <Form.Item
-                            className={styles.compactFormItem}
-                            {...otherLinksRestField}
-                            label="Link URL"
-                            fieldKey={[otherLinksFieldKey, 'url']}
-                            name={[otherLinksName, 'url']}
-                            rules={validationRules.urlValidation}
-                          >
-                            <Input placeholder="Paste your URL here" type="url" />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} md={12}>
-                          <Form.Item
-                            className={styles.compactFormItem}
-                            {...otherLinksRestField}
-                            label="Title Color"
-                            fieldKey={[otherLinksFieldKey, 'textColor']}
-                            name={[otherLinksName, 'textColor']}
-                            rules={[...validationRules.requiredValidation, ...validationRules.hexColorValidation()]}
-                          >
-                            <Input placeholder="Hex color code of the title" />
-                          </Form.Item>
-                        </Col>
-                        <Col xs={24} md={12}>
-                          <Form.Item
-                            className={styles.compactFormItem}
-                            {...otherLinksRestField}
-                            label="Background Color"
-                            fieldKey={[otherLinksFieldKey, 'backgroundColor']}
-                            name={[otherLinksName, 'backgroundColor']}
-                            rules={[...validationRules.requiredValidation, ...validationRules.hexColorValidation()]}
-                          >
-                            <Input placeholder="Hex color code of the background" />
-                          </Form.Item>
-                        </Col>
-                      </Row>
-                    </Panel>
-                  ))}
-                </Collapse>
-              </Col>
-              <Col xs={24}>
-                <Button
-                  block
-                  type="dashed"
-                  onClick={(e) => {
-                    preventDefaults(e);
-                    // NOTE : Since the new one will be added at the last place
-                    // We ad the length of current array to the expanded keys
-                    setExpandedAccordionKeys((prevKeys) => [...new Set([...prevKeys, fields.length])]);
-                    add();
-                  }}
-                  icon={<PlusCircleOutlined />}
-                >
-                  Add more links
-                </Button>
-              </Col>
-              <Col xs={24}>
-                <Form.ErrorList errors={errors} />
-              </Col>
-            </Row>
-          )}
-        </Form.List>
-      </Form.Item>
-    </>
-  );
-};
-
-const DescriptionEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
-  <>
-    <Form.Item
-      {...restFields}
-      id="title"
-      name={[name, 'title']}
-      fieldKey={[fieldKey, 'title']}
-      label="Section Title"
-      rules={validationRules.requiredValidation}
-    >
-      <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
-    </Form.Item>
-    <Form.Item
-      {...restFields}
-      className={classNames(styles.bgWhite, styles.textEditorLayout)}
-      id="values"
-      name={[name, 'values']}
-      fieldKey={[fieldKey, 'values']}
-      label="Content"
-      rules={validationRules.requiredValidation}
-    >
-      <div>
-        <TextEditor
-          form={formInstance}
-          name={['profile', 'sections', name, 'values']}
-          placeholder="Describe yourself here"
-          triggerOnBlur={true}
-        />
-      </div>
-    </Form.Item>
-  </>
-);
-
-const YoutubeLinksEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
-  <>
-    <Form.Item
-      id="title"
-      {...restFields}
-      name={[name, 'title']}
-      fieldKey={[fieldKey, 'title']}
-      label="Title"
-      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
-      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
-      rules={validationRules.requiredValidation}
-    >
-      <Input placeholder="Input container title (max. 30 characters)" maxLength={30} />
-    </Form.Item>
-    <Form.Item
-      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
-      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
-      label="Video Links"
-      required={true}
-    >
-      <Form.List
-        {...restFields}
-        fieldKey={[fieldKey, 'values']}
-        name={[name, 'values']}
-        rules={validationRules.dynamicArrayItemValidation}
-      >
-        {(fields, { add, remove }, { errors }) => (
-          <Row gutter={[8, 12]}>
-            <Col xs={24}>
-              <Paragraph>Accepts YouTube Links with this format:</Paragraph>
-              <Paragraph>
-                <Text strong>https://youtu.be/[video-id]</Text> or{' '}
-                <Text strong>https://www.youtube.com/watch?v=[video-id]</Text>
-              </Paragraph>
-            </Col>
-            <Col xs={24}>
-              {fields.map(({ name: youtubeLinksName, fieldKey: youtubeLinksFieldKey, ...youtubeLinksRestFields }) => (
-                <Row gutter={[8, 12]} align="middle" key={`youtube-fields-${youtubeLinksFieldKey}`}>
-                  <Col flex="1 1 auto">
-                    <Form.Item
-                      {...youtubeLinksRestFields}
-                      className={styles.compactFormItem}
-                      fieldKey={youtubeLinksFieldKey}
-                      name={youtubeLinksName}
-                      rules={validationRules.youtubeLinkValidation}
-                    >
-                      <Input placeholder="Put YouTube video link here" maxLength={100} />
-                    </Form.Item>
-                  </Col>
-                  <Col flex="0 0 40px">
-                    <Tooltip title="Remove this item">
-                      <MinusCircleOutlined
-                        className={styles.redText}
-                        onClick={(e) => {
-                          preventDefaults(e);
-                          remove(youtubeLinksName);
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-                </Row>
-              ))}
-            </Col>
-            <Col xs={24}>
-              <Button
-                block
-                type="dashed"
-                onClick={(e) => {
-                  preventDefaults(e);
-                  add();
-                }}
-                icon={<PlusCircleOutlined />}
-              >
-                Add more links
-              </Button>
-            </Col>
-            <Col xs={24}>
-              <Form.ErrorList errors={errors} />
-            </Col>
-          </Row>
-        )}
-      </Form.List>
-    </Form.Item>
-  </>
-);
-
-const TextListEditForm = ({ formInstance, name, fieldKey, ...restFields }) => (
-  <>
-    <Form.Item
-      id="title"
-      {...restFields}
-      fieldKey={[fieldKey, 'title']}
-      name={[name, 'title']}
-      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
-      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
-      label="Section Title"
-      rules={validationRules.requiredValidation}
-    >
-      <Input placeholder="Input section title (max. 30 characters)" maxLength={30} />
-    </Form.Item>
-    <Form.Item
-      labelCol={{ xs: { span: 24 }, lg: { span: 4 } }}
-      wrapperCol={{ xs: { span: 24 }, lg: { span: 20 } }}
-      label="List Items"
-      required={true}
-    >
-      <Form.List
-        {...restFields}
-        fieldKey={[fieldKey, 'values']}
-        name={[name, 'values']}
-        rules={validationRules.dynamicArrayItemValidation}
-      >
-        {(fields, { add, remove }, { errors }) => (
-          <Row gutter={[8, 12]}>
-            <Col xs={24}>
-              {fields.map(({ name: textListName, fieldKey: textListFieldKey, ...textListRestFields }) => (
-                <Row gutter={[8, 12]} align="middle" key={`text-list-fields-${textListFieldKey}`}>
-                  <Col flex="1 1 auto">
-                    <Form.Item
-                      {...textListRestFields}
-                      fieldKey={textListFieldKey}
-                      name={textListName}
-                      rules={validationRules.requiredValidation}
-                    >
-                      <Input.TextArea
-                        placeholder="Place any text here (max 200 chars)"
-                        maxLength={200}
-                        showCount={true}
-                        autoSize={true}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col flex="0 0 40px">
-                    <Tooltip title="Remove this item">
-                      <MinusCircleOutlined
-                        className={styles.redText}
-                        onClick={(e) => {
-                          preventDefaults(e);
-                          remove(textListName);
-                        }}
-                      />
-                    </Tooltip>
-                  </Col>
-                </Row>
-              ))}
-            </Col>
-            <Col xs={24}>
-              <Button
-                block
-                type="dashed"
-                onClick={(e) => {
-                  preventDefaults(e);
-                  add();
-                }}
-                icon={<PlusCircleOutlined />}
-              >
-                Add more items
-              </Button>
-            </Col>
-            <Col xs={24}>
-              <Form.ErrorList errors={errors} />
-            </Col>
-          </Row>
-        )}
-      </Form.List>
-    </Form.Item>
-  </>
-);
 
 // NOTE: we're ignoring PRODUCTS component for now
 const componentUIType = {
@@ -1077,19 +708,6 @@ const Onboarding = ({ match, history }) => {
     setIsLoading(false);
   };
 
-  // const handleFormFieldsChanged = (changedFields, allFields) => {
-  //   const formValues = form.getFieldsValue();
-
-  //   setCreatorProfileData((prevData) => ({
-  //     ...prevData,
-  //     ...formValues,
-  //     profile: {
-  //       ...prevData.profile,
-  //       ...formValues.profile,
-  //     },
-  //   }));
-  // };
-
   const handleFormValuesChange = (changedValues, allValues) => {
     if (updateTimeoutID) {
       clearTimeout(updateTimeoutID);
@@ -1239,7 +857,7 @@ const Onboarding = ({ match, history }) => {
               >
                 <Row gutter={[12, 12]} align="middle" justify="center">
                   <Col xs={12}>
-                    <Title level={4}>My Public Page</Title>
+                    <Title level={4}>My Website Page</Title>
                   </Col>
                   <Col xs={12} className={styles.textAlignRight}>
                     <Button type="primary" className={styles.greenBtn} htmlType="submit" loading={isLoading}>

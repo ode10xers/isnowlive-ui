@@ -3,7 +3,7 @@ const validationRules = {
   publicUrlValidation: [
     { required: true, message: 'Please input public URL' },
     {
-      pattern: new RegExp('^[a-z]*$'),
+      pattern: new RegExp('^[A-Za-z]*$'),
       message: 'Public URL can only contain lowercase letters',
     },
   ],

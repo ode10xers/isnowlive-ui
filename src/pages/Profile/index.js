@@ -162,6 +162,7 @@ const Profile = () => {
                     <Form.Item
                       name="username"
                       rules={validationRules.publicUrlValidation}
+                      normalize={(value) => value.toLowerCase()}
                       onBlur={handlePublicUrlChange}
                     >
                       <Input placeholder="Username" maxLength={30} />
