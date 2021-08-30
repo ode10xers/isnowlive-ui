@@ -908,7 +908,7 @@ const Onboarding = ({ match, history }) => {
                         type="primary"
                         className={styles.greenBtn}
                         onClick={() => {
-                          history.push(Routes.sessionCreate);
+                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.createSessions);
                           window.scrollTo(0, 0);
                           modalRef.destroy();
                         }}
