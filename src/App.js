@@ -20,7 +20,6 @@ import http from 'services/http';
 
 import './styles/globals.scss';
 import 'swiper/swiper.scss';
-import FullWidthLayout from 'layouts/FullWidthLayout';
 
 const DefaultLayout = lazy(() => import('layouts/DefaultLayout'));
 const SideNavLayout = lazy(() => import('layouts/SideNavLayout'));
@@ -28,6 +27,7 @@ const SideNavWithHeaderLayout = lazy(() => import('layouts/SideNavWithHeaderLayo
 const NavbarFullWidthLayout = lazy(() => import('layouts/NavbarFullWidthLayout'));
 const NavbarLayout = lazy(() => import('layouts/NavbarLayout'));
 const MobileLayout = lazy(() => import('layouts/MobileLayout'));
+const FullWidthLayout = lazy(() => import('layouts/FullWidthLayout'));
 
 const Home = lazy(() => import('pages/Home'));
 const Profile = lazy(() => import('pages/Profile'));

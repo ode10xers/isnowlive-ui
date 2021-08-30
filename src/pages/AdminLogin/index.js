@@ -12,6 +12,7 @@ import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 
 import styles from './style.module.scss';
+import { generateUrlFromUsername } from 'utils/helper';
 
 const { Item } = Form;
 const { Password } = Input;
@@ -29,7 +30,8 @@ const AdminLogin = ({ history }) => {
         if (!user.first_name || !user.last_name || !user.username) {
           history.push(Routes.onboardingName);
         } else if (user.profile_complete === false) {
-          history.push(Routes.onboardingProfile);
+          // history.push(Routes.onboardingProfile);
+          window.open(`${generateUrlFromUsername(user.username)}${Routes.onboardingProfile}`, '_self');
         } else if (user.profile?.zoom_connected === false) {
           history.push(Routes.livestream);
         } else {

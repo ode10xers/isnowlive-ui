@@ -8,7 +8,7 @@ import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals
 
 import validationRules from 'utils/validation';
 import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 
 import { useGlobalContext } from 'services/globalContext';
 import {
@@ -41,7 +41,8 @@ const Login = ({ history }) => {
           if (!user.first_name || !user.last_name || !user.username) {
             history.push(Routes.onboardingName);
           } else if (user.profile_complete === false) {
-            history.push(Routes.onboardingProfile);
+            // history.push(Routes.onboardingProfile);
+            window.open(`${generateUrlFromUsername(user.username)}${Routes.onboardingProfile}`, '_self');
           } else {
             history.push(Routes.creatorDashboard.rootPath);
           }

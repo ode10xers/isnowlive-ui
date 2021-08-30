@@ -247,6 +247,7 @@ const DescriptionEditForm = ({ formInstance, name, fieldKey, ...restFields }) =>
           form={formInstance}
           name={['profile', 'sections', name, 'values']}
           placeholder="Describe yourself here"
+          triggerOnBlur={true}
         />
       </div>
     </Form.Item>
@@ -641,7 +642,6 @@ const Onboarding = ({ match, history }) => {
   const [expandedComponentsSection, setExpandedComponentsSection] = useState([]);
 
   const [isMobileView, setIsMobileView] = useState(true);
-  const [previewKeys, setPreviewKeys] = useState(0);
 
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [editUsernameModalVisible, setEditUsernameModalVisible] = useState(false);
@@ -667,7 +667,11 @@ const Onboarding = ({ match, history }) => {
         setCreatorCoverImageUrl(data.cover_image_url);
         setCreatorProfileImageUrl(data.profile_image_url);
 
-        setCreatorColorChoice(data?.profile?.color ?? null);
+        if (isOnboarding) {
+          setCreatorColorChoice('#ffc60a');
+        } else {
+          setCreatorColorChoice(data?.profile?.color ?? null);
+        }
 
         form.setFieldsValue(data);
       }
@@ -677,11 +681,13 @@ const Onboarding = ({ match, history }) => {
     }
 
     setIsLoading(false);
-  }, [form]);
+  }, [form, isOnboarding]);
 
   useEffect(() => {
     fetchCreatorProfileData();
   }, [fetchCreatorProfileData]);
+
+  useEffect(() => {}, []);
 
   const expandComponentSection = (componentKey) =>
     setExpandedComponentsSection((prevValues) => [...new Set([...prevValues, componentKey])]);
@@ -853,13 +859,12 @@ const Onboarding = ({ match, history }) => {
       const { status, data } = await apis.user.updateProfile(payload);
 
       if (isAPISuccess(status) && data) {
-        setPreviewKeys((prev) => prev + 1);
         if (isOnboarding) {
           setUserDetails(data);
           const creatorUrl = generateUrlFromUsername(data.username);
 
           const modalRef = Modal.success({
-            closbale: false,
+            closable: false,
             maskClosable: false,
             width: 550,
             okButtonProps: { style: { display: 'none' } },
@@ -1051,6 +1056,30 @@ const Onboarding = ({ match, history }) => {
     setIsLoading(false);
   };
 
+  const handleFormFieldsChanged = (changedFields, allFields) => {
+    const formValues = form.getFieldsValue();
+
+    setCreatorProfileData((prevData) => ({
+      ...prevData,
+      ...formValues,
+      profile: {
+        ...prevData.profile,
+        ...formValues.profile,
+      },
+    }));
+  };
+
+  // const handleFormValuesChange = (changedValues, allValues) => {
+  //   setCreatorProfileData((prevData) => ({
+  //     ...prevData,
+  //     ...allValues,
+  //     profile : {
+  //       ...prevData.profile,
+  //       ...allValues.profile,
+  //     }
+  //   }));
+  // };
+
   return (
     <div className={styles.editPageContainer}>
       <Modal
@@ -1160,7 +1189,14 @@ const Onboarding = ({ match, history }) => {
               </Button>
             )}
             <div className={styles.profileFormContainer}>
-              <Form {...newProfileFormLayout} form={form} scrollToFirstError={true} onFinish={handleFormFinish}>
+              <Form
+                {...newProfileFormLayout}
+                form={form}
+                // onValuesChange={handleFormValuesChange}
+                onFieldsChange={handleFormFieldsChanged}
+                scrollToFirstError={true}
+                onFinish={handleFormFinish}
+              >
                 <Row gutter={[12, 12]} align="middle" justify="center">
                   <Col xs={12}>
                     <Title level={4}>My Public Page</Title>
@@ -1201,14 +1237,13 @@ const Onboarding = ({ match, history }) => {
                           >
                             <Panel key="profile" header={<Text strong>Profile</Text>}>
                               <Form.Item
-                                name="cover_image_url"
                                 label="Cover Photo"
+                                name="cover_image_url"
                                 rules={validationRules.requiredValidation}
                               >
                                 <div>
                                   <ImageUpload
                                     name="cover_image_url"
-                                    listType="picture"
                                     label="Upload Cover Image (size of Facebook Cover Image)"
                                     onChange={handleCoverImageUpload}
                                     value={creatorCoverImageUrl}
@@ -1218,8 +1253,8 @@ const Onboarding = ({ match, history }) => {
                                 </div>
                               </Form.Item>
                               <Form.Item
-                                name="profile_image_url"
                                 label="Your Photo"
+                                name="profile_image_url"
                                 rules={validationRules.requiredValidation}
                               >
                                 <div>
@@ -1227,6 +1262,7 @@ const Onboarding = ({ match, history }) => {
                                     aspect={1}
                                     shape="round"
                                     name="profile_image_url"
+                                    label="Your profile image"
                                     onChange={handleProfileImageUpload}
                                     value={creatorProfileImageUrl}
                                     className={styles.creatorProfileImage}
@@ -1255,17 +1291,12 @@ const Onboarding = ({ match, history }) => {
                                 rules={validationRules.requiredValidation}
                                 className={classNames(styles.bgWhite, styles.textEditorLayout)}
                               >
-                                {/* <Input.TextArea
-                                  autoSize={true}
-                                  showCount={true}
-                                  maxLength={2000}
-                                  className={styles.textAreaInput}
-                                /> */}
                                 <div>
                                   <TextEditor
                                     name={['profile', 'bio']}
                                     form={form}
                                     placeholder="Your description here"
+                                    triggerOnBlur={true}
                                   />
                                 </div>
                               </Form.Item>
@@ -1367,13 +1398,13 @@ const Onboarding = ({ match, history }) => {
                   <Col xs={0} lg={24} className={styles.deviceContainer}>
                     {isMobileView ? (
                       <DeviceUIPreview
-                        key={`desktop-mobile-preview-${previewKeys}`}
+                        key="desktop-mobile-preview"
                         creatorProfileData={creatorProfileData}
                         isMobilePreview={true}
                       />
                     ) : (
                       <DeviceUIPreview
-                        key={`desktop-web-preview-${previewKeys}`}
+                        key="desktop-web-preview"
                         creatorProfileData={creatorProfileData}
                         isMobilePreview={false}
                       />
@@ -1384,7 +1415,7 @@ const Onboarding = ({ match, history }) => {
               <Col xs={24} lg={0}>
                 <div className={styles.mobileDeviceContainer}>
                   <DeviceUIPreview
-                    key={`mobile-preview-${previewKeys}`}
+                    key="mobile-preview"
                     creatorProfileData={creatorProfileData}
                     isMobilePreview={true}
                   />

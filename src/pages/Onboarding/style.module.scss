@@ -73,14 +73,20 @@
   max-height: 320px;
   margin: 0 auto;
 
-  :global {
-    .ant-upload-select-picture {
-      min-width: 200px;
-      width: 100%;
-      padding: 10px 0;
-      text-align: center;
-    }
+  & > div {
+    width: 100% !important;
+    min-height: 130px !important;
   }
+
+  // :global {
+  //   .ant-upload-select-picture {
+  //     min-width: 200px;
+  //     width: 100%;
+  //     padding: 10px 0;
+  //     text-align: center;
+  //     cursor: pointer;
+  //   }
+  // }
 }
 
 .creatorProfileImage {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router';
+// import { useHistory } from 'react-router';
 import classNames from 'classnames';
 import { Form, Typography, Button, Row, Col, Input, message, Spin } from 'antd';
 
@@ -9,7 +9,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
 
@@ -25,7 +25,7 @@ const { creator } = mixPanelEventTags;
 // TODO: This page still have some old logic (need to cleanup)
 // The old logic is related to dashboard checking, etc
 const Profile = () => {
-  const history = useHistory();
+  // const history = useHistory();
   const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
@@ -88,7 +88,8 @@ const Profile = () => {
           creator_zoom_connected: localUserDetails.profile?.zoom_connected || customNullValue,
         });
         setUserDetails(data);
-        history.push(Routes.onboardingProfile);
+        // history.push(Routes.onboardingProfile);
+        window.open(`${generateUrlFromUsername(data.username)}${Routes.onboardingProfile}`, '_self');
       }
     } catch (error) {
       setIsLoading(false);
@@ -157,7 +158,7 @@ const Profile = () => {
 
               <Form.Item>
                 <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
-                  <Col flex="0 0 120px">
+                  <Col xs={12}>
                     <Form.Item
                       name="username"
                       rules={validationRules.publicUrlValidation}
@@ -166,21 +167,25 @@ const Profile = () => {
                       <Input placeholder="Username" maxLength={30} />
                     </Form.Item>
                   </Col>
-                  <Col flex="0 0 70px">
-                    <Text>.passion.do</Text>
-                  </Col>
+                  <Col xs={12}>
+                    <Row>
+                      <Col flex="0 0 70px">
+                        <Text>.passion.do</Text>
+                      </Col>
 
-                  <Col flex="1 1 auto">
-                    {isLoadingUsernameCheck ? (
-                      <Spin />
-                    ) : (
-                      <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
-                        <span
-                          className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
-                        ></span>{' '}
-                        {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
-                      </Text>
-                    )}
+                      <Col flex="1 1 auto">
+                        {isLoadingUsernameCheck ? (
+                          <Spin />
+                        ) : (
+                          <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
+                            <span
+                              className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
+                            ></span>{' '}
+                            {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
+                          </Text>
+                        )}
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
               </Form.Item>
