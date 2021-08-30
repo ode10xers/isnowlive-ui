@@ -1299,6 +1299,12 @@ const Onboarding = ({ match, history }) => {
                         <Col xs={24}>
                           <Divider />
                         </Col>
+                        <Col xs={24}>
+                          <Paragraph>
+                            Some of the sections below might not show up if you don't have the related products, but
+                            will show up once you created them
+                          </Paragraph>
+                        </Col>
                         {/* Components Section */}
                         <Col xs={24}>
                           <DragDropContext onDragEnd={handleDragEnd}>

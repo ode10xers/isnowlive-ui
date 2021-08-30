@@ -65,7 +65,7 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
 
       win.document.head.appendChild(metaViewportElement);
       setIsLoading(false);
-    }, 3000);
+    }, 4000);
 
     return () => {
       if (timeoutID) {
