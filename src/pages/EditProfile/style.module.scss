@@ -73,16 +73,6 @@
     width: 100% !important;
     min-height: 130px !important;
   }
-
-  // :global {
-  //   .ant-upload-select-picture {
-  //     min-width: 200px;
-  //     width: 100%;
-  //     padding: 10px 0;
-  //     text-align: center;
-  //     cursor: pointer;
-  //   }
-  // }
 }
 
 .creatorProfileImage {
@@ -133,6 +123,14 @@
   text-align: center;
 }
 
+.desktopSaveButtonContainer {
+  margin-top : -300px;
+}
+
 .mobileDeviceContainer {
   text-align: center;
+}
+
+.mobileSaveButtonContainer {
+  margin-top: -120px;
 }

@@ -321,7 +321,20 @@ const Onboarding = ({ match, history }) => {
     fetchCreatorProfileData();
   }, [fetchCreatorProfileData]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const customFCWidgetStyle = document.createElement('style');
+    customFCWidgetStyle.id = 'custom-fc-widget-style';
+    customFCWidgetStyle.innerHTML = `      @media screen and (max-width: 576px) {
+      .custom_fc_frame {
+        bottom: 10px !important;
+      }
+    }`;
+    window.document.head.appendChild(customFCWidgetStyle);
+
+    return () => {
+      window.document.head.removeChild(customFCWidgetStyle);
+    };
+  }, []);
 
   const expandComponentSection = (componentKey) =>
     setExpandedComponentsSection((prevValues) => [...new Set([...prevValues, componentKey])]);
@@ -842,27 +855,27 @@ const Onboarding = ({ match, history }) => {
       </Modal>
 
       <Spin spinning={isLoading} size="large">
-        <Row gutter={[10, 20]}>
-          <Col xs={24} lg={12}>
-            {!isOnboarding && (
-              <Button
-                className={styles.mb20}
-                type="default"
-                onClick={handleBackToDashboardClicked}
-                icon={<ArrowLeftOutlined />}
-              >
-                Back to Dashboard
-              </Button>
-            )}
-            <div className={styles.profileFormContainer}>
-              <Form
-                {...newProfileFormLayout}
-                form={form}
-                onValuesChange={handleFormValuesChange}
-                // onFieldsChange={handleFormFieldsChanged}
-                scrollToFirstError={true}
-                onFinish={handleFormFinish}
-              >
+        <Form
+          {...newProfileFormLayout}
+          form={form}
+          onValuesChange={handleFormValuesChange}
+          // onFieldsChange={handleFormFieldsChanged}
+          scrollToFirstError={true}
+          onFinish={handleFormFinish}
+        >
+          <Row gutter={[10, 20]}>
+            <Col xs={24} lg={12}>
+              {!isOnboarding && (
+                <Button
+                  className={styles.mb20}
+                  type="default"
+                  onClick={handleBackToDashboardClicked}
+                  icon={<ArrowLeftOutlined />}
+                >
+                  Back to Dashboard
+                </Button>
+              )}
+              <div className={styles.profileFormContainer}>
                 <Row gutter={[12, 12]} align="middle" justify="center">
                   <Col xs={12}>
                     <Title level={4}>My Website Page</Title>
@@ -989,17 +1002,48 @@ const Onboarding = ({ match, history }) => {
                             </Panel>
                           </Collapse>
                         </Col>
-                        <Col xs={24}>
+                        <Col xs={24} lg={0}>
                           <Divider />
                         </Col>
+                        <Col xs={24} lg={0}>
+                          <Row gutter={10}>
+                            <Col xs={24}>
+                              <Space className={styles.usernameContainer} align="center">
+                                <Text copyable={{ text: generateUrlFromUsername(creatorProfileData?.username) }}>
+                                  <Text strong>{creatorProfileData?.username}</Text>.passion.do
+                                </Text>
+                                <Button icon={<EditOutlined />} type="link" onClick={handleEditUsernameClicked} />
+                              </Space>
+                            </Col>
+                            <Col xs={24}>
+                              <div className={styles.mobileDeviceContainer}>
+                                <DeviceUIPreview
+                                  key="mobile-preview"
+                                  creatorProfileData={creatorProfileData}
+                                  isMobilePreview={true}
+                                />
+                              </div>
+                            </Col>
+                            <Col xs={24} className={styles.mobileSaveButtonContainer}>
+                              <Button
+                                block
+                                size="large"
+                                type="primary"
+                                className={styles.greenBtn}
+                                htmlType="submit"
+                                loading={isLoading}
+                              >
+                                Save this look
+                              </Button>
+                            </Col>
+                          </Row>
+                        </Col>
+                        {/* Components Section */}
                         <Col xs={24}>
                           <Paragraph>
                             Some of the sections below might not show up if you don't have the related products, but
                             will show up once you created them
                           </Paragraph>
-                        </Col>
-                        {/* Components Section */}
-                        <Col xs={24}>
                           <DragDropContext onDragEnd={handleDragEnd}>
                             <Form.List name={['profile', 'sections']}>
                               {(sectionFields) => (
@@ -1034,61 +1078,71 @@ const Onboarding = ({ match, history }) => {
                     </Col>
                   )}
                 </Row>
-              </Form>
-            </div>
-          </Col>
-          {creatorProfileData && (
-            <>
-              <Col xs={24} lg={12}>
-                <Row gutter={[10, 10]}>
-                  <Col xs={24} lg={12}>
-                    <Space className={styles.usernameContainer} align="center">
-                      <Text copyable={{ text: generateUrlFromUsername(creatorProfileData?.username) }}>
-                        <Text strong>{creatorProfileData?.username}</Text>.passion.do
-                      </Text>
-                      <Button icon={<EditOutlined />} type="link" onClick={handleEditUsernameClicked} />
-                    </Space>
-                  </Col>
-                  <Col xs={0} lg={12} className={styles.textAlignRight}>
-                    {isMobileView ? (
-                      <Button type="default" icon={<DesktopOutlined />} onClick={() => setIsMobileView(false)}>
-                        Web View
-                      </Button>
-                    ) : (
-                      <Button type="default" icon={<MobileOutlined />} onClick={() => setIsMobileView(true)}>
-                        Mobile View
-                      </Button>
-                    )}
-                  </Col>
-                  <Col xs={0} lg={24} className={styles.deviceContainer}>
-                    {isMobileView ? (
-                      <DeviceUIPreview
-                        key="desktop-mobile-preview"
-                        creatorProfileData={creatorProfileData}
-                        isMobilePreview={true}
-                      />
-                    ) : (
-                      <DeviceUIPreview
-                        key="desktop-web-preview"
-                        creatorProfileData={creatorProfileData}
-                        isMobilePreview={false}
-                      />
-                    )}
-                  </Col>
-                </Row>
-              </Col>
-              <Col xs={24} lg={0}>
-                <div className={styles.mobileDeviceContainer}>
-                  <DeviceUIPreview
-                    key="mobile-preview"
-                    creatorProfileData={creatorProfileData}
-                    isMobilePreview={true}
-                  />
-                </div>
-              </Col>
-            </>
-          )}
-        </Row>
+              </div>
+            </Col>
+            {creatorProfileData && (
+              <>
+                <Col xs={0} lg={12}>
+                  <Row gutter={[10, 10]}>
+                    <Col xs={0} lg={12}>
+                      <Space className={styles.usernameContainer} align="center">
+                        <Text copyable={{ text: generateUrlFromUsername(creatorProfileData?.username) }}>
+                          <Text strong>{creatorProfileData?.username}</Text>.passion.do
+                        </Text>
+                        <Button icon={<EditOutlined />} type="link" onClick={handleEditUsernameClicked} />
+                      </Space>
+                    </Col>
+                    <Col xs={0} lg={12} className={styles.textAlignRight}>
+                      {isMobileView ? (
+                        <Button type="default" icon={<DesktopOutlined />} onClick={() => setIsMobileView(false)}>
+                          Web View
+                        </Button>
+                      ) : (
+                        <Button type="default" icon={<MobileOutlined />} onClick={() => setIsMobileView(true)}>
+                          Mobile View
+                        </Button>
+                      )}
+                    </Col>
+                    <Col xs={0} lg={24} className={styles.deviceContainer}>
+                      {isMobileView ? (
+                        <DeviceUIPreview
+                          key="desktop-mobile-preview"
+                          creatorProfileData={creatorProfileData}
+                          isMobilePreview={true}
+                        />
+                      ) : (
+                        <DeviceUIPreview
+                          key="desktop-web-preview"
+                          creatorProfileData={creatorProfileData}
+                          isMobilePreview={false}
+                        />
+                      )}
+                    </Col>
+                    <Col
+                      xs={0}
+                      lg={24}
+                      className={isMobileView ? styles.mobileSaveButtonContainer : styles.desktopSaveButtonContainer}
+                    >
+                      <Row justify="center">
+                        <Col>
+                          <Button
+                            size="large"
+                            type="primary"
+                            className={styles.greenBtn}
+                            htmlType="submit"
+                            loading={isLoading}
+                          >
+                            Save this look
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                </Col>
+              </>
+            )}
+          </Row>
+        </Form>
       </Spin>
     </div>
   );
