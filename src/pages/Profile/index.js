@@ -158,7 +158,7 @@ const Profile = () => {
 
               <Form.Item>
                 <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
-                  <Col xs={12}>
+                  <Col xs={16} lg={12}>
                     <Form.Item
                       name="username"
                       rules={validationRules.publicUrlValidation}
@@ -167,13 +167,13 @@ const Profile = () => {
                       <Input placeholder="Username" maxLength={30} />
                     </Form.Item>
                   </Col>
-                  <Col xs={12}>
+                  <Col xs={8} lg={12}>
                     <Row>
-                      <Col flex="0 0 70px">
+                      <Col xs={24} lg={{ flex: '0 0 70px' }} className={styles.textAlignLeft}>
                         <Text>.passion.do</Text>
                       </Col>
 
-                      <Col flex="1 1 auto">
+                      <Col xs={24} lg={{ flex: '1 1 auto' }} className={styles.textAlignLeft}>
                         {isLoadingUsernameCheck ? (
                           <Spin />
                         ) : (

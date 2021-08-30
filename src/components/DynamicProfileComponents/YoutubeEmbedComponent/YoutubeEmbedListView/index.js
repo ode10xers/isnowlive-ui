@@ -49,7 +49,7 @@ const YoutubeEmbedListView = ({ urls = [], isContained = false }) => {
         </Row>
       )}
       <Row gutter={[8, 8]} className={isContained ? undefined : styles.youtubeItemListContainer}>
-        {urls.map(renderYoutubeVideoListItem)}
+        {urls.filter((url) => url).map(renderYoutubeVideoListItem)}
       </Row>
     </div>
   );

@@ -649,6 +649,8 @@ const Onboarding = ({ match, history }) => {
   const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(false);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
 
+  const [updateTimeoutID, setUpdateTimeoutID] = useState(null);
+
   const fetchCreatorProfileData = useCallback(async () => {
     setIsLoading(true);
 
@@ -700,18 +702,18 @@ const Onboarding = ({ match, history }) => {
     creatorProfileData?.profile?.sections?.find((component) => component.key === identifier);
 
   const updateSections = (newSections) => {
-    const profileData = form.getFieldsValue();
+    const formData = form.getFieldsValue();
     const newCreatorProfileData = {
-      // ...creatorProfileData,
-      ...profileData,
+      ...creatorProfileData,
+      ...formData,
       profile: {
-        // ...creatorProfileData.profile,
-        ...profileData.profile,
+        ...creatorProfileData.profile,
+        ...formData.profile,
         sections: newSections,
       },
     };
 
-    // setCreatorProfileData(newCreatorProfileData);
+    setCreatorProfileData(newCreatorProfileData);
     form.setFieldsValue(newCreatorProfileData);
   };
 
@@ -954,18 +956,36 @@ const Onboarding = ({ match, history }) => {
 
   const handleCoverImageUpload = (imageUrl) => {
     setCreatorCoverImageUrl(imageUrl);
-    form.setFieldsValue({
-      ...form.getFieldsValue(),
+    const formData = form.getFieldsValue();
+    const newCreatorProfileData = {
+      ...creatorProfileData,
+      ...formData,
+      profile: {
+        ...creatorProfileData.profile,
+        ...formData.profile,
+      },
       cover_image_url: imageUrl,
-    });
+    };
+
+    setCreatorProfileData(newCreatorProfileData);
+    form.setFieldsValue(newCreatorProfileData);
   };
 
   const handleProfileImageUpload = (imageUrl) => {
     setCreatorProfileImageUrl(imageUrl);
-    form.setFieldsValue({
-      ...form.getFieldsValue(),
+    const formData = form.getFieldsValue();
+    const newCreatorProfileData = {
+      ...creatorProfileData,
+      ...formData,
+      profile: {
+        ...creatorProfileData.profile,
+        ...formData.profile,
+      },
       profile_image_url: imageUrl,
-    });
+    };
+
+    setCreatorProfileData(newCreatorProfileData);
+    form.setFieldsValue(newCreatorProfileData);
   };
 
   const handleDragEnd = (result) => {
@@ -1057,29 +1077,37 @@ const Onboarding = ({ match, history }) => {
     setIsLoading(false);
   };
 
-  const handleFormFieldsChanged = (changedFields, allFields) => {
-    const formValues = form.getFieldsValue();
+  // const handleFormFieldsChanged = (changedFields, allFields) => {
+  //   const formValues = form.getFieldsValue();
 
-    setCreatorProfileData((prevData) => ({
-      ...prevData,
-      ...formValues,
-      profile: {
-        ...prevData.profile,
-        ...formValues.profile,
-      },
-    }));
-  };
-
-  // const handleFormValuesChange = (changedValues, allValues) => {
   //   setCreatorProfileData((prevData) => ({
   //     ...prevData,
-  //     ...allValues,
-  //     profile : {
+  //     ...formValues,
+  //     profile: {
   //       ...prevData.profile,
-  //       ...allValues.profile,
-  //     }
+  //       ...formValues.profile,
+  //     },
   //   }));
   // };
+
+  const handleFormValuesChange = (changedValues, allValues) => {
+    if (updateTimeoutID) {
+      clearTimeout(updateTimeoutID);
+    }
+
+    const newTimeout = setTimeout(() => {
+      setCreatorProfileData((prevData) => ({
+        ...prevData,
+        ...allValues,
+        profile: {
+          ...prevData.profile,
+          ...allValues.profile,
+        },
+      }));
+    }, 800);
+
+    setUpdateTimeoutID(newTimeout);
+  };
 
   return (
     <div className={styles.editPageContainer}>
@@ -1193,8 +1221,8 @@ const Onboarding = ({ match, history }) => {
               <Form
                 {...newProfileFormLayout}
                 form={form}
-                // onValuesChange={handleFormValuesChange}
-                onFieldsChange={handleFormFieldsChanged}
+                onValuesChange={handleFormValuesChange}
+                // onFieldsChange={handleFormFieldsChanged}
                 scrollToFirstError={true}
                 onFinish={handleFormFinish}
               >
@@ -1294,10 +1322,9 @@ const Onboarding = ({ match, history }) => {
                               >
                                 <div>
                                   <TextEditor
-                                    name={['profile', 'bio']}
                                     form={form}
+                                    name={['profile', 'bio']}
                                     placeholder="Your description here"
-                                    triggerOnBlur={true}
                                   />
                                 </div>
                               </Form.Item>

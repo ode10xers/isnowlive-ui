@@ -42,6 +42,9 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
       // Copy all the style and link tags from main document
       // to <head> of iframe
       const win = contentRef?.contentWindow;
+
+      win.document.head.innerHTML = '';
+
       const linkEls = win.parent.document.querySelectorAll('link');
       if (linkEls.length) {
         linkEls.forEach((el) => {
@@ -72,7 +75,7 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
         clearTimeout(timeoutID);
       }
     };
-  }, [contentRef, isMobilePreview]);
+  }, [contentRef, isMobilePreview, creatorProfileData]);
 
   const creatorProfilePreview = (
     <MobileLayout>
