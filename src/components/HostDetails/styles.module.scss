@@ -10,8 +10,24 @@
 }
 
 .creatorName {
-  font-size: 24px;
-  font-weight: 500;
+  padding: 10px;
+  display: block;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 20px;
+  color: #003A8C;
+}
+
+.creatorNameTitle {
+  padding: 5px;
+  display: block;
+  font-family: Inter;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 20px;
+  color: #434343;
 }
 
 .fullProfile {

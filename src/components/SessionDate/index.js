@@ -29,6 +29,12 @@ const SessionDate = ({ schedule }) => {
         <br />
         <Text className={styles.timezone}>{getCurrentLongTimezone()}</Text>
       </div>
+      <Divider className={styles.divider} type="vertical" />
+      <Text className={styles.shortday} type="secondary">
+        Session Type
+      </Text>
+      <br />
+      <Text className={styles.subText}>{schedule?.group ? 'Group' : '1-on-1'}</Text>
     </div>
   );
 };

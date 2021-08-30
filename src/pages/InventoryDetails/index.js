@@ -7,7 +7,6 @@ import ReactHtmlParser from 'react-html-parser';
 import Routes from 'routes';
 import apis from 'apis';
 
-import Share from 'components/Share';
 import Loader from 'components/Loader';
 import HostDetails from 'components/HostDetails';
 import SessionDate from 'components/SessionDate';
@@ -17,13 +16,7 @@ import SessionRegistration from 'components/SessionRegistration';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
 
 import { isMobileDevice } from 'utils/device';
-import {
-  generateUrlFromUsername,
-  isAPISuccess,
-  reservedDomainName,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
-} from 'utils/helper';
+import { isAPISuccess, reservedDomainName, isUnapprovedUserError, getUsernameFromUrl } from 'utils/helper';
 import dateUtil from 'utils/date';
 
 import styles from './style.module.scss';
@@ -128,27 +121,8 @@ const InventoryDetails = ({ match, history }) => {
 
         <Col xs={24} lg={14}>
           <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
-        </Col>
-        <Col xs={24} lg={10}>
           <SessionDate schedule={session} />
-        </Col>
-      </Row>
-      <Row justify="space-between" className={styles.mt50}>
-        <Col xs={18}>
           <SessionInfo session={session} />
-        </Col>
-        {creator && (
-          <Col xs={6} lg={{ span: 3, offset: 3 }}>
-            <Share
-              label="Share"
-              shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
-              title={`${session?.name} - ${creator?.first_name} ${creator?.last_name}`}
-            />
-          </Col>
-        )}
-      </Row>
-      <Row justify="space-between" className={styles.mt50}>
-        <Col xs={24} lg={15}>
           <Row>
             {session?.is_offline && (
               <Col xs={24}>
@@ -186,9 +160,23 @@ const InventoryDetails = ({ match, history }) => {
             )}
           </Row>
         </Col>
-        <Col xs={24} lg={{ span: 8, offset: 1 }} className={isMobileDevice ? styles.mt20 : undefined}>
+        <Col xs={24} lg={10}>
           <HostDetails host={creator} />
         </Col>
+      </Row>
+      {/* <Row justify="space-between" className={styles.mt50}>
+        {creator && (
+          <Col xs={6} lg={{ span: 3, offset: 3 }}>
+            <Share
+              label="Share"
+              shareUrl={`${generateUrlFromUsername(creator?.username)}/e/${session.inventory_id}`}
+              title={`${session?.name} - ${creator?.first_name} ${creator?.last_name}`}
+            />
+          </Col>
+        )}
+      </Row> */}
+      <Row justify="space-between" className={styles.mt50}>
+        <Col xs={24} lg={15}></Col>
         {session?.is_course && courses ? (
           courses?.length > 0 && (
             <Col xs={24}>
