@@ -661,6 +661,7 @@ const Onboarding = ({ match, history }) => {
           profile: {
             ...data.profile,
             new_profile: true,
+            color: isOnboarding ? '#ffc60a' : data.profile?.color ?? '',
           },
         });
 
