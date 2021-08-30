@@ -1,5 +1,9 @@
 @import '../../../../styles/variables.scss';
 
+.availabilityItem {
+  max-height: 115px;
+}
+
 .availabilityImageContainer {
   height: 100%;
   position: relative;
