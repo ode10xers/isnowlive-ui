@@ -68,7 +68,7 @@ const DeviceUIPreview = ({ creatorProfileData = null, isMobilePreview = true }) 
       }, initial-scale=1`;
 
       win.document.head.appendChild(metaViewportElement);
-      setIsLoading(false);
+      setTimeout(() => setIsLoading(false), 1000);
     }, 4000);
 
     return () => {
