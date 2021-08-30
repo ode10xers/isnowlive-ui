@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router';
 import classNames from 'classnames';
 import { Form, Typography, Button, Row, Col, Input, message, Spin } from 'antd';
 
@@ -8,7 +9,7 @@ import apis from 'apis';
 import Loader from 'components/Loader';
 
 import validationRules from 'utils/validation';
-import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
 
@@ -24,6 +25,7 @@ const { creator } = mixPanelEventTags;
 // TODO: This page still have some old logic (need to cleanup)
 // The old logic is related to dashboard checking, etc
 const Profile = () => {
+  const history = useHistory();
   const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
@@ -86,7 +88,7 @@ const Profile = () => {
           creator_zoom_connected: localUserDetails.profile?.zoom_connected || customNullValue,
         });
         setUserDetails(data);
-        window.open(`${generateUrlFromUsername(data.username)}${Routes.onboardingProfile}`, '_self');
+        history.push(Routes.onboardingProfile);
       }
     } catch (error) {
       setIsLoading(false);

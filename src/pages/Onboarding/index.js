@@ -1048,7 +1048,7 @@ const Onboarding = ({ match, history }) => {
         if (isAPISuccess(status) && data) {
           setCreatorProfileData(data);
           message.success('Username updated!');
-
+          setEditUsernameModalVisible(false);
           reloadWithNewUsername(values.username);
         }
       } catch (error) {
@@ -1074,13 +1074,19 @@ const Onboarding = ({ match, history }) => {
         <Spin spinning={isLoading}>
           <Row gutter={[8, 8]} className={styles.editUsernameContainer}>
             <Col xs={24}>
+              <Paragraph type="danger">
+                Changing this username will refresh the page! Please make sure to save any changes before proceeding or
+                you might lose any unsaved changes.
+              </Paragraph>
+            </Col>
+            <Col xs={24}>
               <Form
                 form={usernameForm}
                 scrollToFirstError={true}
                 initialValues={{ username: creatorProfileData?.username ?? '' }}
               >
                 <Form.Item>
-                  <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
+                  <Row align="middle" gutter={[10, 10]} className={styles.alignUrl} justify="center">
                     <Col flex="0 0 120px">
                       <Form.Item
                         name="username"
@@ -1094,7 +1100,7 @@ const Onboarding = ({ match, history }) => {
                       <Text>.passion.do</Text>
                     </Col>
 
-                    <Col flex="1 1 auto">
+                    <Col flex="0 0 120px">
                       {isLoadingUsernameCheck ? (
                         <Spin />
                       ) : (
@@ -1110,9 +1116,13 @@ const Onboarding = ({ match, history }) => {
                 </Form.Item>
               </Form>
               <Form.Item>
-                <Button disabled={!isPublicUrlAvailable} type="primary" onClick={handleFinishEditUsername}>
-                  Update Username
-                </Button>
+                <Row gutter={8} justify="center">
+                  <Col>
+                    <Button disabled={!isPublicUrlAvailable} type="primary" onClick={handleFinishEditUsername}>
+                      Update Username
+                    </Button>
+                  </Col>
+                </Row>
               </Form.Item>
             </Col>
           </Row>

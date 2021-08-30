@@ -3,11 +3,13 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
+
 import validationRules from 'utils/validation';
+
+import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import { useGlobalContext } from 'services/globalContext';
 import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
-import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
 import styles from './style.module.scss';
 

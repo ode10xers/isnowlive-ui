@@ -4,6 +4,12 @@ import { Form, Input, Button, Row, Col, message } from 'antd';
 import Routes from 'routes';
 import apis from 'apis';
 
+import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
+
+import validationRules from 'utils/validation';
+import { getRememberUserEmail } from 'utils/storage';
+import { isAPISuccess } from 'utils/helper';
+
 import { useGlobalContext } from 'services/globalContext';
 import {
   mixPanelEventTags,
@@ -12,11 +18,6 @@ import {
   trackSuccessEvent,
   trackFailedEvent,
 } from 'services/integrations/mixpanel';
-
-import validationRules from 'utils/validation';
-import { getRememberUserEmail } from 'utils/storage';
-import { isAPISuccess } from 'utils/helper';
-import { sendNewPasswordEmail, showSetNewPasswordModal } from 'components/Modals/modals';
 
 import { formLayout, formTailLayout } from 'layouts/FormLayouts';
 
