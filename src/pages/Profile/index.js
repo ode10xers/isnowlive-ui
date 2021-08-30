@@ -29,7 +29,7 @@ const Profile = () => {
   const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
-  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(false);
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
   const [form] = Form.useForm();
 
   const getProfileDetails = useCallback(async () => {
