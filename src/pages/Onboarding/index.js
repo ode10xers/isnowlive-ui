@@ -1219,6 +1219,7 @@ const Onboarding = ({ match, history }) => {
                                   <ImageUpload
                                     name="cover_image_url"
                                     listType="picture"
+                                    label="Upload Cover Image (size of Facebook Cover Image)"
                                     onChange={handleCoverImageUpload}
                                     value={creatorCoverImageUrl}
                                     className={styles.creatorCoverImage}

@@ -3,8 +3,10 @@ import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
 import { useLocation } from 'react-router-dom';
 
-import { Row, Col, Image, Space, Typography, Divider, Skeleton } from 'antd';
+import { Row, Col, Image, Space, Typography, Divider } from 'antd';
 import { CaretDownOutlined } from '@ant-design/icons';
+
+import DefaultImage from 'components/Icons/DefaultImage';
 
 import { getExternalLink } from 'utils/url';
 import { socialMediaIcons } from 'utils/constants';
@@ -64,7 +66,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
       <Col xs={24} className={styles.coverImageWrapper}>
         <Image
           loading="lazy"
-          placeholder={<Skeleton.Image loading={true} width="100%" className={styles.coverImage} />}
+          fallback={DefaultImage}
           preview={false}
           width="100%"
           className={styles.coverImage}
@@ -84,12 +86,7 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
               <Col>
                 <Image
                   loading="lazy"
-                  placeholder={
-                    <Skeleton
-                      loading={true}
-                      avatar={{ shape: 'circle', size: 'large', className: styles.profileImage }}
-                    />
-                  }
+                  fallback={DefaultImage}
                   className={styles.profileImage}
                   preview={false}
                   src={profile_image_url ?? 'error'}
