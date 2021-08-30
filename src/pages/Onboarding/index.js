@@ -643,6 +643,7 @@ const Onboarding = ({ match, history }) => {
   const [expandedComponentsSection, setExpandedComponentsSection] = useState([]);
 
   const [isMobileView, setIsMobileView] = useState(true);
+  const [previewKeys, setPreviewKeys] = useState(0);
 
   const [addComponentModalVisible, setAddComponentModalVisible] = useState(false);
   const [editUsernameModalVisible, setEditUsernameModalVisible] = useState(false);
@@ -854,6 +855,7 @@ const Onboarding = ({ match, history }) => {
       const { status, data } = await apis.user.updateProfile(payload);
 
       if (isAPISuccess(status) && data) {
+        setPreviewKeys((prev) => prev + 1);
         if (isOnboarding) {
           setUserDetails(data);
           const creatorUrl = generateUrlFromUsername(data.username);
@@ -1071,12 +1073,6 @@ const Onboarding = ({ match, history }) => {
       >
         <Spin spinning={isLoading}>
           <Row gutter={[8, 8]} className={styles.editUsernameContainer}>
-            <Col xs={24}>
-              <Paragraph type="danger">
-                Changing this username will refresh the page! Please make sure to save any changes before proceeding or
-                you might lose any unsaved changes.
-              </Paragraph>
-            </Col>
             <Col xs={24}>
               <Form
                 form={usernameForm}
@@ -1370,13 +1366,13 @@ const Onboarding = ({ match, history }) => {
                   <Col xs={0} lg={24} className={styles.deviceContainer}>
                     {isMobileView ? (
                       <DeviceUIPreview
-                        key="desktop-mobile-preview"
+                        key={`desktop-mobile-preview-${previewKeys}`}
                         creatorProfileData={creatorProfileData}
                         isMobilePreview={true}
                       />
                     ) : (
                       <DeviceUIPreview
-                        key="desktop-web-preview"
+                        key={`desktop-web-preview-${previewKeys}`}
                         creatorProfileData={creatorProfileData}
                         isMobilePreview={false}
                       />
@@ -1387,7 +1383,7 @@ const Onboarding = ({ match, history }) => {
               <Col xs={24} lg={0}>
                 <div className={styles.mobileDeviceContainer}>
                   <DeviceUIPreview
-                    key="mobile-preview"
+                    key={`mobile-preview-${previewKeys}`}
                     creatorProfileData={creatorProfileData}
                     isMobilePreview={true}
                   />
