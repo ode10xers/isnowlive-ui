@@ -283,6 +283,7 @@
           color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
           
           .moduleContentName {
+            font-weight: 500;
             color: var(--passion-profile-darker-color, #{map-get($map: $colors, $key: 'Black')}) !important;
           }
         }

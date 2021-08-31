@@ -23,6 +23,7 @@ import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBooked
 import dateUtil from 'utils/date';
 import { generateColorPalletteForProfile } from 'utils/colors';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
 import {
   isAPISuccess,
   orderType,
@@ -379,6 +380,16 @@ const CourseDetails = ({ match }) => {
     </Row>
   );
 
+  // TODO: Currently this is hard coded,
+  const handleCourseModuleContentClicked = (content) => {
+    if (content.product_type?.toUpperCase() === 'SESSION') {
+      // In reality it represents inventories
+      redirectToInventoryPage(content.product_data);
+    } else if (content.product_type?.toUpperCase() === 'VIDEO') {
+      redirectToVideosPage(content.product_data);
+    }
+  };
+
   const renderContentIcon = (productType) =>
     productType.toUpperCase() === 'SESSION' ? (
       <VideoCameraOutlined className={styles.contentIcon} />
@@ -417,10 +428,13 @@ const CourseDetails = ({ match }) => {
         <Col xs={24} md={12} lg={14}>
           <Space className={styles.w100}>
             {renderContentIcon(content.product_type)}
-            <Text strong className={styles.moduleContentName}>
-              {' '}
-              {content.name}{' '}
-            </Text>
+            <Button
+              type="link"
+              className={styles.moduleContentName}
+              onClick={() => handleCourseModuleContentClicked(content)}
+            >
+              {content.name}
+            </Button>
           </Space>
         </Col>
         <Col xs={24} md={12} lg={10} className={styles.textAlignRight}>
