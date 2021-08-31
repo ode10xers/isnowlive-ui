@@ -63,6 +63,7 @@ import {
 import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './style.module.scss';
+import { sessionMeetingTypes } from 'utils/constants';
 
 const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
@@ -92,6 +93,23 @@ const colorPickerChoices = [
   '#607d8b',
 ];
 
+const priceTypes = {
+  FREE: 'Free',
+  PAID: 'Paid',
+  FLEXIBLE: 'Flexible',
+};
+
+const meetingTypes = {
+  ZOOM: {
+    label: 'Zoom',
+    value: 'ZOOM',
+  },
+  CUSTOM: {
+    label: 'Other',
+    value: 'CUSTOM',
+  },
+};
+
 const initialSession = {
   price: 0,
   currency: '',
@@ -114,12 +132,7 @@ const initialSession = {
   session_tag_type: 'anyone',
   is_offline: 'false',
   offline_event_address: '',
-};
-
-const priceTypes = {
-  FREE: 'Free',
-  PAID: 'Paid',
-  FLEXIBLE: 'Flexible',
+  meeting_provider: meetingTypes.ZOOM.value,
 };
 
 const Session = ({ match, history }) => {
@@ -145,6 +158,7 @@ const Session = ({ match, history }) => {
   const [selectedTagType, setSelectedTagType] = useState('anyone');
   const [creatorMemberTags, setCreatorMemberTags] = useState([]);
   const [isOfflineSession, setIsOfflineSession] = useState(false);
+  const [onlineMeetingType, setOnlineMeetingType] = useState(meetingTypes.ZOOM.value);
 
   const {
     state: {
@@ -316,6 +330,7 @@ const Session = ({ match, history }) => {
         selected_member_tags: [],
         is_offline: 'false',
         offline_event_address: '',
+        meeting_provider: meetingTypes.ZOOM.value,
       });
       setColorCode(initialColor || whiteColor);
       setIsLoading(false);
@@ -406,7 +421,6 @@ const Session = ({ match, history }) => {
             newWindow.blur();
             window.focus();
             setFreeSession();
-            // history.push(`${Routes.creatorDashboard.rootPath + Routes.creatorDashboard.paymentAccount}`);
           },
         });
       }
@@ -630,6 +644,11 @@ const Session = ({ match, history }) => {
     form.setFieldsValue({ ...form.getFieldsValue(), is_offline: e.target.value });
   };
 
+  const handleMeetingProviderChange = (e) => {
+    setOnlineMeetingType(e.target.value);
+    form.setFieldsValue({ ...form.getFieldsValue(), meeting_provider: e.target.value });
+  };
+
   const onFinish = async (values) => {
     const eventTagObject = creator.click.sessions.form;
 
@@ -711,6 +730,11 @@ const Session = ({ match, history }) => {
             });
           }
         } else {
+          if (onlineMeetingType === meetingTypes.CUSTOM.value) {
+            data.meeting_type = sessionMeetingTypes.CUSTOM_MEETING;
+            data.meeting_details = values.meeting_details;
+          }
+
           const newSessionResponse = isAvailability
             ? await apis.availabilities.create(data)
             : await apis.session.create(data);
@@ -852,30 +876,77 @@ const Session = ({ match, history }) => {
               </Radio.Group>
             </Form.Item>
             {!isOfflineSession ? (
-              zoom_connected === ZoomAuthType.NOT_CONNECTED ? (
-                <Form.Item {...profileFormItemLayout} label={<Text type="danger"> Session hosting link </Text>}>
-                  <Button
-                    type="primary"
-                    icon={<VideoCameraOutlined />}
-                    onClick={() => window.open(config.zoom.oAuthURL, '_self')}
-                    className="connect-your-zoom-btn"
-                  >
-                    Connect your zoom account
-                  </Button>
+              <>
+                <Form.Item
+                  {...profileFormItemLayout}
+                  label="Online Meeting Provider"
+                  name="meeting_provider"
+                  id="meeting_provider"
+                  rules={validationRules.requiredValidation}
+                  onChange={handleMeetingProviderChange}
+                >
+                  <Radio.Group>
+                    {Object.values(meetingTypes).map((meetingType) => (
+                      <Radio key={meetingType.value} value={meetingType.value}>
+                        {meetingType.label}
+                      </Radio>
+                    ))}
+                  </Radio.Group>
                 </Form.Item>
-              ) : (
-                <Form.Item {...profileFormTailLayout}>
-                  <Text>
-                    {' '}
-                    We will automatically generate the meeting link for each event. If you wish to input the meeting
-                    details for each event, you can do so in the{' '}
-                    <Link href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath} target="_blank">
-                      Upcoming {isAvailability ? 'Availabilities' : 'Sessions'}
-                    </Link>
-                    .
-                  </Text>
-                </Form.Item>
-              )
+                {onlineMeetingType === meetingTypes.ZOOM.value ? (
+                  zoom_connected === ZoomAuthType.NOT_CONNECTED ? (
+                    <Form.Item {...profileFormItemLayout} label={<Text type="danger"> Session hosting link </Text>}>
+                      <Button
+                        type="primary"
+                        icon={<VideoCameraOutlined />}
+                        onClick={() => window.open(config.zoom.oAuthURL, '_self')}
+                        className="connect-your-zoom-btn"
+                      >
+                        Connect your zoom account
+                      </Button>
+                    </Form.Item>
+                  ) : (
+                    <Form.Item {...profileFormTailLayout}>
+                      <Text>
+                        We will automatically generate the meeting link for each event. If you wish to input the meeting
+                        details for each event, you can do so in the{' '}
+                        <Link
+                          href={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath}
+                          target="_blank"
+                        >
+                          Upcoming {isAvailability ? 'Availabilities' : 'Sessions'}
+                        </Link>
+                        .
+                      </Text>
+                    </Form.Item>
+                  )
+                ) : (
+                  <>
+                    <Form.Item
+                      {...profileFormItemLayout}
+                      label="Meeting Link"
+                      name={['meeting_details', 'join_url']}
+                      rules={validationRules.requiredValidation}
+                    >
+                      <Input placeholder="Enter meeting link" />
+                    </Form.Item>
+                    <Form.Item
+                      {...profileFormItemLayout}
+                      label="Meeting ID (Optional)"
+                      name={['meeting_details', 'meeting_id']}
+                    >
+                      <Input placeholder="Enter meeting ID" />
+                    </Form.Item>
+                    <Form.Item
+                      {...profileFormItemLayout}
+                      label="Meeting Password (Optional)"
+                      name={['meeting_details', 'password']}
+                    >
+                      <Input.Password placeholder="Enter meeting password" />
+                    </Form.Item>
+                  </>
+                )}
+              </>
             ) : null}
           </Form.Item>
 
@@ -889,7 +960,9 @@ const Session = ({ match, history }) => {
             <Input placeholder="Input the event address/location" />
           </Form.Item>
 
-          {(isOfflineSession || zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
+          {(isOfflineSession ||
+            onlineMeetingType === meetingTypes.CUSTOM.value ||
+            zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
             <>
               <Form.Item
                 label={`${isAvailability ? 'Availability' : 'Session'} Name`}

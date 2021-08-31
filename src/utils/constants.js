@@ -17,3 +17,8 @@ export const socialMediaIcons = {
   instagram_link: InstagramLogo,
   linkedin_link: LinkedInLogo,
 };
+
+export const sessionMeetingTypes = {
+  SYSTEM_GENERATED: 'SYSTEM_GENERATED_MEETING',
+  CUSTOM_MEETING: 'CUSTOM_MEETING',
+};
