@@ -2,7 +2,7 @@ import React from 'react';
 import { Row, Col, Button, Typography, List } from 'antd';
 import { FilePdfOutlined } from '@ant-design/icons';
 
-import { isValidFile, isInCreatorDashboard } from 'utils/helper';
+import { isValidFile } from 'utils/helper';
 import { isMobileDevice } from 'utils/device';
 
 import styles from './style.module.scss';
@@ -11,22 +11,6 @@ const { Text } = Typography;
 
 const SessionInfo = ({ session }) => {
   const documentUrls = session?.document_urls?.filter((documentUrl) => documentUrl && isValidFile(documentUrl)) || [];
-
-  const renderSessionPrice = () => {
-    if (isInCreatorDashboard()) {
-      return session?.pay_what_you_want
-        ? 'Your Fair Price'
-        : session?.price === 0
-        ? 'Free'
-        : `${session?.price || 0} ${session?.currency?.toUpperCase()}`;
-    }
-
-    return session?.pay_what_you_want
-      ? 'Your Fair Price'
-      : session?.total_price === 0 || session?.price === 0
-      ? 'Free'
-      : `${session?.total_price || session?.price || 0} ${session?.currency?.toUpperCase()}`;
-  };
 
   return (
     <Row justify="space-between" gutter={[8, 16]}>
