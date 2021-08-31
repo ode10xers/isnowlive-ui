@@ -95,7 +95,7 @@ export default {
     rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
     generateZoomMeetingInfo: (inventoryId) => http.post(`/secure/creator/inventories/id/${inventoryId}/zoom`),
     submitZoomMeetingInfo: (inventoryId, payload) =>
-      http.patch(`/secure/creator/inventories/id/${inventoryId}/zoom`, payload),
+      http.patch(`/secure/creator/inventories/id/${inventoryId}/custom`, payload),
     getZoomMeetingInfo: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}/zoom`),
     updateSessionInventory: (inventoryId, payload) =>
       http.patch(`/secure/creator/inventories/id/${inventoryId}`, payload),
