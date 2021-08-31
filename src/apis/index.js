@@ -94,9 +94,9 @@ export default {
     deleteSession: (sessionId) => http.delete(`/secure/creator/sessions/${sessionId}`),
     rescheduleSession: (orderId, payload) => http.post(`secure/customer/orders/${orderId}/reschedule`, payload),
     generateZoomMeetingInfo: (inventoryId) => http.post(`/secure/creator/inventories/id/${inventoryId}/zoom`),
-    submitZoomMeetingInfo: (inventoryId, payload) =>
-      http.patch(`/secure/creator/inventories/id/${inventoryId}/custom`, payload),
-    getZoomMeetingInfo: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}/zoom`),
+    submitMeetingInfo: (inventoryId, payload) =>
+      http.patch(`/secure/creator/inventories/id/${inventoryId}/custom-meeting`, payload),
+    getMeetingInfo: (inventoryId) => http.get(`/secure/creator/inventories/id/${inventoryId}/meeting-details`),
     updateSessionInventory: (inventoryId, payload) =>
       http.patch(`/secure/creator/inventories/id/${inventoryId}`, payload),
     updateOfflineEventAddress: (inventoryExternalId, payload) =>
