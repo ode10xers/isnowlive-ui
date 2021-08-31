@@ -4,6 +4,7 @@
   position: relative;
 
   .coverImage {
+    border-radius: 8px;
     img {
       border-radius: 8px;
       width: 100%;
@@ -64,4 +65,13 @@
 
 .linkButton {
   padding: 0px !important;
+}
+
+.inventoryTitle{
+  font-family: Overpass;
+  font-style: normal;
+  font-weight: 800 !important;
+  font-size: 32px !important;
+  line-height: 59px !important;
+  color: #003A8C !important;
 }

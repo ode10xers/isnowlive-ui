@@ -120,7 +120,9 @@ const InventoryDetails = ({ match, history }) => {
         </Col>
 
         <Col xs={24} lg={14}>
-          <Title level={isMobileDevice ? 2 : 1}>{session?.name}</Title>
+          <Title className={styles.inventoryTitle} level={isMobileDevice ? 2 : 1}>
+            {session?.name}
+          </Title>
           <SessionDate schedule={session} />
           <SessionInfo session={session} />
           <Row>
@@ -131,7 +133,9 @@ const InventoryDetails = ({ match, history }) => {
               </Col>
             )}
             <Col xs={24} className={session?.is_offline ? styles.mt50 : undefined}>
-              <Title level={5}>Session Information</Title>
+              <Title className={styles.inventoryTitle} level={5}>
+                Session Information
+              </Title>
               {showDescription ? (
                 <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
               ) : (
