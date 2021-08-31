@@ -675,7 +675,7 @@ const Session = ({ match, history }) => {
         user_timezone_offset: new Date().getTimezoneOffset(),
         user_timezone: getCurrentLongTimezone(),
         color_code: values.color_code || colorCode || whiteColor,
-        is_course: isCourseSession,
+        is_course: isAvailability ? false : isCourseSession,
         tag_ids:
           selectedTagType === 'anyone'
             ? []
@@ -872,8 +872,14 @@ const Session = ({ match, history }) => {
               onChange={handleSessionOfflineTypeChange}
             >
               <Radio.Group>
-                <Radio value="false"> Online </Radio>
-                <Radio value="true"> Offline </Radio>
+                <Radio className={styles.radioOption} value="false">
+                  {' '}
+                  Online{' '}
+                </Radio>
+                <Radio className={styles.radioOption} value="true">
+                  {' '}
+                  Offline{' '}
+                </Radio>
               </Radio.Group>
             </Form.Item>
             {!isOfflineSession ? (
@@ -888,7 +894,7 @@ const Session = ({ match, history }) => {
                 >
                   <Radio.Group>
                     {Object.values(meetingTypes).map((meetingType) => (
-                      <Radio key={meetingType.value} value={meetingType.value}>
+                      <Radio className={styles.radioOption} key={meetingType.value} value={meetingType.value}>
                         {meetingType.label}
                       </Radio>
                     ))}
@@ -1031,7 +1037,7 @@ const Session = ({ match, history }) => {
               </Form.Item>
 
               {/* ---- Session Course Type ---- */}
-              <>
+              {!isAvailability && (
                 <Form.Item label={`${isAvailability ? 'Availability' : 'Session'} Type`} required>
                   <Form.Item
                     name="session_course_type"
@@ -1056,7 +1062,7 @@ const Session = ({ match, history }) => {
                     </Button>
                   </Form.Item>
                 </Form.Item>
-              </>
+              )}
 
               {/* ---- Session Tag Type ---- */}
               <>
