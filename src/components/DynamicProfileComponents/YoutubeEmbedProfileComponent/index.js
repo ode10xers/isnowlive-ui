@@ -11,7 +11,7 @@ import DynamicProfileComponentContainer from 'components/DynamicProfileComponent
 
 import styles from './style.module.scss';
 
-const YoutubeEmbedComponent = ({
+const YoutubeEmbedProfileComponent = ({
   identifier = null,
   isEditing = false,
   isContained = false,
@@ -73,4 +73,4 @@ const YoutubeEmbedComponent = ({
   );
 };
 
-export default YoutubeEmbedComponent;
+export default YoutubeEmbedProfileComponent;
