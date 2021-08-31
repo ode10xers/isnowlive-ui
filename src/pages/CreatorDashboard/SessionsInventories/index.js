@@ -21,7 +21,7 @@ import Routes from 'routes';
 import Table from 'components/Table';
 import Loader from 'components/Loader';
 import CalendarView from 'components/CalendarView';
-import ZoomDetailsModal from 'components/ZoomDetailsModal';
+import MeetingDetailsModal from 'components/MeetingDetailsModal';
 import EventAddressModal from 'components/EventAddressModal';
 import { showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
@@ -389,7 +389,7 @@ const SessionsInventories = ({ match }) => {
               ) : record.start_url ? (
                 <>
                   <Col xs={12} md={8} xl={4}>
-                    <Tooltip title="Show Zoom Meeting Details">
+                    <Tooltip title="Show Meeting Details">
                       <Button type="link" icon={<Icons.VideoLink />} onClick={() => showZoomDetailsModal(record)} />
                     </Tooltip>
                   </Col>
@@ -405,7 +405,7 @@ const SessionsInventories = ({ match }) => {
                 </>
               ) : (
                 <Col xs={12} md={8} xl={4}>
-                  <Tooltip title="Add Zoom Meeting Details">
+                  <Tooltip title="Add Meeting Details">
                     <Button
                       type="link"
                       icon={<VideoCameraAddOutlined />}
@@ -453,7 +453,7 @@ const SessionsInventories = ({ match }) => {
     );
 
     const meetingDetailsButton = (
-      <Tooltip title="Show Zoom Meeting Details">
+      <Tooltip title="Show Meeting Details">
         <Button type="link" icon={<Icons.VideoLink />} onClick={() => showZoomDetailsModal(item)} />
       </Tooltip>
     );
@@ -469,7 +469,7 @@ const SessionsInventories = ({ match }) => {
     );
 
     const addMeetingDetailsButton = (
-      <Tooltip title="Add Zoom Meeting Details">
+      <Tooltip title="Add Meeting Details">
         <Button type="link" icon={<VideoCameraAddOutlined />} onClick={() => showZoomDetailsModal(item)} />
       </Tooltip>
     );
@@ -595,7 +595,7 @@ const SessionsInventories = ({ match }) => {
         closeModal={handleCloseOfflineEventAddressModal}
         inventory={selectedInventoryForModal}
       />
-      <ZoomDetailsModal
+      <MeetingDetailsModal
         visible={zoomDetailsModalVisible}
         selectedInventory={selectedInventoryForModal}
         closeModal={handleCloseZoomDetailsModal}

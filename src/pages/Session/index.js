@@ -730,7 +730,7 @@ const Session = ({ match, history }) => {
             });
           }
         } else {
-          if (onlineMeetingType === meetingTypes.CUSTOM.value) {
+          if (!isOfflineSession && onlineMeetingType === meetingTypes.CUSTOM.value) {
             data.meeting_type = sessionMeetingTypes.CUSTOM_MEETING;
             data.meeting_details = values.meeting_details;
           }
@@ -1236,7 +1236,9 @@ const Session = ({ match, history }) => {
             </>
           )}
         </Section>
-        {(isOfflineSession || zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
+        {(isOfflineSession ||
+          onlineMeetingType === meetingTypes.CUSTOM.value ||
+          zoom_connected !== ZoomAuthType.NOT_CONNECTED) && (
           <>
             {/* ========= SESSION SCHEDULE =========== */}
             <Section>

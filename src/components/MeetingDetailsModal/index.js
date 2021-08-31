@@ -1,35 +1,44 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Row, Col, Form, Modal, Button, Radio, Typography, Input, message } from 'antd';
+import { Link } from 'react-router-dom';
+import { Row, Col, Form, Modal, Button, Radio, Typography, Input } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
 import apis from 'apis';
+import Routes from 'routes';
 
 import Loader from 'components/Loader';
 import { resetBodyStyle, showErrorModal, showSuccessModal } from 'components/Modals/modals';
 
-import { isAPISuccess } from 'utils/helper';
+import { isAPISuccess, ZoomAuthType, copyToClipboard } from 'utils/helper';
 import validationRules from 'utils/validation';
+
+import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
-const { Title, Text, Link } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
-const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => {
+const MeetingDetailsModal = ({ visible, selectedInventory = null, closeModal }) => {
   const [form] = Form.useForm();
+  const {
+    state: { userDetails },
+  } = useGlobalContext();
+
+  const isZoomConnected = userDetails.profile && userDetails.profile.zoom_connected !== ZoomAuthType.NOT_CONNECTED;
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(true);
-  const [view, setView] = useState('generate');
-  const [zoomMeetingDetails, setZoomMeetingDetails] = useState(null);
+  const [view, setView] = useState('add');
+  const [meetingDetails, setMeetingDetails] = useState(null);
 
-  const getZoomMeetingInformation = useCallback(async (inventoryId) => {
+  const getMeetingInformation = useCallback(async (inventoryId) => {
     setIsLoading(true);
     try {
-      const { status, data } = await apis.session.getZoomMeetingInfo(inventoryId);
+      const { status, data } = await apis.session.getMeetingInfo(inventoryId);
 
       if (isAPISuccess(status)) {
-        setZoomMeetingDetails(data);
+        setMeetingDetails(data);
       }
     } catch (error) {
       showErrorModal('Something wrong happened', error.response?.data?.message);
@@ -38,6 +47,18 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
   }, []);
 
   const generateZoomMeetingInformation = useCallback(async (inventoryId) => {
+    if (!isZoomConnected) {
+      showErrorModal(
+        'Unable to generate Zoom Meeting',
+        <>
+          {' '}
+          You have not connected your Zoom Account. Please head{' '}
+          <Link to={Routes.creatorDashboard.rootPath + Routes.creatorDashboard.livestream}>here</Link> to connect it.{' '}
+        </>
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { status } = await apis.session.generateZoomMeetingInfo(inventoryId);
@@ -53,62 +74,32 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
     //eslint-disable-next-line
   }, []);
 
-  const copyTextToClipboard = (text, itemName) => {
-    // Fallback method if navigator.clipboard is not supported
-    if (!navigator.clipboard) {
-      var textArea = document.createElement('textarea');
-      textArea.value = text;
-
-      // Avoid scrolling to bottom
-      textArea.style.top = '0';
-      textArea.style.left = '0';
-      textArea.style.position = 'fixed';
-
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-
-      try {
-        var successful = document.execCommand('copy');
-
-        if (successful) {
-          message.success(`${itemName} copied to clipboard!`);
-        } else {
-          message.error('Failed to copy to clipboard');
-        }
-      } catch (err) {
-        message.error('Failed to copy to clipboard');
-      }
-
-      document.body.removeChild(textArea);
-    } else {
-      navigator.clipboard.writeText(text).then(
-        () => {
-          message.success(`${itemName} copied to clipboard!`);
-        },
-        (err) => {
-          message.error('Failed to copy to clipboard');
-        }
-      );
-    }
-  };
+  const showAddMeetingDetailsForm = useCallback(() => {
+    setShowForm(true);
+    setView('add');
+  }, []);
 
   useEffect(() => {
-    form.resetFields();
-
-    if (visible && selectedInventory && selectedInventory.inventory_id) {
-      if (selectedInventory.start_url) {
-        getZoomMeetingInformation(selectedInventory.inventory_id);
-        setShowForm(false);
-      } else {
-        setShowForm(true);
-        setView('generate');
-      }
+    if (visible && selectedInventory && selectedInventory.inventory_id && selectedInventory.start_url) {
+      getMeetingInformation(selectedInventory.inventory_id);
+      setShowForm(false);
     } else {
-      setShowForm(true);
-      setView('generate');
+      showAddMeetingDetailsForm();
+      setMeetingDetails(null);
     }
-  }, [visible, form, selectedInventory, getZoomMeetingInformation]);
+  }, [visible, selectedInventory, getMeetingInformation, showAddMeetingDetailsForm]);
+
+  useEffect(() => {
+    if (meetingDetails) {
+      form.setFieldsValue({
+        joinUrl: meetingDetails.join_url,
+        meetingId: meetingDetails.meeting_id,
+        password: meetingDetails.password,
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [meetingDetails, form]);
 
   const handleViewChange = (e) => {
     setView(e.target.value);
@@ -124,23 +115,17 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
       return;
     }
 
-    if (values.meetingId && Number.isNaN(parseInt(values.meetingId?.split(' ').join('')))) {
-      showErrorModal('Meeting ID can only consist of numbers');
-      setIsSubmitting(false);
-      return;
-    }
-
     const payload = {
       join_url: values.joinUrl,
-      meeting_id: parseInt(values.meetingId?.split(' ').join('')) || null,
-      password: values.password || null,
+      meeting_id: values.meetingId,
+      password: values.password,
     };
 
     try {
-      const { status } = await apis.session.submitZoomMeetingInfo(selectedInventory.inventory_id, payload);
+      const { status } = await apis.session.submitMeetingInfo(selectedInventory.inventory_id, payload);
 
       if (isAPISuccess(status)) {
-        showSuccessModal('Zoom Meeting information successfully submitted');
+        showSuccessModal(`Meeting information successfully updated`);
         closeModal(true);
       }
     } catch (error) {
@@ -162,10 +147,12 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
         destroyOnClose={true}
         title={
           !showForm ? (
-            <Title level={3}> Zoom Details Sent to Attendee </Title>
+            <Title level={3}> Meeting Details Sent to Attendee </Title>
           ) : (
             <Radio.Group value={view} onChange={handleViewChange}>
-              <Radio.Button value="generate"> Generate </Radio.Button>
+              {isZoomConnected && !selectedInventory?.start_url && (
+                <Radio.Button value="generate"> Generate </Radio.Button>
+              )}
               <Radio.Button value="add"> Add </Radio.Button>
             </Radio.Group>
           )
@@ -181,21 +168,21 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
                       <Form.Item
                         id="joinUrl"
                         name="joinUrl"
-                        label="Zoom Meeting Link"
+                        label="Meeting Link"
                         rules={validationRules.requiredValidation}
                       >
-                        <Input placeholder="Add your zoom meeting link here" />
+                        <Input placeholder="Add your meeting link here" />
                       </Form.Item>
                     </Col>
                   </Row>
                   <Row gutter={[8, 16]}>
                     <Col xs={24} md={12}>
-                      <Form.Item id="meetingId" name="meetingId" label="Meeting ID">
-                        <Input placeholder="Add zoom meeting ID (numeric inputs only)" />
+                      <Form.Item id="meetingId" name="meetingId" label="Meeting ID (optional)">
+                        <Input placeholder="Add meeting ID" />
                       </Form.Item>
                     </Col>
                     <Col xs={24} md={{ span: 11, offset: 1 }}>
-                      <Form.Item id="password" name="password" label="Meeting Password">
+                      <Form.Item id="password" name="password" label="Meeting Password (optional)">
                         <Input.Password placeholder="Add meeting password" />
                       </Form.Item>
                     </Col>
@@ -214,69 +201,74 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
                   </Row>
                 </Form>
               </div>
-            ) : (
-              <Row>
-                <Col xs={24} md={{ span: 10, offset: 7 }}>
-                  <Button
-                    block
-                    size="large"
-                    type="primary"
-                    onClick={() => generateZoomMeetingInformation(selectedInventory.inventory_id)}
-                    loading={isSubmitting}
-                  >
-                    Create a Zoom Meeting
-                  </Button>
+            ) : isZoomConnected && !selectedInventory?.start_url ? (
+              <Row gutter={[12, 12]}>
+                <Col xs={24}>
+                  <Row justify="center">
+                    <Col>
+                      <Button
+                        size="large"
+                        type="primary"
+                        onClick={() => generateZoomMeetingInformation(selectedInventory.inventory_id)}
+                        loading={isSubmitting}
+                      >
+                        Create a Zoom Meeting
+                      </Button>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col xs={24} className={styles.textAlignCenter}>
+                  <Paragraph>
+                    We will automatically create a Zoom meeting for you using the Zoom account you have connected.
+                  </Paragraph>
                 </Col>
               </Row>
-            )
+            ) : null
           ) : (
             <Row gutter={[8, 24]}>
-              {zoomMeetingDetails ? (
+              {meetingDetails ? (
                 <>
-                  {zoomMeetingDetails.join_url && (
+                  {meetingDetails.join_url && (
                     <Col xs={24}>
                       <Row>
                         <Col xs={24}>
                           <Title level={4} className={styles.detailsHeader}>
-                            {' '}
-                            Zoom Meeting Link{' '}
-                          </Title>{' '}
+                            Meeting Link
+                          </Title>
                           <Button
                             type="text"
-                            onClick={() => copyTextToClipboard(zoomMeetingDetails.join_url, 'Meeting Link')}
+                            onClick={() => copyToClipboard(meetingDetails.join_url)}
                             icon={<CopyOutlined />}
                           />
                         </Col>
                         <Col xs={24}>
-                          <Link href={zoomMeetingDetails.join_url} target="_blank">
-                            {' '}
-                            {zoomMeetingDetails.join_url}{' '}
+                          <Link href={meetingDetails.join_url} target="_blank">
+                            {meetingDetails.join_url}
                           </Link>
                         </Col>
                       </Row>
                     </Col>
                   )}
-                  {zoomMeetingDetails.meeting_id ? (
+                  {meetingDetails.meeting_id ? (
                     <Col xs={24} md={12}>
                       <Row>
                         <Col xs={24}>
                           <Title level={4} className={styles.detailsHeader}>
-                            {' '}
-                            Meeting ID{' '}
-                          </Title>{' '}
+                            Meeting ID
+                          </Title>
                           <Button
                             type="text"
-                            onClick={() => copyTextToClipboard(zoomMeetingDetails.meeting_id, 'Meeting ID')}
+                            onClick={() => copyToClipboard(meetingDetails.meeting_id)}
                             icon={<CopyOutlined />}
                           />
                         </Col>
                         <Col xs={24}>
-                          <Text> {zoomMeetingDetails.meeting_id} </Text>
+                          <Text> {meetingDetails.meeting_id} </Text>
                         </Col>
                       </Row>
                     </Col>
                   ) : null}
-                  {zoomMeetingDetails.password ? (
+                  {meetingDetails.password ? (
                     <Col xs={24} md={12}>
                       <Row>
                         <Col xs={24}>
@@ -286,22 +278,30 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
                           </Title>{' '}
                           <Button
                             type="text"
-                            onClick={() => copyTextToClipboard(zoomMeetingDetails.password, 'Meeting Password')}
+                            onClick={() => copyToClipboard(meetingDetails.password)}
                             icon={<CopyOutlined />}
                           />
                         </Col>
                         <Col xs={24}>
-                          <Text> {zoomMeetingDetails.password} </Text>
+                          <Text> {meetingDetails.password} </Text>
                         </Col>
                       </Row>
                     </Col>
                   ) : null}
+                  <Col xs={24}>
+                    <Row justify="center">
+                      <Col>
+                        <Button type="primary" onClick={showAddMeetingDetailsForm}>
+                          Edit Meeting Details
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Col>
                 </>
               ) : (
                 <Col xs={24}>
                   <Title disabled level={5} className={styles.textAlignCenter}>
-                    {' '}
-                    No Zoom Meeting Details available{' '}
+                    No Meeting Details available
                   </Title>
                 </Col>
               )}
@@ -313,4 +313,4 @@ const ZoomDetailsModal = ({ visible, selectedInventory = null, closeModal }) => 
   );
 };
 
-export default ZoomDetailsModal;
+export default MeetingDetailsModal;
