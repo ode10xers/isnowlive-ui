@@ -1,28 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Row, Col, Image, message, Typography, Tabs } from 'antd';
+import { Row, Col, Image, message, Typography, Tabs, Divider } from 'antd';
 import classNames from 'classnames';
 import ReactHtmlParser from 'react-html-parser';
+// import { FilePdfOutlined } from '@ant-design/icons';
 
 import Routes from 'routes';
 import apis from 'apis';
 
-import Share from 'components/Share';
 import Loader from 'components/Loader';
 import HostDetails from 'components/HostDetails';
-import SessionInfo from 'components/SessionInfo';
 import DefaultImage from 'components/Icons/DefaultImage';
 import PublicVideoList from 'components/PublicVideoList';
 import SessionRegistration from 'components/SessionRegistration';
 import ShowcaseCourseCard from 'components/ShowcaseCourseCard';
+// import SessionDate from 'components/SessionDate';
 
 import { isMobileDevice } from 'utils/device';
-import {
-  generateUrlFromUsername,
-  isAPISuccess,
-  reservedDomainName,
-  isUnapprovedUserError,
-  getUsernameFromUrl,
-} from 'utils/helper';
+import { isInCreatorDashboard } from 'utils/helper';
+import { isAPISuccess, reservedDomainName, isUnapprovedUserError, getUsernameFromUrl } from 'utils/helper';
 
 import styles from './style.module.scss';
 
@@ -112,6 +107,22 @@ const SessionDetails = ({ match, history }) => {
     //eslint-disable-next-line
   }, [match.params.session_id]);
 
+  const renderSessionPrice = () => {
+    if (isInCreatorDashboard()) {
+      return session?.pay_what_you_want
+        ? 'Your Fair Price'
+        : session?.price === 0
+        ? 'Free'
+        : `${session?.price || 0} ${session?.currency?.toUpperCase()}`;
+    }
+
+    return session?.pay_what_you_want
+      ? 'Your Fair Price'
+      : session?.total_price === 0 || session?.price === 0
+      ? 'Free'
+      : `${session?.total_price || session?.price || 0} ${session?.currency?.toUpperCase()}`;
+  };
+
   return (
     <Loader loading={isLoading} size="large" text="Loading profile">
       <Row justify="space-between" className={styles.mt50}>
@@ -124,23 +135,71 @@ const SessionDetails = ({ match, history }) => {
             fallback={DefaultImage()}
           />
         </Col>
-        <Col xs={24}>
-          <Title level={3}>{session?.name}</Title>
-        </Col>
       </Row>
-      <Row justify="space-between" className={styles.mt50}>
-        <Col xs={18}>
-          <SessionInfo session={session} />
-        </Col>
-        {creator && (
-          <Col xs={6} lg={{ span: 3, offset: 3 }}>
-            <Share
-              label="Share"
-              shareUrl={`${generateUrlFromUsername(creator?.username)}/s/${session.session_id}`}
-              title={`${session?.name} - ${creator?.first_name} ${creator?.last_name}`}
-            />
+      <Row>
+        <Col xs={24} lg={{ span: 10 }}>
+          <Title level={3} className={styles.blueTitle}>
+            {session?.name}
+          </Title>
+          {/* <Row justify="space-between" gutter={[8, 16]}>
+            {documentUrls.length > 0 && (
+              <Col xs={24} lg={session?.is_course ? 16 : 8}>
+                <Text className={styles.text} type="secondary">
+                  {!isMobileDevice && 'Session '}Pre-read file(s)
+                </Text>
+                <List
+                  size="small"
+                  dataSource={documentUrls}
+                  renderItem={(documentUrl) => (
+                    <List.Item>
+                      <Button
+                        className={styles.downloadButton}
+                        type="link"
+                        icon={<FilePdfOutlined />}
+                        onClick={() => window.open(documentUrl)}
+                      >
+                        {documentUrl.split('_').slice(-1)[0] || 'Download'}
+                      </Button>
+                    </List.Item>
+                  )}
+                />
+              </Col>
+            )}
+          </Row> */}
+          <div className={styles.box}>
+            <div className={styles.container}>
+              <Title className={styles.shortday} level={5}>
+                Price
+              </Title>
+              <Text className={styles.timezone}>{renderSessionPrice()}</Text>
+            </div>
+            <Divider className={styles.divider} type="vertical" />
+            <div className={styles.container}>
+              <Title className={styles.shortday} level={5}>
+                Session Type
+              </Title>
+              <Text className={styles.timezone}>{session?.group ? 'Group' : '1-on-1'}</Text>
+            </div>
+          </div>
+          <Col xs={24} className={session?.is_offline ? styles.mt50 : undefined}>
+            <Title level={5} className={styles.blueTitle}>
+              Session Information
+            </Title>
+            {showDescription ? (
+              <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
+            ) : (
+              <>
+                <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
+                <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
+                  Read More
+                </div>
+              </>
+            )}
           </Col>
-        )}
+        </Col>
+        <Col xs={24} lg={{ span: 10 }} className={isMobileDevice ? styles.mt20 : undefined}>
+          {creator && <HostDetails host={creator} />}
+        </Col>
       </Row>
       <Row justify="space-between" className={styles.mt50} gutter={16}>
         <Col xs={24} lg={14}>
@@ -151,19 +210,6 @@ const SessionDetails = ({ match, history }) => {
                 <Text> {session?.offline_event_address} </Text>
               </Col>
             )}
-            <Col xs={24} className={session?.is_offline ? styles.mt50 : undefined}>
-              <Title level={5}>Session Information</Title>
-              {showDescription ? (
-                <div className={styles.longTextExpanded}>{ReactHtmlParser(session?.description)}</div>
-              ) : (
-                <>
-                  <div className={styles.sessionDesc}>{ReactHtmlParser(session?.description)}</div>
-                  <div className={styles.readMoreText} onClick={() => setShowDescription(true)}>
-                    Read More
-                  </div>
-                </>
-              )}
-            </Col>
             {session?.prerequisites && (
               <Col xs={24} className={styles.mt50}>
                 <Title level={5}>Session Prerequisite</Title>
@@ -180,9 +226,6 @@ const SessionDetails = ({ match, history }) => {
               </Col>
             )}
           </Row>
-        </Col>
-        <Col xs={24} lg={{ span: 9, offset: 1 }} className={isMobileDevice ? styles.mt20 : undefined}>
-          {creator && <HostDetails host={creator} />}
         </Col>
       </Row>
       {session?.is_course && courses ? (

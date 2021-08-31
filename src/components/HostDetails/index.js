@@ -66,9 +66,11 @@ const HostDetails = ({ host }) => {
     <div className={styles.box}>
       <Row>
         <Col>
-          <Title level={5}>About Host</Title>
+          <Title level={5} className={styles.creatorName}>
+            Host
+          </Title>
           <Row>
-            <Col xs={24} lg={6}>
+            <Col xs={24} lg={6} md={6}>
               <Image
                 preview={false}
                 className={isMobileDevice ? styles.profileImageSmall : styles.profileImage}
@@ -81,7 +83,7 @@ const HostDetails = ({ host }) => {
                 }}
               />
             </Col>
-            <Col xs={24} lg={18}>
+            <Col xs={24} lg={18} md={18}>
               <Text className={styles.creatorName}>
                 {host?.first_name} {host?.last_name}
               </Text>
