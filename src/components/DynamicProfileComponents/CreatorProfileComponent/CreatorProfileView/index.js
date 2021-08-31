@@ -104,7 +104,6 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
           <Col xs={24}>
             <Divider className={styles.creatorProfileDivider} />
           </Col>
-          {/* {isContained && ( */}
           <Col xs={24} className={styles.creatorBio}>
             {shouldExpandCreatorBio ? (
               <div className={styles.bio}>{ReactHtmlParser(creatorProfile?.profile?.bio)}</div>
@@ -117,7 +116,6 @@ const CreatorProfileView = ({ creatorProfile, isEditing, isContained }) => {
               </>
             )}
           </Col>
-          {/* )} */}
         </Row>
       </Col>
       {renderCreatorExternalLinks()}
