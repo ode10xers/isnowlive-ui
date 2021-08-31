@@ -37,8 +37,6 @@ import Scheduler from 'components/Scheduler';
 import TextEditor from 'components/TextEditor';
 import { showErrorModal, showCourseOptionsHelperModal, showTagOptionsHelperModal } from 'components/Modals/modals';
 
-import validationRules from 'utils/validation';
-import dateUtil from 'utils/date';
 import {
   getCurrencyList,
   convertSchedulesToUTC,
@@ -47,8 +45,11 @@ import {
   isValidFile,
   ZoomAuthType,
 } from 'utils/helper';
+import dateUtil from 'utils/date';
 import { isMobileDevice } from 'utils/device';
+import validationRules from 'utils/validation';
 import { fetchCreatorCurrency } from 'utils/payment';
+import { sessionMeetingTypes } from 'utils/constants';
 
 import { profileFormItemLayout, profileFormTailLayout } from 'layouts/FormLayouts';
 
@@ -63,7 +64,6 @@ import {
 import { pushToDataLayer, gtmTriggerEvents, customNullValue } from 'services/integrations/googleTagManager';
 
 import styles from './style.module.scss';
-import { sessionMeetingTypes } from 'utils/constants';
 
 const { Title, Text, Paragraph, Link } = Typography;
 const { Option } = Select;
@@ -225,6 +225,7 @@ const Session = ({ match, history }) => {
 
   const getSessionDetails = useCallback(
     async (sessionId, startDate, endDate) => {
+      setIsLoading(true);
       try {
         const { data } = isAvailability
           ? await apis.availabilities.getDetails(sessionId, startDate, endDate)
@@ -269,9 +270,9 @@ const Session = ({ match, history }) => {
           setRecurringDatesRanges(data?.recurring ? [moment(data?.beginning), moment(data?.expiry)] : []);
           setColorCode(data?.color_code || whiteColor);
           setIsCourseSession(data?.is_course || false);
-          setIsLoading(false);
           setSelectedTagType(data?.tags?.length > 0 ? 'selected' : 'anyone');
           await getCreatorCurrencyDetails(data);
+          setIsLoading(false);
         }
       } catch (error) {
         message.error(error.response?.data?.message || 'Something went wrong.');
