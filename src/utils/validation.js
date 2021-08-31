@@ -3,7 +3,7 @@ const validationRules = {
   publicUrlValidation: [
     { required: true, message: 'Please input public URL' },
     {
-      pattern: new RegExp('^[A-Za-z]*$'),
+      pattern: new RegExp('^[a-z]*$'),
       message: 'Public URL can only contain lowercase letters',
     },
   ],
@@ -138,7 +138,8 @@ const validationRules = {
     {
       // eslint-disable-next-line
       pattern: new RegExp(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*$/g),
-      message: 'Please input a valid YouTube video link',
+      message:
+        'Please input a valid YouTube video link (https://youtu.be/[video-id] or https://www.youtube.com/watch?v=[video-id])',
     },
   ],
 };

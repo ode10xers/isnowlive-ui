@@ -57,7 +57,9 @@ const SubscriptionProfileComponent = lazy(() =>
 const OtherLinksProfileComponent = lazy(() => import('components/DynamicProfileComponents/OtherLinksProfileComponent'));
 // const CreatorProfileComponent = lazy(() => import('components/DynamicProfileComponents/CreatorProfileComponent'));
 const ProductsProfileComponent = lazy(() => import('components/DynamicProfileComponents/ProductsProfileComponent'));
-const YoutubeEmbedComponent = lazy(() => import('components/DynamicProfileComponents/YoutubeEmbedComponent'));
+const YoutubeEmbedProfileComponent = lazy(() =>
+  import('components/DynamicProfileComponents/YoutubeEmbedProfileComponent')
+);
 const DescriptionProfileComponent = lazy(() =>
   import('components/DynamicProfileComponents/DescriptionProfileComponent')
 );
@@ -221,7 +223,7 @@ const componentsMap = {
     type: componentUIType.FLEXIBLE,
     optional: true,
     elementId: 'youtube-videos',
-    component: YoutubeEmbedComponent,
+    component: YoutubeEmbedProfileComponent,
     defaultProps: {
       title: 'Youtube Videos',
       values: null,

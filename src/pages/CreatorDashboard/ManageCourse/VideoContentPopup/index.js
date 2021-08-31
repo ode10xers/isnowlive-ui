@@ -168,7 +168,7 @@ const VideoContentPopup = ({ visible, closeModal, addContentMethod = null, exclu
       }
       bodyStyle={{
         maxHeight: 'calc(100vh - 200px)',
-        overflow: 'scroll',
+        overflowY: 'scroll',
       }}
     >
       <Spin spinning={isLoading} tip="Processing">
