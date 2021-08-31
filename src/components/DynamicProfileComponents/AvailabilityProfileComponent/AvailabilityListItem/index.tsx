@@ -2,7 +2,7 @@ import React, { MouseEvent, useCallback, useRef } from 'react'
 import ReactHtmlParser from 'react-html-parser'
 import moment from 'moment'
 
-import { Row, Col, Typography, Card, Avatar } from 'antd'
+import { Row, Col, Typography, Card, Image } from 'antd'
 
 import type { Session } from 'types/models/session'
 
@@ -39,14 +39,17 @@ const AvailabilityListItem: React.VFC<AvailabilityListItemProps> = ({ availabili
         }}
         bodyStyle={{ padding : 8 }}
       >
-        <Row gutter={[12, 4]} justify="center" align="middle">
+        <Row gutter={[12, 4]} justify="center" align="stretch">
           <Col sm={8} xs={10} ref={avatarContainer}>
-            <Avatar
-              shape="square"
+            <div className={styles.availabilityImageContainer}>
+            <Image
+              // shape="square"
+              // size={(avatarContainer.current?.offsetWidth ?? 0) - 20}
+              preview={false}
               src={availability.session_image_url}
-              size={(avatarContainer.current?.offsetWidth ?? 0) - 20}
               className={styles.availabilityImage}
             />
+            </div>
           </Col>
           <Col sm={16} xs={14}>
             <Row>

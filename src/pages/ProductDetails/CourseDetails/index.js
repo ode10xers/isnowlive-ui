@@ -18,11 +18,14 @@ import apis from 'apis';
 
 import Loader from 'components/Loader';
 import AuthModal from 'components/AuthModal';
+import YoutubeVideoEmbed from 'components/YoutubeVideoEmbed';
 import { showPurchaseSingleCourseSuccessModal, showErrorModal, showAlreadyBookedModal } from 'components/Modals/modals';
 
 import dateUtil from 'utils/date';
 import { generateColorPalletteForProfile } from 'utils/colors';
+import { getYoutubeVideoIDFromURL } from 'utils/video';
 import { getCourseSessionContentCount, getCourseVideoContentCount } from 'utils/course';
+import { redirectToInventoryPage, redirectToVideosPage } from 'utils/redirect';
 import {
   isAPISuccess,
   orderType,
@@ -302,6 +305,15 @@ const CourseDetails = ({ match }) => {
     setShowAuthModal(true);
   };
 
+  const handleCourseModuleContentClicked = (content) => {
+    if (content.product_type?.toUpperCase() === 'SESSION') {
+      // In reality it represents inventories
+      redirectToInventoryPage(content.product_data);
+    } else if (content.product_type?.toUpperCase() === 'VIDEO') {
+      redirectToVideosPage(content.product_data);
+    }
+  };
+
   const renderCourseInfoItem = ({ icon, title, content }) => (
     <Space direction="vertical" size="small" className={styles.courseInfoItem}>
       <Text className={styles.courseInfoContent}> {content} </Text>
@@ -417,10 +429,13 @@ const CourseDetails = ({ match }) => {
         <Col xs={24} md={12} lg={14}>
           <Space className={styles.w100}>
             {renderContentIcon(content.product_type)}
-            <Text strong className={styles.moduleContentName}>
-              {' '}
-              {content.name}{' '}
-            </Text>
+            <Button
+              type="link"
+              className={styles.moduleContentName}
+              onClick={() => handleCourseModuleContentClicked(content)}
+            >
+              {content.name}
+            </Button>
           </Space>
         </Col>
         <Col xs={24} md={12} lg={10} className={styles.textAlignRight}>
@@ -483,6 +498,30 @@ const CourseDetails = ({ match }) => {
     ));
   };
 
+  // TODO: Currently this component only supports type = YOUTUBE
+  const coursePreviewEmbed = (
+    <div className={styles.coursePreviewContainer}>
+      <Row gutter={[10, 10]}>
+        {course?.preview_video_urls?.map((preview_video) =>
+          preview_video.type === 'YOUTUBE' ? (
+            <Col xs={24} key={preview_video.url}>
+              <Row gutter={[8, 8]}>
+                <Col xs={24} className={styles.textAlignCenter}>
+                  <Text className={styles.coursePreviewTitle}>{preview_video.title}</Text>
+                </Col>
+                <Col xs={24}>
+                  <div className={styles.courseEmbedContainer}>
+                    <YoutubeVideoEmbed videoId={getYoutubeVideoIDFromURL(preview_video.url)} />
+                  </div>
+                </Col>
+              </Row>
+            </Col>
+          ) : null
+        )}
+      </Row>
+    </div>
+  );
+
   return (
     <div className={styles.newCourseDetails}>
       <AuthModal visible={showAuthModal} closeModal={closeAuthModal} onLoggedInCallback={showConfirmPaymentPopup} />
@@ -544,6 +583,11 @@ const CourseDetails = ({ match }) => {
               </Col>
             </Row>
           </Col>
+          {course?.preview_video_urls?.length > 0 && (
+            <Col xs={24} className={styles.paddedContent}>
+              {coursePreviewEmbed}
+            </Col>
+          )}
           <Col xs={24} className={styles.paddedContent}>
             <Row gutter={[8, 30]}>
               {/* What you'll learn */}

@@ -151,6 +151,13 @@ $spacing: (
   color: map-get($map: $colors, $key: 'White') !important;
 }
 
+.orangeBtn {
+  background-color: map-get($map: $colors, $key: 'Pumpkin') !important;
+  border-color: map-get($map: $colors, $key: 'Pumpkin') !important;
+  color: map-get($map: $colors, $key: 'White') !important;
+}
+
+
 .disabledBuyBtn {
   background: map-get($map: $colors, $key: 'KellyGreenPale') !important;
 }

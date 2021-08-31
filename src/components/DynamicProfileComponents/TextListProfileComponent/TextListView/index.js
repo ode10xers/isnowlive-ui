@@ -17,7 +17,7 @@ const TextListView = ({ items = [], isContained }) => {
     <List
       bordered={false}
       className={styles.textListContainer}
-      dataSource={items}
+      dataSource={items.filter((item) => item)}
       renderItem={renderTextList}
       grid={isContained ? { column: 1, gutter: 8 } : { gutter: 10, column: 1, lg: 2 }}
     />
