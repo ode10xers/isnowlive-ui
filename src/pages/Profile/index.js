@@ -1,53 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router';
 import classNames from 'classnames';
-import { Form, Typography, Button, Space, Row, Col, Input, Card, message, Spin, Modal, Collapse } from 'antd';
-import { DeleteOutlined, PlusOutlined, ArrowLeftOutlined, CopyOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import parse from 'html-react-parser';
+import { Form, Typography, Button, Row, Col, Input, message, Spin } from 'antd';
 
 import Routes from 'routes';
 import apis from 'apis';
 
-import Section from 'components/Section';
 import Loader from 'components/Loader';
-import OnboardSteps from 'components/OnboardSteps';
-import ImageUpload from 'components/ImageUpload';
-import TextEditor from 'components/TextEditor';
-import EMCode from 'components/EMCode';
 
 import validationRules from 'utils/validation';
-import { parseEmbedCode, isAPISuccess, generateUrlFromUsername } from 'utils/helper';
+import { isAPISuccess, generateUrlFromUsername } from 'utils/helper';
 import { getLocalUserDetails } from 'utils/storage';
 import { isMobileDevice } from 'utils/device';
 
-import { profileFormItemLayout, profileFormTailLayout, profileTestimonialTailLayout } from 'layouts/FormLayouts';
-
-import {
-  mixPanelEventTags,
-  trackSimpleEvent,
-  trackSuccessEvent,
-  trackFailedEvent,
-} from 'services/integrations/mixpanel';
+import { mixPanelEventTags, trackSuccessEvent, trackFailedEvent } from 'services/integrations/mixpanel';
 import { gtmTriggerEvents, customNullValue, pushToDataLayer } from 'services/integrations/googleTagManager';
 import { useGlobalContext } from 'services/globalContext';
 
 import styles from './style.module.scss';
 
-const { Title, Text, Paragraph, Link } = Typography;
-const { Panel } = Collapse;
+const { Text } = Typography;
 const { creator } = mixPanelEventTags;
 
+// TODO: This page still have some old logic (need to cleanup)
+// The old logic is related to dashboard checking, etc
 const Profile = () => {
+  // const history = useHistory();
   const { setUserDetails } = useGlobalContext();
   const [isLoading, setIsLoading] = useState(true);
-  const [coverImage, setCoverImage] = useState(null);
-  const [profileImage, setProfileImage] = useState(null);
   const [isLoadingUsernameCheck, setIsLoadingUsernameCheck] = useState(false);
-  const [isPublicUrlAvaiable, setIsPublicUrlAvaiable] = useState(true);
-  const [testimonials, setTestimonials] = useState([]);
-  const [isOnboarding, setIsOnboarding] = useState(true);
+  const [isPublicUrlAvailable, setIsPublicUrlAvailable] = useState(true);
   const [form] = Form.useForm();
-  const history = useHistory();
 
   const getProfileDetails = useCallback(async () => {
     try {
@@ -58,9 +41,6 @@ const Profile = () => {
           data.username = '';
         }
         form.setFieldsValue(data);
-        setCoverImage(data.cover_image_url);
-        setProfileImage(data.profile_image_url);
-        setTestimonials(data.profile?.testimonials || []);
         setIsLoading(false);
       }
     } catch (error) {
@@ -70,12 +50,7 @@ const Profile = () => {
     }
   }, [form]);
 
-  const showCreatorProfilePreview = (creatorUrl) => {
-    const newWindow = window.open(creatorUrl);
-    newWindow.blur();
-    window.focus();
-  };
-
+  // Also adjust the event tags when necessary
   const updateProfileDetails = async (values) => {
     const eventTag = creator.click.profile.editForm.submitProfile;
 
@@ -86,13 +61,19 @@ const Profile = () => {
         await apis.user.convertUserToCreator();
       }
 
-      const { status, data } = await apis.user.updateProfile(values);
+      const payload = {
+        ...values,
+        profile: {
+          category: 'YOGA',
+        },
+      };
+
+      // TODO: Right now, the category is hard coded to YOGA
+      // Later we'll need to make a dropdown of choices
+      const { status, data } = await apis.user.updateProfile(payload);
       if (isAPISuccess(status) && data) {
         setIsLoading(false);
-        trackSuccessEvent(eventTag, { form_values: values });
-        message.success('Profile successfully updated.');
-        localUserDetails = data;
-
+        trackSuccessEvent(eventTag, { form_values: payload });
         pushToDataLayer(gtmTriggerEvents.CREATOR_PROFILE_COMPLETE, {
           creator_external_id: localUserDetails.external_id,
           creator_email: localUserDetails.email,
@@ -106,96 +87,9 @@ const Profile = () => {
           creator_payment_currency: localUserDetails.profile?.currency || customNullValue,
           creator_zoom_connected: localUserDetails.profile?.zoom_connected || customNullValue,
         });
-
-        setUserDetails(localUserDetails);
-
-        if (isOnboarding) {
-          const creatorUrl = generateUrlFromUsername(values.username);
-
-          const modalRef = Modal.success({
-            width: 550,
-            okButtonProps: { style: { display: 'none' } },
-            title: 'Awesome! Your public website is ready',
-            content: (
-              <Row gutter={[8, 12]}>
-                <Col xs={24}>
-                  <Paragraph>You can now share your website</Paragraph>
-                  <Paragraph>
-                    <Space>
-                      <Link
-                        href={creatorUrl}
-                        target="_blank"
-                        copyable={{
-                          icon: [
-                            <Button ghost type="primary" size="small" icon={<CopyOutlined />}>
-                              Copy
-                            </Button>,
-                            <Button type="primary" size="small" icon={<CheckCircleOutlined />}>
-                              Copied!
-                            </Button>,
-                          ],
-                        }}
-                      >
-                        {creatorUrl}
-                      </Link>
-                      <Button size="small" type="primary" onClick={() => showCreatorProfilePreview(creatorUrl)}>
-                        Show me!
-                      </Button>
-                    </Space>
-                  </Paragraph>
-                  <Paragraph>on your social media or with your audience.</Paragraph>
-                  <Paragraph>Now let's get your sessions or videos setup for them to start buying</Paragraph>
-                </Col>
-                <Col xs={24}>
-                  <Row gutter={[8, 8]} justify="space-around">
-                    <Col xs={24} md={12}>
-                      <Button
-                        block
-                        type="primary"
-                        onClick={() => {
-                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.videos, {
-                            onboarding: true,
-                          });
-                          modalRef.destroy();
-                        }}
-                      >
-                        Upload a Video
-                      </Button>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Button
-                        block
-                        type="primary"
-                        className={styles.greenBtn}
-                        onClick={() => {
-                          history.push(Routes.sessionCreate);
-                          window.scrollTo(0, 0);
-                          modalRef.destroy();
-                        }}
-                      >
-                        Schedule a Session
-                      </Button>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Button
-                        block
-                        type="link"
-                        onClick={() => {
-                          history.push(Routes.creatorDashboard.rootPath + Routes.creatorDashboard.defaultPath);
-                          modalRef.destroy();
-                        }}
-                      >
-                        I'll do these later
-                      </Button>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-            ),
-          });
-        } else {
-          history.push('/creator/dashboard/profile');
-        }
+        setUserDetails(data);
+        // history.push(Routes.onboardingProfile);
+        window.open(`${generateUrlFromUsername(data.username)}${Routes.onboardingProfile}`, '_self');
       }
     } catch (error) {
       setIsLoading(false);
@@ -205,44 +99,18 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (history.location.pathname.includes('dashboard')) {
-      setIsOnboarding(false);
-    }
     getProfileDetails();
-  }, [getProfileDetails, history.location.pathname]);
+  }, [getProfileDetails]);
 
   const onFinish = (values) => {
     setIsLoading(true);
-    values.cover_image_url = coverImage;
-    values.profile_image_url = profileImage;
-    values.profile.testimonials = testimonials;
 
-    // TODO: Right now, the category is hard coded to YOGA
-    // Later we'll need to make a dropdown of choices
-    values.profile.category = 'YOGA';
-
-    if (isPublicUrlAvaiable) {
+    if (isPublicUrlAvailable) {
       updateProfileDetails(values);
     } else {
       setIsLoading(false);
       message.error('Please enter valid username.');
     }
-  };
-
-  const onCoverImageUpload = (imageUrl) => {
-    setCoverImage(imageUrl);
-    form.setFieldsValue({
-      ...form.getFieldsValue(),
-      cover_image_url: imageUrl,
-    });
-  };
-
-  const onProfileImageUpload = (imageUrl) => {
-    setProfileImage(imageUrl);
-    form.setFieldsValue({
-      ...form.getFieldsValue(),
-      profile_image_url: imageUrl,
-    });
   };
 
   const handlePublicUrlChange = async (e) => {
@@ -254,9 +122,9 @@ const Profile = () => {
           username: e.target.value?.toLowerCase(),
         });
         if (data) {
-          setIsPublicUrlAvaiable(true);
+          setIsPublicUrlAvailable(true);
         } else {
-          setIsPublicUrlAvaiable(false);
+          setIsPublicUrlAvailable(false);
         }
         setIsLoadingUsernameCheck(false);
       } catch (error) {
@@ -266,331 +134,78 @@ const Profile = () => {
     }
   };
 
-  const addTestimonial = () => {
-    trackSimpleEvent(creator.click.profile.editForm.addEmbedCode);
-    if (testimonials) {
-      setTestimonials([...testimonials, form.getFieldValue().testimonials]);
-      form.setFieldsValue({ testimonials: '' });
-    } else {
-      setTestimonials([form.getFieldValue().testimonials]);
-      form.setFieldsValue({ testimonials: '' });
-    }
-  };
-
-  const trackAndNavigate = (destination, eventTag) => {
-    trackSimpleEvent(eventTag);
-    history.push(destination);
-  };
-
   return (
-    <Loader loading={isLoading} size="large" text="Loading profile">
-      {isOnboarding ? (
-        <OnboardSteps current={0} />
-      ) : (
-        <Row>
-          <Col span={24}>
-            <Button
-              className={styles.headButton}
-              icon={<ArrowLeftOutlined />}
-              onClick={() =>
-                trackAndNavigate('/creator/dashboard/profile', creator.click.profile.editForm.backToProfile)
-              }
+    <div className={styles.onboardingPage}>
+      <Loader loading={isLoading} size="large" text="Loading profile">
+        <div className={styles.formContainer}>
+          <div className={styles.formHeadingText}>Name your Site</div>
+          <div className={styles.formHeadingSubtext}>Set a public URL for your website</div>
+          <div className={styles.formContent}>
+            <Form
+              form={form}
+              onFinish={onFinish}
+              labelAlign={isMobileDevice ? 'left' : 'right'}
+              scrollToFirstError={true}
             >
-              Back
-            </Button>
-          </Col>
-        </Row>
-      )}
-      <Space size="middle" className={!isOnboarding && styles.mt30}>
-        <Typography>
-          <Title> {isOnboarding ? 'Setup' : 'Update'} Public Profile</Title>
-        </Typography>
-      </Space>
-
-      <Form
-        form={form}
-        {...profileFormItemLayout}
-        onFinish={onFinish}
-        labelAlign={isMobileDevice ? 'left' : 'right'}
-        scrollToFirstError={true}
-      >
-        {/* ========PRIMARY INFO======== */}
-        <Section>
-          <Row gutter={[8, 10]}>
-            <Col xs={24}>
-              <Title level={4}>1. Primary Information</Title>
-            </Col>
-            <Col xs={24}>
-              <Paragraph className={styles.mt10} type="secondary">
-                This is your public page on the internet, add a great closeup picture or your logo, a cover to define
-                your page and an a brief description to showcase yourself to your attendees.
-              </Paragraph>
-            </Col>
-            <Col xs={24}>
-              <div className={styles.imageWrapper}>
-                <Form.Item
-                  id="cover_image_url"
-                  name="cover_image_url"
-                  rules={validationRules.requiredValidation}
-                  wrapperCol={{ span: 24 }}
-                  className={styles.coverImageWrapper}
-                >
-                  <div>
-                    <ImageUpload
-                      className={classNames('avatar-uploader', styles.coverImage)}
-                      name="cover_image_url"
-                      onChange={onCoverImageUpload}
-                      value={coverImage}
-                      label={
-                        <>
-                          <Text type="danger">*</Text> Cover Photo (size of Facebook Cover Image)
-                        </>
-                      }
-                      overlayHelpText="Click to change image (size of Facebook Cover Image)"
-                    />
-                  </div>
+              <Form.Item className={styles.nameInputWrapper}>
+                <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
+                  <Input placeholder="First Name" />
                 </Form.Item>
-
-                <Form.Item
-                  id="profile_image_url"
-                  name="profile_image_url"
-                  rules={validationRules.requiredValidation}
-                  wrapperCol={{ span: 24 }}
-                  className={styles.profileImageWrapper}
-                >
-                  <div>
-                    <ImageUpload
-                      aspect={1}
-                      name="profile_image_url"
-                      className={classNames('avatar-uploader', styles.profileImage)}
-                      onChange={onProfileImageUpload}
-                      value={profileImage}
-                      label={
-                        <>
-                          <Text type="danger">*</Text> Profile Photo{' '}
-                        </>
-                      }
-                    />
-                  </div>
+                <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
+                  <Input placeholder="Last Name" />
                 </Form.Item>
-              </div>
-            </Col>
-          </Row>
-
-          <Form.Item label="Name" required className={styles.nameInputWrapper}>
-            <Form.Item className={styles.nameInput} name="first_name" rules={validationRules.nameValidation}>
-              <Input placeholder="First Name" />
-            </Form.Item>
-            <Form.Item className={styles.nameInput} name="last_name" rules={validationRules.nameValidation}>
-              <Input placeholder="Last Name" />
-            </Form.Item>
-          </Form.Item>
-
-          <Form.Item
-            className={classNames(styles.bgWhite, styles.textEditorLayout)}
-            label="Short bio"
-            name={['profile', 'bio']}
-          >
-            <TextEditor name={['profile', 'bio']} form={form} placeholder="  Please input your short bio" />
-          </Form.Item>
-
-          <Form.Item label="Public URL" required>
-            <Row align="middle" className={styles.alignUrl}>
-              <Col>
-                <Form.Item name="username" rules={validationRules.publicUrlValidation} onBlur={handlePublicUrlChange}>
-                  <Input placeholder="username" />
-                </Form.Item>
-              </Col>
-              <Col className={classNames(styles.ml10)}>
-                <Text>.passion.do</Text>
-              </Col>
-              {isLoadingUsernameCheck ? (
-                <Col className={classNames(styles.ml10)}>
-                  <Spin />
-                </Col>
-              ) : (
-                <Col className={classNames(styles.ml10)}>
-                  {isPublicUrlAvaiable ? (
-                    <Text type="success">
-                      <span className={classNames(styles.dot, styles.success)}></span> Available
-                    </Text>
-                  ) : (
-                    <Text type="danger">
-                      <span className={classNames(styles.dot, styles.danger)}></span> Unavailable
-                    </Text>
-                  )}
-                </Col>
-              )}
-            </Row>
-          </Form.Item>
-        </Section>
-
-        <Section>
-          <Collapse>
-            {/* =========ONLINE PRESENCE==== */}
-            <Panel header={<Title level={5}>2. Your other web links (Optional)</Title>} key="web_links">
-              <p className={styles.subtext}>Let people know where else to follow you on the internet</p>
-
-              <Form.Item label="Website" name={['profile', 'social_media_links', 'website']}>
-                <Input placeholder="Your website link" />
               </Form.Item>
 
-              <Form.Item label="Facebook" name={['profile', 'social_media_links', 'facebook_link']}>
-                <Input placeholder="Facebook profile link" />
-              </Form.Item>
+              <Form.Item>
+                <Row align="middle" gutter={[10, 10]} className={styles.alignUrl}>
+                  <Col xs={16} lg={12}>
+                    <Form.Item
+                      name="username"
+                      rules={validationRules.publicUrlValidation}
+                      normalize={(value) => value?.toLowerCase()}
+                      onBlur={handlePublicUrlChange}
+                    >
+                      <Input placeholder="Username" maxLength={30} />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={8} lg={12}>
+                    <Row gutter={8}>
+                      <Col xs={24} lg={10} lassName={styles.textAlignLeft}>
+                        <Text>.passion.do</Text>
+                      </Col>
 
-              <Form.Item label="Twitter" name={['profile', 'social_media_links', 'twitter_link']}>
-                <Input placeholder="Twitter profile link" />
-              </Form.Item>
-
-              <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
-                <Input placeholder="Instagram profile link" />
-              </Form.Item>
-
-              <Form.Item label="LinkedIn" name={['profile', 'social_media_links', 'linkedin_link']}>
-                <Input placeholder="LinkedIn profile link" />
-              </Form.Item>
-            </Panel>
-
-            {/* ========TESTIMONIALS======== */}
-            <Panel
-              header={<Title level={5}>3. Social testimonials from customers (Optional)</Title>}
-              key="testimonials"
-            >
-              <p className={styles.subtext}>
-                Get the embed code (not the normal link) from Instagram, Facebook, LinkedIn, Twitter, or any other
-                social media and see the preview once you add it
-              </p>
-
-              <Form.Item label="Embed code" name="testimonials">
-                <Input.TextArea rows={4} placeholder="Please input your short bio" />
-              </Form.Item>
-              <Form.Item {...profileFormTailLayout}>
-                <Row>
-                  <Col xs={24}>
-                    <Button className={styles.mb10} onClick={() => addTestimonial()}>
-                      <PlusOutlined /> Add
-                    </Button>
+                      <Col xs={24} lg={14} className={styles.textAlignLeft}>
+                        {isLoadingUsernameCheck ? (
+                          <Spin />
+                        ) : (
+                          <Text type={isPublicUrlAvailable ? 'success' : 'danger'}>
+                            <span
+                              className={classNames(styles.dot, isPublicUrlAvailable ? styles.success : styles.danger)}
+                            ></span>{' '}
+                            {isPublicUrlAvailable ? 'Available' : 'Unavailable'}
+                          </Text>
+                        )}
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
               </Form.Item>
 
-              <Form.Item {...(!isMobileDevice && profileTestimonialTailLayout)}>
-                <Row>
-                  {testimonials?.map((item, index) => (
-                    <Col xs={24} md={24} lg={12} key={index}>
-                      {item && item.length ? (
-                        <Card
-                          title="Preview"
-                          bordered={false}
-                          extra={
-                            <DeleteOutlined
-                              onClick={() => {
-                                trackSimpleEvent(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
-                                setTestimonials(testimonials.filter((_, i) => i !== index));
-                              }}
-                            />
-                          }
-                          className={styles.card}
-                          bodyStyle={{ padding: '0px', height: '600px', overflowY: 'scroll' }} // styles.cardbody is not working here
-                        >
-                          <EMCode>{parseEmbedCode(parse(item))}</EMCode>
-                        </Card>
-                      ) : null}
-                    </Col>
-                  ))}
-                </Row>
-              </Form.Item>
-            </Panel>
-          </Collapse>
-        </Section>
-        {/*}
-
-        <Section>
-          <Title level={4}>2. Online Presence</Title>
-          <p className={styles.subtext}>Let people know where else to follow you on social media</p>
-
-          <Form.Item label="Website" name={['profile', 'social_media_links', 'website']}>
-            <Input placeholder="Your website link" />
-          </Form.Item>
-
-          <Form.Item label="Facebook" name={['profile', 'social_media_links', 'facebook_link']}>
-            <Input placeholder="Facebook profile link" />
-          </Form.Item>
-
-          <Form.Item label="Twitter" name={['profile', 'social_media_links', 'twitter_link']}>
-            <Input placeholder="Twitter profile link" />
-          </Form.Item>
-
-          <Form.Item label="Instagram" name={['profile', 'social_media_links', 'instagram_link']}>
-            <Input placeholder="Instagram profile link" />
-          </Form.Item>
-
-          <Form.Item label="LinkedIn" name={['profile', 'social_media_links', 'linkedin_link']}>
-            <Input placeholder="LinkedIn profile link" />
-          </Form.Item>
-        </Section>
-
-        <Section>
-          <Title level={4}>3. Testimonials</Title>
-          <p className={styles.subtext}>Embed social media posts to add social proof on your public page</p>
-
-          <Form.Item label="Embed code" name="testimonials">
-            <Input.TextArea rows={4} placeholder="Please input your short bio" />
-          </Form.Item>
-          <Form.Item {...profileFormTailLayout}>
-            <Row>
-              <Col xs={24}>
-                <Button className={styles.mb10} onClick={() => addTestimonial()}>
-                  <PlusOutlined /> Add
-                </Button>
-              </Col>
-            </Row>
-          </Form.Item>
-
-          <Form.Item {...(!isMobileDevice && profileTestimonialTailLayout)}>
-            <Row>
-              {testimonials?.map((item, index) => (
-                <Col xs={24} md={24} lg={12} key={index}>
-                  {item && item.length ? (
-                    <Card
-                      title="Preview"
-                      bordered={false}
-                      extra={
-                        <DeleteOutlined
-                          onClick={() => {
-                            trackSimpleEvent(mixPanelEventTags.creator.click.profile.editForm.deleteEmbedCode);
-                            setTestimonials(testimonials.filter((_, i) => i !== index));
-                          }}
-                        />
-                      }
-                      className={styles.card}
-                      bodyStyle={{ padding: '0px', height: '600px', overflowY: 'scroll' }} // styles.cardbody is not working here
-                    >
-                      <EMCode>{parseEmbedCode(parse(item))}</EMCode>
-                    </Card>
-                  ) : null}
-                </Col>
-              ))}
-            </Row>
-          </Form.Item>
-        </Section>
-
-*/}
-        {/* ====PREVIEW AND PUBLISH====== */}
-        <Section>
-          <Row justify="center">
-            <Col>
               <Form.Item>
-                <Button htmlType="submit" type="primary">
-                  Publish Page
+                <Button
+                  disabled={!isPublicUrlAvailable}
+                  className={styles.submitButton}
+                  htmlType="submit"
+                  type="primary"
+                >
+                  Continue
                 </Button>
               </Form.Item>
-            </Col>
-          </Row>
-        </Section>
-      </Form>
-    </Loader>
+            </Form>
+          </div>
+        </div>
+      </Loader>
+    </div>
   );
 };
 

@@ -14,6 +14,7 @@ const ImageUpload = ({
   value,
   label,
   onChange,
+  listType = 'picture-card',
   showUploadList = false,
   multiple = false,
   name,
@@ -57,10 +58,10 @@ const ImageUpload = ({
   };
 
   return (
-    <ImgCrop shape={shape} aspect={aspect}>
+    <ImgCrop shape={shape} aspect={aspect} modalOk="Confirm Image">
       <Upload
         className={classNames(className, value ? styles.hideBorder : styles.showBorder)}
-        listType="picture-card"
+        listType={listType}
         name={name}
         multiple={multiple}
         customRequest={handleImageUpload}

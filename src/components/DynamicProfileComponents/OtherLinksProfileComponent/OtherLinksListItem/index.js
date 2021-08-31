@@ -11,10 +11,18 @@ const { Title } = Typography;
 
 const OtherLinksListItem = ({ link }) => {
   return (
-    <div style={{ backgroundColor: link.backgroundColor }} className={styles.linkItem}>
-      <Title level={5} style={{ color: link.textColor }} className={styles.linkItemTitle}>
-        {' '}
-        {link.title}{' '}
+    <div
+      style={{
+        backgroundColor: link.backgroundColor.includes('#') ? link.backgroundColor : `#${link.backgroundColor}`,
+      }}
+      className={styles.linkItem}
+    >
+      <Title
+        level={5}
+        style={{ color: link.textColor.includes('#') ? link.textColor : `#${link.textColor}` }}
+        className={styles.linkItemTitle}
+      >
+        {link.title}
       </Title>
     </div>
   );
